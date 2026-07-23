@@ -98,6 +98,37 @@ project.
 ## Status
 
 - [x] `README.md` — full 50-lesson roadmap, 12 epics
-- [x] `00-developer-environment.md`
-- [x] `01-your-first-wpf-window.md`
-- [ ] Lessons 2–50 — write on request, in order
+- [x] `Lesson-00-developer-environment.md`
+- [x] `Lesson-01-your-first-wpf-window.md`
+- [x] `Lesson-02-grid-and-the-visual-tree.md`
+- [x] `Lesson-03-frame-page-navigation.md`
+- [x] `Lesson-04-the-navigation-stack.md`
+- [x] `Lesson-05-styles-and-resource-dictionaries.md`
+- [ ] Lessons 6–50 — write on request, in order
+
+## Filename convention
+
+Lesson files are named `Lesson-NN-slug.md` (two-digit zero-padded number,
+e.g. `Lesson-06-fields-classes-and-list.md`), not a bare `NN-slug.md`. The
+site's doc renderer (`src/components/docs/MarkdownHub.jsx`, `displayName()`)
+strips a leading bare `^\d+-` pattern from the displayed title — a filename
+starting with a digit loses its number in the UI. Prefixing with `Lesson-`
+avoids that, since the string no longer starts with a digit. Keep this
+convention for every lesson from here on; don't revert to the bare
+`NN-slug.md` pattern lessons 0–1 originally used.
+
+## Independence from the Android track
+
+`../track/` (Android) and this project cover a lot of the same ground —
+SQLite, list/detail UI, validation at a boundary, navigation stacks — on
+purpose, per the README's own "why a sibling project" framing. That
+framing is about the *product concept* being deliberately duplicated
+across platforms so the universal parts become visible by contrast. It is
+**not** license to lighten a WPF lesson's own explanation because the
+Android track already covered the same idea. Every hard concept still
+gets its own full lab, walkthrough, and both lenses here, from zero, as if
+the Android track didn't exist — a "Also recognized in: ...the Android
+track" line in a Recognition list is fine (that's the CS Lens doing its
+job, per `LESSON_CONTRACT.md`'s Recognition section), but it must never
+stand in for the WPF-side explanation itself. This project is meant to
+stand alone.

@@ -31,7 +31,7 @@ to the Memento pattern behind undo/redo — is taught exactly once, at the exact
 lesson that first needs it, inside a project that keeps growing instead of
 getting thrown away. That single sequence *is* your reference afterward: when
 you forget how nullable value types work, you don't hunt through five old
-homework folders — you go back to [Lesson 14](14-nullable-purchase-info.md),
+homework folders — you go back to [Lesson 14](Lesson-14-nullable-purchase-info.md),
 because that's the lesson that needed them first.
 
 This does **not** mean every C# fundamental gets dumped on you in Lesson 0.
@@ -138,7 +138,7 @@ and `var` (including the exact `var` gotcha that prompted this project:
 unlike `int x, y;`); and finally the first WPF project — a window that opens
 and shows text, which is where Lesson 1 picks up.
 
-→ [`00-developer-environment.md`](00-developer-environment.md)
+→ [`Lesson-00-developer-environment.md`](Lesson-00-developer-environment.md)
 
 ---
 
@@ -325,6 +325,10 @@ written before all fifty lessons are, the same way every other project in
 this curriculum (`cam/`, `PDM/`, `track/`) was built a handful of lessons at
 a time rather than all at once. Written so far:
 
-- [x] [Lesson 0 — Developer Environment](00-developer-environment.md)
-- [x] [Lesson 1 — Your First WPF Window](01-your-first-wpf-window.md)
-- [ ] Lessons 2–50 — write on request, in order
+- [x] [Lesson 0 — Developer Environment](Lesson-00-developer-environment.md)
+- [x] [Lesson 1 — Your First WPF Window](Lesson-01-your-first-wpf-window.md)
+- [x] [Lesson 2 — Grid and the Visual Tree](Lesson-02-grid-and-the-visual-tree.md)
+- [x] [Lesson 3 — Frame/Page Navigation](Lesson-03-frame-page-navigation.md)
+- [x] [Lesson 4 — The Navigation Stack](Lesson-04-the-navigation-stack.md)
+- [x] [Lesson 5 — Styles and Resource Dictionaries](Lesson-05-styles-and-resource-dictionaries.md)
+- [ ] Lessons 6–50 — write on request, in order
