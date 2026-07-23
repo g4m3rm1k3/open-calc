@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BLOG_MANIFEST } from '../posts/manifest.ts'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
+import {ChevronDown, ChevronRight} from 'lucide-react'
+
 
 // Metadata for all posts comes from the build-time manifest (see
 // scripts/build-blog-manifest.mjs) instead of eager-loading every post's
@@ -14,6 +16,62 @@ const ALL_POSTS = [...BLOG_MANIFEST].sort((a, b) => {
   }
   return 0
 })
+
+function SeriesFolder({ folderName, posts, readSet, navigate }) {
+  // Private state for this specific folder instance
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      
+      {/* 1. We added cursor-pointer and an onClick handler to the header */}
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className="px-5 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {/* 2. We render a Chevron icon based on the state */}
+          {isOpen ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
+          
+          <span className="text-base">📚</span>
+          <span className="font-semibold text-slate-900 dark:text-white text-sm">{folderName}</span>
+        </div>
+        <span className="text-xs text-slate-400 dark:text-slate-500">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
+      </div>
+      
+      {/* 3. We conditionally render the list, and wrap it in a scrollable div */}
+      {isOpen && (
+        <div className="max-h-[300px] overflow-y-auto">
+          {posts.map((post, i) => (
+            
+            <button
+              key={post.slug}
+              onClick={() => navigate(`/blog/${post.slug}`)}
+              className="w-full text-left flex items-center gap-4 px-5 py-3.5 border-b last:border-b-0 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group"
+            >
+              <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-right shrink-0">{i + 1}.</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors whitespace-normal break-words leading-snug">
+                  {post.title}
+                </p>
+                {post.excerpt && (
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{post.excerpt}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {readSet.has(post.slug) && (
+                  <span title="Read" className="text-emerald-600 dark:text-emerald-400 text-xs">✓</span>
+                )}
+                <span className="text-xs text-slate-400 dark:text-slate-500">{post.readMin} min</span>
+              </div>
+            </button>
+            
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function BlogListPage() {
   const navigate = useNavigate()
@@ -97,41 +155,15 @@ export default function BlogListPage() {
       {filtered === null && (
         <div className="space-y-8">
           {/* Series groups */}
+          {/* Series groups */}
           {Object.entries(series).map(([folderName, posts]) => (
-            <div key={folderName} className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="px-5 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">📚</span>
-                  <span className="font-semibold text-slate-900 dark:text-white text-sm">{folderName}</span>
-                </div>
-                <span className="text-xs text-slate-400 dark:text-slate-500">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
-              </div>
-              <div>
-                {posts.map((post, i) => (
-                  <button
-                    key={post.slug}
-                    onClick={() => navigate(`/blog/${post.slug}`)}
-                    className="w-full text-left flex items-center gap-4 px-5 py-3.5 border-b last:border-b-0 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group"
-                  >
-                    <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-right shrink-0">{i + 1}.</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors whitespace-normal break-words leading-snug">
-                        {post.title}
-                      </p>
-                      {post.excerpt && (
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{post.excerpt}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {readSet.has(post.slug) && (
-                        <span title="Read" className="text-emerald-600 dark:text-emerald-400 text-xs">✓</span>
-                      )}
-                      <span className="text-xs text-slate-400 dark:text-slate-500">{post.readMin} min</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <SeriesFolder 
+              key={folderName} 
+              folderName={folderName} 
+              posts={posts} 
+              readSet={readSet} 
+              navigate={navigate} 
+            />
           ))}
 
           {/* Standalone posts */}
