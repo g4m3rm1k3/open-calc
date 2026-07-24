@@ -18,10 +18,10 @@ function Heading({ level, children }) {
   const text = typeof children === 'string' ? children : ''
   const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
   const sizeMap = {
-    1: 'text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-6 leading-tight',
-    2: 'text-2xl font-bold text-slate-800 dark:text-slate-100 mt-10 mb-4 leading-snug border-b border-slate-200 dark:border-slate-700 pb-3',
-    3: 'text-xl font-semibold text-slate-700 dark:text-slate-200 mt-8 mb-3',
-    4: 'text-lg font-semibold text-slate-600 dark:text-slate-300 mt-6 mb-2',
+    1: 'text-4xl font-extrabold tracking-tight mt-12 mb-8 leading-tight text-transparent bg-clip-text bg-gradient-to-br from-brand-400 via-sky-500 to-indigo-600',
+    2: 'text-3xl font-bold tracking-tight mt-10 mb-6 leading-snug border-b border-slate-200/50 dark:border-slate-700/50 pb-4 text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-sky-500',
+    3: 'text-2xl font-semibold mt-8 mb-4 text-sky-600 dark:text-sky-400',
+    4: 'text-xl font-medium mt-6 mb-3 text-indigo-600 dark:text-indigo-400',
   }
   const Tag = tag
   return <Tag id={id} className={sizeMap[level] || 'text-base font-semibold mt-4 mb-2'}>{children}</Tag>
@@ -63,7 +63,7 @@ export const proseComponents = {
   },
 
   strong({ children }) {
-    return <strong className="font-semibold text-slate-900 dark:text-white">{children}</strong>
+    return <strong className="font-bold text-brand-600 dark:text-brand-400">{children}</strong>
   },
 
   em({ children }) {

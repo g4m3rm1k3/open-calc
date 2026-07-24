@@ -34,6 +34,7 @@ import {
   Volume2,
   Square,
   Type,
+  Settings,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
 import { useSpeech, cleanForSpeech } from '../../utils/useSpeech.js'
@@ -45,6 +46,7 @@ import {
 } from '../../utils/inlineRunner.js'
 import { getThemeStyles, STUDIO_THEMES } from '../../utils/studioThemes.js'
 import { useGlobalTheme, FONT_OPTIONS } from '../../context/ThemeContext.jsx'
+import CodeSettingsModal, { getCodeFontFamily, getCodeFontSize } from '../ui/CodeSettingsModal.jsx'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
 
@@ -188,15 +190,16 @@ function getMdCss(md) {
 .md-body img { max-width: 100%; border-radius: 8px; border: 1px solid ${md.imgBorder}; }
 .md-body .katex-display { overflow-x: auto; overflow-y: hidden; }
 .md-body .katex-display pre { display: inline-block; text-align: left; background: none; border: none; margin: 0; padding: 0; font-size: 0.9em; color: ${md.text}; }
-.md-code-block { margin: 0 0 1.2em; border-radius: 8px; overflow: hidden; border: 1px solid ${md.codeHeaderBorder}; }
-.md-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 14px; background: ${md.codeHeaderBg}; border-bottom: 1px solid ${md.codeHeaderBorder}; }
-.md-code-lang { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: ${md.codeLangText}; font-family: 'JetBrains Mono', monospace; }
-.md-code-actions { display: flex; gap: 5px; }
-.md-code-btn { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 4px; border: 1px solid ${md.codeBtnBorder}; background: ${md.codeBtnBg}; color: ${md.codeBtnText}; cursor: pointer; transition: all 0.15s; font-family: system-ui; line-height: 1.8; }
-.md-code-btn:hover { background: ${md.codeBtnHoverBg}; color: ${md.codeBtnHoverText}; }
-.md-code-btn.copied { color: #16a34a !important; border-color: #86efac !important; }
-.md-code-btn.run { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
-.md-code-btn.run:hover { background: #e0f2fe; }
+.md-code-block { margin: 0 0 1.2em; border-radius: 8px; border: 1px solid ${md.codeHeaderBorder}; box-shadow: 0 4px 20px -5px rgba(99,102,241,0.3), inset 0 0 0 1px rgba(99,102,241,0.15); transition: all 0.3s ease; }
+.md-code-block:hover { box-shadow: 0 8px 30px -5px rgba(99,102,241,0.4), inset 0 0 0 1px rgba(99,102,241,0.25), 0 0 15px rgba(99,102,241,0.2); }
+.md-code-header { border-top-left-radius: 8px; border-top-right-radius: 8px; background: linear-gradient(135deg, ${md.codeHeaderBg} 0%, rgba(99,102,241,0.15) 50%, rgba(14,165,233,0.1) 100%); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(99,102,241,0.3); border-top: 1px solid rgba(99,102,241,0.4); position: relative; }
+.md-code-lang { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; background: linear-gradient(to right, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 10px rgba(129,140,248,0.2); }
+.md-code-actions { display: flex; gap: 8px; align-items: center; }
+.md-code-btn { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: 1px solid ${md.codeBtnBorder}; background: ${md.codeBtnBg}; color: ${md.codeBtnText}; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 6px; font-family: system-ui; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.md-code-btn:hover { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.4); color: #818cf8; box-shadow: 0 2px 10px rgba(99,102,241,0.2); transform: translateY(-1px); }
+.md-code-btn:active { transform: translateY(0); }
+.md-code-btn.run { background: linear-gradient(135deg, #6366f1, #0ea5e9); color: white; border: none; box-shadow: 0 2px 10px rgba(99,102,241,0.4); }
+.md-code-btn.run:hover { opacity: 0.9; box-shadow: 0 4px 15px rgba(99,102,241,0.6); color: white; }
 .md-code-monaco { overflow: hidden; }
 .md-code-monaco .monaco-editor .overflow-guard { border-radius: 0; }
 .md-resize-handle { height: 6px; cursor: row-resize; background: ${md.resizeHandleBg}; display: flex; align-items: center; justify-content: center; transition: background 0.15s; border-radius: 0 0 8px 8px; }
@@ -273,7 +276,11 @@ function openInCodeLens(code, language, navigateFn) {
 }
 
 function MdCodeBlock({ language, code }) {
-  const { isDark, monacoTheme, onRun, codeAlongOpen, onNavigate } = useContext(DocsCtx)
+  const { isDarkGlobal, themeStyles, codeTypography } = useGlobalTheme()
+  const isDark = isDarkGlobal
+  
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const { monacoTheme, onRun, codeAlongOpen, onNavigate } = useContext(DocsCtx)
   const [copied, setCopied] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [editorHeight, setEditorHeight] = useState(() =>
@@ -449,9 +456,21 @@ function MdCodeBlock({ language, code }) {
               {codeAlongOpen ? '→ Workspace' : 'Code Along →'}
             </button>
           )}
-          <button onClick={handleDownload} className="md-code-btn">↓</button>
-          <button onClick={handleCopy} className={`md-code-btn${copied ? ' copied' : ''}`}>
-            {copied ? '✓' : 'Copy'}
+          <div className="relative">
+            <button onClick={() => setSettingsOpen(!settingsOpen)} className="md-code-btn" title="Code Settings">
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+            <CodeSettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+          </div>
+          <button onClick={handleDownload} className="md-code-btn" title="Download snippet">
+            <Download className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`md-code-btn${copied ? ' copied' : ''}`}
+            title="Copy to clipboard"
+          >
+            {copied ? '✓ Copied' : 'Copy'}
           </button>
         </div>
       </div>
@@ -472,8 +491,9 @@ function MdCodeBlock({ language, code }) {
             lineNumbersMinChars: 3,
             folding: false,
             wordWrap: 'off',
-            fontSize: 13,
-            fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
+            fontSize: parseInt(getCodeFontSize(codeTypography.fontSize)),
+            fontFamily: getCodeFontFamily(codeTypography.font),
+            fontLigatures: codeTypography.ligatures,
             renderLineHighlight: runnable ? 'line' : 'none',
             overviewRulerLanes: 0,
             hideCursorInOverviewRuler: true,
@@ -1000,7 +1020,7 @@ function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, line
 
       {pages.map((sections, pageIdx) => {
         const isIntro = pageIdx === 0
-        const widthClass = width === 'narrow' ? 'max-w-3xl mx-auto' : width === 'normal' ? 'max-w-5xl mx-auto' : 'w-full'
+        const widthClass = width === 'narrow' ? 'max-w-3xl mx-auto' : width === 'normal' ? 'max-w-5xl mx-auto' : 'max-w-[1400px] mx-auto'
         const pageClasses = `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || 'border-slate-200 dark:border-slate-800'} w-full ${widthClass}`
 
         const getFontFamily = (f) => {

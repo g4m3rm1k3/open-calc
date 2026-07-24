@@ -194,9 +194,29 @@ export function ThemeProvider({ children }) {
     });
   }, []);
 
+  const [codeTypography, setCodeTypographyState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('oc-code-typography');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      font: 'jetbrains',
+      fontSize: 'sm',
+      ligatures: true
+    };
+  });
+
+  const setCodeTypography = useCallback((newPrefs) => {
+    setCodeTypographyState(prev => {
+      const updated = { ...prev, ...newPrefs };
+      localStorage.setItem('oc-code-typography', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography }),
-    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography]
+    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography]
   );
 
   return (

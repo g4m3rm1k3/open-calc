@@ -144,12 +144,14 @@ export function HighlightedCode({ code, language }) {
     <div className="flex overflow-hidden">
       <pre
         aria-hidden
-        className="m-0 py-4 pl-4 pr-3 text-[13px] leading-[1.6] font-mono select-none text-slate-500 dark:text-slate-600 border-r border-slate-600/25 flex-shrink-0 bg-transparent"
+        className="m-0 py-4 pl-4 pr-3 leading-[1.6] select-none text-slate-500 dark:text-slate-600 border-r border-slate-600/25 flex-shrink-0 bg-transparent"
+        style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
       >
         {lineNums}
       </pre>
       <pre
-        className="m-0 py-4 pl-4 pr-4 text-[13px] leading-[1.6] overflow-x-auto font-mono bg-transparent flex-1 min-w-0"
+        className="m-0 py-4 pl-4 pr-4 leading-[1.6] overflow-x-auto bg-transparent flex-1 min-w-0"
+        style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

@@ -4,6 +4,7 @@ import BlogPost from '../components/blog/BlogPost.jsx'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import { BLOG_MANIFEST } from '../posts/manifest.ts'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
+import { useGlobalTheme } from '../context/ThemeContext.jsx'
 
 // Loader functions only (no `eager: true`) — a post's full body is fetched
 // on demand for the one slug being viewed, not inlined for all 130+ posts
@@ -105,6 +106,7 @@ function SeriesNav({ currentSlug, navigate, readSlugs }) {
 export default function BlogPostPage() {
   const { '*': slug } = useParams()
   const navigate = useNavigate()
+  const { typography } = useGlobalTheme()
 
   // undefined = loading, null = not found, string = loaded content
   const [content, setContent] = useState(undefined)
@@ -142,7 +144,7 @@ export default function BlogPostPage() {
 
   if (content === null) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-24 text-center">
+      <div className="max-w-[1400px] mx-auto px-4 py-24 text-center">
         <p className="text-6xl mb-6">📄</p>
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">Post not found</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-8">No post with slug "{slug}".</p>
@@ -156,8 +158,10 @@ export default function BlogPostPage() {
     )
   }
 
+  const widthClass = typography?.width === 'narrow' ? 'max-w-3xl' : typography?.width === 'normal' ? 'max-w-5xl' : 'max-w-[1400px]'
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 pb-24">
+    <div className={`${widthClass} mx-auto px-4 py-10 pb-24 transition-all duration-300`}>
       <div className="mb-8 flex items-center justify-between">
         <button
           onClick={() => navigate('/blog')}
