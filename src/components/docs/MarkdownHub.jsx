@@ -33,6 +33,7 @@ import {
   Menu,
   Volume2,
   Square,
+  Type,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
 import { useSpeech, cleanForSpeech } from '../../utils/useSpeech.js'
@@ -608,7 +609,12 @@ function ConceptEmbed({ docPath, title }) {
             <span className="text-slate-500 animate-pulse text-sm">Loading concept...</span>
           ) : (
             <span className="block w-full">
-              <SectionedMarkdown content={content} />
+              <SectionedMarkdown 
+                content={content} 
+                ui={themeStyles?.ui} 
+                accentColor={themeStyles?.accentHex || '#0ea5e9'} 
+                isDark={themeStyles?.isDark} 
+              />
             </span>
           )}
         </span>
@@ -900,6 +906,33 @@ function normalizeDisplayMath(text) {
     .join('\n')
 }
 
+function splitIntoPages(markdown) {
+  const lines = markdown.split('\n')
+  const pages = []
+  let currentPage = []
+  let inCodeBlock = false
+  
+  for (const line of lines) {
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock
+    }
+    
+    if (line.startsWith('## ') && !inCodeBlock) {
+      if (currentPage.length > 0) {
+        pages.push(currentPage.join('\n'))
+      }
+      currentPage = [line]
+    } else {
+      currentPage.push(line)
+    }
+  }
+  if (currentPage.length > 0) {
+    pages.push(currentPage.join('\n'))
+  }
+  
+  return pages
+}
+
 function splitMarkdownSections(markdown) {
   const sections = []
   const fenceRe = /^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm
@@ -916,11 +949,14 @@ function splitMarkdownSections(markdown) {
   return sections
 }
 
-function SectionedMarkdown({ content }) {
+function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, lineHeight }) {
   const { speak, stop } = useSpeech()
   const [playingIdx, setPlayingIdx] = useState(null)
   const playingIdxRef = useRef(null)
-  const sections = useMemo(() => splitMarkdownSections(content), [content])
+  
+  const pages = useMemo(() => {
+    return splitIntoPages(content).map(pageContent => splitMarkdownSections(pageContent))
+  }, [content])
 
   useEffect(() => () => { stop() }, [content, stop]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -941,46 +977,85 @@ function SectionedMarkdown({ content }) {
     }
   }, [speak, stop])
 
-  return sections.map((section, idx) => {
-    if (section.type === 'code') {
-      return (
-        <ReactMarkdown
-          key={idx}
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeRaw, rehypeKatex]}
-          components={MD_COMPONENTS}
-        >
-          {section.content}
-        </ReactMarkdown>
-      )
-    }
-    const isPlaying = playingIdx === idx
-    return (
-      <div key={idx} className="relative group">
-        <button
-          onClick={() => handlePlay(idx, section.content)}
-          title={isPlaying ? 'Stop reading' : 'Read aloud'}
-          className={`absolute top-0 right-0 z-10 flex items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium rounded border transition-all ${
-            isPlaying
-              ? 'opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20'
-              : 'opacity-0 group-hover:opacity-100 text-slate-400 border-slate-200 bg-white/90 dark:bg-slate-800/90 dark:border-slate-700 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
-          }`}
-        >
-          {isPlaying
-            ? <><Square className="w-2.5 h-2.5 fill-current" />&nbsp;Stop</>
-            : <><Volume2 className="w-2.5 h-2.5" />&nbsp;Read</>
+  return (
+    <div className="space-y-6 sm:space-y-8 pb-24">
+      {/* Dynamic style for the H1 in the intro page so we can use the accentColor */}
+      <style>{`
+        .intro-page-content h1 {
+          font-size: 2.5rem;
+          line-height: 1.1;
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          background: linear-gradient(135deg, ${accentColor}, ${accentColor}80);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 1.5rem;
+        }
+        @media (min-width: 640px) {
+          .intro-page-content h1 {
+            font-size: 3.5rem;
           }
-        </button>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeRaw, rehypeKatex]}
-          components={MD_COMPONENTS}
-        >
-          {normalizeDisplayMath(convertTexDelimiters(section.content))}
-        </ReactMarkdown>
-      </div>
-    )
-  })
+        }
+      `}</style>
+
+      {pages.map((sections, pageIdx) => {
+        const isIntro = pageIdx === 0
+        const widthClass = width === 'narrow' ? 'max-w-3xl mx-auto' : width === 'normal' ? 'max-w-5xl mx-auto' : 'w-full'
+        const pageClasses = `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || 'border-slate-200 dark:border-slate-800'} w-full ${widthClass}`
+
+        return (
+          <div key={pageIdx} className={pageClasses}>
+            <div className={`md-body ${isIntro ? 'intro-page-content' : ''}`} style={{
+              fontFamily: font === 'serif' ? 'ui-serif, Georgia, serif' : font === 'mono' ? 'ui-monospace, monospace' : 'system-ui, sans-serif',
+              lineHeight: lineHeight === 'compact' ? '1.4' : lineHeight === 'relaxed' ? '1.8' : '1.6'
+            }}>
+              {sections.map((section, secIdx) => {
+                const globalIdx = `${pageIdx}-${secIdx}`
+                if (section.type === 'code') {
+                  return (
+                    <ReactMarkdown
+                      key={globalIdx}
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={MD_COMPONENTS}
+                    >
+                      {section.content}
+                    </ReactMarkdown>
+                  )
+                }
+                const isPlaying = playingIdx === globalIdx
+                return (
+                  <div key={globalIdx} className="relative group mt-4">
+                    <button
+                      onClick={() => handlePlay(globalIdx, section.content)}
+                      title={isPlaying ? 'Stop reading' : 'Read aloud'}
+                      className={`absolute -top-3 -right-3 z-10 flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md border transition-all shadow-sm ${
+                        isPlaying
+                          ? 'opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20'
+                          : `opacity-0 group-hover:opacity-100 text-slate-500 bg-white border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700`
+                      }`}
+                    >
+                      {isPlaying
+                        ? <><Square className="w-2.5 h-2.5 fill-current" />&nbsp;Stop</>
+                        : <><Volume2 className="w-2.5 h-2.5" />&nbsp;Read</>
+                      }
+                    </button>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={MD_COMPONENTS}
+                    >
+                      {normalizeDisplayMath(convertTexDelimiters(section.content))}
+                    </ReactMarkdown>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function MarkdownHub() {
@@ -1002,6 +1077,15 @@ export default function MarkdownHub() {
   const [editorName, setEditorName] = useState('')
   const [editorContent, setEditorContent] = useState('')
   const editorInstanceRef = useRef(null)
+
+  const [readingFont, setReadingFont] = useState(() => localStorage.getItem('mdhub_font') || 'sans')
+  const [readingWidth, setReadingWidth] = useState(() => localStorage.getItem('mdhub_width') || 'wide')
+  const [readingLineHeight, setReadingLineHeight] = useState(() => localStorage.getItem('mdhub_line_height') || 'relaxed')
+  const [typographyOpen, setTypographyOpen] = useState(false)
+  
+  useEffect(() => { localStorage.setItem('mdhub_font', readingFont) }, [readingFont])
+  useEffect(() => { localStorage.setItem('mdhub_width', readingWidth) }, [readingWidth])
+  useEffect(() => { localStorage.setItem('mdhub_line_height', readingLineHeight) }, [readingLineHeight])
 
   // Toolbar insert for the Monaco-backed editor below — real snippet/tabstop
   // support, same mechanism as the Lesson Builder's MarkdownCellEditor.
@@ -1478,7 +1562,7 @@ export default function MarkdownHub() {
       />
 
       <div className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[1650]`}>
-        <div className={`h-16 ${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-10 w-full overflow-x-auto custom-scrollbar gap-4 transition-all duration-300`}>
+        <div className={`h-16 ${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 w-full gap-4 transition-all duration-300 overflow-visible`}>
           
           {/* ── LEFT SECTION: Navigation & Context ── */}
           <div className="flex items-center gap-3 shrink-0">
@@ -1545,6 +1629,50 @@ export default function MarkdownHub() {
                 ))}
               </select>
               <ChevronDown className={`w-3.5 h-3.5 absolute right-2.5 top-2 pointer-events-none ${ui.txt2} group-hover:${ui.txt1} transition-colors`} />
+            </div>
+
+            <div className={`w-px h-6 ${ui.border} mx-1 hidden lg:block border-l opacity-50`}></div>
+
+            {/* Typography picker */}
+            <div className="relative hidden lg:block">
+              <button
+                onClick={() => setTypographyOpen(!typographyOpen)}
+                className={`p-1.5 rounded-full border border-transparent ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-all duration-300 hover:scale-105 ${typographyOpen ? ui.bg0 : ''}`}
+                title="Typography settings"
+              >
+                <Type className="w-4 h-4" />
+              </button>
+              
+              {typographyOpen && (
+                <div className={`absolute top-full right-0 mt-3 w-64 p-4 rounded-xl shadow-xl border ${ui.border} ${ui.bg0} z-50`}>
+                  <div className="space-y-4">
+                    <div>
+                      <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Font Family</label>
+                      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        {['sans', 'serif', 'mono'].map(f => (
+                          <button key={f} onClick={() => setReadingFont(f)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingFont === f ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{f}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Reading Width</label>
+                      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        {['narrow', 'normal', 'wide'].map(w => (
+                          <button key={w} onClick={() => setReadingWidth(w)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingWidth === w ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{w}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Line Height</label>
+                      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        {['compact', 'standard', 'relaxed'].map(lh => (
+                          <button key={lh} onClick={() => setReadingLineHeight(lh)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingLineHeight === lh ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{lh}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={`w-px h-6 ${ui.border} mx-1 hidden lg:block border-l opacity-50`}></div>
@@ -1837,9 +1965,9 @@ export default function MarkdownHub() {
                 {loading ? (
                   <div className="text-slate-500 text-sm animate-pulse">Loading document...</div>
                 ) : (
-                  <div className="md-body mx-auto">
+                  <div className="w-full">
                     {activeFile && (
-                      <div className="mb-6 flex items-center gap-2 flex-wrap">
+                      <div className="mb-6 flex items-center gap-2 flex-wrap px-4">
                         <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500">
                           {activeFile.replace('/src/docs/', '')}
                         </span>
@@ -1850,7 +1978,15 @@ export default function MarkdownHub() {
                         )}
                       </div>
                     )}
-                    <SectionedMarkdown content={content} />
+                    <SectionedMarkdown 
+                      content={content} 
+                      ui={themeStyles.ui} 
+                      accentColor={accentColor} 
+                      isDark={themeStyles.isDark} 
+                      font={readingFont}
+                      width={readingWidth}
+                      lineHeight={readingLineHeight}
+                    />
                   </div>
                 )}
               </div>
@@ -1870,12 +2006,17 @@ export default function MarkdownHub() {
             )}
 
             {tab === 'editor' && activeDocType && previewMode && (
-              <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar"
+              <div className="flex-1 overflow-y-auto px-2 sm:px-4 lg:px-6 py-8 custom-scrollbar"
                 style={{ background: isDark ? themeStyles.md.preBg + '80' : 'rgba(248,250,252,0.5)' }}>
-                <div className="md-body mx-auto p-8 rounded-xl shadow-sm border min-h-full"
-                  style={{ background: isDark ? themeStyles.md.preBg : '#ffffff', borderColor: isDark ? themeStyles.md.preBorder : '#e2e8f0' }}>
-                  <SectionedMarkdown content={editorContent} />
-                </div>
+                <SectionedMarkdown 
+                  content={editorContent} 
+                  ui={themeStyles.ui} 
+                  accentColor={accentColor} 
+                  isDark={themeStyles.isDark} 
+                  font={readingFont}
+                  width={readingWidth}
+                  lineHeight={readingLineHeight}
+                />
               </div>
             )}
 
