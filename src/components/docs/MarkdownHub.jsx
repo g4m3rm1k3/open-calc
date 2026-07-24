@@ -949,7 +949,21 @@ function splitMarkdownSections(markdown) {
   return sections
 }
 
-function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, lineHeight }) {
+const FONT_OPTIONS = [
+  { id: 'sans', name: 'System Sans' },
+  { id: 'serif', name: 'System Serif' },
+  { id: 'mono', name: 'System Mono' },
+  { id: 'arial', name: 'Arial' },
+  { id: 'helvetica', name: 'Helvetica' },
+  { id: 'georgia', name: 'Georgia' },
+  { id: 'times', name: 'Times New Roman' },
+  { id: 'verdana', name: 'Verdana' },
+  { id: 'trebuchet', name: 'Trebuchet MS' },
+  { id: 'courier', name: 'Courier New' },
+  { id: 'consolas', name: 'Consolas' },
+]
+
+function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, lineHeight, fontSize, textAlign }) {
   const { speak, stop } = useSpeech()
   const [playingIdx, setPlayingIdx] = useState(null)
   const playingIdxRef = useRef(null)
@@ -1003,11 +1017,40 @@ function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, line
         const widthClass = width === 'narrow' ? 'max-w-3xl mx-auto' : width === 'normal' ? 'max-w-5xl mx-auto' : 'w-full'
         const pageClasses = `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || 'border-slate-200 dark:border-slate-800'} w-full ${widthClass}`
 
+        const getFontFamily = (f) => {
+          switch(f) {
+            case 'sans': return 'system-ui, sans-serif'
+            case 'serif': return 'ui-serif, Georgia, serif'
+            case 'mono': return 'ui-monospace, monospace'
+            case 'arial': return 'Arial, sans-serif'
+            case 'helvetica': return 'Helvetica, Arial, sans-serif'
+            case 'georgia': return 'Georgia, serif'
+            case 'times': return '"Times New Roman", Times, serif'
+            case 'verdana': return 'Verdana, Geneva, sans-serif'
+            case 'trebuchet': return '"Trebuchet MS", sans-serif'
+            case 'courier': return '"Courier New", Courier, monospace'
+            case 'consolas': return 'Consolas, "JetBrains Mono", "Cascadia Code", monospace'
+            default: return 'system-ui, sans-serif'
+          }
+        }
+        
+        const getFontSize = (fs) => {
+          switch(fs) {
+            case 'sm': return '0.875rem'
+            case 'base': return '1rem'
+            case 'lg': return '1.125rem'
+            case 'xl': return '1.25rem'
+            default: return '1rem'
+          }
+        }
+
         return (
           <div key={pageIdx} className={pageClasses}>
             <div className={`md-body ${isIntro ? 'intro-page-content' : ''}`} style={{
-              fontFamily: font === 'serif' ? 'ui-serif, Georgia, serif' : font === 'mono' ? 'ui-monospace, monospace' : 'system-ui, sans-serif',
-              lineHeight: lineHeight === 'compact' ? '1.4' : lineHeight === 'relaxed' ? '1.8' : '1.6'
+              fontFamily: getFontFamily(font),
+              lineHeight: lineHeight === 'compact' ? '1.4' : lineHeight === 'relaxed' ? '1.8' : '1.6',
+              fontSize: getFontSize(fontSize),
+              textAlign: textAlign === 'justify' ? 'justify' : 'left'
             }}>
               {sections.map((section, secIdx) => {
                 const globalIdx = `${pageIdx}-${secIdx}`
@@ -1081,11 +1124,15 @@ export default function MarkdownHub() {
   const [readingFont, setReadingFont] = useState(() => localStorage.getItem('mdhub_font') || 'sans')
   const [readingWidth, setReadingWidth] = useState(() => localStorage.getItem('mdhub_width') || 'wide')
   const [readingLineHeight, setReadingLineHeight] = useState(() => localStorage.getItem('mdhub_line_height') || 'relaxed')
+  const [readingFontSize, setReadingFontSize] = useState(() => localStorage.getItem('mdhub_font_size') || 'base')
+  const [readingTextAlign, setReadingTextAlign] = useState(() => localStorage.getItem('mdhub_text_align') || 'left')
   const [typographyOpen, setTypographyOpen] = useState(false)
   
   useEffect(() => { localStorage.setItem('mdhub_font', readingFont) }, [readingFont])
   useEffect(() => { localStorage.setItem('mdhub_width', readingWidth) }, [readingWidth])
   useEffect(() => { localStorage.setItem('mdhub_line_height', readingLineHeight) }, [readingLineHeight])
+  useEffect(() => { localStorage.setItem('mdhub_font_size', readingFontSize) }, [readingFontSize])
+  useEffect(() => { localStorage.setItem('mdhub_text_align', readingTextAlign) }, [readingTextAlign])
 
   // Toolbar insert for the Monaco-backed editor below — real snippet/tabstop
   // support, same mechanism as the Lesson Builder's MarkdownCellEditor.
@@ -1617,7 +1664,7 @@ export default function MarkdownHub() {
           <div className="flex items-center gap-3 shrink-0">
             
             {/* Theme picker */}
-            <div className="relative hidden lg:block group">
+            <div className="relative hidden sm:block group">
               <select
                 value={studioTheme}
                 onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
@@ -1631,10 +1678,10 @@ export default function MarkdownHub() {
               <ChevronDown className={`w-3.5 h-3.5 absolute right-2.5 top-2 pointer-events-none ${ui.txt2} group-hover:${ui.txt1} transition-colors`} />
             </div>
 
-            <div className={`w-px h-6 ${ui.border} mx-1 hidden lg:block border-l opacity-50`}></div>
+            <div className={`w-px h-6 ${ui.border} mx-1 hidden sm:block border-l opacity-50`}></div>
 
             {/* Typography picker */}
-            <div className="relative hidden lg:block">
+            <div className="relative hidden sm:block">
               <button
                 onClick={() => setTypographyOpen(!typographyOpen)}
                 className={`p-1.5 rounded-full border border-transparent ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-all duration-300 hover:scale-105 ${typographyOpen ? ui.bg0 : ''}`}
@@ -1644,13 +1691,36 @@ export default function MarkdownHub() {
               </button>
               
               {typographyOpen && (
-                <div className={`absolute top-full right-0 mt-3 w-64 p-4 rounded-xl shadow-xl border ${ui.border} ${ui.bg0} z-50`}>
+                <div className={`absolute top-full right-0 mt-3 w-72 p-4 rounded-xl shadow-xl border ${ui.border} ${ui.bg0} z-50`}>
                   <div className="space-y-4">
                     <div>
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Font Family</label>
+                      <div className="relative group">
+                        <select
+                          value={readingFont}
+                          onChange={(e) => setReadingFont(e.target.value)}
+                          className={`appearance-none w-full text-xs font-semibold rounded-lg pl-3 pr-8 py-2 border border-transparent bg-slate-100 dark:bg-slate-800 ${ui.txt1} cursor-pointer focus:outline-none hover:opacity-90`}
+                        >
+                          {FONT_OPTIONS.map(f => (
+                            <option key={f.id} value={f.id}>{f.name}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className={`w-3.5 h-3.5 absolute right-2.5 top-2.5 pointer-events-none ${ui.txt2} group-hover:${ui.txt1} transition-colors`} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Font Size</label>
                       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                        {['sans', 'serif', 'mono'].map(f => (
-                          <button key={f} onClick={() => setReadingFont(f)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingFont === f ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{f}</button>
+                        {['sm', 'base', 'lg', 'xl'].map(fs => (
+                          <button key={fs} onClick={() => setReadingFontSize(fs)} className={`flex-1 uppercase text-[10px] py-1.5 rounded-md transition-colors ${readingFontSize === fs ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{fs}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Text Align</label>
+                      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        {['left', 'justify'].map(ta => (
+                          <button key={ta} onClick={() => setReadingTextAlign(ta)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingTextAlign === ta ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{ta}</button>
                         ))}
                       </div>
                     </div>
@@ -1675,7 +1745,7 @@ export default function MarkdownHub() {
               )}
             </div>
 
-            <div className={`w-px h-6 ${ui.border} mx-1 hidden lg:block border-l opacity-50`}></div>
+            <div className={`w-px h-6 ${ui.border} mx-1 hidden sm:block border-l opacity-50`}></div>
 
             {/* AI / Tools */}
             <div className="flex items-center gap-2">
@@ -1986,6 +2056,8 @@ export default function MarkdownHub() {
                       font={readingFont}
                       width={readingWidth}
                       lineHeight={readingLineHeight}
+                      fontSize={readingFontSize}
+                      textAlign={readingTextAlign}
                     />
                   </div>
                 )}
@@ -2016,6 +2088,8 @@ export default function MarkdownHub() {
                   font={readingFont}
                   width={readingWidth}
                   lineHeight={readingLineHeight}
+                  fontSize={readingFontSize}
+                  textAlign={readingTextAlign}
                 />
               </div>
             )}
