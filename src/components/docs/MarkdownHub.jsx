@@ -164,7 +164,7 @@ function savePersonal(files) {
 
 function getMdCss(md) {
   return `
-.md-body { line-height: 1.75; font-size: 15px; max-width: 860px; color: ${md.text}; }
+.md-body { line-height: 1.75; font-size: 15px; color: ${md.text}; }
 .md-body h1 { font-size: 2em; font-weight: 700; margin: 0 0 0.5em; color: ${md.h1}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.3em; }
 .md-body h2 { font-size: 1.4em; font-weight: 700; margin: 1.8em 0 0.5em; color: ${md.h2}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.2em; }
 .md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: ${md.h3}; }
