@@ -395,11 +395,16 @@ a smaller scale.
 ### Project Change
 
 - **Reference Source:** No reference counterpart.
-- **Files affected:** New file
-  `app/src/main/java/.../InventoryAdapter.java` (this unit adds just
-  the inner `ViewHolder` piece; the full Adapter class is the next
-  unit).
-- **Change type:** Create.
+- **Files affected:** None yet. This fragment is a preview to type and
+  understand in isolation — **do not create `InventoryAdapter.java`
+  yet.** A bare `static class` cannot legally be the only thing in a
+  `.java` file: `static` on a class only means something for a class
+  nested *inside* another one — this lesson's own Nested Classes unit,
+  above — and there's no outer class here yet for it to nest inside.
+  Saving this fragment alone would fail to compile. The next Concept
+  Unit wraps it inside `InventoryAdapter` and gives you the complete,
+  real, compilable file to actually create.
+- **Change type:** Preview only — nothing saved to disk yet.
 
 ### The New Code
 
@@ -416,9 +421,11 @@ static class InventoryViewHolder extends RecyclerView.ViewHolder {
 
 ### The Updated Project
 
-This is new, freestanding code with no existing structure to land
-inside yet — it becomes a nested class inside `InventoryAdapter`, shown
-whole in the next Concept Unit once the surrounding class exists.
+There is no real file to show this landing inside yet, on purpose —
+this is exactly the code that becomes a nested class inside
+`InventoryAdapter`, shown whole, as one complete and actually
+compilable file, in the next Concept Unit. Hold onto it; don't type it
+into a new file by itself.
 
 ### Mechanical Walkthrough
 
