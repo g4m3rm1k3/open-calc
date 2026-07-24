@@ -210,6 +210,175 @@ definitions themselves (one `class`, many instances).
 
 ---
 
+## Concept Unit: Nested Classes, and What `static` Actually Changes
+
+### The Problem
+
+The `ViewHolder` you're about to build lives *inside* `InventoryAdapter`
+— a class defined inside another class. Java allows this, but a nested
+class can be written two different ways with a real behavioral
+difference between them, and the keyword that decides which one you get
+is the same `static` keyword you'll also see used to mean something
+else entirely on plain fields and methods elsewhere in this project.
+Both uses are worth seeing together, once, rather than guessing at
+`static`'s meaning fresh each time it reappears.
+
+### Introduce the Concept in Isolation
+
+First, nested classes — a regular one, and a `static` one, side by
+side:
+
+```java
+class Outer {
+    private int secret = 42;
+
+    class Inner {
+        void reveal() {
+            System.out.println("Inner can see Outer's secret: " + secret);
+        }
+    }
+
+    static class StaticNested {
+        void reveal() {
+            System.out.println("StaticNested has no access to any Outer instance's fields");
+        }
+    }
+}
+
+public class NestedDemo {
+    public static void main(String[] args) {
+        Outer outer = new Outer();
+
+        Outer.Inner inner = outer.new Inner();
+        inner.reveal();
+
+        Outer.StaticNested nested = new Outer.StaticNested();
+        nested.reveal();
+    }
+}
+```
+
+Compile and run this yourself:
+
+```
+javac NestedDemo.java
+java NestedDemo
+```
+
+Real output — verified this session:
+
+```text
+Inner can see Outer's secret: 42
+StaticNested has no access to any Outer instance's fields
+```
+
+Notice `outer.new Inner()` — genuinely unusual-looking syntax, and
+worth seeing why it's required. Try creating an `Inner` the way you'd
+expect, with no `Outer` instance involved:
+
+```java
+Outer.Inner inner = new Outer.Inner();
+```
+
+Real output — this fails to *compile*:
+
+```text
+error: an enclosing instance that contains Outer.Inner is required
+        Outer.Inner inner = new Outer.Inner();
+                            ^
+```
+
+What this proves: a non-static (`Inner`) nested class silently carries
+a hidden reference to *the specific `Outer` instance that created it* —
+that's how `reveal()` reaches `secret` with no parameter passed at all
+— and the compiler refuses to create one without that instance existing
+first. `StaticNested`, by contrast, carries no such hidden reference:
+it can be created with a plain `new`, and it has no way to reach any
+particular `Outer`'s fields at all, even if it wanted to.
+
+Now the *other* meaning of `static` — on an ordinary field, not a nested
+class:
+
+```java
+class Counter {
+    static int totalCreated = 0;
+    int id;
+
+    Counter() {
+        totalCreated++;
+        id = totalCreated;
+    }
+}
+
+public class StaticDemo {
+    public static void main(String[] args) {
+        Counter a = new Counter();
+        Counter b = new Counter();
+        Counter c = new Counter();
+
+        System.out.println("a.id=" + a.id + ", b.id=" + b.id + ", c.id=" + c.id);
+        System.out.println("Counter.totalCreated=" + Counter.totalCreated);
+    }
+}
+```
+
+Real output — verified this session:
+
+```text
+a.id=1, b.id=2, c.id=3
+Counter.totalCreated=3
+```
+
+What this proves: `id` (no `static`) gets its own separate copy per
+`Counter` instance — `1`, `2`, `3`, one each. `totalCreated` (`static`)
+has exactly **one** copy, shared by every `Counter` that has ever been
+created, which is why it correctly reads `3` after three constructions,
+addressable through the class name (`Counter.totalCreated`) rather than
+through any particular instance.
+
+### Discard the Throwaway Example
+
+Delete `Outer`, `Inner`, `StaticNested`, `NestedDemo`, `Counter`, and
+`StaticDemo` — the real project's own static nested class,
+`InventoryViewHolder`, is built next.
+
+### CS Lens
+
+Both uses of `static` are really the same underlying idea, applied in
+two different positions: **"belongs to the type itself, not to any one
+instance of it."** A `static` field is shared, one copy, across every
+instance — not "this object's own copy" like `id` is. A `static` nested
+class is not tied to any one *enclosing* instance — it doesn't get the
+hidden reference a non-static nested class does. Neither reads or
+depends on "which particular object are we inside of right now"; that's
+the one idea underneath both.
+
+### SE Lens
+
+**Why would `InventoryViewHolder` want to give up the hidden reference
+to its enclosing `Adapter` — isn't more access generally more useful?**
+Not here: a `ViewHolder` only ever needs to know about the one row's
+own views (cached in Lesson 5's field pattern), never about the
+`Adapter` that built it. A non-static inner class would still compile
+and work, but it would silently hold onto a reference to its specific
+`Adapter` instance for the `ViewHolder`'s entire lifetime, for no actual
+benefit — an unnecessary coupling, and, at real scale, an unnecessary
+memory cost (as long as any single `ViewHolder` is kept alive, its
+hidden enclosing reference keeps the whole `Adapter` alive too). `static`
+here is a deliberate "this class genuinely doesn't need that," stated
+directly rather than left as an accident of which syntax happened to be
+used.
+
+### Connection
+
+`InventoryViewHolder`, next, is a `static` nested class for exactly this
+reason — and later in this project, `static` reappears once more on a
+field (`AppDatabase`'s single shared instance, Lesson 13) — the same
+"shared, not per-instance" idea from `Counter.totalCreated` here, applied
+to a real, larger design.
+
+---
+
 ## Concept Unit: `ViewHolder` — One Object Per Visible Row, Not Per Data Item
 
 ### The Problem
@@ -254,14 +423,13 @@ whole in the next Concept Unit once the surrounding class exists.
 ### Mechanical Walkthrough
 
 - `static class InventoryViewHolder extends RecyclerView.ViewHolder` —
-  **first appearance, as a group.** `static` on a nested class means it
-  doesn't hold an implicit reference to an instance of its enclosing
-  class (unlike the click-listener lambdas you've written so far,
-  which *do* capture their enclosing Activity) — appropriate here
-  because a `ViewHolder` only needs to know about one row's views, not
-  about the Activity or Adapter that created it. `extends
-  RecyclerView.ViewHolder` is the required base class — the library's
-  own contract for what counts as a "holder of a row's views."
+  the `static class` part is **reappearing**, from this lesson's own
+  Nested Classes unit above — `InventoryViewHolder` gives up the hidden
+  reference to its enclosing `Adapter` for exactly the reason that unit
+  named: it only ever needs its own row's views, never the `Adapter`
+  itself. `extends RecyclerView.ViewHolder` is the required base
+  class — the library's own contract for what counts as a "holder of a
+  row's views."
 - `TextView itemNameText;` — **reappearing** (field declaration, from
   Lesson 5), new detail: package-private (no modifier) rather than
   `private`, a deliberate choice so the enclosing `Adapter` class (next
@@ -305,6 +473,163 @@ measurable, visible jank on the phones of that era. The `ViewHolder`
 class costs you one extra type to define and reason about, in exchange
 for making "look up my views" a one-time cost per holder object rather
 than a per-scroll-frame cost.
+
+---
+
+## Concept Unit: Generics — One Class, Many Types, Checked at Compile Time
+
+### The Problem
+
+The `Adapter` you're about to build needs to store a list of data (for
+now, item names) and hand that same list to `RecyclerView`. A `List`
+that could hold *anything* — any type, mixed together — sounds
+flexible, but it pushes a real problem to the moment you actually read
+an item back out: you'd have to guess, and cast, and hope you guessed
+right.
+
+### Introduce the Concept in Isolation
+
+See the actual failure first, with a deliberately "flexible" box that
+holds anything at all:
+
+```java
+class ObjectBox {
+    private Object value;
+
+    void set(Object value) {
+        this.value = value;
+    }
+
+    Object get() {
+        return value;
+    }
+}
+
+public class GenericsDemoBad {
+    public static void main(String[] args) {
+        ObjectBox box = new ObjectBox();
+        box.set("hello");
+
+        Integer number = (Integer) box.get();
+        System.out.println(number);
+    }
+}
+```
+
+Compile and run this yourself:
+
+```
+javac GenericsDemoBad.java
+java GenericsDemoBad
+```
+
+Real output — this compiles fine, then crashes:
+
+```text
+Exception in thread "main" java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer (java.lang.String and java.lang.Integer are in module java.base of loader 'bootstrap')
+	at GenericsDemoBad.main(GenericsDemoBad.java:18)
+```
+
+What this proves: `ObjectBox` compiled without complaint even though
+`box` was set to a `String` and read back as an `Integer` — `Object`
+can hold anything, so the compiler has no way to catch the mismatch.
+The bug only surfaces at runtime, as a crash, and only because this
+particular test happened to exercise the wrong combination.
+
+Now the fix — the same class, made **generic**:
+
+```java
+class Box<T> {
+    private T value;
+
+    void set(T value) {
+        this.value = value;
+    }
+
+    T get() {
+        return value;
+    }
+}
+
+public class GenericsDemoGood {
+    public static void main(String[] args) {
+        Box<String> box = new Box<>();
+        box.set("hello");
+
+        String value = box.get();
+        System.out.println(value);
+    }
+}
+```
+
+Real output — verified this session:
+
+```text
+hello
+```
+
+Now prove the compiler actually catches the mismatch this time, rather
+than crashing later:
+
+```java
+Box<String> box = new Box<>();
+box.set(42);
+```
+
+Real output — this genuinely fails to *compile*:
+
+```text
+GenericsDemoReject.java:16: error: incompatible types: int cannot be converted to String
+        box.set(42);
+                ^
+```
+
+What this proves: `Box<T>` is one class definition that works
+correctly for `Box<String>`, `Box<Integer>`, or any other type — `T` is
+a placeholder, filled in with a real type wherever `Box` is actually
+used — and the compiler enforces, for each specific instance, that only
+the matching type ever goes in or comes out. The exact same class of
+mistake `ObjectBox` let through silently, `Box<T>` rejects immediately,
+at compile time, with a clear error pointing at the exact line.
+
+### Discard the Throwaway Example
+
+Delete `ObjectBox`, `Box`, and both demo classes — the real project
+uses `List<String>`, part of the standard library, built on this exact
+same mechanism.
+
+### Mechanical Walkthrough
+
+- `class Box<T>` — the `<T>` after the class name declares a **type
+  parameter**: `T` is a stand-in name (by convention a single capital
+  letter), filled in with a real, concrete type — `String`, `Integer`,
+  anything — at the point `Box` is actually used.
+- `Box<String> box = new Box<>();` — `<String>` on the left fills in
+  what `T` means for *this specific* `box` variable; `<>` on the right
+  (the **diamond operator**) means "infer the type from the left-hand
+  side" rather than repeating `<String>` twice.
+- `private T value;` / `void set(T value)` / `T get()` — every place
+  `Box` mentions "the type it holds," it uses `T` instead of a fixed
+  type — the compiler substitutes the real type in for every specific
+  instance.
+
+### CS Lens
+
+This is **generic programming** — writing one class or method that
+works correctly across many types, with the compiler checking each
+specific use for you, rather than either duplicating the class per
+type (`StringBox`, `IntegerBox`, ...) or using a common supertype like
+`Object` and losing all compile-time checking. `List<String>` — which
+the real `Adapter`, next, is built around — is the standard library's
+own `Box`-like generic class, already written for you.
+
+### Connection
+
+`List<String>` in the `Adapter` you're about to build is exactly this
+mechanism, already provided by the standard library — a real `List`
+holding real `String`s, with the compiler rejecting any attempt to
+insert or retrieve the wrong type, the same guarantee `Box<T>` just
+demonstrated.
 
 ---
 
@@ -389,22 +714,25 @@ it wraps.
 ### Mechanical Walkthrough
 
 - `class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`
-  — **first appearance, as a group**, split into two ideas: extending
-  `RecyclerView.Adapter` is the required base class contract (same
-  "must extend the framework's class" idea as `AppCompatActivity` in
-  Lesson 2, different base class); the `<...>` part is a **generic type
-  parameter** — first appearance in this curriculum — telling the
-  compiler *which* ViewHolder subtype this specific adapter works with,
-  so that methods like `onCreateViewHolder` below can be declared to
-  return `InventoryViewHolder` specifically rather than a plain
+  — split into two ideas: extending `RecyclerView.Adapter` is the
+  required base class contract (same "must extend the framework's
+  class" idea as `AppCompatActivity` in Lesson 2, different base
+  class); the `<...>` part is **reappearing**, from this lesson's own
+  Generics unit above — `RecyclerView.Adapter<VH>` is a generic class
+  much like `Box<T>` was, and this line fills in its type parameter
+  with `InventoryViewHolder`, telling the compiler *which* ViewHolder
+  subtype this specific adapter works with, so that methods like
+  `onCreateViewHolder` below can be declared to return
+  `InventoryViewHolder` specifically rather than a plain
   `RecyclerView.ViewHolder` the caller would have to cast.
 - `private final List<String> itemNames;` — **first appearance of
   `final` on a field.** `final` means this field's reference can be
   assigned exactly once (in the constructor) and never reassigned
   afterward — appropriate here because the Adapter is handed one list
   object to display and isn't meant to swap it out for a different list
-  later. `List<String>` is the same generic-type idea as above, applied
-  to the standard library's `List` interface.
+  later. `List<String>` is **reappearing** (the Generics unit above),
+  applied to the standard library's `List` interface: this specific
+  list is locked to holding `String`s only, compiler-enforced.
 - `InventoryAdapter(List<String> itemNames) { this.itemNames = itemNames; }`
   — **reappearing** (constructor, from the ViewHolder unit), new detail
   worth a clause: `this.itemNames` disambiguates the field from the
@@ -600,6 +928,9 @@ to be correct matters. Restore it afterward.
 
 - [ ] You ran the wasteful `addView()` loop yourself, saw it work, and
       can explain in your own words why it doesn't scale.
+- [ ] You ran the `Outer`/`Inner`/`StaticNested` and `Counter` labs and
+      can explain, concretely, both what `static` changes on a nested
+      class and what it changes on a field.
 - [ ] The inventory screen shows a real scrolling list of five items
       through `RecyclerView`, not hardcoded views.
 - [ ] You can name what `onCreateViewHolder` and `onBindViewHolder` are
@@ -607,6 +938,9 @@ to be correct matters. Restore it afterward.
       recycling.
 - [ ] You broke `getItemCount()` on purpose, saw the blank result, and
       restored it.
+- [ ] You ran the `ObjectBox`/`Box<T>` generics lab yourself — saw the
+      `Object` version crash at runtime, then saw the generic version
+      catch the exact same mistake at compile time instead.
 - [ ] Commit: message explaining why (e.g. "Replace placeholder
       InventoryActivity with a real RecyclerView-backed item list,
       since a manual addView loop doesn't scale past a handful of

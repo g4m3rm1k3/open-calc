@@ -15,8 +15,8 @@ await fs.rm(staging, { recursive: true, force: true })
 await fs.mkdir(staging, { recursive: true })
 
 // Copy Electron entry files
-await fs.copyFile(path.join(appDir, 'main.mjs'),    path.join(staging, 'main.mjs'))
-await fs.copyFile(path.join(appDir, 'preload.mjs'), path.join(staging, 'preload.mjs'))
+await fs.copyFile(path.join(appDir, 'main.cjs'),    path.join(staging, 'main.cjs'))
+await fs.copyFile(path.join(appDir, 'preload.cjs'), path.join(staging, 'preload.cjs'))
 
 // Read version from desktop/app/package.json (already synced by sync-desktop-package)
 const appPkg = JSON.parse(await fs.readFile(path.join(appDir, 'package.json'), 'utf8'))
@@ -28,8 +28,7 @@ const stagingPkg = {
   description: appPkg.description ?? '',
   author:      appPkg.author ?? '',
   license:     appPkg.license ?? 'GPL-3.0-or-later',
-  type:        'module',
-  main:        'main.mjs',
+  main:        'main.cjs',
 
   build: {
     appId:       'org.opencalc.desktop',
@@ -40,7 +39,7 @@ const stagingPkg = {
     },
 
     // Only the Electron process files go into app.asar
-    files: ['main.mjs', 'preload.mjs'],
+    files: ['main.cjs', 'preload.cjs'],
 
     // Frontend build + backend live outside asar so Node can read them at runtime
     extraResources: [
@@ -77,4 +76,4 @@ await fs.writeFile(
 )
 
 console.log(`desktop/staging/ ready  (v${appPkg.version})`)
-console.log('  main.mjs  preload.mjs  package.json')
+console.log('  main.cjs  preload.cjs  package.json')

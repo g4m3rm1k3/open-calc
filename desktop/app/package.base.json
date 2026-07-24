@@ -3,8 +3,7 @@
   "productName": "UpSkillOS",
   "description": "Portable desktop shell for UpSkillOS",
   "license": "GPL-3.0-or-later",
-  "type": "module",
-  "main": "main.mjs",
+  "main": "main.cjs",
   "author": "UpSkillOS contributors",
   "dependencies": {}
 }

@@ -330,6 +330,88 @@ successfully as a *number* — negative-number rejection is a separate,
 deliberate business rule you'll add next, not something `parseInt`
 itself objects to.
 
+### One More Thing: This Exception Didn't Ask Your Permission
+
+`NumberFormatException` never required you to write `try`/`catch` at
+all — the very first `ParseDemo` above, with no `try` anywhere,
+compiled and ran fine (it just crashed when actually executed). Not
+every exception in Java behaves this way. See the difference directly:
+
+```java
+import java.io.FileReader;
+
+public class CheckedDemo {
+    public static void main(String[] args) {
+        FileReader reader = new FileReader("missing.txt");
+        System.out.println("Opened file");
+    }
+}
+```
+
+Try to compile this — no need to run it:
+
+```
+javac CheckedDemo.java
+```
+
+Real output — this genuinely fails to *compile*, not just run:
+
+```text
+CheckedDemo.java:5: error: unreported exception FileNotFoundException; must be caught or declared to be thrown
+        FileReader reader = new FileReader("missing.txt");
+                            ^
+1 error
+```
+
+Now add a `try`/`catch`, the same mechanism you just used above:
+
+```java
+import java.io.FileReader;
+import java.io.IOException;
+
+public class CheckedDemo {
+    public static void main(String[] args) {
+        try {
+            FileReader reader = new FileReader("missing.txt");
+            System.out.println("Opened file");
+        } catch (IOException e) {
+            System.out.println("Caught checked exception: " + e.getMessage());
+        }
+    }
+}
+```
+
+Real output — verified this session:
+
+```text
+Caught checked exception: missing.txt (No such file or directory)
+```
+
+What this proves: Java has two real categories of exception.
+`NumberFormatException` is **unchecked** — the compiler never forces
+you to handle it; skipping `try`/`catch` compiles fine and only fails
+at *runtime*, exactly what you saw at the top of this unit.
+`FileNotFoundException` (a subtype of `IOException`) is **checked** —
+the compiler refuses to compile any code that might throw it unless
+you either catch it (as here) or explicitly declare `throws IOException`
+on the enclosing method, pushing the responsibility to *its* caller
+instead. Both categories are still real exceptions, still unwind the
+stack the same way if uncaught at runtime — the difference is entirely
+about what the compiler is willing to let you get away with *before*
+you ever run the program.
+
+### CS Lens
+
+This is a genuine Java-specific design choice, not a universal
+language feature — Kotlin and C# (if you've touched either elsewhere in
+this curriculum) have no checked/unchecked distinction at all; every
+exception behaves the way `NumberFormatException` does here. Java's bet
+was that certain failures (I/O, mainly — reading a file, opening a
+network connection) are common and consequential enough that the
+compiler should force every caller, all the way up the call chain, to
+consciously decide how to handle them, rather than trusting each
+developer to remember on their own.
+
 ### Discard the Throwaway Example
 
 Delete `ParseDemo.java` — the real project validates real form input
@@ -652,6 +734,9 @@ happening for real because the boundary check was removed. Restore the
       succeeding.
 - [ ] You ran the `ParseDemo` lab yourself and saw both the uncaught
       crash and the caught, handled version.
+- [ ] You ran the `CheckedDemo` lab and saw the checked exception refuse
+      to *compile* until handled — a real, different failure mode than
+      `NumberFormatException`'s runtime-only crash.
 - [ ] Valid input shows a confirmation `Toast` and returns to the list.
 - [ ] You broke the `try`/`catch` on purpose, saw the real crash, and
       restored it.

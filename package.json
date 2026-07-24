@@ -4,7 +4,7 @@
   "description": "An open-source interactive STEM learning platform — intuition first, rigor always",
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "main": "desktop/app/main.mjs",
+  "main": "desktop/app/main.cjs",
   "workspaces": [
     "packages/*"
   ],

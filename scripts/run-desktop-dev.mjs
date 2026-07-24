@@ -42,10 +42,10 @@ console.log('Vite ready — launching Electron')
 
 // ── 3. Launch Electron ───────────────────────────────────────────────────────
 
-const electronBin = require.resolve('electron')
+const electronBin = require('electron')
 const electron = spawn(
   electronBin,
-  [path.join(root, 'desktop/app/main.mjs')],
+  [path.join(root, 'desktop/app/main.cjs')],
   {
     cwd: root,
     stdio: 'inherit',

@@ -220,3 +220,78 @@ Static typing and `var` vs. Python's dynamic assignment, nullable value
 types, `decimal` vs. floating point, enums, LINQ-adjacent collection types,
 `ICommand`, and the .NET publishing pipeline (`dotnet publish`,
 self-contained deployment).
+
+---
+
+### 9. The Bowling Game — Test-Driven Development in Java
+**Folder:** `bowling-game-tdd/` — [Full lesson plan](bowling-game-tdd/README.md)
+
+Build Robert C. Martin's classic "Bowling Game Kata" — a ten-pin scoring
+engine — strictly test-first, then grow it past the kata's original small
+scope into a real multi-player, persisted bowling alley with a leaderboard
+and a text console. A deliberate second TDD exercise alongside Kent Beck's
+own `Money` example (which this student already owns the book for), chosen
+because its incremental scoring rules (open frame → spare → strike → the
+tenth frame) are naturally shaped like a red-green-refactor lesson sequence.
+
+Every Epic 1 lesson opens with a real failing test, run and shown genuinely
+failing, before any production code exists — the red-green-refactor cycle
+*is* this project's adaptation of the standard Concept Unit sequence.
+Lesson 8 shows the kata's famous real design fork (a flat-array scoring
+engine vs. an object-oriented `Frame`-based one) side by side, with honest
+tradeoffs, rather than resolving it prematurely.
+
+**Java taught (assuming Python/JavaScript, not "no programming
+experience"):** primitives vs. wrapper classes and autoboxing, `==` vs.
+`.equals()`, access modifiers, generics (including bounded type
+parameters), enums with real behavior, checked vs. unchecked exceptions,
+the Collections Framework, `Optional`, the Stream API, and `record` —
+revealed late, after hand-writing the boilerplate it replaces, and
+cross-referenced directly against Kotlin's `data class` and C#'s `record`
+from this curriculum's other two language tracks.
+
+**Software engineering taught:** the TDD cycle itself, "fake it till you
+make it" as a legitimate intermediate step, dependency inversion via
+interfaces, and refactoring backed by a real test suite as the concrete
+version of Kent Beck's central argument.
+
+The companion values-and-practices half of this ask — pairing, sustainable
+pace, courage, simplicity, from *Extreme Programming Explained* — lives
+separately as an independently-readable blog-post series in `src/posts/`,
+not as part of this project's lessons.
+
+---
+
+### 10. Snake — Objects, Messages, and Design Patterns in C#
+**Folder:** `snake-csharp/` — [Full lesson plan](snake-csharp/README.md)
+
+A classic arcade game — Snake — built entirely in a terminal, no graphics
+library or engine, in C#. Deliberately standalone: assumes no other lesson in
+this curriculum, only real programming experience in some other language.
+Paced to be finishable in a focused week rather than a term, with every
+lesson ending in a real, playable change — the whole project is built around
+that immediate payoff.
+
+Taught around Alan Kay's own reframing of "object-oriented" as fundamentally
+about **messaging** between independent objects, not class hierarchies — a
+direct answer to "why do real frameworks use Factory, Dependency Injection,
+and Pub/Sub." Interfaces are introduced as message contracts; C# events are
+shown as Kay's idea realized directly; dependency injection is taught as
+"declare what messages you need answered, don't construct your own concrete
+dependencies" — each one explicitly connected back to that framing, not left
+implicit.
+
+**Design patterns taught:** State (menu/playing/paused/game over as real
+objects), Publish/Subscribe (C# `event`/`Action<T>`, score and achievement
+systems), Dependency Injection (a swappable real/fake renderer, the
+mechanism behind ASP.NET Core's DI container), Strategy (a swappable AI
+opponent), Factory (food variety), and Singleton — deliberately included to
+be honestly critiqued, not endorsed, and contrasted against DI as the
+pattern that actually solves the same problem correctly.
+
+**C# and .NET taught:** real-time console input and rendering,
+`LinkedList<T>` as a deliberate data-structure choice (and why, over
+`List<T>`), interfaces vs. abstract classes, properties and encapsulation,
+generics (a hand-written generic grid), and unit testing with real `xUnit` —
+made possible specifically by the dependency-injection lesson that precedes
+it.

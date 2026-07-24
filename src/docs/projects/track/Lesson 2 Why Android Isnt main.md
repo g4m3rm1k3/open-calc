@@ -327,6 +327,182 @@ code entirely.
 
 ---
 
+## Concept Unit: Access Modifiers — The Four Levels, Side by Side
+
+### The Problem
+
+`onCreate` is `protected`, just proven above to matter — the OS can
+call it, but arbitrary unrelated code can't. But `protected` is only
+one of four access levels Java has, and seeing just one of them in
+isolation doesn't show what makes it different from the other three.
+Before moving on, see all four side by side, in one small real project,
+rather than meeting each one separately, once, wherever it happens to
+come up over the following lessons.
+
+### Introduce the Concept in Isolation
+
+Two packages, four fields, one field per access level:
+
+```java
+// vaultpkg/Vault.java
+package vaultpkg;
+
+public class Vault {
+    public int publicField = 1;
+    protected int protectedField = 2;
+    int packagePrivateField = 3;   // no modifier at all
+    private int privateField = 4;
+}
+```
+
+```java
+// vaultpkg/SamePackageAccess.java — same package, unrelated class
+package vaultpkg;
+
+public class SamePackageAccess {
+    public static void main(String[] args) {
+        Vault v = new Vault();
+        System.out.println("Same-package class sees: " + v.publicField
+            + ", " + v.protectedField + ", " + v.packagePrivateField);
+    }
+}
+```
+
+```java
+// otherpkg/Sub.java — different package, but a SUBCLASS of Vault
+package otherpkg;
+import vaultpkg.Vault;
+
+public class Sub extends Vault {
+    public static void main(String[] args) {
+        Sub s = new Sub();
+        System.out.println("Subclass in another package sees: "
+            + s.publicField + ", " + s.protectedField);
+    }
+}
+```
+
+```java
+// otherpkg/Unrelated.java — different package, no inheritance at all
+package otherpkg;
+import vaultpkg.Vault;
+
+public class Unrelated {
+    public static void main(String[] args) {
+        Vault v = new Vault();
+        System.out.println("Unrelated class in another package sees: "
+            + v.publicField);
+    }
+}
+```
+
+Compile and run all four yourself, from the folder containing both
+`vaultpkg/` and `otherpkg/`:
+
+```
+javac vaultpkg/Vault.java vaultpkg/SamePackageAccess.java otherpkg/Sub.java otherpkg/Unrelated.java
+java vaultpkg.SamePackageAccess
+java otherpkg.Sub
+java otherpkg.Unrelated
+```
+
+Real output — verified this session:
+
+```text
+Same-package class sees: 1, 2, 3
+Subclass in another package sees: 1, 2
+Unrelated class in another package sees: 1
+```
+
+What this proves, reading the three lines together: `publicField`
+(`1`) is visible in all three. `protectedField` (`2`) is visible to
+`SamePackageAccess` (same package) *and* `Sub` (a subclass, even in a
+different package) but not to `Unrelated`. `packagePrivateField` (`3`,
+no modifier) is visible only to `SamePackageAccess` — same package,
+inheritance doesn't matter. `privateField` (`4`) appears nowhere except
+`Vault` itself.
+
+Now see the compiler actually enforce each boundary. Try each of these,
+one at a time:
+
+```java
+// In vaultpkg — trying to read privateField from outside Vault
+System.out.println(new Vault().privateField);
+```
+
+```text
+error: privateField has private access in Vault
+```
+
+```java
+// In otherpkg.Sub — trying to read packagePrivateField (inherited, but package differs)
+System.out.println(new Sub().packagePrivateField);
+```
+
+```text
+error: packagePrivateField is not public in Vault; cannot be accessed from outside package
+```
+
+```java
+// In otherpkg.Unrelated — trying to read protectedField (different package, not a subclass)
+System.out.println(new Vault().protectedField);
+```
+
+```text
+error: protectedField has protected access in Vault
+```
+
+All three — verified this session — fail to *compile*, not just at
+runtime; the compiler is checking these rules for every single field
+access, everywhere, all the time.
+
+### Discard the Throwaway Example
+
+Delete `vaultpkg/` and `otherpkg/` — the real project's own access
+levels (private fields with getters starting Lesson 7, package-private
+fields starting Lesson 6) are the ones that matter from here on, now
+with a real reference point for what each level actually guarantees.
+
+### Mechanical Walkthrough
+
+- `public` — visible everywhere, no restriction at all.
+- `protected` — visible within the same package, *and* to subclasses
+  anywhere, even in a different package — this second half is
+  specifically why the OS's own framework-internal call to your
+  `onCreate` works even though your app's code and Android's own
+  platform code aren't in the same package: `AppCompatActivity`'s
+  ancestor classes call `onCreate` on `this`, and `this` — your actual
+  subclass instance — is exactly the "subclass, anywhere" case
+  `protected` allows.
+- *(no modifier at all)* — **package-private** (sometimes called
+  default access): visible only within the same package, regardless of
+  inheritance. This is the level `InventoryViewHolder`'s field will use
+  in Lesson 6, on purpose.
+- `private` — visible only inside the exact class it's declared in,
+  full stop — not even a subclass gets access.
+
+### CS Lens
+
+This is Java's version of a much more general idea: **encapsulation
+boundaries with more than one visibility scale**, not just a binary
+"hidden" vs. "exposed." Also recognized in: C++'s identical four-way
+split (`public`/`protected`/(package doesn't exist there,
+namespace-based instead)/`private`), Python's naming-convention-only
+approach (`_single_underscore`, `__double_underscore` — unenforced by
+the language itself, unlike Java), and C#'s own four levels (`public`/
+`protected`/`internal`/`private` — `internal` means "same assembly,"
+a different boundary than Java's "same package," worth noting
+specifically if this curriculum's C# projects are also on your plate).
+
+### Connection
+
+Every field and method declared from here on, in every remaining
+lesson, uses one of these four levels — you now have a real, verified
+reference point for what each one actually guarantees, rather than
+learning them one at a time, scattered across many lessons.
+
+---
+
 ## Concept Unit: The `R` Class — Generated Code You Never Write
 
 ### The Problem
@@ -443,6 +619,9 @@ anywhere to tap). Restore the block afterward.
       is called by the OS, not by you.
 - [ ] You ran the `pkgdemo2` Template Method lab and it matched your
       prediction (or you understand why it didn't).
+- [ ] You ran the `Vault`/`Sub`/`Unrelated` access-modifiers lab and can
+      state, for each of the four levels, exactly who can and can't see
+      a field with that modifier.
 - [ ] You located the real generated `R.java` file on disk, not just
       read about it.
 - [ ] Commit: message explaining *why* (e.g. "Add Logcat trace to

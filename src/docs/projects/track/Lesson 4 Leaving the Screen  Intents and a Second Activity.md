@@ -144,6 +144,134 @@ visibility in Java itself.
 
 ---
 
+## Concept Unit: Lambda Expressions — Passing Behavior as a Value
+
+### The Problem
+
+The button you're about to wire needs to say "when a tap happens, do
+this" — but a tap happens *later*, at some unpredictable moment chosen
+by the user, not while `onCreate` is running. `onCreate` can't just
+call the reaction code directly, right then, because "right then" is
+never the correct time — the code needs to be handed over now and
+actually run later, by something else, when the real event occurs.
+
+### Introduce the Concept in Isolation
+
+The underlying idea isn't Android-specific at all: **an interface with
+exactly one method describes "a thing that can be called later,"** and
+Java has dedicated shorthand syntax for supplying one without writing a
+full named class. A tiny, non-Android example — a fake button that
+takes a listener now and calls it later:
+
+```java
+interface OnTapListener {
+    void onTap();
+}
+
+class FakeButton {
+    private OnTapListener listener;
+
+    void setOnTapListener(OnTapListener listener) {
+        this.listener = listener;
+    }
+
+    void simulateTap() {
+        System.out.println("FakeButton: a tap event just occurred");
+        listener.onTap();
+    }
+}
+
+public class LambdaDemo {
+    public static void main(String[] args) {
+        FakeButton button = new FakeButton();
+
+        System.out.println("Registering the listener...");
+        button.setOnTapListener(() -> System.out.println("Listener ran!"));
+        System.out.println("Listener registered. Nothing from the listener has printed yet.");
+
+        button.simulateTap();
+    }
+}
+```
+
+Compile and run this yourself:
+
+```
+javac LambdaDemo.java
+java LambdaDemo
+```
+
+Real output:
+
+```text
+Registering the listener...
+Listener registered. Nothing from the listener has printed yet.
+FakeButton: a tap event just occurred
+Listener ran!
+```
+
+What this proves: `() -> System.out.println("Listener ran!")` is an
+**object** — a real, complete implementation of `OnTapListener` —
+handed to `setOnTapListener` and stored, not executed, at registration
+time. "Listener ran!" only prints once `simulateTap()` actually calls
+`listener.onTap()`, which happens *after* both "Registering..." lines
+have already printed. The gap between "registered" and "actually ran"
+is the entire point: a lambda lets you hand over *what* should happen
+without saying *when* — the receiving code (here, `FakeButton`; in the
+real app, Android's touch-event system) decides when to call it.
+
+### The Long Way, Side by Side
+
+Before Java had this shorthand, the only way to supply a one-method
+object like this was a full anonymous class:
+
+```java
+button.setOnTapListener(new OnTapListener() {
+    @Override
+    public void onTap() {
+        System.out.println("Anonymous-class listener ran!");
+    }
+});
+```
+
+Run side by side with the lambda version, both compile to
+functionally the same thing — verified this session, both print
+correctly. `() -> System.out.println(...)` is genuinely shorthand for
+exactly this shape: `()` is the (empty) parameter list matching
+`onTap()`'s own (empty) parameters, `->` separates "parameters" from
+"body," and the body replaces the single method's implementation —
+nothing more. A lambda is only legal where Java already knows,
+from context, which single-method interface it's supposed to
+implement (here, because `setOnTapListener` demands an
+`OnTapListener`) — you cannot write a bare lambda with no interface
+for it to become.
+
+### Discard the Throwaway Example
+
+Delete `LambdaDemo.java` and `OnTapListener`/`FakeButton` — the real
+project uses Android's own `View.OnClickListener` interface, already
+defined by the framework, the same one-method shape as `OnTapListener`
+here.
+
+### CS Lens
+
+This is a **functional interface** (any interface with exactly one
+abstract method) plus Java's lambda syntax for supplying an instance of
+one concisely. Also recognized in: JavaScript's callback functions and
+arrow functions (`(x) => x + 1`) if you've used them, Python's `lambda`
+keyword, and C#'s own lambda syntax and delegate types (`Action`/`Func`)
+if this concept feels familiar from elsewhere in this curriculum — the
+"pass behavior as a value, run it later" idea is the same across all
+of them; only the syntax and the surrounding type system differ.
+
+### Connection
+
+The next unit wires `View.OnClickListener` — a real interface Android
+already defines, same single-method shape as `OnTapListener` here —
+into the actual button, using this exact lambda syntax.
+
+---
+
 ## Concept Unit: `Intent` — Requesting Navigation Through the OS
 
 ### The Problem
@@ -208,24 +336,20 @@ button you built in Lesson 3 to real behavior for the first time.
 - `Button openButton = ...` — reusing already-basic variable
   declaration syntax; the *type* `Button` matching the XML `<Button>`
   tag is worth noting but not a new concept on its own.
-- `.setOnClickListener(v -> { ... })` — **first appearance, as a
-  group** covering two ideas at once, split per the Extraction Rule:
-  - `setOnClickListener(...)` itself: registers a callback to run
-    later, when a tap event occurs — not immediately. This is the
-    **Observer pattern**: you're not calling code now, you're
-    registering code to be called *later*, by the OS's touch-event
-    system, whenever the relevant event happens — the exact same shape
-    as `onCreate` from Lesson 2, except this time *you* are the one
-    registering the callback instead of the framework calling one
-    automatically.
-  - `v -> { ... }` — a **lambda expression**: shorthand syntax for "an
-    object implementing a single-method interface" (here,
-    `View.OnClickListener`), without writing out a full named class.
-    `v` is the parameter (the `View` that was clicked, unused in this
-    body). This genuinely is new syntax even though the underlying
-    "pass behavior as a value" idea may feel familiar from JavaScript
-    callbacks if you've seen them — Java's lambda syntax specifically
-    has not appeared before this lesson.
+- `.setOnClickListener(v -> { ... })` — `setOnClickListener(...)`
+  itself is a **first appearance**: it registers a callback to run
+  later, when a tap event occurs — not immediately. This is the
+  **Observer pattern**: you're not calling code now, you're
+  registering code to be called *later*, by the OS's touch-event
+  system, whenever the relevant event happens — the exact same shape
+  as `onCreate` from Lesson 2, except this time *you* are the one
+  registering the callback instead of the framework calling one
+  automatically. `v -> { ... }` itself is **reappearing**, from this
+  lesson's own Lambda Expressions unit above: `View.OnClickListener` is
+  Android's real, already-defined single-method interface (its one
+  method is `onClick(View v)`), and this lambda is a real implementation
+  of it, just like `OnTapListener` in the isolated lab — `v` is the
+  parameter (the `View` that was clicked, unused in this body).
 - `new Intent(this, InventoryActivity.class)` — **first appearance.**
   Two arguments: `this` (a `Context` — `MainActivity` itself, since
   Activities are a kind of `Context`, meaning "who is making this
@@ -312,6 +436,10 @@ match. Restore the Manifest entry afterward.
       have worked, referencing the lifecycle concept from Lesson 2.
 - [ ] You ran the `RequestDemo` lab and can connect it to what `Intent`
       is really doing.
+- [ ] You ran the `LambdaDemo` lab (both the lambda and the anonymous-class
+      version) and can explain, in your own words, why "Listener ran!"
+      only prints after `simulateTap()` is called, not at registration
+      time.
 - [ ] You broke the Manifest entry on purpose, saw the real
       `ActivityNotFoundException`, and restored it.
 - [ ] Commit: message explaining why (e.g. "Wire Open Inventory button
