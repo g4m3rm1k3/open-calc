@@ -780,7 +780,7 @@ type View =
 const PROGRESS_KEY = 'oc-lesson-progress'
 
 export default function LessonEngineLab({ onBack }: Props) {
-  const { themeStyles, studioTheme } = useGlobalTheme()
+  const { themeStyles, studioTheme, typography } = useGlobalTheme()
   const ui = (themeStyles as any).ui
 
   const [view, setView] = useState<View>({ kind: 'series-list' })
@@ -846,6 +846,7 @@ export default function LessonEngineLab({ onBack }: Props) {
               else setView({ kind: 'level-list', series: view.series })
             }}
             onEdit={currentFile ? () => setEditingFile(currentFile) : undefined}
+            typography={typography}
           />
         )
       })()}

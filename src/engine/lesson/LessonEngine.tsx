@@ -6,7 +6,7 @@ import { useGlobalTheme } from '../../context/ThemeContext'
 import type { UiTheme } from './types'
 
 export default function LessonEngine({ markdown }: { markdown: string }) {
-  const { themeStyles } = useGlobalTheme() as any
+  const { themeStyles, typography } = useGlobalTheme() as any
   const t = themeStyles ?? {}
   
   const ui: UiTheme = useMemo(() => ({
@@ -30,6 +30,7 @@ export default function LessonEngine({ markdown }: { markdown: string }) {
       lesson={lesson} 
       executor={executeCode} 
       ui={ui} 
+      typography={typography}
     />
   )
 }

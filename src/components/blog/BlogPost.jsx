@@ -1,4 +1,5 @@
 import { useRef, useCallback, useMemo, createContext, useContext } from 'react'
+import { useGlobalTheme, getFontFamily, getFontSize, getLineHeight } from '../../context/ThemeContext.jsx'
 import ReactMarkdown from 'react-markdown'
 import { PROSE_REMARK_PLUGINS, PROSE_REHYPE_PLUGINS, proseComponents, InlineCode } from '../markdown/proseComponents.jsx'
 import { preprocess } from '../math/latexPreprocess.js'
@@ -27,6 +28,8 @@ function getTopLevelDecls(code) {
 }
 
 export default function BlogPost({ content, interactive = true, onLinkClick }) {
+  const { typography } = useGlobalTheme()
+
   // Per-post notebook state: tracks latest code for each code block by index
   const cellCodesRef = useRef(new Map())
   // Resets to 0 each render pass so cells always get the same index
@@ -130,7 +133,15 @@ export default function BlogPost({ content, interactive = true, onLinkClick }) {
   }), [renderCode, renderPre, renderLink, onLinkClick])
 
   return (
-    <article className="prose-blog max-w-none">
+    <article 
+      className="prose-blog max-w-none"
+      style={{
+        fontFamily: typography?.font ? getFontFamily(typography.font) : undefined,
+        fontSize: typography?.fontSize ? getFontSize(typography.fontSize) : undefined,
+        lineHeight: typography?.lineHeight ? getLineHeight(typography.lineHeight) : undefined,
+        textAlign: typography?.textAlign === 'justify' ? 'justify' : 'left'
+      }}
+    >
       <ReactMarkdown
         remarkPlugins={PROSE_REMARK_PLUGINS}
         rehypePlugins={PROSE_REHYPE_PLUGINS}

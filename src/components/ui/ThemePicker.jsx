@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Palette, X, Sun, Moon, Layers, Check, Sparkles } from 'lucide-react';
-import { useGlobalTheme } from '../../context/ThemeContext.jsx';
+import { Palette, X, Sun, Moon, Layers, Check, Sparkles, Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, Maximize2, Minimize2, Monitor, Smartphone, Text } from 'lucide-react';
+import { useGlobalTheme, FONT_OPTIONS } from '../../context/ThemeContext.jsx';
 import { STUDIO_THEMES } from '../../utils/studioThemes.js';
 
 // ── Theme catalogue ───────────────────────────────────────────────────────────
@@ -186,7 +186,8 @@ function ThemeCard({ theme, isActive, onClick }) {
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 function ThemeModal({ onClose }) {
-  const { studioTheme, setStudioTheme } = useGlobalTheme();
+  const { studioTheme, setStudioTheme, typography, setTypography } = useGlobalTheme();
+  const [activeTab, setActiveTab] = useState('themes'); // 'themes' | 'typography'
   const [activeGroup, setActiveGroup] = useState(() => {
     for (const g of GROUPS) {
       if (g.themes.some(t => t.id === studioTheme)) return g.name;
@@ -253,7 +254,7 @@ function ThemeModal({ onClose }) {
                 <h2 className="text-xl font-black text-white tracking-tight">Appearance</h2>
               </div>
               <p className="text-sm text-white/70 font-medium">
-                Choose a theme — changes apply live as you browse
+                Customize your reading experience
               </p>
             </div>
             <button
@@ -278,7 +279,34 @@ function ThemeModal({ onClose }) {
 
         {/* ── Body ── */}
         <div className="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-900">
-          {/* Group tabs */}
+          
+          {/* Top Tabs */}
+          <div className="shrink-0 flex items-center gap-6 px-8 pt-4 border-b border-slate-200/80 dark:border-slate-800">
+            <button
+              onClick={() => setActiveTab('themes')}
+              className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+                activeTab === 'themes' 
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' 
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+              }`}
+            >
+              Themes
+            </button>
+            <button
+              onClick={() => setActiveTab('typography')}
+              className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+                activeTab === 'typography' 
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' 
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+              }`}
+            >
+              Typography
+            </button>
+          </div>
+
+          {activeTab === 'themes' && (
+            <>
+              {/* Group tabs */}
           <div className="shrink-0 flex items-center gap-2 px-6 py-4 border-b border-slate-200/80 dark:border-slate-800 overflow-x-auto">
             {GROUPS.map(g => {
               const hasActive = g.themes.some(t => t.id === studioTheme);
@@ -361,6 +389,136 @@ function ThemeModal({ onClose }) {
               </motion.div>
             </AnimatePresence>
           </div>
+          </>
+          )}
+
+          {activeTab === 'typography' && (
+            <div className="flex-1 overflow-y-auto px-8 py-6 min-h-0 text-slate-800 dark:text-slate-200 space-y-8">
+              
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <Type className="w-5 h-5 text-indigo-500" />
+                  <h3 className="text-base font-bold">Font Family</h3>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {FONT_OPTIONS.map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => setTypography({ font: f.id })}
+                      className={`px-4 py-3 rounded-xl border text-sm text-left transition-all ${
+                        typography.font === f.id
+                          ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold shadow-sm'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {f.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Text className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-base font-bold">Font Size</h3>
+                  </div>
+                  <div className="flex bg-slate-200/50 dark:bg-slate-800 rounded-xl p-1">
+                    {['sm', 'base', 'lg', 'xl'].map(size => (
+                      <button
+                        key={size}
+                        onClick={() => setTypography({ fontSize: size })}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                          typography.fontSize === size
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {size === 'sm' ? 'Small' : size === 'base' ? 'Normal' : size === 'lg' ? 'Large' : 'Huge'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlignLeft className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-base font-bold">Line Height</h3>
+                  </div>
+                  <div className="flex bg-slate-200/50 dark:bg-slate-800 rounded-xl p-1">
+                    {['tight', 'normal', 'relaxed', 'loose'].map(lh => (
+                      <button
+                        key={lh}
+                        onClick={() => setTypography({ lineHeight: lh })}
+                        className={`flex-1 flex justify-center py-2 text-sm font-medium rounded-lg transition-all ${
+                          typography.lineHeight === lh
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                        title={lh}
+                      >
+                        {lh === 'tight' ? <AlignJustify className="w-4 h-4 scale-y-75" /> 
+                         : lh === 'normal' ? <AlignJustify className="w-4 h-4" /> 
+                         : lh === 'relaxed' ? <AlignJustify className="w-4 h-4 scale-y-125" /> 
+                         : <AlignJustify className="w-4 h-4 scale-y-150" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Monitor className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-base font-bold">Reading Width</h3>
+                  </div>
+                  <div className="flex bg-slate-200/50 dark:bg-slate-800 rounded-xl p-1">
+                    {['narrow', 'normal', 'wide'].map(w => (
+                      <button
+                        key={w}
+                        onClick={() => setTypography({ width: w })}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                          typography.width === w
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {w === 'narrow' ? 'Narrow' : w === 'normal' ? 'Normal' : 'Full'}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-2 px-1">Note: Width applies to full-page tutorials.</p>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlignLeft className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-base font-bold">Text Align</h3>
+                  </div>
+                  <div className="flex bg-slate-200/50 dark:bg-slate-800 rounded-xl p-1">
+                    {['left', 'center', 'right', 'justify'].map(align => (
+                      <button
+                        key={align}
+                        onClick={() => setTypography({ textAlign: align })}
+                        className={`flex-1 flex justify-center py-2 text-sm font-medium rounded-lg transition-all ${
+                          typography.textAlign === align
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                        title={align}
+                      >
+                        {align === 'left' ? <AlignLeft className="w-4 h-4" /> 
+                         : align === 'center' ? <AlignCenter className="w-4 h-4" /> 
+                         : align === 'right' ? <AlignRight className="w-4 h-4" /> 
+                         : <AlignJustify className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>

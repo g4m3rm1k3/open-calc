@@ -44,7 +44,7 @@ import {
   runLuaInline, runRubyInline, runCInline, runBrainfuckInline,
 } from '../../utils/inlineRunner.js'
 import { getThemeStyles, STUDIO_THEMES } from '../../utils/studioThemes.js'
-import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { useGlobalTheme, FONT_OPTIONS } from '../../context/ThemeContext.jsx'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
 
@@ -949,20 +949,6 @@ function splitMarkdownSections(markdown) {
   return sections
 }
 
-const FONT_OPTIONS = [
-  { id: 'sans', name: 'System Sans' },
-  { id: 'serif', name: 'System Serif' },
-  { id: 'mono', name: 'System Mono' },
-  { id: 'arial', name: 'Arial' },
-  { id: 'helvetica', name: 'Helvetica' },
-  { id: 'georgia', name: 'Georgia' },
-  { id: 'times', name: 'Times New Roman' },
-  { id: 'verdana', name: 'Verdana' },
-  { id: 'trebuchet', name: 'Trebuchet MS' },
-  { id: 'courier', name: 'Courier New' },
-  { id: 'consolas', name: 'Consolas' },
-]
-
 function SectionedMarkdown({ content, ui, accentColor, isDark, font, width, lineHeight, fontSize, textAlign }) {
   const { speak, stop } = useSpeech()
   const [playingIdx, setPlayingIdx] = useState(null)
@@ -1121,18 +1107,7 @@ export default function MarkdownHub() {
   const [editorContent, setEditorContent] = useState('')
   const editorInstanceRef = useRef(null)
 
-  const [readingFont, setReadingFont] = useState(() => localStorage.getItem('mdhub_font') || 'sans')
-  const [readingWidth, setReadingWidth] = useState(() => localStorage.getItem('mdhub_width') || 'wide')
-  const [readingLineHeight, setReadingLineHeight] = useState(() => localStorage.getItem('mdhub_line_height') || 'relaxed')
-  const [readingFontSize, setReadingFontSize] = useState(() => localStorage.getItem('mdhub_font_size') || 'base')
-  const [readingTextAlign, setReadingTextAlign] = useState(() => localStorage.getItem('mdhub_text_align') || 'left')
   const [typographyOpen, setTypographyOpen] = useState(false)
-  
-  useEffect(() => { localStorage.setItem('mdhub_font', readingFont) }, [readingFont])
-  useEffect(() => { localStorage.setItem('mdhub_width', readingWidth) }, [readingWidth])
-  useEffect(() => { localStorage.setItem('mdhub_line_height', readingLineHeight) }, [readingLineHeight])
-  useEffect(() => { localStorage.setItem('mdhub_font_size', readingFontSize) }, [readingFontSize])
-  useEffect(() => { localStorage.setItem('mdhub_text_align', readingTextAlign) }, [readingTextAlign])
 
   // Toolbar insert for the Monaco-backed editor below — real snippet/tabstop
   // support, same mechanism as the Lesson Builder's MarkdownCellEditor.
@@ -1197,7 +1172,7 @@ export default function MarkdownHub() {
     const el = contentScrollRef.current?.querySelector(`[id="${CSS.escape(id)}"]`)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
-  const { studioTheme, setStudioTheme, themeStyles } = useGlobalTheme();
+  const { studioTheme, setStudioTheme, themeStyles, typography, setTypography } = useGlobalTheme();
   const ui = themeStyles.ui;
   const accentColor = STUDIO_THEMES[studioTheme]?.accentHex ?? '#0ea5e9';
 
@@ -1697,8 +1672,8 @@ export default function MarkdownHub() {
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Font Family</label>
                       <div className="relative group">
                         <select
-                          value={readingFont}
-                          onChange={(e) => setReadingFont(e.target.value)}
+                          value={typography.font}
+                          onChange={(e) => setTypography({ font: e.target.value })}
                           className={`appearance-none w-full text-xs font-semibold rounded-lg pl-3 pr-8 py-2 border border-transparent bg-slate-100 dark:bg-slate-800 ${ui.txt1} cursor-pointer focus:outline-none hover:opacity-90`}
                         >
                           {FONT_OPTIONS.map(f => (
@@ -1712,7 +1687,7 @@ export default function MarkdownHub() {
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Font Size</label>
                       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                         {['sm', 'base', 'lg', 'xl'].map(fs => (
-                          <button key={fs} onClick={() => setReadingFontSize(fs)} className={`flex-1 uppercase text-[10px] py-1.5 rounded-md transition-colors ${readingFontSize === fs ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{fs}</button>
+                          <button key={fs} onClick={() => setTypography({ fontSize: fs })} className={`flex-1 uppercase text-[10px] py-1.5 rounded-md transition-colors ${typography.fontSize === fs ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{fs}</button>
                         ))}
                       </div>
                     </div>
@@ -1720,7 +1695,7 @@ export default function MarkdownHub() {
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Text Align</label>
                       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                         {['left', 'justify'].map(ta => (
-                          <button key={ta} onClick={() => setReadingTextAlign(ta)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingTextAlign === ta ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{ta}</button>
+                          <button key={ta} onClick={() => setTypography({ textAlign: ta })} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${typography.textAlign === ta ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{ta}</button>
                         ))}
                       </div>
                     </div>
@@ -1728,7 +1703,7 @@ export default function MarkdownHub() {
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Reading Width</label>
                       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                         {['narrow', 'normal', 'wide'].map(w => (
-                          <button key={w} onClick={() => setReadingWidth(w)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingWidth === w ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{w}</button>
+                          <button key={w} onClick={() => setTypography({ width: w })} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${typography.width === w ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{w}</button>
                         ))}
                       </div>
                     </div>
@@ -1736,7 +1711,7 @@ export default function MarkdownHub() {
                       <label className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2`}>Line Height</label>
                       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                         {['compact', 'standard', 'relaxed'].map(lh => (
-                          <button key={lh} onClick={() => setReadingLineHeight(lh)} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${readingLineHeight === lh ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{lh}</button>
+                          <button key={lh} onClick={() => setTypography({ lineHeight: lh })} className={`flex-1 capitalize text-xs py-1.5 rounded-md transition-colors ${typography.lineHeight === lh ? 'bg-white dark:bg-slate-700 shadow-sm font-bold ' + ui.txt1 : ui.txt2 + ' hover:opacity-80'}`}>{lh}</button>
                         ))}
                       </div>
                     </div>
@@ -2053,11 +2028,11 @@ export default function MarkdownHub() {
                       ui={themeStyles.ui} 
                       accentColor={accentColor} 
                       isDark={themeStyles.isDark} 
-                      font={readingFont}
-                      width={readingWidth}
-                      lineHeight={readingLineHeight}
-                      fontSize={readingFontSize}
-                      textAlign={readingTextAlign}
+                      font={typography.font}
+                      width={typography.width}
+                      lineHeight={typography.lineHeight}
+                      fontSize={typography.fontSize}
+                      textAlign={typography.textAlign}
                     />
                   </div>
                 )}
@@ -2085,11 +2060,11 @@ export default function MarkdownHub() {
                   ui={themeStyles.ui} 
                   accentColor={accentColor} 
                   isDark={themeStyles.isDark} 
-                  font={readingFont}
-                  width={readingWidth}
-                  lineHeight={readingLineHeight}
-                  fontSize={readingFontSize}
-                  textAlign={readingTextAlign}
+                  font={typography.font}
+                  width={typography.width}
+                  lineHeight={typography.lineHeight}
+                  fontSize={typography.fontSize}
+                  textAlign={typography.textAlign}
                 />
               </div>
             )}

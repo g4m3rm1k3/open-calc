@@ -11,6 +11,7 @@ import RunExample from './RunExample'
 import ChallengeStep from './ChallengeStep'
 import DeltaTutor from './DeltaTutor'
 import { CodeBlockPre, CodeBlockCode } from '../../components/math/CodeBlock.jsx'
+import { getFontFamily, getFontSize, getLineHeight } from '../../context/ThemeContext.jsx'
 import styles from './LessonEngine.module.css'
 
 interface Props {
@@ -22,11 +23,12 @@ interface Props {
   onComplete?: () => void
   seriesLabel?: string
   onEdit?: () => void
+  typography?: any
 }
 
 type RightTab = 'lesson' | 'output' | 'dom' | 'tree' | 'css' | 'debug' | 'tutor'
 
-export default function LessonView({ lesson, executor, ui, onBack, onBackToSeriesList, onComplete, seriesLabel, onEdit }: Props) {
+export default function LessonView({ lesson, executor, ui, onBack, onBackToSeriesList, onComplete, seriesLabel, onEdit, typography }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [rightTab, setRightTab] = useState<RightTab>('lesson')
   const [events, setEvents] = useState<TraceEvent[]>([])
@@ -309,7 +311,15 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
                   )}
                 </div>
               {/* Prose */}
-              <div className={`px-5 pb-6 ${styles.prose} ${ui.txt1} text-sm`}>
+              <div 
+                className={`px-5 pb-6 ${styles.prose} ${ui.txt1} text-sm`}
+                style={{
+                  fontFamily: typography?.font ? getFontFamily(typography.font) : undefined,
+                  fontSize: typography?.fontSize ? getFontSize(typography.fontSize) : undefined,
+                  lineHeight: typography?.lineHeight ? getLineHeight(typography.lineHeight) : undefined,
+                  textAlign: typography?.textAlign === 'justify' ? 'justify' : 'left'
+                }}
+              >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{

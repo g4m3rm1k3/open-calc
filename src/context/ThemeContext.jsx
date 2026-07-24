@@ -9,6 +9,67 @@ const ThemeContext = createContext({
   themeStyles: {}
 });
 
+export const FONT_OPTIONS = [
+  { id: 'sans', name: 'System Sans' },
+  { id: 'serif', name: 'System Serif' },
+  { id: 'mono', name: 'System Mono' },
+  { id: 'arial', name: 'Arial' },
+  { id: 'helvetica', name: 'Helvetica' },
+  { id: 'georgia', name: 'Georgia' },
+  { id: 'times', name: 'Times New Roman' },
+  { id: 'verdana', name: 'Verdana' },
+  { id: 'trebuchet', name: 'Trebuchet MS' },
+  { id: 'courier', name: 'Courier New' },
+  { id: 'consolas', name: 'Consolas' },
+];
+
+export const getFontFamily = (f) => {
+  switch(f) {
+    case 'sans': return 'system-ui, sans-serif'
+    case 'serif': return 'ui-serif, Georgia, serif'
+    case 'mono': return 'ui-monospace, monospace'
+    case 'arial': return 'Arial, sans-serif'
+    case 'helvetica': return 'Helvetica, Arial, sans-serif'
+    case 'georgia': return 'Georgia, serif'
+    case 'times': return '"Times New Roman", Times, serif'
+    case 'verdana': return 'Verdana, Geneva, sans-serif'
+    case 'trebuchet': return '"Trebuchet MS", sans-serif'
+    case 'courier': return '"Courier New", Courier, monospace'
+    case 'consolas': return 'Consolas, "JetBrains Mono", "Cascadia Code", monospace'
+    default: return 'system-ui, sans-serif'
+  }
+}
+
+export const getFontSize = (fs) => {
+  switch(fs) {
+    case 'sm': return '0.875rem'
+    case 'base': return '1rem'
+    case 'lg': return '1.125rem'
+    case 'xl': return '1.25rem'
+    default: return '1rem'
+  }
+}
+
+export const getLineHeight = (lh) => {
+  switch(lh) {
+    case 'compact': 
+    case 'tight': return '1.4'
+    case 'standard':
+    case 'normal': return '1.6'
+    case 'relaxed': return '1.8'
+    case 'loose': return '2.0'
+    default: return '1.6'
+  }
+}
+
+const DEFAULT_TYPOGRAPHY = {
+  font: 'sans',
+  fontSize: 'base',
+  textAlign: 'left',
+  width: 'wide',
+  lineHeight: 'relaxed'
+};
+
 export function ThemeProvider({ children }) {
   const [studioThemeState, setStudioThemeState] = useState(() => {
     return localStorage.getItem('studio_theme') || 'default';
@@ -111,9 +172,31 @@ export function ThemeProvider({ children }) {
     }
   }, [studioTheme, isDarkGlobal]);
 
+  const [typography, setTypographyState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('oc-typography');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      font: 'sans',
+      fontSize: 'base',
+      textAlign: 'left',
+      width: 'wide',
+      lineHeight: 'relaxed'
+    };
+  });
+
+  const setTypography = useCallback((newPrefs) => {
+    setTypographyState(prev => {
+      const updated = { ...prev, ...newPrefs };
+      localStorage.setItem('oc-typography', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles }),
-    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles]
+    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography]
   );
 
   return (

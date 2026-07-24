@@ -43,7 +43,7 @@ export const proseComponents = {
 
   p({ children }) {
     return (
-      <p className="text-slate-700 dark:text-slate-300 leading-[1.8] mb-5 text-base">
+      <p className="text-slate-700 dark:text-slate-300 mb-5">
         {children}
       </p>
     )
