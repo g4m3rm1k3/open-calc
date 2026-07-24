@@ -15,6 +15,7 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   File,
   Folder,
   FilePenLine,
@@ -24,10 +25,12 @@ import {
   Eye,
   Upload,
   RefreshCcw,
+  RotateCcw,
   Code2,
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
+  Menu,
   Volume2,
   Square,
 } from 'lucide-react'
@@ -760,7 +763,7 @@ function nodeContainsFile(node, filePath) {
   return (node.children ?? []).some(child => nodeContainsFile(child, filePath))
 }
 
-function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set(), accentColor = '#0ea5e9' }) {
+function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set(), accentColor = '#0ea5e9', ui = {} }) {
   const [open, setOpen] = useState(() => node.open !== false || nodeContainsFile(node, activeFile))
   const indent = depth * 14
 
@@ -773,12 +776,12 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
       <div>
         <div
           onClick={() => setOpen((value) => !value)}
-          className="flex items-center gap-1.5 px-2 py-1 cursor-pointer text-amber-600 dark:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors select-none group"
+          className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer transition-colors select-none group ${ui.txt2} ${ui.bgHover}`}
           style={{ paddingLeft: 8 + indent }}
         >
-          {open ? <ChevronDown className="w-3 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" /> : <ChevronRight className="w-3 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />}
-          <Folder className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-bold tracking-wide uppercase mt-0.5">{displayName(node.name)}</span>
+          {open ? <ChevronDown className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" /> : <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />}
+          <Folder className="w-3.5 h-3.5" style={{ color: accentColor }} />
+          <span className="text-[11px] font-bold tracking-wide mt-0.5" style={{ color: accentColor }}>{displayName(node.name)}</span>
         </div>
         {open && node.children.map((child, index) => (
           <TreeNode
@@ -789,6 +792,7 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
             depth={depth + 1}
             overriddenPaths={overriddenPaths}
             accentColor={accentColor}
+            ui={ui}
           />
         ))}
       </div>
@@ -800,36 +804,39 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
   return (
     <div
       onClick={() => onSelect(node.path)}
-      className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-2 ${
+      className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-[3px] ${
         isActive
-          ? 'text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/60'
-          : 'text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+          ? `${ui.txt1} font-medium`
+          : `${ui.txt2} border-transparent ${ui.bgHover}`
       }`}
-      style={{ paddingLeft: 12 + indent, ...(isActive ? { borderLeftColor: accentColor } : {}) }}
+      style={{ 
+        paddingLeft: 12 + indent, 
+        ...(isActive ? { borderLeftColor: accentColor, backgroundColor: `${accentColor}1A`, color: accentColor } : {}) 
+      }}
     >
-      <File className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
+      <File className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-70'}`} style={isActive ? { color: accentColor } : {}} />
       <span className="truncate">{displayName(node.name)}</span>
       {isOverridden && <span className="ml-auto text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Override</span>}
     </div>
   )
 }
 
-function DocListItem({ label, subtitle, isActive, onSelect, onDelete, kind, accentColor = '#0ea5e9' }) {
+function DocListItem({ label, subtitle, isActive, onSelect, onDelete, kind, accentColor = '#0ea5e9', ui = {} }) {
   return (
     <div className="flex items-center group">
       <div
         onClick={onSelect}
-        className={`flex-1 flex items-center gap-1.5 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-2 ml-2 ${
+        className={`flex-1 flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-[3px] ml-2 ${
           isActive
-            ? 'text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/60'
-            : 'text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+            ? `${ui.txt1} font-medium`
+            : `${ui.txt2} border-transparent ${ui.bgHover}`
         }`}
-        style={isActive ? { borderLeftColor: accentColor } : undefined}
+        style={isActive ? { borderLeftColor: accentColor, backgroundColor: `${accentColor}1A`, color: accentColor } : undefined}
       >
         <FilePenLine className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
         <div className="truncate flex-1">
           <div className="truncate">{label || 'Untitled'}</div>
-          {subtitle && <div className="truncate text-[10px] text-slate-400 dark:text-slate-500">{subtitle}</div>}
+          {subtitle && <div className={`truncate text-[10px] ${ui.txt3}`}>{subtitle}</div>}
         </div>
         <span className={`text-[9px] uppercase tracking-widest ${kind === 'override' ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-500 dark:text-indigo-300'}`}>
           {kind}
@@ -840,7 +847,7 @@ function DocListItem({ label, subtitle, isActive, onSelect, onDelete, kind, acce
           event.stopPropagation()
           onDelete()
         }}
-        className="p-1 text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity mr-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+        className={`p-1 ${ui.txt3} opacity-0 group-hover:opacity-100 transition-opacity mr-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
         title={kind === 'override' ? 'Restore built-in doc' : 'Delete document'}
       >
         <X className="w-3.5 h-3.5" />
@@ -1471,155 +1478,171 @@ export default function MarkdownHub() {
       />
 
       <div className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[1650]`}>
-        <div className={`h-12 ${ui.bg1} border-b ${ui.border} flex items-center gap-1.5 px-3 shrink-0 z-10 w-full`}>
+        <div className={`h-16 ${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-10 w-full overflow-x-auto custom-scrollbar gap-4 transition-all duration-300`}>
+          
+          {/* ── LEFT SECTION: Navigation & Context ── */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Exit Button */}
+            <button
+              onClick={() => navigate(-1)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${ui.border} ${ui.bg0} ${ui.hoverBg} ${ui.hoverTx} transition-all duration-300 shadow-sm hover:shadow-md font-semibold text-xs group`}
+              title="Exit Studio"
+            >
+              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline">Exit</span>
+            </button>
 
-          {/* Nav toggle */}
-          <button
-            onClick={() => setDocsNavOpen((v) => !v)}
-            className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`}
-            title={docsNavOpen ? 'Hide navigation' : 'Show navigation'}
-          >
-            {docsNavOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
-          </button>
+            <div className={`w-px h-6 ${ui.border} mx-1 hidden sm:block border-l opacity-50`}></div>
 
-          {/* Title */}
-          <span className={`text-sm font-bold ${ui.txt1} tracking-tight mr-1`}>🖥️ Studio</span>
+            {/* Nav Toggle */}
+            <button
+              onClick={() => setDocsNavOpen((v) => !v)}
+              className={`p-2 rounded-full border border-transparent ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-all duration-300 hover:scale-105`}
+              title={docsNavOpen ? 'Hide sidebar' : 'Show sidebar'}
+            >
+              <Menu className="w-4 h-4" />
+            </button>
 
-          {/* Tab switcher */}
-          <div className={`flex ${ui.bg2} p-0.5 rounded-lg gap-0.5 border ${ui.border}`}>
-            {['tutorials', 'editor'].map((nextTab) => (
-              <button
-                key={nextTab}
-                onClick={() => setTab(nextTab)}
-                className={`px-2.5 py-1 text-xs font-bold capitalize rounded-md transition-all ${
-                  tab === nextTab
-                    ? `${ui.bg0} ${ui.primary} shadow-sm`
-                    : `${ui.txt2} ${ui.hoverBg} ${ui.hoverTx}`
-                }`}
-              >
-                {nextTab === 'tutorials' ? '📖 Tutorials' : '✏️ Editor'}
-              </button>
-            ))}
+            {/* Title */}
+            <span className={`text-sm font-extrabold ${ui.txt1} tracking-tight ml-1 mr-3 hidden md:inline-block bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-100 dark:to-slate-300`}>
+              Studio
+            </span>
+
+            {/* Tab switcher */}
+            <div className={`flex ${ui.bg2} p-1 rounded-full gap-1 shadow-inner relative`}>
+              {['tutorials', 'editor'].map((nextTab) => (
+                <button
+                  key={nextTab}
+                  onClick={() => setTab(nextTab)}
+                  className={`relative px-4 py-1.5 text-xs font-bold capitalize rounded-full transition-all duration-300 ease-out z-10 ${
+                    tab === nextTab
+                      ? `${ui.txt1} drop-shadow-sm`
+                      : `${ui.txt2} hover:opacity-80`
+                  }`}
+                >
+                  {tab === nextTab && (
+                    <span className={`absolute inset-0 ${ui.bg0} rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.08)] -z-10`} />
+                  )}
+                  {nextTab === 'tutorials' ? '📖 Tutorials' : '✏️ Editor'}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex-1" />
-
-          {/* Backend status */}
-          <span className={`text-[10px] uppercase tracking-widest ${ui.txt2} hidden md:block`}>
-            {backendLoading ? '…' : backendReady ? '⚡ Backend' : '⬡ Local'}
-          </span>
-
-          {/* Code Along */}
-          <button
-            onClick={() => setCodeAlongOpen((v) => !v)}
-            className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
-              codeAlongOpen
-                ? (themeStyles.isDark ? 'text-cyan-300 bg-cyan-900/30 border-cyan-700' : 'text-cyan-700 bg-cyan-50 border-cyan-200')
-                : `${ui.txt2} ${ui.bg1} ${ui.border} ${ui.hoverBg} ${ui.hoverTx}`
-            }`}
-            title="Code-along workspace"
-          >
-            <Code2 className="w-3.5 h-3.5" /><span className="hidden sm:inline">Code Along</span>
-          </button>
-
-          {/* Ask Ada */}
-          <button
-            onClick={() => setAdaOpen((v) => !v)}
-            className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
-              adaOpen
-                ? (themeStyles.isDark ? 'text-violet-300 bg-violet-900/30 border-violet-700' : 'text-violet-700 bg-violet-50 border-violet-200')
-                : `${ui.txt2} ${ui.bg1} ${ui.border} ${ui.hoverBg} ${ui.hoverTx}`
-            }`}
-            title="Ask Ada — AI code tutor"
-          >
-            <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline">Ask Ada</span>
-          </button>
-
-          {/* Theme picker */}
-          <select
-            value={studioTheme}
-            onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
-            className={`text-xs font-semibold rounded-lg px-2 py-1.5 border ${ui.border} ${ui.bg1} ${ui.txt2} cursor-pointer focus:outline-none`}
-            title="Studio theme"
-          >
-            {Object.entries(STUDIO_THEMES).map(([id, t]) => (
-              <option key={id} value={id}>{t.name}</option>
-            ))}
-          </select>
-
-          {/* Icon-only secondary actions */}
-          <button onClick={refreshDocsIndex} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Refresh docs index">
-            <RefreshCcw className="w-3.5 h-3.5" />
-          </button>
-          <button onClick={() => fileInputRef.current?.click()} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Import document">
-            <Upload className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Conditional: tutorial actions */}
-          {tab === 'tutorials' && activeFile && (
-            <>
-              <button
-                onClick={openTutorialOverrideEditor}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-                title={tutorialOverrideActive ? 'Edit override' : 'Edit local version'}
+          {/* ── RIGHT SECTION: Actions & Tools ── */}
+          <div className="flex items-center gap-3 shrink-0">
+            
+            {/* Theme picker */}
+            <div className="relative hidden lg:block group">
+              <select
+                value={studioTheme}
+                onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
+                className={`appearance-none text-xs font-semibold rounded-full pl-3 pr-8 py-1.5 border ${ui.border} ${ui.bg0} ${ui.txt1} cursor-pointer focus:outline-none shadow-sm hover:shadow transition-shadow`}
+                title="Studio theme"
               >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">{tutorialOverrideActive ? 'Edit override' : 'Edit local'}</span>
+                {Object.entries(STUDIO_THEMES).map(([id, t]) => (
+                  <option key={id} value={id}>{t.name}</option>
+                ))}
+              </select>
+              <ChevronDown className={`w-3.5 h-3.5 absolute right-2.5 top-2 pointer-events-none ${ui.txt2} group-hover:${ui.txt1} transition-colors`} />
+            </div>
+
+            <div className={`w-px h-6 ${ui.border} mx-1 hidden lg:block border-l opacity-50`}></div>
+
+            {/* AI / Tools */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCodeAlongOpen((v) => !v)}
+                className={`relative group overflow-hidden rounded-full p-[1px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${codeAlongOpen ? 'ring-2 ring-cyan-400/50 ring-offset-1 ring-offset-transparent' : ''}`}
+                title="Code-along workspace"
+              >
+                <span className={`absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-60 group-hover:opacity-100 transition-opacity ${codeAlongOpen ? 'opacity-100' : ''}`} />
+                <div className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold ${ui.bg0} rounded-full ${ui.txt1}`}>
+                  <Code2 className="w-3.5 h-3.5 text-cyan-500" /><span className="hidden xl:inline">Code Along</span>
+                </div>
               </button>
-              {tutorialOverrideActive && backendReady && (
-                <button
-                  onClick={() => deleteOverrideDoc(activeFile)}
-                  className="p-1.5 rounded-md text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
-                  title="Restore built-in doc"
-                >
+
+              <button
+                onClick={() => setAdaOpen((v) => !v)}
+                className={`relative group overflow-hidden rounded-full p-[1px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${adaOpen ? 'ring-2 ring-violet-400/50 ring-offset-1 ring-offset-transparent' : ''}`}
+                title="Ask Ada — AI code tutor"
+              >
+                <span className={`absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-60 group-hover:opacity-100 transition-opacity ${adaOpen ? 'opacity-100' : ''}`} />
+                <div className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold ${ui.bg0} rounded-full ${ui.txt1}`}>
+                  <Sparkles className="w-3.5 h-3.5 text-purple-500" /><span className="hidden xl:inline">Ask Ada</span>
+                </div>
+              </button>
+            </div>
+
+            <div className={`w-px h-6 ${ui.border} mx-1 border-l opacity-50`}></div>
+
+            {/* Document Actions */}
+            <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-1 p-1 rounded-full ${ui.bg2} border ${ui.border} shadow-inner`}>
+                <button onClick={refreshDocsIndex} className={`p-1.5 rounded-full ${ui.txt2} hover:bg-white dark:hover:bg-slate-700 ${ui.hoverTx} transition-all hover:shadow-sm`} title="Refresh docs index">
                   <RefreshCcw className="w-3.5 h-3.5" />
                 </button>
-              )}
-            </>
-          )}
-
-          {/* Download (conditional) */}
-          {((tab === 'tutorials' && activeFile) || (tab === 'editor' && activeDocType)) && (
-            <button onClick={downloadCurrentMarkdown} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Download markdown">
-              <Download className="w-3.5 h-3.5" />
-            </button>
-          )}
-
-          {/* Editor mode toggle + export (conditional) */}
-          {tab === 'editor' && activeDocType && (
-            <>
-              {previewMode ? (
-                <button
-                  onClick={() => setPreviewMode(false)}
-                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-lg hover:bg-indigo-100 transition-colors"
-                >
-                  <Edit2 className="w-3.5 h-3.5" /><span className="hidden md:inline">Edit</span>
+                <button onClick={() => fileInputRef.current?.click()} className={`p-1.5 rounded-full ${ui.txt2} hover:bg-white dark:hover:bg-slate-700 ${ui.hoverTx} transition-all hover:shadow-sm`} title="Import document">
+                  <Upload className="w-3.5 h-3.5" />
                 </button>
-              ) : (
-                <button
-                  onClick={() => setPreviewMode(true)}
-                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 transition-colors"
-                >
-                  <Eye className="w-3.5 h-3.5" /><span className="hidden md:inline">Preview</span>
-                </button>
-              )}
-              <button
-                onClick={exportSharePack}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800/50 rounded-lg hover:bg-sky-100 transition-colors"
-              >
-                <Download className="w-3.5 h-3.5" /><span className="hidden md:inline">Export</span>
-              </button>
-            </>
-          )}
+                {((tab === 'tutorials' && activeFile) || (tab === 'editor' && activeDocType)) && (
+                  <button onClick={downloadCurrentMarkdown} className={`p-1.5 rounded-full ${ui.txt2} hover:bg-white dark:hover:bg-slate-700 ${ui.hoverTx} transition-all hover:shadow-sm`} title="Download markdown">
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
 
-          {/* Close */}
-          <button
-            onClick={() => navigate(-1)}
-            className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`}
-            title="Exit Studio"
-          >
-            <X className="w-4 h-4" />
-          </button>
+              {/* Conditional Editors */}
+              {tab === 'tutorials' && activeFile && (
+                <div className="flex items-center gap-1.5 ml-1">
+                  <button
+                    onClick={openTutorialOverrideEditor}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-300/50 dark:border-emerald-800/50 rounded-full hover:bg-emerald-200/50 dark:hover:bg-emerald-800/50 transition-all shadow-sm hover:shadow"
+                    title={tutorialOverrideActive ? 'Edit override' : 'Edit local version'}
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{tutorialOverrideActive ? 'Edit override' : 'Edit local'}</span>
+                  </button>
+                  {tutorialOverrideActive && backendReady && (
+                    <button
+                      onClick={() => deleteOverrideDoc(activeFile)}
+                      className="p-1.5 rounded-full border border-amber-300/50 dark:border-amber-800/50 text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/30 hover:bg-amber-200/50 dark:hover:bg-amber-800/50 transition-all shadow-sm hover:shadow"
+                      title="Restore built-in doc"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {tab === 'editor' && activeDocType && (
+                <div className="flex items-center gap-1.5 ml-1">
+                  {previewMode ? (
+                    <button
+                      onClick={() => setPreviewMode(false)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-100/50 dark:bg-indigo-900/30 border border-indigo-300/50 dark:border-indigo-800/50 rounded-full hover:bg-indigo-200/50 transition-all shadow-sm hover:shadow"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" /><span className="hidden sm:inline">Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setPreviewMode(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-300/50 dark:border-emerald-800/50 rounded-full hover:bg-emerald-200/50 transition-all shadow-sm hover:shadow"
+                    >
+                      <Eye className="w-3.5 h-3.5" /><span className="hidden sm:inline">Preview</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={exportSharePack}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-100/50 dark:bg-sky-900/30 border border-sky-300/50 dark:border-sky-800/50 rounded-full hover:bg-sky-200/50 transition-all shadow-sm hover:shadow hidden sm:flex"
+                  >
+                    <Download className="w-3.5 h-3.5" /><span className="hidden sm:inline">Export</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            
+          </div>
         </div>
 
 
@@ -1706,7 +1729,6 @@ export default function MarkdownHub() {
                 )}
               </div>
             )}
-
             {/* ── Normal tree (hidden while searching) ── */}
             {!(tab === 'tutorials' && docSearch.trim().length >= 2) && (
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar min-h-0">
@@ -1725,6 +1747,7 @@ export default function MarkdownHub() {
                       onSelect={selectTutorial}
                       overriddenPaths={overriddenPaths}
                       accentColor={accentColor}
+                      ui={ui}
                     />
                     ))
               )}
@@ -1761,6 +1784,7 @@ export default function MarkdownHub() {
                       onSelect={() => selectUserDoc(doc)}
                       onDelete={() => deleteUserDoc(doc.id)}
                       accentColor={accentColor}
+                      ui={ui}
                     />
                   ))}
                   {userDocs.length === 0 && (
@@ -1782,6 +1806,7 @@ export default function MarkdownHub() {
                       onSelect={() => selectOverrideDoc(doc)}
                       onDelete={() => deleteOverrideDoc(doc.path)}
                       accentColor={accentColor}
+                      ui={ui}
                     />
                   ))}
                   {overrideDocs.length === 0 && (
@@ -1927,6 +1952,8 @@ export default function MarkdownHub() {
           tutorialContent={content}
           fileList={workspaceSnap.fileList}
           isDark={isDark}
+          ui={ui}
+          accentColor={accentColor}
         />
       )}
     </>

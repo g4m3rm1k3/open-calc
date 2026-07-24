@@ -6,7 +6,7 @@
 // as the case study instead of a planned topic, plus what changes when the
 // teacher is an AI with no file access. This file just appends the specific
 // report's details to that contract; it does not restate or thin it.
-import BUG_LESSON_CONTRACT from '../docs/BUG_LESSON_CONTRACT.md?raw'
+import BUG_LESSON_CONTRACT from '../docs/reference/BUG_LESSON_CONTRACT.md?raw'
 
 export { BUG_LESSON_CONTRACT }
 

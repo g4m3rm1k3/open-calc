@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Minus, Send, X, Zap } from 'lucide-react'
+import { Minus, Send, X, Zap, Sparkles } from 'lucide-react'
 import { useStudioAI } from '../../hooks/useStudioAI.js'
 
 // ── Inline markdown renderer (code blocks + bold + inline code) ───────────────
@@ -59,7 +59,7 @@ const QUICK = [
   { label: 'Explain from tutorial', q: 'How does what I\'m coding relate to what the tutorial is teaching?' },
 ]
 
-export default function AdaPanel({ code = '', language = '', filename = '', terminalOutput = '', tutorialContent = '', fileList = [], isDark = true }) {
+export default function AdaPanel({ code = '', language = '', filename = '', terminalOutput = '', tutorialContent = '', fileList = [], isDark = true, ui = {}, accentColor = '#0ea5e9' }) {
   const { askStream, isThinking, isDownloading, downloadProgress } = useStudioAI()
   const [history, setHistory] = useState([])
   const [input, setInput]     = useState('')
@@ -137,40 +137,49 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
 
   const onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }
 
-  // ── Colours ────────────────────────────────────────────────────────────────
-  const panelBg  = D ? 'bg-[#08111e]'     : 'bg-white'
-  const headBg   = D ? 'bg-[#0c1928]'     : 'bg-slate-100'
-  const border   = D ? 'border-slate-700/60' : 'border-slate-300'
-  const txt      = D ? 'text-slate-200'   : 'text-slate-800'
-  const txt2     = D ? 'text-slate-400'   : 'text-slate-500'
-  const bubbleU  = D ? 'bg-slate-800/70 text-slate-200' : 'bg-slate-100 text-slate-800'
-  const bubbleA  = D ? 'bg-cyan-950/50 border border-cyan-800/30 text-slate-200' : 'bg-cyan-50 border border-cyan-200 text-slate-800'
-  const accentTx = D ? 'text-cyan-400'    : 'text-cyan-600'
+  // ── Colours & Theme Integration ────────────────────────────────────────────
+  // Fallback defaults if `ui` isn't fully provided
+  const panelBg  = ui.bg1 || (D ? 'bg-[#08111e]' : 'bg-white')
+  const headBg   = ui.bg2 || (D ? 'bg-[#0c1928]' : 'bg-slate-100')
+  const border   = ui.border || (D ? 'border-slate-700/60' : 'border-slate-300')
+  const txt      = ui.txt1 || (D ? 'text-slate-200' : 'text-slate-800')
+  const txt2     = ui.txt2 || (D ? 'text-slate-400' : 'text-slate-500')
+  
+  const bubbleU  = `${ui.bg2 || (D ? 'bg-slate-800/70' : 'bg-slate-100')} ${txt} shadow-sm border border-transparent`
+  
+  // Create a custom glowy gradient style for AI bubbles based on accentColor
+  const aiBubbleStyle = {
+    backgroundColor: `${accentColor}10`, // 10% opacity hex
+    borderColor: `${accentColor}40`,     // 25% opacity hex
+    color: txt
+  }
 
   return (
     <div
-      className={`fixed z-[9999] rounded-xl shadow-2xl border flex flex-col overflow-hidden ${panelBg} ${border}`}
+      className={`fixed z-[9999] rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.2)] border flex flex-col overflow-hidden ${panelBg} ${border} backdrop-blur-2xl bg-opacity-95 transition-all duration-300 ease-out`}
       style={{ left: pos.x, top: pos.y, width: size.w, height: minimized ? 'auto' : size.h }}
     >
       {/* ── Drag handle / header ── */}
       <div
-        className={`shrink-0 flex items-center gap-2 px-3 py-2.5 rounded-t-xl cursor-grab select-none ${headBg}`}
+        className={`shrink-0 flex items-center gap-3 px-4 py-3 cursor-grab select-none ${headBg} border-b ${border}`}
         onMouseDown={onHeaderMouseDown}
       >
-        <span className={`text-[13px] font-bold ${accentTx}`}>✦ Ada</span>
-        <span className={`text-[10px] ${txt2} flex-1 truncate`}>
+        <span className="text-[13px] font-extrabold tracking-tight flex items-center gap-1.5" style={{ color: accentColor }}>
+          <Sparkles className="w-4 h-4" /> Ada
+        </span>
+        <span className={`text-[10px] ${txt2} flex-1 truncate font-medium`}>
           {isDownloading
-            ? <span className="text-amber-400 animate-pulse">{downloadProgress || 'Loading model…'}</span>
+            ? <span className="text-amber-500 animate-pulse">{downloadProgress || 'Loading model…'}</span>
             : fileList.length
               ? <span title={fileList.map(f => (f.name || f)).join(', ')}>{filename || 'Studio'} · {fileList.length} file{fileList.length !== 1 ? 's' : ''}</span>
               : 'Studio AI · local · private'}
         </span>
         <button
           onClick={() => setMinimized(m => !m)}
-          className={`w-5 h-5 flex items-center justify-center rounded hover:bg-slate-700/50 transition-colors ${txt2}`}
+          className={`w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ${txt2} hover:${txt}`}
           title={minimized ? 'Expand' : 'Minimize'}
         >
-          <Minus className="w-3 h-3" />
+          <Minus className="w-4 h-4" />
         </button>
       </div>
 
@@ -178,26 +187,30 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
       {!minimized && (
         <>
           {/* Messages */}
-          <div className={`flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar ${txt}`}>
+          <div className={`flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar ${txt}`}>
             {history.length === 0 && !isThinking && !isDownloading && (
-              <div className={`text-center pt-3 text-[11px] ${txt2}`}>
-                <p className={`font-semibold mb-1 ${accentTx}`}>Hi, I'm Ada — your private code tutor.</p>
-                <p>I can see your code, the terminal output, and the tutorial you're reading.</p>
-                <p className="mt-0.5">Ask me anything or pick a quick action below.</p>
+              <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[2px] shadow-lg mb-4">
+                  <div className={`w-full h-full rounded-full ${panelBg} flex items-center justify-center backdrop-blur-sm`}>
+                    <Sparkles className="w-8 h-8 text-transparent bg-clip-text" style={{ stroke: 'url(#adaGradient)', color: accentColor }} />
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-pink-500" style={{ color: accentColor }}>Hi, I'm Ada.</h3>
+                <p className={`text-sm ${txt2} max-w-[250px] leading-relaxed`}>I'm your private AI tutor. I can see your code, terminal, and current lesson.</p>
               </div>
             )}
 
             {isDownloading && (
-              <div className={`rounded-lg px-3 py-2 text-xs ${bubbleA}`}>
-                <p className={`font-bold text-[10px] mb-1 ${accentTx}`}>✦ Ada</p>
-                <p className="text-amber-300 animate-pulse">{downloadProgress || 'Downloading AI (~500 MB, first time only)…'}</p>
-                <p className={`mt-1 text-[10px] ${txt2}`}>Runs entirely in your browser — nothing is sent to any server.</p>
+              <div className="rounded-2xl px-4 py-3 text-[13px] shadow-sm border border-transparent" style={aiBubbleStyle}>
+                <p className="font-bold text-[11px] mb-1.5 flex items-center gap-1" style={{ color: accentColor }}><Sparkles className="w-3 h-3" /> Ada</p>
+                <p className="text-amber-500 font-medium animate-pulse">{downloadProgress || 'Downloading AI (~500 MB, first time only)…'}</p>
+                <p className={`mt-1.5 text-[10px] ${txt2}`}>Runs entirely in your browser — nothing is sent to any server.</p>
               </div>
             )}
 
             {history.map((m, i) => (
-              <div key={i} className={`rounded-lg px-3 py-2 text-xs ${m.role === 'user' ? bubbleU : bubbleA}`}>
-                {m.role === 'ai' && <p className={`font-bold text-[10px] mb-1 ${accentTx}`}>✦ Ada</p>}
+              <div key={i} className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm ${m.role === 'user' ? bubbleU : 'border'}`} style={m.role === 'ai' ? aiBubbleStyle : undefined}>
+                {m.role === 'ai' && <p className="font-bold text-[11px] mb-1.5 flex items-center gap-1" style={{ color: accentColor }}><Sparkles className="w-3 h-3" /> Ada</p>}
                 {m.role === 'ai'
                   ? <AiMessage text={m.text} isDark={D} />
                   : <span className="whitespace-pre-wrap">{m.text}</span>}
@@ -205,17 +218,19 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
             ))}
 
             {streaming && (
-              <div className={`rounded-lg px-3 py-2 text-xs ${bubbleA}`}>
-                <p className={`font-bold text-[10px] mb-1 ${accentTx}`}>✦ Ada</p>
+              <div className="rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm border" style={aiBubbleStyle}>
+                <p className="font-bold text-[11px] mb-1.5 flex items-center gap-1" style={{ color: accentColor }}><Sparkles className="w-3 h-3" /> Ada</p>
                 <AiMessage text={streaming} isDark={D} />
-                <span className={`animate-pulse ${accentTx}`}>▍</span>
+                <span className="animate-pulse" style={{ color: accentColor }}>▍</span>
               </div>
             )}
 
             {isThinking && !streaming && (
-              <div className={`rounded-lg px-3 py-2 text-xs ${bubbleA}`}>
-                <p className={`font-bold text-[10px] mb-1 ${accentTx}`}>✦ Ada</p>
-                <span className={`animate-pulse ${txt2}`}>Thinking…</span>
+              <div className="rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm border" style={aiBubbleStyle}>
+                <p className="font-bold text-[11px] mb-1.5 flex items-center gap-1" style={{ color: accentColor }}><Sparkles className="w-3 h-3" /> Ada</p>
+                <span className={`animate-pulse ${txt2} font-medium flex items-center gap-2`}>
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: accentColor, borderTopColor: 'transparent' }} /> Thinking…
+                </span>
               </div>
             )}
 
@@ -224,15 +239,14 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
 
           {/* Quick actions */}
           {history.length < 2 && !isThinking && !isDownloading && (
-            <div className={`shrink-0 flex flex-wrap gap-1.5 px-3 py-2 border-t ${border}`}>
+            <div className={`shrink-0 flex flex-wrap gap-2 px-4 py-3 border-t ${border} ${ui.bg0}`}>
               {QUICK.map(({ label, q }) => (
                 <button
                   key={label}
                   onClick={() => send(q)}
                   disabled={isThinking || isDownloading}
-                  className={`text-[10px] px-2 py-1 rounded border font-medium transition-colors disabled:opacity-40 ${
-                    D ? `border-cyan-800/50 ${accentTx} hover:bg-cyan-900/30` : 'border-cyan-300 text-cyan-700 hover:bg-cyan-50'
-                  }`}
+                  className={`text-[11px] px-3 py-1.5 rounded-full border shadow-sm font-semibold transition-all duration-300 ease-out hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0`}
+                  style={{ borderColor: `${accentColor}50`, color: accentColor, backgroundColor: `${accentColor}05` }}
                 >
                   {label}
                 </button>
@@ -241,7 +255,7 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
           )}
 
           {/* Input */}
-          <div className={`shrink-0 flex items-center gap-2 px-3 py-2 border-t ${border} ${headBg}`}>
+          <div className={`shrink-0 flex items-center gap-3 px-4 py-3 border-t ${border} ${headBg}`}>
             <input
               ref={inputRef}
               value={input}
@@ -249,14 +263,15 @@ export default function AdaPanel({ code = '', language = '', filename = '', term
               onKeyDown={onKey}
               disabled={isThinking || isDownloading}
               placeholder="Ask Ada anything…"
-              className={`flex-1 bg-transparent outline-none text-xs ${txt} placeholder:text-slate-500`}
+              className={`flex-1 bg-transparent outline-none text-[13px] ${txt} placeholder:text-slate-500 font-medium`}
             />
             <button
               onClick={() => send(input)}
               disabled={!input.trim() || isThinking || isDownloading}
-              className="shrink-0 w-6 h-6 flex items-center justify-center rounded bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 transition-colors"
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white shadow-md transition-all duration-300 disabled:opacity-40 hover:scale-105"
+              style={{ backgroundColor: accentColor }}
             >
-              {isThinking ? <Zap className="w-3 h-3 text-white animate-pulse" /> : <Send className="w-3 h-3 text-white" />}
+              {isThinking ? <Zap className="w-4 h-4 animate-pulse" /> : <Send className="w-4 h-4 ml-0.5" />}
             </button>
           </div>
 
