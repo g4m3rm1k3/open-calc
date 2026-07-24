@@ -139,17 +139,19 @@ feeding each one into the hash incrementally, rather than reading the
 whole file into memory first.
 
 ### Mechanical Walkthrough
+- `import hashlib` — first appearance of this module.
+- `def hash_file(path):` — basic.
+- `hasher = hashlib.sha256()` — the concept from this unit's lab, reused for real.
+- `with open(path, "rb") as f:` —
 
-`import hashlib` — first appearance of this module. `def
-hash_file(path):` — basic. `hasher = hashlib.sha256()` — the concept
-from this unit's lab, reused for real. `with open(path, "rb") as f:` —
 `"rb"` reminder from Lesson 61; binary mode matters here specifically
 because `hasher.update()` needs real bytes, not decoded text. `while
-True: chunk = f.read(4096) ...` — the exact chunked-reading loop from
-Lesson 10, reminder. `hasher.update(chunk)` — the concept from this
+- True: chunk = f.read(4096) ...` — the exact chunked-reading loop from Lesson 10, reminder.
+- `hasher.update(chunk)` — the concept from this
+
 unit's lab, reused for real, called once per chunk instead of once on
 the whole file — proven equivalent by this unit's second lab example.
-`return hasher.hexdigest()` — the concept from this unit's lab, reused
+- `return hasher.hexdigest()` — the concept from this unit's lab, reused
 for real.
 
 ### CS Lens
@@ -299,11 +301,13 @@ dictionary currently includes *every* file, even ones with no
 duplicates at all, which the next unit filters out.
 
 ### Mechanical Walkthrough
+- `import os` — reminder.
+- `def find_duplicates(root):` — basic.
+- `hashes = {}` — basic.
+- `for dirpath, dirnames, filenames in os.walk(root):` — Lesson 12, reminder.
+- `path = os.path.join(dirpath, filename)` — reminder.
+- `digest = hash_file(path)` — calling the function built in
 
-`import os` — reminder. `def find_duplicates(root):` — basic. `hashes =
-{}` — basic. `for dirpath, dirnames, filenames in os.walk(root):` —
-Lesson 12, reminder. `path = os.path.join(dirpath, filename)` —
-reminder. `digest = hash_file(path)` — calling the function built in
 this lesson's first unit. `hashes.setdefault(digest, []).append(path)`
 — the concept from this unit's lab, reused for real.
 

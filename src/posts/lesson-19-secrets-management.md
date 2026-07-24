@@ -263,15 +263,14 @@ back and decrypts it — end to end, a working, correct application of Lesson 8'
 encryption to a secrets file.
 
 ### Mechanical Walkthrough
-
-Every element here is a direct reapplication of Lesson 8's already-lab'd `Fernet` API —
+- Every element here is a direct reapplication of Lesson 8's already-lab'd `Fernet` API —
 **(b) hard concept reappearing** throughout, with one new fact worth isolating: `encrypted`
-is written to `secrets.enc` on disk, but `encryption_key` — the one piece of information
-that makes `secrets.enc` readable at all — exists, in this program, only as a Python
+- is written to `secrets.enc` on disk, but `encryption_key` — the one piece of information that makes `secrets.enc` readable at all — exists, in this program, only as a Python
+
 variable, generated fresh on every run, and printed nowhere. **This is deliberate, and it's
 the entire point of this unit**: the code runs correctly, but it never actually answers the
 question of where `encryption_key` itself is supposed to live between runs, or how a
-*different* program — one that needs to read `secrets.enc` later, possibly on a different
+- *different* program — one that needs to read `secrets.enc` later, possibly on a different
 machine — is supposed to obtain it.
 
 ### CS Lens
@@ -387,7 +386,6 @@ secrets that identity is permitted to retrieve — `backend-service` may fetch
 `database_password`; nothing else may, by default.
 
 ### Mechanical Walkthrough
-
 - `authorized_identities.get(identity, [])` — **(b) hard concept reappearing**: a
   dictionary lookup with a default value, defending against `KeyError` for an identity the
   vault has never heard of — reused from earlier lessons' lookup-table pattern.
@@ -395,7 +393,7 @@ secrets that identity is permitted to retrieve — `backend-service` may fetch
   authorization check, applied here to secrets instead of diary entries — is the specific
   thing being requested in the specific list this identity is permitted to access.
 - `access_log.append({...})` — **(a) first appearance**: every single call to
-  `request_secret` is recorded — including denied ones — before the function returns
+- `request_secret` is recorded — including denied ones — before the function returns
   anything. This line runs unconditionally, regardless of whether `granted` is `True` or
   `False`.
 - `time.strftime("%H:%M:%S")` — **(a) first appearance**: formats the current time as an

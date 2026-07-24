@@ -37,7 +37,6 @@ discipline this project has used from the start, applied here to a
 question docs alone couldn't answer: *is this code actually called?*
 
 ### Mechanical Walkthrough
-
 A real, command-line grep across the reference's own source settled it:
 
 ```
@@ -51,11 +50,11 @@ cnc/CNCEngine.test.ts:302:describe("buildFullToolProfile", ...
 ```
 
 `TOOL_TEMPLATES` itself is real and used (seeding the reference's own
-default tool table) — but `getHolderProfile`/`buildFullToolProfile`
+- default tool table) — but `getHolderProfile`/`buildFullToolProfile`
 only ever appear in `CNCEngine.test.ts`. Confirmed further: the
 reference's actual "Tool Shape Preview" canvas
 (`ToolEditForm.jsx`'s own `toolCvsRef`, drawn in `CNCSim.jsx`) hand-draws
-a hardcoded icon per `tool.type` — it never calls
+- a hardcoded icon per `tool.type` — it never calls
 `buildFullToolProfile` at all. There is no working reference display of
 tool/holder 3D geometry anywhere in the running app — real code, dead
 on arrival, exercised only by its own unit tests.
@@ -108,7 +107,6 @@ table_info`, row counts, cross-referencing ID sets) is precisely the
 technique used here, generalized.
 
 ### Mechanical Walkthrough
-
 Every real step, run directly against `Untitled.TOOLDB`, in order:
 
 **1. What's actually in this file?**
@@ -124,7 +122,7 @@ for row in cur.fetchall():
 "
 ```
 
-76 real tables — `TlAssembly`, `TlAssemblyComponent`, `TlHolder`,
+- 76 real tables — `TlAssembly`, `TlAssemblyComponent`, `TlHolder`,
 `TlGraphicsFile`, `TlProfileData`, and 71 more.
 
 **2. Row counts — which of these are actually populated?**
@@ -209,7 +207,6 @@ radius, StartAngle, SweepAngle`) needed a real interpretation — what do
 these numbers actually describe?
 
 ### Mechanical Walkthrough
-
 One real holder's full profile, read directly and hand-traced:
 
 ```
@@ -231,16 +228,15 @@ for r in cur.fetchall(): print(r)
 ```
 
 Traced by hand: `(0,0)→(0.25,0)` (a face, out to radius 0.25),
-`(0.25,0)→(0.25,3)` (straight up at a constant radius — a cylindrical
-shank), `(0.25,3)→(1.0,3)` (a step outward — a shoulder), `(1.0,3)→
-(1.0,4)` (straight up again — a larger-diameter body), `(1.0,4)→(0,4)`
+- `(0.25,0)→(0.25,3)` (straight up at a constant radius — a cylindrical shank), `(0.25,3)→(1.0,3)` (a step outward — a shoulder), `(1.0,3)→ (1.0,4)` (straight up again — a larger-diameter body), `(1.0,4)→(0,4)`
+
 (back to the axis, closing the outline). `x` is radius; `y` is axial
 (Z) position — a real, revolve-ready lathe-style cross-section, ordered
 segment by segment, each one's end matching the next one's start.
 
 Checked across every real segment in both this file (56 rows) and
 Mastercam's own official system library (15,015 rows, `Type` always
-`2` — a line): arcs (`radius`/`StartAngle`/`SweepAngle`) never actually
+- `2` — a line): arcs (`radius`/`StartAngle`/`SweepAngle`) never actually
 occur in real Mastercam holder data. Those columns are kept in the
 model below, honestly unexercised, not invented.
 
@@ -422,19 +418,18 @@ class TlAssemblyItem(Base):
 ```
 
 ### Mechanical Walkthrough
-
-`ForeignKey("TlTool.ID")` removed entirely from `TlAssemblyItem.ID` —
+- `ForeignKey("TlTool.ID")` removed entirely from `TlAssemblyItem.ID` —
 SQLite here never enforces foreign keys anyway (no `PRAGMA
 foreign_keys` anywhere in `core/storage.py`), so nothing changes at
 runtime; what changes is that the relationship can no longer be
 *inferred* from that FK, so both sides now say explicitly, in
 `primaryjoin`, exactly how to join (`TlTool.ID == foreign(TlAssemblyItem.ID)`
-and its mirror) — the `foreign()` annotation marking which side plays
+- and its mirror) — the `foreign()` annotation marking which side plays
 the FK-like role a real column-level `ForeignKey` used to play
 automatically. Both relationships are `viewonly=True`: every real write
 already happens by constructing `TlAssemblyItem(ID=tool_id, ...)` or
 `TlAssemblyItem(ID=holder.ID, ...)` directly (`insert_tool`,
-`_copy_tool_assembly` below) — nothing ever wrote through
+- `_copy_tool_assembly` below) — nothing ever wrote through
 `.catalog_item =`/`.tool =`, so marking both read-only costs nothing
 and is simply honest about how they're actually used.
 
@@ -634,11 +629,10 @@ class TlAssembly(Base):
 ```
 
 ### Mechanical Walkthrough
-
-`TlHolder.profile` — the same `primaryjoin`/`foreign()` shape as the
+- `TlHolder.profile` — the same `primaryjoin`/`foreign()` shape as the
 shared-catalog unit above, here for a genuinely one-directional,
 one-real-owner relationship (a profile segment always belongs to
-exactly one holder) — `viewonly=True` for the same reason: real writes
+- exactly one holder) — `viewonly=True` for the same reason: real writes
 go through `_copy_tool_assembly` (below), never through this attribute.
 `order_by="TlProfileData.Segment"` guarantees the profile always comes
 back in real outline order, matching the order the segments were
@@ -767,7 +761,6 @@ def get_assembly(tool_id):
 ```
 
 ### Mechanical Walkthrough
-
 - `points` is built by taking every segment's own *start* point in
   order, then appending the very last segment's *end* point once —
   since consecutive real segments share an endpoint
@@ -781,7 +774,7 @@ def get_assembly(tool_id):
 - The route checks `get_tool_by_id(tool_id) is None` first, specifically
   so a request for a tool that doesn't exist at all (404) reads
   differently from a request for a real tool with no assembly
-  (`200`, `{"assembly": null}`) — two different real situations, not
+- (`200`, `{"assembly": null}`) — two different real situations, not
   conflated into one error response.
 
 ### CS Lens / SE Lens
@@ -956,10 +949,9 @@ whole, not elided, even though only the last two lines are new:
 ```
 
 ### Mechanical Walkthrough
-
 `_copy_tool_assembly` takes the *source* session (already open, reading
 the uploaded file) as one argument, and separately opens this project's
-own `get_session()` to write into — two different databases, exactly
+- own `get_session()` to write into — two different databases, exactly
 the same "read from one, write to the other" shape `import_tools_from_file`
 already uses for tools themselves. `already_have_holder`/
 `already_have_assembly` guards make this idempotent: importing the same

@@ -225,13 +225,12 @@ of yet. The next lesson gives it somewhere permanent to write its
 output; for now, it's complete and callable entirely on its own.
 
 ### Mechanical Walkthrough
-
 `PBKDF2_ITERATIONS = 600_000` names the concept lab's iteration count as
 a real constant, reused by both functions below instead of repeating the
-literal number twice — the same `ALL_CAPS` module-level-constant
+- literal number twice — the same `ALL_CAPS` module-level-constant
 convention `MOTION_CODES` established in Lesson 13. `hash_password`
-takes a plain-text `password` and returns a **tuple** — two values
-handed back together, `(salt, hashed)` — the first time this project has
+- takes a plain-text `password` and returns a **tuple** — two values handed back together, `(salt, hashed)` — the first time this project has
+
 returned more than one value from a function this way; `salt, hashed =
 hash_password(...)` on the calling side would unpack it, the same
 unpacking-assignment shape from Lesson 7's `commit_hash, timestamp,
@@ -239,7 +238,7 @@ message = line.split(...)`. `secrets.token_bytes(16)` generates this
 call's own random salt — a new value every single time, confirmed in
 this lesson's earlier unit that the same password produces a different
 hash on each call. `password.encode()` converts the string into bytes,
-since `pbkdf2_hmac` operates on raw bytes, not text — the same
+- since `pbkdf2_hmac` operates on raw bytes, not text — the same
 string-to-bytes boundary already crossed implicitly by `.read_text(encoding="utf-8")`
 back in Lesson 3, made explicit here instead. `hashlib.pbkdf2_hmac("sha256",
 password.encode(), salt, PBKDF2_ITERATIONS)` is the concept lab's exact
@@ -247,7 +246,8 @@ call, for real, with a real random salt instead of a hardcoded one.
 `verify_password` takes a later login attempt's `password`, plus the
 `salt` and `expected_hash` that were stored when the account was
 created, and recomputes the *identical* hash using that same stored
-salt — `candidate_hash` — before comparing. `secrets.compare_digest(candidate_hash,
+- salt — `candidate_hash` — before comparing.
+- `secrets.compare_digest(candidate_hash,
 expected_hash)` reuses Lesson 8's exact timing-safe comparison, for the
 exact same reason: comparing hash bytes with a plain `==` would leak,
 byte by byte, how close a guess's *hash* was, the identical side-channel

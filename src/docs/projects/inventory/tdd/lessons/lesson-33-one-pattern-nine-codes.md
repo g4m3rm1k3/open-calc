@@ -158,7 +158,6 @@ def compute_path(commands):
 ```
 
 ### Mechanical Walkthrough
-
 - `_CYCLE_MODES = (...)` — **(a) first appearance** — direct port of the
   reference's own `hasCyc` array (Lesson 4's own `_MOTION_CODES` is a
   dict keyed by number; this is a tuple checked by membership, since
@@ -169,14 +168,14 @@ def compute_path(commands):
   *before* this move, exactly like `ch.pos.Z` is read before
   `applyMotion` overwrites it in the reference.
 - `is_absolute = command.get("pos_mode", "G90") == "G90"` /
-  `r = command["r"] if is_absolute else old_z + command["r"]` — **(a)
+- `r = command["r"] if is_absolute else old_z + command["r"]` — **(a)
   first appearance** — direct port of the real ternary
   (`w.R != null ? (ch.posMode === "G90" ? w.R : ch.pos.Z + w.R) : ch.pos.Z + 3`),
   reusing Lesson 31's own `pos_mode` field for the first time outside
   `MachineState`.
 - `_add_cycle_points(command, x, y, z, r, points)` — **(a) first
   appearance** — the shared 3-point pattern, called once regardless of
-  which of the 9 real cycle codes triggered it — `command["motion"]`
+- which of the 9 real cycle codes triggered it — `command["motion"]`
   itself (already correctly set per-code by `_apply_g_code`, Lesson 29)
   is only consulted again inside this function for the two codes
   (`G83`, `G76`) whose real behavior actually differs from the shared
@@ -186,7 +185,7 @@ def compute_path(commands):
   exactly like the reference's own `w.Q != null` check; `abs(command["q"])`
   matches `Math.abs(w.Q)`.
 - `if command["motion"] == "G76": for _ in range(3): ...` — **(a) first
-  appearance** — the reference's own literal `for (let p = 0; p < 3;
+- appearance** — the reference's own literal `for (let p = 0; p < 3;
   p++)`, tagging points `"G32"` (a motion mode this project has never
   emitted before, and doesn't otherwise interpret — it's the real
   reference's own tag for a thread-cutting pass, carried through

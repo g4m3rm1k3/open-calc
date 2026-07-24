@@ -219,38 +219,37 @@ def init_db():
 - **Dependencies** — none beyond Python's standard library.
 
 ### Mechanical Walkthrough
-
 - `DB_PATH = Path(__file__).resolve().parent.parent / "instance" /
-  "cnc.db"` — **(b) reappearing** `Path`/`__file__` navigation (the same
+- "cnc.db"` — **(b) reappearing** `Path`/`__file__` navigation (the same
   real pattern used implicitly by Flask's own `templates`/`static`
   lookup since Lesson 1, now written explicitly); `.parent.parent` walks
   up from `core/storage.py` to `cnc-service/`, then into a new
-  `instance/` folder — **(a) a real, named convention, not Flask's own
+- `instance/` folder — **(a) a real, named convention, not Flask's own
   mechanism**: `instance/` is a common real-world convention for "local,
   environment-specific data that shouldn't be committed to version
   control" (Flask itself has a similar, same-named concept,
-  `app.instance_path` — deliberately not used here, since `core/` must
+- `app.instance_path` — deliberately not used here, since `core/` must
   never import `flask` at all, the Lesson 2 boundary, so this project
   borrows the *name* as a plain folder, not Flask's own API).
 - `get_connection()` / `DB_PATH.parent.mkdir(parents=True,
-  exist_ok=True)` — **(a) first appearance** of `Path.mkdir` with these
+- exist_ok=True)` — **(a) first appearance** of `Path.mkdir` with these
   two real keyword arguments: `parents=True` creates any missing parent
   directories too (not just the final one); `exist_ok=True` means "don't
   raise an error if it already exists" — together, safe to call on
   *every* connection, not just the first.
 - `sqlite3.connect(DB_PATH)` — **(b) reappearing**, now a **real file
-  path** instead of `":memory:"` — SQLite creates the file itself, on
+- path** instead of `":memory:"` — SQLite creates the file itself, on
   disk, the first time this runs, if it doesn't already exist.
 - `connection.row_factory = sqlite3.Row` — **(a) first appearance.** By
   default, `sqlite3` rows behave like plain tuples (positional access
-  only, `row[0]`, `row[1]`) — the disposable `pets` lab used exactly
+- only, `row[0]`, `row[1]`) — the disposable `pets` lab used exactly
   this default. `sqlite3.Row` changes returned rows to support
   **both** positional *and* name-based access (`row["name"]`), and,
-  critically, `dict(row)` — used throughout this project's real
+- critically, `dict(row)` — used throughout this project's real
   functions to hand back plain dicts, the same shape every other route
   already returns.
 - `CREATE TABLE IF NOT EXISTS tools (...)` — **(b) reappearing** `CREATE
-  TABLE` syntax; **(a) the `IF NOT EXISTS` clause is new** — makes this
+- TABLE` syntax; **(a) the `IF NOT EXISTS` clause is new** — makes this
   statement safe to run every time the app starts, not just the first —
   real, if genuinely simple: this is **not** a real migration system
   (there's no way to *change* an existing table's columns later without
@@ -447,7 +446,6 @@ def seed_tools_if_empty():
 ```
 
 ### Mechanical Walkthrough
-
 - `tool["name"], ..., tool.get("subtype"), ...` — **(b) reappearing**
   dict indexing/`.get`-with-default (Lesson 2/10); required fields use
   `[...]` (a `KeyError`, a real, if currently uncaught, failure if
@@ -463,10 +461,10 @@ def seed_tools_if_empty():
   for the first time — converting every row to a plain dict, the same
   shape `/api/tools` (Lesson 13) already promised its caller.
 - `connection.execute("SELECT COUNT(*) FROM tools").fetchone()[0]` —
-  **(a) first appearance** of SQL's `COUNT(*)` **aggregate function** —
+- **(a) first appearance** of SQL's `COUNT(*)` **aggregate function** —
   returns the number of matching rows as a single value, not the rows
   themselves; `.fetchone()` (rather than `.fetchall()`) gets the one
-  resulting row; `[0]` reads its first (only) column — real, standard
+- resulting row; `[0]` reads its first (only) column — real, standard
   SQL, not a Python-side count of an already-fetched list, which would
   require fetching every row just to discard them.
 - `if count == 0: for tool in SEED_TOOLS: insert_tool(tool)` — **(a)
@@ -545,7 +543,6 @@ def create_tool():
 ```
 
 ### Mechanical Walkthrough
-
 - `init_db()` / `seed_tools_if_empty()` called **at module load time**
   (directly under `app = Flask(__name__)`, not inside any route
   function) — **(a) a real, deliberate placement**: this runs exactly
@@ -558,14 +555,14 @@ def create_tool():
   *(Full standalone treatment: ../concepts/flask-url-path-parameters.md.)*
   `<name>` matches
   any path segment in that position and passes it as a real argument to
-  the view function below it (`def get_tool(name):`) — Flask converts
+- the view function below it (`def get_tool(name):`) — Flask converts
   `/api/tools/drill_hss` into a call to `get_tool("drill_hss")`
   automatically.
 - `if tool is None: return {"error": ...}, 404` — **(b) reappearing**
   tuple-return-for-status-code (Lesson 2); **(a) `404`, first real,
   deliberate application-level use** in this project — the standard HTTP
   status for "nothing exists at this specific address," distinct from
-  Lesson 2's `400` ("what you sent was malformed") — a real, meaningful
+- Lesson 2's `400` ("what you sent was malformed") — a real, meaningful
   difference: `/api/tools/does_not_exist` is a well-formed request for a
   resource that genuinely isn't there, not a malformed one.
   *(Full standalone treatment, including this exact deliberate-vs-automatic
@@ -583,7 +580,7 @@ def create_tool():
   catching any real, honest discrepancy (a column default applied by
   SQLite itself, for instance) rather than an assumed echo.
 - `, 201` — **(a) first appearance** of HTTP `201 Created` (added to
-  `../concepts/http-status-codes.md` while auditing this lesson) — the
+- `../concepts/http-status-codes.md` while auditing this lesson) — the
   specific, correct status for "a new resource now exists," distinct
   from a plain `200` ("here's data, nothing changed on the server"),
   matching real HTTP convention.

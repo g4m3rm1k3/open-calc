@@ -193,17 +193,16 @@ deciding what to do next — used starting in this lesson's final unit
 to make `WHERE` genuinely optional.
 
 ### Mechanical Walkthrough
-
 - `bool Parser::checkKeyword(const std::string& keyword) const` —
-  reuses `const` member functions (Level 1 Lesson 4) — genuinely read-
+- reuses `const` member functions (Level 1 Lesson 4) — genuinely read-
   only, unlike `advance`, which mutates `pos`.
 - `if (pos >= tokens.size()) { return false; }` — **a hard concept
   reappearing**: the identical bounds check `peek()` uses (Lesson 3),
-  but returning `false` instead of throwing — the whole point of this
+- but returning `false` instead of throwing — the whole point of this
   method existing separately from `peek()`.
 - `tokens[pos].type == TokenType::KEYWORD && tokens[pos].text ==
-  keyword` — reuses `&&`, `==`, and direct indexing (`tokens[pos]`
-  instead of going through `peek()`) — indexing directly here, rather
+- keyword` — reuses `&&`, `==`, and direct indexing (`tokens[pos]` instead of going through `peek()`) — indexing directly here, rather
+
   than calling `peek()`, is deliberate: `peek()` would throw on an
   out-of-bounds `pos`, which is exactly the case this method needs to
   handle gracefully instead.
@@ -550,27 +549,26 @@ unit, then `;` — assembled entirely from pieces this project already
 had, plus `parseValueList`, built specifically for this.
 
 ### Mechanical Walkthrough
-
 - `WhereClause` and `InsertStatement` in `ast.h` — reuse `struct`
   exactly (Level 1 Lesson 2); `WhereClause` holds a `Token`, not a raw
-  value, for the same reason `InsertStatement::values` does — the AST
+- value, for the same reason `InsertStatement::values` does — the AST
   doesn't yet convert `NUMBER`/`STRING` text into real typed C++ values;
   that conversion is deferred, honestly, to whichever future lesson
   builds the executor.
 - `bool hasWhere = false;` — **first appearance** of a default member
-  initializer directly in a `struct` definition — every `SelectStatement`
+- initializer directly in a `struct` definition — every `SelectStatement`
   starts with `hasWhere` already `false`, without the constructing code
   needing to set it explicitly, unless a `WHERE` is actually found.
 - `if (checkKeyword("WHERE")) { ... }` — reuses `if` and this lesson's
-  own new `checkKeyword` — the payoff of this lesson's first unit: no
+- own new `checkKeyword` — the payoff of this lesson's first unit: no
   `try`/`catch`, no special-casing, just a plain conditional.
 - `stmt.where = parseWhereClause();` — **first appearance** of one
   parsing method's return value being assigned directly into a field of
-  another statement's AST node — `parseSelect` doesn't know or care how
+- another statement's AST node — `parseSelect` doesn't know or care how
   `parseWhereClause` works internally, only that it returns a complete
   `WhereClause`.
 - `while (peek().type == TokenType::COMMA)` in `parseValueList` —
-  reuses `peek()` and `==` — the same shape as the lab's `while` loop,
+- reuses `peek()` and `==` — the same shape as the lab's `while` loop,
   now checking a `Token`'s `type` instead of comparing raw strings.
 - `values.push_back(advance());` — reused twice in `parseValueList`
   (once before the loop, once inside it) — each call both reads and

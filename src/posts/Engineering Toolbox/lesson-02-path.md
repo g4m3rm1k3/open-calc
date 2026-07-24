@@ -90,9 +90,9 @@ Just the import — nothing surrounding it yet, per the schema's carve-out
 for a brand-new file.
 
 ### Mechanical Walkthrough
+- `import os` — the `import` concept from Lesson 1, reapplied to a different module — a reminder, not a re-explanation.
+- `os` — first
 
-`import os` — the `import` concept from Lesson 1, reapplied to a
-different module — a reminder, not a re-explanation. `os` — first
 appearance of this specific module: Python's interface to
 operating-system-level functionality (environment variables, file paths,
 process info — we'll use several corners of it this lesson).
@@ -199,9 +199,9 @@ crashing on that edge case. Nothing is searched yet — `path_value` is
 currently just one long string.
 
 ### Mechanical Walkthrough
+- `def which(program):` — assuming function definitions as basic, from your stated background.
+- `os.environ.get("PATH", "")` — the exact `.get`
 
-`def which(program):` — assuming function definitions as basic, from
-your stated background. `os.environ.get("PATH", "")` — the exact `.get`
 concept from this unit's lab, reused for real: `"PATH"` is the specific
 variable holding the search list; `""` is the fallback if it's missing.
 
@@ -301,8 +301,7 @@ def which(program):
 `PATH` — ready to loop over, instead of one unbroken string.
 
 ### Mechanical Walkthrough
-
-`path_value.split(os.pathsep)` — `.split()` and `os.pathsep`, both from
+- `path_value.split(os.pathsep)` — `.split()` and `os.pathsep`, both from
 this unit's lab, reused directly: `path_value` (the whole `PATH` string)
 split wherever `os.pathsep` (the OS-correct separator) occurs.
 
@@ -424,17 +423,19 @@ match that both exists and is executable — or `None` if it checks every
 folder and finds nothing.
 
 ### Mechanical Walkthrough
+- `for directory in directories:` — basic `for` loop, already established.
+- `os.path.join(directory, program)` — the `os.path.join` concept from
 
-`for directory in directories:` — basic `for` loop, already established.
-`os.path.join(directory, program)` — the `os.path.join` concept from
 this unit's lab, reused for real. `if os.path.isfile(candidate) and
-os.access(candidate, os.X_OK):` — both checks from the lab, combined
+- os.access(candidate, os.X_OK):` — both checks from the lab, combined
 with `and` (assuming boolean `and` as basic); both must be true for the
-`if` to pass. `return candidate` — assuming `return` inside a function as
+- `if` to pass.
+- `return candidate` — assuming `return` inside a function as
 basic, but worth naming explicitly: returning *inside* a loop exits the
 function immediately, stopping the search at the *first* match, which
-mirrors exactly how a real shell searches `PATH` — first match wins, not
-best match. `return None` — sits outside the loop, only reached if the
+- mirrors exactly how a real shell searches `PATH` — first match wins, not best match.
+- `return None` — sits outside the loop, only reached if the
+
 loop finishes without ever hitting the `return` above it.
 
 ### CS Lens

@@ -237,7 +237,6 @@ from pathlib import Path
 placed directly above the route that uses it, built in the next unit.
 
 ### Mechanical Walkthrough
-
 `import re` reuses ordinary import syntax, pulling in Python's standard
 library regular-expression module — this project's first use of it,
 deliberately, since the G-code lexer chose hand-written scanning instead
@@ -247,15 +246,16 @@ single, fixed, already-known shape to check against — exactly the kind
 of narrow, closed pattern regex is the right, standard tool for.
 `re.compile(r"^[0-9a-f]{4,40}$")` builds a reusable pattern object once,
 rather than re-parsing the pattern string on every request. `r"..."` is
-a **raw string** — the `r` prefix tells Python not to interpret
+- a **raw string** — the `r` prefix tells Python not to interpret
 backslashes specially inside it, which matters here even though this
 particular pattern has none, since regex patterns commonly do and
 writing them as raw strings is the standard convention. `^` and `$`
 anchor the match to the *entire* string — without them, a pattern
 merely present somewhere inside a longer malicious string would still
-match. `[0-9a-f]` matches exactly one lowercase hexadecimal digit —
+- match.
+- `[0-9a-f]` matches exactly one lowercase hexadecimal digit —
 `git` hashes are hex, always lowercase in their canonical form. `{4,40}`
-requires between 4 and 40 of them in a row — 4 as the shortest `git`
+- requires between 4 and 40 of them in a row — 4 as the shortest `git`
 itself will accept as an unambiguous abbreviation, 40 as a full SHA-1
 hash's exact length.
 
@@ -340,18 +340,17 @@ structure to show it inside of; the block above is everything there is
 to see.
 
 ### Mechanical Walkthrough
-
 The first two checks reuse the identical traversal and existence
 pattern from every route in this file since Lesson 5.
 `COMMIT_HASH_PATTERN.match(commit)` is new: `.match()` tests a string
 against a compiled pattern from its very start, returning a match object
 if it succeeds, `None` if it doesn't. `not COMMIT_HASH_PATTERN.match(commit)`
-is `True` exactly when that call returned `None` — a failed match — so
+- is `True` exactly when that call returned `None` — a failed match — so
 this `if` raises precisely when `commit` did *not* match the required
 shape. `relative_to(CONTENT_DIR).as_posix()`
 reuses the exact pattern from `file_history` right above it.
 `["git", "show", commit, "--", relative_path]` reuses the argument-list
-form of `subprocess.run` from every earlier `git` call in this project —
+- form of `subprocess.run` from every earlier `git` call in this project —
 `commit`, now guaranteed by the check above to be nothing but lowercase
 hex digits, can no longer be mistaken for a flag no matter what `git`
 itself might otherwise accept there. `result.returncode != 0` reuses the
@@ -485,17 +484,16 @@ function historyFile() {
 ```
 
 ### Mechanical Walkthrough
-
-`.clickable` loses its `.sidebar li` prefix — the same generalize-once-
+- `.clickable` loses its `.sidebar li` prefix — the same generalize-once-
 a-second-real-instance-needs-it reasoning `.output-panel` already went
 through in Lesson 10, `cursor: pointer` now meaningful on any element,
 not only sidebar list items. `.output-panel .clickable` and
 `.output-panel .clickable:hover` are **descendant selectors**, reused
-from `.sidebar li` itself — matching any `.clickable` element that sits
+- from `.sidebar li` itself — matching any `.clickable` element that sits
 *inside* an `.output-panel`, giving history entries their own
 appropriately dark-background hover color without touching the
 sidebar's light-background one at all. In `historyFile`, `data.commits.forEach((commit)
-=> { ... })` reuses `.forEach()` from Lesson 2 in place of `.map()` —
+- => { ... })` reuses `.forEach()` from Lesson 2 in place of `.map()` —
 deliberately: `.map()` builds a new array of *return values*; this code
 doesn't return anything from the callback, it performs a side effect
 (building and inserting a real element) for each commit, exactly the
@@ -503,7 +501,7 @@ distinction Lesson 10 already drew between the two methods.
 `document.createElement("div")`, `entry.className = "clickable"`, and
 `entry.addEventListener("click", () => { diffCommit(commit.hash); })`
 all reuse the exact construct-style-attach pattern `renderFileList` has
-used since Lesson 2 — a **closure** over `commit`, the same mechanism
+- used since Lesson 2 — a **closure** over `commit`, the same mechanism
 Lesson 2's own CS Lens named for its click handlers, capturing this
 specific commit's hash for this specific entry.
 `outputElement.appendChild(entry)` reuses `.appendChild()` from the same
@@ -575,18 +573,17 @@ The same reason as every panel before it: without this, switching tabs
 would leave a previous file's diff on screen instead of a clean slate.
 
 ### Mechanical Walkthrough
-
 `function diffCommit(commitHash)` reuses ordinary function-declaration
-syntax with a parameter — the value `historyFile`'s click handler closes
+- syntax with a parameter — the value `historyFile`'s click handler closes
 over and passes in. The guard clause reuses the standard shape.
 `encodeURIComponent(activeTabPath) + "&commit=" + encodeURIComponent(commitHash)`
 reuses URL-safety encoding from Lesson 2, applied to *two* query
-parameters chained with `&` — the same convention every multi-parameter
+- parameters chained with `&` — the same convention every multi-parameter
 URL in this project's backend already expects, here built by hand for
 the first time on the frontend, since every earlier route only ever
 needed one. `outputElement.textContent = data.diff` reuses plain text
 assignment, displaying the real diff text exactly as `git` produced it
-— `.output-panel`'s existing `white-space: pre-wrap` (Lesson 5) is what
+- — `.output-panel`'s existing `white-space: pre-wrap` (Lesson 5) is what
 keeps its line breaks and indentation intact rather than collapsing into
 one run-on line.
 
@@ -599,7 +596,7 @@ entry: `historyFile()` builds one real, clickable `<div>` per commit,
 each one's click handler closing over that exact commit's hash. Clicking
 one calls `diffCommit(commit.hash)`, sending `GET /diff?path=src/utils.py&commit=...`.
 On the backend, `diff_file` runs the shared traversal and existence
-checks, then — critically — validates `commit` against
+- checks, then — critically — validates `commit` against
 `COMMIT_HASH_PATTERN` before it ever reaches `subprocess.run` at all;
 only a value shaped like a real hash gets that far. `git show commit --
 relative_path` runs, exactly as this lesson's first unit demonstrated by
@@ -628,11 +625,11 @@ called at all.
    shows the file being added, not a comparison against a previous
    version that doesn't exist.
 3. Reproduce this lesson's argument-injection lab yourself, inside
-   `content/`'s own repo, and read the real file it creates — then
+- `content/`'s own repo, and read the real file it creates — then
    delete it and confirm `COMMIT_HASH_PATTERN` rejects the identical
    value through the real `/diff` route.
 4. Predict, before checking, whether `COMMIT_HASH_PATTERN` accepts an
-   uppercase hash like `"6D69CDD"` — then verify, and explain what real
+- uppercase hash like `"6D69CDD"` — then verify, and explain what real
    `git` hashes would ever look like in practice.
 
 ## Definition of done

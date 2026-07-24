@@ -350,18 +350,17 @@ output areas added directly below what Lesson 36 already had:
 ```
 
 ### Mechanical Walkthrough
-
-`watch(activeTabPath, () => {...})` — this lesson's own lab pattern,
+- `watch(activeTabPath, () => {...})` — this lesson's own lab pattern,
 applied for real: no second argument beyond the callback is used here
-(the lab's `(newValue, oldValue)` parameters aren't needed — this
+- (the lab's `(newValue, oldValue)` parameters aren't needed — this
 callback doesn't care *what* the new path is, only that it changed).
 `runFile` and `diagnoseFile` both call `authenticatedFetch` (Lesson
 35) with `method: 'POST'`, and both branch on their response inside a
-`.then()` — that much is genuinely shared. What isn't shared, named
+- `.then()` — that much is genuinely shared. What isn't shared, named
 above: `runFile` sets a real loading message and pre-clears its error
 flag; `diagnoseFile` does neither, for the real, measured reason
 already given. Each one's success branch reads its own backend route's
-actual field names — `data.stderr`/`data.stdout` for `runFile`,
+- actual field names — `data.stderr`/`data.stdout` for `runFile`,
 matching Lesson 5's `/run` response exactly; `data.ok`/`data.line`/
 `data.message` for `diagnoseFile`, matching Lesson 9's `/diagnose`
 response exactly — confirmed directly against the real backend routes
@@ -370,9 +369,9 @@ what they used to return. `saveFile`'s `return`
 keyword, added in three places, is the entire fix: JavaScript
 functions that don't explicitly `return` a value inside a `.then()`
 callback return `undefined`, which `.then()` on the *calling* side
-would receive as `wasSuccessful` — explicitly returning `true`/`false`
-makes that value real and checkable. `handleSave` in `Editor.vue` —
-`saveFile().then((wasSuccessful) => {...})` — is where the two
+- would receive as `wasSuccessful` — explicitly returning `true`/`false` makes that value real and checkable.
+- `handleSave` in `Editor.vue` — `saveFile().then((wasSuccessful) => {...})` — is where the two
+
 composables actually meet: not through either one importing the other,
 but through this component calling both and passing information
 between them itself.

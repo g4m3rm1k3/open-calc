@@ -202,13 +202,12 @@ export default function PageCanvas({ pageId, initialJSON, onLeavePage, tool, str
 ```
 
 #### Mechanical Walkthrough
-
 `n >> 16` shifts the 24-bit RGB integer right by 16 bits, leaving only
 the red byte in the low position; `& 255` masks off everything above
 the lowest 8 bits, isolating exactly that byte — the same two-operator
 pattern repeats at `>> 8` for green and with no shift at all for blue
 (already in the lowest byte). `canvas.isDrawingMode = tool === 'pen' ||
-tool === 'marker'` — a boolean expression assigned directly, no `if`
+- tool === 'marker'` — a boolean expression assigned directly, no `if`
 needed, since both branches want the same fabric-level flag turned on.
 `canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)` is
 re-created on every effect run rather than reused and mutated — cheap
@@ -233,7 +232,7 @@ palette that must be kept in sync by hand forever after.
 #### SE Lens
 
 The alternative — giving each tool (Pen, Marker) its own independent
-`toolColor`/`toolWidth` state — would let a user set the marker to a
+- `toolColor`/`toolWidth` state — would let a user set the marker to a
 totally different color than the pen without having to re-pick it
 every time they switch tools, a real usability upside. It was rejected
 here for a smaller feature surface: one color/width picker, shared by
@@ -246,7 +245,7 @@ over-build now on a guess.
 #### Connect to What Came Before
 
 Lesson 2's mount effect created the one canvas instance this effect
-reaches into via `fabricRef.current` — this unit is the first code to
+- reaches into via `fabricRef.current` — this unit is the first code to
 actually configure that canvas for something a user does with the
 mouse, rather than just loading and saving its contents.
 
@@ -356,17 +355,17 @@ return () => canvas.off('mouse:down', onMouseDown)
 ```
 
 #### Mechanical Walkthrough
-
-`o.evented = tool === 'select' || tool === 'eraser'` — established
+- `o.evented = tool === 'select' || tool === 'eraser'` — established
 boolean-expression style (previous unit), extended: an object must stay
 `evented` (able to receive mouse events at all) under Eraser too, or
 fabric would never populate `opt.target` for it during hit-testing,
-even though it isn't `selectable`. `opt.target` — a property fabric
+- even though it isn't `selectable`.
+- `opt.target` — a property fabric
 attaches to every mouse event it fires, naming the topmost object
 under the pointer, or `undefined` if the click hit empty canvas.
-`canvas.remove(opt.target)` — removes that one object from the
+- `canvas.remove(opt.target)` — removes that one object from the
 canvas's object list; nothing else on the canvas is touched.
-`canvas.on(...)`/`canvas.off(...)` — established (`SvgStudioPage.jsx`
+- `canvas.on(...)`/`canvas.off(...)` — established (`SvgStudioPage.jsx`
 already registers and cleans up canvas event listeners this same way)
 — the cleanup function returned from the effect ensures the *previous*
 tool's listener is removed before a new one is attached on the next
@@ -421,13 +420,13 @@ slider; clicking any of them updates `tool`, `strokeColor`, or
 `strokeWidth` in `CanvasNotesPage`'s state, which flows down as props
 to `PageCanvas`. `PageCanvas`'s third effect (this lesson) watches all
 three and reconfigures the one shared `fabric.Canvas` accordingly: Pen
-and Marker set `isDrawingMode` and install a `PencilBrush` — the same
+- and Marker set `isDrawingMode` and install a `PencilBrush` — the same
 brush class, differing only in color alpha and width, per this
 lesson's first unit; Eraser instead attaches a `mouse:down` listener
 that deletes whatever `target` fabric resolves for the click, per the
 second unit. Because this all lives in the *tool* effect (dependent on
 `[tool, strokeColor, strokeWidth]`), none of it interferes with Lesson
-2's separate *page-swap* effect (dependent on `[pageId]`) — switching
+- 2's separate *page-swap* effect (dependent on `[pageId]`) — switching
 pages mid-draw and switching tools mid-page are handled by two
 independent effects, each reacting only to the state that's actually
 its concern.
@@ -438,7 +437,7 @@ Verified live, this session: with the `o.evented = tool === 'select' ||
 tool === 'eraser'` line reverted to the Lesson-2-era
 `o.evented = tool === 'select'` (Eraser no longer keeps objects
 evented), clicking directly on a drawn stroke while Eraser is active
-produces `opt.target === undefined` — fabric can't hit-test an object
+- produces `opt.target === undefined` — fabric can't hit-test an object
 that isn't listening for events at all. The click silently does
 nothing: no error, no console warning, and a user has no way to tell
 whether they missed the stroke or whether Eraser is simply broken.
@@ -451,7 +450,7 @@ whether they missed the stroke or whether Eraser is simply broken.
   Predict what additional state this needs (a drag-start point, at
   minimum) before writing it.
 - Temporarily set the marker's `strokeLineCap` to `'round'` instead of
-  `'butt'` and compare the visual difference at a stroke's start/end —
+- `'butt'` and compare the visual difference at a stroke's start/end —
   confirm you can explain why a highlighter typically wants a flatter
   cap than a pen.
 

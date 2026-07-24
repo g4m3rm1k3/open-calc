@@ -245,11 +245,10 @@ def init_db():
 ```
 
 ### Mechanical Walkthrough
-
 - `DB_PATH` / `mkdir` — **(c) already established** (Lesson 14),
   unchanged.
 - `class Base(DeclarativeBase): pass` — **(b) reappearing** (this
-  lesson's own `Pet` lab) — this project's **one real, shared**
+- lesson's own `Pet` lab) — this project's **one real, shared**
   declarative base; every real model (`Tool`, and any future table)
   will inherit from this exact class, so `Base.metadata` collects every
   one of them in a single place.
@@ -271,8 +270,8 @@ def init_db():
   runs (Python only registers a class with `Base.metadata` when the
   class *definition itself* executes, which requires the module
   defining it to have been imported). This project's real, correct
-  order — `app.py` imports `core.tools` (which defines `Tool`) *before*
-  calling `init_db()` — is what makes this work; calling `init_db()`
+- order — `app.py` imports `core.tools` (which defines `Tool`) *before* calling `init_db()` — is what makes this work; calling `init_db()`
+
   before that import would silently create an empty database with no
   `tools` table at all. Verified, not assumed: this exact ordering was
   tested this session and produces the real, correct table.
@@ -331,14 +330,13 @@ class Tool(Base):
 ```
 
 ### Mechanical Walkthrough
-
 - `class Tool(Base): __tablename__ = "tools"` — **(b) reappearing**
   (this lesson's own `Pet`), applied to the real table Lesson 14 built
   by hand — same real table name, same real column set, now declared
   once as a Python class instead of a `CREATE TABLE` string plus a
   separate mental model of "what fields a tool dict has."
 - `subtype: Mapped[str | None]` / `point_angle_deg: Mapped[float |
-  None]` — **(a) first appearance** of `Mapped[T | None]`: the **union
+- None]` — **(a) first appearance** of `Mapped[T | None]`: the **union
   with `None`** in the type annotation itself is what tells SQLAlchemy
   a column is **nullable** — the real, direct equivalent of Lesson 14's
   explicit SQL (columns *without* `NOT NULL` were nullable; here,
@@ -348,7 +346,7 @@ class Tool(Base):
 - `def to_dict(self): return {...}` — **(a) first appearance** of a
   **real method on a model class**, something Lesson 14's raw
   `sqlite3.Row` objects had no equivalent of at all (`dict(row)` worked
-  generically, with no method belonging to the row itself) — `Tool`
+- generically, with no method belonging to the row itself) — `Tool`
   instances are real Python objects, so they can carry real behavior,
   not just data; this one method is what lets every route keep
   returning the exact same plain-dict shape as before, unchanged.
@@ -398,7 +396,6 @@ def seed_tools_if_empty():
 ```
 
 ### Mechanical Walkthrough
-
 - `with get_session() as session:` — **(a) first appearance** of
   `Session` used as a **context manager**: guarantees the session is
   properly closed when the block ends, even if an error occurs inside
@@ -410,7 +407,7 @@ def seed_tools_if_empty():
   class constructor instead of building a dict). **A real, verified
   fact, worth naming as a genuine improvement over Lesson 14's raw
   version**: if `tool` contains any key that isn't a real column on
-  `Tool`, this line raises a real `TypeError` — *"'unexpected_field' is
+- `Tool`, this line raises a real `TypeError` — *"'unexpected_field' is
   an invalid keyword argument for Tool"*, confirmed this session —
   whereas Lesson 14's hand-written `INSERT INTO tools (name, type,
   ...)` silently **ignored** any extra dict key not in its explicit
@@ -418,7 +415,7 @@ def seed_tools_if_empty():
   extra validation code this project had to write.
 - `select(Tool).where(Tool.name == name)` — **(b) reappearing** (this
   lesson's own `Pet` lab), now the real lookup Lesson 14 wrote as
-  `"SELECT * FROM tools WHERE name = ?"` — identical real behavior,
+- `"SELECT * FROM tools WHERE name = ?"` — identical real behavior,
   including safety: `Tool.name == name` **always** compiles to a real
   parameterized query, confirmed this session with the exact same
   malicious input Lesson 14 used
@@ -429,12 +426,12 @@ def seed_tools_if_empty():
   or one** matching row; returns the real object, or `None` if none
   matched (would raise a real error if *more than one* matched,
   correctly treating that as a genuine data problem rather than
-  silently picking one — not reachable here since `name` isn't
+- silently picking one — not reachable here since `name` isn't
   declared unique yet, a real, honest, small gap worth naming: a future
   lesson should add a real `UNIQUE` constraint on `Tool.name`).
 - `seed_tools_if_empty` — **(c) already established** shape (Lesson
   14), `session.execute(select(Tool)).scalars().first()` replacing the
-  raw `SELECT COUNT(*)` — a real, deliberate simplification: fetching
+- raw `SELECT COUNT(*)` — a real, deliberate simplification: fetching
   one row and checking for `None` is simpler to read than a separate
   count query, at the honest cost of a marginally less efficient query
   if the table were ever huge (not a real concern at this project's
@@ -478,13 +475,12 @@ ALLOWED_TOOL_FIELDS = REQUIRED_TOOL_FIELDS + OPTIONAL_TOOL_FIELDS
 ```
 
 ### Mechanical Walkthrough
-
 - `ALLOWED_TOOL_FIELDS = REQUIRED_TOOL_FIELDS + OPTIONAL_TOOL_FIELDS` —
   **(b) reappearing** tuple concatenation (already-known basic Python);
   a real, explicit **allow-list** — the same instinct as Lesson 4's
   `_SUPPORTED_WORDS`, applied here to request-body fields.
 - `{field: body[field] for field in ALLOWED_TOOL_FIELDS if field in
-  body}` — **(a) first appearance** of a **dict comprehension**.
+- body}` — **(a) first appearance** of a **dict comprehension**.
   *(Full standalone treatment: ../concepts/python-dict-comprehension.md.)*
   Builds
   a brand-new dict containing only the real, known-safe fields present

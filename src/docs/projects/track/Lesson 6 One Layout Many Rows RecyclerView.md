@@ -187,10 +187,9 @@ one child, the `RecyclerView`, constrained to fill the entire screen on
 all four edges.
 
 ### Mechanical Walkthrough
-
 - `<androidx.recyclerview.widget.RecyclerView>` — **first appearance.**
   Same full-class-path tag pattern as `ConstraintLayout` itself
-  (Lesson 3) — this instantiates the real `RecyclerView` class from the
+- (Lesson 3) — this instantiates the real `RecyclerView` class from the
   library you just added as a dependency, which is why Sync had to
   succeed first: without it, this tag would fail to resolve.
 - The four `app:layout_constraint*_to*Of="parent"` lines — reappearing,
@@ -428,10 +427,9 @@ compilable file, in the next Concept Unit. Hold onto it; don't type it
 into a new file by itself.
 
 ### Mechanical Walkthrough
-
 - `static class InventoryViewHolder extends RecyclerView.ViewHolder` —
   the `static class` part is **reappearing**, from this lesson's own
-  Nested Classes unit above — `InventoryViewHolder` gives up the hidden
+- Nested Classes unit above — `InventoryViewHolder` gives up the hidden
   reference to its enclosing `Adapter` for exactly the reason that unit
   named: it only ever needs its own row's views, never the `Adapter`
   itself. `extends RecyclerView.ViewHolder` is the required base
@@ -453,7 +451,7 @@ into a new file by itself.
   internally (accessible later as `.itemView`).
 - `itemView.findViewById(R.id.itemNameText)` — **reappearing**
   (`findViewById`, Lesson 4), new detail: called on `itemView` (the
-  inflated `list_item_inventory.xml` root) rather than on an Activity —
+- inflated `list_item_inventory.xml` root) rather than on an Activity —
   `findViewById` works the same way on any View, searching its own
   subtree, which here is a single `TextView`, not a whole screen.
 
@@ -606,11 +604,10 @@ uses `List<String>`, part of the standard library, built on this exact
 same mechanism.
 
 ### Mechanical Walkthrough
-
 - `class Box<T>` — the `<T>` after the class name declares a **type
   parameter**: `T` is a stand-in name (by convention a single capital
-  letter), filled in with a real, concrete type — `String`, `Integer`,
-  anything — at the point `Box` is actually used.
+- letter), filled in with a real, concrete type — `String`, `Integer`, anything — at the point `Box` is actually used.
+
 - `Box<String> box = new Box<>();` — `<String>` on the left fills in
   what `T` means for *this specific* `box` variable; `<>` on the right
   (the **diamond operator**) means "infer the type from the left-hand
@@ -719,13 +716,12 @@ methods `RecyclerView.Adapter` requires plus a constructor and the data
 it wraps.
 
 ### Mechanical Walkthrough
-
 - `class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`
-  — split into two ideas: extending `RecyclerView.Adapter` is the
+- — split into two ideas: extending `RecyclerView.Adapter` is the
   required base class contract (same "must extend the framework's
   class" idea as `AppCompatActivity` in Lesson 2, different base
   class); the `<...>` part is **reappearing**, from this lesson's own
-  Generics unit above — `RecyclerView.Adapter<VH>` is a generic class
+- Generics unit above — `RecyclerView.Adapter<VH>` is a generic class
   much like `Box<T>` was, and this line fills in its type parameter
   with `InventoryViewHolder`, telling the compiler *which* ViewHolder
   subtype this specific adapter works with, so that methods like
@@ -743,7 +739,7 @@ it wraps.
 - `InventoryAdapter(List<String> itemNames) { this.itemNames = itemNames; }`
   — **reappearing** (constructor, from the ViewHolder unit), new detail
   worth a clause: `this.itemNames` disambiguates the field from the
-  parameter of the same name — `this.` explicitly means "the field on
+- parameter of the same name — `this.` explicitly means "the field on
   this object," not the parameter that's shadowing it.
 - `@NonNull` — **first appearance.** An annotation (same category as
   `@Override` from Lesson 2, different purpose): a documentation-and-
@@ -759,20 +755,20 @@ it wraps.
   multiple different row layouts — not this project, yet).
 - `LayoutInflater.from(parent.getContext())` — **first appearance.**
   `LayoutInflater` is the class responsible for turning an XML layout
-  resource into real View objects — the same process `setContentView`
+- resource into real View objects — the same process `setContentView`
   triggers for you automatically for a whole screen; here you're
   calling it yourself for a single row layout instead.
 - `.inflate(R.layout.list_item_inventory, parent, false)` — **first
   appearance.** Three arguments: which layout resource to inflate, the
   `parent` ViewGroup it will eventually live inside (needed so the
   inflated view gets correctly-typed layout parameters), and `false`
-  meaning "don't attach it to `parent` yet" — `RecyclerView` itself
+- meaning "don't attach it to `parent` yet" — `RecyclerView` itself
   handles attaching the returned view at the right time; passing `true`
   here is a common real bug that duplicates the view in the tree.
 - `return new InventoryViewHolder(itemView);` — reappearing
   (constructor call, `new`, already basic since Lesson 4's `new Intent(...)`).
 - `onBindViewHolder(@NonNull InventoryViewHolder holder, int position)`
-  — **first appearance.** Called far more often than `onCreateViewHolder`
+- — **first appearance.** Called far more often than `onCreateViewHolder`
   — every time a holder (new *or* recycled) needs to display a
   *different* data item, including every time a recycled row scrolls
   back into view with new content. `position` is the index into your
@@ -782,7 +778,7 @@ it wraps.
   array indexing.
 - `holder.itemNameText.setText(name)` — reappearing (`setText`, Lesson 5),
   reading the cached field directly (package-private access, explained
-  in the ViewHolder unit) instead of calling `findViewById` again — this
+- in the ViewHolder unit) instead of calling `findViewById` again — this
   line is the actual payoff of the whole ViewHolder unit.
 - `getItemCount()` — **first appearance.** `RecyclerView` calls this to
   know how many total rows exist — it has no other way to know your
@@ -846,15 +842,14 @@ anything: a `LayoutManager` (arrangement logic) and an `Adapter` (data-
 to-view binding logic, built in this lesson).
 
 ### Mechanical Walkthrough
-
 - `new ArrayList<>()` — **first appearance.** A concrete, resizable
-  `List` implementation — the `<>` (diamond operator) means "infer the
+- `List` implementation — the `<>` (diamond operator) means "infer the
   type parameter from the left-hand side" (`List<String>`), so you
   don't have to repeat `<String>` on both sides.
 - `.add(...)` — reappearing pattern (already-basic method call).
 - `new LinearLayoutManager(this)` — **first appearance.** The
   arrangement collaborator: specifically, "lay rows out in a single
-  vertical (by default) scrolling list" — a `RecyclerView` refuses to
+- vertical (by default) scrolling list" — a `RecyclerView` refuses to
   display anything at all without one, since arrangement logic isn't
   built into `RecyclerView` itself, deliberately (grids, horizontal
   lists, and staggered lists are other `LayoutManager` implementations

@@ -236,14 +236,14 @@ as a new method, callable independently of every existing Room-backed
 method on this class.
 
 ### Mechanical Walkthrough
-
 - `new Retrofit.Builder().baseUrl(...).addConverterFactory(GsonConverterFactory.create()).build()`
-  — reappearing Builder pattern (Lesson 13/22/26). `.baseUrl(...)` —
-  **first appearance** — the root URL every `@GET`/`@POST` path is
-  appended to. `.addConverterFactory(GsonConverterFactory.create())` —
+- — reappearing Builder pattern (Lesson 13/22/26).
+- `.baseUrl(...)` — **first appearance** — the root URL every `@GET`/`@POST` path is appended to.
+- `.addConverterFactory(GsonConverterFactory.create())` —
+
   **first appearance** — registers Gson as the library responsible for
   converting raw JSON text into real Java objects (`RemoteNotice`),
-  and back — this single line is what replaces the `JSONObject`
+- and back — this single line is what replaces the `JSONObject`
   hand-parsing from this lesson's first unit entirely.
 - `.create(CatalogApi.class)` — **first appearance.** Generates a real,
   working implementation of the `CatalogApi` interface at runtime,
@@ -260,7 +260,7 @@ method on this class.
   appearance.** Actually triggers the network request — **asynchronously**,
   on Retrofit's own internally-managed background thread pool (Lesson
   14's principle, automated the same way `WorkManager` automated it in
-  Lesson 26 — no manual `ExecutorService` needed here either) — the
+- Lesson 26 — no manual `ExecutorService` needed here either) — the
   anonymous `Callback` (same anonymous-class shape as Lesson 8/20/27)
   is invoked once a result or failure is known.
 - `onResponse(Call<...> call, Response<...> response)` — **first
@@ -342,10 +342,9 @@ Replaces the connectivity receiver's `Log.d(...)`-only body from Lesson
 action instead of only a log line.
 
 ### Mechanical Walkthrough
-
 - `new ItemRepository((Application) context.getApplicationContext())`
   — reappearing (constructor call, Lesson 17), a fresh instance rather
-  than the one `InventoryViewModel` owns — worth naming honestly as a
+- than the one `InventoryViewModel` owns — worth naming honestly as a
   simplification: a real production app would more likely share one
   `ItemRepository` instance app-wide (a job for a proper dependency-
   injection setup, out of scope here) rather than construct a new one

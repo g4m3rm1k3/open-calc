@@ -182,15 +182,14 @@ structure to show it inside of; the block above is everything there is
 to see.
 
 ### Mechanical Walkthrough
+- The first three checks — `is_relative_to`, `is_file`, `target_file.suffix != ".py"` — are not new logic; they're the identical traversal,
 
-The first three checks — `is_relative_to`, `is_file`, `target_file.suffix
-!= ".py"` — are not new logic; they're the identical traversal,
 existence, and Python-only checks `run_file` already uses, copy-pasted
 again, the same named cost from Lesson 2 and Lesson 5. `content =
 target_file.read_text(encoding="utf-8")` reuses `read_file`'s exact
 pattern from Lesson 3, encoding pinned for the same reason. `ast.parse(content,
 filename=target_file.name)` is the concept lab's function, for real this
-time — `filename=target_file.name` is new: it doesn't change what gets
+- time — `filename=target_file.name` is new: it doesn't change what gets
 parsed, only what a raised `SyntaxError` reports as its source, so an
 error message names the actual file instead of `"<unknown>"`. `except
 SyntaxError as error:` reuses the exact `try`/`except` shape from Lesson
@@ -198,7 +197,7 @@ SyntaxError as error:` reuses the exact `try`/`except` shape from Lesson
 each time, the same underlying construct. `error.lineno`, `error.offset`,
 and `error.msg` are the same three attributes just proven in the concept
 lab, now placed into a returned dictionary instead of printed. `return
-{"ok": True}` — reached only if `ast.parse` raised nothing at all — is
+- {"ok": True}` — reached only if `ast.parse` raised nothing at all — is
 this route's success case, mirroring the shape of every JSON response
 this API has returned since Lesson 1.
 
@@ -336,22 +335,21 @@ Nothing writes to `#diagnostics-output` yet — it exists, styled, empty,
 waiting for the next unit.
 
 ### Mechanical Walkthrough
-
 `font-family: monospace`, `font-size: 13px`, and `padding: 4px 0` all
 reuse exactly the properties `#run-output` already established in Lesson
 5, for the same reason — this is also a fixed-width status readout.
-`color: #666` is new only in its specific value — a medium gray, chosen
+- `color: #666` is new only in its specific value — a medium gray, chosen
 for a default/neutral state sitting directly on this page's plain white
 background, distinct from `#run-output`'s white-on-near-black scheme.
 `#diagnostics-output.has-error` reuses the exact `.has-error` *naming*
-convention `#run-output.has-error` established in Lesson 5 — the same
+- convention `#run-output.has-error` established in Lesson 5 — the same
 idea, "a class toggled on to signal an error state," applied a second
-time — but with its own color, `#c00` (a dark red), chosen for
+- time — but with its own color, `#c00` (a dark red), chosen for
 readability against this element's light background rather than
 `#run-output.has-error`'s `#f88` against a dark one. Same pattern,
 different concrete values, because the two elements sit on different
 backgrounds. The bare `<div id="diagnostics-output"></div>` is the same
-empty, ID-tagged container shape as `#run-output` itself — nothing
+- empty, ID-tagged container shape as `#run-output` itself — nothing
 inside it yet; JavaScript fills it in, same as `#run-output` has been
 filled in since Lesson 5.
 
@@ -411,9 +409,8 @@ structure to show it inside of; the block above is everything there is
 to see. Nothing calls it yet — the next unit does.
 
 ### Mechanical Walkthrough
-
 `if (activeTabPath === null) { return; }` reuses the exact guard clause
-`openFile`, `saveFile`, and `runFile` all already use — nothing to check
+- `openFile`, `saveFile`, and `runFile` all already use — nothing to check
 with no tab open. `fetch(...)` with `method: "POST"` and an
 `Authorization` header reuses `runFile`'s exact shape from Lesson 5/8:
 `POST`, because this route performs a check rather than fetching a
@@ -429,7 +426,8 @@ returns on the backend, the same JSON-shape correspondence named back in
 Lesson 8 for `data.token`. `diagnosticsElement.className = ""` /
 `"has-error"` and `.textContent = ...` both reuse the exact
 toggle-a-class/set-the-text pattern `runFile` already applies to
-`#run-output` — the same two-property pairing, a new element. `"Line " +
+- `#run-output` — the same two-property pairing, a new element.
+- `"Line " +
 data.line + ": " + data.message` reuses `+` string concatenation,
 building a readable sentence from the two structured fields the backend
 computed. `.catch((error) => { ... })` reuses the network-failure
@@ -538,14 +536,13 @@ triggers a check immediately afterward, and switching tabs always clears
 the previous tab's stale answer before the new one's is known.
 
 ### Mechanical Walkthrough
-
 `diagnoseFile();`, called with no arguments, reuses ordinary function-call
 syntax already established since Lesson 1 — the only thing new here is
 *where* it's called from: inside `saveFile`'s own success callback, after
 a `fetch` that has nothing to do with `/diagnose` has already completed.
 `document.getElementById("diagnostics-output").textContent = ""` and
 `.className = ""` both reuse the exact clearing pattern the two lines
-immediately above them already apply to `#run-output` — the same idea, a
+- immediately above them already apply to `#run-output` — the same idea, a
 second element.
 
 ### CS Lens — one async operation triggering another, not chaining the same one

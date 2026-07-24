@@ -101,16 +101,16 @@ meaning calling this on two completely different folders produces two
 sets that are genuinely comparable to each other.
 
 ### Mechanical Walkthrough
+- `import os` — reminder.
+- `def relative_snapshot(root):` — basic.
+- `paths = set()` — first appearance of building a `set` from scratch (Lesson 14 only ever built sets *from* existing dicts via `set(some_dict)`) —
 
-`import os` — reminder. `def relative_snapshot(root):` — basic. `paths
-= set()` — first appearance of building a `set` from scratch (Lesson
-14 only ever built sets *from* existing dicts via `set(some_dict)`) —
 `set()` with no arguments creates an empty one, ready for `.add()`.
 `for dirpath, dirnames, filenames in os.walk(root):`, `full_path =
-os.path.join(dirpath, filename)` — Lesson 12, reminder. `rel_path =
-os.path.relpath(full_path, root)` — the concept from this unit's lab,
-reused for real. `paths.add(rel_path)` — first appearance of `.add()`
-on a `set` — the set equivalent of a list's `.append()`, adding one
+- os.path.join(dirpath, filename)` — Lesson 12, reminder.
+- `rel_path = os.path.relpath(full_path, root)` — the concept from this unit's lab, reused for real.
+- `paths.add(rel_path)` — first appearance of `.add()` on a `set` — the set equivalent of a list's `.append()`, adding one
+
 item; unlike a list, adding the same value twice has no effect — a set
 never holds duplicates.
 
@@ -236,17 +236,18 @@ to each side and what's genuinely different in content between the two,
 by relative path.
 
 ### Mechanical Walkthrough
+- `hash_file()` — Lesson 13, reminder, unchanged.
+- `source_paths = relative_snapshot(source)`, `dest_paths = relative_snapshot(dest)` —
 
-`hash_file()` — Lesson 13, reminder, unchanged. `source_paths =
-relative_snapshot(source)`, `dest_paths = relative_snapshot(dest)` —
 calling this lesson's first unit's function on two real, different
-roots. `only_in_source = source_paths - dest_paths`, `only_in_dest =
-dest_paths - source_paths`, `common = source_paths & dest_paths` —
+- roots.
+- `only_in_source = source_paths - dest_paths`, `only_in_dest = dest_paths - source_paths`, `common = source_paths & dest_paths` —
+
 Lesson 14's set operations, reminder, now comparing two genuinely
 different trees instead of two snapshots of the *same* tree at
 different times. `differing = {p for p in common if hash_file(...) !=
-hash_file(...)}` — a set comprehension (Lesson 14, reminder) combining
-`common` with `hash_file()` — for every path both trees share, comparing
+- hash_file(...)}` — a set comprehension (Lesson 14, reminder) combining `common` with `hash_file()` — for every path both trees share, comparing
+
 their real content, not just their names.
 
 ### CS Lens
@@ -392,18 +393,17 @@ that's missing from `dest` or genuinely different, preserving each
 one's original timestamp — a real, working one-way sync.
 
 ### Mechanical Walkthrough
-
-`only_in_source | differing` — first appearance of `|`, set **union**:
+- `only_in_source | differing` — first appearance of `|`, set **union**:
 combining two sets into one containing everything from either —
 exactly the two categories that actually need copying (files only in
 `source`, and files that exist in both but differ). `os.makedirs(
-os.path.dirname(dst_path), exist_ok=True)` — `os.path.dirname()` — a
+- os.path.dirname(dst_path), exist_ok=True)` — `os.path.dirname()` — a
 small, self-explanatory `os.path` function (same family as `basename`,
-`expanduser` — returns everything *except* the final filename) — needed
+- `expanduser` — returns everything *except* the final filename) — needed
 here because a file nested in a subfolder that doesn't yet exist in
 `dest` needs that subfolder created first; `exist_ok=True` (Lesson 11,
 reminder) makes this safe even when it already exists. `shutil.copy2(
-src_path, dst_path)` — the concept from this unit's lab, reused for
+- src_path, dst_path)` — the concept from this unit's lab, reused for
 real.
 
 ### CS Lens

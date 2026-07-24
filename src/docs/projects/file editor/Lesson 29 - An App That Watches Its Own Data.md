@@ -286,25 +286,24 @@ it doesn't touch `openTabs`, `activeTabPath`, `authToken`, or any other
 variable the rest of the app depends on.
 
 ### Mechanical Walkthrough
-
-`<script src="...">` — every `<script>` tag in this project until now
+- `<script src="...">` — every `<script>` tag in this project until now
 has been inline, its content written directly between the opening and
 closing tags. `src` is new: instead of inline content, it tells the
-browser to fetch a separate file — here, from `unpkg.com` — and run it
+- browser to fetch a separate file — here, from `unpkg.com` — and run it
 as though it were written inline at that exact point in the page.
 Because this tag sits before the project's own `<script>` block, the
 `Vue` global it defines already exists by the time any of this
 project's own code runs.
 
-`position: fixed` — first appearance of CSS positioning in this
+- `position: fixed` — first appearance of CSS positioning in this
 project; every element so far has used the browser's default layout
 flow (`static` positioning), where an element's location is determined
 entirely by the elements around it. `fixed` removes an element from
 that flow entirely and positions it relative to the browser window
 itself, unaffected by scrolling or by `#login-screen`/`#app-layout`
-toggling their own `display` — exactly why this widget stays visible
+- toggling their own `display` — exactly why this widget stays visible
 and in the same spot regardless of which screen is showing. `top: 8px`
-and `right: 8px` — with `fixed` positioning, these properties place the
+- and `right: 8px` — with `fixed` positioning, these properties place the
 element's edges a fixed distance from the corresponding edge of the
 browser window; `font-size: 12px` and `color: #666` reuse already-
 established CSS properties, matching `#login-status`'s own small,
@@ -312,10 +311,12 @@ muted styling.
 
 `data()` and `{{ statusText }}` reuse this lesson's own first unit
 exactly, now with a real, meaningful initial value instead of
-`"hello"`. `methods: { checkBackend() { ... } }` — first appearance of
+- `"hello"`.
+- `methods: { checkBackend() { ... } }` — first appearance of
 the `methods` option: a place for functions the template can call by
 name, here via `@click="checkBackend"` rather than an inline expression
-like the previous unit's `count++`. `this.statusText` — inside a Vue
+- like the previous unit's `count++`.
+- `this.statusText` — inside a Vue
 method, `this` refers to the component instance itself, and reading or
 assigning `this.statusText` reads or assigns the exact same reactive
 value `data()` returned; setting it here is what makes `{{ statusText

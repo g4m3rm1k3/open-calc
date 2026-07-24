@@ -210,7 +210,6 @@ every use of it before making this change, so removing it outright
 introduces no dangling reference anywhere else in the file.
 
 ### Mechanical Walkthrough
-
 `v-if="errorMessage !== ''"` reuses `v-if` from nowhere yet in this
 project's Vue code — first appearance, though it's the exact same
 directive family as `v-model` and `v-on`/`@`, just choosing whether an
@@ -222,14 +221,14 @@ the key — unique within any one folder listing, the same uniqueness
 (`backend/main.py`'s `list_files`) already guarantees by construction.
 `@click="goUp"`/`@click="handleEntryClick(entry)"` reuse `@click`
 (Lesson 29); note `handleEntryClick(entry)` is called *with an
-argument* here, unlike every previous `@click` in this project — inside
+- argument* here, unlike every previous `@click` in this project — inside
 a `v-for`, each rendered copy has its own `entry` in scope, so this
 expression calls the method with *that specific copy's* item, not a
 shared value. `this.currentPath.split("/").slice(0, -1).join("/")`
 inside `goUp` is Lesson 2's exact parent-path logic, unchanged, just
 reading `this.currentPath` instead of the old global. `handleEntryClick`
 reuses the identical `is_directory` branch `renderFileList` always had
-— same decision, same two functions called (`loadFolder`/`openFile`),
+- — same decision, same two functions called (`loadFolder`/`openFile`),
 now living inside a Vue method instead of an inline click-listener
 callback.
 

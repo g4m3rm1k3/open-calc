@@ -146,16 +146,18 @@ and closes — a fresh database file gets `users` and `locks` together,
 the very first time this function runs against it.
 
 ### Mechanical Walkthrough
-
-`CREATE TABLE IF NOT EXISTS locks (...)` — reappearance of the exact
+- `CREATE TABLE IF NOT EXISTS locks (...)` — reappearance of the exact
 SQL statement shape from Lesson 16's `users` table; no restatement
-needed beyond naming the reuse. `path TEXT PRIMARY KEY` — first
+- needed beyond naming the reuse.
+- `path TEXT PRIMARY KEY` — first
 appearance of `PRIMARY KEY` on a column that isn't an autoincrementing
 ID: here it's the file's own path, meaning the table structurally
 cannot hold two rows for the same path, exactly as this lesson's lab
-just demonstrated with `item`. `username TEXT NOT NULL` — reappearance
+- just demonstrated with `item`.
+- `username TEXT NOT NULL` — reappearance
 of `NOT NULL` from the `users` table, requiring every lock row to name
-who holds it. `checked_out_at TEXT NOT NULL` — same `NOT NULL`
+- who holds it.
+- `checked_out_at TEXT NOT NULL` — same `NOT NULL`
 constraint, storing a timestamp as text, the type SQLite uses for
 `datetime()` values.
 
@@ -306,20 +308,19 @@ things this feature needs to do: claim a file, release a claim, and
 check the current claim without altering it.
 
 ### Mechanical Walkthrough
-
 `INSERT INTO locks (path, username, checked_out_at) VALUES (?, ?,
-datetime('now'))` — the `?` placeholders and passed-tuple parameter
+- datetime('now'))` — the `?` placeholders and passed-tuple parameter
 binding are a direct reapplication of Lesson 16's SQL-injection fix,
 now protecting `path` and `username` the same way it already protects
 `username` in `create_user`. `datetime('now')` is SQLite's own function
 for the current UTC timestamp as text, called from inside the SQL
 string itself rather than computed in Python and passed in — first
 appearance of a SQL-side function call in this project. `DELETE FROM
-locks WHERE path = ?` — first appearance of `DELETE`; like `INSERT` and
+- locks WHERE path = ?` — first appearance of `DELETE`; like `INSERT` and
 `SELECT`, it takes a `WHERE` clause, and without one it would delete
 every row in the table, not just the one requested. `get_lock`'s body is
-a verbatim structural repeat of `get_user` — a `SELECT`, a
-parameterized `WHERE`, `.fetchone()`, close, return — reapplying an
+- a verbatim structural repeat of `get_user` — a `SELECT`, a parameterized `WHERE`, `.fetchone()`, close, return — reapplying an
+
 already-taught shape to a new table, no new mechanic. All three
 functions reuse `get_connection()`/`.close()` from Lesson 16, and the
 same asymmetry from that lesson repeats here: `checkout_file` and
@@ -481,15 +482,15 @@ Lesson 3. `relative_path` moved one line earlier than before, since the
 new lock check needs it before the write happens, not after.
 
 ### Mechanical Walkthrough
-
-`get_lock(relative_path)` — a call to this lesson's own function,
+- `get_lock(relative_path)` — a call to this lesson's own function,
 returning either `None` (no row found, `.fetchone()`'s documented
 behavior on no match) or a tuple of the three selected columns.
-`lock_path, lock_username, checked_out_at = lock` — tuple unpacking,
+- `lock_path, lock_username, checked_out_at = lock` — tuple unpacking,
 already used throughout this project for `get_user`'s return value
 (Lesson 16); `lock_path` and `checked_out_at` are unpacked but unused
 in this specific check, kept only because Python's tuple unpacking
-requires naming every position. `if lock_username != current_user` —
+- requires naming every position.
+- `if lock_username != current_user` —
 `current_user`, Lesson 25's new capture, compared directly against the
 username stored in the lock row: the entire enforcement decision is one
 equality check between two strings. `f"Checked out by {lock_username}"`

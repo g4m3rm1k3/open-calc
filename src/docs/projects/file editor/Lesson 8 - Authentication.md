@@ -147,13 +147,12 @@ Nothing compares anything yet — this unit only sets up the value
 everything else will check against.
 
 ### Mechanical Walkthrough
-
 `os.environ.get("ADMIN_PASSWORD", "changeme")` reads an **environment
 variable** — a value set outside the program itself, in the shell or
 deployment environment it runs in — falling back to the literal string
 `"changeme"` if that variable was never set. `secrets` is Python's
 standard library module specifically for security-sensitive randomness
-and comparisons — not `random`, which is fast and predictable enough to
+- and comparisons — not `random`, which is fast and predictable enough to
 be unsuitable for anything security-related.
 
 ### SE Lens — a secret that lives outside the source code
@@ -281,9 +280,9 @@ already having a token — every route after this one, starting with the
 next unit, will require one.
 
 ### Mechanical Walkthrough
-
 `LoginRequest` is the same `BaseModel` pattern as `FileEdit` from Lesson
-3 — FastAPI parses the request body into it automatically. `secrets.compare_digest(...)`
+- 3 — FastAPI parses the request body into it automatically.
+- `secrets.compare_digest(...)`
 is the real fix for the timing problem in the concept lab: it always
 takes the same amount of time regardless of *where* the two strings
 first differ, specifically engineered to defeat the measurement the lab
@@ -348,16 +347,16 @@ Nothing calls `require_auth` yet — the next unit attaches it to routes,
 which needs one more import of its own.
 
 ### Mechanical Walkthrough
-
 `authorization: str = Header(None)` is a new kind of parameter inference
-— FastAPI reads this specific request *header*, named `Authorization`
+- — FastAPI reads this specific request *header*, named `Authorization`
 (the name is matched automatically from the parameter name), and hands
 its value in as a string, or `None` if the header wasn't sent at all,
 which `Header(None)`'s default makes valid rather than an error.
 `"Bearer <token>"` is a standard, widely-used convention for sending a
-token in this header — `.startswith("Bearer ")` confirms it's actually
+- token in this header — `.startswith("Bearer ")` confirms it's actually
 in that shape; `.removeprefix("Bearer ")` strips the label off, leaving
-just the token itself. `token not in valid_tokens` is the actual check —
+- just the token itself.
+- `token not in valid_tokens` is the actual check —
 a set membership test, the payoff for choosing a `set` two units ago.
 
 ### CS Lens — a function that gates, without doing the work itself
@@ -444,15 +443,14 @@ the lesson that built it. Only the decorator line, on each of these five
 routes, grew one argument.
 
 ### Mechanical Walkthrough
-
 `dependencies=[Depends(require_auth)]` is FastAPI's **dependency
 injection** system: `Depends(require_auth)` tells FastAPI "run this
 function first, before the route body, on every request to this route."
-Because `require_auth` is passed here — not called directly — FastAPI
+- Because `require_auth` is passed here — not called directly — FastAPI
 controls exactly when it runs, the same "pass the function itself, not
 its result" idea already seen with `RUNNERS` in Lesson 6. If
 `require_auth` raises, FastAPI sends that error straight back to the
-client and the route function underneath — `list_files`, `run_file`,
+- client and the route function underneath — `list_files`, `run_file`,
 whichever it is — never runs at all.
 
 ### CS Lens — the same decorator idea, a second explicit form
@@ -557,9 +555,8 @@ is the one new check, sitting first inside the loop, before anything else
 runs for a given entry.
 
 ### Mechanical Walkthrough
-
 `entry.name.startswith(".")` catches `.git`, and, for free, any other
-dot-prefixed entry that might exist later — `.gitignore`, `.env`,
+- dot-prefixed entry that might exist later — `.gitignore`, `.env`,
 anything conventionally treated as hidden. `continue` skips straight to
 the next loop iteration, never reaching `entries.append(...)` for this
 one entry.
@@ -816,15 +813,14 @@ document.getElementById("login-button").addEventListener("click", login);   // �
 ```
 
 ### Mechanical Walkthrough
-
 `document.getElementById("password-input").value` reads whatever's
-currently typed into the password field — the same `.value` property
+- currently typed into the password field — the same `.value` property
 Lesson 3 used to read a `<textarea>`'s current content, here reading an
 `<input>` instead; the property means the same thing on both elements.
 `let authToken = null;` follows the exact same convention
 `activeTabPath` established in Lesson 4: `null` specifically means
 "nothing yet" — no tab was active before any file was opened, and no
-token exists before login succeeds — distinct from `""`, which
+- token exists before login succeeds — distinct from `""`, which
 `currentPath` uses to mean a real value (the root folder), not an
 absence of one. `JSON.stringify({ password: password })` is
 **serialization** again — the same operation, and the same reason for
@@ -840,7 +836,7 @@ inside a `.then()` deliberately triggers the next `.catch()` in the
 chain, on purpose, converting "the server said no" into the same
 handling path as "the network failed entirely." `authToken = data.token`
 reads the exact field the backend's `/login` route returned a few units
-back — `return {"token": token}` — the same JSON-shape-in,
+- back — `return {"token": token}` — the same JSON-shape-in,
 JSON-shape-out correspondence every route in this project has followed
 since Lesson 1. `"Bearer " + authToken` builds the exact header shape
 `require_auth` expects on the backend.

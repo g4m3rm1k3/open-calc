@@ -175,10 +175,9 @@ log_login_attempt(malicious_username, "failed")
 `username` is now sanitized before it ever reaches the write.
 
 ### Mechanical Walkthrough
-
 - `username.replace("\n", "\\n")` — **(a) first appearance in this lesson, reapplying an
   already-basic method**: replaces every literal newline character in `username` with the
-  two-character, visible escape sequence `\n` (backslash, then the letter `n`) — the
+- two-character, visible escape sequence `\n` (backslash, then the letter `n`) — the
   string now contains text that *describes* a newline rather than an actual line break.
 - `.replace("\r", "\\r")` — **(c) already basic**, same method, applied to the carriage
   return character, the second line-ending character relevant on some systems and log
@@ -335,9 +334,8 @@ not a hand-parsed string, which is exactly what lets `detect_brute_force` and
 to parse free text first.
 
 ### Mechanical Walkthrough
-
 - `defaultdict(int)` — **(a) first appearance**: a dictionary variant where accessing a
-  key that doesn't exist yet doesn't raise `KeyError` — instead, it's automatically
+- key that doesn't exist yet doesn't raise `KeyError` — instead, it's automatically
   created with a default value, here `0` (the result of calling `int()` with no
   arguments), letting `failures_by_ip[entry["ip"]] += 1` work correctly even the very
   first time a given IP address is seen.

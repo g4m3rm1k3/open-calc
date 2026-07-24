@@ -188,7 +188,6 @@ one specific user's diary — but, as written, returns *whichever* diary the URL
 to anyone holding *any* valid session, regardless of whose diary was requested.
 
 ### Mechanical Walkthrough
-
 Enumerating every element of the new branch, in order:
 
 - `parsed.path.startswith("/diary/")` — **(c) already basic**: `startswith` was
@@ -208,12 +207,12 @@ Enumerating every element of the new branch, in order:
 - `self.send_response(401)` / `self.end_headers()` / `self.wfile.write(...)` — **(b) hard
   concept reappearing** (the HTTP response-writing sequence from Lesson 14 and 15), except
   for `401` specifically, which is **(a) first appearance as a named concept**: `401
-  Unauthorized` is the HTTP status code meaning "you have not proven who you are at all" —
+- Unauthorized` is the HTTP status code meaning "you have not proven who you are at all" —
   no valid credentials or session were presented. It was *used* without explanation in
   Lesson 15; today is its first full definition, and it matters here because the very next
   Concept Unit introduces a status code with a meaningfully different meaning.
 - `users[requested_username]["diary"]` — **(a) first appearance of the actual bug**: this
-  is a direct dictionary lookup using `requested_username` — the value pulled straight out
+- is a direct dictionary lookup using `requested_username` — the value pulled straight out
   of the URL in this unit's first line — with nothing between extracting it and using it
   to fetch data. No comparison against `requesting_username` occurs anywhere in this
   branch.
@@ -374,12 +373,11 @@ belongs to, do they match the specific diary being requested (authorization). On
 request that passes both reaches the actual data lookup.
 
 ### Mechanical Walkthrough
-
 - `requesting_username != requested_username` — **(a) first appearance of the actual
   fix**: a direct string comparison between the identity the session proves and the
   identity the URL names. Because this line runs only after the `401` branch has already
   returned for a missing session, `requesting_username` is guaranteed to be a real
-  username here, not `None` — which is exactly why ordering these two checks correctly
+- username here, not `None` — which is exactly why ordering these two checks correctly
   matters, as flagged in the previous unit.
 - `self.send_response(403)` — **(b) hard concept just introduced**, applied for the first
   time: this is precisely the case the previous unit defined it for — a real, valid

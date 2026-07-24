@@ -151,20 +151,20 @@ two new listeners and the new function:
 ```
 
 ### Mechanical Walkthrough
-
-`((event.clientX - rect.left) / rect.width) * 2 - 1` converts a real
+- `((event.clientX - rect.left) / rect.width) * 2 - 1` converts a real
 pixel position (relative to the canvas's own bounding rect, since the
 canvas itself may not start at the browser window's own origin) into
-NDC `x` — `0` at the left edge maps to `-1`, `rect.width` at the right
-edge maps to `+1`. The `y` axis is negated (`-(... * 2 - 1)`, written
+- NDC `x` — `0` at the left edge maps to `-1`, `rect.width` at the right edge maps to `+1`. The `y` axis is negated (`-(... * 2 - 1)`, written
+
 here as `-(... ) * 2 + 1`) because screen pixels count downward from
 the top while NDC counts upward from the bottom — the single most
 common real bug in this exact conversion, when it's gotten backwards.
 `raycaster`/`pointerNdc`/`intersection` are all created once, outside
-`handlePointerMove`, and mutated in place on every real move event —
+- `handlePointerMove`, and mutated in place on every real move event —
 a real, deliberate avoidance of allocating three new objects on
 every single mouse-move firing, which can easily happen dozens of
-times per second. `planeFor` is a real, pure function — same real
+- times per second.
+- `planeFor` is a real, pure function — same real
 input, same real plane, every time — called both once at setup
 (`G17`, depth `0`, matching `core/parser.py`'s own real default) and
 again from `setDrawPlane` whenever the user picks a different plane or
@@ -269,16 +269,15 @@ The new, matching `setDrawPlane` effect, alongside the existing
 ```
 
 ### Mechanical Walkthrough
-
 `onCursorMoveRef` is seeded from `onCursorMove` at first render
 (`useRef(onCursorMove)`), then kept current by a small, dedicated
-effect depending on `[onCursorMove]` — the exact same shape `usePlayback.ts`
+- effect depending on `[onCursorMove]` — the exact same shape `usePlayback.ts`
 (Lesson 46) already established for `sbkRef`/`speedModeRef`/
 `custSpeedRef`. The mount effect passes a small, stable arrow function
 (`(position) => onCursorMoveRef.current(position)`) to `createViewport`
 — *that* wrapper's own identity never changes across renders (it's
 created once, inside an effect with an empty dependency array), but
-what it *calls* — `onCursorMoveRef.current` — is always whatever the
+- what it *calls* — `onCursorMoveRef.current` — is always whatever the
 latest real `onCursorMove` prop actually is.
 
 ### CS Lens / SE Lens
@@ -441,17 +440,16 @@ The new CSS this real layout needs:
 ```
 
 ### Mechanical Walkthrough
-
 `PLANES` names, for each real plane, which two real world axes a
-position *on* that plane actually varies in (`axes`) — `G17`'s own
+- position *on* that plane actually varies in (`axes`) — `G17`'s own
 depth is `z`, so a cursor position there only ever varies in `x`/`y`;
 the bar shows exactly those two, by real axis name, not a fixed "X/Y"
 label that would be wrong for `G18`/`G19`. `valueA`/`valueB` read
 straight off `cursorPosition` using those axis names as real object
-keys (`cursorPosition[axisA]`) — no separate per-plane display logic
+- keys (`cursorPosition[axisA]`) — no separate per-plane display logic
 needed, since `cursorPosition` already has real `x`/`y`/`z` fields for
 every plane. `.status-bar-planes` reuses `.btn-group`/`.btn`/`.btn-sm`/
-`.btn-bl` — the identical real classes `PlaybackControls.tsx`'s own
+- `.btn-bl` — the identical real classes `PlaybackControls.tsx`'s own
 speed-mode row already established (Lesson 46) — for the same real
 "a row of mutually-exclusive toggle buttons" shape.
 
@@ -535,10 +533,9 @@ cursor.
 ```
 
 ### Mechanical Walkthrough
-
 `<StatusBar>` sits as a real sibling of `.app-body` inside `.app-shell`
 (a real, always-visible bottom bar, not another toggleable side-panel
-tab) — `.app-shell`'s own `flex-direction: column` plus `.status-bar`'s
+- tab) — `.app-shell`'s own `flex-direction: column` plus `.status-bar`'s
 own `flex-shrink: 0` reserves its real space without needing any layout
 changes to the existing ribbon/canvas/side-panel structure.
 `onCursorMove={setCursorPosition}` passes React's own dispatch function

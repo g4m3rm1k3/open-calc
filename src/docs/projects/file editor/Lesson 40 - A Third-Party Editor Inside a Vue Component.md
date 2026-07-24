@@ -374,9 +374,8 @@ reproduced here in full since it's still part of the real file:
 ```
 
 ### Mechanical Walkthrough
+- `import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'` — not `import * as monaco from 'monaco-editor'` — imports only Monaco's
 
-`import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'` —
-not `import * as monaco from 'monaco-editor'` — imports only Monaco's
 editor core, not every language mode the package ships; the second
 import line, `monaco-editor/esm/vs/basic-languages/python/python.
 contribution`, registers Python specifically, the only language this

@@ -266,8 +266,7 @@ This is the entire file — a brand-new module, nothing to place it
 inside of.
 
 ### Mechanical Walkthrough
-
-`openFile`/`closeTab` reuse Lesson 4's exact shapes — `.find()`,
+- `openFile`/`closeTab` reuse Lesson 4's exact shapes — `.find()`,
 `.filter()`, `.push()`, all already-taught array methods, applied to
 `openTabs.value` instead of the old global `openTabs`.
 `authenticatedFetch`, imported from `useAuth()` exactly like
@@ -277,7 +276,7 @@ absence, worth naming explicitly: the old Lesson 28 `saveFile` had a
 line, `activeTab.content = content;` (later `activeTab.content =
 editedContent.value;`), copying the saved value back onto the tab
 after a successful save. That line is gone here, and its absence is
-not an oversight — `editedContent`'s `set()` already writes directly
+- not an oversight — `editedContent`'s `set()` already writes directly
 into `openTabs`, on every keystroke, not just after a save. By the
 time `saveFile` runs, `editedContent.value` already *is*
 `activeTab.content`; copying it onto itself would do nothing.
@@ -390,16 +389,16 @@ This is the entire file — a brand-new component, nothing to place it
 inside of.
 
 ### Mechanical Walkthrough
-
-`:class="tab.path === activeTabPath ? 'tab active' : 'tab'"` — first
+- `:class="tab.path === activeTabPath ? 'tab active' : 'tab'"` — first
 appearance of binding `class` with `:` (Lesson 31's `v-bind` family,
-already used for `:key`) — Vite's own compiled output confirms exactly
+- already used for `:key`) — Vite's own compiled output confirms exactly
 what this does: `class: _normalizeClass(tab.path === $setup.activeTabPath
 ? 'tab active' : 'tab')`, a plain ternary producing a string, assigned
-as the element's class. `@click.stop` — first appearance of a Vue
+- as the element's class.
+- `@click.stop` — first appearance of a Vue
 **event modifier**: compiled output confirms it wraps the handler in
 `_withModifiers(..., ["stop"])`, calling `event.stopPropagation()`
-(Lesson 4) before running `closeTab` — without it, clicking the close
+- (Lesson 4) before running `closeTab` — without it, clicking the close
 button would also trigger the *tab's own* `@click`, switching to a tab
 about to be closed, the exact bug Lesson 4's original `stopPropagation()`
 call already existed to prevent.
@@ -569,9 +568,8 @@ content to show — is gone, replaced by the actual tab bar and editor
 it was always standing in for.
 
 ### Mechanical Walkthrough
-
 `v-model="editedContent"` reuses Lesson 30's directive exactly, now
-bound to a writable `computed()` instead of a plain `ref()` — Vue
+- bound to a writable `computed()` instead of a plain `ref()` — Vue
 doesn't distinguish between the two when compiling `v-model`, since
 both expose the same `.value` getter/setter interface; the compiled
 output confirms this directly, generating identical

@@ -286,20 +286,19 @@ function login() {
 freestanding new function.
 
 ### Mechanical Walkthrough
-
 `document.getElementById("username-input").value` reuses `.value` from
-Lesson 3, reading a text `<input>` instead of a `<textarea>` this time —
+- Lesson 3, reading a text `<input>` instead of a `<textarea>` this time —
 the same property, meaning the same thing on both element types, exactly
 as Lesson 3 already noted about `<textarea>` versus `<input>`.
 `JSON.stringify({ username: username, password: password })` reuses
 serialization from Lesson 3's `saveFile`, now with two fields instead of
 one. Inside `signup`'s success handler, `authMode = "login";
-renderAuthMode();` reuses this lesson's own state-then-render pattern —
+- renderAuthMode();` reuses this lesson's own state-then-render pattern —
 after a successful signup, the form switches itself back to login mode
 automatically, rather than leaving a person on a screen that no longer
 matches what they should do next. `document.getElementById("login-status").textContent
 = "Account created. Log in below."` reuses ordinary text assignment,
-repurposing `#login-status` — until now only ever used for errors — to
+- repurposing `#login-status` — until now only ever used for errors — to
 carry a genuinely good-news message this time.
 
 ### Run It
@@ -452,11 +451,10 @@ above directly after it — the file's other CSS, `.layout` through
 ```
 
 ### Mechanical Walkthrough
-
 `display: flex` on `#login-screen` reuses the same property `.layout`
 already uses in Lesson 2 — but for a genuinely different purpose:
 `.layout` uses it to place two panes *side by side*; here,
-`align-items: center` and `justify-content: center` — both first
+- `align-items: center` and `justify-content: center` — both first
 appearances — use flexbox's *centering* behavior instead, centering
 `.auth-card` both vertically and horizontally within `#login-screen`.
 `height: 100vh` reuses the viewport-height unit from `.layout`.
@@ -465,15 +463,15 @@ appearances — use flexbox's *centering* behavior instead, centering
 something to visually sit on top of. `.auth-card`'s `display: flex;
 flex-direction: column; gap: 12px;` reuses the exact shape
 `#editor-pane`'s implicit stacking already relies on, made explicit
-here — `gap: 12px` spaces every direct child evenly without needing
+- here — `gap: 12px` spaces every direct child evenly without needing
 margin on each one individually. `width: 320px` and `padding: 32px`
 reuse ordinary sizing properties already used throughout this project.
 `border-radius: 8px` reuses the property already used on `.sidebar li`
 since Lesson 2, a larger value for a more visible rounded corner.
-`box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1)` is new: four values —
+- `box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1)` is new: four values —
 horizontal offset (`0`), vertical offset (`2px`, pushing the shadow
 slightly downward), blur radius (`12px`, how soft the shadow's edge is),
-and a color — `rgba(0, 0, 0, 0.1)`, new on its own: the same
+- and a color — `rgba(0, 0, 0, 0.1)`, new on its own: the same
 red/green/blue channels `#000`-style hex colors already use throughout
 this project, plus a fourth **alpha** channel, `0.1`, meaning "10%
 opaque" — a shadow that barely darkens whatever is behind it, rather
@@ -485,7 +483,7 @@ properties, giving both `<input>` elements the same visual treatment as
 `.auth-card`'s own border-radius, rather than each browser's differing
 default input appearance. `.auth-card button` reuses the identical
 property set for the submit button, plus `background-color: #2563eb`
-and `color: #fff` — a blue button with white text, `border: none`
+- and `color: #fff` — a blue button with white text, `border: none`
 removing the browser's default button border entirely, and `cursor:
 pointer` reused from `.sidebar li.clickable` since Lesson 2, signaling
 it's clickable the same way a folder entry already does.
@@ -502,7 +500,7 @@ secondary text beneath the main form rather than competing with it.
 ## Connect the pieces
 
 Opening the page for the first time: `authMode` starts `"login"`, and
-the `renderAuthMode();` call at the bottom of the script — reached the
+- the `renderAuthMode();` call at the bottom of the script — reached the
 instant the page finishes loading, the same way `loadFolder("")` always
 has been — has already set the form's title, button text, and toggle
 link to match, genuinely produced by that call rather than merely
@@ -512,11 +510,11 @@ re-rendering the same form in place — no new elements created, nothing
 about `#username-input` or `#password-input` touched at all, only their
 surrounding labels and button. Filling in a new username and password
 and clicking the now-relabeled submit button calls `submitAuth()`,
-which — because `authMode` is `"signup"` — calls `signup()`, sending
+- which — because `authMode` is `"signup"` — calls `signup()`, sending
 `POST /signup`. On success, `authMode` flips back to `"login"`
 automatically, the form re-renders itself back to its original labels,
 and `"Account created. Log in below."` appears. Typing the same
-credentials and clicking the button again now calls `login()` instead —
+- credentials and clicking the button again now calls `login()` instead —
 the identical two input fields, read the identical way, sent to a
 different route entirely, because one small piece of state changed what
 the whole form means.
@@ -524,7 +522,7 @@ the whole form means.
 ## What breaks without this
 
 Already demonstrated concretely, not hypothetically: before this lesson,
-`login()` never read `#username-input` at all — Lesson 17's `/login`
+- `login()` never read `#username-input` at all — Lesson 17's `/login`
 route, requiring a `username` field, would have received a request body
 missing it entirely, confirmed by inspecting `login()`'s own code before
 this lesson's fix. And visually — described directly, not measured —
@@ -544,8 +542,8 @@ unaligned, in the corner of an otherwise blank page.
    submitting anything, and confirm the title, button text, and toggle
    text always match the current mode correctly.
 4. In `renderAuthMode`, add a third ternary controlling a new
-   `placeholder` value for `#password-input` — `"Choose a password"` in
-   signup mode, `"Password"` in login mode — and wire it in following
+- `placeholder` value for `#password-input` — `"Choose a password"` in signup mode, `"Password"` in login mode — and wire it in following
+
    this lesson's exact pattern.
 
 ## Definition of done

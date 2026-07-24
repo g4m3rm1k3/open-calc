@@ -87,8 +87,7 @@ This sits between the two check functions in `analyzer.py` — the next
 unit shows exactly where.
 
 ### Mechanical Walkthrough
-
-`MOTION_CODES = {0, 1, 2, 3}` reuses set-literal syntax — the same curly-
+- `MOTION_CODES = {0, 1, 2, 3}` reuses set-literal syntax — the same curly-
 brace construct as `valid_tokens = set()` from Lesson 8, here written
 with actual starting members instead of built empty. `ALL_CAPS` naming
 is new only as a convention, not a language rule: Python treats this
@@ -174,13 +173,12 @@ second, entirely independent check next to it, not a modification of the
 first one.
 
 ### Mechanical Walkthrough
-
 `[word for word in block.words if word.letter == "G" and word.value in
 MOTION_CODES]` is this project's first list comprehension *with a
 filter*: every earlier comprehension (`tokenize_program`,
 `parse_program`) transformed every item, unconditionally. Adding `if
 ...` after the `for` clause keeps only the items where that condition is
-`true` — the exact same effect as a `for` loop with an `if`/`continue`
+- `true` — the exact same effect as a `for` loop with an `if`/`continue`
 inside it, stated in one expression instead. `word.value in
 MOTION_CODES` reuses set membership testing from Lesson 8. `if
 len(motion_words) > 1:` reuses `.length`'s Python counterpart, `len()`,
@@ -192,7 +190,7 @@ but it produces values one at a time as `.join()` asks for them instead
 of building a whole list first; handed directly to `.join()`, which only
 ever needs to consume the values once, in order, building the whole list
 first would be pure waste. Second, `:02d` inside the f-string is a
-**format spec** — `d` means "format as a decimal integer," `02` means
+- **format spec** — `d` means "format as a decimal integer," `02` means
 "pad with a leading zero to at least two digits wide" — confirmed
 directly:
 
@@ -207,7 +205,7 @@ Actual output:
 G01
 ```
 
-— turning `1.0` into `"G01"`, not `"G1"`, matching real G-code
+- — turning `1.0` into `"G01"`, not `"G1"`, matching real G-code
 convention. `Diagnostic(...)` and the final `return []` both reuse
 already-established shapes — one diagnostic when a conflict exists,
 none when it doesn't.

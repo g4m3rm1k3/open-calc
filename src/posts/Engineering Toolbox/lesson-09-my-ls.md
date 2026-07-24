@@ -96,15 +96,18 @@ The function now lists a folder's contents, alphabetically sorted
 into `info` — but doesn't display any of it yet.
 
 ### Mechanical Walkthrough
-
-`import os` — reminder. `def my_ls(path="."):` — default argument
+- `import os` — reminder.
+- `def my_ls(path="."):` — default argument
 (reminder), with `"."` meaning "the current folder," a standard Unix
 convention worth naming since it's the first time this curriculum uses
-it as a real default. `entries = sorted(os.listdir(path))` —
-`os.listdir()` (reminder) wrapped in `sorted()` (Lesson 6, reminder) —
+- it as a real default.
+- `entries = sorted(os.listdir(path))` — `os.listdir()` (reminder) wrapped in `sorted()` (Lesson 6, reminder) —
+
 real `ls` also sorts alphabetically by default, which this line
-reproduces directly. `full_path = os.path.join(path, entry)` —
-reminder. `info = os.stat(full_path)` — the concept from this unit's
+- reproduces directly.
+- `full_path = os.path.join(path, entry)` — reminder.
+- `info = os.stat(full_path)` — the concept from this unit's
+
 lab, reused for real.
 
 ### CS Lens
@@ -218,10 +221,9 @@ Each entry now has its permission string computed — `"-rw-r--r--"` or
 similar — ready to display, though nothing is printed yet.
 
 ### Mechanical Walkthrough
-
-`import stat` — first appearance of this module, distinct from the
+- `import stat` — first appearance of this module, distinct from the
 `os` module even though the names sound related. `permissions =
-stat.filemode(info.st_mode)` — the concept from this unit's lab, reused
+- stat.filemode(info.st_mode)` — the concept from this unit's lab, reused
 for real.
 
 ### CS Lens
@@ -343,16 +345,16 @@ right-aligned size, formatted modification time, and name — one real
 line per entry, columns lined up.
 
 ### Mechanical Walkthrough
-
-`size = info.st_size` — direct attribute access, already basic once
+- `size = info.st_size` — direct attribute access, already basic once
 `os.stat()` itself is understood. `mtime = ...fromtimestamp(...
-).strftime(...)` — the two-step conversion from this unit's lab, reused
+- ).strftime(...)` — the two-step conversion from this unit's lab, reused
 for real, chained directly (calling `.strftime()` immediately on the
 `datetime` object `fromtimestamp()` just returned, without a separate
-named variable in between — already-basic method chaining). `print(
-f"{permissions} {size:>10} {mtime} {entry}")` — first appearance of
+- named variable in between — already-basic method chaining).
+- `print( f"{permissions} {size:>10} {mtime} {entry}")` — first appearance of
+
 `:>10` specifically: a format spec meaning "right-align this value
-within a 10-character-wide field" — a small extension of the `:02x`
+- within a 10-character-wide field" — a small extension of the `:02x`
 zero-padding format spec from Lesson 61, same mechanism, different
 alignment flag, worth the reminder rather than a full new unit.
 

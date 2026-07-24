@@ -130,7 +130,6 @@ disconnected step: the next unit's whole job is turning these three
 loose variables into a real record.
 
 ### Mechanical Walkthrough
-
 - `int id;`, `std::string name;`, `int age;` — three plain variable
   declarations. `int` and `std::string` are both reused from earlier
   lessons; declaring a variable with no initializer (no `=` anything) is
@@ -139,7 +138,7 @@ loose variables into a real record.
   `std::string`) until `std::cin` fills them in below.
 - `std::cin` — **first appearance.** The counterpart to `std::cout`
   from Lesson 1: an object representing standard *input* — your
-  keyboard — the same way `std::cout` represents standard output.
+- keyboard — the same way `std::cout` represents standard output.
 - `>>` — **first appearance.** The *stream extraction operator* —
   `<<`'s mirror image. Where `<<` sends data into a stream, `>>` pulls
   data out of one, converting the typed text into whatever type the
@@ -320,9 +319,9 @@ detail of *how* a student gets read from the keyboard lives entirely
 inside `readStudent`, where `main` never has to look at it again.
 
 ### Mechanical Walkthrough
-
 - `Student readStudent()` — **first appearance** of a user-defined
-  function beyond `main` itself. `Student` here is the *return type* —
+- function beyond `main` itself.
+- `Student` here is the *return type* —
   a promise that calling this function eventually hands back one
   `Student`. Empty parentheses mean it takes no parameters. This is the
   same shape as `int square(int x)` from the lab, just with a
@@ -335,7 +334,7 @@ inside `readStudent`, where `main` never has to look at it again.
   targets are now struct members (`s.id`, reusing member-access syntax
   from Lesson 2) instead of three separate loose variables.
 - `return s;` — reuses `return` from `main`'s own `return 0;` since
-  Lesson 1 (a hard concept reappearing — Lesson 1 taught `return` as
+- Lesson 1 (a hard concept reappearing — Lesson 1 taught `return` as
   "hand back main's result code"; here it's the same keyword doing the
   same job — hand back a value to the caller — just handing back a
   `Student` instead of an `int`).
@@ -533,7 +532,6 @@ ended up there — and `main` never has to know the difference, since
 either way it gets back one complete `Student`.
 
 ### Mechanical Walkthrough
-
 - `!` — **first appearance.** The logical NOT operator: flips `true` to
   `false` and vice versa. `!(std::cin >> ...)` reads as "NOT (this read
   succeeded)" — i.e., "if this read failed."
@@ -542,10 +540,10 @@ either way it gets back one complete `Student`.
   "a stream, used as a condition, reports success or failure" idea
   Lesson 1 taught with `while (std::getline(in, line))`. The only
   difference is which stream operation is being tested, and that it's
-  wrapped in `!` and used inside an `if` here instead of a `while` —
+- wrapped in `!` and used inside an `if` here instead of a `while` —
   the underlying idea, not re-taught in full.
 - `if (...) { ... }` — reuses `if` conditionally-executed blocks, the
-  same shape as the `if`/`else` in the throwaway lab above — basic
+- same shape as the `if`/`else` in the throwaway lab above — basic
   reuse.
 - `s.id = 0;`, `s.name = "unknown";`, `s.age = 0;` — plain assignment to
   already-declared struct members; reuses member access from Lesson 2,

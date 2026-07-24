@@ -200,7 +200,6 @@ The end of `createViewport`, in full:
 as the app runs, not just at the exact moment it was first created.
 
 ### Mechanical Walkthrough
-
 - `new ResizeObserver(() => {...})` / `.observe(container)` — **(b)
   reappearing**, full treatment in the concept file, watching this
   project's own real viewport container instead of the lab's plain
@@ -209,16 +208,16 @@ as the app runs, not just at the exact moment it was first created.
   appearance** of a real, defensive guard this project's own container
   specifically needs: a `.canvas-layer` briefly at zero size during
   initial mount (before layout settles) would otherwise divide by zero
-  computing `camera.aspect`, producing `NaN` and a real, broken render —
+- computing `camera.aspect`, producing `NaN` and a real, broken render —
   never observed in the concept file's own simpler lab, genuinely new
   here.
 - `renderer.setSize(newWidth, newHeight)` — **(b) reappearing** the
   identical call already made once, at creation, in `createViewport`'s
   own earlier lines — now called again, live, instead of never again.
 - `camera.aspect = ...` / `camera.updateProjectionMatrix()` — **(a)
-  first appearance** — a `PerspectiveCamera`'s `aspect` ratio is read
+- first appearance** — a `PerspectiveCamera`'s `aspect` ratio is read
   once when its internal projection matrix is built and never
-  recomputed automatically after — `updateProjectionMatrix()` is the
+- recomputed automatically after — `updateProjectionMatrix()` is the
   real, required call telling Three.js to rebuild it from the new
   `aspect` value; skipping it would leave the camera's own math stale
   even though `aspect` itself changed.
@@ -373,7 +372,6 @@ export default SidePanel;
 ```
 
 ### Mechanical Walkthrough
-
 - `content: ReactNode` — **(b) reappearing**, full treatment in the
   concept file — a tab carries its already-built content, not raw data
   `SidePanel` would have to know how to render itself.
@@ -388,12 +386,12 @@ export default SidePanel;
   reappearing**, the identical call `ToolCardList.tsx` already used
   (Lesson 17) for the same reason: without it, closing a tab would also
   fire the tab's own `onClick` (selecting a tab about to be removed) and
-  the panel's `onMouseDown` (redundant, but not itself harmful here) —
+- the panel's `onMouseDown` (redundant, but not itself harmful here) —
   named because a reader seeing three nested click handlers on one
   element needs to know which ones are meant to fire together and which
   aren't.
 - `` `side-panel ${side}${isSelected ? " selected" : ""}` `` /
-  `` `side-panel-tab${tab.id === activeTabId ? " active" : ""}` `` —
+- `` `side-panel-tab${tab.id === activeTabId ? " active" : ""}` `` —
   **(b) reappearing**, the exact conditional-class shape established
   since Lesson 17.
 
@@ -589,9 +587,8 @@ bar, each tab's own active/inactive and hover-to-close states, and the
 empty-state message.
 
 ### Mechanical Walkthrough
-
 - `.side-panel.left .side-panel-resize-handle` / `.side-panel.right
-  .side-panel-resize-handle` — **(a) first appearance** of the descendant
+- .side-panel-resize-handle` — **(a) first appearance** of the descendant
   combinator in this project, per the isolated lab above: `right: -3px`
   only applies to a resize handle that's really nested inside a
   `.side-panel.left`, letting one shared class (`.side-panel-resize-handle`)
@@ -599,11 +596,11 @@ empty-state message.
   contains it — exactly the problem a single, unscoped rule couldn't
   solve.
 - `.side-panel`, `.side-panel-tabs`, `.side-panel-tab`, `.side-panel-tab-close`,
-  `.side-panel-body`, `.side-panel-empty`, `.side-panel-resize-handle` —
+- `.side-panel-body`, `.side-panel-empty`, `.side-panel-resize-handle` —
   **(c) already basic** — plain class selectors, the same syntax
   established since `css-rule-syntax-selectors-cascade.md`.
 - `.side-panel.left`, `.side-panel.right`, `.side-panel.selected`,
-  `.side-panel-tab.active` — **(b) reappearing** — compound class
+- `.side-panel-tab.active` — **(b) reappearing** — compound class
   selectors (two classes required on one element), the same shape
   Lesson 18's own `.btn.full`/`.btn-gr` combination already established,
   cited there back to `css-rule-syntax-selectors-cascade.md`.
@@ -678,16 +675,15 @@ Full standalone lab, run for real, in the concept file above. Not
 repeated here.
 
 ### Mechanical Walkthrough
-
 - `const dragState = useRef<{ startX: number; startWidth: number } | null>(null);`
-  — **(b) reappearing** `useRef`, but genuinely new *for this project's
+- — **(b) reappearing** `useRef`, but genuinely new *for this project's
   own code*: every earlier use (`Viewport.tsx`'s `containerRef`, Lesson
   8) held a real DOM node; this one holds a plain mutable value — the
   exact second half `react-useref-hook.md`'s own isolated lab already
   covers (its `RenderCounter` example), now actually used that way here
   for the first time.
 - `handlePointerDown` — **(b) reappearing**, full treatment in the drag
-  concept file — `dragState.current` (not a `useState` value) captures
+- concept file — `dragState.current` (not a `useState` value) captures
   the drag's starting point specifically *because* recording it should
   never itself trigger a re-render; only `onResize`'s own `setState`
   call, further down, should.
@@ -903,7 +899,6 @@ anywhere in this file anymore — it doesn't fit the panel model yet (a
 third toggle no one asked for. The component itself is untouched.
 
 ### Mechanical Walkthrough
-
 - `type PanelState = { tabs: ViewId[]; activeTab: ViewId | null }` —
   **(b) reappearing** TypeScript object/union types, applied to a new,
   real shape.
@@ -924,11 +919,11 @@ third toggle no one asked for. The component itself is untouched.
   `setState`, spread); **(a) first appearance** of this specific,
   real three-branch decision as a whole.
 - `(Object.keys(VIEW_LABELS) as ViewId[]).map(...)` — **(a) first
-  appearance** of `Object.keys()` in this project — returns a real
+- appearance** of `Object.keys()` in this project — returns a real
   array of an object's own keys, cast back to `ViewId[]` since
   `Object.keys` itself only ever returns `string[]`, with no way for
   TypeScript to know the specific literal keys `VIEW_LABELS` actually
-  has — this is what lets `RibbonToolbar`'s groups be built directly
+- has — this is what lets `RibbonToolbar`'s groups be built directly
   from `VIEW_LABELS` rather than a second, separately-maintained list of
   view ids that could drift out of sync with it.
 

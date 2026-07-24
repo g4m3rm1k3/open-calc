@@ -148,10 +148,9 @@ config specifically to the `release` variant — `debug` continues using
 Android Studio's own auto-managed debug key, untouched.
 
 ### Mechanical Walkthrough
-
 - `def keystoreProperties = new Properties()` — **first appearance of
   Gradle-script-level Groovy syntax** distinct from the Java this
-  project's app code has used throughout — `build.gradle` files are
+- project's app code has used throughout — `build.gradle` files are
   themselves Groovy scripts (a JVM language related to but distinct
   from Java), a real, honest thing worth naming even though a full
   Groovy treatment is out of scope this late in the curriculum.
@@ -167,7 +166,7 @@ Android Studio's own auto-managed debug key, untouched.
   pulling every credential from the loaded properties rather than
   hardcoding them directly in a file that *is* committed to Git.
 - `buildTypes { release { signingConfig signingConfigs.release } }` —
-  **first appearance of the `buildTypes` block** — ties the
+- **first appearance of the `buildTypes` block** — ties the
   `release` build type to the signing config just declared.
 
 ### SE Lens
@@ -219,7 +218,6 @@ buildTypes {
 signing config added in the previous unit.
 
 ### Mechanical Walkthrough
-
 - `minifyEnabled true` — **first appearance.** Turns on R8 — Android's
   code shrinker, optimizer, and obfuscator, run automatically as part
   of building the `release` variant. It performs **tree-shaking**
@@ -232,12 +230,12 @@ signing config added in the previous unit.
   meaningfully harder).
 - `shrinkResources true` — **first appearance.** A companion step
   removing unused *resources* (an unreferenced drawable, an unused
-  string) — only effective alongside `minifyEnabled true`, since it
+- string) — only effective alongside `minifyEnabled true`, since it
   needs R8's code analysis to know what's actually referenced.
 - `proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'`
   — **first appearance.** Supplies R8 two rule files: a
   platform-provided default (handling common Android framework needs)
-  and this project's own `proguard-rules.pro` — the wizard-generated,
+- and this project's own `proguard-rules.pro` — the wizard-generated,
   empty file every Lesson 1 project already contains, finally given
   real content next.
 
@@ -283,11 +281,10 @@ name at runtime" code R8 has no static way to know is actually needed.
 `proguard-rules.pro`, previously empty, gains two `-keep` rules.
 
 ### Mechanical Walkthrough
-
 - `-keep class com.yourname.pocketinventory.Item { *; }` — **first
   appearance of ProGuard/R8 rule syntax.** Tells R8 explicitly: never
   rename, remove, or otherwise touch this class or any of its members
-  (`{ *; }` — everything inside it), overriding its default
+- (`{ *; }` — everything inside it), overriding its default
   reflection-blind analysis for exactly the classes that need it —
   `Item` (read by both Room and Gson via field names) and `RemoteNotice`
   (read by Gson, Lesson 28) are precisely the two classes in this

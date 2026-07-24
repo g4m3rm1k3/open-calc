@@ -192,12 +192,12 @@ This is the entire file so far — nothing exists in `lexer.py` yet for
 this to sit alongside.
 
 ### Mechanical Walkthrough
-
 `from dataclasses import dataclass` imports a decorator from Python's
 standard library — the same **import statement** shape used throughout
-this project, a new specific name. `@dataclass` is a new decorator — the
+- this project, a new specific name.
+- `@dataclass` is a new decorator — the
 same underlying mechanism as `@app.get(...)` back in Lesson 1, attaching
-behavior to `Token` without modifying its body directly — but where
+- behavior to `Token` without modifying its body directly — but where
 `@app.get` registers a route, `@dataclass` automatically writes an
 `__init__` method (and a few others) *for* the class, based purely on
 the field declarations below it, so nothing here has to hand-write
@@ -205,7 +205,7 @@ the field declarations below it, so nothing here has to hand-write
 plain Python normally would. `type: str` and `text: str` declare two
 required fields, typed exactly like the `BaseModel` fields from Lesson
 3's `FileEdit`. `letter: str | None = None` is new on two counts: `str |
-None` is a **union type** — this field's declared type is *either* a
+- None` is a **union type** — this field's declared type is *either* a
 `str` *or* specifically the value `None`, the first time this project
 has said a value is allowed to be one of two different types rather than
 exactly one; ` = None` gives it a default, so a `Token` can be
@@ -279,25 +279,26 @@ return are built in the next two units, directly inside this same
 function.
 
 ### Mechanical Walkthrough
-
 `def tokenize_line(line: str) -> list[Token]:` reuses the parameter-type
-and return-type annotation shapes from Lessons 1 and 6 — `list[Token]`
+- and return-type annotation shapes from Lessons 1 and 6 — `list[Token]`
 is new only in being a list *of* a project-defined type, the same
 bracket syntax already used for `list[list[Token]]` nowhere yet but
 familiar from ordinary typed lists. `tokens = []`, `i = 0`, and `length =
 len(line)` set up the exact cursor-and-collector shape from the concept
-lab — `i` is the cursor, `tokens` collects results, `length` is computed
+- lab — `i` is the cursor, `tokens` collects results, `length` is computed
 once instead of calling `len(line)` repeatedly inside the loop. `while i
 < length:` and `char = line[i]` reuse the concept lab's outer loop and
-lookahead exactly. `char.isspace()` — reused from Python's string
-methods, the same family as `.isdigit()` from the lab — skips whitespace
+- lookahead exactly.
+- `char.isspace()` — reused from Python's string methods, the same family as `.isdigit()` from the lab — skips whitespace
+
 without producing a token for it at all; `continue` reuses the loop-skip
 keyword, jumping straight back to the `while` condition. `char == "("`
 tests for the start of a comment. `line.find(")", i)` is new: `.find()`
 searches a string for a substring — here, a single character — starting
 from position `i`, and returns its index, or `-1` if it's never found at
 all, the same "not found" convention Python's dictionaries used with
-`.get()` back in Lesson 6. `if end == -1: end = length - 1` handles a
+- `.get()` back in Lesson 6.
+- `if end == -1: end = length - 1` handles a
 genuinely broken input — an unterminated comment with no closing
 parenthesis — by treating the rest of the line as the comment instead of
 crashing; confirmed directly:
@@ -312,10 +313,10 @@ Actual output:
 [Token(type='COMMENT', text='(unterminated comment', letter=None, value=None)]
 ```
 
-`line[i:end + 1]` slices out the comment, parentheses included — `+ 1`
+- `line[i:end + 1]` slices out the comment, parentheses included — `+ 1`
 because slicing excludes its end index, and the closing `)` itself needs
 to be part of the captured text. `tokens.append(Token(type="COMMENT",
-text=text))` constructs a `Token` — `letter` and `value` are left
+- text=text))` constructs a `Token` — `letter` and `value` are left
 unset, falling back to the `None` defaults declared in the previous
 unit, since a comment has neither. `i = end + 1` moves the cursor past
 the whole comment in one jump, not one character at a time.
@@ -415,7 +416,6 @@ minimal grammar doesn't recognize) becomes a one-character `UNKNOWN`
 token instead of silently vanishing or crashing the whole scan.
 
 ### Mechanical Walkthrough
-
 `char.isalpha()` tests for a letter, the branch this whole unit adds.
 `letter = char.upper()` reuses `.upper()` from Lesson 8's decorator lab,
 here for a real reason: some real G-code is written in lowercase, and
@@ -423,22 +423,23 @@ normalizing to uppercase means `g01` and `G01` produce the identical
 token. `start = i` marks where this word begins, the same
 mark-then-slice-later pattern from the concept lab. `i += 1` moves past
 the letter itself. `if i < length and line[i] in "+-": i += 1` is new: an
-optional sign — `in "+-"` checks whether a single character is one of
+- optional sign — `in "+-"` checks whether a single character is one of
 two specific characters, reusing the `in` operator against a string
 rather than a collection like `valid_tokens` in Lesson 8; if a sign is
 there, the cursor consumes it, and if not, this `if` simply does
 nothing, leaving `i` right where it was. The `while` loop directly below
 it is the concept lab's exact digit-scanning technique, with one
 addition: `or line[i] == "."`, so a decimal point is treated the same as
-a digit — both keep the number growing. `text = line[start:i]` slices
-out the whole word, letter and number together — `"X10.5"`, `"G01"`,
+- a digit — both keep the number growing.
+- `text = line[start:i]` slices out the whole word, letter and number together — `"X10.5"`, `"G01"`,
+
 whatever was actually scanned. `number_text = text[1:]` reuses ordinary
 string slicing to drop just the first character — the letter — leaving
 only the numeric part. `float(number_text) if number_text not in ("",
 "-", "+") else None` is a ternary, reused from Lesson 2, guarding a real
 edge case: a bare letter with no digits after it (just `X`, or a lone
 `+`/`-` with nothing following) would make `float(...)` raise a
-`ValueError` if called directly — the condition checks for exactly those
+- `ValueError` if called directly — the condition checks for exactly those
 three broken cases first and produces `None` instead. Confirmed directly
 against a line ending in a bare `X`:
 
@@ -528,11 +529,10 @@ structure to show it inside of; the line above is everything there is to
 see.
 
 ### Mechanical Walkthrough
-
 `text.splitlines()` reuses `.splitlines()` from Lesson 7's `git log`
 parsing — splitting a whole block of text into one string per line,
 without the trailing newline characters. `[tokenize_line(line) for line
-in text.splitlines()]` is this project's first **list comprehension** —
+- in text.splitlines()]` is this project's first **list comprehension** —
 a way to build a list by writing what each item *is*, in one expression,
 instead of Lesson 2's explicit pattern: create an empty list, `for` over
 something, `.append()` inside the loop. This one line is exactly
@@ -546,7 +546,7 @@ return result
 ```
 
 except the comprehension states the same idea more directly — "the list
-of `tokenize_line(line)`, for every `line`" — with no separate
+- of `tokenize_line(line)`, for every `line`" — with no separate
 initialization step and no explicit `.append()` call. `list[list[Token]]`
 as the return type is a direct consequence: one line becomes one list of
 tokens, so the whole program becomes a list of those lists — one entry
@@ -616,9 +616,8 @@ enclosing structure to show it inside of; the block above is everything
 there is to see.
 
 ### Mechanical Walkthrough
-
 The first three checks reuse the identical traversal, existence, and
-extension-specific pattern from `diagnose_file` and `run_file` — a
+- extension-specific pattern from `diagnose_file` and `run_file` — a
 `.nc`-only check this time, the same shape as the `.py`-only check
 Lesson 5 introduced. `content = target_file.read_text(encoding="utf-8")`
 reuses Lesson 3's pinned-encoding read. `tokenize_program(content)` is
@@ -626,9 +625,9 @@ this lesson's own function, called for real for the first time outside a
 terminal. The `for line_tokens in tokenize_program(content):` loop and
 its nested list comprehension are new only in *what* they're doing, not
 their shapes: for each line's list of `Token` objects, a second list
-comprehension converts each individual `Token` into a plain dictionary —
+- comprehension converts each individual `Token` into a plain dictionary —
 `{"type": token.type, "text": token.text, "letter": token.letter,
-"value": token.value}` — reading each dataclass field explicitly by
+- "value": token.value}` — reading each dataclass field explicitly by
 name, the same explicit-dictionary-construction pattern `list_files` has
 used since Lesson 2. `lines.append([...])` builds up one list of
 dictionaries per line.
@@ -772,13 +771,12 @@ already provides, and that still works unchanged with a class selector
 underneath it.
 
 ### Mechanical Walkthrough
-
-`.output-panel` reuses every property `#run-output` already had — only
+- `.output-panel` reuses every property `#run-output` already had — only
 the selector's *kind* changed, from `#` (matching one specific element by
 its unique `id`) to `.` (matching any element carrying that class,
 however many there are). `class="output-panel"` added to both
 `<div>`s is the same attribute already used throughout this project
-(`class="tab"`, `class="clickable"`) — the only difference is that this
+- (`class="tab"`, `class="clickable"`) — the only difference is that this
 particular class is now shared on purpose, by two different elements,
 rather than describing one element's one-off role.
 
@@ -1004,7 +1002,6 @@ document.getElementById("login-button").addEventListener("click", login);
 ```
 
 ### Mechanical Walkthrough
-
 `if (activeTabPath === null) { return; }` reuses the standard guard
 clause. `!activeTabPath.endsWith(".nc")` is new: `.endsWith(...)` is a
 string method testing whether a string finishes with the given text —
@@ -1014,8 +1011,8 @@ request the backend would just reject with a `400` anyway. `fetch(...)`
 with `method: "POST"` and the `Authorization` header reuses the exact
 shape from `runFile`/`diagnoseFile`. Inside the success `.then()`,
 `data.lines.map((lineTokens, index) => { ... })` is this project's
-**fourth** array iteration method — after `.forEach()` (Lesson 2),
-`.filter()` (Lesson 4), and `.find()` (Lesson 4) — and the first to use
+- **fourth** array iteration method — after `.forEach()` (Lesson 2), `.filter()` (Lesson 4), and `.find()` (Lesson 4) — and the first to use
+
 its optional second callback parameter, `index`: every one of those
 methods hands the current position in the array to the callback as a
 second argument, available whenever it's actually needed, silently
@@ -1046,7 +1043,7 @@ file is actually open, confirms its path ends in `.nc`, and sends `POST
 /tokens?path=src/sample.nc`. On the backend, `tokenize_file` runs the
 same traversal/existence/extension checks every file route shares, reads
 the file, and calls `tokenize_program`, which splits it into lines and
-calls `tokenize_line` once per line — each call walking the line
+- calls `tokenize_line` once per line — each call walking the line
 character by character with the cursor technique from this lesson's
 concept lab, recognizing comments by finding their closing parenthesis
 and words by scanning a letter followed by an optional sign and a run of
@@ -1054,7 +1051,7 @@ digits/decimal points. Each recognized piece becomes a `Token`, converted
 explicitly into a plain dictionary before the whole nested structure
 returns as JSON. The frontend receives it, and two nested `.map()` calls
 turn that same nested structure back into readable text — one line per
-line, `letter=value` per word — displayed in `#tokens-output`, a panel
+- line, `letter=value` per word — displayed in `#tokens-output`, a panel
 that only exists at all because `#run-output`'s exact look was worth
 sharing rather than duplicating, which is also the reason `runFile`'s
 `.className` assignments needed fixing first.
@@ -1069,7 +1066,7 @@ spaces at all, confirmed directly against both versions of the same
 line. And the `.className`/`.classList` bug: before the fix, clicking Run
 after this lesson's CSS refactor would silently strip `#run-output`'s
 entire box styling on every single run, not through any error, but
-because `.className = ""` does exactly what it says — replace the whole
+- because `.className = ""` does exactly what it says — replace the whole
 attribute, not just the part that used to be the only part.
 
 ## Exercises
@@ -1079,8 +1076,8 @@ attribute, not just the part that used to be the only part.
    `letter=value` for every word.
 2. Click Tokens on `src/main.py` instead and confirm the friendly "Not a
    G-code file." message appears — with no network request sent at all.
-3. In the concept lab, trace `tokenize_line("N10 G90")` on paper first —
-   predict every token's `type`, `text`, `letter`, and `value` — then run
+- 3. In the concept lab, trace `tokenize_line("N10 G90")` on paper first — predict every token's `type`, `text`, `letter`, and `value` — then run
+
    it and compare.
 4. Add a line to `sample.nc` with a real mistake this lexer's minimal
    grammar doesn't recognize (a bare `%` character, for instance), run it
@@ -1096,7 +1093,7 @@ attribute, not just the part that used to be the only part.
 - [ ] You can trace the cursor-and-lookahead technique by hand against a
       line you choose yourself
 - [ ] You can explain the difference between `Token` (a `dataclass`) and
-      `FileEdit` (a `BaseModel`) — what each one buys you, and why `Token`
+- `FileEdit` (a `BaseModel`) — what each one buys you, and why `Token`
       doesn't need what `FileEdit` needs
 - [ ] You can explain, precisely, why `.className = ""` was safe before
       this lesson's CSS refactor and not safe after it

@@ -116,17 +116,19 @@ per Lesson 21's `settimeout()`, reminder) bounding how long any single
 check can take.
 
 ### Mechanical Walkthrough
-
-`import socket` — reminder. `def scan_port(host, port, timeout=1):` —
+- `import socket` — reminder.
+- `def scan_port(host, port, timeout=1):` —
 default argument, reminder. `s = socket.socket(socket.AF_INET,
-socket.SOCK_STREAM)` — Lesson 18, reminder — deliberately `SOCK_STREAM`
+- socket.SOCK_STREAM)` — Lesson 18, reminder — deliberately `SOCK_STREAM`
 (TCP), since "is this TCP port open" is exactly what a `connect()`
-attempt answers. `s.settimeout(timeout)` — Lesson 21, reminder. `result
-= s.connect_ex((host, port))` — the concept from this unit's lab,
-reused for real. `s.close()` — closing the socket directly rather than
+- attempt answers.
+- `s.settimeout(timeout)` — Lesson 21, reminder.
+- `result = s.connect_ex((host, port))` — the concept from this unit's lab, reused for real.
+- `s.close()` — closing the socket directly rather than
+
 via `with`, since this function returns a plain boolean, not something
 that needs the connection to stay open afterward. `return result == 0`
-— translating the raw error code into the simple `True`/`False` the
+- — translating the raw error code into the simple `True`/`False` the
 rest of the scanner actually wants to work with.
 
 ### CS Lens
@@ -219,12 +221,14 @@ def scan_range(host, start_port, end_port, timeout=1):     # ← new
 `port_scanner.py` is now complete: a real, working range scanner.
 
 ### Mechanical Walkthrough
+- `open_ports = []` — basic.
+- `for port in range(start_port, end_port + 1):` — `range()` (Lesson 5, reminder), `+ 1` because `range()`'s stop
 
-`open_ports = []` — basic. `for port in range(start_port, end_port +
-1):` — `range()` (Lesson 5, reminder), `+ 1` because `range()`'s stop
 value is exclusive and a real scan range should include its own end
-port. `if scan_port(host, port, timeout):` — calling this lesson's
-first unit's function directly. `open_ports.append(port)` — basic list
+- port.
+- `if scan_port(host, port, timeout):` — calling this lesson's first unit's function directly.
+- `open_ports.append(port)` — basic list
+
 building.
 
 ### CS Lens

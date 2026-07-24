@@ -99,12 +99,12 @@ nothing with each yet — including plenty of entries that aren't
 processes at all.
 
 ### Mechanical Walkthrough
-
-`import os` — reminder, reused from Lesson 2. `def list_processes():` —
+- `import os` — reminder, reused from Lesson 2.
+- `def list_processes():` —
 assuming function definitions as basic. `for entry in os.listdir("/proc"):`
-— `os.listdir()` from this unit's lab, reused for real, iterated directly
+- — `os.listdir()` from this unit's lab, reused for real, iterated directly
 in a `for` loop (already-basic iteration, applied to a new source).
-`pass` — reminder, same placeholder role from earlier lessons.
+- `pass` — reminder, same placeholder role from earlier lessons.
 
 ### CS Lens
 
@@ -206,11 +206,11 @@ The function now skips every non-numeric entry entirely, and converts
 the real PIDs from strings into actual integers.
 
 ### Mechanical Walkthrough
+- `if entry.isdigit():` — `.isdigit()` from this unit's lab, reused for real.
+- `pid = int(entry)` — assuming `int()` conversion as basic (a
 
-`if entry.isdigit():` — `.isdigit()` from this unit's lab, reused for
-real. `pid = int(entry)` — assuming `int()` conversion as basic (a
 standard, familiar conversion from your Python background); worth
-noting only that it's *needed* here — `entry` is still a string at this
+- noting only that it's *needed* here — `entry` is still a string at this
 point, and the rest of the lesson wants a real number to build a path
 and pass to `os.kill()` with.
 
@@ -317,13 +317,12 @@ alongside it — assuming, for now, that the process is still there by the
 time we get to it.
 
 ### Mechanical Walkthrough
+- `with open(f"/proc/{pid}/comm") as f:` — the `with` concept from Lesson 1, reapplied here — a reminder; `f"/proc/{pid}/comm"` is an f-string
 
-`with open(f"/proc/{pid}/comm") as f:` — the `with` concept from Lesson
-1, reapplied here — a reminder; `f"/proc/{pid}/comm"` is an f-string
 building a path from `pid`, already-basic string formatting. `f.read().strip()`
-— `.read()` reminder from Lesson 61 (there in binary mode; here in text
-mode — same method, different mode, worth the note); `.strip()` from
-this unit's lab, reused for real. `print(f"{pid}: {name}")` — basic
+- — `.read()` reminder from Lesson 61 (there in binary mode; here in text mode — same method, different mode, worth the note); `.strip()` from this unit's lab, reused for real.
+- `print(f"{pid}: {name}")` — basic
+
 f-string printing.
 
 ### CS Lens
@@ -439,16 +438,17 @@ process that vanishes mid-listing is silently skipped instead of
 crashing the whole function.
 
 ### Mechanical Walkthrough
-
-`try: ... except (...): ...` — the concept from this unit's lab, reused
+- `try: ... except (...): ...` — the concept from this unit's lab, reused
 for real, now wrapping the actual read-and-print instead of a toy
-example. `(FileNotFoundError, ProcessLookupError)` — first appearance of
+- example.
+- `(FileNotFoundError, ProcessLookupError)` — first appearance of
 catching *two* different exception types at once: `FileNotFoundError`
 covers the file genuinely being gone; `ProcessLookupError` is a second,
 related failure that can occur reading certain `/proc` files for a
 process in the middle of exiting — both mean the same thing here ("this
 process is gone, move on"), so both are caught together rather than with
-two separate `except` blocks. `continue` — first appearance: skips the
+- two separate `except` blocks.
+- `continue` — first appearance: skips the
 rest of *this* loop iteration and moves straight to the next `entry`,
 already-basic loop control once named.
 
@@ -665,12 +665,11 @@ def kill_process(pid):        # ← new
 running process; `kill_process(pid)` asks a specific one to stop.
 
 ### Mechanical Walkthrough
+- `import signal` — first appearance of this module: Python's interface to OS signals.
+- `os.kill(pid, signal.SIGTERM)` — the concept from this unit's lab, reused for real: `os.kill` (a slightly misleading name — it
 
-`import signal` — first appearance of this module: Python's interface to
-OS signals. `os.kill(pid, signal.SIGTERM)` — the concept from this
-unit's lab, reused for real: `os.kill` (a slightly misleading name — it
 *sends a signal*, any signal, not exclusively a lethal one) taking the
-target `pid` and `signal.SIGTERM` (a named constant — "terminate,
+- target `pid` and `signal.SIGTERM` (a named constant — "terminate,
 please" — the conventional, catchable, ignorable request to stop; not
 the same as `signal.SIGKILL`, which a process genuinely cannot ignore or
 handle, not used here on purpose).

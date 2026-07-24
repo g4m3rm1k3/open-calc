@@ -210,9 +210,8 @@ enclosing structure to show it inside of; the block above is everything
 there is to see.
 
 ### Mechanical Walkthrough
-
 `def diff_current(path: str, edit: FileEdit):` reuses the exact
-two-parameter shape `write_file` has used since Lesson 3 — `path` from
+- two-parameter shape `write_file` has used since Lesson 3 — `path` from
 the query string, `edit` parsed from the JSON request body because its
 type is a `BaseModel` subclass, not a plain type. The first two checks
 reuse the identical traversal and existence pattern from every route in
@@ -220,7 +219,7 @@ this file. `saved_content = target_file.read_text(encoding="utf-8")`
 reuses the pinned-encoding read from Lesson 3 — this is the "saved" side
 of the comparison, read fresh from disk on every request, never cached.
 `difflib.unified_diff(...)` reuses this lesson's own concept lab exactly,
-with `saved_content` as one side and `edit.content` — whatever the
+- with `saved_content` as one side and `edit.content` — whatever the
 frontend actually sent, unsaved or not — as the other.
 `"".join(diff_lines)` reuses `.join()` from Lesson 2's Python side,
 flattening the generator's individual lines back into one string for the
@@ -327,9 +326,8 @@ document.getElementById("current-diff-button").addEventListener("click", diffCur
 ```
 
 ### Mechanical Walkthrough
-
 `document.getElementById("file-content").value` reuses reading a
-`<textarea>`'s live value, the same property `saveFile` already reads —
+- `<textarea>`'s live value, the same property `saveFile` already reads —
 the entire point of this function is reading it *without* saving it
 first. `JSON.stringify({ content: content })` reuses serialization from
 Lesson 3, the identical shape `saveFile` already sends, since both
@@ -344,8 +342,8 @@ broken, exactly the reasoning already used for `"(no output)"`.
 ## Connect the pieces
 
 Editing `src/utils.py` without saving, then clicking Current Diff:
-`diffCurrent()` reads `#file-content`'s live value — the unsaved edit,
-still only in browser memory — and sends it as `POST /diff-current`'s
+- `diffCurrent()` reads `#file-content`'s live value — the unsaved edit, still only in browser memory — and sends it as `POST /diff-current`'s
+
 body. On the backend, `diff_current` reads the *actual* saved content
 fresh off disk and runs `difflib.unified_diff` against the two,
 producing the same unified-diff format `/diff` already produces from
@@ -372,7 +370,7 @@ same real, readable diff shown in this lesson's own concept lab.
 2. Save that change, click Current Diff again, and confirm the panel now
    reports "No unsaved changes."
 3. Compare `/diff`'s and `/diff-current`'s real JSON responses side by
-   side for the same edit, once saved — confirm the `diff` text itself
+- side for the same edit, once saved — confirm the `diff` text itself
    is close in shape (`---`/`+++`/`@@`) even though one came from `git`
    and the other from `difflib`.
 

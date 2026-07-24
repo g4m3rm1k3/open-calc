@@ -167,13 +167,12 @@ Nothing in `main` changed — it already existed to call `check_access` and repo
 result; `check_access` itself is the entire new piece.
 
 ### Mechanical Walkthrough
-
 - `char *input_name` — **(a) first appearance**: a **pointer** to `char` — a memory
   address where a sequence of characters begins, not the characters themselves. C strings
   are not a built-in type the way Python's `str` is; they're just a block of memory with
   a special end marker (the next item explains this).
 - `char name_buffer[8]` — **(a) first appearance**: declares a fixed-size array of 8
-  `char` values, reserving exactly 8 bytes of space in this function's **stack frame** —
+- `char` values, reserving exactly 8 bytes of space in this function's **stack frame** —
   the region of memory the running program uses to hold this specific function call's
   local variables, for as long as that call is active.
 - `int is_authenticated = 0` — **(c) already basic**: an integer variable, initialized to
@@ -181,17 +180,17 @@ result; `check_access` itself is the entire new piece.
   explicitly-typed declaration.
 - `strcpy(name_buffer, input_name)` — **(a) first appearance**: a C standard library
   function that copies characters from `input_name` into `name_buffer`, one byte at a
-  time, until it reaches a **null terminator** — a single zero byte (`\0`) that marks the
+- time, until it reaches a **null terminator** — a single zero byte (`\0`) that marks the
   end of a C string, since C strings carry no built-in length the way Python's `str` does.
   Critically: `strcpy` has no parameter telling it how large `name_buffer` actually is. It
   will keep copying bytes past the end of `name_buffer` for as long as `input_name`
   provides more non-zero bytes, writing into whatever memory happens to sit immediately
-  after `name_buffer` — with no check, no error, and no warning.
+- after `name_buffer` — with no check, no error, and no warning.
 - `printf("%s", name_buffer)` — **(c) already basic**: printing a string; `%s` as a format
   specifier needs no further explanation for reading purposes here.
 
 **Execution trace**, since this code's behavior depends entirely on how far `strcpy`
-writes past `name_buffer`'s 8-byte boundary — the concrete values below are the actual
+- writes past `name_buffer`'s 8-byte boundary — the concrete values below are the actual
 values this program produced when compiled and run:
 
 ```
@@ -203,16 +202,16 @@ input length 12+:                                            program crashes
                                                                (Segmentation fault)
 ```
 
-At exactly 9 characters — one character past `name_buffer`'s declared 8-byte size —
+- At exactly 9 characters — one character past `name_buffer`'s declared 8-byte size —
 `strcpy` writes one extra byte immediately following the buffer, and on this compiler and
 platform, that byte lands inside `is_authenticated`'s own memory. `65` is the ASCII code
-for the character `'A'` — the single overflow byte, interpreted directly as (part of) an
+- for the character `'A'` — the single overflow byte, interpreted directly as (part of) an
 integer, because C draws no boundary in memory between "this belongs to `name_buffer`" and
 "this belongs to `is_authenticated`" beyond the compiler's own bookkeeping, which
 `strcpy` has no way to consult or respect. At 12 or more characters, the overflow reaches
 far enough to corrupt memory the program needs to keep running at all — most often the
 **saved return address**, the memory location recording where execution should resume once
-`check_access` finishes — and the program crashes outright rather than merely
+- `check_access` finishes — and the program crashes outright rather than merely
 misbehaving.
 
 ### CS Lens

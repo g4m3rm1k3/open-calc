@@ -96,12 +96,11 @@ mode, reads every byte into `data`, and closes the file automatically
 different object).
 
 ### Mechanical Walkthrough
-
-`open("sample.bin", "rb")` — `open` itself and the `with`/`as` pattern
+- `open("sample.bin", "rb")` — `open` itself and the `with`/`as` pattern
 are reappearing from Lesson 1 (a reminder, not a re-explanation).
-`"rb"` — first appearance: the mode string telling `open` two things at
-once — `r` (read, not write) and `b` (binary — don't decode to text).
-`f.read()` — first appearance of this exact call: reads the *entire*
+- `"rb"` — first appearance: the mode string telling `open` two things at once — `r` (read, not write) and `b` (binary — don't decode to text).
+- `f.read()` — first appearance of this exact call: reads the *entire*
+
 remaining contents of the file in one call, returning `bytes` because
 the file was opened in binary mode.
 
@@ -217,14 +216,14 @@ nothing with each one yet — `pass` is a stand-in the next several units
 replace with real formatting logic.
 
 ### Mechanical Walkthrough
+- `def hexdump(data, width=16):` — `def` and default-argument syntax (`width=16`) — assuming these as basic from your stated Python
 
-`def hexdump(data, width=16):` — `def` and default-argument syntax
-(`width=16`) — assuming these as basic from your stated Python
 background (functions with default args are a small, standard extension
-of "functions," not a new idea worth its own lab). `for b in data:` —
+- of "functions," not a new idea worth its own lab).
+- `for b in data:` —
 this *is* the new concept from this unit's lab, reapplied to real
 project data instead of a hand-built list: each `b` will be an `int`.
-`pass` — reappearing from Lesson 1's placeholder use — a reminder, not a
+- `pass` — reappearing from Lesson 1's placeholder use — a reminder, not a
 re-explanation.
 
 ### CS Lens
@@ -324,12 +323,12 @@ bytes into `chunk`. Nothing is printed yet — the row's contents exist,
 but nothing formats or displays them.
 
 ### Mechanical Walkthrough
-
-`for offset in range(0, len(data), width):` — the loop variable name
+- `for offset in range(0, len(data), width):` — the loop variable name
 changed from `b` to `offset` on purpose (it now tracks a *position*, not
-a byte value) — no new syntax here beyond `range`'s third argument,
-covered next. `len(data)` — assuming `len()` as basic, already
-established. `data[offset:offset + width]` — this *is* the concept from
+- a byte value) — no new syntax here beyond `range`'s third argument, covered next.
+- `len(data)` — assuming `len()` as basic, already established.
+- `data[offset:offset + width]` — this *is* the concept from
+
 this unit's lab, reapplied for real: a slice from `offset` up to (not
 including) `offset + width`.
 
@@ -471,10 +470,10 @@ hex pair per byte, space-separated — but it's built, not yet printed.
 reused directly.
 
 ### Mechanical Walkthrough
+- `hex_part = ""` — plain assignment of an empty string, already basic.
+- `for b in chunk:` — the bytes-iteration concept, reapplied to `chunk` instead of the whole `data` — a reminder.
+- `hex_part += f"{b:02x} "` —
 
-`hex_part = ""` — plain assignment of an empty string, already basic.
-`for b in chunk:` — the bytes-iteration concept, reapplied to `chunk`
-instead of the whole `data` — a reminder. `hex_part += f"{b:02x} "` —
 `+=` (assuming as basic, standard string accumulation) combined with the
 `:02x` format spec, which *is* this unit's new concept, reused directly
 from the lab; the trailing space inside the f-string is what puts a gap
@@ -601,13 +600,15 @@ simple over clever, so each concept stays visible as its own step
 instead of merged into one dense loop.
 
 ### Mechanical Walkthrough
+- `ascii_part = ""` — basic, same pattern as `hex_part`.
+- `for b in chunk:` — reminder, third reuse of the same iteration concept.
+- `if 32 <= b <= 126:` — the chained-comparison concept from this unit's lab, reused for
 
-`ascii_part = ""` — basic, same pattern as `hex_part`. `for b in chunk:`
-— reminder, third reuse of the same iteration concept. `if 32 <= b <=
-126:` — the chained-comparison concept from this unit's lab, reused for
 real: `32` and `126` are the printable-ASCII range's boundaries (space
-through `~`). `ascii_part += chr(b)` — `chr()`, reused directly from the
-lab. `else: ascii_part += "."` — the fallback for anything outside
+- through `~`).
+- `ascii_part += chr(b)` — `chr()`, reused directly from the lab.
+- `else: ascii_part += "."` — the fallback for anything outside
+
 printable range, already-basic `if`/`else`.
 
 ### CS Lens

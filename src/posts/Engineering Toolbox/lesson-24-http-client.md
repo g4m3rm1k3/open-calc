@@ -117,13 +117,13 @@ request over a genuine socket — but doesn't yet read or make sense of
 whatever comes back.
 
 ### Mechanical Walkthrough
-
 `import socket`, `with socket.socket(...) as s:`, `s.connect((host,
-port))` — all direct reminders of Lesson 18, unchanged. `request =
-(...)` — the concept from this unit's lab, reused for real, with
+- port))` — all direct reminders of Lesson 18, unchanged.
+- `request = (...)` — the concept from this unit's lab, reused for real, with
+
 `host`/`path` now genuine parameters instead of hardcoded values.
-`s.sendall(request.encode())` — Lesson 19's `sendall()` reminder,
-combined with `.encode()` (Lesson 1, reminder) — the request, built as
+- `s.sendall(request.encode())` — Lesson 19's `sendall()` reminder, combined with `.encode()` (Lesson 1, reminder) — the request, built as
+
 a Python `str`, has to become `bytes` before a socket will send it, the
 identical text/bytes boundary Lesson 1 first established.
 
@@ -279,21 +279,19 @@ returns a genuinely parsed status line, a headers dictionary, and the
 raw body — all from a hand-built HTTP client with no library help.
 
 ### Mechanical Walkthrough
-
-`while True: chunk = s.recv(4096) ...` — Lesson 19's `recv()`-until-
+- `while True: chunk = s.recv(4096) ...` — Lesson 19's `recv()`-until-
 empty pattern, reminder — here reading the *entire* response, relying
 specifically on the server closing the connection (per
 `"Connection: close"`, sent in the request) to know when to stop; this
 reliance is exactly what the closing section shows breaking. `response
-.split(b"\r\n\r\n", 1)` — the concept from this unit's lab, reused for
-real. `header_part.decode().split("\r\n")` — `.decode()` (Lesson 1,
-reminder) then `.split("\r\n")` — turning the header block into one
-line per header. `status_line = header_lines[0]` — the very first line
+- .split(b"\r\n\r\n", 1)` — the concept from this unit's lab, reused for real.
+- `header_part.decode().split("\r\n")` — `.decode()` (Lesson 1, reminder) then `.split("\r\n")` — turning the header block into one line per header.
+- `status_line = header_lines[0]` — the very first line
+
 is always the status line, by the format's own definition. `for line in
-header_lines[1:]:` — slicing (Lesson 61, reminder) past the status
-line, over every actual header. `key, value = line.split(": ", 1)` —
-splitting each header line on `": "` — HTTP's specified separator
-between a header's name and its value — with `1` again limiting to one
+- header_lines[1:]:` — slicing (Lesson 61, reminder) past the status line, over every actual header.
+- `key, value = line.split(": ", 1)` — splitting each header line on `": "` — HTTP's specified separator between a header's name and its value — with `1` again limiting to one
+
 split, in case a value itself contains that substring.
 
 ### CS Lens

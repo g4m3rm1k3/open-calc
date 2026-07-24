@@ -565,22 +565,21 @@ its `sketchEntities` prop hands it, exactly as Lesson 52 built it; only
 *which* array reaches that prop changed.
 
 ### Mechanical Walkthrough
-
 - `prev.map((l) => (l.id === id ? { ...l, visible: !l.visible } : l))` —
-  **(b) hard concept reappearing** — the identical `.map`-plus-spread
+- **(b) hard concept reappearing** — the identical `.map`-plus-spread
   "update one item in an array by id" shape `renameLayer` (directly
   above it) already used for `name`; no new syntax, a different field.
-  `!l.visible` — already-established syntax (logical NOT on a boolean
+- `!l.visible` — already-established syntax (logical NOT on a boolean
   field).
 - `sketchEntities.filter((e) => ...)` — **(b) hard concept reappearing**
-  — `.filter` returning a new array, the same construct `App.tsx`'s own
+- — `.filter` returning a new array, the same construct `App.tsx`'s own
   `revealedPoints` (Lesson 46) already uses.
 - `layers.find((l) => l.id === e.layerId)` — **(b) hard concept
-  reappearing** — `.find`, already used identically in `ToolCardList.tsx`
-  (Lesson 48, `tools.find((t) => t.id === assemblyToolId)`) — look up the
+- reappearing** — `.find`, already used identically in `ToolCardList.tsx` (Lesson 48, `tools.find((t) => t.id === assemblyToolId)`) — look up the
+
   one related object by id, exactly the "read the foreign key, then look
   up the row it points at" step `sqlalchemy-relationship-back-
-  populates.md` named for `book.author` — done here by hand, with a
+- populates.md` named for `book.author` — done here by hand, with a
   linear scan, instead of a real index or an ORM's own query.
 - `?.visible` — already-established syntax (optional chaining) — `find`
   returns `undefined` if no layer matches; without `?.` this would throw
@@ -757,20 +756,19 @@ mutate them (`setActiveLayerId`, `addLayer`, `renameLayer`,
 not spread across separate return statements.
 
 ### Mechanical Walkthrough
-
 - `if (layers.length <= 1) return;` — **(a) first appearance of this
   exact guard in this project** — a plain early return preventing the
   function from doing anything at all once only one real layer remains;
   `<=` rather than `===` defensively covers an unreachable `0` case the
   same way, at no extra cost.
 - `setLayers((prev) => prev.filter((l) => l.id !== id))` — **(b) hard
-  concept reappearing** — `.filter` excluding one item by id, the same
+- concept reappearing** — `.filter` excluding one item by id, the same
   construct `removeFromPanel` (`App.tsx`, Lesson 45) already uses to
   drop a closed tab from a panel's own `tabs` array.
 - `setSketchEntities((prev) => prev.filter((e) => e.layerId !== id))` —
   the cascade itself: every entity whose `layerId` matches the layer
   being deleted is excluded from the *entities* array, in the same
-  statement, using the identical already-taught `.filter` construct —
+- statement, using the identical already-taught `.filter` construct —
   no new syntax, the entire "cascade" is one already-familiar method
   call pointed at a second array.
 - `if (activeLayerId === id) { ... }` — already-established syntax (an
@@ -780,7 +778,7 @@ not spread across separate return statements.
   `.find`, this time locating *any* remaining layer (the first one that
   isn't the one being deleted) rather than one specific id.
 - `for (const e of sketchEntities) counts[e.layerId] = (counts[e.layerId] ?? 0) + 1;`
-  — **(b) hard concept reappearing** — `for...of` (already used in
+- — **(b) hard concept reappearing** — `for...of` (already used in
   `viewport.ts`'s own cleanup functions, Lesson 52) building up a plain
   object used as a lookup table, keyed by string — the same "object as
   a map" shape this project's `VIEW_LABELS` (`App.tsx`, Lesson 22) and
@@ -1167,7 +1165,6 @@ The complete new CSS (`theme.css:342-392`):
 ```
 
 ### Mechanical Walkthrough
-
 Every construct here is a 100%-matching repeat, per the Repetition Rule,
 used without further comment:
 
@@ -1181,13 +1178,13 @@ used without further comment:
   (`input[type="checkbox"]`) for the identical real purpose (a bound
   boolean toggle).
 - `disabled={!canDelete}`, `className={...}`, `onClick={(e) =>
-  e.stopPropagation()}` on a checkbox nested in a clickable row — the
+- e.stopPropagation()}` on a checkbox nested in a clickable row — the
   exact pattern `ToolImportPanel.tsx` (Lesson 18) and `BlockList.tsx`
   (Lesson 46) already established for "a row is clickable as a whole,
   but an element inside it needs its own, independent click."
 - `value={layer.name}` / `onChange={(e) => onRename(layer.id,
-  e.target.value)}` — a controlled text input updating one item in an
-  array by id — the same shape `BlockList.tsx`'s own editable move
+- e.target.value)}` — a controlled text input updating one item in an array by id — the same shape `BlockList.tsx`'s own editable move
+
   fields (Lessons 43–44) already established.
 - `className="btn full"` — Lesson 46's own full-width action button.
 

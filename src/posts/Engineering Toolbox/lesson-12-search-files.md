@@ -102,13 +102,15 @@ across every folder — but does nothing with `pattern` or each
 `filename` yet.
 
 ### Mechanical Walkthrough
+- `import os` — reminder.
+- `def find_files(root, pattern):` — basic.
+- `for dirpath, dirnames, filenames in os.walk(root):` — the concept from
 
-`import os` — reminder. `def find_files(root, pattern):` — basic.
-`for dirpath, dirnames, filenames in os.walk(root):` — the concept from
 this unit's lab, reused for real; this is tuple unpacking (Lesson 1,
 reminder) across *three* values instead of two, applied to each step
-`os.walk` produces. `for filename in filenames:` — basic iteration over
-the list `os.walk` already handed us. `pass` — reminder placeholder.
+- `os.walk` produces.
+- `for filename in filenames:` — basic iteration over the list `os.walk` already handed us.
+- `pass` — reminder placeholder.
 
 ### CS Lens
 
@@ -214,10 +216,10 @@ tree, whose name matches the given pattern — genuinely working, though
 the next unit changes *how* it delivers results.
 
 ### Mechanical Walkthrough
+- `import fnmatch` — first appearance of this module.
+- `if fnmatch.fnmatch(filename, pattern):` — the concept from this unit's lab, reused for real.
+- `os.path.join(dirpath, filename)` — Lesson 2,
 
-`import fnmatch` — first appearance of this module. `if
-fnmatch.fnmatch(filename, pattern):` — the concept from this unit's
-lab, reused for real. `os.path.join(dirpath, filename)` — Lesson 2,
 reminder — building the full path from the current folder and the
 matched filename.
 
@@ -372,8 +374,7 @@ produces one matching path at a time, only as something actually asks
 for the next one.
 
 ### Mechanical Walkthrough
-
-`yield os.path.join(dirpath, filename)` — the concept from this unit's
+- `yield os.path.join(dirpath, filename)` — the concept from this unit's
 lab, reused for real, replacing the earlier `print(...)` directly.
 
 ### CS Lens

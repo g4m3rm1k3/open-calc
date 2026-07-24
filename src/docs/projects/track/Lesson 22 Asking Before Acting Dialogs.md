@@ -69,7 +69,6 @@ delegation matching every other method there exactly. No existing
 method in any of the three files changes at all.
 
 ### Mechanical Walkthrough
-
 - `@Delete void delete(Item item);` — reappearing (Room-generated
   method, Lesson 13), same primary-key-based row matching `@Update`
   already relied on.
@@ -79,7 +78,7 @@ method in any of the three files changes at all.
   appearance of `List.removeIf`.** Takes a `Predicate` (another
   single-abstract-method interface, same family as `Runnable`/
   `OnItemClickListener`) and removes every element it returns `true`
-  for — here, matching by `id` (Lesson 20's identity check, reused for
+- for — here, matching by `id` (Lesson 20's identity check, reused for
   a third purpose) rather than full-field `equals()`, since the exact
   object reference passed in might not be the same instance currently
   held in `itemsLiveData`'s list.
@@ -252,7 +251,6 @@ is a new private method the class gains, called only from the menu
 handler.
 
 ### Mechanical Walkthrough
-
 - `menuInflater.inflate(R.menu.menu_item_detail, menu)` — reappearing,
   Lesson 21.
 - `"Delete " + item.getName() + "?"` — reappearing (string
@@ -267,14 +265,14 @@ handler.
   from the menu handler directly, which is the entire structural point
   of this lesson.
 - `Navigation.findNavController(requireView()).navigateUp()` —
-  reappearing (Lesson 19/21), new detail: `requireView()` — **first
+- reappearing (Lesson 19/21), new detail: `requireView()` — **first
   appearance** — a Fragment convenience method returning its current
   view non-null (throwing if called when none exists) — used here
   instead of the `view` parameter `onViewCreated` provided, since this
   method runs later, outside that parameter's scope.
 - `.setNegativeButton("Cancel", null)` — **first appearance of `null`
   as a listener argument.** A dialog button doesn't require a
-  listener at all — passing `null` here means "show a Cancel button
+- listener at all — passing `null` here means "show a Cancel button
   that simply dismisses the dialog and does nothing else," which is
   exactly the correct, safe behavior for declining a destructive
   action.

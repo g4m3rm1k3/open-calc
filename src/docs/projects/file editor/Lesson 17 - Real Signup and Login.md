@@ -131,19 +131,18 @@ lesson replaces *how* a token gets issued, not what a token proves once
 issued.
 
 ### Mechanical Walkthrough
-
 `from auth import hash_password, verify_password` and `from db import
 init_db, create_user, get_user` both reuse the cross-module import
-pattern from Lesson 11 — `main.py` now depends on two more of this
+- pattern from Lesson 11 — `main.py` now depends on two more of this
 project's own modules, the same way `gcode.parser` depends on
 `gcode.lexer`. `SignupRequest` and the now-two-field `LoginRequest` both
-reuse the plain `BaseModel` shape from Lesson 3's `FileEdit` — two
+- reuse the plain `BaseModel` shape from Lesson 3's `FileEdit` — two
 required string fields each. `init_db()`, called directly at the top
 level rather than inside any function, runs exactly once, the moment
 this file is imported — before any route can possibly be hit, ensuring
 the `users` table already exists by the time the first request arrives.
 `secrets.token_bytes(16)`/`secrets.token_bytes(32)` reuse the exact
-random-byte generation `hash_password` itself already uses — this
+- random-byte generation `hash_password` itself already uses — this
 lesson's next unit explains what these two specific values are for.
 
 ---
@@ -183,9 +182,8 @@ unit rebuilds `/login` immediately after it, in the same spot Lesson 8
 originally put it.
 
 ### Mechanical Walkthrough
-
 `get_user(credentials.username) is not None` reuses Lesson 16's own
-`None`-means-not-found convention directly — a real username collision,
+- `None`-means-not-found convention directly — a real username collision,
 caught here, before ever reaching `create_user`, which would otherwise
 raise a raw `sqlite3.IntegrityError` instead of a clean, readable `400`.
 `hash_password(credentials.password)` reuses Lesson 15's function
@@ -286,20 +284,19 @@ those two lines — proving it now means checking a real, individual
 account instead of one shared secret.
 
 ### Mechanical Walkthrough
-
 `user = get_user(credentials.username)` reuses Lesson 16's lookup
 directly. `if user is None:` handles the case where no such username
-exists at all — `verify_password(credentials.password, DUMMY_SALT,
+- exists at all — `verify_password(credentials.password, DUMMY_SALT,
 DUMMY_HASH)` runs anyway, its result thrown away entirely, purely to
 spend the same real time a genuine check would — the next unit explains
 exactly why. `raise HTTPException(status_code=401, detail="Invalid
 username or password")` reuses the generic-401 shape from Lesson 8,
 worded deliberately vague. `user_id, username, salt, password_hash =
-user` unpacks the real stored row — `user_id` and `username` aren't used
+- user` unpacks the real stored row — `user_id` and `username` aren't used
 again in this function, kept as named, readable positions in the tuple
 rather than an unexplained `_, _, salt, password_hash`. `verify_password(credentials.password,
 salt, password_hash)` reuses Lesson 15's function against this specific
-user's own real stored values — the entire reason a per-user `salt` was
+- user's own real stored values — the entire reason a per-user `salt` was
 stored at all back in Lesson 16, put to use for the first time. The
 final three lines reuse Lesson 8 exactly, unchanged.
 

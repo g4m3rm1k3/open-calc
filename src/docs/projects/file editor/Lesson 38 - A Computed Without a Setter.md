@@ -299,18 +299,17 @@ And its `<style scoped>` block, with the new rule added directly after
 ```
 
 ### Mechanical Walkthrough
-
-`lockStatus`'s body is this lesson's own lab, applied for real — the
+- `lockStatus`'s body is this lesson's own lab, applied for real — the
 only difference is reading `tab.checked_out_by` (found via `.find()`,
 already established) instead of a standalone `checkedOutBy` ref, and
 an added `if (!tab) return ''` guard for the moment before any file is
 open at all. `{{ lockMessage || lockStatus }}` reuses the `||`-fallback
-idiom (Lesson 5) — `lockMessage` is a non-empty string only right after
+- idiom (Lesson 5) — `lockMessage` is a non-empty string only right after
 a failed checkout/checkin attempt; the rest of the time it's `''`,
-which is falsy, so `lockStatus` — the always-current derived value —
+- which is falsy, so `lockStatus` — the always-current derived value —
 shows instead. `checkoutFile`/`checkinFile` are otherwise a direct,
 mechanical port: `let wasSuccessful`, the `response.ok` capture, the
-`.then()`/`.catch()` shape — all Lesson 28's own pattern, unchanged.
+- `.then()`/`.catch()` shape — all Lesson 28's own pattern, unchanged.
 
 ### CS Lens — read-only vs. writable, the same primitive both ways
 

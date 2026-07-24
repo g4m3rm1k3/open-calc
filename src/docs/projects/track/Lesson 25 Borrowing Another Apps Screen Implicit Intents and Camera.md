@@ -59,14 +59,14 @@ using `ACTION_IMAGE_CAPTURE` through a purpose-built contract, is built
 next.
 
 ### Mechanical Walkthrough
-
 - `new Intent(Intent.ACTION_DIAL, Uri.parse("tel:5555555555"))` —
   **first appearance of the single-action-plus-data constructor.**
   `Intent.ACTION_DIAL` is a `String` constant the whole Android
   platform agrees on — any app can declare, in its own Manifest, that
   it can handle this action, and any app can *request* it without
-  knowing which one will respond. `Uri.parse("tel:5555555555")` —
-  **first appearance of `Uri`** — a structured way to represent "what
+- knowing which one will respond.
+- `Uri.parse("tel:5555555555")` — **first appearance of `Uri`** — a structured way to represent "what
+
   data this action concerns," here a phone-number URI.
 - `dialIntent.resolveActivity(requireContext().getPackageManager())` —
   **first appearance.** Asks the OS, *before* actually launching,
@@ -161,14 +161,13 @@ implementation 'androidx.core:core:1.12.0'
 `<activity>` entry from Lesson 19.
 
 ### Mechanical Walkthrough
-
 - `<paths>` / `<external-files-path name="photos" path="Pictures" />`
   — **first appearance.** Declares which specific folder(s) this
   `FileProvider` is willing to expose, and under what public alias
-  (`name="photos"`) — a deliberate allowlist, not blanket access to
+- (`name="photos"`) — a deliberate allowlist, not blanket access to
   this app's entire storage.
 - `<provider android:name="androidx.core.content.FileProvider" ...>` —
-  **first appearance of a `<provider>` Manifest entry** — a fourth kind
+- **first appearance of a `<provider>` Manifest entry** — a fourth kind
   of app component, alongside `<activity>` (Lesson 2), and two more
   (`<service>`, `<receiver>`) arriving in Lessons 26–27. A
   `ContentProvider` (Lesson 29 covers the general concept in full;
@@ -268,7 +267,6 @@ replaced with a real call to `launchCamera()` — every other branch
 (rationale, fresh request) is unchanged from Lesson 24.
 
 ### Mechanical Walkthrough
-
 - `private Uri pendingPhotoUri;` — reappearing (field, `Uri` type from
   this lesson's first unit), holding the destination the Camera app
   will write into, needed by the launcher's own callback later.
@@ -283,7 +281,7 @@ replaced with a real call to `launchCamera()` — every other branch
 - `item.setPhotoUri(pendingPhotoUri.toString())` — calls a new setter,
   added to `Item` next, storing the URI as a plain `String` (Room
   cannot store a `Uri` object directly without a custom type
-  converter, out of scope here — a `String` round-trips cleanly through
+- converter, out of scope here — a `String` round-trips cleanly through
   `Uri.parse(...)` whenever needed).
 - `viewModel.updateItem(item)` — reappearing shape (Lesson 13's
   exercise, Lesson 17's delegation pattern), persisting the change.
@@ -291,16 +289,17 @@ replaced with a real call to `launchCamera()` — every other branch
   Loads and displays an image directly from a `Uri` into an `ImageView`
   — a new view type and method, the actual visible payoff.
 - `new java.io.File(requireContext().getExternalFilesDir("Pictures"), "item_" + item.getId() + "_" + System.currentTimeMillis() + ".jpg")`
-  — **first appearance of `java.io.File`** in this project, and
-  `getExternalFilesDir("Pictures")` — **first appearance** — an
+- — **first appearance of `java.io.File`** in this project, and `getExternalFilesDir("Pictures")` — **first appearance** — an
+
   app-specific, no-extra-permission-required storage area, matching
   the `<external-files-path>` alias declared in `file_paths.xml`
-  above. `System.currentTimeMillis()` — **first appearance** — a
+- above.
+- `System.currentTimeMillis()` — **first appearance** — a
   simple way to keep every generated filename unique.
 - `FileProvider.getUriForFile(requireContext(), "com.yourname.pocketinventory.fileprovider", photoFile)`
-  — **first appearance.** Converts the raw `File` path into the safe,
+- — **first appearance.** Converts the raw `File` path into the safe,
   brokered `content://` URI the Camera app is actually allowed to
-  write into — the direct payoff of the `FileProvider` Manifest
+- write into — the direct payoff of the `FileProvider` Manifest
   configuration from the previous unit.
 - `takePictureLauncher.launch(pendingPhotoUri)` — reappearing
   (`.launch(...)`, Lesson 10/24), this contract's specific input type.
@@ -349,10 +348,9 @@ from `1` (Lesson 13) to `2`, and `.fallbackToDestructiveMigration()` is
 added to the builder chain — worth being direct about what this means.
 
 ### Mechanical Walkthrough
-
 - `@Nullable private String photoUri;` — reappearing (`@Nullable`,
   Lesson 6; field declaration), new detail: the *first* genuinely
-  optional field on `Item` — every prior field was required at
+- optional field on `Item` — every prior field was required at
   construction.
 - `getPhotoUri()` / `setPhotoUri(String photoUri)` — reappearing
   (getter/setter pattern, Lesson 7).

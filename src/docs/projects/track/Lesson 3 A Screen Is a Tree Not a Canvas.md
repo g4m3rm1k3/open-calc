@@ -66,10 +66,9 @@ one `TextView`, positioned by four constraints that each say "align
 this edge to the matching edge of my parent."
 
 ### Mechanical Walkthrough
-
 - `<androidx.constraintlayout.widget.ConstraintLayout>` — **first
   appearance.** The root of the tree. Notice it's referenced by a full
-  class path, exactly like the Manifest's `.MainActivity` — this is
+- class path, exactly like the Manifest's `.MainActivity` — this is
   the same Java package-naming concept from Lesson 1, just inside XML
   now: this tag literally instantiates a real Java/Kotlin class from
   the ConstraintLayout library.
@@ -92,11 +91,11 @@ this edge to the matching edge of my parent."
 - `android:text="Hello World!"` — **first appearance.** Directly sets
   the displayed string. (You'll later learn why hardcoding a string
   literal like this, instead of a `@string/` resource reference the
-  way the Manifest did with `app_name`, is considered bad practice —
+- way the Manifest did with `app_name`, is considered bad practice —
   flagged for a later lesson, not explained here to avoid a second new
   concept riding along with this one.)
 - `app:layout_constraintBottom_toBottomOf="parent"` (and its three
-  siblings: `Left`, `Right`, `Top`) — **first appearance, as a group.**
+- siblings: `Left`, `Right`, `Top`) — **first appearance, as a group.**
   This is the actual concept the lesson is named for. Each line reads
   as a sentence: "constrain *my* bottom edge to *parent's* bottom
   edge." All four together, each anchored to the opposite edge of the
@@ -236,19 +235,18 @@ instead of the placeholder `TextView`, each independently constrained
 to the parent's edges.
 
 ### Mechanical Walkthrough
-
 - `android:layout_marginTop="64dp"` — **first appearance.** A margin
   pushes a view *away* from whatever it's constrained to, using the
-  `dp` unit from the previous unit — this is that concept's first real
+- `dp` unit from the previous unit — this is that concept's first real
   use.
 - `android:textSize="28sp"` — **reappearing concept** (`sp` from the
   unit above), first real use.
 - `app:layout_constraintStart_toStartOf="parent"` /
-  `...End_toEndOf="parent"` — **reappearing concept** (same constraint
+- `...End_toEndOf="parent"` — **reappearing concept** (same constraint
   idea as `Left`/`Right` in the placeholder file), new terms worth a
   clause: `Start`/`End` mean the same as `Left`/`Right` in
   left-to-right languages, but automatically flip in right-to-left
-  languages (like Arabic or Hebrew) — preferred over `Left`/`Right` for
+- languages (like Arabic or Hebrew) — preferred over `Left`/`Right` for
   exactly that reason.
 - `<Button ...>` — **first appearance.** A tappable view; structurally
   declared the same way as `TextView`, just a different view class

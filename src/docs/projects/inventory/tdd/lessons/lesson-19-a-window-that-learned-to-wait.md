@@ -124,22 +124,21 @@ advisory range on that older major version, fixed by bumping to the
 version actually checked.
 
 ### Mechanical Walkthrough
-
 - `"main": "main.js"` — **(a) first appearance** of this field's real
   meaning for an Electron project specifically: Electron's own `electron .`
   command reads this exact field to find which file is the application's
-  entry point — the same role Flask's `if __name__ == "__main__":` block
+- entry point — the same role Flask's `if __name__ == "__main__":` block
   plays (Lesson 1), pointed to declaratively instead of run positionally.
 - `"scripts": { "start": "electron ." }` — **(b) reappearing** the same
   `package.json` `"scripts"` mechanism `cnc-web`'s own `"dev": "vite"`
-  already established (Lesson 7) — a new command name (`start`, npm's own
+- already established (Lesson 7) — a new command name (`start`, npm's own
   conventional name for "run the built application," distinct from `dev`),
   same mechanism.
 - `"devDependencies": { "electron": "^43.1.1" }` — **(b) reappearing**
   the same `package.json` dependency-declaration shape already
   established; `electron` is a dev dependency specifically because it's
   a tool this project runs *with*, not a library `main.js`'s own logic
-  imports and calls — the identical reasoning `vite`/`typescript` already
+- imports and calls — the identical reasoning `vite`/`typescript` already
   used as dev dependencies in `cnc-web`.
 
 ### CS Lens
@@ -203,7 +202,6 @@ This is the complete, first version of `cnc-desktop/main.js` — nothing
 precedes it yet.
 
 ### Mechanical Walkthrough
-
 - `const { app, BrowserWindow } = require("electron")` — **(b)
   reappearing** `require`/destructuring, full treatment in the previous
   unit's concept file, applied to Electron's own two most central
@@ -215,7 +213,7 @@ precedes it yet.
   function declaration syntax; what's new is only its contents, covered
   below.
 - `new BrowserWindow({ width: 1280, height: 800 })` /
-  `win.loadURL(DEV_URL)` / `app.whenReady().then(createWindow)` — **(b)
+- `win.loadURL(DEV_URL)` / `app.whenReady().then(createWindow)` — **(b)
   reappearing**, full treatment in this unit's concept file, applied
   here to this project's own real dev-server address instead of the
   lab's throwaway `data:` URL.
@@ -394,17 +392,16 @@ attempt has been exhausted, instead of leaving a blank window with no
 explanation, as the previous unit's real, caused failure did.
 
 ### Mechanical Walkthrough
-
 - `let attempt = 0;` / `const tryLoad = () => { attempt += 1; ... }` —
   **(b) reappearing** a **closure**, the same mechanism
   `event-driven-ui-callbacks.md`'s own Mechanical Walkthrough already
-  named by that word — `tryLoad` and the `did-fail-load` handler below
+- named by that word — `tryLoad` and the `did-fail-load` handler below
   are two separate functions that both read and mutate the same one
   `attempt` variable from their shared enclosing scope, across many
   separate calls over real, elapsed time — not two independent copies.
 - `win.webContents.on("did-fail-load", (_event, errorCode, errorDescription) => {...})`
   — **(b) reappearing**, full treatment in
-  `electron-main-process-and-browserwindow.md` — Electron's own real,
+- `electron-main-process-and-browserwindow.md` — Electron's own real,
   documented event, fired with the failing URL's real numeric error code
   and a human-readable description as its second and third arguments.
 - `if (errorCode === -3) return;` — **(a) first appearance** of a real,
@@ -418,14 +415,14 @@ explanation, as the previous unit's real, caused failure did.
   — **(b) reappearing** the bounded-retry-count half of
   `retry-timeout-and-backoff.md`'s own pattern, and **(a) first
   appearance** of the `data:` URL scheme + `encodeURIComponent`, full
-  treatment in `data-url-scheme.md` — building one real, safe URL whose
+- treatment in `data-url-scheme.md` — building one real, safe URL whose
   entire content is the error message itself, shown directly in the
   window in place of the unreachable page.
 - `2 ** attempt * 150 + Math.random() * 150` — **(b) reappearing**
   exponential backoff with jitter, the identical formula shape
   `retry-timeout-and-backoff.md`'s own isolated example already proved,
   reused here with different real constants (`150`ms base instead of
-  `100`ms — chosen smaller since a local `loadURL` failure resolves far
+- `100`ms — chosen smaller since a local `loadURL` failure resolves far
   faster than a real network `fetch` would).
 - `setTimeout(tryLoad, delayMs)` — **(b) reappearing**, also full
   treatment in the same concept file.
@@ -573,7 +570,6 @@ different situations: *"has this ever actually worked"* and *"is it
 working right now"* — only the first one ever gives up.
 
 ### Mechanical Walkthrough
-
 - `let hasConnectedOnce = false;` — **(c) already established** variable
   declaration; what's new is only its role, covered below.
 - `did-finish-load` — **(b) reappearing**, full treatment already given
@@ -581,7 +577,7 @@ working right now"* — only the first one ever gives up.
   same `webContents`, fired only on a real, successful load, never on a
   failure.
 - `if (hasConnectedOnce) { ...; return; }` placed *before* the
-  `MAX_ATTEMPTS` check — **(a) first appearance** of this lesson's real
+- `MAX_ATTEMPTS` check — **(a) first appearance** of this lesson's real
   design decision: once the target has been proven reachable even once,
   every later failure takes a completely different branch — a short,
   fixed-delay retry that never counts toward giving up — rather than the
@@ -742,13 +738,12 @@ each platform's own real convention for what happens after every window
 closes.
 
 ### Mechanical Walkthrough
-
 - `app.on("window-all-closed", ...)` — **(b) reappearing** the same
   `EventEmitter` pattern already used for `did-fail-load`, on `app`
-  instead of `webContents` — Electron's own real, documented event,
+- instead of `webContents` — Electron's own real, documented event,
   fired once every open window has closed.
 - `process.platform !== "darwin"` — **(b) reappearing**, full treatment
-  in this unit's concept file — `"darwin"` specifically identifies
+- in this unit's concept file — `"darwin"` specifically identifies
   macOS.
 - `app.quit()` — **(b) reappearing**, already used once in the concept
   file's own isolated lab.
@@ -805,9 +800,8 @@ project produces yet, added now so they're already excluded the moment
 packaging becomes real, later work.
 
 ### Mechanical Walkthrough
-
 - `node_modules` — **(b) reappearing** the identical entry `cnc-web/.gitignore`
-  and `cnc/.gitignore` already use — real, regeneratable from
+- and `cnc/.gitignore` already use — real, regeneratable from
   `package-lock.json` via `npm install` alone, never committed.
 - `package-lock.json` is **not** in this file — **(a) first appearance
   of a deliberate omission** worth naming: confirmed against

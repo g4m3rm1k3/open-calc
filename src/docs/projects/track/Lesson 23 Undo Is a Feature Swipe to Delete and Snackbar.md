@@ -100,25 +100,24 @@ uses the identical `ItemTouchHelper` shape against `InventoryAdapter`
 and `InventoryListFragment`'s already-real data.
 
 ### Mechanical Walkthrough
-
 - `new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) { ... })`
-  — **first appearance.** `SimpleCallback`'s constructor takes two
-  flag sets: drag directions (`0` here — this project doesn't support
+- — **first appearance.** `SimpleCallback`'s constructor takes two flag sets: drag directions (`0` here — this project doesn't support
+
   reordering rows by dragging) and swipe directions
   (`LEFT | ItemTouchHelper.RIGHT`, combined with the bitwise OR
-  operator `|` — **first appearance** — meaning "either direction
+- operator `|` — **first appearance** — meaning "either direction
   counts").
 - `onMove(...)` — **first appearance.** Required by the abstract class
   even when unused; governs drag-to-reorder specifically, `return false`
   meaning "don't support this."
 - `onSwiped(RecyclerView.ViewHolder viewHolder, int direction)` —
   **first appearance.** Called once the swipe gesture completes past
-  its threshold — `direction` reports which way (`ItemTouchHelper.LEFT`
+- its threshold — `direction` reports which way (`ItemTouchHelper.LEFT`
   or `.RIGHT`), unused in this project since both trigger the same
   delete behavior.
 - `viewHolder.getAdapterPosition()` — reappearing, Lesson 8.
 - `touchHelper.attachToRecyclerView(scratchList)` — **first appearance.**
-  Registers the gesture detector against a specific `RecyclerView` —
+- Registers the gesture detector against a specific `RecyclerView` —
   nothing above this line actually listens for touches until this call.
 
 ### CS Lens
@@ -184,9 +183,8 @@ registration and `viewModel.loadItems()` call from Lesson 16/20 —
 everything from that point on is unchanged.
 
 ### Mechanical Walkthrough
-
 - `adapter.getCurrentList()` — **first appearance.** A method
-  `ListAdapter` (Lesson 20) provides for free — returns whatever list
+- `ListAdapter` (Lesson 20) provides for free — returns whatever list
   it's currently displaying, exactly the list `submitList` last set,
   needed here since `InventoryAdapter` no longer keeps a directly
   Fragment-accessible `items` field of its own (Lesson 20 removed it).
@@ -245,21 +243,21 @@ A new private method on `InventoryListFragment`, called only from the
 `onSwiped` callback built in the previous unit.
 
 ### Mechanical Walkthrough
-
 - `Snackbar.make(requireView(), "Deleted " + deletedItem.getName(), Snackbar.LENGTH_LONG)`
-  — **first appearance.** `Snackbar` is a brief, auto-dismissing bar
-  anchored to the bottom of the screen — visually similar to `Toast`
+- — **first appearance.** `Snackbar` is a brief, auto-dismissing bar anchored to the bottom of the screen — visually similar to `Toast`
+
   (Lesson 9) but, critically, **interactive**: it can hold a real
-  clickable action, which `Toast` cannot. `requireView()` — reappearing,
+- clickable action, which `Toast` cannot.
+- `requireView()` — reappearing,
   Lesson 22 — anchors it to this Fragment's current view.
-  `Snackbar.LENGTH_LONG` — **first appearance**, a duration constant
+- `Snackbar.LENGTH_LONG` — **first appearance**, a duration constant
   parallel to `Toast.LENGTH_SHORT` (Lesson 9).
 - `.setAction("Undo", v -> { ... })` — **first appearance.** Adds a
   tappable button-like text action directly inside the Snackbar —
   reappearing lambda syntax, `v` unused (the tapped `View`, same unused-
   parameter pattern as every click listener since Lesson 4).
 - `new Item(deletedItem.getName(), deletedItem.getQuantity(), deletedItem.getLocation())`
-  — reappearing (the `@Ignore`-annotated three-argument constructor,
+- — reappearing (the `@Ignore`-annotated three-argument constructor,
   Lesson 13), a **deliberate, new object**, not the original —
   discussed directly in the SE Lens below.
 - `viewModel.addItem(restored)` — reappearing, Lesson 15/16/17 — the

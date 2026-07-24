@@ -117,18 +117,17 @@ public class InventoryActivity extends AppCompatActivity {
 ```
 
 ### Mechanical Walkthrough
-
 - `parent="Theme.MaterialComponents.DayNight.NoActionBar"` — **first
-  appearance.** `DayNight` — first appearance, worth a clause: this
+- appearance.** `DayNight` — first appearance, worth a clause: this
   theme family automatically switches between light and dark variants
   based on the system setting, a detail Lesson 33 covers fully.
   `NoActionBar` disables the framework's own automatic title bar,
-  required whenever you supply your own `Toolbar` — supplying both
+- required whenever you supply your own `Toolbar` — supplying both
   without this would produce two stacked title bars, a real, common
   mistake worth flagging.
 - `<com.google.android.material.appbar.MaterialToolbar ...>` — **first
   appearance.** Same full-class-path tag pattern as `ConstraintLayout`/
-  `RecyclerView` (Lesson 3/6) — a Material Design app bar widget.
+- `RecyclerView` (Lesson 3/6) — a Material Design app bar widget.
 - `?attr/actionBarSize` — **first appearance of theme attribute
   resolution.** The `?attr/` prefix (distinct from `@id/`/`@layout/`'s
   `@` prefix, both introduced Lesson 2/3) means "resolve this value
@@ -137,14 +136,14 @@ public class InventoryActivity extends AppCompatActivity {
   future custom one, Lesson 33) is applied.
 - `findViewById(R.id.toolbar)` — reappearing, Lesson 4.
 - `setSupportActionBar(toolbar)` — **first appearance.** Registers this
-  specific `Toolbar` as the Activity's action bar — the object
+- specific `Toolbar` as the Activity's action bar — the object
   `onCreateOptionsMenu`-style menu handling (next unit) and navigation
   title updates both target.
 - `getSupportFragmentManager().findFragmentById(R.id.navHostFragment)`
-  — **first appearance of `findFragmentById`.** Retrieves the
+- — **first appearance of `findFragmentById`.** Retrieves the
   `NavHostFragment` instance the layout XML already created (Lesson
   19's `android:name="androidx.navigation.fragment.NavHostFragment"`),
-  cast — reappearing (`(NavHostFragment)`, Lesson 8) — to access its
+- cast — reappearing (`(NavHostFragment)`, Lesson 8) — to access its
   navigation-specific methods.
 - `.getNavController()` — reappearing (Lesson 19's underlying concept),
   first direct retrieval from Java rather than via
@@ -286,9 +285,8 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 ```
 
 ### Mechanical Walkthrough
-
 - `requireActivity().addMenuProvider(new MenuProvider() { ... }, getViewLifecycleOwner())`
-  — **first appearance.** `MenuProvider` is another single-purpose
+- — **first appearance.** `MenuProvider` is another single-purpose
   interface (this project's now-familiar shape — Lesson 8's
   `OnItemClickListener`, Lesson 13's `ItemDao`) with two required
   methods, registered against the Activity but scoped to *this
@@ -298,7 +296,7 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
   gone, not linger).
 - `onCreateMenu(Menu menu, MenuInflater menuInflater)` — **first
   appearance.** Called once, when the menu needs building.
-  `menuInflater.inflate(...)` — reappearing pattern (`LayoutInflater.inflate`,
+- `menuInflater.inflate(...)` — reappearing pattern (`LayoutInflater.inflate`,
   Lesson 6, same idea for a different resource type) — turns the XML
   menu resource into real, in-memory `MenuItem` objects.
 - `onMenuItemSelected(MenuItem menuItem)` — **first appearance.**
@@ -362,14 +360,13 @@ corner, overlapping the list rather than reserving its own row — the
 conventional Material Design placement for a screen's primary action.
 
 ### Mechanical Walkthrough
-
 - `<com.google.android.material.floatingactionbutton.FloatingActionButton>`
   — **first appearance.** A circular, elevated button — visually
   distinct from a plain `Button` (Lesson 3), conventionally reserved
   for one clear primary action per screen.
 - `android:src="@android:drawable/ic_input_add"` — reappearing pattern
   (`android:src`, briefly mentioned as an exercise in Lesson 3;
-  `@android:drawable/...` — a system-provided resource reference,
+- `@android:drawable/...` — a system-provided resource reference,
   same `@type/name` syntax, `android:` prefix meaning "from the
   platform's own resources, not this app's").
 
@@ -434,7 +431,6 @@ entry:
 ```
 
 ### Mechanical Walkthrough
-
 - `app:showAsAction="always|collapseActionView"` — **first appearance.**
   `always` (contrasted with Settings' `never`) keeps this item visible
   as an icon directly in the Toolbar, not the overflow menu — the
@@ -444,7 +440,7 @@ entry:
   afterward, rather than permanently occupying Toolbar space.
 - `app:actionViewClass="androidx.appcompat.widget.SearchView"` —
   **first appearance.** Names a real widget class to inflate *as* this
-  menu item's expanded form — `SearchView` specifically provides a text
+- menu item's expanded form — `SearchView` specifically provides a text
   field with built-in search-appropriate styling and behavior.
 
 ### The New Code — Reacting to Query Text
@@ -512,7 +508,6 @@ actual data, since a search filter is a purely UI-local, temporary
 view of the same underlying list.
 
 ### Mechanical Walkthrough
-
 - `menu.findItem(R.id.menu_search)` — **first appearance.** Retrieves a
   specific inflated `MenuItem` by its ID, same generated-ID lookup
   pattern as `R.id.menu_settings` used for dispatch above.
@@ -528,7 +523,7 @@ view of the same underlying list.
   project returns `false` (not handled specially), relying entirely on
   live filtering instead.
 - `onQueryTextChange(String newText)` — **first appearance.** Called on
-  every keystroke — `return true` tells `SearchView` "I've handled
+- every keystroke — `return true` tells `SearchView` "I've handled
   updating the UI myself," suppressing its own default suggestion
   behavior.
 - `viewModel.getItems().getValue()` — reappearing (`LiveData.getValue()`,
@@ -539,10 +534,10 @@ view of the same underlying list.
   real-world use of `getValue()`, distinct from using it to *drive*
   business logic (which should stay inside the Repository).
 - `item.getName().toLowerCase().contains(query.toLowerCase())` —
-  **first appearance of `String.toLowerCase()`/`.contains()`** —
+- **first appearance of `String.toLowerCase()`/`.contains()`** —
   case-insensitive substring matching, standard-library string methods.
 - `adapter.submitList(filtered)` — reappearing (Lesson 20), now fed a
-  computed subset instead of the full list — `DiffUtil` handles this
+- computed subset instead of the full list — `DiffUtil` handles this
   exactly the same way regardless of *why* the list changed shape,
   animating the filtered-out rows away and back in correctly.
 

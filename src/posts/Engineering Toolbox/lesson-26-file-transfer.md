@@ -122,16 +122,16 @@ file's total size — three separate `sendall()` calls, each one a
 distinct, self-describing piece.
 
 ### Mechanical Walkthrough
+- `import struct` — Lesson 22, reminder.
+- `os.path.basename(filepath)`, `os.path.getsize(filepath)` — Lesson 11/9, reminders.
+- `with socket.socket(...) as s: s.connect((host, port))` — Lesson 18, reminder.
+- `struct.pack("!I", len(name_bytes))` — `"I"` (unsigned 4-byte integer — smaller than `"Q"`, appropriately sized for a
 
-`import struct` — Lesson 22, reminder. `os.path.basename(filepath)`,
-`os.path.getsize(filepath)` — Lesson 11/9, reminders. `with
-socket.socket(...) as s: s.connect((host, port))` — Lesson 18,
-reminder. `struct.pack("!I", len(name_bytes))` — `"I"` (unsigned
-4-byte integer — smaller than `"Q"`, appropriately sized for a
 filename's length, which will never need 8 bytes' worth of range) — the
 concept from this unit's lab, reused for real, sized differently.
-`s.sendall(name_bytes)` — Lesson 19, reminder. `struct.pack("!Q",
-file_size)` — the concept from this unit's lab, reused for real, `"Q"`
+- `s.sendall(name_bytes)` — Lesson 19, reminder.
+- `struct.pack("!Q", file_size)` — the concept from this unit's lab, reused for real, `"Q"`
+
 this time since a real file's size genuinely can exceed what 4 bytes
 could hold.
 
@@ -244,16 +244,19 @@ exactly `n` of them — never returning early with less, regardless of
 how many separate `recv()` calls that takes.
 
 ### Mechanical Walkthrough
+- `def recv_exact(conn, n):` — basic.
+- `data = b""` — an empty `bytes` accumulator.
+- `while len(data) < n:` — keeps looping until enough bytes have genuinely arrived.
+- `chunk = conn.recv(n - len(data))` — Lesson 18,
 
-`def recv_exact(conn, n):` — basic. `data = b""` — an empty `bytes`
-accumulator. `while len(data) < n:` — keeps looping until enough bytes
-have genuinely arrived. `chunk = conn.recv(n - len(data))` — Lesson 18,
 reminder, but requesting only however many bytes are *still needed*,
-not always the full `n`. `if not chunk: raise ConnectionError(...)` —
+- not always the full `n`.
+- `if not chunk: raise ConnectionError(...)` —
 Lesson 19's empty-bytes-means-disconnected pattern, reminder — but here
 treated as a real failure (raising an exception) rather than a normal
 disconnect, since a connection closing mid-header genuinely means the
-transfer failed. `data += chunk` — accumulating.
+- transfer failed.
+- `data += chunk` — accumulating.
 
 ### CS Lens
 

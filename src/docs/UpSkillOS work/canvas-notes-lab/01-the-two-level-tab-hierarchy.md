@@ -120,10 +120,10 @@ export default function CanvasNotesPage() {
 — an array where each entry directly owns its own `pages` array.
 
 #### Mechanical Walkthrough
-
 `INITIAL_SECTIONS` is a plain array literal, two objects, each with `id`,
-`title`, and a `pages` array of its own — no new syntax here at all, just
-this unit's new *shape* applied for real. `useState(INITIAL_SECTIONS)` —
+- `title`, and a `pages` array of its own — no new syntax here at all, just this unit's new *shape* applied for real.
+- `useState(INITIAL_SECTIONS)` —
+
 already-established React (assumed known coming into this lesson set, per
 this curriculum's existing `useeffect-and-useref-fundamentals` lesson
 implying `useState` itself predates it).
@@ -266,9 +266,9 @@ never needs this reconciliation — picking a different page within the
 `PageTabs` — needs the extra line.
 
 #### Mechanical Walkthrough
+- `sections.find((s) => s.id === sectionId)` — `.find()`, established.
+- `newSection?.pages[0]?.id ?? null` — two established concepts chained:
 
-`sections.find((s) => s.id === sectionId)` — `.find()`, established.
-`newSection?.pages[0]?.id ?? null` — two established concepts chained:
 optional chaining (already present in this codebase before either lesson
 in this set touched it) guards against a section with zero pages, and `??`
 (established, `lab-registry-autofind/01-...md`) supplies `null` if there's
@@ -326,10 +326,10 @@ inside that section's own object in the first place.
 Removing the last line of `handleSelectSection` (`setActivePageId(...)`)
 reproduces a real, silent bug — verified this session: switch from
 "Getting Started" (with `activePageId` pointing at its "Tips" page) to
-"Project Ideas." Without the reset, `activePageId` stays `'page-2'` —
+- "Project Ideas." Without the reset, `activePageId` stays `'page-2'` —
 a page that only exists in the *previous* section. `PageTabs` renders
 "Project Ideas"'s one real page ("Brainstorm") correctly, since
-`PageTabs` only ever renders what's actually in its `pages` prop — but
+- `PageTabs` only ever renders what's actually in its `pages` prop — but
 the content area's `activePage?.title ?? 'No page selected'` falls
 through to `'No page selected'`, because `activeSection.pages.find((p) => p.id === 'page-2')`
 finds nothing in the new section. Nothing throws or logs — the page
@@ -339,7 +339,7 @@ alone.
 ## Definition of Done
 
 - [ ] `src/labs/canvas-notes/meta.js` registers the lab (Lesson 1/2 of
-      `lab-registry-autofind/` convention — no `App.jsx` edits)
+- `lab-registry-autofind/` convention — no `App.jsx` edits)
 - [ ] `CanvasNotesPage.jsx`, `SectionTabs.jsx`, `PageTabs.jsx` exist;
       `sections` state uses the nested shape (each section owns its own
       `pages` array)

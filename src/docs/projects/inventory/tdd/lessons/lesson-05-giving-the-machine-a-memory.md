@@ -184,7 +184,6 @@ real reference's own initial position — and `apply()` moves it one
 command at a time, `position()` reporting wherever it currently is.
 
 ### Mechanical Walkthrough
-
 - `class MachineState: def __init__(self): self.x = 0.0; ...` — **(b)
   hard concept reappearing**, the exact `Counter`/`Parser` class shape
   from Lesson 4, applied to a third kind of instance state. `0.0` (a
@@ -198,7 +197,7 @@ command at a time, `position()` reporting wherever it currently is.
 - `def apply(self, command):` — **(a) first appearance** of this specific
   method name in this project, though the shape (`self`, one parameter)
   is already established; `command` is one dict, shaped exactly like
-  Lesson 4's `Parser` output (`{"motion": ..., "x": ..., ...}`) — though,
+- Lesson 4's `Parser` output (`{"motion": ..., "x": ..., ...}`) — though,
   worth noting explicitly, `apply` never reads `command["motion"]` at all.
   This lesson's `MachineState` only cares about position, not which
   motion mode produced it — a real, deliberate scope limit: distinguishing
@@ -208,7 +207,7 @@ command at a time, `position()` reporting wherever it currently is.
 - `if "x" in command: self.x = command["x"]` (and the `y`/`z` equivalents)
   — **(a) first appearance** of the actual fold logic: check whether this
   specific command mentions this specific axis; if so, overwrite; if not,
-  `self.x` simply isn't touched this call, which — because it's an
+- `self.x` simply isn't touched this call, which — because it's an
   instance attribute, not a local variable — means it still holds
   whatever the *previous* call to `apply` last set it to. This single
   fact (an untouched instance attribute keeps its old value across calls)
@@ -367,7 +366,6 @@ where they *end up* — the fold's final answer, deliberately separate from
 the list that produced it.
 
 ### Mechanical Walkthrough
-
 - The validation and `try`/`except` block — **(c) already
   established**, byte-for-byte the same shape as `/api/parse` (Lesson 4);
   no new explanation owed, per the Repetition Rule.
@@ -381,7 +379,7 @@ the list that produced it.
   already returns — this route simply *does something further* with it
   rather than returning it directly.
 - `return {"position": state.position()}` — **(b) reappearing**
-  dict-to-JSON auto-conversion; `state.position()` — **(b) reappearing**
+- dict-to-JSON auto-conversion; `state.position()` — **(b) reappearing**
   from this lesson's own first unit, called exactly once, after every
   command has already been applied.
 
@@ -452,9 +450,8 @@ document.getElementById("simulate-button").addEventListener("click", () => {
 ```
 
 ### Mechanical Walkthrough
+- Every individual piece here — `addEventListener`, reading `.value`, `fetch` with a `POST`/JSON body, `.then` chaining, `JSON.stringify` — is
 
-Every individual piece here — `addEventListener`, reading `.value`,
-`fetch` with a `POST`/JSON body, `.then` chaining, `JSON.stringify` — is
 **(c) already established**, identical in shape to the Parse button added
 in Lesson 4. **(a) The one genuinely new decision**, worth naming
 explicitly rather than silently copying: this button writes its result

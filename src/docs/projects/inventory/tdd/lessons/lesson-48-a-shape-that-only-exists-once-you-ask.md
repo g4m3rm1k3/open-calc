@@ -304,8 +304,7 @@ Render loop, resize handling, and teardown, all directly mirroring
 ```
 
 ### Mechanical Walkthrough
-
-No `EffectComposer`/`UnrealBloomPass`/`Line2` at all — a plain
+- No `EffectComposer`/`UnrealBloomPass`/`Line2` at all — a plain
 `renderer.render(scene, camera)` call, since two solid, lit meshes need
 none of the toolpath viewport's own glow/thick-line machinery.
 Everything else (Z-up camera, damped `OrbitControls`, a `ResizeObserver`
@@ -388,9 +387,8 @@ function setAssembly(
 ```
 
 ### Mechanical Walkthrough
-
 Every call to `setAssembly` first disposes and removes every mesh the
-*previous* call created — `mesh.geometry.dispose()` releases the real
+- *previous* call created — `mesh.geometry.dispose()` releases the real
 GPU-side vertex buffer a `LatheGeometry` allocated (it can't be
 "re-profiled" in place; a changed profile means an entirely new
 geometry object), and `mesh.material.dispose()` releases its own GPU
@@ -464,10 +462,10 @@ controls.target.copy(center);
 
 ### Mechanical Walkthrough / CS Lens / SE Lens
 
-Not repeated — fully covered by `camera-auto-framing-from-bounding-
+- Not repeated — fully covered by `camera-auto-framing-from-bounding-
 box.md`. The one project-specific detail beyond that file's own generic
 example: `camera.near`/`camera.far` are also derived from
-`maxDimension`, not left fixed — a `near` plane fixed at a value fine
+- `maxDimension`, not left fixed — a `near` plane fixed at a value fine
 for an 8-unit assembly would clip straight through a 0.2-unit one.
 
 ### Commands
@@ -751,15 +749,14 @@ function ToolAssemblyModal({ tool, onClose }: ToolAssemblyModalProps) {
 ```
 
 ### Mechanical Walkthrough
-
 Two separate `useEffect`s, deliberately: one with an **empty dependency
 array** (`[]`) creates the real WebGL viewport exactly once, for this
-modal's own lifetime — a second one, depending on `[tool, assembly,
+- modal's own lifetime — a second one, depending on `[tool, assembly,
 showHolder]`, re-runs `setAssembly` whenever any of that real data
 changes, reading `viewportRef.current` (populated by the first effect).
 React runs effects in the order they're declared within the same
 commit, so by the time the second effect's own first run happens,
-`viewportRef.current` is already set — no race, confirmed by direct
+- `viewportRef.current` is already set — no race, confirmed by direct
 testing (the tool's own procedural profile renders immediately on open,
 before the real assembly fetch even resolves, then the holder appears
 once it does). `upperType`/`upperSize`/`lowerType`/`lowerSize` are
@@ -1028,13 +1025,12 @@ New CSS for the modal's own two-pane body (`.assembly-modal-body`,
 ```
 
 ### Mechanical Walkthrough
-
 `.tcard` already had `cursor: pointer` in `theme.css` (Lesson 17,
 originally for a click-to-select interaction the reference has but this
 project never wired up) — the click handler added here is the first
 real use of that existing affordance. `update_holder_connections`
 mutates the already-loaded `holder` ORM object's own attributes
-directly and calls `session.commit()` — SQLAlchemy's own unit-of-work
+- directly and calls `session.commit()` — SQLAlchemy's own unit-of-work
 tracks the change without needing an explicit `UPDATE` statement built
 by hand. The route's `allowed`/`unknown` check rejects any field name
 outside the four real, intended ones with a clear `400`, rather than

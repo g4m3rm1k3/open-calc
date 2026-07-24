@@ -98,11 +98,11 @@ notice what's *missing* compared to every earlier TCP server: no
 doesn't have those concepts, which the next unit explains.
 
 ### Mechanical Walkthrough
-
 `import socket`, `HOST`/`PORT`, `with socket.socket(...) as
-server_socket:` — reminders from Lesson 18, structurally unchanged.
-`socket.SOCK_DGRAM` — the concept from this unit's lab, reused for
-real. `server_socket.bind((HOST, PORT))` — Lesson 18, reminder: even a
+- server_socket:` — reminders from Lesson 18, structurally unchanged.
+- `socket.SOCK_DGRAM` — the concept from this unit's lab, reused for real.
+- `server_socket.bind((HOST, PORT))` — Lesson 18, reminder: even a
+
 UDP socket needs to claim an address so others know where to send to
 it — binding isn't a TCP-only idea.
 
@@ -204,17 +204,16 @@ acknowledgment straight back to that exact address — all without ever
 having "connected" to anyone.
 
 ### Mechanical Walkthrough
-
-`while True:` — Lesson 10, reminder, here waiting for datagrams
+- `while True:` — Lesson 10, reminder, here waiting for datagrams
 instead of client connections. `data, addr = server_socket.recvfrom(
-1024)` — the concept from this unit's lab, reused for real: unlike
+- 1024)` — the concept from this unit's lab, reused for real: unlike
 TCP's `conn.recv(1024)` (which only returns data, because `conn`
 already identifies the other side), `recvfrom()` returns **both** the
 data *and* the sender's address — it has to, since nothing established
 who's on the other end beforehand. `server_socket.sendto(b"ack: " +
-data, addr)` — the concept from this unit's lab, reused for real:
+- data, addr)` — the concept from this unit's lab, reused for real:
 every send needs an explicit destination; there's no equivalent of
-TCP's plain `conn.sendall(data)` here, because there's no `conn` — just
+- TCP's plain `conn.sendall(data)` here, because there's no `conn` — just
 one socket, capable of sending anywhere, one message at a time.
 
 ### CS Lens

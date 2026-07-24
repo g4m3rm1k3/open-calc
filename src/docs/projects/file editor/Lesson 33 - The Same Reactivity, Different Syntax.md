@@ -296,10 +296,9 @@ import BackendStatus from './components/BackendStatus.vue'   <!-- ← new -->
 ```
 
 ### Mechanical Walkthrough
-
 Every construct in `BackendStatus.vue` has already been isolated and
-explained in this lesson's first two units — `ref()`, `.value`,
-`<script setup>`'s auto-exposure, `<style scoped>` — so nothing here is
+- explained in this lesson's first two units — `ref()`, `.value`, `<script setup>`'s auto-exposure, `<style scoped>` — so nothing here is
+
 new syntax. What's worth tracing is the direct correspondence to
 Lesson 29's original: `statusText = ref("Not checked yet.")` replaces
 `data() { return { statusText: "Not checked yet." } }`; every

@@ -100,7 +100,6 @@ sibling to the `<activity>` and `<provider>` entries already present —
 same declaration pattern, a different component type.
 
 ### Mechanical Walkthrough
-
 - `extends Service` — **first appearance.** Same "must extend the
   framework's class" pattern as `AppCompatActivity` (Lesson 2), a
   component with no view hierarchy of its own at all.
@@ -113,7 +112,7 @@ same declaration pattern, a different component type.
   what `startId` distinguishes between separate start requests.
 - `new Thread(() -> { ... }).start()` — reappearing (Lesson 14),
   worth restating directly: **`Service` methods run on the main thread
-  by default**, exactly like an Activity's — a `Service` is not
+- by default**, exactly like an Activity's — a `Service` is not
   automatically a background thread itself, a common, real point of
   confusion; the actual database work still needs its own thread, the
   same rule Lesson 14 established for everything else.
@@ -130,7 +129,7 @@ same declaration pattern, a different component type.
   resume; other constants (`START_STICKY`, not used here) exist for
   services that should be recreated and re-invoked after being killed.
 - `onBind(Intent intent)` returning `null` — **first appearance.**
-  Required by the `Service` contract regardless of use — this method
+- Required by the `Service` contract regardless of use — this method
   matters for a **bound** `Service` (one other components attach to
   and call methods on directly, a real, different usage pattern this
   project doesn't need and doesn't build); returning `null` here
@@ -281,9 +280,8 @@ check exist; `WorkManager` itself owns actually running it from then on,
 independent of whether `InventoryActivity` is ever opened again.
 
 ### Mechanical Walkthrough
-
 - `extends Worker` — **first appearance.** The unit of work
-  `WorkManager` executes — deliberately **not** an Activity, Fragment,
+- `WorkManager` executes — deliberately **not** an Activity, Fragment,
   or `Service` subclass; a plain class with a required constructor
   shape and one method to implement.
 - `public LowStockWorker(@NonNull Context context, @NonNull WorkerParameters params) { super(context, params); }`
@@ -293,12 +291,12 @@ independent of whether `InventoryActivity` is ever opened again.
 - `doWork()` — **first appearance.** Called by `WorkManager`, already
   on a background thread it manages internally — **notably, unlike a
   `Service`'s `onStartCommand`, no manual `Thread`/`ExecutorService`
-  wrapping is needed here** — `WorkManager` handles the "don't block
+- wrapping is needed here** — `WorkManager` handles the "don't block
   the main thread" concern (Lesson 14) for you, the same kind of
   built-in convenience `ListAdapter` provided over hand-rolled
   `DiffUtil` dispatching in Lesson 20.
 - `AppDatabase.getInstance(getApplicationContext())` — reappearing
-  (Lesson 13's Singleton), `getApplicationContext()` — reappearing
+- (Lesson 13's Singleton), `getApplicationContext()` — reappearing
   (Lesson 13/15), correct here for the same long-lived-context reason.
 - `prefs.getInt("low_stock_threshold", 5)` — reappearing, Lesson 11,
   read directly rather than through `ItemRepository`, a reasonable,
@@ -306,23 +304,23 @@ independent of whether `InventoryActivity` is ever opened again.
   Repository chain (Lesson 17) at all — it's a separate entry point
   into the same underlying data.
 - `Result.success()` — **first appearance.** Reports the outcome back
-  to `WorkManager` — other values (`Result.retry()`, `Result.failure()`,
+- to `WorkManager` — other values (`Result.retry()`, `Result.failure()`,
   not needed by this simple check) exist for work that can meaningfully
   fail and be retried.
 - `new PeriodicWorkRequest.Builder(LowStockWorker.class, 6, TimeUnit.HOURS).build()`
   — **first appearance.** The Builder pattern again (Lesson 22's named
   concept, Lesson 13's `Room.databaseBuilder`), configuring which
-  `Worker` to run and how often — `TimeUnit.HOURS` — **first
+- `Worker` to run and how often — `TimeUnit.HOURS` — **first
   appearance** — a standard-library enum making the interval's unit
   unambiguous.
 - `WorkManager.getInstance(this)` — reappearing (Singleton retrieval
   shape, Lesson 13).
 - `.enqueueUniquePeriodicWork("low_stock_check", ExistingPeriodicWorkPolicy.KEEP, lowStockRequest)`
-  — **first appearance.** `"low_stock_check"` names this specific
+- — **first appearance.** `"low_stock_check"` names this specific
   periodic job — calling this method again with the *same* name and
   `ExistingPeriodicWorkPolicy.KEEP` (**first appearance**) means "if
   this job is already scheduled, leave it exactly as it is, don't
-  duplicate or restart it" — critical given `InventoryActivity.onCreate`
+- duplicate or restart it" — critical given `InventoryActivity.onCreate`
   runs on every app launch (Lesson 5); without `KEEP`, every relaunch
   would schedule a redundant duplicate periodic job.
 
@@ -396,7 +394,6 @@ the existing `<application>` tag's attributes (alongside
 Manifest).
 
 ### Mechanical Walkthrough
-
 - `extends Application` — **first appearance.** Unlike every other
   base class in this project, `Application` represents the *whole
   running process*, not one screen or component — exactly one instance
@@ -417,7 +414,7 @@ Manifest).
   default behavior (sound, visual prominence).
 - `getSystemService(NotificationManager.class)` — **first appearance.**
   A general Android mechanism for retrieving OS-level service objects
-  by type — the same underlying idea `LayoutInflater.from(...)` (Lesson
+- by type — the same underlying idea `LayoutInflater.from(...)` (Lesson
   6) and `getSharedPreferences(...)` (Lesson 11) already used less
   explicitly.
 - `manager.createNotificationChannel(channel)` — **first appearance.**
@@ -467,7 +464,6 @@ it. The Manifest gains one more `<uses-permission>` line, alongside
 `CAMERA` (Lesson 24).
 
 ### Mechanical Walkthrough
-
 - `<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />`
   — reappearing pattern (Lesson 24), a permission specific to Android
   13+ — on older devices, posting notifications never required runtime
@@ -476,7 +472,7 @@ it. The Manifest gains one more `<uses-permission>` line, alongside
 - `ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PERMISSION_GRANTED`
   — reappearing exactly, Lesson 24 — this project deliberately doesn't
   build a full rationale-dialog flow for this one (it would need a UI
-  screen to launch from, and `LowStockWorker` has none) — instead, it
+- screen to launch from, and `LowStockWorker` has none) — instead, it
   silently skips posting if permission was never granted, a reasonable,
   narrower handling for a background-only feature with no screen to
   ask from directly (the request itself would need to be triggered from
@@ -485,12 +481,12 @@ it. The Manifest gains one more `<uses-permission>` line, alongside
   — reappearing Builder pattern, referencing the channel ID created
   once at app startup.
 - `.setSmallIcon(...)`, `.setContentTitle(...)`, `.setContentText(...)`,
-  `.setPriority(...)`, `.setAutoCancel(true)` — **first appearance, as
+- `.setPriority(...)`, `.setAutoCancel(true)` — **first appearance, as
   a group.** Standard notification content fields; `setAutoCancel(true)`
   — worth its own clause — dismisses the notification automatically
   once the user taps it.
 - `NotificationManagerCompat.from(context).notify(1001, builder.build())`
-  — **first appearance.** `1001` is this notification's ID — reusing
+- — **first appearance.** `1001` is this notification's ID — reusing
   the same ID on a future call would **update** the existing
   notification rather than post a new one, a detail worth knowing even
   though this project always uses the same fixed ID.

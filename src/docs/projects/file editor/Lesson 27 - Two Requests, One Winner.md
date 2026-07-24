@@ -270,24 +270,23 @@ check — the `try`/`except` around `checkout_file` is what actually makes
 the route race-safe, not the `get_lock` check above it.
 
 ### Mechanical Walkthrough
-
-`class LockConflictError(Exception): pass` — first appearance of
+- `class LockConflictError(Exception): pass` — first appearance of
 defining a custom exception type in this project: `Exception` is
 Python's built-in base class every exception ultimately inherits from,
 and `pass` means this new class adds no behavior of its own, existing
 purely to be a distinct, catchable name. `try: ... except
-sqlite3.IntegrityError: raise LockConflictError(path)` — first
+- sqlite3.IntegrityError: raise LockConflictError(path)` — first
 appearance of one exception being caught and *re-raised as a different
 type*: `sqlite3.IntegrityError` is SQLite's own generic exception,
 reused here from `create_user`'s existing exposure to it; catching it
 and raising `LockConflictError(path)` in its place hides the
 database-specific detail from anything upstream, so `main.py` never
 needs to know SQLite specifically is involved. `finally: connection.close()`
-— first appearance of a `finally` block: unlike the code before this
+- — first appearance of a `finally` block: unlike the code before this
 fix, which only closed the connection after a successful `commit()`,
 `finally` runs whether the `try` block succeeded or raised, guaranteeing
 the connection is always closed either way. `try: checkout_file(...)
-except LockConflictError:` in `/checkout` — the same `try`/`except`
+- except LockConflictError:` in `/checkout` — the same `try`/`except`
 shape already used throughout this project for expected failure modes,
 here catching this lesson's own new exception rather than a bare
 database one.

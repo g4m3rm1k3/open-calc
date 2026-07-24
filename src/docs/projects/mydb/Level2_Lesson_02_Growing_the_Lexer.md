@@ -211,21 +211,20 @@ missing quoted strings and still silently dropping anything else,
 both addressed in the next two units.
 
 ### Mechanical Walkthrough
-
 - `NUMBER`, `STRING`, `COMMA`, `EQUALS`, `LPAREN`, `RPAREN` in
-  `TokenType` — reuse `enum class` member declarations exactly (Level 2
+- `TokenType` — reuse `enum class` member declarations exactly (Level 2
   Lesson 1) — six more named values, same mechanism.
 - `if (c == ',') { ... }`, `if (c == '=') { ... }`, `if (c == '(')
-  { ... }`, `if (c == ')') { ... }` — **a hard concept reappearing**
+- { ... }`, `if (c == ')') { ... }` — **a hard concept reappearing**
   (per the Repetition Rule): each is the identical single-character
-  token pattern Lesson 1 already fully explained for `*` and `;` — new
+- token pattern Lesson 1 already fully explained for `*` and `;` — new
   characters, zero new mechanism, not owed individual re-explanation.
 - `word == "WHERE"`, `word == "INSERT"`, `word == "INTO"`, `word ==
-  "VALUES"` added to the `||` chain — reuses `||` and `==` exactly
+- "VALUES"` added to the `||` chain — reuses `||` and `==` exactly
   (Lesson 1) — the keyword *list* grew; the *mechanism* checking
   membership in it did not change at all.
 - `if (std::isdigit(c))` — **first appearance** of `isdigit` from
-  `<cctype>`, a sibling of `isalpha`/`isspace` (Lesson 1) — reports
+- `<cctype>`, a sibling of `isalpha`/`isspace` (Lesson 1) — reports
   whether a character is a digit `0`–`9`.
 - The body of the `isdigit` branch — **a hard concept reappearing**:
   structurally identical to the `isalpha` word-accumulation branch
@@ -394,10 +393,9 @@ the last piece needed, alongside `NUMBER`, `COMMA`, and `LPAREN`/
 20);`, this lesson's opening target statement.
 
 ### Mechanical Walkthrough
-
 - `if (c == '\'')` — **first appearance.** `'\''` is an *escaped*
   character literal: a single quote, written this way because a bare
-  `'''` would be ambiguous — the backslash tells the compiler "the next
+- `'''` would be ambiguous — the backslash tells the compiler "the next
   character is the literal value, not the closing delimiter."
 - `i++;` immediately after entering the branch — **first appearance**
   of a deliberate, unconditional skip: this specifically advances `i`
@@ -412,7 +410,7 @@ the last piece needed, alongside `NUMBER`, `COMMA`, and `LPAREN`/
 - Note what's *absent* here compared to the two previous accumulation
   branches: no `i--` afterward. Worth reasoning through explicitly,
   since getting it wrong is an easy, subtle bug: the `while` loop stops
-  with `i` sitting exactly *on* the closing quote — a character that
+- with `i` sitting exactly *on* the closing quote — a character that
   needs to be consumed, not reprocessed. The outer `for` loop's own
   `i++` does exactly that, advancing past the closing quote correctly.
   Word and number accumulation needed `i--` because their loops stop
@@ -615,11 +613,10 @@ contributes to) a token, or the function throws immediately, naming the
 exact character that defeated it.
 
 ### Mechanical Walkthrough
-
 - `throw std::runtime_error(...)` — **a hard concept reappearing**
   (per the Repetition Rule): the exact mechanism Level 1 Lesson 5 built
   for `Table::update`/`remove`, reused here for a completely different
-  kind of failure — proof `throw`/`catch` is a general-purpose tool,
+- kind of failure — proof `throw`/`catch` is a general-purpose tool,
   not something specific to storage.
 - `std::string("Lexer error: unexpected character '") + c + "'"` —
   reuses `std::string` construction from a literal and `+` concatenation

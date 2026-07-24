@@ -118,15 +118,15 @@ unit computes the real value), and the caller-supplied `identifier`/
 specific request that caused it.
 
 ### Mechanical Walkthrough
+- `import struct` — first appearance.
+- `def build_packet(identifier, sequence):` — basic.
+- `struct.pack("!BBHHH", 8, 0, 0, identifier, sequence)` — the concept from this unit's lab, reused for real, with
 
-`import struct` — first appearance. `def build_packet(identifier,
-sequence):` — basic. `struct.pack("!BBHHH", 8, 0, 0, identifier,
-sequence)` — the concept from this unit's lab, reused for real, with
 genuine ICMP field values instead of placeholders. `payload = b"my_ping
-payload"` — an arbitrary byte string; real `ping` uses this space for
+- payload"` — an arbitrary byte string; real `ping` uses this space for
 a timestamp, but any bytes are valid — the protocol doesn't care what's
 here, only that it's echoed back unchanged. `return header + payload`
-— concatenating two `bytes` objects, already-basic from earlier
+- — concatenating two `bytes` objects, already-basic from earlier
 lessons.
 
 ### CS Lens
@@ -274,21 +274,22 @@ packet, including the header itself, so the header can't be finished
 until the checksum is known.
 
 ### Mechanical Walkthrough
+- `def checksum(data):` — basic.
+- `if len(data) % 2 == 1: data += b"\x00"` — `%` (modulo, already-basic arithmetic), padding odd-length data with
 
-`def checksum(data):` — basic. `if len(data) % 2 == 1: data += b"\x00"`
-— `%` (modulo, already-basic arithmetic), padding odd-length data with
 one zero byte so it can be processed in clean 2-byte chunks. `for i in
-range(0, len(data), 2):` — `range()` with a step (Lesson 5, reminder).
-`word = (data[i] << 8) + data[i + 1]` — first appearance of `<<`
+- range(0, len(data), 2):` — `range()` with a step (Lesson 5, reminder).
+- `word = (data[i] << 8) + data[i + 1]` — first appearance of `<<`
+
 (left bit-shift): shifts `data[i]`'s bits 8 places left, then adds
-`data[i+1]` — together, combining two separate bytes into one 16-bit
+- `data[i+1]` — together, combining two separate bytes into one 16-bit
 number, the same "combine bytes into a larger number" idea Lesson 5's
 `/proc/stat` parsing touched from a text-based angle, here done at the
 bit level directly. `total = (total >> 16) + (total & 0xffff)`, `total
-+= (total >> 16)` — `>>` (right bit-shift) and `&` (bitwise AND,
-distinct from the `and` boolean operator already known) — folding
+- += (total >> 16)` — `>>` (right bit-shift) and `&` (bitwise AND, distinct from the `and` boolean operator already known) — folding
+
 overflow bits back in, per the real ICMP checksum specification.
-`return ~total & 0xffff` — `~` (bitwise NOT — flips every bit), masked
+- `return ~total & 0xffff` — `~` (bitwise NOT — flips every bit), masked
 to 16 bits with `& 0xffff` afterward, since `~` on Python's arbitrary-
 precision integers would otherwise flip far more bits than the 16 that
 actually matter here.

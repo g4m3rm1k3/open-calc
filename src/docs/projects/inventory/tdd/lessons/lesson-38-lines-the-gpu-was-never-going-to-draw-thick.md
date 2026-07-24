@@ -222,17 +222,16 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
 ```
 
 ### Mechanical Walkthrough
-
 - `EffectComposer`/`RenderPass`/`UnrealBloomPass`/`OutputPass` — **(a)
   first appearance** — a real, chained post-processing pipeline: render
   the scene normally (`RenderPass`), then run a real bloom filter over
   the result (`UnrealBloomPass`), then map the (HDR, internally
   higher-range) result back to the screen's real display range
-  (`OutputPass`) — each pass consuming the previous one's output.
+- (`OutputPass`) — each pass consuming the previous one's output.
 - `UnrealBloomPass(..., 0.6, 0.5, 1.2)` — **(a) first appearance** —
   strength `0.6` (how strong the glow is), radius `0.5` (how far it
   spreads), threshold `1.2` (only pixels *brighter* than this bloom at
-  all) — the threshold being above `1.0` is what keeps a plain white
+- all) — the threshold being above `1.0` is what keeps a plain white
   background from blooming, since normal, non-HDR color values never
   exceed `1.0` on any channel.
 - `new THREE.Color(baseColor).multiplyScalar(1.5)` — **(a) first
@@ -242,7 +241,7 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
   even though it doesn't correspond to any real, displayable 0–255 value
   until tone-mapped back down by `OutputPass`.
 - `Line2`/`LineGeometry`/`LineMaterial`, `resolution`, `linewidth: 3` —
-  **(a) first appearance**, per `webgl-linewidth-limitation.md` — real
+- **(a) first appearance**, per `webgl-linewidth-limitation.md` — real
   triangle-based fat lines; `resolution` is required because the
   triangle-widening math happens in screen pixels, not world units, so
   the material needs to know the real, current pixel size of the canvas
@@ -252,14 +251,14 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
   depth relative to) everything else in the scene, so the glow is never
   hidden behind the grid.
 - `child.geometry.dispose(); child.material.dispose();` before
-  `pathGroup.remove(child)` — **(a) first appearance of real disposal
+- `pathGroup.remove(child)` — **(a) first appearance of real disposal
   here** — a genuinely separate, real, pre-existing leak this change
   happens to close: `pathGroup.remove(pathGroup.children[0])` alone
   (Lessons 8–37) removed old lines from the scene graph but never
   released their GPU geometry/material buffers, on every single redraw
   (every theme switch, every new program parsed) since Lesson 8.
 - `composer.setSize`/`mat.resolution.set(...)` in the resize handler,
-  `composer.dispose()` in `cleanup()` — **(b) reappearing** shape (extend
+- `composer.dispose()` in `cleanup()` — **(b) reappearing** shape (extend
   the existing resize/cleanup functions) applied to the two new,
   real resources this lesson introduces.
 

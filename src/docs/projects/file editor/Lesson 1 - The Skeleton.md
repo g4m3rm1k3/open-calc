@@ -180,17 +180,16 @@ starting there, every addition gets shown both on its own and back in
 context.
 
 ### Mechanical Walkthrough
-
-`from fastapi import FastAPI` is an **import statement** — it pulls the
+- `from fastapi import FastAPI` is an **import statement** — it pulls the
 name `FastAPI` out of the `fastapi` package (installed in the previous
 unit) and makes it available in this file. `app = FastAPI()` creates one
 running instance of the application; every route this project adds
 attaches to this specific `app` object. `@app.get("/health")` is the same
-shape just demonstrated in the lab — it wraps `health_check`, and what it
+- shape just demonstrated in the lab — it wraps `health_check`, and what it
 attaches is "remember this function; run it for GET requests to
-`/health`." `def health_check():` defines a function with no parameters —
+- `/health`." `def health_check():` defines a function with no parameters —
 the same `def` syntax used inside `shout` above. `return {"status": "ok"}`
-returns a **dictionary literal** — a set of key-value pairs in `{}` —
+- returns a **dictionary literal** — a set of key-value pairs in `{}` —
 which FastAPI automatically converts to a JSON response; nothing in this
 function converts it explicitly.
 
@@ -316,18 +315,17 @@ unit. `health_check` itself is untouched; every response it sends now
 simply passes through this middleware first.
 
 ### Mechanical Walkthrough
-
 `from fastapi.middleware.cors import CORSMiddleware` imports this one
 class from FastAPI's own middleware module — the same kind of import
 statement as `FastAPI` itself in the previous unit, just a different name
 from a different location inside the same package. `CORSMiddleware`
 (Cross-Origin Resource Sharing) adds a response header —
-`Access-Control-Allow-Origin` — that tells the browser "pages from other
+- `Access-Control-Allow-Origin` — that tells the browser "pages from other
 origins may read this." `add_middleware` registers it to run on every
 response this app sends. `allow_origins=["*"]` sets that header's value
 to `*`, granting permission to any origin. `allow_methods=["*"]` and
 `allow_headers=["*"]` are the same idea applied to two other axes CORS
-separately controls — which HTTP methods (`GET`, `POST`, `PUT`, ...) a
+- separately controls — which HTTP methods (`GET`, `POST`, `PUT`, ...) a
 cross-origin request is allowed to use, and which request headers it's
 allowed to send — both also wide open here for the same reason
 `allow_origins` is: nothing sensitive to protect yet.
@@ -432,14 +430,13 @@ so, as with `main.py` in the second unit, there's no larger structure to
 place it inside yet.
 
 ### Mechanical Walkthrough
-
 `<!DOCTYPE html>` tells the browser to render this as modern HTML.
 `<html>`, `<head>`, and `<body>` are the three required top-level
-sections every HTML document has — `<head>` holds metadata the page
+- sections every HTML document has — `<head>` holds metadata the page
 itself doesn't display (here, the character encoding and the browser
 tab's title), `<body>` holds everything actually shown on screen. `<p>`
 is a paragraph element. `id="status"` gives this specific element a
-unique name, `status`, that other code can look it up by — the
+- unique name, `status`, that other code can look it up by — the
 JavaScript below does exactly that.
 
 ### Connects To
@@ -558,9 +555,9 @@ later, once the request the script starts has settled one way or the
 other.
 
 ### Mechanical Walkthrough
-
 `<script>` is the HTML element that embeds JavaScript directly in the
-page. `fetch(url)` starts the request and returns a Promise immediately —
+- page.
+- `fetch(url)` starts the request and returns a Promise immediately —
 the exact shape from the lab, real this time. The first
 `.then((response) => response.json())` runs once headers arrive and
 itself returns another Promise, since parsing the body as JSON takes its
@@ -616,10 +613,9 @@ document.getElementById("status")
 ```
 
 ### Mechanical Walkthrough
-
 `document` is the browser's built-in object representing the whole page.
-`.getElementById("status")` searches the DOM tree — the browser's
-in-memory representation of the HTML — for the one element whose `id`
+- `.getElementById("status")` searches the DOM tree — the browser's in-memory representation of the HTML — for the one element whose `id`
+
 attribute equals `"status"`, and returns it, or `null` if none exists.
 This is the same `id="status"` set on the `<p>` element earlier.
 
@@ -706,7 +702,6 @@ node_modules/
 ```
 
 ### Mechanical Walkthrough
-
 Each line is a **pattern** git checks every file path against before
 deciding whether to track it. `__pycache__/` and `*.pyc` are Python's
 own compiled-bytecode cache, regenerated automatically every run —
@@ -715,7 +710,8 @@ environment created earlier in this lesson: hundreds of megabytes,
 entirely reproducible from `requirements.txt` on any machine via
 `pip install -r requirements.txt`, so committing it would bloat the
 repository with something that carries no information a fresh install
-couldn't regenerate. `node_modules/` isn't needed yet — no
+- couldn't regenerate.
+- `node_modules/` isn't needed yet — no
 JavaScript package manager exists in this project until much
 later — but it's included now because it's the exact same category of
 problem `.venv/` is, and adding it later would mean remembering to add

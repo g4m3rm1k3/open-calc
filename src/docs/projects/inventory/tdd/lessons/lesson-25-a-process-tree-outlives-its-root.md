@@ -288,14 +288,13 @@ below.
 - **Dependencies:** none.
 
 ### Mechanical Walkthrough
-
 - `execSync("node --version")` — **(a) first appearance** — runs the
   string as a real shell command and blocks until it finishes, returning
   everything the command wrote to stdout as one value, all at once —
   contrast `node-child-process-spawn.md`'s own `"data"` events, which can
   fire many times for a single long-running command.
 - `output.toString().trim()` — **(b) reappearing** `Buffer.toString()`
-  (`node-child-process-spawn.md`); `.trim()` — **(c) already basic**.
+- (`node-child-process-spawn.md`); `.trim()` — **(c) already basic**.
 - `try { execSync(...) } catch (err) { ... }` — **(b) reappearing**
   `try`/`catch` (`python-try-except.md`'s same idea, a different
   language); what triggers the throw is **(a) first appearance** — a
@@ -557,7 +556,6 @@ correct; `frontendProcess` is the one this fix actually changes the
 behavior of.
 
 ### Mechanical Walkthrough
-
 - `function killProcessTree(child) { ... }` — **(c) already basic** — a
   plain function declaration, taking the same `ChildProcess` object
   `spawn` already returns.
@@ -565,12 +563,12 @@ behavior of.
   shape as the existing `if (backendProcess) { ... }` checks this code
   replaces, just moved inside the helper.
 - `process.platform === "win32"` — **(b) reappearing**, per
-  `node-process-platform.md` (Lesson 19) — this project's second real
+- `node-process-platform.md` (Lesson 19) — this project's second real
   platform branch, after `startBackend`'s `python`/`python3` choice and
   `startFrontend`'s `shell: isWindows`.
 - `` execSync(`taskkill /pid ${child.pid} /t /f`) `` — **(a) first
   appearance of both `execSync`, per `node-child-process-execsync.md`,
-  and `taskkill /t /f`, per `windows-taskkill-process-tree.md`** —
+- and `taskkill /t /f`, per `windows-taskkill-process-tree.md`** —
   combined here for the first time as real project code, each already
   proven separately above.
 - `try { ... } catch { ... }` with an empty `catch` — **(b) reappearing**
@@ -579,7 +577,7 @@ behavior of.
   an error," a real, deliberate choice — not a silently swallowed bug —
   since `taskkill` throws whenever its target PID no longer exists.
 - `child.kill()` (the `else` branch) — **(b) reappearing**, per
-  `node-child-process-spawn.md`'s own "Try It Yourself" — unchanged
+- `node-child-process-spawn.md`'s own "Try It Yourself" — unchanged
   behavior on macOS/Linux, where `startFrontend` never sets
   `shell: true` in the first place.
 

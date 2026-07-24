@@ -112,17 +112,17 @@ header, followed by a "question" section — the encoded domain name plus
 two more fields specifying what kind of record is being requested.
 
 ### Mechanical Walkthrough
-
-`struct.pack("!HHHHHH", query_id, 0x0100, 1, 0, 0, 0)` — the DNS
+- `struct.pack("!HHHHHH", query_id, 0x0100, 1, 0, 0, 0)` — the DNS
 header's real, fixed 12-byte layout: a query ID (so a reply can be
 matched to its request — the same identifier idea Lesson 22's ICMP
-work used), `0x0100` (a flags field — `0x0100` specifically requests
+- work used), `0x0100` (a flags field — `0x0100` specifically requests
 "please resolve this recursively," a standard, real flag combination),
 then four 2-byte counts — 1 question, 0 answers (this is a query, not a
 response — it has no answers yet), 0 authority records, 0 additional
 records. The label-encoding loop — this unit's own lab, reused for
-real. `struct.pack("!HH", 1, 1)` — the question's final two fields:
-`QTYPE=1` (requesting an "A" record — an IPv4 address) and `QCLASS=1`
+- real.
+- `struct.pack("!HH", 1, 1)` — the question's final two fields: `QTYPE=1` (requesting an "A" record — an IPv4 address) and `QCLASS=1`
+
 (requesting the "IN," or Internet, class — effectively always this
 value in practice).
 
@@ -288,28 +288,30 @@ def dns_lookup(domain, dns_server="8.8.8.8"):                              # ←
 response, and correctly parse out every real IP address it contains.
 
 ### Mechanical Walkthrough
+- `s.sendto(query, (dns_server, 53))` — Lesson 21's `sendto()`, reminder — `53` is DNS's standardized port, the same idea as HTTP's `80`.
+- `struct.unpack("!HHHHHH", response[:12])` — decoding the response's
 
-`s.sendto(query, (dns_server, 53))` — Lesson 21's `sendto()`, reminder
-— `53` is DNS's standardized port, the same idea as HTTP's `80`.
-`struct.unpack("!HHHHHH", response[:12])` — decoding the response's
 header, mirroring how the query's header was built. The first `while`
 loop skips past the echoed-back question section, byte by byte, using
 the identical length-prefix logic from this lesson's first unit — just
 reading instead of writing. `offset += 4` skips the question's trailing
 `QTYPE`/`QCLASS` fields. Inside the answer loop: `if name_byte & 0xC0
-== 0xC0:` — first appearance of the **compression check** — `0xC0`
+- == 0xC0:` — first appearance of the **compression check** — `0xC0`
 (binary `11000000`) is a real, specified marker: if a name field's
 first byte has its top two bits both set, the *entire* name is just a
-2-byte pointer, not a literal length-prefixed name at all — `offset +=
+- 2-byte pointer, not a literal length-prefixed name at all — `offset +=
 2` skips exactly those two bytes, nothing more. The `else` branch
 handles the (less common in practice, but valid) case of an
 uncompressed literal name, using the same length-prefix walk as
-before. `struct.unpack("!HHIH", ...)` — the fixed fields following any
+- before.
+- `struct.unpack("!HHIH", ...)` — the fixed fields following any
 answer's name: type, class, TTL (how long this answer may be cached,
-as a 4-byte integer — `"I"`), and the length of what follows.
-`rdata = response[offset:offset+rdlength]` — the actual answer data;
+- as a 4-byte integer — `"I"`), and the length of what follows.
+- `rdata = response[offset:offset+rdlength]` — the actual answer data;
+
 for an A record (`rtype == 1`), exactly 4 raw bytes, each one an octet
-of the IP address. `".".join(str(b) for b in rdata)` — a generator
+- of the IP address.
+- `".".join(str(b) for b in rdata)` — a generator
 expression (a compact form of a list comprehension, feeding `.join()`
 directly) turning those 4 raw byte values into the familiar dotted
 IP-address string.

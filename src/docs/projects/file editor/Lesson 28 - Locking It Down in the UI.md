@@ -83,16 +83,15 @@ who (if anyone) currently holds it — in the same round trip that already
 existed, rather than requiring a second request.
 
 ### Mechanical Walkthrough
-
-`target_file.relative_to(CONTENT_DIR).as_posix()` — the identical
+- `target_file.relative_to(CONTENT_DIR).as_posix()` — the identical
 expression already used in `write_file`, `checkout`, and `checkin`
 (Lesson 26), reapplied here for the first time inside `read_file`,
 which never needed a path in this exact form before. `lock[1] if lock
-is not None else None` — a conditional expression, Python's ternary,
+- is not None else None` — a conditional expression, Python's ternary,
 already used elsewhere in this project (`Lesson 12`'s diagnostic
 formatting); `lock[1]` reads the `username` position out of the tuple
 `get_lock` returns (`path, username, checked_out_at`, per Lesson 26's
-`SELECT` column order) — first use of positional tuple indexing in this
+- `SELECT` column order) — first use of positional tuple indexing in this
 project rather than unpacking all three names, chosen here because only
 the username is needed.
 
@@ -204,13 +203,13 @@ clears it, and a page refresh recovers it from `sessionStorage` exactly
 as the token already does.
 
 ### Mechanical Walkthrough
-
-`let currentUsername = null;` — a `let` declaration, already used
+- `let currentUsername = null;` — a `let` declaration, already used
 throughout this project since Lesson 1, initialized to `null` the same
-way `authToken` is. `currentUsername = username` — a plain assignment,
+- way `authToken` is.
+- `currentUsername = username` — a plain assignment,
 reusing the `username` value `login` already reads from the form input
 one line above it in the existing, unmodified code. `sessionStorage.setItem("username",
-username)` / `.getItem("username")` / `.removeItem("username")` — Lesson
+- username)` / `.getItem("username")` / `.removeItem("username")` — Lesson
 19's exact `sessionStorage` API, applied to a second key, `"username"`,
 alongside the existing `"authToken"` key; no new mechanic, a second
 application of an already-taught one.
@@ -500,17 +499,16 @@ panel — switching tabs, or opening a file for the first time, always
 shows that file's own current lock state.
 
 ### Mechanical Walkthrough
-
-`openTabs.find((tab) => tab.path === activeTabPath)` — Lesson 4's
+- `openTabs.find((tab) => tab.path === activeTabPath)` — Lesson 4's
 existing `.find()` pattern, reapplied without change. `activeTab.checked_out_by === null` /
-`=== currentUsername` — plain equality checks against a value stored on
+- `=== currentUsername` — plain equality checks against a value stored on
 the tab object and this lesson's own `currentUsername`; `if`/`else if`/`else`
 is already-established control flow, no restatement needed.
 `authenticatedFetch(...).then((response) => { wasSuccessful =
-response.ok; return response.json(); })` — this lesson's own lab
+- response.ok; return response.json(); })` — this lesson's own lab
 pattern, applied for the first time against a real network response
 rather than `fakeFetch`'s stand-in. `data.checked_out_by` inside
-`checkoutFile`'s success branch — reading the real field this lesson's
+- `checkoutFile`'s success branch — reading the real field this lesson's
 first unit added to the backend response (`/checkout`'s response
 already included `checked_out_by` since Lesson 26; this lesson is the
 first time the frontend reads it).
@@ -699,10 +697,9 @@ content untouched, so a later save attempt doesn't silently believe the
 rejected edit was ever recorded.
 
 ### Mechanical Walkthrough
-
 Every line here reuses either this lesson's own closure pattern
 (`wasSuccessful`, assigned in the first `.then()`, read in the second)
-or code already present in `saveFile` since Lesson 3 — no new construct
+- or code already present in `saveFile` since Lesson 3 — no new construct
 in this unit at all, only a rearrangement of already-known pieces to
 close a gap that existed since this function's very first version.
 

@@ -289,24 +289,23 @@ to match:
 ```
 
 ### Mechanical Walkthrough
-
-`import { createApp } from 'vue'` — this lesson's own `import` syntax,
+- `import { createApp } from 'vue'` — this lesson's own `import` syntax,
 now pulling from a package name (`'vue'`) rather than a relative file
 path; Vite resolves `'vue'` by looking inside `node_modules/vue`,
 installed by this lesson's earlier `npm install`. `import './style.css'`
 — first appearance of importing a CSS file directly from JavaScript;
 Vite recognizes the `.css` extension and injects that stylesheet into
 the page, rather than treating it as JavaScript to execute.
-`import App from './App.vue'` — importing a Vue Single File Component
+- `import App from './App.vue'` — importing a Vue Single File Component
 exactly like importing any other module; `App` here is the *default*
 export (no `{ }`), matching `App.vue`'s `<script setup>` block, which
 implicitly exports the whole component as its default. `createApp(App).mount('#app')`
-reuses `createApp`/`.mount()` from Lesson 29 exactly — the only
+- reuses `createApp`/`.mount()` from Lesson 29 exactly — the only
 difference from `Vue.createApp(...)` is reaching `createApp` through
 this file's own `import` instead of a CDN-attached global `Vue` object.
 `<script type="module" src="/src/main.js">` in `frontend/index.html`
 is the *browser's* side of the same module system this whole unit
-relies on — `type="module"` is what makes `import`/`export` legal
+- relies on — `type="module"` is what makes `import`/`export` legal
 inside a browser-loaded script at all, not just inside Node.
 
 ### CS Lens — a compiler in the loop, not just a file server

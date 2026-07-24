@@ -87,15 +87,14 @@ never used — `src/test/java/com/yourname/pocketinventory/`, mirroring
 exactly, but compiled and run entirely separately.
 
 ### Mechanical Walkthrough
-
 - `testImplementation 'junit:junit:4.13.2'` — **first appearance of a
   `testImplementation` dependency**, distinct from every
-  `implementation` line since Lesson 6 — code and libraries declared
+- `implementation` line since Lesson 6 — code and libraries declared
   this way are available only when compiling and running tests, never
   bundled into the actual shipped app.
 - `src/test/java/...` — **first appearance of the test source set.**
   Gradle treats this directory as an entirely separate compilation unit
-  from `src/main/`, run on your development machine's plain JVM — no
+- from `src/main/`, run on your development machine's plain JVM — no
   Android device, no emulator, seconds instead of the minutes an
   emulator boot and app install take.
 - `@Test` — **first appearance.** Marks a method as a test case JUnit's
@@ -110,10 +109,10 @@ exactly, but compiled and run entirely separately.
   opening the file.
 - `import static org.junit.Assert.*;` — **first appearance of a static
   import.** Makes `Assert`'s methods (`assertEquals`, `assertNotEquals`,
-  used below) callable without the `Assert.` prefix — a real, if minor,
+- used below) callable without the `Assert.` prefix — a real, if minor,
   new piece of Java syntax worth naming directly.
 - `assertEquals(a, b)` — **first appearance.** Fails the test loudly,
-  with a clear message, if `a.equals(b)` is `false` — this is the exact
+- with a clear message, if `a.equals(b)` is `false` — this is the exact
   method whose correctness Lesson 7 built and this test now
   permanently, automatically verifies.
 - `assertNotEquals(a, b)` — **first appearance**, the inverse check.
@@ -214,7 +213,6 @@ also meaning "invalid" for `parseQuantity`'s different return type),
 with no `EditText`, no `Context`, no Android class involved at all.
 
 ### Mechanical Walkthrough
-
 - `static String validateName(String name)` — reappearing logic
   (Lesson 9's `name.isEmpty()` check), `static` (Lesson 13's
   `AppDatabase.getInstance` already used `static`, first use on a
@@ -226,8 +224,8 @@ with no `EditText`, no `Context`, no Android class involved at all.
   simple result shape avoiding a new custom result type for three tiny
   methods; worth naming as a real, debatable design choice, not a rule.
 - `parseQuantity(String quantityText)` returning `Integer` (the boxed
-  wrapper class, not primitive `int`) — **first appearance of using a
-  boxed type specifically to represent "no valid value" via `null`** —
+- wrapper class, not primitive `int`) — **first appearance of using a boxed type specifically to represent "no valid value" via `null`** —
+
   a primitive `int` cannot be `null`, which is exactly why the boxed
   `Integer` is used here instead, the same reasoning Java's own
   standard library relies on throughout.
@@ -270,9 +268,8 @@ each still branching on failure exactly as before — the *behavior* is
 unchanged; only *where the logic lives* moved.
 
 ### Mechanical Walkthrough
-
 - `ItemValidator.validateName(name)` / `.parseQuantity(quantityText)` /
-  `.validateLocation(location)` — calling the new pure functions,
+- `.validateLocation(location)` — calling the new pure functions,
   reappearing `if (... != null) { ...setError...; return; }` shape,
   Lesson 9.
 
@@ -415,9 +412,8 @@ any caller — the second, package-private constructor exists purely to
 give tests a way in that bypasses `AppDatabase` entirely.
 
 ### Mechanical Walkthrough
-
 - `ItemRepository(Application application) { this(AppDatabase.getInstance(application).itemDao()); }`
-  — reappearing (`this(...)` constructor chaining, Lesson 13's `Item`
+- — reappearing (`this(...)` constructor chaining, Lesson 13's `Item`
   convenience constructor), now used to make the real-usage path
   delegate to a more fundamental, more directly testable one.
 - `ItemRepository(ItemDao itemDao) { this.itemDao = itemDao; }` — **first
@@ -478,9 +474,8 @@ exercises real asynchronous, `LiveData`-publishing behavior, rather
 than a plain synchronous function call.
 
 ### Mechanical Walkthrough
-
 - `@Rule public InstantTaskExecutorRule instantTaskExecutorRule = ...`
-  — **first appearance of a JUnit `@Rule`.** A `Rule` wraps every test
+- — **first appearance of a JUnit `@Rule`.** A `Rule` wraps every test
   method in this class with extra setup/teardown behavior —
   `InstantTaskExecutorRule` specifically forces `LiveData`'s internal
   main-thread dispatching (normally requiring a real Android main
@@ -501,13 +496,13 @@ than a plain synchronous function call.
   constructor would otherwise require.
 - `new CountDownLatch(1)` — **first appearance.** A standard-library
   synchronization tool: a counter starting at `1`, and `.await(...)`
-  (below) blocks the calling thread until it reaches `0` — needed here
+- (below) blocks the calling thread until it reaches `0` — needed here
   because `ItemRepository.loadItems()` still genuinely dispatches to
   `dbExecutor`, a real background thread (Lesson 14), even inside this
   test; the test thread must have a real way to wait for that
   asynchronous work to actually finish before making assertions.
 - `repository.getItems().observeForever(items -> { if (!items.isEmpty()) latch.countDown(); })`
-  — **first appearance of `observeForever`** — reappearing concept from
+- — **first appearance of `observeForever`** — reappearing concept from
   Lesson 16's exercise (a `LiveData` observation with no
   `LifecycleOwner`, appropriate here since a JUnit test has no
   Android lifecycle at all to tie observation to) — the callback counts
@@ -516,7 +511,7 @@ than a plain synchronous function call.
   real method under test.
 - `latch.await(2, TimeUnit.SECONDS)` — **first appearance.** Blocks up
   to two seconds for the countdown to reach zero, returning `true` if
-  it did in time — `assertTrue(...)` around it fails the test outright
+- it did in time — `assertTrue(...)` around it fails the test outright
   if the asynchronous update never arrived at all, rather than the test
   silently passing on stale, pre-load data.
 - `repository.getItems().getValue().size()` — reappearing

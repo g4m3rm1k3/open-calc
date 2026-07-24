@@ -111,11 +111,10 @@ mapping file extensions to the folder name each should land in. Nothing
 reads it yet.
 
 ### Mechanical Walkthrough
+- `import os`, `import shutil` — reminders, `shutil` first appearance as a module name (distinct from `os`, though closely related — `shutil`
 
-`import os`, `import shutil` — reminders, `shutil` first appearance as
-a module name (distinct from `os`, though closely related — `shutil`
 sits on top of `os`, providing higher-level file operations).
-`CATEGORIES = {...}` — a dictionary literal; assuming this as basic
+- `CATEGORIES = {...}` — a dictionary literal; assuming this as basic
 syntax from your stated Python background.
 
 ### CS Lens
@@ -244,20 +243,21 @@ creating each subfolder as needed, and safely leaves existing
 subfolders (and anything already sorted inside them) untouched.
 
 ### Mechanical Walkthrough
-
-`for entry in os.listdir(folder):` — Lesson 4, reminder — deliberately
+- `for entry in os.listdir(folder):` — Lesson 4, reminder — deliberately
 `os.listdir()`, not `os.walk()`: this only looks at the folder's
 immediate contents, not everything nested inside it (worth noting
-explicitly, since Lessons 12–14 all reached for `os.walk()` instead —
+- explicitly, since Lessons 12–14 all reached for `os.walk()` instead —
 here, recursing into subfolders would mean trying to "organize" files
-that are already organized). `if os.path.isdir(full_path): continue` —
-`os.path.isdir()` (Lesson 7, reminder) — skips folders entirely,
+- that are already organized).
+- `if os.path.isdir(full_path): continue` — `os.path.isdir()` (Lesson 7, reminder) — skips folders entirely,
+
 including the category folders this same function creates, which is
 exactly what makes running it repeatedly safe. `base, ext =
-os.path.splitext(entry)`, `category = CATEGORIES.get(ext, "Other")` —
+- os.path.splitext(entry)`, `category = CATEGORIES.get(ext, "Other")` —
 this unit's lab, reused for real. `os.makedirs(category_folder,
-exist_ok=True)` — Lesson 11, reminder. `shutil.move(full_path,
-os.path.join(category_folder, entry))` — the concept from the previous
+- exist_ok=True)` — Lesson 11, reminder.
+- `shutil.move(full_path, os.path.join(category_folder, entry))` — the concept from the previous
+
 unit, reused for real.
 
 ### CS Lens

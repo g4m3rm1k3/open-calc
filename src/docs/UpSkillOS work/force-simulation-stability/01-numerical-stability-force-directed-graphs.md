@@ -305,7 +305,6 @@ const f = Math.min(K_REP / dist2, MAX_F)   // ← new
 This inner loop now accumulates bounded repulsion forces: no single pair of nodes — however close they start — can contribute more than `MAX_F` units of force in any direction.
 
 ### Mechanical Walkthrough
-
 - `Math.min(K_REP / dist2, MAX_F)` — **(b) `Math.min` reappearing**, first applied to force magnitudes rather than UI coordinates. **(a) the softening addend `+ 0.5`:** the denominator `dist2` is squared distance plus a small constant. Without this, two coincident nodes (identical starting positions, which can happen with 1,412 nodes randomly initialised on a sphere) produce `dist2 = 0`, making `K_REP / dist2` = `Infinity`. Adding `0.5` means the minimum denominator is `0.5`, bounding the maximum force to `K_REP / 0.5 = 2 × K_REP` even for coincident nodes.
 - `MAX_F` — **(a) first appearance.** Defined as `2.0` in the constants block. It is the absolute ceiling on any single pair's force contribution per iteration, regardless of proximity.
 
@@ -322,7 +321,7 @@ Given: node i at (0.001, 0.0, 0.0), node j at (0.0, 0.0, 0.0)
   fx[i] += 0.00141 × 2.0             = 0.00282       ← bounded, not infinite
 ```
 
-Without the softening term and the clamp, those two nearly-coincident nodes would have generated `K_REP / 0.000001` ≈ 2,274,000 units of force — easily enough to accelerate both nodes to `Infinity` in a single iteration.
+- Without the softening term and the clamp, those two nearly-coincident nodes would have generated `K_REP / 0.000001` ≈ 2,274,000 units of force — easily enough to accelerate both nodes to `Infinity` in a single iteration.
 
 ### CS Lens
 

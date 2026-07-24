@@ -205,9 +205,8 @@ that same callback's shape once, as its own type, so
 signature inline.
 
 ### Mechanical Walkthrough
-
 - `existing == null ? [] : Array.isArray(existing) ? existing :
-  [existing]` — **reappearing** normalize-to-array idiom (Lesson 41's
+- [existing]` — **reappearing** normalize-to-array idiom (Lesson 41's
   own `mValues`/`gValues`).
 - `values.filter((v) => !inGroup(v))` — the actual fix, per `concepts/
   partition-and-replace-within-a-combined-field.md`: keeps every value
@@ -216,7 +215,7 @@ signature inline.
   appends the real replacement value(s) onto whatever survived
   filtering.
 - The rest — `delete`, conditional single-vs-array assignment, line
-  splicing — is **reappearing**, identical to `applyWordEdit`'s own
+- splicing — is **reappearing**, identical to `applyWordEdit`'s own
   shape (Lesson 43).
 
 ### CS Lens / SE Lens
@@ -437,21 +436,20 @@ where the browser's default `outline` would draw a plain rectangle
 regardless of how rounded the element underneath it is.
 
 ### Mechanical Walkthrough
-
 - `"7,8".split(",").map(Number)` — **reappearing** (Lesson 43's own
-  `parseWordInput` does the identical split/convert) — the *reason*
+- `parseWordInput` does the identical split/convert) — the *reason*
   it's needed here is new: "Flood + Mist" is the one option whose
   `value` string encodes *two* real numbers at once (`M7` and `M8`
-  together), not one — `applyGroupEdit`'s own `newValues: number[]`
+- together), not one — `applyGroupEdit`'s own `newValues: number[]`
   parameter is what makes writing both in one edit possible.
 - `value={currentValue}` / `onChange={...}` on a `<select>` — **first
   appearance of `<select>` itself** (see the concept file), but the
   *controlled-element* mechanism (React owns the displayed value,
-  `onChange` is the only path to change it) is **reappearing** — the
+- `onChange` is the only path to change it) is **reappearing** — the
   same idea Lesson 18's checkbox and Lesson 43's `EditableCell` already
   established, a third HTML element using the identical pattern.
 - Unlike `EditableCell` (Lesson 43), `EditableInfoBlock` has **no local
-  state** — `value={currentValue}` reads directly from the prop, every
+- state** — `value={currentValue}` reads directly from the prop, every
   render, exactly like Lesson 18's checkbox. This is a deliberate,
   correct difference, not an inconsistency: a `<select>` only changes on
   a discrete, deliberate choice, never mid-keystroke, so there's no
@@ -543,16 +541,15 @@ function handleEditTool(command: Command, toolNumber: number) {
 ```
 
 ### Mechanical Walkthrough
-
 The bug this replaced, named directly rather than silently absorbed:
 calling `applyWordEdit(ref, command, "T", ...)` then `applyWordEdit(ref,
-command, "H", ...)` — each call reads `command.words` **fresh, from the
+- command, "H", ...)` — each call reads `command.words` **fresh, from the
 original, un-edited command object** — so the second call rebuilds its
 `newWords` from the *pre-T-edit* words, silently reverting the `T` the
 first call just wrote the moment the second call's own serialization
 ran. The fix builds **one combined `newWords`** with both `T` and `H`
 set at once, serializing the line exactly once. `{ ...command.words, T:
-toolNumber, H: toolNumber }` — **reappearing** object spread (Lesson
+- toolNumber, H: toolNumber }` — **reappearing** object spread (Lesson
 43) with two keys overridden at once, rather than one.
 
 ### CS Lens
@@ -662,14 +659,14 @@ and a narrower width than a `<select>`'s own dropdown affordance needs:
 ```
 
 ### Mechanical Walkthrough
-
 `(typedSfm * 12) / (Math.PI * diameterInches)` is `computeSfm`'s own
 formula (`sfm = π × diameter × rpm / 12`) solved for `rpm` instead of
-`sfm` — ordinary algebra, not a new construct. `Number.isNaN(typedSfm)`
-gate — **reappearing** (Lesson 43's own `parseWordInput` uses the
+- `sfm` — ordinary algebra, not a new construct.
+- `Number.isNaN(typedSfm)` gate — **reappearing** (Lesson 43's own `parseWordInput` uses the
+
 identical guard) — a not-yet-finished number while typing doesn't write
 a bogus `S` word. The local `text` state, seeded once and not resynced
-— **reappearing**, the exact same tradeoff `EditableCell` (Lesson 43)
+- — **reappearing**, the exact same tradeoff `EditableCell` (Lesson 43)
 already accepts, for the identical reason (a debounce-lagged `sfm` prop
 shouldn't fight the user's typing).
 
@@ -799,12 +796,11 @@ All already-established selector syntax — plain classes and one
 hover" shape, one level deeper in the tree.
 
 ### Mechanical Walkthrough
+- Every construct here is **reappearing** — `useState` toggle, conditional `{expanded && (...)}` rendering, a `▾`/`▸` button — the identical shape
 
-Every construct here is **reappearing** — `useState` toggle, conditional
-`{expanded && (...)}` rendering, a `▾`/`▸` button — the identical shape
 `OperationBlock`'s own collapse (Lesson 41) and `BlockList`'s program
 collapse already use. The only real new content: `{commands.length}
-move{commands.length === 1 ? "" : "s"}` — a plain, correct singular/
+- move{commands.length === 1 ? "" : "s"}` — a plain, correct singular/
 plural label, ordinary conditional string building, no new construct.
 
 ### CS Lens / SE Lens
@@ -853,8 +849,7 @@ column, so they were never visible or directly editable.
 (`J`/`K` are the identical shape, repeated twice more.)
 
 ### Mechanical Walkthrough
-
-Every line is **reappearing** — `EditableCell`/`fmtWord`/`onEditWord`
+- Every line is **reappearing** — `EditableCell`/`fmtWord`/`onEditWord`
 are exactly Lesson 43's own machinery, applied to three more letters.
 No new construct; the only real content is that these three columns
 existed as real, round-tripped data (Lesson 43's own `WORD_ORDER`

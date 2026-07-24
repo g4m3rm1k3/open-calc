@@ -213,12 +213,11 @@ callbacks at all — `loadItems` and `addItem` now purely update
 on its own, with no coordination required from this class.
 
 ### Mechanical Walkthrough
-
 - `MutableLiveData<List<Item>>` — **first appearance.** A generic
   container (same `<>` type-parameter idea as `List<Item>` itself,
   Lesson 7) holding exactly one current value, plus the observer list
   and notification logic the `ObservableValue` lab just built by hand
-  — `LiveData` is the abstract, read-only-facing base type;
+- — `LiveData` is the abstract, read-only-facing base type;
   `MutableLiveData` is the subtype that actually allows setting a new
   value, a deliberate split explained in this unit's SE Lens.
 - `new MutableLiveData<>(new ArrayList<>())` — reappearing (`ArrayList`
@@ -227,7 +226,7 @@ on its own, with no coordination required from this class.
   `null` before the first real load completes.
 - `LiveData<List<Item>> getItems()` — **first appearance of exposing
   the base `LiveData` type from a method whose backing field is the
-  more capable `MutableLiveData`.** This is a deliberate narrowing —
+- more capable `MutableLiveData`.** This is a deliberate narrowing —
   explained fully in the SE Lens — giving outside callers (the
   Activity) read/observe access without write access.
 - `itemsLiveData.postValue(loadedItems)` — **first appearance.**
@@ -438,10 +437,9 @@ any method added later, reaches the Adapter automatically through this
 single subscription.
 
 ### Mechanical Walkthrough
-
 - `viewModel.getItems().observe(this, updatedItems -> adapter.setItems(updatedItems))`
-  — **first appearance.** `.observe(...)` takes two arguments: a
-  **LifecycleOwner** (`this` — `AppCompatActivity` implements this
+- — **first appearance.** `.observe(...)` takes two arguments: a **LifecycleOwner** (`this` — `AppCompatActivity` implements this
+
   interface, meaning it can report its own lifecycle state — a detail
   not previously named but true since Lesson 2) and a callback
   (reappearing lambda syntax) invoked with the current value every time
@@ -458,7 +456,7 @@ single subscription.
   destroyed, removing an entire category of "callback fired after my
   screen was gone" bugs you'd otherwise have to guard against by hand.
 - `viewModel.loadItems()` — reappearing (method call, Lesson 15), new
-  detail: no `Runnable` argument anymore — this method now has nothing
+- detail: no `Runnable` argument anymore — this method now has nothing
   to report back to directly; it just updates `itemsLiveData`, and the
   observer registered above reacts on its own.
 - `viewModel.addItem(newItem)` — same simplification.

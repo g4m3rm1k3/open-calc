@@ -217,11 +217,14 @@ The function now walks every entry directly inside `path` — but only
 one level deep so far, and does nothing with each entry yet.
 
 ### Mechanical Walkthrough
+- `import os` — reminder.
+- `def directory_size(path):` — basic.
+- `total_bytes = 0` — basic.
+- `for entry in os.listdir(path):` — Lesson
 
-`import os` — reminder. `def directory_size(path):` — basic.
-`total_bytes = 0` — basic. `for entry in os.listdir(path):` — Lesson
 4's `os.listdir()`, reminder, reused on an arbitrary path instead of
-hardcoded `/proc`. `full_path = os.path.join(path, entry)` — Lesson 2's
+- hardcoded `/proc`.
+- `full_path = os.path.join(path, entry)` — Lesson 2's
 `os.path.join()`, reminder, reused for real.
 
 ### CS Lens
@@ -300,17 +303,18 @@ exactly the base-case/recursive-case shape from this lesson's first
 unit, now doing real work on a real folder tree.
 
 ### Mechanical Walkthrough
-
-`if os.path.isdir(full_path):` — first appearance of `os.path.isdir()`
+- `if os.path.isdir(full_path):` — first appearance of `os.path.isdir()`
 specifically, though it's the same idea as Lesson 2's `os.path.isfile()`
 — a reminder rather than full treatment, since the concept ("check what
 kind of thing this path is") was already covered there, only the
-specific check differs. `total_bytes += directory_size(full_path)` —
+- specific check differs.
+- `total_bytes += directory_size(full_path)` —
 this *is* the recursive case: calling `directory_size` again, on a
 sub-folder, before the current call has finished — the exact pattern
-from the throwaway lab, now on real data. `os.path.getsize(full_path)` —
+- from the throwaway lab, now on real data.
+- `os.path.getsize(full_path)` —
 the concept from this unit's own earlier lab, reused for real. `return
-total_bytes` — assuming `return` as basic.
+- total_bytes` — assuming `return` as basic.
 
 ### CS Lens
 
@@ -447,12 +451,12 @@ bytes; `print_tree` recursively prints a visual, indented tree —
 structurally the same recursion, applied to a different task.
 
 ### Mechanical Walkthrough
+- `def print_tree(path, depth=0):` — default argument, reminder from Lesson 61.
+- `print("  " * depth + entry)` — the string-repetition concept
 
-`def print_tree(path, depth=0):` — default argument, reminder from
-Lesson 61. `print("  " * depth + entry)` — the string-repetition concept
 from this unit's lab, reused for real, concatenated (`+`, already basic
 string joining) with the entry's own name. `print_tree(full_path, depth
-+ 1)` — the recursive call, passing `depth + 1` so each deeper level
+- + 1)` — the recursive call, passing `depth + 1` so each deeper level
 prints with one more level of indentation than its parent — worth
 noting explicitly: this is *how* the indentation actually tracks depth,
 by passing the current depth down to each recursive call rather than

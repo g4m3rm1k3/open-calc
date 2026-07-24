@@ -185,7 +185,6 @@ def list_tools():
 ```
 
 ### Mechanical Walkthrough
-
 - `TOOLS = [ {...}, {...}, ... ]` — a list of dicts, already-known basic
   Python; **(a) worth naming as a real, deliberate, temporary design**:
   this is a plain, in-memory, hardcoded Python list — not a database
@@ -196,12 +195,12 @@ def list_tools():
 - `"id": 1` (etc.) — **(a) first appearance** of an explicit, hand-
   assigned identifier field, added by this project (the reference's own
   `TOOL_TEMPLATES` uses its dict *keys*, like `"end_mill_4fl"`, as the
-  identifier — this project adds a separate numeric `id` because a
+- identifier — this project adds a separate numeric `id` because a
   future real database table, per `CURRICULUM.md`'s own plan, will want
   a real primary key, and deciding that shape now avoids a rename later).
 - `"subtype": None` — already-known basic Python (`None`); used here for
   tools that have no real subtype in the reference (only `end_mill_4fl`/
-  `end_mill_2fl` have one, `"square"`) — present on every tool
+- `end_mill_2fl` have one, `"square"`) — present on every tool
   dict, even when its value is empty, so every tool has the exact same
   set of keys (a deliberate consistency choice, not required by Python
   itself, which would tolerate dicts with different keys in the same
@@ -209,7 +208,7 @@ def list_tools():
 - `def list_tools(): return TOOLS` — **(a) first appearance of a real,
   if trivial, accessor function** rather than exposing `TOOLS` for
   direct import everywhere: the same instinct as `core/machine.py`'s
-  `position()` (Lesson 5) — one real function is the actual "how do I
+- `position()` (Lesson 5) — one real function is the actual "how do I
   get the tools" contract, even though today it does nothing but return
   a constant; if this becomes a real database query later, only this
   function's *body* needs to change, not every caller.
@@ -248,14 +247,13 @@ def get_tools():
 ```
 
 ### Mechanical Walkthrough
-
 - `@app.route("/api/tools")` — **(c) already established** routing
   decorator, defaulting to `GET` (no `methods=` argument, same as
-  `/api/status`, Lesson 1) — appropriate here since this route only
+- `/api/status`, Lesson 1) — appropriate here since this route only
   *reads* data, never accepts a body.
 - `return {"tools": list_tools()}` — **(c) already established** dict-
   to-JSON auto-conversion, wrapping the real list under a named
-  `"tools"` key — the same real convention `/api/path`'s `"points"` and
+- `"tools"` key — the same real convention `/api/path`'s `"points"` and
   `/api/parse`'s `"commands"` already established, kept consistent
   rather than inventing a new shape per route.
 

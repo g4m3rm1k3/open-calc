@@ -175,18 +175,17 @@ immediately, from inside `parseWhereClause`, exactly as if `WHERE` had
 been misspelled.
 
 ### Mechanical Walkthrough
-
 - `word == "DELETE" || word == "UPDATE" || word == "SET"` added to the
-  keyword `||` chain — reuses `||` and `==` (Level 2 Lesson 1) exactly
+- keyword `||` chain — reuses `||` and `==` (Level 2 Lesson 1) exactly
   — the list simply grew by three.
 - `struct DeleteStatement { std::string tableName; WhereClause where;
-  };` — reuses `struct` (Level 1 Lesson 2), reusing `WhereClause`
-  itself (Level 2 Lesson 4) as a member — note there's no `hasWhere`
+- };` — reuses `struct` (Level 1 Lesson 2), reusing `WhereClause` itself (Level 2 Lesson 4) as a member — note there's no `hasWhere`
+
   flag here, unlike `SelectStatement`: `where` is never optional for a
   `DeleteStatement`, so there's nothing to flag.
 - `stmt.where = parseWhereClause();` inside `parseDelete` — reuses this
   exact call from `parseSelect` (Level 2 Lesson 4), but *unconditional*
-  here instead of behind `if (checkKeyword("WHERE"))` — the same
+- here instead of behind `if (checkKeyword("WHERE"))` — the same
   function, used two different ways depending on which grammar rule is
   calling it.
 
@@ -422,20 +421,19 @@ copy it, change *only* the field named by `SET`, and write the complete
 copy back — never constructing a `Student` from scratch.
 
 ### Mechanical Walkthrough
-
 - `table.remove(targetId);` in `executeDelete` — reuses `Table::remove`
   (Level 1, Lesson 5) unchanged — this is the first real call to it
   from anywhere in `sql/`/`engine/`.
 - `for (const Student& s : students) { if (s.id != targetId) {
-  continue; } ... }` — reuses range-based `for`, `!=`, and `continue`
+- continue; } ... }` — reuses range-based `for`, `!=`, and `continue`
   exactly as `executeSelect`'s `WHERE` filtering already did (Level 2,
   Lesson 5) — the same search pattern, reused for a different purpose.
 - `Student updated = s;` — **the core of this unit**, reusing ordinary
   copy-by-assignment (implicit for a `struct` with no custom copy
-  logic, first relied on this explicitly here) — `updated` starts as a
+- logic, first relied on this explicitly here) — `updated` starts as a
   complete, independent duplicate of `s`, every field included.
 - `if (stmt.setColumn == "name") { updated.name = ...; } else if ...`
-  — reuses `if`/`else if` and member assignment — exactly one branch
+- — reuses `if`/`else if` and member assignment — exactly one branch
   runs, changing exactly one field of `updated`; every other field
   keeps whatever `Student updated = s;` already gave it.
 - `table.update(targetId, updated);` — reuses `Table::update` (Level 1,

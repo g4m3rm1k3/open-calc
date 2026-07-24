@@ -135,16 +135,15 @@ This is the entire file so far — nothing exists in `db.py` yet for this
 to sit alongside.
 
 ### Mechanical Walkthrough
-
 `DB_PATH = Path(__file__).parent / "users.db"` reuses the exact
 `Path(__file__).parent / "..."` construction from Lesson 2's
-`CONTENT_DIR` — the database file lives directly in `backend/`, sibling
+- `CONTENT_DIR` — the database file lives directly in `backend/`, sibling
 to `main.py`, not inside `content/`, since it isn't something the
 editor's own user should ever browse or edit as a file. `get_connection()`
-returns a `sqlite3.Connection` — a live link to that file, opened fresh
+- returns a `sqlite3.Connection` — a live link to that file, opened fresh
 each time this function is called, the same reason `write_file` opens
 and closes a file handle per call rather than keeping one open forever.
-`connection.execute("""..."""` runs a **SQL** statement — this project's
+- `connection.execute("""..."""` runs a **SQL** statement — this project's
 first appearance of a language other than Python, JavaScript, HTML, or
 CSS. `CREATE TABLE IF NOT EXISTS users (...)` defines the table's shape,
 only if it doesn't already exist — safe to call every time this project
@@ -154,7 +153,7 @@ per row, never chosen by this project's own code. `username TEXT UNIQUE
 NOT NULL` declares a required text field that SQLite itself refuses to
 let repeat across two different rows — enforced by the database, not by
 this project's own Python code remembering to check. `salt BLOB NOT NULL`
-and `password_hash BLOB NOT NULL` are both required binary fields — `BLOB`
+- and `password_hash BLOB NOT NULL` are both required binary fields — `BLOB`
 storing raw bytes directly, the exact `bytes` values `hash_password`
 already returns, with no conversion needed. `connection.commit()` makes
 the change permanent; `connection.close()` releases the connection.
@@ -205,18 +204,17 @@ nothing existing is modified, so there's no enclosing structure to show
 them inside of; the block above is everything there is to see.
 
 ### Mechanical Walkthrough
-
 `INSERT INTO users (username, salt, password_hash) VALUES (?, ?, ?)` is
 SQL's row-creation statement — three named columns, three values. The
-three `?` characters are **placeholders** — not string formatting, a
-distinct feature `sqlite3` provides specifically for this — and
+- three `?` characters are **placeholders** — not string formatting, a distinct feature `sqlite3` provides specifically for this — and
+
 `(username, salt, password_hash)`, a tuple passed as `.execute()`'s
 second argument, supplies the actual values, matched to the placeholders
 in order. `SELECT id, username, salt, password_hash FROM users WHERE
 username = ?` is SQL's row-retrieval statement, the same placeholder
 mechanism protecting the one value being searched for.
 `.fetchone()` returns exactly one matching row as a tuple, or `None` if
-nothing matched — the same `None`-for-nothing-found convention already
+- nothing matched — the same `None`-for-nothing-found convention already
 used by `RUNNERS.get(...)` in Lesson 6. Both functions reuse
 `get_connection()` and `.close()` from the unit just above, opening and
 closing a connection per call rather than holding one open — but only

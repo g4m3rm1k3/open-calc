@@ -261,12 +261,11 @@ directly, which is precisely why someone might reach for `chmod u+s` on it in th
 place: that's a legitimate-sounding reason to want this specific program to run as root.
 
 ### Mechanical Walkthrough
-
 - `argc != 2` — **(c) already basic**: argument-count checking, familiar from Lesson 17's
   `argv[1]` usage.
 - `fopen(argv[1], "r")` — **(a) first appearance**: opens the file at the path given by
   `argv[1]` for reading (`"r"`), returning a `FILE *` handle on success or `NULL` on
-  failure — critically, `fopen` performs its permission check using the *calling
+- failure — critically, `fopen` performs its permission check using the *calling
   process's effective UID*, not the real UID. This single fact is the entire
   vulnerability: called from a setuid-root binary, `fopen` checks permissions as root,
   regardless of who actually launched the program.
@@ -275,8 +274,8 @@ place: that's a legitimate-sounding reason to want this specific program to run 
   system call failed (e.g., "Permission denied," "No such file or directory") — standard
   C error reporting.
 - `fgets(line, sizeof(line), file)` — **(a) first appearance**: reads one line (up to
-  `sizeof(line) - 1` characters, or until a newline) from `file` into `line`, returning
-  `NULL` once the end of the file is reached — this is what a bounds-respecting read looks
+- `sizeof(line) - 1` characters, or until a newline) from `file` into `line`, returning `NULL` once the end of the file is reached — this is what a bounds-respecting read looks
+
   like, in direct contrast to Lesson 17's unbounded `strcpy`, since `fgets` is explicitly
   told `line`'s size and will not write past it.
 - `fclose(file)` — **(c) already basic**: releases the file handle; needs no further
@@ -419,10 +418,9 @@ but `fopen` now always operates on a path the program itself constructed, anchor
 `/var/backups/`, rather than on `argv[1]` directly.
 
 ### Mechanical Walkthrough
-
 - `strstr(argv[1], "..") != NULL` — **(a) first appearance**: `strstr` searches for one
   string inside another, returning a pointer to the first occurrence or `NULL` if it's
-  absent. Checking for `".."` specifically blocks **path traversal** — an attacker
+- absent. Checking for `".."` specifically blocks **path traversal** — an attacker
   supplying something like `../../root/secret.txt` to walk back out of the intended
   directory using relative path segments.
 - `argv[1][0] == '/'` — **(a) first appearance**: checks whether the filename's first

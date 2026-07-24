@@ -264,11 +264,10 @@ real signal — words, a comment, or a real N-number — is enough to keep
 it.
 
 ### Mechanical Walkthrough
-
 - `enumerate(text.split("\n"), start=1)` — **first appearance** in this
   file (though `enumerate` itself is ordinary Python): pairs each
   element of the split-on-newline list with a running count starting at
-  1, not 0 — chosen deliberately so `line_number` matches a real
+- 1, not 0 — chosen deliberately so `line_number` matches a real
   editor's own 1-indexed line display.
 - `not words and not comment and real_seq_n is None` — **first
   appearance of this exact three-way condition**: a boolean `and` chain
@@ -515,7 +514,6 @@ across every non-real line in between; if it doesn't, the fallback
 (unchanged) groups by tool change or a standalone comment instead.
 
 ### Mechanical Walkthrough
-
 **Execution trace**, first 6 commands of `O0003.nc` (`hasRealSeqNumbers
 = true`), `currentKey` starting `null`:
 
@@ -535,7 +533,7 @@ c_at_line_15 ("N2101", has_real=true, seq_n=2101):
 
 The key insight the trace makes visible: `c1` through the line right
 before `N2101` all land in exactly **one** group, even though 23 of
-them carry 23 different, mutually-unequal `seq_n` values — because the
+- them carry 23 different, mutually-unequal `seq_n` values — because the
 condition that starts a new group only fires on a *real* N-word whose
 value differs from the current key, never on a synthetic one.
 
@@ -693,12 +691,11 @@ every real movement line, merging consecutive movement lines into one
 table instead of starting a new one per line.
 
 ### Mechanical Walkthrough
-
 - `let lastCoolant: string = coolantLabel(declared);` — **first
   appearance of this exact seeding pattern**: initializing the "last
   shown" tracker from the *declared* baseline, not from the first
   element of `rest`. This is the specific bug this function fixed
-  earlier this session — without seeding from `declared`, the first
+- earlier this session — without seeding from `declared`, the first
   real coolant word in `rest` that happened to match what was already
   declared up top would still fire (comparing against `undefined`/
   nothing), producing a redundant duplicate block.
@@ -711,9 +708,9 @@ table instead of starting a new one per line.
   the reappearing idea from the previous unit, applied here to decide
   what to *render* rather than how to *group*.
 - `const last = runs[runs.length - 1];` then `if (last && last.type ===
-  "table")` — **reappearing** array-last-element access (already used
+- "table")` — **reappearing** array-last-element access (already used
   in `buildOperations`); `last.type === "table"` is a TypeScript
-  discriminated-union narrowing check — reading `last.type` first is
+- discriminated-union narrowing check — reading `last.type` first is
   what lets `last.commands.push(...)` type-check on the next line
   without a cast, since TypeScript narrows the union based on that
   comparison.
@@ -1235,7 +1232,6 @@ function OperationBlock({
 ```
 
 ### Mechanical Walkthrough
-
 - `useState(true)` — **reappearing** (established React hook, first
   taught Lesson 11, reused for a collapse toggle the same way `App.tsx`
   already uses it for `isConfigOpen`): `expanded` starts `true` (an
@@ -1254,13 +1250,13 @@ function OperationBlock({
   idiom (already used throughout this codebase, e.g. `SidePanel`'s
   conditional tab content).
 - `runs.map((run) => run.type === "block" ? <InfoBlock .../> : <table>...)`
-  — **reappearing** `Array.prototype.map` returning JSX per element
+- — **reappearing** `Array.prototype.map` returning JSX per element
   (already established since the earliest React lessons); the ternary
   branches on `run.type`, the same discriminated-union narrowing already
   named in `buildOperationRuns`'s own Mechanical Walkthrough earlier in
   this lesson.
 - `<InfoBlock kind="plane" label="Plane" value={declared.plane} />` and
-  its siblings — `InfoBlock` itself is this lesson's own component,
+- its siblings — `InfoBlock` itself is this lesson's own component,
   **already shown in full** earlier (the "Declared Once, Re-Emitted
   Only on Change" unit's own surrounding code) — these lines are new
   *call sites* passing new props, not a new component definition.
@@ -1339,7 +1335,6 @@ function BlockList({ program }: BlockListProps) {
 ```
 
 ### Mechanical Walkthrough
-
 - `useEffect(() => { fetchBlocks(program)... }, [program])` —
   **reappearing** (Lesson 27's own debounced-reparse effect shape, and
   Lesson 26's `.catch()` + `logger.error` convention): re-runs
@@ -1348,12 +1343,12 @@ function BlockList({ program }: BlockListProps) {
   exactly once, on mount — **reappearing**, the same "empty deps = mount
   only" idiom already used for `App.tsx`'s theme initializer.
   `fetchTools` here is a **new, separate function of the same name**
-  as `ToolCardList.tsx`'s own `fetchTools` (Lesson 17) — a real name
+- as `ToolCardList.tsx`'s own `fetchTools` (Lesson 17) — a real name
   collision across two different files, not the same function reused;
   worth naming directly since a mechanical, name-only check can't tell
   the two apart.
 - `const toolsByNumber = new Map<number, Tool>();` / the `for...of` loop
-  — **reappearing** (`Map`, already used in this codebase); building a
+- — **reappearing** (`Map`, already used in this codebase); building a
   lookup that keeps only the first tool seen per `tool_number`, per this
   schema's own real, named, non-unique-number allowance (`core/tools.
   py`).
@@ -1573,7 +1568,6 @@ none of them have any visual layout yet without the CSS backing them.
 ```
 
 ### Mechanical Walkthrough
-
 - `.block-program-header, .block-row-header { display: flex; ... }` —
   **reappearing** flexbox layout (`concepts/css-flexbox-layout.md`,
   already established) — a comma-separated selector list applying one
@@ -1586,7 +1580,7 @@ none of them have any visual layout yet without the CSS backing them.
   new CSS mechanism, a new *use* of one already taught): a block's
   `kind` prop (`InfoBlock`, shown earlier) selects a modifier class
   (`block-info-${kind}`), and each modifier only overrides one property,
-  `border-left-color` — the base `.block-info` rule supplies everything
+- `border-left-color` — the base `.block-info` rule supplies everything
   else identically. This is `concepts/design-tokens-theming-pattern.md`'s
   own "swappable catalog of named values" idea, applied to *block kind*
   instead of *app theme*: seven kinds, one shared shape, one color each.
@@ -1613,7 +1607,7 @@ none of them have any visual layout yet without the CSS backing them.
   movement tables sit inside a collapsed operation (indented, to align
   under that operation's own declared-info blocks), but the one table
   belonging to the *currently-running* block (`.block-move-table-run`)
-  is shown flush, unindented, at the top level — `:not()` expresses
+- is shown flush, unindented, at the top level — `:not()` expresses
   "every other case" directly, rather than needing a second, positive
   class naming every table that *isn't* the running one.
 
@@ -1707,13 +1701,12 @@ if (id === "blocks") return <BlockList program={debouncedCode} />;
 ```
 
 ### Mechanical Walkthrough
-
 All three lines **reappear** the exact mechanism Lesson 27 established
 for adding a tab at all (and Lesson 35 already reused once for `code`):
 a new member on the `ViewId` union, a matching new key in
 `VIEW_LABELS` (which is what `RibbonToolbar`'s own toggle buttons are
 generated from, for free), and one new `if` branch in
-`renderViewContent`. No new construct in any of these three lines —
+- `renderViewContent`. No new construct in any of these three lines —
 `RibbonToolbar` needed zero changes to pick up a fourth toggle button
 automatically, exactly as designed back in Lesson 27.
 

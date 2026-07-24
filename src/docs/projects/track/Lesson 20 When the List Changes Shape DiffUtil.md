@@ -116,7 +116,6 @@ uses a purpose-built, higher-level wrapper around this exact mechanism,
 built next.
 
 ### Mechanical Walkthrough
-
 - `DiffUtil.Callback` — **first appearance.** An abstract class (same
   category as `SQLiteOpenHelper`, Lesson 12) you extend to describe two
   list states — here as an **anonymous class** (Lesson 8's
@@ -133,7 +132,7 @@ built next.
   **first appearance.** Only ever called for a pair `DiffUtil` already
   determined *is* the same logical item — answers the follow-up
   question, "but did its displayed content actually change?" For real
-  `Item`s, this becomes `Item.equals()` — Lesson 7's method, finally
+- `Item`s, this becomes `Item.equals()` — Lesson 7's method, finally
   used for its originally-stated purpose rather than just `HashSet`
   correctness.
 - `DiffUtil.calculateDiff(callback)` — **first appearance.** Runs the
@@ -141,7 +140,7 @@ built next.
   algorithm used by tools like `git diff`) and returns a `DiffResult`.
 - `.dispatchUpdatesTo(ListUpdateCallback)` — **first appearance.**
   Replays the computed minimal edit as a sequence of
-  `onInserted`/`onRemoved`/`onMoved`/`onChanged` calls — exactly the
+- `onInserted`/`onRemoved`/`onMoved`/`onChanged` calls — exactly the
   same method *names* (not coincidentally) as `RecyclerView.Adapter`'s
   own `notifyItemInserted`/`notifyItemRemoved`/etc. from Lesson 10,
   which is precisely how the next unit wires this output directly into
@@ -301,7 +300,6 @@ provides all three internally, backed by its own list management and
 the `DIFF_CALLBACK` supplied to its constructor.
 
 ### Mechanical Walkthrough
-
 - `extends ListAdapter<Item, InventoryAdapter.InventoryViewHolder>` —
   **first appearance.** A `RecyclerView.Adapter` subclass (so
   everything Lesson 6 taught about `onCreateViewHolder`/`onBindViewHolder`
@@ -318,7 +316,7 @@ the `DIFF_CALLBACK` supplied to its constructor.
 - `oldItem.getId() == newItem.getId()` — reappearing (`getId()`,
   Lesson 13), first real use for its intended purpose: identity
   comparison by primary key, deliberately **not** using
-  `Item.equals()` here — two positions can be "the same logical item"
+- `Item.equals()` here — two positions can be "the same logical item"
   even if every displayed field changed (an edited quantity is still
   the same row, not a delete-then-insert), which is exactly the
   distinction `areItemsTheSame` versus `areContentsTheSame` exists to
@@ -329,7 +327,7 @@ the `DIFF_CALLBACK` supplied to its constructor.
 - `super(DIFF_CALLBACK)` — reappearing (parent constructor call,
   Lesson 6), new detail: `ListAdapter`'s required constructor argument.
 - `getItem(position)` — **first appearance.** `ListAdapter`'s own
-  method, replacing `items.get(position)` — reads from `ListAdapter`'s
+- method, replacing `items.get(position)` — reads from `ListAdapter`'s
   internally-held current list, which you never touch directly.
 
 ### The New Code — Submitting Lists Instead of Setting Them
@@ -359,11 +357,10 @@ viewModel.loadItems();
 ```
 
 ### Mechanical Walkthrough
-
 - `adapter.submitList(updatedItems)` — **first appearance.**
   `ListAdapter`'s replacement for the deleted `setItems` method:
   internally, this triggers `DiffUtil.calculateDiff` between the
-  currently-held list and `updatedItems` — **on a background thread**,
+- currently-held list and `updatedItems` — **on a background thread**,
   automatically (`ListAdapter` uses its own internal executor for this,
   the same "don't block the main thread with real work" principle from
   Lesson 14, applied here without you writing any `dbExecutor`-style

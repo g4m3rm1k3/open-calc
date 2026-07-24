@@ -266,10 +266,9 @@ and the command dict / axis loop, now also gated:
 ```
 
 ### Mechanical Walkthrough
-
 - `_FANUC_MILL_M_CODES` — **(a) first appearance** — a real data bank,
   keyed by category, each value a tuple of real code strings, directly
-  mirroring `fanuc_mill.mCodes`'s own shape; `(b) reappearing` — dict
+- mirroring `fanuc_mill.mCodes`'s own shape; `(b) reappearing` — dict
   literal syntax itself, unchanged since Lesson 4's `_MOTION_CODES`.
 - `_m_code_matches(bank_key, m_int)` — **(a) first appearance** — a real
   port of the reference's own `match()` closure, including its exact
@@ -278,18 +277,18 @@ and the command dict / axis loop, now also gated:
   a simpler `code[1:]` slice, since the real function is written to
   tolerate code strings that aren't just `"M"` plus digits.
 - `if _m_code_matches(...): ...` (repeated, unindented from each other) —
-  **(a) first appearance** — independent checks, not `elif`, a real,
+- **(a) first appearance** — independent checks, not `elif`, a real,
   deliberate structural choice ported from the reference's own sequence
-  of separate `if (match(...))` statements — genuinely different from
+- of separate `if (match(...))` statements — genuinely different from
   `_apply_g_code`'s `elif` chain one method above it.
 - `program_ended` / `if not program_ended: ...` (twice — the
-  `S`/`F` capture, then the axis loop) — **(a) first appearance** of the
+- `S`/`F` capture, then the axis loop) — **(a) first appearance** of the
   mechanism being real and load-bearing; the comment citing
   `_executeBlock`'s dispatch order was already present since Lesson 29,
   but had nothing to actually gate until this lesson gave `_apply_m_code`
   a real way to signal program end.
 - `self.active_t`/`self.pending_t`/`self.done`/`self.waiting` — **(a)
-  first appearance** — real `ChannelState` fields, previously entirely
+- first appearance** — real `ChannelState` fields, previously entirely
   absent from this project.
 - `"T"` added to `_SUPPORTED_WORDS` — **(a) first appearance** — the
   actual fix for the crash this lesson opened with.

@@ -93,12 +93,11 @@ built next, replaces the *entire* screen's content, not a small corner
 of it.
 
 ### Mechanical Walkthrough
-
 - `extends Fragment` — **first appearance.** Same "must extend the
   framework's class" pattern as `AppCompatActivity` (Lesson 2), a
   different base class carrying a related but distinct lifecycle.
 - `onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)`
-  — **first appearance.** The Fragment counterpart to `Activity.onCreate`
+- — **first appearance.** The Fragment counterpart to `Activity.onCreate`
   plus `setContentView` combined into one step: instead of calling
   `setContentView(...)` as a side effect (Lesson 2), a Fragment
   **returns** the `View` it wants shown, directly, as this method's
@@ -108,11 +107,11 @@ of it.
 - `new TextView(requireContext())` — **first appearance of
   `requireContext()`.** A Fragment doesn't have its own `Context` the
   way an Activity *is* one (Lesson 8's `InventoryActivity.this` as
-  `Context` argument) — `requireContext()` retrieves the hosting
+- `Context` argument) — `requireContext()` retrieves the hosting
   Activity's `Context`, throwing immediately if called before the
   Fragment is actually attached to one (safer than a silent `null`).
 - `getSupportFragmentManager()` — **first appearance.** Every
-  `AppCompatActivity` provides one — the object responsible for adding,
+- `AppCompatActivity` provides one — the object responsible for adding,
   replacing, and removing Fragments within that Activity.
 - `.beginTransaction()` — **first appearance.** Fragment changes are
   batched into an explicit **transaction** object — you can add,
@@ -122,7 +121,7 @@ of it.
 - `.replace(R.id.scratchContainer, new ScratchFragment())` — **first
   appearance.** Names the container view (matching Lesson 3's
   `@+id/`-declared views) and the Fragment instance to place inside it
-  — `replace` specifically removes whatever Fragment currently occupies
+- — `replace` specifically removes whatever Fragment currently occupies
   that container first, if any, then adds the new one.
 - `.commit()` — **first appearance.** Finalizes and actually executes
   the transaction — nothing in the previous three lines takes effect on
@@ -191,12 +190,11 @@ container with no content of its own, existing purely to have a real
 `View` in the hierarchy for a Fragment's UI to be placed inside.
 
 ### Mechanical Walkthrough
-
 - `<FrameLayout ...>` — **first appearance as a root element on its
   own** (briefly seen as `scratchContainer`'s type in the throwaway
   lab). The simplest container Android provides — no arrangement logic
   at all (contrast `ConstraintLayout`'s relationship-solving, Lesson 3,
-  or `LinearLayout`'s stacking, Lesson 7) — appropriate here since its
+- or `LinearLayout`'s stacking, Lesson 7) — appropriate here since its
   only job is being *replaceable*, not arranging multiple children.
 
 ### The New Code — the Fragment Itself
@@ -289,14 +287,13 @@ a whole now does everything `InventoryActivity` used to do, hosted as a
 Fragment instead of an Activity.
 
 ### Mechanical Walkthrough
-
 - `registerForActivityResult(...)` field — reappearing (Lesson 10),
   worth one clause: `Fragment` supports this exact same API, field-
   declared the same way, for the same "must register before the host
   is fully ready" timing reason as Lesson 10 explained for Activities.
 - `onCreateView` returning `inflater.inflate(R.layout.fragment_inventory_list, container, false)`
-  — reappearing (`LayoutInflater.inflate`, Lesson 6's `onCreateViewHolder`),
-  same three-argument shape, same `false` meaning ("don't attach yet —
+- — reappearing (`LayoutInflater.inflate`, Lesson 6's `onCreateViewHolder`), same three-argument shape, same `false` meaning ("don't attach yet —
+
   the Fragment system handles that"), applied here to inflate an entire
   screen's layout instead of one row.
 - `onViewCreated(View view, Bundle savedInstanceState)` — **first
@@ -304,7 +301,7 @@ Fragment instead of an Activity.
   `onCreateView`.** `onCreateView`'s *only* job is producing and
   returning the `View`; `onViewCreated` is called immediately after,
   guaranteed the view now actually exists and is safe to call
-  `findViewById` on — splitting "build the view" from "now wire it up"
+- `findViewById` on — splitting "build the view" from "now wire it up"
   into two methods, where an Activity's `onCreate` does both in one.
 - `view.findViewById(...)` — reappearing (Lesson 4), new detail: called
   on the Fragment's own `view` parameter, not directly on `this` the

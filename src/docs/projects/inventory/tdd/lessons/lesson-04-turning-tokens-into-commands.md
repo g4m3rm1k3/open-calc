@@ -270,12 +270,11 @@ default read above — ready to parse a first line even if that line never
 mentions `G` at all.
 
 ### Mechanical Walkthrough
-
 - `from core.lexer import parse_line` — **(b) reappearing** import syntax
   (Lesson 2), now reaching across two modules inside `core/`.
 - `_MOTION_CODES = {0: "G0", 1: "G1", 2: "G2", 3: "G3"}` — already-known
   basic Python (dict literal); this is a **lookup table**, ported
-  directly from the reference's `switch` statement above — each `case N`
+- directly from the reference's `switch` statement above — each `case N`
   becomes one dict entry, an intentional, direct translation of one
   language's dispatch construct into another's data structure, not a
   reinterpretation.
@@ -394,17 +393,16 @@ figures out *one* line's command, given the words already extracted for
 it, and updates `self.current_motion` if this line changes the mode.
 
 ### Mechanical Walkthrough
-
 - `def parse(self, text):` — **(b) reappearing** method syntax; `text` is
   a whole multi-line program, not one line.
 - `for raw_line in text.split("\n"):` — already-known basic Python
-  (`str.split`), applied to newlines specifically — **(b) reappearing**
+- (`str.split`), applied to newlines specifically — **(b) reappearing**
   from Lesson 1's own `python -m venv` unit, which used `\n`'s conceptual
   cousin only in prose; here it's real code splitting a program into
   individual lines for the first time in this project.
 - `words = parse_line(raw_line)["words"]` — **(b) reappearing**
   (Lesson 3); this lesson only needs the `"words"` half of `parse_line`'s
-  return value — `"comment"` is read and discarded here, a **named,
+- return value — `"comment"` is read and discarded here, a **named,
   deliberate simplification**: nothing in this project displays or acts
   on a comment yet, so there's nothing meaningful to do with it at this
   call site; the moment something does, this line is exactly where it
@@ -419,7 +417,7 @@ it, and updates `self.current_motion` if this line changes the mode.
   is visible on the *next* loop iteration — this single fact is the entire
   mechanism modal state depends on.
 - `if "G" in words: g_int = int(words["G"]); if g_int in _MOTION_CODES:
-  self.current_motion = _MOTION_CODES[g_int]` — **(a) first appearance**
+- self.current_motion = _MOTION_CODES[g_int]` — **(a) first appearance**
   of the actual modal-update logic: only *touch* `self.current_motion`
   when this line actually has a `G`-word *and* it's one of the four this
   project understands; otherwise, `self.current_motion` is left exactly
@@ -427,11 +425,11 @@ it, and updates `self.current_motion` if this line changes the mode.
   mechanism of "inheriting" a mode is simply *not overwriting* the
   variable, not some separate lookup-the-previous-value step.
 - `command = {"motion": self.current_motion}` — **(a) first appearance**
-  of reading `self.current_motion` back out — every command, whether or
+- of reading `self.current_motion` back out — every command, whether or
   not its own line had a `G`-word, carries whichever mode is currently
   active.
 - The `for axis in ("X", "Y", "Z"): if axis in words: command[axis.lower()]
-  = words[axis]` and `if "F" in words: command["f"] = words["F"]` lines —
+- = words[axis]` and `if "F" in words: command["f"] = words["F"]` lines —
   **(c) already established** dict/loop patterns from Lesson 2, applied to
   a new dict being built up instead of `tokenize`'s.
 
@@ -619,11 +617,11 @@ asked for.
   same shape as the disposable `TooColdError` lab, applied for real.
 - `for letter in words: if letter not in _SUPPORTED_WORDS: raise ...` —
   **(a) first appearance** of validating *every key* of a dict up front,
-  before any of them are used — `_SUPPORTED_WORDS` is the exact same kind
+- before any of them are used — `_SUPPORTED_WORDS` is the exact same kind
   of allow-list idea as `_MOTION_CODES`, applied to letters instead of
   G-code numbers.
 - `if isinstance(g_value, list): raise ...` — **(b) reappearing**
-  `isinstance` (Lesson 2's `tokenize`, in the opposite direction — there,
+- `isinstance` (Lesson 2's `tokenize`, in the opposite direction — there,
   a list meant "a repeated word, keep appending"; here, a repeated `G`
   word on one line is nonsensical for motion mode specifically, so it's
   rejected instead).
@@ -740,7 +738,6 @@ call code that can genuinely `raise`, and the first to translate a
 Python-level failure into an HTTP-level one on purpose.
 
 ### Mechanical Walkthrough
-
 - `Parser()` — **(b) reappearing** instantiation; a **fresh** instance is
   created for every single request — **(a) worth naming explicitly**: if
   one shared `Parser` were reused across requests, one user's program
@@ -750,10 +747,10 @@ Python-level failure into an HTTP-level one on purpose.
   guarantee `Counter`'s `a`/`b` independence proved earlier in this
   lesson, now load-bearing for correctness rather than just demonstrated.
 - `try: commands = Parser().parse(body["program"]) except
-  UnsupportedCodeError as error:` — **(a) first appearance** of
+- UnsupportedCodeError as error:` — **(a) first appearance** of
   `try`/`except` in this project. Code inside `try:` runs normally unless
   it raises; if it raises specifically an `UnsupportedCodeError` (or any
-  subclass of it — none exist yet), execution jumps into the `except`
+- subclass of it — none exist yet), execution jumps into the `except`
   block instead of crashing the whole request. `as error` binds the
   actual exception object to the name `error`, so `str(error)` (already-
   known basic Python string conversion) retrieves the exact message
@@ -827,7 +824,6 @@ G1 Z-5 F100</textarea>
 ```
 
 ### Mechanical Walkthrough
-
 - `<textarea rows="6" cols="40">...</textarea>` — **(a) first
   appearance**: unlike `<input type="text">` (Lesson 2), a `<textarea>`
   accepts multiple lines and is sized in rows/columns of text rather than
@@ -836,7 +832,7 @@ G1 Z-5 F100</textarea>
   exactly why the sample program above is typed literally inside it,
   newlines and all.
 - The rest — `.value`, `addEventListener("click", ...)`,
-  `fetch(..., {method: "POST", ...})` — **(c) already established**,
+- `fetch(..., {method: "POST", ...})` — **(c) already established**,
   identical pattern to Lesson 2/3's tokenize form, reused with a different
   field name (`program` instead of `line`) and a different result element.
 

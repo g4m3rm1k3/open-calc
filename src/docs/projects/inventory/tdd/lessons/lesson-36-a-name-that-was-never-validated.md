@@ -106,7 +106,6 @@ export function monacoThemeName(themeId: string): string {
 ```
 
 ### Mechanical Walkthrough
-
 - `themeId.replace(/[^a-zA-Z0-9-]/g, "-")` — **(a) first appearance** —
   a general character-class sanitizer, not a special case for
   underscores specifically: any character Monaco's own regex wouldn't
@@ -114,7 +113,7 @@ export function monacoThemeName(themeId: string): string {
   apostrophe would be handled by the same line, not require a second fix.
 - The sanitizing happens only at the two Monaco call sites, never
   touching `theme.id` itself anywhere else (`findTheme`, `localStorage`,
-  `applyTheme`) — **(a) first appearance of this specific boundary
+- `applyTheme`) — **(a) first appearance of this specific boundary
   discipline** in this project: the real, stored identity of a theme and
   the name Monaco is willing to accept are two different real
   constraints, kept separate rather than collapsing `themes.ts`'s own ids

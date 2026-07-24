@@ -89,14 +89,17 @@ The function now opens the source file for reading and the destination
 for writing, both at once — but copies nothing between them yet.
 
 ### Mechanical Walkthrough
+- `import os` — reminder.
+- `def my_cp(src, dst):` — basic.
+- `with open(src, "rb") as source, open(dst, "wb") as dest:` — first appearance of a
 
-`import os` — reminder. `def my_cp(src, dst):` — basic. `with open(src,
-"rb") as source, open(dst, "wb") as dest:` — first appearance of a
 `with` statement managing **two** resources in one line, separated by a
-comma — both `source` and `dest` are guaranteed closed when the block
+- comma — both `source` and `dest` are guaranteed closed when the block
 ends, exactly the same guarantee Lesson 1's single-resource `with`
-already established, just extended to two at once. `"rb"` — reminder
-from Lesson 61. `"wb"` — the concept from this unit's lab, reused for
+- already established, just extended to two at once.
+- `"rb"` — reminder from Lesson 61.
+- `"wb"` — the concept from this unit's lab, reused for
+
 real.
 
 ### CS Lens
@@ -172,10 +175,9 @@ bounded 4096-byte pieces, the exact loop shape from Lesson 10, now
 paired with a `.write()` on the far end instead of a `print()`.
 
 ### Mechanical Walkthrough
-
-`while True:`, `chunk = source.read(4096)`, `if not chunk: break` — all
+- `while True:`, `chunk = source.read(4096)`, `if not chunk: break` — all
 direct reminders of Lesson 10's `cat_file()`, unchanged in shape.
-`dest.write(chunk)` — the concept from the previous unit's lab, reused
+- `dest.write(chunk)` — the concept from the previous unit's lab, reused
 for real, writing each chunk out immediately after reading it rather
 than accumulating them.
 
@@ -293,8 +295,8 @@ line, no chunking, no streaming — because it's doing fundamentally less
 work, per this unit's CS Lens.
 
 ### Mechanical Walkthrough
-
-`def my_mv(src, dst):` — basic. `os.rename(src, dst)` — the concept
+- `def my_mv(src, dst):` — basic.
+- `os.rename(src, dst)` — the concept
 from this unit's lab, reused for real.
 
 ### CS Lens
@@ -465,26 +467,27 @@ trash folder — never permanently deleting anything, and never silently
 overwriting an existing trashed file with the same name.
 
 ### Mechanical Walkthrough
-
-`TRASH_DIR = os.path.expanduser("~/.my_trash")` — `os.path.expanduser()`
+- `TRASH_DIR = os.path.expanduser("~/.my_trash")` — `os.path.expanduser()`
 (Lesson 6, reminder), resolving `~` to a real home directory. `def
 unique_path(path):` and its `if not os.path.exists(path): return path`
-— `os.path.exists()` (Lesson 8, reminder) — if nothing's there yet, no
-renaming needed at all. `base, ext = os.path.splitext(path)` — the
+- — `os.path.exists()` (Lesson 8, reminder) — if nothing's there yet, no renaming needed at all.
+- `base, ext = os.path.splitext(path)` — the
+
 concept from this unit's lab, reused for real, paired with tuple
 unpacking (Lesson 1, reminder). `while True: candidate = f"{base}
-({counter}){ext}" ...` — the exact "try a name, check if it's taken,
+- ({counter}){ext}" ...` — the exact "try a name, check if it's taken,
 increment and retry" pattern, structurally identical to Lesson 10's
 chunked-read loop shape, just checking existence instead of reading
-data. `def my_rm(path):` — `os.makedirs(TRASH_DIR, exist_ok=True)` —
+- data.
+- `def my_rm(path):` — `os.makedirs(TRASH_DIR, exist_ok=True)` —
 the concept from this unit's lab, reused for real, ensuring the trash
 folder exists every time without erroring if it already does.
-`filename = os.path.basename(path)` — a small, self-explanatory
+- `filename = os.path.basename(path)` — a small, self-explanatory
 `os.path` function (same family as `os.path.join`, `os.path.expanduser`
 — extracting just the final name from a full path); not given a full
 lab since the idea "os.path has small utility functions" is already
 well established by this point in the curriculum. `os.rename(path,
-destination)` — reused directly from the previous unit, doing the
+- destination)` — reused directly from the previous unit, doing the
 actual move into the trash.
 
 ### CS Lens

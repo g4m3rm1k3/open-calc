@@ -297,23 +297,22 @@ def compute_path(commands):
 ```
 
 ### Mechanical Walkthrough
-
 - `_ARC_MODES = ("G2", "G3")` / `_ARC_WORDS = (...)` — **(a) first
-  appearance** — `_ARC_WORDS` exists because real arc motion needs *some*
-  word present (an endpoint or a center specifier) — a bare `"G2"` with
+- appearance** — `_ARC_WORDS` exists because real arc motion needs *some* word present (an endpoint or a center specifier) — a bare `"G2"` with
+
   no other words on the line is a real no-op in the reference (`hasArcMotion`
   is `False`), and this project's own `is_arc` check mirrors that gate.
 - `old_x, old_y, old_z = state.x, state.y, state.z` (before
-  `state.apply()`) — **(b) reappearing** — Lesson 33's own
+- `state.apply()`) — **(b) reappearing** — Lesson 33's own
   capture-before-apply pattern, extended to `x`/`y` since arc geometry
   needs the *starting* point of the move, not just its depth.
 - `ocx = old_x + command.get("i", 0.0)` / `ocy = old_y + command.get("j",
-  0.0)` — **(a) first appearance** — the real center-offset form:
-  `I`/`J` are offsets *from the start point*, not absolute coordinates —
+- 0.0)` — **(a) first appearance** — the real center-offset form: `I`/`J` are offsets *from the start point*, not absolute coordinates —
+
   a real, easy-to-get-backwards detail, ported exactly as
   `ch.pos.X + I` reads.
 - The `if "r" in command:` block (half-chord check, `h`, `mx`/`my`,
-  `ux`/`uy`, `sign`) — **(a) first appearance** — the real `R`-word
+- `ux`/`uy`, `sign`) — **(a) first appearance** — the real `R`-word
   center derivation: given only a radius and the two endpoints, there are
   two possible circle centers producing that radius (one on each side of
   the chord connecting them); `sign` (`+1` for `G02`, `-1` for `G03`)
@@ -330,7 +329,7 @@ def compute_path(commands):
   Fanuc convention this port preserves: `G02 I-15. J0.` with no `X`/`Y`
   at all means "a complete circle back to the start," not "go nowhere."
 - `if mode == "G2": if da > 0: da -= 2 * math.pi` / `else: if da < 0: da
-  += 2 * math.pi` — **(a) first appearance** — real sweep-direction
+- += 2 * math.pi` — **(a) first appearance** — real sweep-direction
   normalization: `atan2`'s own range (`-π` to `π`) can produce a `da`
   that goes the *wrong way* around for the commanded direction; this
   forces `G02` (clockwise) to always be a negative sweep and `G03`

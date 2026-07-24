@@ -195,8 +195,7 @@ import changes either: `HTTPException` and `CONTENT_DIR` are both already
 in scope from Lesson 2.
 
 ### Mechanical Walkthrough
-
-The first two checks are the traversal guard and `is_file()` — the
+- The first two checks are the traversal guard and `is_file()` — the
 `is_dir()` counterpart from Lesson 2, catching the opposite case: a real
 folder isn't a file. `read_text(encoding="utf-8")` is a `Path` method
 that opens the file, reads its full contents, and decodes those bytes
@@ -371,13 +370,13 @@ shown here in full because this is the real state of the file, not
 because any of it changed again.
 
 ### Mechanical Walkthrough
-
 `@app.put(...)` is the first route in this project using a decorator
-other than `@app.get` — FastAPI provides one per HTTP method. `path: str`
+- other than `@app.get` — FastAPI provides one per HTTP method.
+- `path: str`
 is inferred as a query parameter exactly as in every earlier route;
 `edit: FileEdit`, typed as a `BaseModel` subclass instead of a plain
 type, is inferred completely differently: FastAPI parses the request's
-JSON body and constructs a `FileEdit` from it automatically — the same
+- JSON body and constructs a `FileEdit` from it automatically — the same
 construction step just demonstrated with `Dog`, except an invalid body
 here doesn't crash the program; FastAPI catches that `ValidationError`
 itself and returns a `422` before `write_file`'s own code ever runs.
@@ -526,8 +525,7 @@ sidebar to open it.</p>` is gone entirely; that same instruction now
 lives as the `<textarea>`'s starting text instead.
 
 ### Mechanical Walkthrough
-
-`<textarea>` is an editable multi-line text input — unlike every element
+- `<textarea>` is an editable multi-line text input — unlike every element
 used so far (`<p>`, `<h1>`, `<li>`), its content isn't set through
 `.textContent`; it's read and written through a separate `.value`
 property, since a `<textarea>` has a live, user-editable value distinct
@@ -586,15 +584,14 @@ everything there is to see. It isn't called by anything yet — the next
 unit wires a click to it.
 
 ### Mechanical Walkthrough
+- This has the exact same shape as `loadFolder` from Lesson 2 — `fetch` → parse JSON → update the DOM → `.catch()` a fallback — the same repeatable
 
-This has the exact same shape as `loadFolder` from Lesson 2 — `fetch` →
-parse JSON → update the DOM → `.catch()` a fallback — the same repeatable
 pattern, assembled again rather than reinvented. `.value = data.content`
 is new specifically because `<textarea>` needs `.value`, not
 `.textContent`, as covered in the previous unit. `.style.display =
 "inline-block"` is the first time this project sets a style property
 directly from JavaScript, rather than toggling a CSS class the way
-`item.className = "clickable"` did in Lesson 2 — a reasonable choice here
+- `item.className = "clickable"` did in Lesson 2 — a reasonable choice here
 since this is a plain on/off switch on one specific element, not a
 reusable rule worth a class.
 
@@ -734,10 +731,9 @@ script load, the same way `loadFolder("")` does at the very bottom of
 the file — it's what actually connects the Save button to `saveFile`.
 
 ### Mechanical Walkthrough
-
 Every earlier `fetch` call took a single argument, a URL, and defaulted
 to `GET` with no body. This one passes a second argument: an **options
-object** — the first JavaScript object literal (`{ ... }` with
+- object** — the first JavaScript object literal (`{ ... }` with
 `key: value` pairs) this project has written, as opposed to a JSON
 string received *from* one. `method: "PUT"` overrides the default.
 `headers: { "Content-Type": "application/json" }` tells the server what

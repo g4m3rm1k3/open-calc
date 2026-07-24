@@ -98,12 +98,11 @@ This is the entire file so far — nothing exists in `analyzer.py` yet for
 this to sit alongside.
 
 ### Mechanical Walkthrough
-
 Every piece here reuses shapes from `Token` and `Block` before it:
 `@dataclass` a third time, `line_number: int | None` the identical field
 `Block` already has, `message: str` an ordinary required string field.
 `from gcode.parser import Block` reuses the cross-module import pattern
-Lesson 11 introduced — `gcode.analyzer` now depends on `gcode.parser`,
+- Lesson 11 introduced — `gcode.analyzer` now depends on `gcode.parser`,
 which itself depends on `gcode.lexer`, a real three-stage chain matching
 `BRD.md`'s own pipeline, one file per stage.
 
@@ -204,8 +203,7 @@ def analyze_block(block: Block) -> list[Diagnostic]:
 ```
 
 ### Mechanical Walkthrough
-
-`diagnostics = []` and `seen_letters = set()` set up two accumulators —
+- `diagnostics = []` and `seen_letters = set()` set up two accumulators —
 `set`, reused from Lesson 8's `valid_tokens`, exactly for the same
 reason: only membership matters, not order or count. `for word in
 block.words:` reuses the plain `for` loop, over a `Block`'s own field
@@ -298,12 +296,11 @@ structure to show it inside of; the block above is everything there is
 to see.
 
 ### Mechanical Walkthrough
-
 `diagnostics = []` and the `for block in blocks:` loop reuse the
 accumulate-then-return shape used throughout this project since Lesson
 2. `diagnostics.extend(analyze_block(block))` is new: `.extend()` is a
 list method that adds every item *from* another list into this one,
-individually — different from `.append()`, which adds exactly one item,
+- individually — different from `.append()`, which adds exactly one item,
 *as* one item. `analyze_block(block)` already returns a list (possibly
 empty, possibly several diagnostics); `.append()`-ing that list would put
 the whole list itself in as a single item, nested one level too deep —
@@ -531,10 +528,9 @@ would leave a previous file's analysis results on screen instead of a
 clean slate.
 
 ### Mechanical Walkthrough
-
 The guard clause, the `.endsWith(".nc")` check, and the `fetch(...)`
 shape all reuse `parseFile`/`tokenizeFile` exactly. `data.diagnostics.length
-=== 0` is new only in what it's checking, not the mechanism —
+- === 0` is new only in what it's checking, not the mechanism —
 `.length` on an array was already read back in Lesson 4's `closeTab`
 (`openTabs.length`); `=== 0` reuses strict equality from Lesson 2. When
 there are none, the function returns early with a plain success message,
@@ -552,22 +548,22 @@ Clicking Analyze on `duplicate_axis.nc`: `analyzeFile()` confirms the
 file is open and G-code, then sends `POST
 /analyze?path=src/duplicate_axis.nc`. On the backend, `analyze_file`
 runs the shared checks, then chains all three pipeline stages built
-across three lessons in two lines — `tokenize_program` into
+- across three lessons in two lines — `tokenize_program` into
 `parse_program` into `analyze_program`. `analyze_block` walks each
 block's words, skipping `G`/`M` codes entirely, and flags any other
-letter seen twice — line 10's repeated `X` produces one `Diagnostic`;
+- letter seen twice — line 10's repeated `X` produces one `Diagnostic`;
 line 20's `G90 G94`, a real modal-group line, produces none, exactly
 because of the bug this lesson caught and fixed before it ever reached
 this route. The frontend receives one diagnostic, and `analyzeFile`
 turns it into `"Line 10: Address X appears more than once in this
-block"`, displayed in `#analysis-output` — the fourth panel now sharing
+- block"`, displayed in `#analysis-output` — the fourth panel now sharing
 Lesson 10's `.output-panel`, next to the raw tokens and parsed blocks
 for the exact same file.
 
 ## What breaks without this
 
 Already demonstrated concretely above, not hypothetically: the naive,
-un-fixed `analyze_block` — no `G`/`M` exclusion — flagged this project's
+- un-fixed `analyze_block` — no `G`/`M` exclusion — flagged this project's
 own real, correct `sample.nc` on its very first real line of G-code,
 confirmed with real output before the fix existed. Without the
 `.extend()` vs. `.append()` distinction, `analyze_program` would nest
@@ -586,7 +582,7 @@ confirmed directly against a small standalone example.
    check, re-run against `sample.nc`, and read the real false positives
    yourself — then restore the check.
 4. Predict, before checking, what `analyze_block` would report for a
-   block with *three* `X` words in a row — then verify.
+- block with *three* `X` words in a row — then verify.
 
 ## Definition of done
 

@@ -57,13 +57,13 @@ editor pane's state lives in `openTabs`/`activeTabPath`, entirely
 separate from which folder the sidebar happens to be showing.
 
 ### Mechanical Walkthrough
-
-`openTabs = []` is an empty **array** — the same list construct from
+- `openTabs = []` is an empty **array** — the same list construct from
 Lesson 2's Python `for` loop lab, here holding JavaScript objects instead
 of strings. Each entry will be an object shaped `{ path: ..., content: ... }`
 — a small **record**: several named pieces of data traveling together as
 one unit, the same shape every backend route in this project has already
-been returning as JSON. `activeTabPath = null` starts as `null` — a value
+- been returning as JSON.
+- `activeTabPath = null` starts as `null` — a value
 meaning "nothing," distinct from `""` (`currentPath`'s empty state, which
 still means a real location: the root folder). No tab is open yet, so
 there's no path at all to point to, not even an empty one.
@@ -254,19 +254,18 @@ inline `style="display: none;"` the way Lesson 3 had it — hiding the
 button itself redundant.
 
 ### Mechanical Walkthrough
-
-`#tab-bar` is an empty `<div>` — nothing shown yet, filled in later this
+- `#tab-bar` is an empty `<div>` — nothing shown yet, filled in later this
 lesson by `renderTabs`. `#editor-empty` holds the same "click a file"
 message Lesson 3 put directly in the `<p>` it replaced, now its own
 dedicated element instead of shared with the textarea's placeholder
 text. `#editor-pane`, wrapping the `<textarea>` and Save row, starts
-with an inline `style="display: none;"` — the same hide-by-default
+- with an inline `style="display: none;"` — the same hide-by-default
 technique Lesson 3 used on the Save button, applied here to the whole
 pane at once. `.tab-bar { display: flex; ... }` lays tabs out
 horizontally, reusing the flex layout from Lesson 2's `.layout`.
 `.tab { border: 1px solid #ccc; border-bottom: none; ... }` gives each
 tab three sides of a border but not the fourth, which — combined with
-`.tab-bar`'s own `border-bottom` — is what makes a tab look visually
+- `.tab-bar`'s own `border-bottom` — is what makes a tab look visually
 attached to the pane below it rather than floating separately.
 `.tab.active { background-color: #eee; font-weight: bold; }` reuses the
 two-class-selector shape from nowhere yet in this project — this is its
@@ -373,15 +372,16 @@ branch, `entryPath`'s computation, `item.className` — is exactly what
 Lesson 3 left in place; only the one call this unit's rename affects.
 
 ### Mechanical Walkthrough
-
 `.find()` is an array method: it calls the function passed to it once
 per item, and returns the *first* item for which that function returns
-`true` — or `undefined` if none match. `(tab) => tab.path === path`
+- `true` — or `undefined` if none match.
+- `(tab) => tab.path === path`
 checks each tab's `path` against the one just clicked. If a match exists,
 this function ends immediately (`return`) after just switching which tab
-is active — no new fetch, no duplicate tab. `openTabs.push({ path:
+- is active — no new fetch, no duplicate tab.
+- `openTabs.push({ path:
 data.path, content: data.content })` is this project's first use of
-`.push()` — an array method that adds one item to the *end* of an array,
+- `.push()` — an array method that adds one item to the *end* of an array,
 mutating it in place, unlike `.filter()`'s later habit of returning a new
 array instead. The object literal passed to it, `{ path: ..., content:
 ... }`, is the same record shape described in the previous unit,
@@ -427,13 +427,13 @@ to see. Nothing calls it yet — a later unit wires a close button's click
 to it.
 
 ### Mechanical Walkthrough
-
 `.filter()` is another array method: it calls the function passed to it
 once per item and builds a *new* array containing only the items where
 that function returned `true`. `(tab) => tab.path !== path` keeps every
-tab except the one being closed. `openTabs[openTabs.length - 1]` reads a
+- tab except the one being closed.
+- `openTabs[openTabs.length - 1]` reads a
 specific array element directly by its numeric position — square
-brackets after an array, with the index inside; `.length - 1` is the last
+- brackets after an array, with the index inside; `.length - 1` is the last
 valid index, since indices start at `0`.
 
 ### SE Lens
@@ -590,7 +590,6 @@ already being called from inside `openFile`, built in the previous unit,
 which is what will actually run it once both functions exist.
 
 ### Mechanical Walkthrough
-
 `document.getElementById("tab-bar")` and `tabBar.textContent = ""` reuse
 the exact lookup-and-clear pattern `renderFileList` used on `#file-list`
 in Lesson 2, now against a different element. `openTabs.forEach((tab) =>
@@ -599,7 +598,7 @@ collection this lesson introduced instead of the backend's `entries`.
 `document.createElement("div")` reuses `createElement` from Lesson 2,
 building a `<div>` instead of an `<li>`. `tabElement.className = tab.path
 === activeTabPath ? "tab active" : "tab"` combines two already-taught
-pieces — the ternary from Lesson 2, and `.className` assignment from the
+- pieces — the ternary from Lesson 2, and `.className` assignment from the
 same lesson — in a new way worth a clause: the string assigned is two
 space-separated CSS classes, `"tab active"`, not one, when this tab is
 the active one; a single `.className` assignment can carry as many
@@ -612,12 +611,12 @@ reuse the same construction pattern a second time for a different
 element. `tabElement.appendChild(label)` reuses `appendChild` from
 Lesson 2. Then the new code from this unit: `document.createElement("span")`
 for `closeButton`, its `.textContent`/`.className` set the same reused
-way, and `.addEventListener("click", (event) => { ... })` — the first
+- way, and `.addEventListener("click", (event) => { ... })` — the first
 time this project's event handler has actually used the `event` argument
 handed to every listener automatically. `event.stopPropagation()` is new:
 without it, clicking the close button would fire *both* handlers —
 `closeTab` (removing the tab) and, via bubbling, `tabElement`'s own click
-handler (setting `activeTabPath` to the tab that just got removed) —
+- handler (setting `activeTabPath` to the tab that just got removed) —
 leaving `activeTabPath` pointing at a tab that no longer exists. This is
 the exact bug the concept lab demonstrated, now with a real, breaking
 consequence if left out. `tabElement.appendChild(closeButton)` and, at
@@ -673,8 +672,7 @@ handler inside `renderTabs`, built in earlier units — this is the last
 piece needed before either of those can actually run without erroring.
 
 ### Mechanical Walkthrough
-
-This reuses `.style.display` toggling from Lesson 3 — nothing new in the
+- This reuses `.style.display` toggling from Lesson 3 — nothing new in the
 mechanism, only in the decision it's making: with no active tab, show the
 empty-state message and hide the editor entirely; with one, do the
 reverse and fill the `<textarea>` from that specific tab's `content`,
@@ -814,7 +812,6 @@ global path — everything else about it, the options object, the
 for that one renamed variable.
 
 ### Mechanical Walkthrough
-
 `if (activeTabPath === null) { return; }` is the same guard-clause shape
 `openFile` used earlier in this lesson, reused here for a different
 reason: with no tab open at all, there's nothing for Save to do, so the
@@ -823,7 +820,7 @@ function exits before touching `document.getElementById("file-content")`
 still hold Lesson 3's original placeholder text, not real file content,
 and saving it would silently overwrite a file with the wrong thing.
 `encodeURIComponent(activeTabPath)` reuses `encodeURIComponent` from
-Lesson 2, with `activeTabPath` — this lesson's own state — standing in
+- Lesson 2, with `activeTabPath` — this lesson's own state — standing in
 for the single global `path` Lesson 3 used to read directly. Inside the
 success callback, `openTabs.find((tab) => tab.path === activeTabPath)`
 reuses `.find()`, introduced earlier in this lesson, the same lookup

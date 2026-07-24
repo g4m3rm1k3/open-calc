@@ -80,10 +80,9 @@ This is a whole new file, in a whole new directory this project has
 never used, `src/androidTest/java/com/yourname/pocketinventory/`.
 
 ### Mechanical Walkthrough
-
 - `@RunWith(AndroidJUnit4.class)` — **first appearance.** Tells JUnit to
   use a specialized runner capable of launching real Android
-  components — plain `@Test` methods (Lesson 30) don't need this,
+- components — plain `@Test` methods (Lesson 30) don't need this,
   since they never touch anything Android-specific.
 - `ActivityScenario.launch(InventoryActivity.class)` — **first
   appearance.** Actually starts a real `InventoryActivity` instance on
@@ -98,14 +97,14 @@ never used, `src/androidTest/java/com/yourname/pocketinventory/`.
   naming directly rather than treating as ordinary `try`.
 - `onView(withId(R.id.toolbar))` — **first appearance of Espresso's
   core query shape.** `onView(...)` locates a `View` in the currently
-  displayed screen; `withId(R.id.toolbar)` — **first appearance** — a
+- displayed screen; `withId(R.id.toolbar)` — **first appearance** — a
   `Matcher` (a general "does this match a condition" object, a shape
   briefly similar to `DiffUtil.ItemCallback`'s comparison role, Lesson
   20) identifying it by the same generated `R.id` constant every
   `findViewById` call in this project has used since Lesson 4.
 - `.check(matches(isDisplayed()))` — **first appearance.** Asserts a
-  condition holds *without* performing any action — `isDisplayed()` —
-  **first appearance** — another `Matcher`, confirming the Toolbar
+- condition holds *without* performing any action — `isDisplayed()` — **first appearance** — another `Matcher`, confirming the Toolbar
+
   (Lesson 21) is genuinely visible on screen.
 
 ### Run It
@@ -289,11 +288,10 @@ test-only escape hatch that overrides the Singleton's held instance
 directly.
 
 ### Mechanical Walkthrough
-
 - `static void setInstanceForTesting(AppDatabase testInstance) { instance = testInstance; }`
-  — **first appearance.** Directly reassigns the `private static`
+- — **first appearance.** Directly reassigns the `private static`
   `instance` field (Lesson 13) from outside `getInstance`'s own
-  lazy-construction logic — package-private, deliberately not `public`,
+- lazy-construction logic — package-private, deliberately not `public`,
   since this is meant to be called only from test code in the same
   package, never from real app code.
 
@@ -317,14 +315,14 @@ Added as a second `@Before` method, run before every test in
 previous unit.
 
 ### Mechanical Walkthrough
-
 - `Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase.class)`
   — **first appearance.** A Room-provided alternative to
-  `Room.databaseBuilder` (Lesson 13) that never touches disk at all —
+- `Room.databaseBuilder` (Lesson 13) that never touches disk at all —
   every table exists purely in memory, for exactly the lifetime of this
   test process, automatically discarded afterward with no cleanup code
-  needed. `ApplicationProvider.getApplicationContext()` — **first
-  appearance** — the test-environment way to obtain a real `Context`
+- needed.
+- `ApplicationProvider.getApplicationContext()` — **first appearance** — the test-environment way to obtain a real `Context`
+
   without an Activity.
 - `.allowMainThreadQueries()` — **first appearance**, and worth a
   direct, honest caveat: this permits Room to bypass Lesson 13's own
@@ -354,29 +352,30 @@ public void addingItem_appearsInList() {
 ```
 
 ### Mechanical Walkthrough
-
 - `onView(withId(R.id.addItemFab)).perform(click())` — **first
   appearance of `.perform(...)`.** Executes a real, simulated user
-  action — `click()` — **first appearance** — against the located
+- action — `click()` — **first appearance** — against the located
   view, the FAB built in Lesson 21.
 - `onView(withId(R.id.nameInput)).perform(typeText("Test Widget"), closeSoftKeyboard())`
-  — **first appearance of `typeText(...)`**, simulating real keystrokes
-  into the real `EditText` from Lesson 9. `closeSoftKeyboard()` —
+- — **first appearance of `typeText(...)`**, simulating real keystrokes into the real `EditText` from Lesson 9.
+- `closeSoftKeyboard()` —
+
   **first appearance** — dismisses the on-screen keyboard, which can
   otherwise visually obscure a view a later step needs to interact
-  with. `.perform(...)` accepting **multiple actions** — **first
+- with.
+- `.perform(...)` accepting **multiple actions** — **first
   appearance of this overload** — runs them in sequence against the
   same view.
 - `onView(withId(R.id.saveButton)).perform(click())` — reappearing
   (`.perform(click())`), triggering the real, unmodified validation and
   save logic from Lesson 9/30.
 - `onView(withId(R.id.inventoryRecyclerView)).check(matches(hasDescendant(withText("Test Widget"))))`
-  — **first appearance of `hasDescendant(...)`.** A `RecyclerView`
+- — **first appearance of `hasDescendant(...)`.** A `RecyclerView`
   isn't matched by looking for one specific row's text directly (rows
   are dynamically inflated and recycled, Lesson 6); `hasDescendant`
   checks whether *any* descendant view, anywhere in the `RecyclerView`'s
   currently-displayed subtree, matches the inner condition —
-  `withText("Test Widget")` — **first appearance** — confirming the
+- `withText("Test Widget")` — **first appearance** — confirming the
   newly-added item's name genuinely rendered somewhere in the list.
 
 ### Run It

@@ -139,12 +139,12 @@ ordered array built entirely from disk contents — no line of it is
 hand-typed data.
 
 #### Mechanical Walkthrough
-
 Enumerating the new line specifically, left to right: `a` and `b` are the
-two comparator parameters `.sort()` always passes — two elements of the
+- two comparator parameters `.sort()` always passes — two elements of the
 array being compared, already-established syntax from `toolLoader.js`'s
 own `.sort()` (Repetition Rule: reminder only, not re-explained). `.order`
-is a plain property access. `??` is this unit's new concept — substitutes
+- is a plain property access.
+- `??` is this unit's new concept — substitutes
 `0` only if the left side is `null`/`undefined`. The subtraction `- `
 between the two resulting numbers is the already-standard "sort
 ascending by numeric field" comparator shape, same as
@@ -283,19 +283,21 @@ none of it depended on *where* metadata came from, only that some
 metadata object existed to spread.
 
 #### Mechanical Walkthrough
-
-`LABS.find(...)` — this unit's new concept, just introduced. `(l) => l.key === key` —
+- `LABS.find(...)` — this unit's new concept, just introduced.
+- `(l) => l.key === key` —
 an arrow function (already-established syntax throughout this codebase)
-comparing with `===` (already-established). `meta?.path` — optional
+- comparing with `===` (already-established).
+- `meta?.path` — optional
 chaining, already used one line below it in the original code
 (`mod.meta?.path`), so not new here, just carried over onto the new
-variable name. `?? \`/lab/${key}\`` — this lesson's *other* new concept
+- variable name.
+- `?? \`/lab/${key}\`` — this lesson's *other* new concept
 (nullish coalescing, Concept Unit above), reappearing — brief reminder
 only, not re-explained.
 
 #### CS Lens
 
-`.find()` is a **linear search** — worst case, it inspects every element
+- `.find()` is a **linear search** — worst case, it inspects every element
 before concluding nothing matches. **Recognized in:** a database doing a
 full table scan when no index exists on the searched column; a browser's
 `document.querySelector` walking the DOM when no ID/class index applies;
@@ -306,7 +308,7 @@ grep scanning a file line by line.
 For 41 labs, a linear scan on every lab-open is irrelevant — it's a few
 dozen comparisons, effectively instant. The alternative that *would*
 matter at larger scale is a `Map` keyed by `key` (O(1) lookup instead of
-O(n)) — exactly the same `Map`-over-plain-object tradeoff already named in
+- O(n)) — exactly the same `Map`-over-plain-object tradeoff already named in
 `lesson-engine-autofind/02-...md`'s walkthrough of `levelsBySeriesId`.
 Reaching for `.find()` here instead of building a `Map` is a deliberate
 "don't solve a performance problem that doesn't exist yet" call, not an
@@ -469,8 +471,7 @@ narrated individually here, per this lesson's own scope.
 array to resolve a specific lab's metadata when it's actually opened.
 
 #### Mechanical Walkthrough
-
-Nothing new syntactically in the `meta.js` files themselves — they're
+- Nothing new syntactically in the `meta.js` files themselves — they're
 plain object literals, `export default {...}`, no new language construct
 over what registry.js's entries already were.
 
@@ -488,7 +489,7 @@ inode versus the file's actual data blocks.
 
 #### SE Lens
 
-The alternative this lesson removes — `registry.js` hand-duplicating
+- The alternative this lesson removes — `registry.js` hand-duplicating
 facts a lab's own code also knew — is a **single source of truth**
 violation: exactly the "three hand-synced copies" bug class
 `lesson-engine-autofind/02-...md` already named for lesson content,
@@ -499,7 +500,7 @@ small files spread across 41 folders — genuinely harder to eyeball-scan
 by hand. `labRegistryLoader.js` exists specifically to pay that cost back:
 it reconstructs the exact same single-array overview, automatically, at
 load time, so nothing about the *consuming* code (`TopicTable.jsx`,
-`StartMenu.jsx`, `topicGroups.js`) had to change at all — only where the
+- `StartMenu.jsx`, `topicGroups.js`) had to change at all — only where the
 array's contents originate from.
 
 #### Connect to What Came Before
@@ -518,10 +519,11 @@ Trace one lab end to end, `css-mastery`, through everything built in this
 lesson: its `meta.js` (Concept Unit 3) is read by `import.meta.glob`
 inside `labRegistryLoader.js` at app load, alongside all 40 others;
 `Object.entries(...).map(...)` turns it into a record with a `key`
-derived from its folder name; `.sort((a,b) => (a.order ?? 0) - ...)`
+- derived from its folder name; `.sort((a,b) => (a.order ?? 0) - ...)`
 (Concept Unit 1) places it at position 9, exactly where `registry.js`'s
-array used to put it, without a human retyping that position. `LABS` —
-the finished array — is imported by `TopicTable.jsx`, `StartMenu.jsx`,
+- array used to put it, without a human retyping that position.
+- `LABS` — the finished array — is imported by `TopicTable.jsx`, `StartMenu.jsx`,
+
 and `topicGroups.js`, which render its card from `label`/`emoji`/`desc`/
 `tags`/`cover` with no changes to any of those three files' own code.
 When a user actually clicks the card, `labLoader.js`'s `getLabEntry('css-mastery')`
@@ -533,7 +535,7 @@ object `EntryShell` needs to open the floating window.
 ## What Breaks Without This
 
 Removing the `?? 0` fallback from Concept Unit 1's comparator and giving
-one lab no `order` field reproduces a real, verified sorting bug —
+- one lab no `order` field reproduces a real, verified sorting bug —
 run for real, this session:
 
 ```js
@@ -555,16 +557,16 @@ Without ?? fallback: zebra:5, yak:undefined, apple:1, banana:2, mango:3
 With ?? fallback:    yak:undefined, apple:1, banana:2, mango:3, zebra:5
 ```
 
-Without the fallback, `x.order - y.order` becomes `undefined - 5`, which
-is `NaN` — and a comparator that returns `NaN` doesn't throw, it just
+- Without the fallback, `x.order - y.order` becomes `undefined - 5`, which is `NaN` — and a comparator that returns `NaN` doesn't throw, it just
+
 leaves that pair's relative order effectively arbitrary. `yak` lands
-stuck between `apple` and `banana` for no principled reason — not sorted
+- stuck between `apple` and `banana` for no principled reason — not sorted
 first (its intended default), not sorted by its real position (it has
-none) — genuinely wrong, and silent. With the fallback, a missing `order`
+- none) — genuinely wrong, and silent. With the fallback, a missing `order`
 correctly defaults to the front of the list, every time.
 
 Without Concept Unit 2's `LABS.find(...)`, `labLoader.js` would still
-compile and run — `...meta` would just silently spread `undefined`
+- compile and run — `...meta` would just silently spread `undefined`
 (since nothing sets a `meta` variable), producing a lab entry with no
 label, no emoji, no tags at all, and `path: mod.meta?.path ?? ...` would
 always fall through to the `/lab/${key}` default, harmless for labs
@@ -574,7 +576,7 @@ custom `path`.
 ## Definition of Done
 
 - [ ] `src/labs/labRegistryLoader.js` exists, exports `LABS`, uses an eager
-      `import.meta.glob('./*/meta.js')`, and sorts with `(a.order ?? 0) - (b.order ?? 0)`
+- `import.meta.glob('./*/meta.js')`, and sorts with `(a.order ?? 0) - (b.order ?? 0)`
 - [ ] All 41 labs from the old `registry.js` have a `src/labs/<key>/meta.js`
       with every field the old registry entry had, plus `order` matching
       that entry's original array position
@@ -591,7 +593,7 @@ custom `path`.
       no-folder-before lab (`Notebook Lab`), and a plain lab (`Backend Lab`)
       — verified live, this session, with zero console errors
 - [ ] Opening a lab (tested: SVG Studio) still works end to end through the
-      updated `labLoader.js` — verified live, this session
+- updated `labLoader.js` — verified live, this session
 - [ ] `npm run build` succeeds with `registry.js` fully removed — verified
       this session
 - [ ] You reproduced the missing-`order` sorting bug against real data and
@@ -609,7 +611,7 @@ custom `path`.
 
 The ~26 labs relocated from an inline `index.jsx` meta (Worked Example A)
 still have their old `export const meta = {...}` block physically present
-in `index.jsx` — dead code once `labLoader.js` switched to reading
+- in `index.jsx` — dead code once `labLoader.js` switched to reading
 `LABS.find(...)` instead of `mod.meta`. It was deliberately left in place
 rather than stripped by a scripted bulk edit across ~26 existing source
 files with no per-file review. Removing it is a good, small, separate

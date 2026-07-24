@@ -105,9 +105,8 @@ wire them together yet; that's deliberate, so the extraction itself can
 be verified as behavior-preserving before anything else changes.
 
 ### Mechanical Walkthrough
-
 `def run_python(target_file: Path) -> subprocess.CompletedProcess:` adds
-a **return type annotation** — `-> subprocess.CompletedProcess` — the
+- a **return type annotation** — `-> subprocess.CompletedProcess` — the
 first one in this project. Like the parameter type hints already used
 throughout, this doesn't change runtime behavior; it documents, in a way
 tools and readers can both check, exactly what kind of value this
@@ -209,15 +208,14 @@ a third language later means adding one line to `RUNNERS` and writing
 one new function; `run_file` itself doesn't change again.
 
 ### Mechanical Walkthrough
+- `RUNNERS` is a dictionary whose values are the functions themselves — `run_python`, not `run_python()` — a function referenced by name,
 
-`RUNNERS` is a dictionary whose values are the functions themselves —
-`run_python`, not `run_python()` — a function referenced by name,
 without calling it, is a value like any other in Python, storable in a
 dict, passable around, and called later. `RUNNERS.get(target_file.suffix)`
 looks up the extension; `.get(...)` (rather than `RUNNERS[...]`) returns
 `None` for a missing key instead of raising an error, which is exactly
 what the very next line checks for. `f"Cannot run {target_file.suffix}
-files"` is this project's first **f-string** — a string literal prefixed
+- files"` is this project's first **f-string** — a string literal prefixed
 with `f`, where anything inside `{}` is evaluated and inserted directly
 into the resulting string, rather than built by hand with `+`
 concatenation; here it drops the actual unsupported extension into the
@@ -344,17 +342,16 @@ inside `RUNNERS` without `run_file` needing to know which one it's
 calling.
 
 ### Mechanical Walkthrough
-
 `target_file.with_suffix(".exe")` builds a new path from `target_file`
-with its extension replaced — `hello.rs` becomes `hello.exe`, the same
+- with its extension replaced — `hello.rs` becomes `hello.exe`, the same
 `Path` object pattern from `.parent` in Lesson 2, a different property
-this time. The first `subprocess.run` invokes `rustc` — Rust's compiler —
+- this time. The first `subprocess.run` invokes `rustc` — Rust's compiler —
 with `-o` naming where to write the compiled binary; this step can take
 noticeably longer than running an already-interpreted script, hence a
 longer `timeout=10` instead of `5`. `if compile_result.returncode != 0:
 return compile_result` is the key branch: a failed compile is returned
 immediately, with the compiler's own error message sitting in `.stderr`,
-and the second `subprocess.run` — actually running the program — never
+- and the second `subprocess.run` — actually running the program — never
 happens at all.
 
 ### CS Lens — compiled vs. interpreted, confirmed directly
@@ -519,12 +516,11 @@ and — regardless of whether running the binary succeeded, failed, or
 even timed out — always delete the compiled artifacts before returning.
 
 ### Mechanical Walkthrough
-
-`finally:` is new — every earlier `try` in this project (Lessons 3 and
+- `finally:` is new — every earlier `try` in this project (Lessons 3 and
 5) only ever had an `except`. A `finally` block runs *unconditionally*
 after the `try`, whether the code inside it succeeded, raised an
 exception that got caught elsewhere, or is actively in the middle of
-returning a value — `return subprocess.run(...)` inside the `try` still
+- returning a value — `return subprocess.run(...)` inside the `try` still
 lets `finally` run before that return value actually leaves the
 function. `binary_path.unlink(missing_ok=True)` deletes the file;
 `missing_ok=True` means "don't raise an error if it's already gone,"

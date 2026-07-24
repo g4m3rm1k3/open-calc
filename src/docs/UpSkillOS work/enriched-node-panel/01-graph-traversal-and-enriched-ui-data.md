@@ -109,7 +109,6 @@ for (const [a, b] of EDGES) {
 This block now computes all four structures in a single pass over 2,137 edges. `ADJ` is still used by the hover highlight logic further down the file. `IMPORTS_CNT` and `IMPORTED_BY` are still the count arrays. `IMPORTS_FROM[i]` is a new array of node indices that node `i` imports. `IMPORTED_BY_IDX[i]` is a new array of node indices that import node `i`.
 
 ### Mechanical Walkthrough
-
 Enumerating every element in the new block, in order:
 
 - `Array.from({ length: NODES.length }, () => [])` — **(b) `Array.from` with a mapping function, hard concept reappearing from the previous lesson.** The two-argument form takes an array-like and a map function; the `{ length: N }` trick creates a sparse array-like object with `.length = N`, and the `() => []` factory is called once per index, producing a *new, independent* empty array for every slot. If you wrote `new Array(N).fill([])` instead, every slot would point to the *same* array object — a classic JavaScript trap.
@@ -135,7 +134,7 @@ Edge [1, 4]: IMPORTS_FROM[1].push(4)    → IMPORTS_FROM[1]    = [4]
              IMPORTED_BY[4]++           → IMPORTED_BY[4]       = 1
 ```
 
-After all 2,137 edges: `IMPORTS_FROM[0]` is a list of every index that `App.jsx` imports (47 entries); `IMPORTED_BY_IDX[0]` is empty — nothing imports `App.jsx`.
+- After all 2,137 edges: `IMPORTS_FROM[0]` is a list of every index that `App.jsx` imports (47 entries); `IMPORTED_BY_IDX[0]` is empty — nothing imports `App.jsx`.
 
 ### CS Lens
 

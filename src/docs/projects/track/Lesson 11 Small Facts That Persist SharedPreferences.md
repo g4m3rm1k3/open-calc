@@ -193,12 +193,12 @@ This is the whole new file — the `onCreate` override, `setContentView`,
 validation pattern reused for a single field instead of three.
 
 ### Mechanical Walkthrough
-
 - `getSharedPreferences("pocket_inventory_prefs", MODE_PRIVATE)` —
   **first appearance.** Returns a `SharedPreferences` object backed by
   a small file the OS manages on the device's internal storage, named
   by the first argument — an app can have multiple named preference
-  files, though this project only needs one. `MODE_PRIVATE` — **first
+- files, though this project only needs one.
+- `MODE_PRIVATE` — **first
   appearance** — means this file is only readable by your own app
   (the only mode generally recommended; other modes historically
   allowed cross-app sharing and are now deprecated for security
@@ -208,17 +208,17 @@ validation pattern reused for a single field instead of three.
   work — a string key, a required default for when the key has never
   been set (true the very first time the app ever runs).
 - `String.valueOf(currentThreshold)` — **first appearance.** Converts a
-  primitive `int` into a `String` — the reverse direction of
+- primitive `int` into a `String` — the reverse direction of
   `Integer.parseInt`, needed here because `EditText.setText` expects a
   `CharSequence`/`String`, not an `int`.
 - `prefs.edit()` — **first appearance.** `SharedPreferences` itself is
-  read-only; writing requires a separate `Editor` object — a
+- read-only; writing requires a separate `Editor` object — a
   deliberate split, explained below in the SE Lens.
 - `editor.putInt("low_stock_threshold", threshold)` — **first
   appearance.** Stages a value to be written — critically, **this call
   alone does not save anything yet**.
 - `editor.apply()` — **first appearance.** Commits every staged
-  `put...` call to disk, asynchronously, in the background — the call
+- `put...` call to disk, asynchronously, in the background — the call
   returns immediately without waiting for the write to finish.
 - The `try`/`catch` around `Integer.parseInt(text)` — **reappearing**,
   the exact mechanism from Lesson 9, applied to a single field instead
@@ -342,9 +342,8 @@ roughly equal halves through mutual constraint rather than a fixed
 pixel split.
 
 ### Mechanical Walkthrough
-
 - `app:layout_constraintEnd_toStartOf="@id/addItemButton"` and its
-  mirror `app:layout_constraintStart_toEndOf="@id/settingsButton"` —
+- mirror `app:layout_constraintStart_toEndOf="@id/settingsButton"` —
   **first appearance of this specific pairing**, though each individual
   constraint direction is reappearing (Lesson 5/9's sibling-anchoring):
   two views each constrained to the *other's* facing edge is what
@@ -461,9 +460,8 @@ Adapter — deliberately placed in `onResume`, not `onCreate`, since
 returning from `SettingsActivity` after changing the value.
 
 ### Mechanical Walkthrough
-
 - `settingsButton.setOnClickListener(...)`, `startActivity(new Intent(...))`
-  — reappearing, same pattern as `addButton`/`ItemDetailActivity`
+- — reappearing, same pattern as `addButton`/`ItemDetailActivity`
   navigation.
 - `onResume()` override — **reappearing** from Lesson 5's lifecycle
   logging lab, now doing real work for the first time: this is the
@@ -473,7 +471,7 @@ returning from `SettingsActivity` after changing the value.
   `onCreate` does not.
 - `getSharedPreferences(...)`, `prefs.getInt(...)` — reappearing, from
   earlier this lesson, now read from the *reading* side (`InventoryActivity`)
-  rather than the writing side (`SettingsActivity`) — same file, same
+- rather than the writing side (`SettingsActivity`) — same file, same
   key, two different Activities agreeing on both strings by convention,
   not by any compiler-checked contract (worth flagging as a real, sharp
   edge — a typo in either key string would silently read the default
@@ -483,7 +481,7 @@ returning from `SettingsActivity` after changing the value.
 - `private int lowStockThreshold = 5;` in `InventoryAdapter` —
   reappearing (field with initializer, Lesson 5).
 - `void setLowStockThreshold(int threshold) { this.lowStockThreshold = threshold; notifyDataSetChanged(); }`
-  — **first appearance of `notifyDataSetChanged()`** in the real
+- — **first appearance of `notifyDataSetChanged()`** in the real
   project (mentioned but not used in Lesson 10). Unlike
   `notifyItemInserted`, which named one specific row, this tells
   `RecyclerView` "assume every row's appearance might now be different"
@@ -493,7 +491,7 @@ returning from `SettingsActivity` after changing the value.
 - `item.getQuantity() <= lowStockThreshold` — reappearing (`Item`
   getter, Lesson 7; `<=` comparison, already basic).
 - `holder.itemDetailText.setTextColor(android.graphics.Color.RED)` /
-  `.setTextColor(android.graphics.Color.BLACK)` — **first appearance.**
+- `.setTextColor(android.graphics.Color.BLACK)` — **first appearance.**
   `Color.RED`/`Color.BLACK` are predefined integer color constants;
   `setTextColor` applies one to a `TextView`'s text directly from Java,
   the runtime counterpart to a color you could otherwise only set in

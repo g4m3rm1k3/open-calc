@@ -173,11 +173,10 @@ the way back out, which is also how you'll be able to tell parsing
 worked correctly: the printed output should look identical to before.
 
 ### Mechanical Walkthrough
-
 - `Student Table::parseLine(const std::string& line) const` — reuses
   the `Table::` definition pattern and `const` member-function syntax
   from Lesson 4 (basic reuse); the only new part is that this one is
-  `private` — never called from `mydb.cpp`, only from inside `Table`
+- `private` — never called from `mydb.cpp`, only from inside `Table`
   itself.
 - `line.find(',')` — **first appearance.** A member function on
   `std::string` (reusing the general idea of calling a member function
@@ -450,20 +449,20 @@ now *is* the filtered version, and the intermediate `.tmp` file no
 longer exists under that name.
 
 ### Mechanical Walkthrough
-
 - `std::string tempFilename = filename + ".tmp";` — **first appearance**
-  of `+` on two `std::string`s — string concatenation, building a new
+- of `+` on two `std::string`s — string concatenation, building a new
   filename by appending `.tmp` to the table's real filename.
 - `std::ofstream out(tempFilename);` — reuses `ofstream` from Lesson 1
   (basic reuse), just opening a different, temporary filename instead
-  of `filename` directly — the whole point being that `filename` itself
+- of `filename` directly — the whole point being that `filename` itself
   is never opened for writing during this rebuild.
 - `if (s.id != id)` — reuses `if` and introduces `!=` (not-equal
   comparison) as a small, easily-inferred sibling of the `==` idea
   implied by "matching" — genuinely basic, not owed a full explanation
   on its own.
 - `std::remove(filename.c_str())` — **first appearance.** Deletes the
-  file at the given path. `.c_str()` — **first appearance** — converts
+- file at the given path.
+- `.c_str()` — **first appearance** — converts
   a `std::string` into the raw C-style string type this older function
   expects; you'll see `.c_str()` again anywhere a function predates
   `std::string` in C++'s history, which several parts of the standard
@@ -770,7 +769,6 @@ id — and instead of the program silently doing nothing or crashing, the
 `catch` block reports exactly what went wrong.
 
 ### Mechanical Walkthrough
-
 - `bool found = false;`, `found = true;` — plain boolean bookkeeping;
   `bool` is new by name but the idea (a variable that's one of two
   states) is already familiar from every `if` condition since
@@ -783,7 +781,7 @@ id — and instead of the program silently doing nothing or crashing, the
 - `throw std::runtime_error("...")` — **first appearance** of `throw`
   in the real project, reusing the exact pattern from the lab: build a
   `std::runtime_error` with a message, and abandon normal execution.
-  `#include <stdexcept>` — **first appearance** of this header, which
+- `#include <stdexcept>` — **first appearance** of this header, which
   declares `std::runtime_error`.
 - `Table::update(int id, const Student& newData)` — its whole body is
   **a hard concept reappearing**, per the Repetition Rule: the same
@@ -791,7 +789,7 @@ id — and instead of the program silently doing nothing or crashing, the
   just taught in full, applied to *replacing* one record's contents
   instead of omitting it. The one genuinely new line inside it is the
   `newData.id << "," << newData.name ...` branch, which reuses member
-  access and `<<` chaining you've had since Lesson 2 — no new syntax,
+- access and `<<` chaining you've had since Lesson 2 — no new syntax,
   just a new use of the pattern.
 - `try { ... } catch (const std::runtime_error& e) { ... }` — reuses the
   exact shape from the lab (basic reuse at this point), now wrapped

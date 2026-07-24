@@ -133,19 +133,18 @@ defaults to `"G0"` (matching `MachineState`'s own default motion, Lesson
 prior context, is conventionally a rapid positioning move.
 
 ### Mechanical Walkthrough
-
 - `DEFAULT_MOTION = "G0"` — **(a) first appearance** of a **module-level
   constant** in this file, named rather than inlined, specifically so the
   one place this default is decided is unambiguous and grep-able.
 - `{"motion": DEFAULT_MOTION, **state.position()}` — **(a) first
   appearance** of `**` used in a **dict literal** (distinct from Lesson
-  4's `**` inside f-string math — unrelated meanings sharing one
+- 4's `**` inside f-string math — unrelated meanings sharing one
   character).
   *(Full standalone treatment: ../concepts/python-dict-unpacking.md.)*
   `**state.position()` **unpacks** every key-value pair from
   the dict `state.position()` returns (`x`, `y`, `z`) directly into this
   new, larger dict literal, alongside the explicitly-written `"motion"`
-  key — equivalent to writing `{"motion": ..., "x": ..., "y": ...,
+- key — equivalent to writing `{"motion": ..., "x": ..., "y": ...,
   "z": ...}` by hand, without needing to know or repeat `position()`'s
   exact fields here.
 - `{"motion": command["motion"], **state.position()}` — same unpacking,
@@ -234,7 +233,6 @@ export function groupSegments(points: PathPoint[]): Segment[] {
 ```
 
 ### Mechanical Walkthrough
-
 - `export interface PathPoint { motion: string; x: number; ... }` — **(b)
   reappearing** interface syntax (Lesson 7) and `export` (Lesson 7's
   `vite.config.ts`; *../concepts/javascript-es-modules-import-export.md*),
@@ -247,14 +245,14 @@ export function groupSegments(points: PathPoint[]): Segment[] {
   case** — an empty path produces an empty segment list, not an error or
   a segment with no points.
 - `let current: Segment = { motion: points[0].motion, points:
-  [points[0]] };` — the first segment starts as just the first point,
+- [points[0]] };` — the first segment starts as just the first point,
   tagged with its own motion mode.
 - `if (point.motion !== current.motion)` — **(a) first appearance of the
   actual grouping decision**, ported directly from the reference's
   identical comparison (`mode !== currentSegment.mode`): a change in
   motion mode ends the current run.
 - `current = { motion: point.motion, points: [current.points[current.
-  points.length - 1], point] };` — **(a) the one real, easy-to-miss
+- points.length - 1], point] };` — **(a) the one real, easy-to-miss
   detail, ported faithfully rather than simplified away**: the *new*
   segment starts with **two** points — the *last* point of the segment
   that just ended, plus this new one — not just the new point alone.
@@ -468,7 +466,6 @@ function drawPath(points: PathPoint[]) {
 ```
 
 ### Mechanical Walkthrough
-
 - `import { groupSegments, type PathPoint } from "./segments.ts";` —
   **(a) first appearance** of an **inline type-only import specifier**.
   *(Full standalone treatment: ../concepts/typescript-type-only-import.md.)*
@@ -498,14 +495,14 @@ function drawPath(points: PathPoint[]) {
   (`condition ? ifTrue : ifFalse`) in this project.
   *(Full standalone treatment: ../concepts/ternary-conditional-operator.md.)*
   A compact
-  `if`/`else` that produces a *value* rather than executing a block —
+- `if`/`else` that produces a *value* rather than executing a block —
   read as "if this segment's motion is `G0`, the color is rapid red;
   otherwise, it's feed green" — a direct, one-line port of the
   reference's own identical ternary (`seg.mode === "G00" ? colors.rapid :
   channelColor`), simplified since this project has no channel-based
   color variation yet.
 - The rest of the loop body (`BufferGeometry`, `LineBasicMaterial`,
-  `THREE.Line`, `pathGroup.add`) — **(c) already established** (Lesson
+- `THREE.Line`, `pathGroup.add`) — **(c) already established** (Lesson
   8), now run once *per segment* instead of once for the whole path.
 
 ### CS Lens

@@ -124,17 +124,17 @@ The function now sends one real broadcast packet to every device on
 this network segment — but doesn't yet collect any replies.
 
 ### Mechanical Walkthrough
+- `import socket`, `import time` — reminders.
+- `def discover(timeout=2):` — default argument, reminder.
+- `with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:` — Lesson 21, reminder.
+- `s.setsockopt( socket.SOL_SOCKET, socket.SO_BROADCAST, 1)` — the concept from this
 
-`import socket`, `import time` — reminders. `def discover(timeout=2):`
-— default argument, reminder. `with socket.socket(socket.AF_INET,
-socket.SOCK_DGRAM) as s:` — Lesson 21, reminder. `s.setsockopt(
-socket.SOL_SOCKET, socket.SO_BROADCAST, 1)` — the concept from this
 unit's lab, reused for real; the same `setsockopt` mechanism Lesson 19
 used for `SO_REUSEADDR`, a different option here. `s.settimeout(
-timeout)` — Lesson 21, reminder — genuinely essential here, since
+- timeout)` — Lesson 21, reminder — genuinely essential here, since
 there's no way to know in advance how many replies (if any) will come
 back, or when the last one has arrived. `s.sendto(b"DISCOVER",
-("192.0.2.255", 65500))` — Lesson 21's `sendto()`, reminder, targeting
+- ("192.0.2.255", 65500))` — Lesson 21's `sendto()`, reminder, targeting
 a broadcast address (`.255`, the highest address in this `/24` subnet
 — a real networking convention, not this lesson's invention) instead of
 one specific host.

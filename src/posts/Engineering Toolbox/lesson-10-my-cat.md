@@ -89,11 +89,12 @@ command line, minus its own script name — but does nothing with them
 yet.
 
 ### Mechanical Walkthrough
+- `import sys` — reminder-style import, first use of the `sys` module specifically.
+- `def main():` — assuming function definitions as basic;
 
-`import sys` — reminder-style import, first use of the `sys` module
-specifically. `def main():` — assuming function definitions as basic;
 worth noting `main` as a name is just a convention here, not a special
-Python keyword, unlike some other languages. `args = sys.argv[1:]` —
+- Python keyword, unlike some other languages.
+- `args = sys.argv[1:]` —
 the `sys.argv` concept from this unit's lab, reused for real; `[1:]` is
 slicing (Lesson 61, reminder) — everything from index 1 onward, which
 is every argument *except* the script's own name.
@@ -215,17 +216,19 @@ def main():
 next unit fixes a real, visible flaw in how it prints each piece.
 
 ### Mechanical Walkthrough
+- `def cat_file(path):` — basic.
+- `with open(path) as f:` — reminder.
+- `while True:` — first appearance of an intentionally infinite loop, relying entirely on the `break` inside it to end — a different loop
 
-`def cat_file(path):` — basic. `with open(path) as f:` — reminder.
-`while True:` — first appearance of an intentionally infinite loop,
-relying entirely on the `break` inside it to end — a different loop
 shape from every `for` loop used so far, worth naming since nothing
 about `while True:` on its own limits how many times it runs.
-`chunk = f.read(4096)` — the concept from this unit's lab, reused for
+- `chunk = f.read(4096)` — the concept from this unit's lab, reused for
 real, `4096` chosen as a conventional, reasonably-sized chunk (matching
 common OS disk-read block sizes — not a magic number, a real
-convention). `if not chunk: break` — the empty-string-as-sentinel
-concept from the lab, reused for real. `print(chunk)` — basic, though
+- convention).
+- `if not chunk: break` — the empty-string-as-sentinel concept from the lab, reused for real.
+- `print(chunk)` — basic, though
+
 the next unit shows exactly why this line alone isn't quite right yet.
 
 ### CS Lens
@@ -338,8 +341,7 @@ newlines inserted between chunks — the file's own actual line breaks
 (wherever they land inside a chunk) are the only ones that appear.
 
 ### Mechanical Walkthrough
-
-`print(chunk, end="")` — the concept from this unit's lab, reused for
+- `print(chunk, end="")` — the concept from this unit's lab, reused for
 real.
 
 ### CS Lens
@@ -466,17 +468,17 @@ final bare `main()` call is what actually runs the program when the
 script executes (nothing ran automatically before this line existed).
 
 ### Mechanical Walkthrough
+- `if not args:` — `args` is a list; an empty list is `False`-y, the same "emptiness is falsy" idea `if not chunk:` already used this lesson —
 
-`if not args:` — `args` is a list; an empty list is `False`-y, the same
-"emptiness is falsy" idea `if not chunk:` already used this lesson —
 worth the explicit connection. `for line in sys.stdin: print(line,
-end="")` — `sys.stdin` from this unit's lab, reused for real; `end=""`
-reused from the previous unit — lines from `sys.stdin` already include
+- end="")` — `sys.stdin` from this unit's lab, reused for real; `end=""` reused from the previous unit — lines from `sys.stdin` already include
+
 their own newline, same as any file's lines, so no extra one is added.
-`for path in args: cat_file(path)` — basic loop, calling the function
+- `for path in args: cat_file(path)` — basic loop, calling the function
 built earlier once per argument — this is what makes multiple files
 concatenate: each call continues printing right where the last left
-off. `main()` — the bare call at the very bottom, already-basic function
+- off.
+- `main()` — the bare call at the very bottom, already-basic function
 invocation, called out because without it, everything above would be
 defined but never actually executed.
 

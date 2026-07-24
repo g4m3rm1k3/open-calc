@@ -121,12 +121,13 @@ import { LABS } from "./labs/labRegistryLoader.js";   // ← new import
 whole once both pieces exist.)
 
 #### Mechanical Walkthrough
+- `LABS` — the array from Lesson 1's loader, already established.
+- `.filter(...)` — this unit's new method.
+- `(lab) => lab.routes` — an arrow function
 
-`LABS` — the array from Lesson 1's loader, already established. `.filter(...)`
-— this unit's new method. `(lab) => lab.routes` — an arrow function
 (already-established syntax) whose body is a bare property access,
 relying on JavaScript's own truthy/falsy rules (an array is truthy, `undefined`
-is falsy) rather than an explicit `!== undefined` check — this is idiomatic
+- is falsy) rather than an explicit `!== undefined` check — this is idiomatic
 but worth naming explicitly: it works here specifically because no lab
 would ever legitimately set `routes` to something else falsy (`0`, `''`),
 so the shortcut is safe.
@@ -143,7 +144,7 @@ flagged messages.
 
 `.filter()` always does a full linear pass and always allocates a new
 array, even if only one element matches. For 41 labs, that cost is
-unmeasurable. The alternative — pre-splitting `LABS` into two arrays
+- unmeasurable. The alternative — pre-splitting `LABS` into two arrays
 (routed and non-routed) once, at the loader level, instead of filtering on
 every render — would be a legitimate future optimization if this list ever
 grew by orders of magnitude; not worth the added complexity at today's
@@ -232,23 +233,26 @@ two; `.flatMap()` merges every lab's contribution into one flat list
 `<Routes>` renders directly.
 
 #### Mechanical Walkthrough
+- `.flatMap((lab) => ...)` — this unit's new method, applied to the already-filtered array.
+- `lab.routes.map((path) => (...))` — plain
 
-`.flatMap((lab) => ...)` — this unit's new method, applied to the
-already-filtered array. `lab.routes.map((path) => (...))` — plain
 `.map()` (already established, `lesson-engine-autofind/02-...md`),
-producing one `<Route>` per path string. `key={path}` — the path string
+- producing one `<Route>` per path string.
+- `key={path}` — the path string
 itself, already guaranteed unique across all labs (two different labs
 can't legitimately claim the same URL), used as React's required list
-key — same requirement `adding-a-taskbar-component/01-...md` already
+- key — same requirement `adding-a-taskbar-component/01-...md` already
 covered for list rendering, reappearing here with a string key instead of
-an index. `path.replace(/^\//, '')` — a regex-based string replace,
+- an index.
+- `path.replace(/^\//, '')` — a regex-based string replace,
 **already taught** in `lesson-engine-autofind/02-...md`'s
-`path.replace(/^\.\/content\//, '')` — reminder only: `/^\//` matches a
+- `path.replace(/^\.\/content\//, '')` — reminder only: `/^\//` matches a
 single leading `/` and replaces it with nothing, because every route in
 this codebase's `<Route>` elements is written without a leading slash
 (`path="cnc-sim"`, not `path="/cnc-sim"`), while this lesson's `meta.js`
 `routes` arrays use a leading slash for consistency with each lab's own
-`path` field. `element={<lab.component />}` — this unit's sibling
+- `path` field.
+- `element={<lab.component />}` — this unit's sibling
 concept, covered next.
 
 #### CS Lens
@@ -266,7 +270,7 @@ async results into one continuation.
 
 Reaching for `.map()` first and only noticing the nested-array problem
 once it renders wrong is a completely normal way to discover you need
-`.flatMap()` instead — the fix is a one-word method rename, not a
+- `.flatMap()` instead — the fix is a one-word method rename, not a
 restructure, precisely because `.flatMap()` is defined as "map, then
 flatten one level," not a different algorithm. Knowing the method exists
 up front, as this unit does, avoids that specific debugging detour.
@@ -383,14 +387,13 @@ Every other field is exactly what Lesson 1 produced — this lesson only
 adds two fields, to a file that already existed.
 
 #### Mechanical Walkthrough
-
-`import { lazy } from 'react'` — a new import in this specific file (this
+- `import { lazy } from 'react'` — a new import in this specific file (this
 exact `lazy` function was already used throughout `App.jsx` before this
 lesson touched it, so the *concept* isn't new, only its new home). `lazy(() => import('./CSSMasteryPage.jsx'))`
-— unchanged from how `App.jsx` used to write this line; only its
+- — unchanged from how `App.jsx` used to write this line; only its
 location moved, from `App.jsx` to the lab's own folder. This is worth
 being precise about: `meta.js` is loaded *eagerly* (Lesson 1's
-`import.meta.glob(..., { eager: true })`) — but `lazy(...)` merely
+- `import.meta.glob(..., { eager: true })`) — but `lazy(...)` merely
 *wraps* a function; the `import()` call inside it doesn't actually run
 until React tries to render `<lab.component />` for real. Eagerly loading
 the *wrapper* does not eagerly load the *component* — those are two
@@ -412,7 +415,7 @@ Storing `component` as a field on the same object as `label`/`emoji`/`tags`
 keeps one lab's *entire* description — display facts and runtime
 behavior alike — in one file, which is the whole point of this two-lesson
 effort. The honest cost: `meta.js` is no longer purely serializable data
-(a `lazy(...)` wrapper isn't JSON-safe) — a minor conceptual shift from
+- (a `lazy(...)` wrapper isn't JSON-safe) — a minor conceptual shift from
 "this file is just facts" to "this file is facts plus one function
 reference," worth naming rather than glossing over.
 
@@ -429,11 +432,11 @@ lookup required.
 
 One request, traced end to end: a user navigates to
 `/web-learn/css-mastery`. React Router matches it against the generated
-route list — produced by `LABS.filter((lab) => lab.routes)` narrowing 41
+- route list — produced by `LABS.filter((lab) => lab.routes)` narrowing 41
 labs to 17, then `.flatMap(...)` turning each of their `routes` arrays
 into one flat list of `<Route>` elements, one of which has
 `path="web-learn/css-mastery"` because `css-mastery/meta.js`'s `routes`
-field says so. That matched route's `element` is `<lab.component />` —
+- field says so. That matched route's `element` is `<lab.component />` —
 `lab.component` is the very `lazy(() => import('./CSSMasteryPage.jsx'))`
 value sitting in that same `meta.js`, evaluated as a component reference
 because JSX treats any dotted member expression that way. React's
@@ -445,7 +448,7 @@ never named `CSSMasteryPage` at any point in this trace.
 ## What Breaks Without This
 
 Reverting `.flatMap()` to plain `.map()` and rendering the result
-directly inside `<Routes>` reproduces a real error — verified this
+- directly inside `<Routes>` reproduces a real error — verified this
 session:
 
 ```
@@ -453,7 +456,7 @@ Warning: React.jsx: type is invalid -- expected a string ... but got: object.
 ```
 
 `<Routes>` expects each child to be a `<Route>` element (or `null`/
-fragments of them) — with plain `.map()`, `css-mastery` and every other
+- fragments of them) — with plain `.map()`, `css-mastery` and every other
 two-route lab would contribute a *nested array* of two `<Route>`s
 instead of two siblings, and React does not automatically flatten
 JSX children nested that deeply through an intermediate array-of-arrays;
@@ -469,7 +472,7 @@ to fix it after.
       consts or their hand-written `<Route>` blocks
 - [ ] The generated block —
       `{LABS.filter((lab) => lab.routes).flatMap((lab) => lab.routes.map((path) => <Route key={path} path={path.replace(/^\//, '')} element={<lab.component />} />))}`
-      — sits in `<Routes>` where those seventeen blocks used to be
+- — sits in `<Routes>` where those seventeen blocks used to be
 - [ ] All six spot-checked routes (`web-learn/css-mastery`, `cnc-sim`,
       `learn/sicp`, `lesson-builder`, `chemistry`, `five-axis`) load with
       real content and zero console errors — verified live, this session

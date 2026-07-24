@@ -81,23 +81,22 @@ props, the `block-info-${kind}` class, the value `<span>`) — only the
 label now renders an icon before its text, chosen by `kind`.
 
 ### Mechanical Walkthrough
-
 - `Record<string, React.ReactNode>` — **reappearing** `Record<>` (first
-  taught `App.tsx`'s `VIEW_LABELS: Record<ViewId, string>`, Lesson 27) —
+- taught `App.tsx`'s `VIEW_LABELS: Record<ViewId, string>`, Lesson 27) —
   the only new wrinkle is the *value* type: `React.ReactNode` (anything
-  React can render — an element, a string, `null`), not `string`, so
+- React can render — an element, a string, `null`), not `string`, so
   this lookup's values are real JSX elements, not labels.
 - `React.ReactNode` used with no `import React from "react"` anywhere
-  in this file — **first appearance of this specific detail**: `@types/
+- in this file — **first appearance of this specific detail**: `@types/
   react`'s own type declarations include `export as namespace React;`,
   which makes the `React` namespace available as an ambient, global
   type reference project-wide the moment *any* file imports anything
-  from `"react"` (this file already does, for `useEffect`/`useState`) —
+- from `"react"` (this file already does, for `useEffect`/`useState`) —
   no separate import of `React` itself is required to reference
   `React.ReactNode` as a type.
 - `{INFO_ICONS[kind] || <Settings size={12} />}` — **reappearing**
   bracket-lookup-with-`||`-fallback (the concept file's own isolated
-  example already demonstrates this exact idiom) — `kind` values this
+- example already demonstrates this exact idiom) — `kind` values this
   project doesn't have a mapped icon for (there are none today; every
   real kind has an entry) would fall back to a generic gear icon rather
   than rendering nothing.
@@ -348,13 +347,13 @@ First appearance in this project — full standalone treatment:
 ```
 
 ### Mechanical Walkthrough
-
 The three base pseudo-elements are fully covered in `concepts/custom-
 scrollbar-styling.md`. `:hover` chained onto `::-webkit-scrollbar-
 thumb` is **reappearing** (`:hover` itself, already used throughout
 this project's CSS) — the new detail is only that it's chained onto a
 vendor-prefixed pseudo-element, which works exactly like chaining it
-onto any ordinary selector. `color-mix(in srgb, ...)` — **reappearing**
+- onto any ordinary selector.
+- `color-mix(in srgb, ...)` — **reappearing**
 (Lesson 40).
 
 ### CS Lens / SE Lens
@@ -413,11 +412,10 @@ side panels) already has.
 ```
 
 ### Mechanical Walkthrough
-
 `AnimatePresence`, `motion.div`, and its `initial`/`animate`/`exit`/
-`transition` props are all **reappearing** — the exact mechanism
+- `transition` props are all **reappearing** — the exact mechanism
 Lesson 39 gave full first-time treatment (there, animating `x` for a
-slide; here, animating `height`/`opacity` for a collapse) — no new
+- slide; here, animating `height`/`opacity` for a collapse) — no new
 construct, a different property being animated. Two real, small
 wrinkles worth naming directly, per the Repetition Rule, rather than
 silently treating the whole block as identical to Lesson 39's:
@@ -586,8 +584,7 @@ directly editable text, which it isn't (yet — see Lesson 41's own
 "Known Incomplete").
 
 ### Mechanical Walkthrough
-
-Every property in this unit is **reappearing** — `linear-gradient()`,
+- Every property in this unit is **reappearing** — `linear-gradient()`,
 `color-mix()`, `backdrop-filter`/`-webkit-backdrop-filter`, and
 `box-shadow` (including the `inset` variant) were all given full,
 first-time treatment in Lesson 40; `currentColor` (named above) and

@@ -80,12 +80,12 @@ const CANVAS_H = 1600
 ```
 
 #### Mechanical Walkthrough
-
 `fabric.Canvas`'s own `width`/`height` options (set at construction,
 Lesson 2) control the drawing surface's real size — 2400×1600 now,
 regardless of how much of that is visible at once. The wrapping
 `<div>` with `overflow: auto` and a fixed `height: '65vh'` is what's
-actually visible — a viewport, not the page itself. `65vh` (65% of the
+- actually visible — a viewport, not the page itself.
+- `65vh` (65% of the
 viewport's height) is a relative unit, so this viewport resizes
 sensibly across differently-sized floating windows rather than being
 one fixed pixel value that's too small on a big monitor or too large
@@ -211,16 +211,15 @@ Scroll actually changed (panned): true
 ```
 
 #### Mechanical Walkthrough
-
-The fix routes through `canvas.on('mouse:down', ...)` — established
+- The fix routes through `canvas.on('mouse:down', ...)` — established
 since Lesson 2 — instead of a native listener on the ref. Fabric's own
 event system already listens on whichever element actually receives
 clicks (the upper canvas) internally, and hands you a normalized event
 object (`opt`) with `opt.e` as an escape hatch back to the real
-browser `MouseEvent` — `opt.e.clientX`/`clientY` are exactly what a
+- browser `MouseEvent` — `opt.e.clientX`/`clientY` are exactly what a
 native listener would have given you, just reached through fabric's
 wrapper instead of around it. Everything downstream — tracking a
-start position, listening for `window`-level `mousemove`/`mouseup` —
+- start position, listening for `window`-level `mousemove`/`mouseup` —
 is the same drag shape `StickyNote.jsx` already uses to drag its own
 card around, just driving `scrollLeft`/`scrollTop` instead of a CSS
 position.
@@ -333,8 +332,7 @@ Scroll after:  { left: 150, top: 150 }
 ```
 
 #### Mechanical Walkthrough
-
-`tool === 'select' ? 'auto' : 'none'` — the note's content box is only
+- `tool === 'select' ? 'auto' : 'none'` — the note's content box is only
 genuinely clickable while the Select tool is active; every other tool
 (Pan, Pen, Marker, Eraser, Text, Note) now passes clicks straight
 through it to the canvas beneath, the same as Lesson 3's
@@ -393,7 +391,7 @@ native scrollbars alone already let a user navigate a page bigger than
 their screen. The Pan tool (second unit) adds drag-anywhere panning on
 top of that, discovered along the way that fabric's own interactive
 surface is a *second*, invisible canvas layered on top of the one held
-in `canvasElRef` — meaning the drag has to be wired through fabric's
+- in `canvasElRef` — meaning the drag has to be wired through fabric's
 own event system, not a native listener on the wrong element. Placing
 a markdown note (Lesson 5) on a page and then trying to pan near it
 surfaced a second, unrelated bug (third unit): the note's own
@@ -437,7 +435,7 @@ wrong element.
       wired through `canvas.on('mouse:down', ...)`, not a native
       listener on `canvasElRef.current`
 - [ ] `MarkdownNote`'s interactive content box is only `pointerEvents: 'auto'`
-      while `tool === 'select'` — every other tool passes clicks
+- while `tool === 'select'` — every other tool passes clicks
       through it to the canvas
 - [ ] The overlay position-sync effect also re-runs on `scroll`
       (capture phase), so notes stay glued to their anchor while

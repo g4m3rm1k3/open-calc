@@ -155,18 +155,17 @@ Executor::Executor(Table& table) : table(table) {}
 ```
 
 ### Mechanical Walkthrough
-
 - `Table& table;` as a private member — **first appearance** of a
   *reference member*: unlike every earlier member variable in this
   project (`Table::filename`, `Parser::pos`), this one doesn't hold its
-  own value — it refers to a `Table` that belongs to someone else.
+- own value — it refers to a `Table` that belongs to someone else.
 - `Executor(Table& table);` — the constructor takes a reference
   parameter, exactly like `Table::insert(const Student& s)` already did
   (Level 1 Lesson 4) — reused, not new.
 - `Executor::Executor(Table& table) : table(table) {}` — reuses the
   member-initializer-list pattern (Level 1 Lesson 4), with one hard
   requirement worth naming: a reference member *must* be initialized in
-  the initializer list — unlike an `int` or `std::string` member, it
+- the initializer list — unlike an `int` or `std::string` member, it
   cannot be left uninitialized and assigned later in the constructor
   body, because a reference has to refer to something from the moment
   it exists; there's no such thing as a reference that doesn't yet
@@ -308,21 +307,20 @@ prints each one, skipping any that don't match an optional `WHERE`
 filter — currently limited, honestly, to filtering by `id` alone.
 
 ### Mechanical Walkthrough
-
 - `Student s; s.id = std::stoi(stmt.values[0].text); ...` — reuses
   `struct` field assignment (Level 1 Lesson 2) and `std::stoi` (Level 1
   Lesson 5) exactly — this is the debt Level 2 Lesson 2 explicitly
   deferred, paid off here in three lines.
 - `table.insert(s);` — reuses `Table::insert` (Level 1 Lesson 4/5,
-  frozen since Lesson 6) — the actual moment `sql/` and `storage/`
+- frozen since Lesson 6) — the actual moment `sql/` and `storage/`
   connect for the first time in this project's history.
 - `table.selectAll()` — reuses `Table::selectAll` identically.
 - `if (stmt.where.column != "id") { throw ...; }` — reuses `!=` and
-  `throw`/`std::runtime_error` — an honest, explicit refusal rather
+- `throw`/`std::runtime_error` — an honest, explicit refusal rather
   than a silent wrong answer, the same principle Level 2 Lesson 2's
   lexer error and this project's every other `throw` has followed.
 - `if (s.id != filterId) { continue; }` — reuses `continue` (Level 1
-  Lesson 5) — skipping a non-matching student without an `else`
+- Lesson 5) — skipping a non-matching student without an `else`
   wrapped around the print line below it.
 
 ### CS Lens
@@ -499,20 +497,19 @@ header diagram at the top of every lesson in this level has been
 describing all along.
 
 ### Mechanical Walkthrough
-
 - `tokens[0].type == TokenType::KEYWORD && tokens[0].text == "SELECT"`
-  — reuses `&&` and `==` (Level 2 Lessons 1–2) — checking the very
+- — reuses `&&` and `==` (Level 2 Lessons 1–2) — checking the very
   first token directly, by index, rather than through any of `Parser`'s
   own lookahead methods (`checkKeyword`, Lesson 4), since no `Parser`
   has even been constructed yet at this point — deciding *which*
   parsing rule to use has to happen *before* parsing starts.
 - `else if (tokens[0].type == TokenType::KEYWORD && tokens[0].text ==
-  "INSERT")` — reuses `else if` (Level 1 Lesson 6).
+- "INSERT")` — reuses `else if` (Level 1 Lesson 6).
 - `executor.executeSelect(parser.parseSelect());` — **first
   appearance** of directly nesting one function's return value straight
   into another call's argument, rather than storing it in a named
   variable first (contrast with Level 2 Lesson 3's `SelectStatement
-  stmt = parser.parseSelect(); ...` in two steps) — a small stylistic
+- stmt = parser.parseSelect(); ...` in two steps) — a small stylistic
   choice, safe here because the intermediate `SelectStatement` value
   isn't needed for anything else.
 

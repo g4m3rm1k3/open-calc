@@ -63,7 +63,6 @@ whatever the wizard generated; `themes.xml`'s existing `Theme.PocketInventory`
 style (Lesson 21) gains three `<item>` overrides pointing at them.
 
 ### Mechanical Walkthrough
-
 - `<color name="brandPrimary">#2E5945</color>` — reappearing resource-
   declaration shape (`<color name="...">`, present since Lesson 1's
   wizard-generated file, never explained until now): a named color
@@ -72,7 +71,7 @@ style (Lesson 21) gains three `<item>` overrides pointing at them.
 - `<item name="colorPrimary">@color/brandPrimary</item>` — **first
   appearance of theme attribute overriding.** `colorPrimary` is one of
   a fixed set of *theme attribute names* Material Components looks for
-  by convention — every Material widget in this project (the `Toolbar`,
+- by convention — every Material widget in this project (the `Toolbar`,
   Lesson 21; every `Button`; the `FloatingActionButton`) automatically
   colors itself using whichever concrete color these named attributes
   currently resolve to, without any individual widget's XML naming a
@@ -143,7 +142,6 @@ A whole new file, at a whole new path — `res/values-night/colors.xml`
 `themes.xml` or anywhere else in the project changes at all.
 
 ### Mechanical Walkthrough
-
 - `res/values-night/` — **first appearance of a resource qualifier
   folder** in this project, though the underlying mechanism has been
   implicit since Lesson 3: `-night` is a **configuration qualifier**
@@ -154,7 +152,7 @@ A whole new file, at a whole new path — `res/values-night/colors.xml`
   project ships, without a single `if` statement anywhere in your Java
   code.
 - Identical `<color name="brandPrimary">...</color>` declarations,
-  different values — **the entire mechanism.** `@color/brandPrimary`,
+- different values — **the entire mechanism.** `@color/brandPrimary`,
   referenced from `themes.xml`, resolves to `#2E5945` in light mode and
   `#5B8F73` in dark mode, automatically, based purely on which folder
   the OS currently considers active — no Java code anywhere decides
@@ -226,9 +224,8 @@ attribute, removing whatever individually-duplicated sizing/casing
 attributes previously existed on each one.
 
 ### Mechanical Walkthrough
-
 - `<style name="PrimaryActionButton" parent="Widget.MaterialComponents.Button">`
-  — **first appearance of a `<style>` resource** — a **named bundle of
+- — **first appearance of a `<style>` resource** — a **named bundle of
   attribute values**, inheriting from a base style (`parent="..."`,
   the same inheritance idea as Lesson 2's `extends`, applied to XML
   resources instead of Java classes) and overriding specific ones.
@@ -237,7 +234,7 @@ attributes previously existed on each one.
   layout attribute rather than a theme-wide color role.
 - `style="@style/PrimaryActionButton"` on a `<Button>` — **first
   appearance of applying a style.** A single attribute now supplies
-  every value the `<style>` bundle declares — a real, direct DRY
+- every value the `<style>` bundle declares — a real, direct DRY
   improvement, the XML-resource equivalent of Lesson 17's
   `ItemRepository` extraction: repeated configuration pulled into one
   place, referenced everywhere it's needed.
@@ -377,7 +374,6 @@ navigating away; otherwise, it falls back to Lesson 19's normal
 single-pane navigation, completely unchanged.
 
 ### Mechanical Walkthrough
-
 - `requireActivity().findViewById(R.id.detailContainer)` — reappearing
   (`findViewById`, Lesson 4), the actual detection mechanism: this
   returns a real `FrameLayout` on a large-screen device (where the
@@ -391,7 +387,7 @@ single-pane navigation, completely unchanged.
   check is how application code discovers, at runtime, which one
   actually got chosen.
 - `new Bundle(); args.putParcelable("item", item); new ItemDetailFragment(); detailFragment.setArguments(args);`
-  — reappearing shapes (`Bundle`/`putParcelable`, Lesson 8;
+- — reappearing shapes (`Bundle`/`putParcelable`, Lesson 8;
   `setArguments`, the manual-Fragment-argument mechanism Lesson 19's
   Safe Args normally generates for you automatically — used directly
   here since this path bypasses the Navigation Component entirely).

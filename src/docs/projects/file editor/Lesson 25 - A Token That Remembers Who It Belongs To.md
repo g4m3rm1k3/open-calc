@@ -137,11 +137,10 @@ above and below that one line, the password verification, the dummy
 timing-attack call from Lesson 17, the response shape, is unchanged.
 
 ### Mechanical Walkthrough
-
-`valid_tokens = {}` — an empty dict literal, the same `{}` syntax
+- `valid_tokens = {}` — an empty dict literal, the same `{}` syntax
 `RUNNERS` used in Lesson 6, but starting empty and growing one entry per
 login rather than being written out whole. `valid_tokens[token] =
-credentials.username` — first appearance of dict assignment in this
+- credentials.username` — first appearance of dict assignment in this
 project: `token` is the key, `credentials.username` is the value being
 attached to it: reusing the exact `ownership["bear"] = "north den"`
 mechanic from this lesson's own lab, now for real.
@@ -306,8 +305,7 @@ looked up, instead of implicitly returning `None`; `write_file` moved
 `current_user`, which now receives that username on every call.
 
 ### Mechanical Walkthrough
-
-`return valid_tokens[token]` — a first appearance of returning a dict
+- `return valid_tokens[token]` — a first appearance of returning a dict
 lookup directly: `token` is already known valid at this point (the line
 above just confirmed `token in valid_tokens`), so `valid_tokens[token]`
 retrieves the username stored there in `login`, and `return` sends it
@@ -317,7 +315,7 @@ reapplied — it now honestly states what the function hands back.
 `current_user: str = Depends(require_auth)` is this lesson's lab
 mechanic, applied for real: FastAPI runs `require_auth` before
 `write_file`'s body, same as the old `dependencies=[...]` form, but now
-assigns its return value — the username — to `current_user`.
+- assigns its return value — the username — to `current_user`.
 
 ### SE Lens — every gated route pays the same setup cost
 

@@ -112,13 +112,15 @@ the same "one honest reading" idea Lesson 5's `memory_usage()` already
 established, applied here to a whole tree instead of one file.
 
 ### Mechanical Walkthrough
-
-`import os` — reminder. `def snapshot(root):` — basic. `state = {}` —
+- `import os` — reminder.
+- `def snapshot(root):` — basic.
+- `state = {}` —
 basic. `for dirpath, dirnames, filenames in os.walk(root):` and `path =
-os.path.join(dirpath, filename)` — Lesson 12, reminder.
-`state[path] = os.path.getmtime(path)` — `os.path.getmtime()` is a
+- os.path.join(dirpath, filename)` — Lesson 12, reminder.
+- `state[path] = os.path.getmtime(path)` — `os.path.getmtime()` is a
+
 small, self-explanatory `os.path` convenience function (same family as
-`os.path.basename`, `os.path.expanduser` — a direct equivalent to
+- `os.path.basename`, `os.path.expanduser` — a direct equivalent to
 reading `os.stat(path).st_mtime` directly, as Lesson 9 did; not given a
 full lab since the idea "os.path has small metadata-reading utility
 functions" is already well established).
@@ -214,14 +216,13 @@ exactly what changed between them — additions, removals, and content
 modifications, as three separate sets.
 
 ### Mechanical Walkthrough
-
 `old_paths = set(old)`, `new_paths = set(new)`, `added = new_paths -
-old_paths`, `removed = old_paths - new_paths`, `common = old_paths &
-new_paths` — all the exact set operations from this lesson's first
+- old_paths`, `removed = old_paths - new_paths`, `common = old_paths & new_paths` — all the exact set operations from this lesson's first
+
 lab, reused for real. `modified = {p for p in common if old[p] !=
-new[p]}` — first appearance of a **set comprehension**: the same
+- new[p]}` — first appearance of a **set comprehension**: the same
 comprehension idea as Lesson 5's list comprehension and Lesson 13's
-dict comprehension, here building a `set` instead — walking every path
+- dict comprehension, here building a `set` instead — walking every path
 present in *both* snapshots and keeping only the ones whose timestamp
 actually changed.
 

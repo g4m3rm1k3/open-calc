@@ -144,18 +144,18 @@ it directly — meaning `accept()` gets called again right away, able to
 accept a second client while the first is still connected.
 
 ### Mechanical Walkthrough
-
-`import threading` — first appearance. `clients = []` — an empty list,
+- `import threading` — first appearance.
+- `clients = []` — an empty list,
 meant to track every currently-connected client — not yet written to.
-`def handle_client(conn, addr):` — a new function, deliberately
+- `def handle_client(conn, addr):` — a new function, deliberately
 separated out so it can be handed to `threading.Thread` as a `target`.
-`server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)` —
+- `server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)` —
 first appearance: a real, practical necessity for this lesson's testing
 — without it, quickly restarting the server on the same port (as
 happens constantly while developing) fails with `Address already in
 use` for a short cooldown period after the previous run; this option
 tells the OS to allow immediate reuse. `thread = threading.Thread(
-target=handle_client, args=(conn, addr))`, `thread.start()` — the
+- target=handle_client, args=(conn, addr))`, `thread.start()` — the
 concept from this unit's lab, reused for real: each accepted connection
 gets its own thread, started immediately, running `handle_client`
 independently of the outer loop.
@@ -327,19 +327,22 @@ failure just demonstrated — but `handle_client` doesn't call it yet,
 and never adds anyone to `clients` in the first place.
 
 ### Mechanical Walkthrough
-
-`clients_lock = threading.Lock()` — first appearance: a **lock** —
+- `clients_lock = threading.Lock()` — first appearance: a **lock** —
 a real object whose entire purpose is letting only one thread at a
-time hold it. `def broadcast(message, sender_conn):` — basic. `with
-clients_lock:` — the `with` concept (Lesson 1) applied to something
+- time hold it.
+- `def broadcast(message, sender_conn):` — basic.
+- `with clients_lock:` — the `with` concept (Lesson 1) applied to something
+
 genuinely new: entering this block *waits* if another thread already
 holds the lock, and guarantees the lock is released when the block
 ends — even if an error occurs inside it, the same unconditional
 guarantee `with` has provided since Lesson 1, now protecting against
-threads instead of resource leaks. `for conn in clients:` — the exact
+- threads instead of resource leaks.
+- `for conn in clients:` — the exact
 iteration from this unit's lab, now happening *only* while the lock is
-held. `if conn is not sender_conn:` — `is not`, identity comparison
-(different from `!=` — checking these are literally the same socket
+- held.
+- `if conn is not sender_conn:` — `is not`, identity comparison (different from `!=` — checking these are literally the same socket
+
 object, not just equal-valued) — so a client never receives its own
 message echoed back. `try: conn.sendall(message) except OSError: pass`
 — Lesson 4's pattern, reused: a client whose connection has gone bad

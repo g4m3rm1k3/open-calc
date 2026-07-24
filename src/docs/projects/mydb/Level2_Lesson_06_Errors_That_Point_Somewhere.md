@@ -389,7 +389,6 @@ that happens to span multiple lines still keeps `line`/`lineStart`
 correct for whatever comes after it.
 
 ### Mechanical Walkthrough
-
 - `int tokenLine = line; int tokenColumn = i - lineStart + 1;` —
   computed once, right before the six single-character checks and the
   three accumulation branches, capturing the position of the *first*
@@ -404,7 +403,7 @@ correct for whatever comes after it.
   token still correctly reports where it *started*, not where the
   accumulation finished.
 - `if (sql[i] == '\n') { line++; lineStart = i + 1; }` inside the
-  string-scanning `while` loop — reuses the exact newline-handling logic
+- string-scanning `while` loop — reuses the exact newline-handling logic
   from the previous unit's top-level check, applied here too so a
   multi-line string doesn't desynchronize position tracking for
   whatever comes after it.
@@ -542,18 +541,17 @@ exactly where the mismatch happened, taken directly from the token that
 failed to match.
 
 ### Mechanical Walkthrough
-
 - `Token t = peek();` at the top of both methods — reuses `peek()`
   (Level 2 Lesson 3) — called once now and reused, rather than calling
   `peek()` again inside the error branch, since the token is needed
   either way (for the position, or to hand to `advance()` on success).
 - `"Parser error at line " + std::to_string(t.line) + ", column " +
-  std::to_string(t.column) + ": " + errorMessage` — reuses `+`
+- std::to_string(t.column) + ": " + errorMessage` — reuses `+`
   concatenation and this lesson's own `std::to_string`, chained across
   four pieces to build one message.
 - Every caller's error-message argument shrank (e.g., `"expected
   table name"` instead of the old `"Parser error: expected table
-  name"`) — the position and the `"Parser error"` prefix are now
+- name"`) — the position and the `"Parser error"` prefix are now
   supplied once, centrally, inside `expect`/`expectKeyword` themselves,
   rather than repeated in every one of `parseSelect`'s five separate
   calls.

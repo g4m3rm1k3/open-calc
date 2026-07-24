@@ -262,7 +262,6 @@ export default Viewport;
 ```
 
 ### Mechanical Walkthrough
-
 - `interface ViewportProps { points: PathPoint[]; }` — **(b) reappearing**
   interface syntax (Lesson 7); **(a) first appearance of the concept of
   props**: the object a component receives as its single argument,
@@ -275,7 +274,7 @@ export default Viewport;
   *(Full standalone treatment: ../concepts/javascript-destructuring.md.)*
   Pulls
   `points` straight out of the incoming props object, rather than writing
-  `props.points` throughout the function body — already-familiar
+- `props.points` throughout the function body — already-familiar
   destructuring syntax (Lesson 6's tuple unpacking, in Python; this is
   its TypeScript/object equivalent), applied to a function parameter for
   the first time in this project.
@@ -284,22 +283,22 @@ export default Viewport;
   *(Full standalone treatment: ../concepts/react-useref-hook.md.)*
   Creates an object with one mutable property,
   `.current`, that **persists across re-renders without itself causing
-  one when changed** — a real, deliberate contrast with `useState`
+- one when changed** — a real, deliberate contrast with `useState`
   (changing a ref never triggers a re-render, which is exactly why it's
   the right tool here: the actual Three.js renderer object has nothing to
   do with what React should display, only with what already exists on
   screen).
 - `const viewportRef = useRef<ReturnType<typeof createViewport> | null>(null);`
-  — **(a) first appearance** of `ReturnType<typeof fn>` — a real
+- — **(a) first appearance** of `ReturnType<typeof fn>` — a real
   TypeScript **utility type**.
   *(Full standalone treatment: ../concepts/typescript-typeof-returntype-utility.md.)*
   `typeof createViewport` refers to the
   function's own type (not its return value); `ReturnType<...>` extracts
   *what that function returns* as a type, without writing out `{ drawPath:
-  (points: PathPoint[]) => void }` by hand — used here specifically so
+- (points: PathPoint[]) => void }` by hand — used here specifically so
   this file never has to duplicate `viewport.ts`'s own return shape.
 - `useEffect(() => { if (!containerRef.current) return;
-  viewportRef.current = createViewport(containerRef.current); }, []);` —
+- viewportRef.current = createViewport(containerRef.current); }, []);` —
   **(a) first appearance** of `useEffect`.
   *(Full standalone treatment: ../concepts/react-useeffect-hook.md.)*
   Runs its callback *after*
@@ -312,20 +311,20 @@ export default Viewport;
 - `useEffect(() => { viewportRef.current?.drawPath(points); }, [points]);`
   — **(a) a second, separate effect**, with a **real, non-empty
   dependency array**: `[points]` tells React "run this again whenever
-  `points` is a genuinely new value" — the mechanism that replaces this
+- `points` is a genuinely new value" — the mechanism that replaces this
   project's old `.then((points) => { ... viewport.drawPath(points); })`
   callback (Lesson 8) with something that reacts to *state changing*
   instead of a *fetch completing directly*. `viewportRef.current?.
-  drawPath(...)` — **(a) first appearance** of the **optional chaining
+- drawPath(...)` — **(a) first appearance** of the **optional chaining
   operator**, `?.`.
   *(Full standalone treatment: ../concepts/javascript-optional-chaining.md.)*
   Only calls `.drawPath` if `viewportRef.current` isn't
-  `null` — genuinely possible here on a component's very first render,
+- `null` — genuinely possible here on a component's very first render,
   before the first effect has run at all.
 - `return <div ref={containerRef} style={{ width: 700, height: 400 }} />;`
-  — **(a) first appearance** of the `ref` **JSX attribute**
+- — **(a) first appearance** of the `ref` **JSX attribute**
   (part of `../concepts/react-useref-hook.md`'s own treatment). Connects this
-  specific rendered `<div>` to `containerRef` — after this line runs,
+- specific rendered `<div>` to `containerRef` — after this line runs,
   `containerRef.current` *is* this real DOM element, which is exactly
   what the first `useEffect` above depends on existing.
 
@@ -465,15 +464,14 @@ JSON dump — is rendered by React from here, replacing Lesson 7–9's
 directly-authored `<h1>`/`<input>`/`<pre>` markup entirely.
 
 ### Mechanical Walkthrough
-
 - `useState<PathPoint[]>([])` — **(b) reappearing** `useState`, now with
-  an explicit type argument (`PathPoint[]`) — necessary here since `[]`
+- an explicit type argument (`PathPoint[]`) — necessary here since `[]`
   alone gives TypeScript nothing to infer an element type from.
 - `useEffect(() => { fetchPath(PROGRAM).then(setPoints); }, []);` — **(b)
   reappearing** `useEffect` with an empty array (runs once, on mount);
-  **(c) already established** `.then()` (Lesson 1); `setPoints` — passed
+- **(c) already established** `.then()` (Lesson 1); `setPoints` — passed
   directly as the `.then` callback, rather than a wrapping arrow function
-  — valid because `setPoints`'s own real signature already accepts
+- — valid because `setPoints`'s own real signature already accepts
   exactly what `.then` will hand it (the resolved `PathPoint[]`),
   needing no extra wrapping.
 - `<> ... </>` — **(a) first appearance** of a **JSX Fragment**.
@@ -490,9 +488,9 @@ directly-authored `<h1>`/`<input>`/`<pre>` markup entirely.
   its own second `useEffect` (previous unit) watches for changes on.
 - `<pre>{JSON.stringify(points, null, 2)}</pre>` — **(a) first appearance**
   of a **JSX expression**: `{...}` inside JSX embeds a real JavaScript
-  expression's *value* into the rendered output — `(c) already
+- expression's *value* into the rendered output — `(c) already
   established` `JSON.stringify` (Lesson 1), now called inline rather than
-  assigned to `.textContent` — this is the direct replacement for every
+- assigned to `.textContent` — this is the direct replacement for every
   previous lesson's manual `document.getElementById(...).textContent =
   ...` pattern.
 - `createRoot(container).render(<App />)` — **(a) first appearance**.

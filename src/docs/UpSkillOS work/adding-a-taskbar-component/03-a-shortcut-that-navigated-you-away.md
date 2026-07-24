@@ -115,13 +115,12 @@ Still on the Reference page (not stranded on Labs): true
 ```
 
 #### Mechanical Walkthrough
-
-`getLabEntry('canvas-notes')` — the exact function
+- `getLabEntry('canvas-notes')` — the exact function
 `labLoader.js` exports and `StartMenu.jsx`/`EntryShell.jsx` already
 call; it returns `{ ...meta, component }` for the given lab key,
 resolving the dynamic `import()` under the hood. `.then((e) =>
-e.component)` — established `async`/`await`-adjacent Promise chaining
-(`01-...md`'s `async`/`await` lab covers the same mechanism) — unwraps
+- e.component)` — established `async`/`await`-adjacent Promise chaining (`01-...md`'s `async`/`await` lab covers the same mechanism) — unwraps
+
 just the `component` field, matching exactly what `openPinnedApp`'s
 existing `const Component = await app.loader()` line expects to
 receive. Nothing about `openPinnedApp` changed; it was always capable
@@ -141,9 +140,9 @@ way through, not just confirmed they end up looking similar on screen.
 
 #### SE Lens
 
-The alternative fix — leaving `route` in place and instead changing
+- The alternative fix — leaving `route` in place and instead changing
 `EntryShell`'s `backTo` to remember wherever the user came from,
-rather than a fixed `"/labs"` — would also solve this, and would fix
+- rather than a fixed `"/labs"` — would also solve this, and would fix
 it for *every* lab opened via a route-based trigger, not just Canvas
 Notes' taskbar shortcut. It's a bigger, riskier change (touching
 `EntryShell.jsx`, used by every lab in the app) for a problem that, for

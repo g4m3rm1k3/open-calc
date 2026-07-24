@@ -235,7 +235,6 @@ fit it, an empty scene, and a camera positioned to look at the scene from
 a specific, real, ported angle.
 
 ### Mechanical Walkthrough
-
 - `0x07111e` / `0x131c28` / `0x46d89f` — **(a) first appearance** of
   JavaScript's **hexadecimal number literal** syntax.
   *(Full standalone treatment: ../concepts/javascript-hexadecimal-number-literal.md.)*
@@ -245,7 +244,7 @@ a specific, real, ported angle.
   (`"#07111e"` → `0x07111e`) one-to-one.
 - `interface Point { x: number; y: number; z: number; }` — **(b)
   reappearing** (Lesson 7), a second, independent declaration of the same
-  shape `main.ts` already declares — **(a) worth naming**: TypeScript has
+- shape `main.ts` already declares — **(a) worth naming**: TypeScript has
   no built-in way to *share* one interface across files without an
   explicit `import`/`export`; this project accepts one small duplication
   now rather than adding a shared-types file for a single, simple shape —
@@ -254,7 +253,7 @@ a specific, real, ported angle.
   **(b) reappearing** function/type-annotation syntax (Lesson 7) and ES
   module `export` (Lesson 7's `vite.config.ts`;
   *full standalone treatment: ../concepts/javascript-es-modules-import-export.md*);
-  `HTMLElement` — **(a) first appearance** of a real, specific DOM type —
+- `HTMLElement` — **(a) first appearance** of a real, specific DOM type —
   the general type for *any* HTML element, used here (rather than a more
   specific one) because this function should accept whatever container
   its caller chooses. *(Added retroactively, found missing while
@@ -284,8 +283,8 @@ a specific, real, ported angle.
   more GPU work) accepted here because it's the reference's own real
   setting.
 - `renderer.setSize(width, height)` / `.setClearColor(BACKGROUND_COLOR,
-  1)` — sets the canvas's real pixel dimensions and its background color
-  (the `1` is opacity — fully opaque).
+- 1)` — sets the canvas's real pixel dimensions and its background color (the `1` is opacity — fully opaque).
+
 - `container.appendChild(renderer.domElement)` — **(b) reappearing**
   general DOM insertion (the general mechanism, if not this exact call,
   already implied by Lesson 1's DOM work) — this is the one line that
@@ -296,11 +295,8 @@ a specific, real, ported angle.
   has nothing to draw.
 - `new THREE.PerspectiveCamera(45, width / height, 0.1, 10000)` — **(a)
   first appearance**, four real, specific arguments, each ported
-  verbatim: `45` — field of view, in degrees (how wide an angle the
-  camera sees, like a real camera lens); `width / height` — **aspect
-  ratio**, so the image isn't stretched; `0.1` — the near clipping plane
-  (nothing closer than this renders); `10000` — the far clipping plane
-  (nothing farther renders) — `0.1`–`10000` gives a huge real range,
+- verbatim: `45` — field of view, in degrees (how wide an angle the camera sees, like a real camera lens); `width / height` — **aspect ratio**, so the image isn't stretched; `0.1` — the near clipping plane (nothing closer than this renders); `10000` — the far clipping plane (nothing farther renders) — `0.1`–`10000` gives a huge real range,
+
   appropriate for a workspace that could be measured in millimeters or
   meters.
 - `camera.up.set(0, 0, 1)` — **(a) first appearance, and a real,
@@ -368,11 +364,10 @@ controls.target.set(0, 0, 0);
 ```
 
 ### Mechanical Walkthrough
-
 - `import { OrbitControls } from "three/examples/jsm/controls/
-  OrbitControls.js"` — **(a) first appearance** of importing from a
+- OrbitControls.js"` — **(a) first appearance** of importing from a
   *specific subpath* of a package rather than its top level (`three`
-  itself, imported above) — `OrbitControls` isn't part of Three.js's
+- itself, imported above) — `OrbitControls` isn't part of Three.js's
   core library; it's one of many optional "examples" modules shipped
   alongside it, imported explicitly only when used, exactly matching the
   reference's own identical import path.
@@ -417,17 +412,16 @@ scene.add(directionalLight);
 ```
 
 ### Mechanical Walkthrough
-
 - `new THREE.AmbientLight(0xffffff, 0.7)` — **(a) first appearance** —
   light with no source or direction, applied *equally* to every surface
   in the scene regardless of its orientation; `0xffffff` (white),
   `0.7` intensity. On its own, ambient light alone makes a scene visible
   but completely flat — no shading, since nothing is darker on one side.
 - `new THREE.DirectionalLight(0xffffff, 0.8)` /
-  `.position.set(100, 100, 300)` — **(a) first appearance** — light
+- `.position.set(100, 100, 300)` — **(a) first appearance** — light
   travelling in one consistent direction (like real sunlight, effectively
   from infinitely far away), which *does* shade surfaces differently
-  depending on their angle to it — its `.position` here sets the
+- depending on their angle to it — its `.position` here sets the
   direction it shines *from*, toward the origin.
 - `scene.add(...)` (twice) — **(c) already established** `scene.add`,
   applied to lights instead of the camera/controls above (which aren't
@@ -464,7 +458,6 @@ scene.add(grid);
 ```
 
 ### Mechanical Walkthrough
-
 - `new THREE.GridHelper(500, 50, GRID_COLOR, GRID_COLOR)` — **(a) first
   appearance** — a real, built-in Three.js utility object: a flat grid,
   `500` units wide, divided into `50` divisions, colored (this project's
@@ -479,7 +472,7 @@ scene.add(grid);
   Three.js's own default "Y is up" convention); rotating it a quarter-turn
   (`Math.PI / 2` radians = 90°) around the X axis lays it flat on the
   X/Y plane instead, matching this project's own Z-up convention
-  (`camera.up.set(0, 0, 1)`, above) — the same real trigonometric unit
+- (`camera.up.set(0, 0, 1)`, above) — the same real trigonometric unit
   (`Math.PI`, radians) `LessonContract` itself requires deriving, not
   assuming, whenever it appears; here, one quarter of a full turn
   (`2 * Math.PI`) reorients one plane onto another.
@@ -603,16 +596,16 @@ useful with this module.
 
 - `new THREE.Group()` — **(b) reappearing** grouping concept (this
   project's own `MachineState`/`Parser` don't use it, but the reference's
-  own `pathLayer`, ported here directly, is exactly this) — a container
+- own `pathLayer`, ported here directly, is exactly this) — a container
   that can hold multiple objects and be cleared/manipulated as one unit,
   used here so a *new* path can cleanly replace an *old* one.
 - `while (pathGroup.children.length) { pathGroup.remove(pathGroup.
-  children[0]); }` — **(a) first appearance** of clearing every child
+- children[0]); }` — **(a) first appearance** of clearing every child
   from a group by draining it.
   *(Full standalone treatment: ../concepts/javascript-drain-collection-while-loop.md.)*
   Removing index `0` repeatedly until none remain (`.
   remove` shifts remaining children down, so always removing index `0`
-  eventually empties the whole list) — necessary so calling `drawPath`
+- eventually empties the whole list) — necessary so calling `drawPath`
   a second time doesn't leave the *previous* path's line still in the
   scene alongside the new one.
 - `points.map((p) => new THREE.Vector3(p.x, p.y, p.z))` — **(a) first
@@ -624,7 +617,7 @@ useful with this module.
   Three.js's own `Vector3` type, which is what its geometry APIs actually
   require.
 - `new THREE.BufferGeometry().setFromPoints(vectors)` — **(a) first
-  appearance** — `BufferGeometry` is Three.js's real, GPU-friendly
+- appearance** — `BufferGeometry` is Three.js's real, GPU-friendly
   representation of a shape's raw vertex data; `.setFromPoints(...)`
   builds one directly from an ordered list of points — exactly the
   reference's own identical call (line 950), applied to this project's
@@ -640,15 +633,15 @@ useful with this module.
   pairing pattern every drawable Three.js object uses (a `Mesh`, for
   solid shapes, pairs the same way — a real, later lesson's concern).
 - `function render() { controls.update(); renderer.render(scene,
-  camera); requestAnimationFrame(render); }` — **(a) first appearance**
+- camera); requestAnimationFrame(render); }` — **(a) first appearance**
   of a real **render loop**.
   *(Full standalone treatment: ../concepts/browser-request-animation-frame.md.)*
   `controls.update()` applies any pending
   damped camera movement since the last frame; `renderer.render(scene,
   camera)` draws the current state of the scene, from the camera's
-  viewpoint, onto the canvas; `requestAnimationFrame(render)` — **(b)
+- viewpoint, onto the canvas; `requestAnimationFrame(render)` — **(b)
   reappearing** browser API, already named (not yet used in code) in this
-  project's own `LessonContract` performance section — schedules
+- project's own `LessonContract` performance section — schedules
   `render` to run again just before the browser's *next* repaint, the
   standard way to animate anything smoothly instead of using a fixed
   timer. This function calling itself this way, forever, is why the

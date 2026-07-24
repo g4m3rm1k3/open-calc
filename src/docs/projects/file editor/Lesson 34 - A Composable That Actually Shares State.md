@@ -180,19 +180,19 @@ This is the entire file — a brand-new module, nothing to place it
 inside of.
 
 ### Mechanical Walkthrough
-
-`ref(sessionStorage.getItem('authToken'))` — this lesson's
+- `ref(sessionStorage.getItem('authToken'))` — this lesson's
 module-scope pattern, applied for real: `authToken`'s *starting* value
 comes straight from `sessionStorage`, reusing Lesson 19's exact
 persistence idea, so a page reload with a valid stored token starts
 already logged in, with no separate bootstrap check needed the way the
-old `index.html` required. `setAuth(token, username)` — first
+- old `index.html` required.
+- `setAuth(token, username)` — first
 appearance of a composable exposing a *function* alongside its state,
 not just the state itself; every component that calls `useAuth()`
 gets the identical `setAuth`, so the actual logic for "what does
 logging in mean" lives in exactly one place, not copy-pasted into
 every component that needs to trigger it. `export function useAuth()`
-is what other files actually `import` (Lesson 32) — the two `const`
+- is what other files actually `import` (Lesson 32) — the two `const`
 declarations above it are never exported directly, only reachable
 through calling this function, the same encapsulation idea a Python
 module achieves by simply not exposing a name.
@@ -431,21 +431,20 @@ assembled in the order shown (state and `toggleMode` first, then
 block), is the entire file, nothing left out.
 
 ### Mechanical Walkthrough
-
-Nothing in this unit is new syntax — every construct (`ref()`,
+- Nothing in this unit is new syntax — every construct (`ref()`,
 `v-model`, `@click`, ternary-in-interpolation, `<style scoped>`) was
 isolated and explained in an earlier lesson (Lessons 18, 30, 33).
 What changed, traced directly against Lesson 30's version:
 `this.username`/`this.password` became
 `username.value`/`password.value`; `document.getElementById("login-screen")`
-and the manual `style.display` toggling are gone entirely — this
+- and the manual `style.display` toggling are gone entirely — this
 component doesn't decide whether it's visible, its *parent* does (the
 next unit); `authToken = data.token; currentUsername = this.username`
 — two separate assignments to global variables — became one call,
 `setAuth(data.token, username.value)`, the composable's own function
 doing both at once, plus the `sessionStorage` writes Lesson 30 wrote
 inline every single time. The CSS itself is a verbatim port of Lesson
-18's card styling — only the selectors changed, from `#login-screen`/
+- 18's card styling — only the selectors changed, from `#login-screen`/
 `#auth-toggle`/`#login-status` (IDs, meaningful when this markup lived
 in one large shared page) to `.login-screen`/`.auth-toggle`/
 `.login-status` (classes), since `<style scoped>` already guarantees
@@ -517,13 +516,12 @@ This is the entire file — `App.vue` is small enough that "the new
 code" and "the whole file" are the same thing.
 
 ### Mechanical Walkthrough
-
-`const { authToken, currentUsername } = useAuth()` — calling this
+- `const { authToken, currentUsername } = useAuth()` — calling this
 lesson's composable from a *second* component; `authToken` here is the
 identical `ref` `LoginScreen.vue` reads and writes through `setAuth`,
 confirmed directly in this lesson's earlier `useAuth` verification
 (two independent call sites, one shared `ref`). `v-if="authToken === null"`
-reuses `v-if` (Lesson 31) — a `ref` is auto-unwrapped inside a
+- reuses `v-if` (Lesson 31) — a `ref` is auto-unwrapped inside a
 template expression exactly like inside `{{ }}` (Lesson 33), so this
 reads `authToken.value === null` without needing `.value` written
 explicitly. `<div v-else>` is `v-if`'s companion, first used together

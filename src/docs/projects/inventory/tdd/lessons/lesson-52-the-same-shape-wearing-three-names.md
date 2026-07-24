@@ -76,9 +76,8 @@ export type SketchEntity =
 ```
 
 ### Mechanical Walkthrough
-
 `"polyline"` alone covers three of the reference's own five real tools
-— `line`/`rect`/`contour` all end up as this one variant, differing
+- — `line`/`rect`/`contour` all end up as this one variant, differing
 only in how many points they hold and whether `closed` is `true`.
 `circle`/`arc` stay their own real variants, since they carry real
 parameters (`center`, `radius`, angles) a plain point list can't
@@ -165,13 +164,12 @@ export function rectCorners(corner1: Point3, corner2: Point3, plane: DrawPlane):
 ```
 
 ### Mechanical Walkthrough
-
 `corner2InA` shares `corner1`'s own value on `axisB`, but takes
-`corner2`'s own value on `axisA` — one real corner, adjacent to
+- `corner2`'s own value on `axisA` — one real corner, adjacent to
 `corner1` along the `axisA` direction. `corner2InB` is the mirror case.
 Together with the two real clicked corners, all four are real,
 resolved points, in real winding order (`corner1 → corner2InA →
-corner2 → corner2InB`, then closed back to `corner1`) — a real,
+- corner2 → corner2InB`, then closed back to `corner1`) — a real,
 standard rectangle, regardless of which two axes `plane` actually
 names.
 
@@ -283,9 +281,8 @@ export function circumcircle(
 ```
 
 ### Mechanical Walkthrough
-
 `d` is (twice) the signed area of the triangle formed by the three real
-points — `Math.abs(d) < 0.001` is the real, direct test for "these
+- points — `Math.abs(d) < 0.001` is the real, direct test for "these
 three points are collinear" (a triangle with zero real area), the
 degenerate case where no real circumcircle exists at all. `ux`/`uy`
 (the real circumcenter) come from the standard real circumcircle
@@ -433,16 +430,15 @@ export function entityPoints(entity: SketchEntity): Point3[] {
 ```
 
 ### Mechanical Walkthrough
-
 `tessellateCircle` walks a full `2π` sweep in `segments` even steps,
 placing each real point at `center + radius * (cos, sin)` along
 whichever two real axes the plane names. `tessellateArc` does the
 identical real thing, but only across the arc's own real, normalized
-`sweep` (not a full circle) — the same direction-normalization
+- `sweep` (not a full circle) — the same direction-normalization
 technique (`% (Math.PI * 2)`, then adjusted by sign to match `ccw`)
 already confirmed correct in the circumcircle unit above.
 `entityPoints` is the one real place that decides, per entity type,
-how to turn stored parameters into a real point list — `polyline`
+- how to turn stored parameters into a real point list — `polyline`
 just returns its own points (closing the loop back to the start if
 `closed`), `circle`/`arc` tessellate.
 
@@ -723,17 +719,16 @@ entirely while active.
 ```
 
 ### Mechanical Walkthrough
-
 `raycastAtEvent` is the same real raycasting logic Lesson 50 already
 established for `handlePointerMove`, now factored out into its own
 function so `handlePointerDown` can reuse it exactly rather than
 duplicating the NDC-conversion/raycast steps. `handlePointerDown`
-checks `event.button !== 0` — the real convention for "was this the
+- checks `event.button !== 0` — the real convention for "was this the
 left mouse button" — so a right-click (already handled separately by
 `handleContextMenu`) never also gets misread as a real draw click.
 `controls.enabled = tool === "select"` is the one real line doing all
 the mode-switching work: `OrbitControls` itself, internally, already
-checks this flag before starting a drag on `pointerdown` — nothing
+- checks this flag before starting a drag on `pointerdown` — nothing
 here has to separately intercept or cancel an orbit; disabling it at
 the source is enough.
 
@@ -832,8 +827,7 @@ switching back to Select immediately restores normal orbiting.
 ```
 
 ### Mechanical Walkthrough
-
-Not repeated in depth — `threejs-geometry-material-object.md` covers
+- Not repeated in depth — `threejs-geometry-material-object.md` covers
 the real geometry/material/mesh (here, `Line`) separation;
 `threejs-mutating-scene-after-creation.md` covers exactly why
 `setSketchEntities` disposes and rebuilds rather than mutating
@@ -931,13 +925,12 @@ The one new, real CSS rule this row needed (everything else — `.btn`,
 ```
 
 ### Mechanical Walkthrough
-
 `App.tsx` never touches `sketch.sketchEntities`/`drawPoints` directly
-beyond passing them straight through to `<Viewport>` — every real
+- beyond passing them straight through to `<Viewport>` — every real
 decision about what a click *means* already happened inside
 `useSketch` itself. `StatusBar.tsx`'s own new tool-button row reuses
 the identical `.btn-group`/`.btn`/`.btn-sm` classes already established
-for the plane-selector row, styled active with `.btn-gr` (green — the
+- for the plane-selector row, styled active with `.btn-gr` (green — the
 same "armed/active" color `PlaybackControls`' own Cycle Start button
 already uses) rather than reusing the plane row's own blue, so the two
 real button groups stay visually distinct from each other.

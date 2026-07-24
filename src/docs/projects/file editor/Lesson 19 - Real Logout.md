@@ -189,7 +189,6 @@ everything there is to see. Every gated call in the next unit is
 rewritten to call this instead of `fetch` directly.
 
 ### Mechanical Walkthrough
-
 `function authenticatedFetch(url, options)` reuses ordinary function
 declaration syntax, with a second parameter, `options`, that's allowed
 to be omitted entirely by any caller that needs nothing beyond
@@ -209,7 +208,7 @@ doesn't exist. `fetch(url, fetchOptions)` reuses ordinary `fetch`, wired
 with the merged options built above. `.then((response) => { if
 (response.status === 401) { ... } return response; })` reuses `.status`
 directly, rather than the `!response.ok` shorthand `login()` already
-uses — deliberately: `!response.ok` is `true` for *any* failure code
+- uses — deliberately: `!response.ok` is `true` for *any* failure code
 (`400`, `404`, `401`, ...), and only `401` specifically means "this
 token is no longer valid," as opposed to, say, a `400` for a wrong file
 extension, which every calling function already handles correctly on
@@ -255,8 +254,7 @@ depends on the next unit's `sessionStorage.setItem(...)` call inside
 first.
 
 ### Mechanical Walkthrough
-
-`function logout(message)` takes one parameter — the exact text to show,
+- `function logout(message)` takes one parameter — the exact text to show,
 so a stale-token logout and (later, if this project ever adds one) a
 deliberate "Log Out" button click could each supply their own honest
 reason. `authToken = null;` reuses the exact reset already used
@@ -265,7 +263,7 @@ is new — explained fully in this lesson's last unit, alongside the
 `.setItem` call it undoes. `document.getElementById("app-layout").style.display
 = "none"` and `document.getElementById("login-screen").style.display =
 "flex"` reuse ordinary inline-style toggling, in the *opposite* direction
-from `login`'s own success handler — hiding the app, showing the login
+- from `login`'s own success handler — hiding the app, showing the login
 screen, instead of the reverse. `document.getElementById("login-status").textContent
 = message` reuses ordinary text assignment, displaying whatever specific
 reason the caller supplied.
@@ -417,12 +415,11 @@ and whether `method`/`body`/`Content-Type` are present, differ between
 them, exactly as they always have.
 
 ### Mechanical Walkthrough
-
 Every changed line reuses `authenticatedFetch`, built two units ago, in
-place of `fetch` plus a hand-written `Authorization` header — nothing
+- place of `fetch` plus a hand-written `Authorization` header — nothing
 about *what* each function does with the response changes at all.
 Worth naming directly: when `authenticatedFetch` detects a `401` and
-calls `logout(...)`, it also `throw`s — that rejection skips straight
+- calls `logout(...)`, it also `throw`s — that rejection skips straight
 past each function's own `.then((response) => response.json())` and
 lands in that same function's existing `.catch()` block, which still
 runs too, briefly setting its own panel's text (`"Could not reach
@@ -521,8 +518,7 @@ if (storedToken) {                                          // ← new
 ```
 
 ### Mechanical Walkthrough
-
-`sessionStorage` is a browser-provided storage object — new to this
+- `sessionStorage` is a browser-provided storage object — new to this
 project — that persists small key/value pairs across a page reload
 *within the same browser tab*, distinct from a plain JavaScript
 variable, which does not; it's cleared when the tab itself closes,
@@ -530,9 +526,9 @@ unlike `localStorage`, a related API that would persist even across
 closing and reopening the browser entirely. `.setItem("authToken",
 data.token)` stores the token under that key, string to string.
 `.getItem("authToken")` reads it back, returning the stored string or
-`null` if nothing was ever stored — the same `null`-for-nothing-found
+- `null` if nothing was ever stored — the same `null`-for-nothing-found
 convention `RUNNERS.get(...)` used in Lesson 6. `if (storedToken) {`
-reuses ordinary truthy testing — `null` is falsy, so this branch only
+- reuses ordinary truthy testing — `null` is falsy, so this branch only
 runs when a real stored token actually exists. Inside it, `authToken =
 storedToken;` restores the in-memory variable from what was persisted,
 and the three lines below it reuse `login`'s own success-handler shape

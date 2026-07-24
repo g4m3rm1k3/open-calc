@@ -214,11 +214,11 @@ ref each one writes to. Once more in the template:
 ```
 
 ### Mechanical Walkthrough
-
-`ref('')` — reused from Lesson 33, nothing new. `clearAuth(message)` —
+- `ref('')` — reused from Lesson 33, nothing new.
+- `clearAuth(message)` —
 a plain function taking a parameter, exactly like `setAuth`; nothing
 about composables changes how ordinary JavaScript functions work.
-`...options` and `...(options && options.headers)` — the spread
+- `...options` and `...(options && options.headers)` — the spread
 operator, already used in this exact shape in the old `index.html`'s
 `authenticatedFetch` (Lesson 19), unchanged. `fetch(url, fetchOptions).then(...)`
 reuses `fetch`/`.then()` verbatim; `response.status === 401` is Lesson
@@ -306,20 +306,19 @@ This is the entire file — a brand-new module, nothing to place it
 inside of.
 
 ### Mechanical Walkthrough
-
 `import { useAuth } from './useAuth.js'` reuses Lesson 32's `import`
-exactly — the only difference from every other `import` in this
+- exactly — the only difference from every other `import` in this
 project is that the thing being imported is itself a composable, not a
 component or a plain utility. `const { authenticatedFetch } =
-useAuth()` — first appearance of one composable calling another, at
-module scope, exactly once, when `useFileSystem.js` is first loaded —
+- useAuth()` — first appearance of one composable calling another, at module scope, exactly once, when `useFileSystem.js` is first loaded —
+
 `authenticatedFetch` here is a plain function reference, stable for
 the lifetime of the module, that still reads the *live*
 `authToken.value` every time it's actually called, because that's how
 the function itself was written inside `useAuth.js`. `loadFolder`'s
-body is a line-for-line port of Lesson 31's original — `.then()`/`.catch()`,
+- body is a line-for-line port of Lesson 31's original — `.then()`/`.catch()`,
 the same three-value state shape (`currentPath`, `entries`,
-`errorMessage`) — reading and writing `.value` instead of touching
+- `errorMessage`) — reading and writing `.value` instead of touching
 `sidebarApp.currentPath` the way the old CDN-mounted version did.
 
 ### CS Lens — composition, the same idea at a new layer
@@ -470,13 +469,12 @@ const { authToken, currentUsername } = useAuth()
 ```
 
 ### Mechanical Walkthrough
+- Every directive in `FileBrowser.vue`'s template — `v-if`, `v-for`, `:key`, `@click` — is a direct reuse of Lesson 31's already-taught
 
-Every directive in `FileBrowser.vue`'s template — `v-if`, `v-for`,
-`:key`, `@click` — is a direct reuse of Lesson 31's already-taught
 syntax, applied to `ref()`-backed values instead of `data()`-backed
 ones. `goUp`/`handleEntryClick` are line-for-line ports of Lesson 31's
 own methods, `.value` added wherever the old code read `this.currentPath`.
-`loadFolder('')`, the very last line of `<script setup>` — first
+- `loadFolder('')`, the very last line of `<script setup>` — first
 appearance of a plain function call sitting at the top level of a
 component's script, not inside a method, not behind a click. Every
 line above it runs once, synchronously, when this component is

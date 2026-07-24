@@ -167,7 +167,6 @@ from scratch as the project's real, permanent persistence layer.
 the lesson.)
 
 ### Mechanical Walkthrough
-
 - `extends SQLiteOpenHelper` — **first appearance.** The framework's
   base class for managing a SQLite database's lifecycle — creation,
   and version upgrades — same "must extend the framework's class"
@@ -177,7 +176,7 @@ the lesson.)
   constructor call pattern, Lesson 6's `ViewHolder`), new arguments: a
   `Context`, the database's on-disk filename, a `null` (an optional
   advanced `Cursor` factory, unused here), and a **schema version
-  number** — first appearance, explained by `onUpgrade` next.
+- number** — first appearance, explained by `onUpgrade` next.
 - `onCreate(SQLiteDatabase db)` — **first appearance**, a different
   method from `Activity.onCreate` despite the same name (Java allows
   same-named methods on unrelated classes; there's no conflict since
@@ -187,7 +186,7 @@ the lesson.)
 - `db.execSQL("CREATE TABLE scratch_items (...)")` — **first
   appearance of SQL itself** inside this curriculum. `execSQL` runs any
   SQL statement that doesn't return rows. `CREATE TABLE`, column names,
-  and types (`INTEGER`, `TEXT`) are SQL syntax, not Java — worth
+- and types (`INTEGER`, `TEXT`) are SQL syntax, not Java — worth
   flagging plainly as an entirely different language embedded as a
   string.
 - `id INTEGER PRIMARY KEY AUTOINCREMENT` — **first appearance**, the
@@ -197,7 +196,7 @@ the lesson.)
 - `onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)` —
   **first appearance.** Called automatically if the app is reinstalled
   or updated with a *higher* version number than the one passed to
-  `super(...)` above (here, `1`) than what's already on the device —
+- `super(...)` above (here, `1`) than what's already on the device —
   this project's throwaway version just destroys and rebuilds the table,
   which is fine for scratch data but would delete a real user's
   inventory in production; correctly migrating a real schema (adding a
@@ -217,20 +216,20 @@ the lesson.)
   `Intent.putExtra` (Lesson 8) across types.
 - `db.insert("scratch_items", null, values)` — **first appearance.**
   Table name, an optional "nullColumnHack" (a SQLite quirk for
-  inserting an all-default row — irrelevant here, always `null` in
+- inserting an all-default row — irrelevant here, always `null` in
   practice), and the `ContentValues` to insert.
 - `db.rawQuery("SELECT name, quantity FROM scratch_items", null)` —
   **first appearance.** Runs a raw `SELECT` SQL string and returns a
-  `Cursor` — an object representing a *position within* the result
+- `Cursor` — an object representing a *position within* the result
   rows, not the rows themselves loaded all at once (worth connecting
   back to Lesson 6's opening lab: this is the framework's own version
   of "don't eagerly load everything you don't need yet").
 - `cursor.moveToNext()` — **first appearance.** Advances the cursor to
-  the next row and returns `true`, or `false` once there are no more —
+- the next row and returns `true`, or `false` once there are no more —
   the loop condition itself, driving the execution trace above.
 - `cursor.getString(0)` / `cursor.getInt(1)` — **first appearance.**
   Reads a column's value at the cursor's *current* row, by **integer
-  position** in the `SELECT` clause — `0` for `name` (listed first in
+- position** in the `SELECT` clause — `0` for `name` (listed first in
   the query), `1` for `quantity` (listed second). This positional,
   stringly-untyped access is the exact rough edge the next unit names
   directly.

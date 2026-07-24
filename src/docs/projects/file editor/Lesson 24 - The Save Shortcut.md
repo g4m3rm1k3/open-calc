@@ -118,11 +118,10 @@ structure to show it inside of; the block above is everything there is
 to see.
 
 ### Mechanical Walkthrough
-
 `event.ctrlKey && event.key === "s"` reuses `&&` from Lesson 1's
-`require_auth` — both conditions must hold: `Ctrl` currently held down,
+- `require_auth` — both conditions must hold: `Ctrl` currently held down,
 *and* the key that triggered this exact event is `"s"`. Checking `event.key
-=== "s"` specifically, rather than just `event.ctrlKey` alone, matters —
+- === "s"` specifically, rather than just `event.ctrlKey` alone, matters —
 without it, this handler would fire on *every* `Ctrl`-anything
 combination, including `Ctrl+C`, `Ctrl+V`, and every other browser
 shortcut a person still needs to work. `event.preventDefault()` is new:

@@ -329,29 +329,28 @@ so there's nothing left for an explicit "render the default state" call
 to do.
 
 ### Mechanical Walkthrough
-
-`{{ mode === "login" ? "Log In" : "Sign Up" }}` — interpolation
+- `{{ mode === "login" ? "Log In" : "Sign Up" }}` — interpolation
 (Lesson 29) around a ternary expression, already established syntax
 from Lesson 2, now living inside `{{ }}` instead of assigned to
 `.textContent`; the same ternary appears four times, once per piece of
 text that used to be set by hand inside `renderAuthMode`.
-`v-model="username"`/`v-model="password"` — this lesson's own first
+- `v-model="username"`/`v-model="password"` — this lesson's own first
 unit, applied for real; the DOM's `id="username-input"` and
 `id="password-input"` are gone because nothing needs to `getElementById`
 either input anymore. `@click="submitAuth"`/`@click="toggleMode"` reuse
 Lesson 29's directive exactly. Inside `loginApp`: `mode`, `username`,
 `password`, `statusMessage` are four reactive values in one `data()`,
 the same shape as Lesson 29's single-value widget, just more of them.
-`this.login()`/`this.signup()` inside `submitAuth` — calling one method
+- `this.login()`/`this.signup()` inside `submitAuth` — calling one method
 from another using `this.`, first appearance of a method calling a
 sibling method; both must be reached through `this` because `methods`
 doesn't put them in the surrounding JavaScript scope, only on the
 component instance. Inside `login()` and `signup()`: `this.username`
 and `this.password` replace the old `document.getElementById(...).value`
-reads — reading the exact same values `v-model` has already been
+- reads — reading the exact same values `v-model` has already been
 keeping in sync since the user started typing, not a fresh DOM read at
 submit time. `this.statusMessage = ...` inside each `.catch()` replaces
-`document.getElementById("login-status").textContent = ...` — same
+- `document.getElementById("login-status").textContent = ...` — same
 idea as Lesson 29's `checkBackend`, now with two independent failure
 messages instead of one. `authToken = data.token` and
 `currentUsername = this.username`, inside `login()`'s success handler,

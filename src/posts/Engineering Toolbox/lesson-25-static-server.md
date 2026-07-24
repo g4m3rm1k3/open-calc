@@ -140,20 +140,20 @@ every request, correctly extracts the requested path — but does
 nothing with it yet.
 
 ### Mechanical Walkthrough
+- `import os`, `import mimetypes` — reminders/first appearance.
+- `WEBROOT = "/home/claude/webroot"` — a plain string constant naming
 
-`import os`, `import mimetypes` — reminders/first appearance.
-`WEBROOT = "/home/claude/webroot"` — a plain string constant naming
 the one folder this server is meant to serve files from. `with
 socket.socket(...) as server_socket:`, `.setsockopt(...)`, `.bind(...)`,
-`.listen()`, `while True: conn, addr = server_socket.accept()` — all
+- `.listen()`, `while True: conn, addr = server_socket.accept()` — all
 direct reminders of Lessons 19/23. `request = conn.recv(4096).decode()`
 — Lesson 24, reminder — reading and decoding the incoming request in
 one line, reasonable here since a real request line plus headers
 almost always fits comfortably under 4096 bytes. `if not request:
-continue` — Lesson 19's empty-bytes-means-disconnected pattern,
+- continue` — Lesson 19's empty-bytes-means-disconnected pattern,
 reminder, applied to a request instead of a chat message. `first_line
 = request.split("\r\n")[0]`, `method, path, version =
-first_line.split(" ")` — the concept from this unit's lab, reused for
+- first_line.split(" ")` — the concept from this unit's lab, reused for
 real.
 
 ### CS Lens
@@ -329,15 +329,15 @@ security flaw baked into `file_path = WEBROOT + path` that nothing here
 catches.
 
 ### Mechanical Walkthrough
-
-`if path == "/": path = "/index.html"` — a real, common web-server
+- `if path == "/": path = "/index.html"` — a real, common web-server
 convention: a request for the site root serves a default file. `file_path
-= WEBROOT + path` — plain string concatenation, deliberately **not**
+- = WEBROOT + path` — plain string concatenation, deliberately **not**
 `os.path.join()`, joining the trusted `WEBROOT` constant with the
 completely untrusted `path` from the previous unit. `os.path.isfile(
-file_path)` — Lesson 7, reminder. `open(file_path, "rb")`,
-`f.read()` — Lesson 9/61, reminder — reading the file's real bytes.
-`mimetypes.guess_type(file_path)` — the concept from this unit's lab,
+- file_path)` — Lesson 7, reminder.
+- `open(file_path, "rb")`, `f.read()` — Lesson 9/61, reminder — reading the file's real bytes.
+- `mimetypes.guess_type(file_path)` — the concept from this unit's lab,
+
 reused for real. The response-building itself — Lesson 24's byte-string
 assembly, reminder, reused for both the success and 404 cases.
 

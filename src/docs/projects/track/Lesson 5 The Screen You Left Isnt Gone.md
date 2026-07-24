@@ -321,14 +321,13 @@ the bottom:
 ```
 
 ### Mechanical Walkthrough
-
 - `app:layout_constraintTop_toBottomOf="@id/titleText"` — **reappearing
   concept** (constraints, from Lesson 3), worth one clause for the new
   shape: previous constraints all anchored to `"parent"`; this one
   anchors to a *sibling view's ID* instead — the same relationship
   idea, just between two children rather than child-to-parent.
 - Everything else in this block — `TextView`, `android:id="@+id/..."`,
-  `wrap_content`, `android:text`, margins — **reappearing**, all from
+- `wrap_content`, `android:text`, margins — **reappearing**, all from
   Lesson 3.
 
 ### The New Code — Part 2: A Field That Gets Lost
@@ -414,7 +413,6 @@ instance field, initialized once per object, exactly the kind of state
 that only survives as long as the object holding it does.
 
 ### Mechanical Walkthrough
-
 - `private int tapCount = 0;` — **first appearance as an instance
   field** on this class (you've declared local variables before, e.g.
   `openButton`, but never a field that lives at the class level,
@@ -431,7 +429,7 @@ that only survives as long as the object holding it does.
 - `tapCountText.setText("Taps: " + tapCount)` — **first appearance** of
   `setText` taking a runtime-built string (string concatenation with
   `+`, already-basic syntax) rather than the XML-hardcoded literal
-  `android:text` used so far — this is how a view's displayed content
+- `android:text` used so far — this is how a view's displayed content
   changes *after* the layout is already on screen.
 
 ### Run It
@@ -582,7 +580,6 @@ the field and the label, so the counter survives rotation even though
 the object holding it does not.
 
 ### Mechanical Walkthrough
-
 - `onSaveInstanceState(Bundle outState)` — **first appearance.** Called
   by the OS *before* `onDestroy`, specifically when the Activity is
   being destroyed for a reason it expects to recreate from (rotation,
@@ -596,8 +593,8 @@ the object holding it does not.
 - `outState.putInt("tapCount", tapCount)` — **first appearance.**
   `Bundle` is a String-keyed container (conceptually close to the
   `Map<String, String>` from Lesson 4's `RequestDemo` lab, but
-  type-specific methods per value type — `putInt`, and later you'll see
-  `putString`, `putBoolean`, etc. — rather than one generic `put`).
+- type-specific methods per value type — `putInt`, and later you'll see `putString`, `putBoolean`, etc. — rather than one generic `put`).
+
   `"tapCount"` is just a string key you chose; it must match on the
   read side.
 - `savedInstanceState != null` — **first appearance of this specific
@@ -607,7 +604,7 @@ the object holding it does not.
   distinguishes "fresh start" from "recreated after saving state."
 - `savedInstanceState.getInt("tapCount", 0)` — **first appearance.**
   The counterpart read to `putInt`, with a required second argument: a
-  default value (`0`) used if that key isn't present — defensive
+- default value (`0`) used if that key isn't present — defensive
   against the key being missing for any reason.
 
 ### Run It

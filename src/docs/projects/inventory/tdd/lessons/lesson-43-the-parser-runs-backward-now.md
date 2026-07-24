@@ -98,14 +98,13 @@ depends on just as much — each one is folded back in explicitly, not
 assumed to live inside `words`.
 
 ### Mechanical Walkthrough
-
 - `WORD_ORDER` — a fixed, literal array of every letter `core/
   parser.py`'s own `_SUPPORTED_WORDS` recognizes, in a deliberate
   display order (motion/position words first, then arc/cycle words,
   then feed/speed/misc words last) — **first appearance of this
   specific ordering choice**, not a new language construct.
 - `for (const letter of WORD_ORDER)` / `if (!(letter in words))
-  continue` — **reappearing** (`for...of`, `in` — both already
+- continue` — **reappearing** (`for...of`, `in` — both already
   established); the real point worth naming: iterating the *fixed*
   order, not `Object.keys(words)`, is what guarantees a rebuilt line
   always reads `G` before `X` before `Y`, regardless of what order the
@@ -212,10 +211,9 @@ command = {
 ```
 
 ### Mechanical Walkthrough
-
 - `skip=False` as `_parse_block`'s new keyword parameter default —
   **reappearing** (Python default-argument syntax, already established)
-  — the same pattern `has_real_seq_n=False`/`line_number=None` already
+- — the same pattern `has_real_seq_n=False`/`line_number=None` already
   use.
 - Nothing else here is new syntax — the walkthrough's real content is
   the *timing* of this fix, named directly in this unit's own title:
@@ -320,10 +318,9 @@ real, 1-indexed `line_number` (Lesson 41) minus one (arrays are
 0-indexed) — every other line in the file is untouched.
 
 ### Mechanical Walkthrough
-
 - `rawInput.split(",").map((s) => s.trim()).filter((s) => s.length >
-  0)` — **reappearing** method chain (already used identically in
-  `mValues`/`gValues`'s own array normalization, Lesson 41) — splits on
+- 0)` — **reappearing** method chain (already used identically in `mValues`/`gValues`'s own array normalization, Lesson 41) — splits on
+
   comma (matching `fmtWord`'s own comma-joined display), trims
   whitespace, drops empty segments (so a trailing comma or repeated
   commas don't produce a stray empty string).
@@ -339,14 +336,14 @@ real, 1-indexed `line_number` (Lesson 41) minus one (arrays are
   closest existing parallel, though `null` there vs. `undefined` here
   is a real, minor inconsistency worth naming, not fixing this lesson).
 - `{ ...command.words }` — **reappearing** object spread (already
-  established) — a shallow copy, so mutating `newWords` next never
+- established) — a shallow copy, so mutating `newWords` next never
   touches the original `command.words` still being displayed elsewhere
   (other cells in the same row read from the *original* command until
   a fresh parse replaces it).
 - `delete newWords[letter]` — **first appearance of the `delete`
   operator** in this project's frontend: removes a key from an object
   entirely, distinct from setting it to `undefined` (which would leave
-  the key present with an `undefined` value — `"G" in words` would
+- the key present with an `undefined` value — `"G" in words` would
   still be `true`, breaking `serializeWords`'s own `letter in words`
   check). A single, self-explanatory operator; not given its own
   concept file per the Stopping Rule.
@@ -501,17 +498,16 @@ depends on:
 ```
 
 ### Mechanical Walkthrough
-
 - `value={text}` / `onChange={(e) => { setText(...); onCommit(...); }}`
   — **reappearing**, the same React controlled-input mechanism Lesson
   18 first taught (`checked={isSelected}` / `onChange={() =>
-  toggleSelected(...)}` on `ToolImportPanel.tsx`'s own checkbox) — a
+- toggleSelected(...)}` on `ToolImportPanel.tsx`'s own checkbox) — a
   text `<input>` instead of a checkbox, `value` instead of `checked`,
   same underlying idea: React owns the displayed value, and `onChange`
   is the only path anything can change it through.
 - **The one genuinely new wrinkle**, worth naming directly rather than
   folding silently into "reappearing": Lesson 18's checkbox has *no*
-  local state at all — `checked` reads directly from the parent's own
+- local state at all — `checked` reads directly from the parent's own
   state, every render. `EditableCell` instead seeds a *local* `useState`
   from `value` once, on mount, and never resyncs it if `value` changes
   later. This is deliberate: `value` here is derived from `program`,
@@ -526,7 +522,7 @@ depends on:
 - `command.x != null ? String(command.x) : ""` — **reappearing**
   ternary/null-check (already established); `fmtWord(command.words.G)`
   — the G column now reads the *literal* per-line word, not the
-  resolved `command.motion` Lesson 41 displayed there — named directly:
+- resolved `command.motion` Lesson 41 displayed there — named directly:
   editing the resolved value would stamp an explicit, redundant G-word
   onto every plain continuation line the instant its row was clicked
   into, since resolved motion is shown even on lines that never set G
@@ -539,7 +535,7 @@ depends on:
   `:hover`, but tracking *keyboard/input* attention rather than the
   mouse's position. `outline: none` deliberately removes the browser's
   own default focus ring first, replaced immediately by this rule's own
-  `border-color`/`background` change — a real, deliberate substitution,
+- `border-color`/`background` change — a real, deliberate substitution,
   not a loss of the accessibility signal a focus indicator exists to
   give: every cell still shows *some* visible change the instant it's
   focused, just this project's own, matching every other real
@@ -630,8 +626,7 @@ above), but between two rapid edits, the ref (not the lagging prop) is
 the real source of truth.
 
 ### Mechanical Walkthrough
-
-`useRef(program)` and `.current` reads/writes are **reappearing** — see
+- `useRef(program)` and `.current` reads/writes are **reappearing** — see
 `react-useref-hook.md` for the construct's own first-time treatment.
 The genuinely new *application*, worth naming directly since it's a
 different problem than that concept file's own DOM-node/render-counter
@@ -728,10 +723,9 @@ onEditWord={onEditWord} />`), and `BlockList` passes its own
 each `OperationBlock`.
 
 ### Mechanical Walkthrough
-
 Every line in this unit is **reappearing** prop-threading — already
 established throughout this codebase (`SidePanel`'s own multi-level
-`tabs`/`onSelectTab` threading, Lesson 23) — passing a callback down
+- `tabs`/`onSelectTab` threading, Lesson 23) — passing a callback down
 through an intermediate component that doesn't use it itself, only
 forwards it. `onProgramChange={setCode}` is the one line that actually
 closes the loop: `setCode` is the *exact same* setter Monaco's own

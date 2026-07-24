@@ -77,15 +77,14 @@ first of five small functions `themes.ts` defines below its `THEMES`
 catalog, all building toward one exported `applyTheme`.
 
 ### Mechanical Walkthrough
-
 - `function hexToRgb(hex: string): [number, number, number]` — **(a)
   first appearance** the tuple return type, per
-  `typescript-tuple-types.md` — **(c) already basic** the `string`
+- `typescript-tuple-types.md` — **(c) already basic** the `string`
   parameter annotation.
 - `hex.replace("#", "")` — **(c) already basic** — a plain, non-regex
   string replace.
 - `clean.slice(0, 2)`, `.slice(2, 4)`, `.slice(4, 6)` — **(a) first
-  appearance** — `String.prototype.slice(start, end)`, splitting the
+- appearance** — `String.prototype.slice(start, end)`, splitting the
   6-character cleaned string into its three 2-character channel
   substrings by position.
 - `parseInt(str, 16)` — **(a) first appearance** — parses a string as a
@@ -535,7 +534,6 @@ directly, and push all thirteen resulting values onto the one element
 every rule in `theme.css` already reads its colors from.
 
 ### Mechanical Walkthrough
-
 - `emphasize(hex, amount, isLight)` — **(c) already basic** — a plain
   function; its own ternary body is **(b) reappearing**
   (`ternary-conditional-operator.md`).
@@ -545,10 +543,10 @@ every rule in `theme.css` already reads its colors from.
   `javascript-css-custom-property-write.md`.
 - `root.setProperty("--color-bg", theme.bg0)` and the twelve calls like it
   — **(a) first appearance** of the real project usage, per
-  `javascript-css-custom-property-write.md`'s isolated lab — each call
+- `javascript-css-custom-property-write.md`'s isolated lab — each call
   independent, one custom property at a time.
 - `theme.txt2` used for **both** `--color-grid` and `--color-muted`/
-  `--color-text-dim` — **(c) already basic** property access, but worth
+- `--color-text-dim` — **(c) already basic** property access, but worth
   naming directly: this is not three unrelated tokens that happen to
   match, it's the same real value reused for three different roles that
   all need a legible-secondary-foreground color, decided in this
@@ -703,7 +701,6 @@ The whole file now reads, top to bottom, as: the shape one theme takes
 functions that turn any one of them into thirteen real CSS values.
 
 ### Mechanical Walkthrough
-
 - `interface ThemeDefinition { ... }` — **(b) reappearing** — a plain TS
   interface (`typescript-interfaces.md`); `type: "light" | "dark" | "dynamic"`
   is **(b) reappearing** a union type (`typescript-union-types.md`),
@@ -711,7 +708,7 @@ functions that turn any one of them into thirteen real CSS values.
 - `const THEMES: ThemeDefinition[] = [ {...}, {...}, ... ]` — **(a) first
   appearance, at the whole-unit level** — the catalog itself, per
   `design-tokens-theming-pattern.md`: eighteen complete, self-contained
-  value-sets, addressable by `id`. Each individual entry — **(c) already
+- value-sets, addressable by `id`. Each individual entry — **(c) already
   basic** — is just an object literal matching the interface above it;
   the concept being taught is the *array-of-complete-sets* shape, not any
   one entry's own syntax.
@@ -1511,9 +1508,8 @@ guaranteed to happen exactly once no matter how many times `App` itself
 re-renders afterward.
 
 ### Mechanical Walkthrough
-
 - `useState(() => { ... })` — **(a) first appearance**, per
-  `react-usestate-lazy-initializer.md` — a function passed directly,
+- `react-usestate-lazy-initializer.md` — a function passed directly,
   not called.
 - `const id = getStoredThemeId()` — **(b) reappearing**, per
   `browser-local-storage.md`'s own unit above.
@@ -1773,10 +1769,9 @@ mutated (the two lights) and rebuilding what can't (the grid) — then
 replays the last-drawn toolpath so its rapid/feed colors catch up too.
 
 ### Mechanical Walkthrough
-
 - `let colors = themeColors()` — **(b) reappearing** `themeColors()`
   itself (Lesson 8); **(a) first appearance** of `let` instead of `const`
-  here specifically — needed because `updateColors` below reassigns this
+- here specifically — needed because `updateColors` below reassigns this
   same variable, and a `const` binding cannot be reassigned.
 - `const ambientLight = new THREE.AmbientLight(...); scene.add(ambientLight)`
   — **(b) reappearing** the constructor call itself
@@ -1796,16 +1791,16 @@ replays the last-drawn toolpath so its rapid/feed colors catch up too.
   - `colors = themeColors()` — **(c) already basic** reassignment, now
     legal because of the `let` change above.
   - `renderer.setClearColor(colors.background, 1)` — **(b) reappearing**
-    — the exact same call `createViewport` already made once, at setup.
+- — the exact same call `createViewport` already made once, at setup.
   - `ambientLight.color.set(colors.lightAmbient)` /
-    `directionalLight.color.set(colors.lightDirectional)` — **(a) first
-    appearance**, per `threejs-mutating-scene-after-creation.md` — the
+- `directionalLight.color.set(colors.lightDirectional)` — **(a) first appearance**, per `threejs-mutating-scene-after-creation.md` — the
+
     mutate-in-place technique.
   - `scene.remove(grid)` — **(a) first appearance** — removes an object
     from the scene graph; necessary before adding its replacement, or both
     would render at once.
   - `grid = new THREE.GridHelper(...)` — **(a) first appearance**, per
-    `threejs-mutating-scene-after-creation.md` — the rebuild-in-place
+- `threejs-mutating-scene-after-creation.md` — the rebuild-in-place
     technique, for the one property that genuinely can't be mutated.
   - `drawPath(lastPoints)` — **(b) reappearing** — the existing function,
     called again with the value `lastPoints` was set to save specifically

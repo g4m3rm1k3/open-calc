@@ -87,14 +87,13 @@ struct SelectStatement {
 ```
 
 ### Mechanical Walkthrough
-
 - `struct SelectStatement { std::string tableName; };` — reuses
-  `struct` exactly as taught in Level 1 Lesson 2 (basic reuse) — one
+- `struct` exactly as taught in Level 1 Lesson 2 (basic reuse) — one
   member, `tableName`, deliberately minimal: this lesson's lexer only
   ever produces one statement shape (`SELECT * FROM <table>;`), so this
   AST node only needs to remember which table. There's no field for
   *which columns* were selected, because this project doesn't support
-  anything but `*` yet — an honest, deliberate scope match, not an
+- anything but `*` yet — an honest, deliberate scope match, not an
   oversight.
 
 ### CS Lens
@@ -289,21 +288,20 @@ without consuming it; `advance()` returns the current token and moves
 in this project will be built from.
 
 ### Mechanical Walkthrough
-
 - `class Parser` with `private: std::vector<Token> tokens; size_t
-  pos;` — reuses `class`/`private` exactly (Level 1 Lesson 4), applied
+- pos;` — reuses `class`/`private` exactly (Level 1 Lesson 4), applied
   to a new kind of state: unlike `Table`'s `filename`, which never
   changed after construction, `pos` is designed to be mutated
   repeatedly by the object's own methods over its lifetime — the first
   time this project has built a class around *changing* internal state
   rather than fixed configuration.
 - `Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens),
-  pos(0) {}` — reuses the member-initializer-list constructor pattern
+- pos(0) {}` — reuses the member-initializer-list constructor pattern
   from Level 1 Lesson 4 exactly, initializing two members instead of
   one.
 - `Token Parser::peek() const` — reuses `const` member functions
   (Level 1 Lesson 4): `peek` promises not to modify `Parser`, which is
-  true — it only reads `pos` and `tokens`, never advances anything.
+- true — it only reads `pos` and `tokens`, never advances anything.
 - `if (pos >= tokens.size()) { throw ... }` — **a hard concept
   reappearing** (per the Repetition Rule): the identical bounds-check
   idea the lexer used constantly (`i < sql.size() && ...`, Level 2
@@ -314,7 +312,7 @@ in this project will be built from.
   read the moment a statement is missing a token it should have had.
 - `Token Parser::advance() { Token t = peek(); pos++; return t; }` —
   **first appearance** of one method calling another method on the same
-  object (`peek()` from inside `advance()`) — reuses ordinary function
+- object (`peek()` from inside `advance()`) — reuses ordinary function
   calling (Level 1 Lesson 3) with no new syntax, just applied to a
   sibling member function instead of a free function. Calling `peek()`
   here, rather than duplicating its bounds check, means `advance()`
@@ -463,22 +461,22 @@ Anything out of order, missing, or wrong at any step throws immediately,
 naming what was expected.
 
 ### Mechanical Walkthrough
-
 - `Token Parser::expect(TokenType type, const std::string&
-  errorMessage)` — the generic, type-only check: reuses `peek()`,
+- errorMessage)` — the generic, type-only check: reuses `peek()`,
   `!=`, and `throw` exactly as established, with `errorMessage`
-  supplied by the caller — deliberately generic, used for `*`,
+- supplied by the caller — deliberately generic, used for `*`,
   identifiers, and `;`, none of which need a specific *text* match,
   only a specific *kind*.
 - `Token Parser::expectKeyword(const std::string& keyword)` — the
   specific check this unit's Problem section motivated: `||` (Level 2
   Lesson 1) combines two conditions — wrong type, *or* right type but
-  wrong text — either one is a failure. `peek().text != keyword`
+- wrong text — either one is a failure.
+- `peek().text != keyword`
   reuses `std::string` `!=` comparison (a direct sibling of `==`,
   Level 1 Lesson 6).
 - `Token tableToken = expect(TokenType::IDENTIFIER, "...");` — reuses
   `expect`, storing its *return value* this time (every earlier call in
-  `parseSelect` discarded it) — because this is the one token whose
+- `parseSelect` discarded it) — because this is the one token whose
   actual text matters afterward, not just its presence.
 - `stmt.tableName = tableToken.text;` — reuses member access and
   assignment (Level 1 Lesson 2) — the entire payoff of parsing: one

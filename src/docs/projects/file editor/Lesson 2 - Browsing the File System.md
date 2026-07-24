@@ -115,15 +115,14 @@ configured. `/health` itself is untouched, shown here in full anyway
 since the whole file is still small enough to show whole.
 
 ### Mechanical Walkthrough
-
 `Path` (from `pathlib`) represents a filesystem location as an object
 with its own methods, instead of a plain string. `__file__` is a
-variable Python fills in automatically — the path to `main.py` itself.
+- variable Python fills in automatically — the path to `main.py` itself.
 `.parent` is a property returning the folder that contains it.
-`/ "content"` joins `"content"` onto that folder — the exact operator
+- `/ "content"` joins `"content"` onto that folder — the exact operator
 overload demonstrated in the lab above, real this time instead of a
 throwaway example. `.resolve()` collapses the result to its absolute,
-canonical form, resolving away any `..` segments along the way — this
+- canonical form, resolving away any `..` segments along the way — this
 matters a great deal in the next unit.
 
 ### CS Lens — this `/` is not division
@@ -286,10 +285,9 @@ requested path is verifiably inside the sandbox. It doesn't yet return
 anything on success — that's the next unit.
 
 ### Mechanical Walkthrough
-
 `CONTENT_DIR / path` builds a candidate location using the same join
 operator from the first unit; `.resolve()` collapses it exactly as
-before — critically, *after* whatever `..` sequences `path` might
+- before — critically, *after* whatever `..` sequences `path` might
 contain. `is_relative_to(...)` asks whether `target_dir`, now fully
 resolved, is still located inside `CONTENT_DIR`. `raise
 HTTPException(status_code=400, detail="Invalid path")` is new: `raise`
@@ -411,18 +409,17 @@ unit, untouched — this unit only added what happens once that check has
 already passed.
 
 ### Mechanical Walkthrough
-
-`is_dir()` catches a second failure case beyond the traversal check — a
+- `is_dir()` catches a second failure case beyond the traversal check — a
 syntactically valid path that just doesn't point at a real folder, caught
 with the same `HTTPException` shape, a different status code (`404`,
 "not found," rather than `400`, "bad request"). `entries = []` creates an
 empty list, the same construct from the concept lab. `target_dir.iterdir()`
 is a `Path` method that reads the folder and produces one `Path` per item
-inside it — `iterdir()` makes no promise about *order*, which can vary by
+- inside it — `iterdir()` makes no promise about *order*, which can vary by
 filesystem; `sorted(...)` wraps it to guarantee alphabetical order
 instead, so the sidebar doesn't reshuffle for no reason on every reload.
 Inside the loop, `entry.name` (a property) gives just the filename;
-`entry.is_dir()` (a method — note the parentheses, since it actually
+- `entry.is_dir()` (a method — note the parentheses, since it actually
 checks the filesystem each call, unlike the property) returns
 `True`/`False`. `.append(...)` adds each resulting dictionary onto
 `entries`.
@@ -568,29 +565,29 @@ The `<style>` block is new — Lesson 1 had none. The `<body>` now has a
 `<p id="status">` from Lesson 1, which is gone entirely.
 
 ### Mechanical Walkthrough
+- `display: flex` on `.layout` places its children — `.sidebar` and `.main-content` — side by side instead of stacked.
+- `flex: 1` on
 
-`display: flex` on `.layout` places its children — `.sidebar` and
-`.main-content` — side by side instead of stacked. `flex: 1` on
 `.main-content` tells it to consume whatever space is left over;
 `.sidebar` has no `flex` value, so it keeps its own fixed `width`
 instead of stretching, bounded between `min-width` and `max-width` so
 the resize handle (below) can't shrink or grow it without limit.
 `border-right`, `padding`, and `box-sizing: border-box` are ordinary
-visual spacing — `box-sizing: border-box` specifically means the
+- visual spacing — `box-sizing: border-box` specifically means the
 element's declared `width` includes its padding and border, rather than
 padding being added on top of it, which is what keeps the sidebar's
 actual rendered width matching the number set above instead of quietly
 growing past it. `resize: horizontal` adds a native browser-provided
 drag handle for resizing the sidebar's width — no JavaScript involved.
 `.sidebar ul { list-style: none; margin: 0; padding: 0; }` strips three
-defaults every `<ul>` has out of the box — the bullet points, and the
+- defaults every `<ul>` has out of the box — the bullet points, and the
 built-in indentation/spacing browsers apply automatically — none of
 which fit a file-browser sidebar. `.sidebar li { padding: 4px 6px;
 border-radius: 4px; }` gives each list item some breathing room and
 slightly rounded corners. `.sidebar li.clickable { cursor: pointer; }`
 and `.sidebar li.clickable:hover { background-color: #eee; }` are a
-matched pair: neither rule applies to a plain `<li>` — only to one that
-also carries the `clickable` class — and together they're what makes a
+- matched pair: neither rule applies to a plain `<li>` — only to one that also carries the `clickable` class — and together they're what makes a
+
 folder entry visually announce itself as interactive: the pointer cursor
 on hover, and a light background highlight while the mouse is over it.
 Nothing in the JavaScript has assigned that class to anything yet; that
@@ -642,10 +639,9 @@ The whole `<script>` block is emptied out and restarted here — Lesson
 end of the lesson builds up a new script from scratch.
 
 ### Mechanical Walkthrough
-
 This is the first variable declaration anywhere in this curriculum.
 `let` declares a binding that *can* be reassigned later
-(`currentPath = "src"` further down is valid) — different from a binding
+- (`currentPath = "src"` further down is valid) — different from a binding
 meant to never change, which JavaScript spells `const` instead.
 `currentPath` starts as an empty string, meaning "the root of
 `CONTENT_DIR`."
@@ -721,7 +717,6 @@ doesn't yet decide what to actually draw for each one. That's the next
 three units.
 
 ### Mechanical Walkthrough
-
 `function renderFileList(entries) { ... }` is a **named function
 declaration** — the first time this curriculum has written a function
 this way, rather than as an arrow function like every `.then(...)` and
@@ -729,14 +724,14 @@ this way, rather than as an arrow function like every `.then(...)` and
 function (`renderFileList`) and declares its parameter (`entries`) up
 front, and — unlike the arrow functions seen so far, which were always
 created and handed somewhere else in the same expression (into `.then`,
-into `addEventListener`) — this one is declared on its own, to be called
+- into `addEventListener`) — this one is declared on its own, to be called
 by name from other code later in this lesson. `const list =
 document.getElementById("file-list")` reuses `getElementById` from
 Lesson 1 exactly as before, just against a different `id`, and reuses
-`const` from the previous unit's `let`/`const` distinction — this binding
+- `const` from the previous unit's `let`/`const` distinction — this binding
 is never reassigned once set. `list.textContent = ""` is the same
 `.textContent` assignment from Lesson 1, applied here to erase whatever
-the `<ul>` currently shows — an empty string is valid `textContent`,
+- the `<ul>` currently shows — an empty string is valid `textContent`,
 removing all of an element's content rather than replacing it with new
 text. `.forEach()` is an array method: it calls the function passed to
 it once for each item in the array, handing that item in as `entry`.
@@ -817,7 +812,6 @@ the page yet, because nothing has attached `item` to the document — the
 next unit does that.
 
 ### Mechanical Walkthrough
-
 `entry.is_directory ? entry.name + "/" : entry.name` is the lab's
 ternary, real this time: `entry.is_directory` is the condition,
 `entry.name + "/"` and `entry.name` are the two possible results.
@@ -832,7 +826,8 @@ if (entry.is_directory) {
 ```
 
 `entry.name + "/"` reuses `+` for string concatenation, already taught
-in Lesson 1. `document.createElement("li")` is new — the same
+- in Lesson 1.
+- `document.createElement("li")` is new — the same
 DOM-construction family as Lesson 1's `getElementById`, except this
 one *creates* a new element in memory rather than finding an existing
 one; it isn't attached to the visible page yet.
@@ -958,10 +953,9 @@ because both a folder and a file (added in Lesson 3) will need it
 identically — only what happens with it differs.
 
 ### Mechanical Walkthrough
-
 `currentPath !== ""` and, further down inside the `forEach`,
 `currentPath === ""` are this curriculum's first use of JavaScript's
-`===`/`!==` comparison operators — first appearance, worth a clause of
+- `===`/`!==` comparison operators — first appearance, worth a clause of
 its own: JavaScript also has `==`/`!=`, which silently convert the two
 sides to a common type before comparing (`0 == ""` is `true`); `===`/`!==`
 compare both value *and* type with no conversion, which is why they're
@@ -969,7 +963,7 @@ the pair used by default throughout this project — the behavior is
 predictable without having to reason about JavaScript's conversion rules
 case by case. `upItem.className = "clickable"` and
 `item.className = "clickable"` set an element's CSS class from
-JavaScript — assigning to `.className` attaches that class the same way
+- JavaScript — assigning to `.className` attaches that class the same way
 writing `class="clickable"` directly in HTML would, except done
 dynamically, per element, only for the ones this code decides should
 have it. This is what actually activates the `.sidebar li.clickable` and
@@ -1024,10 +1018,9 @@ For `currentPath = "src/lib"`:
 ```
 
 ### Mechanical Walkthrough
-
 `.split("/")` breaks a string into an array wherever `"/"` appears.
 `.slice(0, -1)` returns a copy of an array from index `0` up to, but
-excluding, the last element — `-1` is a negative index meaning "one from
+- excluding, the last element — `-1` is a negative index meaning "one from
 the end." `.join("/")` reverses `split`, gluing an array of strings back
 together with `"/"` between each piece. Chained, this is "drop the last
 path segment" — entirely as string/array manipulation; only the backend
@@ -1093,8 +1086,7 @@ the very bottom of the script is what actually starts everything running
 the moment the page loads — nothing else in the file calls itself.
 
 ### Mechanical Walkthrough
-
-`function loadFolder(path) { ... }` is a **named function declaration** —
+- `function loadFolder(path) { ... }` is a **named function declaration** —
 the same shape as `renderFileList` earlier in this lesson, reused here,
 not a new concept. `fetch(...)`, `.then((response) => response.json())`,
 the second `.then((data) => { ... })`, and `.catch((error) => { ... })`
@@ -1102,14 +1094,14 @@ are the exact Promise-chain shape from Lesson 1's health check — reused
 wholesale, down to the same three-link structure. `"http://127.0.0.1:8000/files?path=" +
 encodeURIComponent(path)` concatenates a fixed URL prefix with a safely
 escaped `path`, using the same `+` string concatenation already taught;
-`encodeURIComponent` itself is new — it escapes characters unsafe in a
+- `encodeURIComponent` itself is new — it escapes characters unsafe in a
 URL, a space becoming `%20`, `&` becoming `%26`. A folder literally named
 `notes & drafts`, sent unescaped, would have its `&` misread as
 separating two query parameters instead of being part of one folder
 name; `encodeURIComponent` keeps it intact as a single value regardless
 of what characters it contains. Inside the second `.then`,
 `currentPath = data.path;` is this project's first *reassignment* of a
-`let` binding — the exact reason `currentPath` was declared with `let`
+- `let` binding — the exact reason `currentPath` was declared with `let`
 and not `const` back when it was introduced: this is where it actually
 needs to change. `renderFileList(data.entries);` calls the function built
 earlier in this lesson, handing it the freshly fetched entries — the
@@ -1117,7 +1109,7 @@ same function-call syntax used throughout, nothing new. The `.catch`
 body sets `.textContent` on the file list to an error message, the same
 property assignment from Lesson 1. Finally, `loadFolder("");`, sitting
 outside any function at the bottom of the script, runs immediately when
-the browser parses this file — the same way Lesson 1's `fetch(...)` call
+- the browser parses this file — the same way Lesson 1's `fetch(...)` call
 ran immediately, just now wrapped in a named function invoked explicitly
 instead of an anonymous chain sitting directly in the script.
 
@@ -1129,7 +1121,7 @@ Page load: `loadFolder("")` runs directly. It builds
 `http://127.0.0.1:8000/files?path=`, `encodeURIComponent` leaving the
 empty string untouched, and sends it. On the backend, `list_files`
 resolves that empty `path` against `CONTENT_DIR`, confirms with
-`is_relative_to` that it hasn't left the sandbox (trivially true — it
+- `is_relative_to` that it hasn't left the sandbox (trivially true — it
 *is* the sandbox root), confirms it's a real directory, and returns
 `{"path": "", "entries": [...]}` built by the `for` loop. Back in the
 browser, `currentPath` is set to that returned path and `renderFileList`
@@ -1137,15 +1129,15 @@ clears the `<ul>` and rebuilds it entirely: no "up" entry, since
 `currentPath` is empty, then one `<li>` per entry, each labeled by the
 ternary and made clickable if it's a folder.
 
-Click `src/`: the entry's click handler — a closure over `currentPath`
-and `entryPath`, wired up when the list was drawn — calls
+- Click `src/`: the entry's click handler — a closure over `currentPath` and `entryPath`, wired up when the list was drawn — calls
+
 `loadFolder("src")`. The exact same backend path runs again, this time
 resolving `CONTENT_DIR / "src"`, and the exact same frontend path runs
 again, this time drawing an "up" entry too, since `currentPath` is no
 longer empty.
 
 Click `.. (up)`: the up entry's own closure computes
-`currentPath.split("/").slice(0, -1).join("/")` — `"src"` becomes `""` —
+- `currentPath.split("/").slice(0, -1).join("/")` — `"src"` becomes `""` —
 and calls `loadFolder("")` again, back to the root.
 
 ## What breaks without this

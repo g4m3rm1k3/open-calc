@@ -342,22 +342,22 @@ and return exactly what it printed, what errors it raised, and how it
 exited.
 
 ### Mechanical Walkthrough
-
-`["python", str(target_file)]` — this is the same shape as the concept
+- `["python", str(target_file)]` — this is the same shape as the concept
 lab, except running a real file path instead of an inline `-c` string.
 `str(target_file)` converts the `Path` object built at the top of this
-function back into a plain string — `subprocess.run`'s argument list
+- function back into a plain string — `subprocess.run`'s argument list
 needs actual strings to hand to the operating system, not `Path`
 objects, which exist purely for this project's own path manipulation.
-`timeout=5` is the concept lab's timeout, real this time — long enough
+- `timeout=5` is the concept lab's timeout, real this time — long enough
 for a genuine short script, short enough that a runaway loop can't hang
 the request indefinitely. `cwd=CONTENT_DIR` sets the child process's
 working directory, so a script using relative paths of its own resolves
 them against the content folder, not wherever the server happened to be
 started from. The `try`/`except` around it is the exact shape from
-Lesson 3's `read_file` — `except TimeoutExpired` in place of
+- Lesson 3's `read_file` — `except TimeoutExpired` in place of
 `UnicodeDecodeError`, `raise HTTPException(status_code=408, ...)` in
-place of `400`. `408` is the HTTP status for "the client took too long" —
+- place of `400`.
+- `408` is the HTTP status for "the client took too long" —
 a distinct, correct code for a distinct failure, the same way `400` and
 `404` were kept distinct back in Lesson 2.
 
@@ -580,9 +580,8 @@ has no `body` and no `Content-Type` header, because there's nothing to
 send; `path` in the URL's query string is the entire request.
 
 ### Mechanical Walkthrough
-
 `data.stdout || "(no output)"` uses `||` ("or") to fall back to a literal
-string when `data.stdout` is falsy — an empty string counts as falsy in
+- string when `data.stdout` is falsy — an empty string counts as falsy in
 JavaScript, so a script that printed nothing shows `"(no output)"`
 instead of a blank panel that looks broken. `outputElement.className =
 "has-error"` toggles the CSS class from Lesson 2's className-based
@@ -596,7 +595,7 @@ Click Run on the currently open `src/main.py` tab: `runFile()` reads
 `activeTabPath`, sets the output panel to `"Running..."`, and sends
 `POST /run?path=src/main.py`. On the backend, `run_file` resolves and
 verifies the path with the same checks every file route in this project
-shares, confirms the `.py` extension, then calls `subprocess.run` — a
+- shares, confirms the `.py` extension, then calls `subprocess.run` — a
 genuinely separate operating-system process starts, runs
 `src/main.py` to completion (or is killed at the five-second mark),
 and its stdout, stderr, and exit code are captured back into this
@@ -607,7 +606,7 @@ frontend sees an empty `stderr` and displays `stdout` in the normal
 ## What breaks without this
 
 Already demonstrated concretely, not hypothetically: without the
-`timeout`, `src/infinite_loop.py` would never return at all — the
+- `timeout`, `src/infinite_loop.py` would never return at all — the
 request would hang indefinitely, and (without process isolation on top
 of that) could take the entire server down with it. With process
 isolation but no timeout, the request still hangs forever even though the
@@ -621,7 +620,7 @@ a bounded failure, reported cleanly.
    the output panel go from "Running..." to a timeout message after five
    seconds.
 2. Write a `.py` file that raises an uncaught exception (e.g.
-   `raise ValueError("test")`) and run it — confirm `stderr` is non-empty
+- `raise ValueError("test")`) and run it — confirm `stderr` is non-empty
    and the output panel switches to the error style.
 3. In the concept lab, change the timeout to `0.001` seconds against a
    script that just prints one line with no delay — predict whether it

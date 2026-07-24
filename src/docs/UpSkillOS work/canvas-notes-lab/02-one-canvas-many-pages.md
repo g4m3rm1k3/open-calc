@@ -182,13 +182,13 @@ export default function PageCanvas({ pageId, initialJSON, onLeavePage }) {
 ```
 
 #### Mechanical Walkthrough
-
-`useRef(pageId)` — established (`useeffect-and-useref-fundamentals/01-...md`),
+- `useRef(pageId)` — established (`useeffect-and-useref-fundamentals/01-...md`),
 seeded with whatever `pageId` this component first mounted with.
 `prevPageIdRef.current !== pageId` reads the box's stashed value and
 compares it against this render's fresh prop — the two can only differ
 if a parent passed a genuinely new `pageId` since the last time this
-effect ran. `onLeavePage(prevPageIdRef.current, ...)` — note it passes
+- effect ran.
+- `onLeavePage(prevPageIdRef.current, ...)` — note it passes
 the *old* id, not the new one; this is what makes the save target the
 page actually being left, not the page being entered. The assignment
 `prevPageIdRef.current = pageId`, at the very end, updates the box for
@@ -210,13 +210,13 @@ instead of the whole payload every time).
 
 The alternative — running this logic inside the event handler that
 *causes* the page switch (e.g., inside `PageTabs`'s `onSelect`) instead
-of inside an effect watching `pageId` — was rejected here: it would
+- of inside an effect watching `pageId` — was rejected here: it would
 require `PageCanvas` to expose its save/load logic to its parent (via
 `forwardRef`/`useImperativeHandle`, a materially more advanced React
 API), just so the parent's click handler could call it before changing
 state. Watching `pageId` itself and reacting to the *effect* of the
 click, rather than the click, keeps every bit of canvas lifecycle logic
-inside `PageCanvas` — the component that owns the canvas is the only
+- inside `PageCanvas` — the component that owns the canvas is the only
 one that needs to know how to save and load it.
 
 #### Connect to What Came Before
@@ -332,15 +332,14 @@ corrects the `loadFromJSON` line inside that same file; no other lines
 change.)
 
 #### Mechanical Walkthrough
-
-`canvas.loadFromJSON(initialJSON)` returns a `Promise<Canvas>` — new
+- `canvas.loadFromJSON(initialJSON)` returns a `Promise<Canvas>` — new
 here, first appearance of a fabric method whose completion must be
 awaited rather than assumed synchronous. `.then(() => canvas.requestRenderAll())`
 schedules the render for after deserialization genuinely finishes,
 whether that takes one tick or several (fabric enlivens each object,
 including any that need to fetch external resources like images —
 relevant again once Increment 6 adds pasted images). `canvas.clear()`
-— established (`SvgStudioPage.jsx` already relies on it) — empties the
+- — established (`SvgStudioPage.jsx` already relies on it) — empties the
 canvas synchronously before either branch runs, so the *previous*
 page's shapes are never briefly visible under the new page's content.
 
@@ -359,7 +358,7 @@ second.
 
 #### SE Lens
 
-Dispose-and-recreate (a fresh `fabric.Canvas` — and a fresh `<canvas>`
+- Dispose-and-recreate (a fresh `fabric.Canvas` — and a fresh `<canvas>`
 DOM element — per page) is the safer default: zero risk of any
 listener, cached dimension, or internal fabric state leaking from one
 page into the next, at the cost of real DOM/WebGL-context churn every
@@ -389,7 +388,7 @@ A user clicks a different page tab: `activePageId` changes in
 `pageId` prop. The effect built in this lesson's first unit notices
 `pageId` no longer matches `prevPageIdRef.current`, so it calls
 `onLeavePage` with the *outgoing* page's id and its live
-`canvas.toDatalessJSON()` — `CanvasNotesPage` stores that under the
+- `canvas.toDatalessJSON()` — `CanvasNotesPage` stores that under the
 outgoing page's id in `pageCanvasData`. The effect then clears the one
 shared canvas and, per this lesson's second unit, correctly awaits
 `loadFromJSON` before rendering the incoming page's saved content (or a
@@ -427,7 +426,7 @@ with no error message telling them why.
       `onLeavePage` (using `prevPageIdRef`, not the new `pageId`) before
       clearing and loading the incoming page's content
 - [ ] `loadFromJSON` is awaited (via `.then()` or `await`) before
-      calling `requestRenderAll` — never passed a callback in its
+- calling `requestRenderAll` — never passed a callback in its
       reviver argument position
 - [ ] Verified live, this session: drawing on one page, switching away,
       and switching back restores the drawing exactly; a page with no

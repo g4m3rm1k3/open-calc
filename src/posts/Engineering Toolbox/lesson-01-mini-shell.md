@@ -96,14 +96,15 @@ convention) and reads real input, forever, until someone types exactly
 `exit` — but does nothing with any other input yet.
 
 ### Mechanical Walkthrough
-
-`def mini_shell():` — basic. `while True:` — Lesson 10's intentional
+- `def mini_shell():` — basic.
+- `while True:` — Lesson 10's intentional
 infinite loop shape, reminder, here relying on the `break` below rather
-than an empty-read sentinel. `command = input("$ ")` — the concept from
+- than an empty-read sentinel.
+- `command = input("$ ")` — the concept from
 this unit's lab, reused for real; `input()` accepts an optional prompt
 string, printed before waiting — first appearance of that specific
 argument, small enough not to need its own lab. `if command == "exit":
-break` — basic string comparison and loop control, already established.
+- break` — basic string comparison and loop control, already established.
 
 ### CS Lens
 
@@ -256,13 +257,14 @@ typing a command actually runs it as a separate process, safely, and
 the loop continues until `exit`.
 
 ### Mechanical Walkthrough
-
-`parts = command.split()` — `.split()` with no arguments (Lesson 5,
+- `parts = command.split()` — `.split()` with no arguments (Lesson 5,
 reminder), turning the typed line into a list of words — exactly the
-list shape `subprocess.run()` expects. `if not parts: continue` —
-`continue` (Lesson 4, reminder) — skips straight to the next prompt on
+- list shape `subprocess.run()` expects.
+- `if not parts: continue` — `continue` (Lesson 4, reminder) — skips straight to the next prompt on
+
 an empty line (just pressing Enter), rather than trying to run "nothing"
-as a command. `subprocess.run(parts)` — the concept from this unit's
+- as a command.
+- `subprocess.run(parts)` — the concept from this unit's
 lab, reused for real: whatever the person typed, split into words,
 launched directly.
 

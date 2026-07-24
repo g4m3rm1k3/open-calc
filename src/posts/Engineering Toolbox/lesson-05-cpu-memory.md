@@ -106,14 +106,15 @@ nothing with each one yet, and returns an (currently empty) dictionary
 meant to hold the parsed results.
 
 ### Mechanical Walkthrough
+- `def memory_usage():` — assuming function definitions as basic.
+- `stats = {}` — assuming empty-dict creation as basic, from your stated Python background.
+- `with open("/proc/meminfo") as f:` — `with`/`open` reminder, from Lesson 1 and reused throughout Lesson 4.
+- `for line in f:` — this
 
-`def memory_usage():` — assuming function definitions as basic. `stats
-= {}` — assuming empty-dict creation as basic, from your stated Python
-background. `with open("/proc/meminfo") as f:` — `with`/`open` reminder,
-from Lesson 1 and reused throughout Lesson 4. `for line in f:` — this
 *is* the concept from this unit's lab, reused for real: each `line`
-will be one full line of `/proc/meminfo`, newline included. `pass` —
-reminder placeholder. `return stats` — assuming `return` as basic.
+- will be one full line of `/proc/meminfo`, newline included.
+- `pass` — reminder placeholder.
+- `return stats` — assuming `return` as basic.
 
 ### CS Lens
 
@@ -221,15 +222,13 @@ every label in `/proc/meminfo` (`"MemTotal"`, `"MemFree"`, ...) to its
 value in kilobytes, as an actual `int`.
 
 ### Mechanical Walkthrough
+- `key, rest = line.split(":")` — tuple unpacking (the Lesson 1 concept, reappearing — a reminder) applied to a two-element list from `.split(":")` — worth noting `.split()` returns a `list`, not a `tuple`, but unpacking works identically on either.
+- `int(rest.split()[0])` — `.split()` with no
 
-`key, rest = line.split(":")` — tuple unpacking (the Lesson 1 concept,
-reappearing — a reminder) applied to a two-element list from `.split(":")`
-— worth noting `.split()` returns a `list`, not a `tuple`, but unpacking
-works identically on either. `int(rest.split()[0])` — `.split()` with no
 arguments, from this unit's lab, reused for real; `[0]` indexing into the
 resulting list to grab just the number, discarding `"kB"`; `int(...)`
 converting that number-as-string into a real integer, assumed basic.
-`stats[key] = value_kb` — assigning into a dictionary by key; assuming
+- `stats[key] = value_kb` — assigning into a dictionary by key; assuming
 this as basic dict usage from your stated Python background, since the
 underlying idea ("dictionaries store key/value pairs") isn't new here,
 only its use in a real loop.
@@ -350,9 +349,10 @@ because on its own this is only ever *one* reading, and one reading, as
 the rest of this part proves, isn't usage yet.
 
 ### Mechanical Walkthrough
+- `def cpu_snapshot():` — basic.
+- `with open("/proc/stat") as f:` — reminder.
+- `line = f.readline()` — the concept from this unit's lab,
 
-`def cpu_snapshot():` — basic. `with open("/proc/stat") as f:` —
-reminder. `line = f.readline()` — the concept from this unit's lab,
 reused for real.
 
 ### CS Lens
@@ -460,17 +460,17 @@ booted, not "right now," which is exactly the trap the next unit
 addresses.
 
 ### Mechanical Walkthrough
-
-`fields = line.split()` — `.split()` with no arguments, reminder from
+- `fields = line.split()` — `.split()` with no arguments, reminder from
 Part A, reused here on the CPU line instead of a meminfo line.
-`[int(x) for x in fields[1:]]` — the list comprehension concept from
+- `[int(x) for x in fields[1:]]` — the list comprehension concept from
 this unit's lab, reused for real; `fields[1:]` is a slice (Lesson 61,
-reminder) skipping the `"cpu"` label itself. `values[3]` — indexing;
+- reminder) skipping the `"cpu"` label itself.
+- `values[3]` — indexing;
 per `/proc/stat`'s documented field order, index `3` (the fourth
 number) is specifically the *idle* time field — a fact about this
 file's format, not something derivable from the code alone, worth
 stating plainly rather than leaving as an unexplained magic number.
-`sum(values)` — the `sum()` concept from this unit's lab, reused: total
+- `sum(values)` — the `sum()` concept from this unit's lab, reused: total
 time across *every* category (user, system, idle, iowait, and others),
 not just idle.
 
@@ -607,16 +607,18 @@ read; `cpu_usage()` deliberately takes two, one second apart by
 default, and reports the percentage of that interval spent *not* idle.
 
 ### Mechanical Walkthrough
+- `import time` — reminder of `import`, applied to a new module.
+- `cpu_snapshot()` called twice — reusing the function built two units ago, once before and once after the pause.
+- `time.sleep(interval)` — the
 
-`import time` — reminder of `import`, applied to a new module.
-`cpu_snapshot()` called twice — reusing the function built two units
-ago, once before and once after the pause. `time.sleep(interval)` — the
 concept from this unit's lab, reused for real, with `interval`
-(default `1` second) controlling the gap. `idle_delta = idle2 - idle1`
-and `total_delta = total2 - total1` — basic subtraction, but the *idea*
+- (default `1` second) controlling the gap.
+- `idle_delta = idle2 - idle1` and `total_delta = total2 - total1` — basic subtraction, but the *idea*
+
 being computed — a difference between two points in time — is this
-whole unit's point, not incidental. `100 * (1 - idle_delta /
-total_delta)` — `idle_delta / total_delta` is the *fraction* of elapsed
+- whole unit's point, not incidental.
+- `100 * (1 - idle_delta / total_delta)` — `idle_delta / total_delta` is the *fraction* of elapsed
+
 time that was idle; `1 -` that fraction is the fraction that was busy;
 `100 *` converts it to a percentage.
 

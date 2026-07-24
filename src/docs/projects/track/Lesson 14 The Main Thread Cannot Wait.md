@@ -147,13 +147,13 @@ already the real, permanent fix, now fully motivated by having seen the
 failure it prevents.
 
 ### Mechanical Walkthrough
-
 - `Thread.sleep(8000)` — **first appearance.** Pauses *the calling
   thread* — here, the main thread, since that's what ran this click
   listener — for the given number of milliseconds, doing no other work
-  in the meantime. `throws InterruptedException`/`try`/`catch` — the
+- in the meantime.
+- `throws InterruptedException`/`try`/`catch` — the
   compiler requires handling this checked exception (a category
-  distinct from the unchecked `NumberFormatException` in Lesson 9 —
+- distinct from the unchecked `NumberFormatException` in Lesson 9 —
   covered again properly if a later lesson needs the distinction; for
   now, know Java forces you to acknowledge this specific possible
   failure at compile time, not just at runtime).
@@ -239,25 +239,25 @@ Delete `ThreadDemo.java` — the real project doesn't create raw
 `ExecutorService` remains the real, permanent tool.
 
 ### Mechanical Walkthrough
-
 - `Thread.currentThread().getName()` — **first appearance.** Returns
-  the currently-executing thread's name — `"main"` is a fixed, special
+- the currently-executing thread's name — `"main"` is a fixed, special
   name every Java (and Android) process's initial thread carries.
 - `new Thread(() -> { ... })` — **first appearance.** `Thread`'s
-  constructor accepts a `Runnable` — the exact same interface labbed
+- constructor accepts a `Runnable` — the exact same interface labbed
   in this lesson's first unit — describing what the new thread should
   run.
 - `worker.start()` — **first appearance.** Actually begins the new
   thread's execution, running its `Runnable` concurrently with
-  whatever called `start()` — **not** the same as calling `.run()`
+- whatever called `start()` — **not** the same as calling `.run()`
   directly, which would just execute the `Runnable`'s code on the
   *current* thread with no new thread created at all, a common
   first-time mistake worth flagging explicitly.
 - `worker.join()` — **first appearance.** Blocks the calling thread
-  until `worker` finishes — the deliberate, controlled version of
+- until `worker` finishes — the deliberate, controlled version of
   "wait for this to be done," in contrast to the *accidental*,
   uncontrolled blocking of the main thread in the previous unit's ANR
-  demo. `join()` here runs on `main`, which is fine — this is a
+- demo.
+- `join()` here runs on `main`, which is fine — this is a
   standalone demo, not an Android UI thread with real responsiveness
   requirements.
 

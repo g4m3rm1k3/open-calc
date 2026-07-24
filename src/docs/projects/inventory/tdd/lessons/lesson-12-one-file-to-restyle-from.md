@@ -156,7 +156,6 @@ body {
 - **Dependencies** — none.
 
 ### Mechanical Walkthrough
-
 - `:root { ... }` — **(a) first appearance** of a **CSS custom
   property** (informally, a "CSS variable").
   *(Full standalone treatment: ../concepts/css-custom-properties.md.)*
@@ -173,7 +172,7 @@ body {
   had no styling at all before this lesson).
 - `font-family: system-ui, sans-serif;` — already-known basic CSS;
   named only because it's this project's first real typography decision
-  — `system-ui` uses the visiting device's own native UI font rather than
+- — `system-ui` uses the visiting device's own native UI font rather than
   shipping/loading one, a real, deliberate simplicity choice.
 
 ### CS Lens
@@ -246,12 +245,11 @@ export function themeColors(): ThemeColors {
 ```
 
 ### Mechanical Walkthrough
-
 - `getComputedStyle(document.documentElement)` — **(a) first
   appearance.** `document.documentElement` is the real `<html>` element
   (the same element `:root` in CSS refers to). `getComputedStyle(el)`
   returns an object representing *every* real, final CSS value currently
-  applied to `el` — after the browser has resolved cascading, inheritance,
+- applied to `el` — after the browser has resolved cascading, inheritance,
   and, relevantly here, custom properties — as opposed to reading an
   element's own inline `style` attribute, which would miss anything set
   in a stylesheet (exactly how this project's colors are set).
@@ -261,11 +259,11 @@ export function themeColors(): ThemeColors {
 - `.trim()` — already-known basic string method; **(a) worth naming
   why it's needed here specifically**: browsers commonly return computed
   custom-property values with a leading space (`" #07111e"`, an artifact
-  of how the declaration `--color-bg: #07111e;` itself is parsed) —
+- of how the declaration `--color-bg: #07111e;` itself is parsed) —
   verified for real, this session, before trusting it blindly.
 - `export interface ThemeColors { ... }` — **(b) reappearing** interface
   syntax (Lesson 7), naming the real shape this module's one public
-  function returns — so any file importing `themeColors` gets full,
+- function returns — so any file importing `themeColors` gets full,
   checked typing on the result, not a bare, untyped object.
 - `themeColors()` — **(a) first appearance** of this project's own real
   "read the current theme" function — called fresh, each time, rather
@@ -344,17 +342,16 @@ import "./theme.css";
 ```
 
 ### Mechanical Walkthrough
-
 - `import { themeColors } from "./theme.ts";` replaces the four deleted
   `const ..._COLOR = 0x......;` lines entirely.
 - `const colors = themeColors();` — called once, at the top of
   `createViewport`, **after** the component has mounted (this function
-  only ever runs inside `Viewport.tsx`'s first `useEffect`, Lesson 11) —
+- only ever runs inside `Viewport.tsx`'s first `useEffect`, Lesson 11) —
   guaranteeing `theme.css` has already been loaded and applied to the
   real page by the time this runs.
 - `renderer.setClearColor(colors.background, 1)` / `new THREE.
   GridHelper(500, 50, colors.grid, colors.grid)` / `segment.motion ===
-  "G0" ? colors.rapid : colors.feed` — **(a) a real, verified fact worth
+- "G0" ? colors.rapid : colors.feed` — **(a) a real, verified fact worth
   naming explicitly**: every one of these Three.js APIs accepts a plain
   CSS-style hex **string** directly (`"#07111e"`), not only the `0x...`
   number literals used since Lesson 8 — confirmed this session:
@@ -365,7 +362,7 @@ import "./theme.css";
   importing a **CSS file directly inside a `.ts`/`.tsx` file**.
   *(Full standalone treatment: ../concepts/vite-css-side-effect-import.md.)*
   Not a
-  value import (nothing is bound to a name) — Vite recognizes `.css`
+- value import (nothing is bound to a name) — Vite recognizes `.css`
   imports specially and, as a real, deliberate **side effect**, injects
   the file's real rules into the page the moment this module runs —
   which is exactly why this one line, placed before `App` is even

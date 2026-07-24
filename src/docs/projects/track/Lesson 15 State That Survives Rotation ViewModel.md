@@ -141,10 +141,9 @@ This is the whole new file — a brand-new class with nothing surrounding
 it yet.
 
 ### Mechanical Walkthrough
-
 - `extends AndroidViewModel` — **first appearance.** A specific
   `ViewModel` subclass that accepts an `Application` (rather than plain
-  `ViewModel`, which accepts no context at all) — needed here because
+- `ViewModel`, which accepts no context at all) — needed here because
   `AppDatabase.getInstance` requires a `Context`, and an `Application`
   context (Lesson 13's `getApplicationContext()`) is exactly the kind
   of long-lived context safe to hold in an object that deliberately
@@ -161,7 +160,7 @@ it yet.
   first Concept Unit.
 - `public InventoryViewModel(@NonNull Application application)` —
   **first appearance of this exact constructor shape**, required by
-  `AndroidViewModel`'s contract — the framework calls this specific
+- `AndroidViewModel`'s contract — the framework calls this specific
   constructor when it needs to create a new instance (only once per
   logical screen, never again after rotation, which is the entire
   point).
@@ -171,7 +170,7 @@ it yet.
 - `getItems()` / `isLoaded()` — reappearing (getter pattern, Lesson 7),
   package-private (no modifier) rather than `public`, the same
   tightly-coupled-helper reasoning as `InventoryViewHolder`'s fields in
-  Lesson 6 — only `InventoryActivity`, in the same package, needs
+- Lesson 6 — only `InventoryActivity`, in the same package, needs
   these.
 
 ### CS Lens
@@ -336,7 +335,6 @@ very first time, guarded by `isLoaded()` — the direct fix for the
 wasted query proven at the start of this lesson.
 
 ### Mechanical Walkthrough
-
 - `new ViewModelProvider(this)` — **first appearance.** `this` here is
   the Activity, acting as the **ViewModelStoreOwner** — the framework
   uses it to find (or create, the first time) the retained store this
@@ -361,10 +359,10 @@ wasted query proven at the start of this lesson.
   payoff: `false` only on the very first `onCreate` for this screen's
   lifetime; `true` on every subsequent one, including every rotation.
 - `viewModel.loadItems(() -> runOnUiThread(() -> adapter.notifyDataSetChanged()))`
-  — reappearing pattern (`Runnable` callback, this lesson's first unit;
+- — reappearing pattern (`Runnable` callback, this lesson's first unit;
   `runOnUiThread`, Lesson 13/14), new shape: the `ViewModel`'s method
   itself takes a `Runnable` to run when loading finishes, rather than
-  the Activity directly calling `dbExecutor`/`runOnUiThread` itself —
+- the Activity directly calling `dbExecutor`/`runOnUiThread` itself —
   this is what lets `dbExecutor` move entirely into the `ViewModel`,
   out of the Activity, matching the SE Lens's "ViewModel never touches
   UI directly" rule: the `ViewModel` runs the callback it was *given*,

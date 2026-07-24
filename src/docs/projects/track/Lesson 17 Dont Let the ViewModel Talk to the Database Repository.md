@@ -119,7 +119,6 @@ here is conceptually new syntax; every piece (`MutableLiveData`,
 from Lesson 13–16, relocated wholesale into its own class.
 
 ### Mechanical Walkthrough
-
 - `class ItemRepository` — a plain class, not extending anything —
   **first appearance of this specific shape** in this project's
   architecture: unlike `AndroidViewModel` (Lesson 15) or `RecyclerView.Adapter`
@@ -132,7 +131,7 @@ from Lesson 13–16, relocated wholesale into its own class.
   `AndroidViewModel`: a Repository, like a `ViewModel`, should outlive
   any single Activity, so it must never hold an Activity-scoped context.
 - Every other line — `itemDao`, `dbExecutor`, `itemsLiveData`, `loaded`,
-  `getItems()`, `loadItems()`, `addItem()` — **reappearing**, verbatim,
+- `getItems()`, `loadItems()`, `addItem()` — **reappearing**, verbatim,
   from Lesson 13–16's `InventoryViewModel`.
 
 ### The New Code — the ViewModel, Reduced
@@ -201,14 +200,13 @@ someone else manages" — the actual, structural realization of the
 Repository pattern's promise.
 
 ### Mechanical Walkthrough
-
 - `private final ItemRepository repository;` — reappearing (field,
   constructor-assigned, `final`) new type, replacing four separate
   fields (`itemDao`, `dbExecutor`, `itemsLiveData`, `loaded`) with one.
 - `repository = new ItemRepository(application);` — reappearing
   (constructor call).
 - `getItems()`, `loadItems()`, `addItem(item)` — every method body is
-  now exactly one line, calling the matching method on `repository` —
+- now exactly one line, calling the matching method on `repository` —
   worth naming plainly as **delegation**: this class does none of the
   real work itself anymore, only forwards the call to the object that
   does.

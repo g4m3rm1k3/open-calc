@@ -113,17 +113,18 @@ each generated short code to the real URL it represents. `generate_code
 ()` produces a random 6-character code from letters and digits.
 
 ### Mechanical Walkthrough
-
-`import json` — first appearance. `import string`, `import random` —
+- `import json` — first appearance.
+- `import string`, `import random` —
 first appearances: `string.ascii_letters` is a ready-made constant
 string containing every letter, upper and lower case; `string.digits`
-is `"0123456789"`. `links = {}` — an empty dict, meant to persist for
+- is `"0123456789"`.
+- `links = {}` — an empty dict, meant to persist for
 the server's whole run (not saved to disk — a real, honest
 simplification; a production version would use a real database).
-`"".join(random.choice(chars) for _ in range(length))` — a generator
+- `"".join(random.choice(chars) for _ in range(length))` — a generator
 expression (Lesson 28, reminder) feeding `.join()`, picking `length`
 random characters from `chars` and joining them into one string;
-`random.choice()` — first appearance, picks one random element from a
+- `random.choice()` — first appearance, picks one random element from a
 sequence.
 
 ### CS Lens
@@ -286,17 +287,19 @@ JSON HTTP response, are complete — but nothing yet reads a real
 request or calls any of them.
 
 ### Mechanical Walkthrough
+- `data = json.loads(body)` — the concept from this unit's lab, reused for real, decoding the request's raw body.
+- `url = data["url"]` — plain
 
-`data = json.loads(body)` — the concept from this unit's lab, reused
-for real, decoding the request's raw body. `url = data["url"]` — plain
 dict key access, already basic. `code = generate_code()`, `links[code]
-= url` — using this lesson's earlier unit directly. `return 201, {...}`
+- = url` — using this lesson's earlier unit directly.
+- `return 201, {...}`
 — a function returning a **tuple** (a status code and a result
 dictionary together), already-basic tuple usage (Lesson 1, reminder),
 here used to hand back two related pieces of information from one
-call. `if code in links:` — dictionary membership testing, already
-basic. `json_response(status, body_dict)` — `status_text = {200: "OK",
-...}[status]` — a dictionary used as a lookup table (not a router this
+- call.
+- `if code in links:` — dictionary membership testing, already basic.
+- `json_response(status, body_dict)` — `status_text = {200: "OK", ...}[status]` — a dictionary used as a lookup table (not a router this
+
 time, just a status-code-to-text mapping), reused idea, new specific
 use. The f-string response assembly — Lesson 25, reminder, reused for
 real JSON content instead of HTML/files.

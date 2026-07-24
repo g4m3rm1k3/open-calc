@@ -92,9 +92,8 @@ module's tools available under the name `socket`. Nothing is connected
 to a network yet — we've only unlocked the toolbox.
 
 ### Mechanical Walkthrough
+- Enumerating the line: `import` (first appearance — a keyword that loads a module and binds it to a name), `socket` (first appearance — the name
 
-Enumerating the line: `import` (first appearance — a keyword that loads
-a module and binds it to a name), `socket` (first appearance — the name
 of the standard-library module containing every networking tool we'll
 use in this lesson). There is nothing else on this line.
 
@@ -207,11 +206,12 @@ arbitrary port number above 1024 (ports below that are reserved by the
 OS). Nothing is bound or listening yet — these are just labeled values.
 
 ### Mechanical Walkthrough
-
-`HOST` and `PORT` — both first appearance as *names*, but they're just
+- `HOST` and `PORT` — both first appearance as *names*, but they're just
 variable assignment, already-basic syntax from your Python background —
-no new unit owed for assignment itself. `"127.0.0.1"` — a string, also
-already basic. `65432` — an integer literal, already basic. Nothing here
+- no new unit owed for assignment itself.
+- `"127.0.0.1"` — a string, also already basic.
+- `65432` — an integer literal, already basic. Nothing here
+
 is new *syntax*; what's new is the upcoming *use* of these two values
 together as a tuple, which the next code block shows.
 
@@ -309,15 +309,16 @@ The file now creates one live socket object and holds onto it as
 just created, sitting idle, ready to be configured.
 
 ### Mechanical Walkthrough
-
-`socket.socket(...)` — first appearance: calling the `socket` module's
+- `socket.socket(...)` — first appearance: calling the `socket` module's
 `socket` **class** as a constructor, producing a new socket object.
-`socket.AF_INET` — first appearance: a constant meaning "use IPv4
+- `socket.AF_INET` — first appearance: a constant meaning "use IPv4
 addressing" (as opposed to IPv6, Bluetooth, or other address families
-`socket` also supports). `socket.SOCK_STREAM` — first appearance: a
+- `socket` also supports).
+- `socket.SOCK_STREAM` — first appearance: a
 constant meaning "use TCP" — a reliable, ordered, connection-based
 stream (as opposed to `SOCK_DGRAM`, UDP, which is connectionless and can
-drop or reorder messages — not covered this lesson). `server_socket = `
+- drop or reorder messages — not covered this lesson).
+- `server_socket = `
 — plain assignment, already basic.
 
 ### CS Lens
@@ -431,12 +432,12 @@ remaining unit in this lesson adds real code *inside* this block,
 replacing `pass`.
 
 ### Mechanical Walkthrough
-
-`with` — first appearance: a keyword that wraps a block, guaranteeing
+- `with` — first appearance: a keyword that wraps a block, guaranteeing
 cleanup on exit even if an error occurs partway through. `as
-server_socket` — first appearance of this exact pattern: names the
+- server_socket` — first appearance of this exact pattern: names the
 value the `with` expression produces (here, the socket object itself)
-so the indented block can use it. `pass` — first appearance: a
+- so the indented block can use it.
+- `pass` — first appearance: a
 do-nothing statement, used only because Python requires an indented
 block to contain *something*; it will be deleted the moment real code
 takes its place.
@@ -532,15 +533,15 @@ for connection attempts. It doesn't yet do anything when one arrives —
 that's the next unit.
 
 ### Mechanical Walkthrough
-
-`server_socket.bind(...)` — first appearance: a method that claims a
+- `server_socket.bind(...)` — first appearance: a method that claims a
 specific address for this socket; raises an error if something else on
-the machine already claimed that exact host/port. `(HOST, PORT)` — this
+- the machine already claimed that exact host/port.
+- `(HOST, PORT)` — this
 *is* the tuple concept from two units ago, reappearing: two separate
 variables, combined into one tuple, because `bind` requires the address
 as a single argument, not two. Worth naming explicitly since it's the
 first real *use* of a tuple, not just a demonstration of one.
-`server_socket.listen()` — first appearance: a method with no arguments
+- `server_socket.listen()` — first appearance: a method with no arguments
 that switches the socket into "queue incoming connections" mode; called
 with nothing here, meaning "use the default queue size."
 
@@ -631,17 +632,18 @@ happens, it resumes, holding two new values: a socket for talking to
 that specific client, and that client's address.
 
 ### Mechanical Walkthrough
-
-`server_socket.accept()` — first appearance: a **blocking** call (the
+- `server_socket.accept()` — first appearance: a **blocking** call (the
 program does nothing else, uses no CPU, just waits) until a client
-connects, then returns a tuple. `conn, addr = ...` — this is tuple
+- connects, then returns a tuple.
+- `conn, addr = ...` — this is tuple
 unpacking, the exact concept from the Tuples unit, reappearing for its
 first real use: `accept()`'s return value is a two-element tuple, and
-this line splits it into two names in one step. `conn` — first
+- this line splits it into two names in one step.
+- `conn` — first
 appearance conceptually: a **new, separate socket**, distinct from
 `server_socket`, specifically for exchanging data with this one client
-— `server_socket` itself keeps only listening for *further* new
-connections. `addr` — the connecting client's own `(host, port)` tuple.
+- — `server_socket` itself keeps only listening for *further* new connections.
+- `addr` — the connecting client's own `(host, port)` tuple.
 
 ### CS Lens
 
@@ -761,16 +763,17 @@ guaranteed closed when the block ends, even if `recv` or `decode` raises
 an error.
 
 ### Mechanical Walkthrough
-
-`with conn:` — the exact `with` concept from earlier, reapplied to a
+- `with conn:` — the exact `with` concept from earlier, reapplied to a
 different object (a connection socket instead of a listening one) — a
 reminder, not a re-explanation, per the Repetition Rule. `print(
-"Connected by", addr)` — `print` with two arguments and a comma; already
-basic. `conn.recv(1024)` — first appearance: a blocking call that waits
+- "Connected by", addr)` — `print` with two arguments and a comma; already basic.
+- `conn.recv(1024)` — first appearance: a blocking call that waits
+
 for data to arrive on this connection and returns it as **bytes** (not
 text), up to `1024` bytes at a time (the maximum chunk size to read in
-one call — real messages can require multiple `recv` calls, not covered
-this lesson). `data.decode()` — the `decode` concept from the throwaway
+- one call — real messages can require multiple `recv` calls, not covered this lesson).
+- `data.decode()` — the `decode` concept from the throwaway
+
 lab, reappearing for its first real use: converting the raw bytes we
 received back into a readable `str`.
 

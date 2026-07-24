@@ -426,18 +426,16 @@ handling now looping and delegating instead of checking one value
 inline. `_apply_g_code` itself is the entire new real table.
 
 ### Mechanical Walkthrough
-
 Every distinct real case, in order, sorted honestly:
 
 - `g_values = words["G"] if isinstance(...) else [words["G"]]` — **(b)
   reappearing** — the identical multi-value normalization already
-  established for `M` (just above, unchanged) — a real, direct port of
+- established for `M` (just above, unchanged) — a real, direct port of
   `_gList`'s own `Array.isArray(w.G) ? w.G : [w.G]` shape, now applied to
   `G` for the first time.
 - `for g_value in g_values: if self._apply_g_code(...): went_home = True`
-  — **(b) reappearing** loop-and-delegate shape, per `_gList`/`for (const
-  g of gs) { applyGCode(...) }`; `went_home` — **(a) first appearance**
-  of the mechanism — a local flag threading `_apply_g_code`'s one
+- — **(b) reappearing** loop-and-delegate shape, per `_gList`/`for (const g of gs) { applyGCode(...) }`; `went_home` — **(a) first appearance** of the mechanism — a local flag threading `_apply_g_code`'s one
+
   real side effect that isn't a plain field mutation (a full position
   override) back out to where the command dict gets built.
 - `g2 = round(g_value * 10) / 10; g_int = math.floor(g2)` — **(a) first
@@ -450,14 +448,14 @@ Every distinct real case, in order, sorted honestly:
   before.
 - `elif g_int == 20/21: self.units = ...` — **(a) first appearance** —
   units, real but not yet consumed by `MachineState`/the DRO (a named,
-  honest gap, not a silent one — nothing downstream reads `self.units`
+- honest gap, not a silent one — nothing downstream reads `self.units`
   yet).
 - `elif g_int == 28: return True` — **(a) first appearance** — the one
   case with a real, immediate side effect beyond modal state; deliberately
   returns rather than mutating a field directly, so the caller can apply
   it to the actual command being built.
 - `elif g_int == 40/41/42: self.cutter_comp = ...` / `elif g_int ==
-  43/44/49: self.tool_length_comp = ...` (43 also reading `H`) — **(a)
+- 43/44/49: self.tool_length_comp = ...` (43 also reading `H`) — **(a)
   first appearance** of both fields; **(b) reappearing** the `if "H" in
   words` conditional-read shape, already established for `S`/`F` above.
 - `elif g_int == 50/92: if "S" in words: self.css_speed_max = ...` — **(a)
@@ -479,17 +477,17 @@ Every distinct real case, in order, sorted honestly:
   entirely produces the identical real result (a no-op) for this
   project's mill-only model, since the gate would never pass anyway.
 - `elif g_int == 80: ...` / `elif g_int in (81..89): ...` — **(a) first
-  appearance** — canned-cycle codes, each setting both `current_motion`
+- appearance** — canned-cycle codes, each setting both `current_motion`
   and `cycle` together, exactly as the reference's own two-assignment
   cases do.
 - `elif g_int == 90/91: self.pos_mode = ...` — **(a) first appearance**.
 - `elif g_int == 94/95: self.feed_mode = ...` — **(a) first appearance**.
 - `elif g_int == 96/97: self.css_mode = ...` — **(a) first appearance** —
   `97` also reading `S` into `self.spindle_rpm` specifically (not a new
-  `css_speed`-like field) — ported exactly as the reference's own
+- `css_speed`-like field) — ported exactly as the reference's own
   `ch.rpm = w.S` line does.
 - `elif g_int == 98/99: self.retract_plane = ...` — **(a) first
-  appearance** — the reference's own `if (lathe) ... else ...` branch,
+- appearance** — the reference's own `if (lathe) ... else ...` branch,
   narrowed to only the non-lathe half, since this project has no lathe
   concept to branch on at all.
 - `return False` — **(c) already basic** — the default path for every

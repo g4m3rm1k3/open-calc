@@ -415,10 +415,9 @@ formatting, closing the handle) now lives entirely inside
 `table.cpp`, invisible to `main`.
 
 ### Mechanical Walkthrough
-
 - `class Table` — **first appearance.** Declares a new type, same
   general idea as `struct Student`, but a `class` defaults its members
-  to `private` instead of `public` — the mechanism this unit's whole
+- to `private` instead of `public` — the mechanism this unit's whole
   Problem section was about.
 - `public:` / `private:` — **first appearance.** Access specifiers:
   everything listed after `public:` is reachable from outside the
@@ -435,31 +434,31 @@ formatting, closing the handle) now lives entirely inside
   their signatures, the `.cpp` supplies their bodies. `const` after
   `printAll()`'s parameter list is new here specifically as a promise
   about the function itself — "calling this will not modify the
-  `Table` object it's called on" — distinct from the `const` you've
+- `Table` object it's called on" — distinct from the `const` you've
   already seen on parameters (Lesson 2), though the same underlying
   idea of "this won't be changed."
 - `std::string filename;` under `private:` — reuses `std::string`
   member declarations from `struct Student` (basic reuse), just now
   inaccessible from outside `Table`.
 - `Table::Table(const std::string& filename) : filename(filename) {}`
-  — **first appearance** of the *scope resolution operator* `::` used
+- — **first appearance** of the *scope resolution operator* `::` used
   to define a class's member outside the class body ("this is `Table`'s
   constructor, being defined here in the `.cpp`") and of a *member
-  initializer list* — the `: filename(filename)` part, which sets the
+- initializer list* — the `: filename(filename)` part, which sets the
   private member `filename` to the value of the constructor's
   parameter (also confusingly named `filename`) before the constructor
   body even runs. The empty `{}` after it is the (empty) constructor
   body — there's nothing left to do once the initializer list has set
   the one member.
 - `void Table::insert(const Student& s) { ... }`,
-  `void Table::printAll() const { ... }` — reuse the same `::`
+- `void Table::printAll() const { ... }` — reuse the same `::`
   definition pattern just introduced, and their bodies are the exact
   `ofstream`/`ifstream` code from Lessons 1–3, relocated verbatim, not
   rewritten — worth noticing explicitly, since it's proof this lesson
   is reorganizing working code, not reinventing it.
 - `Table table("school.db");` — **first appearance** of constructing an
   object of a user-defined class by calling its constructor with an
-  argument — same general shape as `Student s;` from Lesson 3's
+- argument — same general shape as `Student s;` from Lesson 3's
   `readStudent`, but this time passing a value in, which is what the
   constructor's parameter is for.
 - `table.insert(s);`, `table.printAll();` — **first appearance** of

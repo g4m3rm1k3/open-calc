@@ -91,11 +91,10 @@ computed once, correct regardless of where `npm start` is actually
 invoked from.
 
 ### Mechanical Walkthrough
-
 - `require("path")` — **(b) reappearing** CommonJS `require`, applied to
   another of Node's built-in modules.
 - `path.join(__dirname, "..", "cnc-service")` — **(b) reappearing**, full
-  treatment in the concept file — `__dirname` here is
+- treatment in the concept file — `__dirname` here is
   `cnc-desktop/`'s own real location; `".."` steps up to this
   project's repository root, then into the real, sibling `cnc-service/`
   folder.
@@ -163,7 +162,6 @@ structure to show it inside of (per this schema's own rule for a
 brand-new function with nothing surrounding it).
 
 ### Mechanical Walkthrough
-
 - `let backendProcess = null;` — **(c) already established** variable
   declaration, module-scoped so both this function and the cleanup unit
   below can read and reassign it; `null` specifically so later code can
@@ -175,7 +173,7 @@ brand-new function with nothing surrounding it).
   Windows Python installs commonly register the command as `python`,
   not `python3`.
 - `spawn(pythonCmd, ["app.py"], { cwd: CNC_SERVICE_DIR })` — **(b)
-  reappearing**, full treatment in the concept file — `cwd` (a `spawn`
+- reappearing**, full treatment in the concept file — `cwd` (a `spawn`
   option not shown in that file's own lab) sets the *working directory*
   the child process starts in, **(a) first appearance** of this specific
   option: without it, `app.py`'s own relative imports (`from core.lexer
@@ -188,7 +186,7 @@ brand-new function with nothing surrounding it).
   established in Lesson 18's real logging, is that *what* happened
   matters more here than which stream it arrived on.
 - `chunk.toString().trimEnd()` — **(b) reappearing** `.toString()`
-  (concept file); **(a) first appearance** of `.trimEnd()` — removes the
+- (concept file); **(a) first appearance** of `.trimEnd()` — removes the
   trailing newline every line of piped output already carries, so the
   `[cnc-service]` prefix doesn't end up separated from its own message
   by a blank line.
@@ -257,14 +255,13 @@ This directly replaces Lesson 19's single-line
 itself included, is unchanged by this unit.
 
 ### Mechanical Walkthrough
-
 - `app.whenReady().then(() => { startBackend(); createWindow(); })` —
   **(b) reappearing** `.then(...)` (Lesson 19); **(a) first appearance**
   of a *new*, inline arrow function replacing a bare function reference
   as the callback — needed the moment more than one thing has to happen
   in sequence, rather than passing `createWindow` directly as before.
   `startBackend()` runs first, `createWindow()` second, in the order
-  written — not because either call waits for the other to finish (`spawn`
+- written — not because either call waits for the other to finish (`spawn`
   returns immediately, per the previous unit), but because *starting*
   the backend process before opening the window at least gives it a
   head start, even though nothing here yet guarantees it's actually
@@ -431,19 +428,18 @@ being ready yet, and guarantees the backend process is stopped the
 moment this app actually quits, on every platform.
 
 ### Mechanical Walkthrough
-
 - `app.on("before-quit", () => {...})` — **(b) reappearing** the same
   `app.on(event, handler)` pattern Lesson 19 already used twice
-  (`window-all-closed`, `activate`) — **(a) first appearance of this
+- (`window-all-closed`, `activate`) — **(a) first appearance of this
   specific event**: fires once, right before the app actually exits, on
   every platform, regardless of how many windows are or aren't open at
-  that moment — unlike `window-all-closed` (which never fires at all on
+- that moment — unlike `window-all-closed` (which never fires at all on
   macOS unless the user quits directly) or `activate` (which has nothing
   to do with quitting), this is the one real, reliable place a cleanup
   action is guaranteed to run before the process ends.
 - `if (backendProcess) { backendProcess.kill(); }` — **(b) reappearing**
   `.kill()`, full treatment in `node-child-process-spawn.md`'s own "Try
-  It Yourself" — the `null` check matters concretely: without it, quitting
+- It Yourself" — the `null` check matters concretely: without it, quitting
   after the backend had already exited on its own (a real crash, for
   instance) would call `.kill()` on a `null` value and throw.
 

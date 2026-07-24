@@ -346,13 +346,15 @@ times it appeared — no `.items()` yet visible in this function, but this
 is the data that unit's concept will walk through next.
 
 ### Mechanical Walkthrough
+- `def command_counts(path):` — basic.
+- `counts = {}` — assuming empty-dict creation as basic.
+- `with open(path) as f: for line in f:` — reminders from Lessons 1 and 5.
+- `command = line.split()[0]` — `.split()` with no
 
-`def command_counts(path):` — basic. `counts = {}` — assuming empty-dict
-creation as basic. `with open(path) as f: for line in f:` — reminders
-from Lessons 1 and 5. `command = line.split()[0]` — `.split()` with no
 arguments (Lesson 5, reminder) taking just the first word — the command
-name — discarding its arguments; `[0]` indexing, already basic.
-`counts[command] = counts.get(command, 0) + 1` — `.get(key, default)`
+- name — discarding its arguments; `[0]` indexing, already basic.
+- `counts[command] = counts.get(command, 0) + 1` — `.get(key, default)`
+
 (Lesson 2, reminder), reused here for a genuinely different purpose than
 before: not just "read safely," but the actual **counting pattern** —
 "give me the current count, or `0` if this is the first time we've seen
@@ -530,13 +532,13 @@ frequency data; `top_commands()` ranks it, returning just the top `n`
 (default 5) as a list of `(command, count)` pairs, highest first.
 
 ### Mechanical Walkthrough
-
-`def top_commands(counts, n=5):` — default argument, already-basic
+- `def top_commands(counts, n=5):` — default argument, already-basic
 pattern from Lesson 61's `hexdump(data, width=16)`, a reminder.
-`sorted(counts.items(), key=lambda pair: pair[1], reverse=True)` —
+- `sorted(counts.items(), key=lambda pair: pair[1], reverse=True)` —
 `.items()` from earlier this lesson, `lambda` from this unit's lab, and
 `sorted(..., key=..., reverse=...)` all combined for real, exactly as
-proven piece by piece above. `ranked[:n]` — slicing (Lesson 61,
+- proven piece by piece above.
+- `ranked[:n]` — slicing (Lesson 61,
 reminder), taking just the first `n` results.
 
 ### CS Lens

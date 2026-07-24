@@ -199,14 +199,13 @@ Lesson 6–11 code that already treats `Item` as a data-holder needs to
 change, because `id` is purely additive.
 
 ### Mechanical Walkthrough
-
 - `@Entity(tableName = "items")` — **first appearance.** Declares this
   class as a Room-managed table; `tableName` names the actual SQL
   table Room generates (`CREATE TABLE items (...)`, equivalent to
   Lesson 12's hand-written version, generated instead of typed).
 - `@PrimaryKey(autoGenerate = true)` on `private long id;` — **first
   appearance.** The direct Room equivalent of Lesson 12's
-  `INTEGER PRIMARY KEY AUTOINCREMENT` — `autoGenerate = true` means
+- `INTEGER PRIMARY KEY AUTOINCREMENT` — `autoGenerate = true` means
   Room/SQLite assigns this value on insert; you never set it yourself
   ahead of time. `long` (not `int`) is Room's conventional type for
   auto-generated keys.
@@ -321,22 +320,21 @@ is fully implemented by generated code you'll never hand-write or even
 directly see the source of.
 
 ### Mechanical Walkthrough
-
 - `@Dao` — **first appearance.** "Data Access Object" — marks this
   interface as one Room should generate a real implementation for.
 - `interface ItemDao` — reappearing (interface syntax, Lesson 8), new
   detail: an interface with *multiple* abstract methods, unlike Lesson
-  8's single-method `OnItemClickListener` — this is exactly why nothing
+- 8's single-method `OnItemClickListener` — this is exactly why nothing
   here could be written as a lambda (same reason `Parcelable.Creator`
   in Lesson 8 needed an anonymous class instead).
 - `@Insert long insert(Item item);` — **first appearance.** Room
   generates the actual `INSERT` SQL from the entity's `@Entity`/`@PrimaryKey`
-  annotations — no SQL string written anywhere. The `long` return value
-  is the newly auto-generated `id` — this is *how* you find out what
+- annotations — no SQL string written anywhere. The `long` return value is the newly auto-generated `id` — this is *how* you find out what
+
   id the database assigned.
 - `@Update void update(Item item);` — **first appearance.** Room
   matches the row to update by the entity's `@PrimaryKey` value already
-  present on the object you pass in — this is precisely why `Item`
+- present on the object you pass in — this is precisely why `Item`
   needed a real, stable `id` (the Lesson 12 motivation for primary keys
   made concrete): without one, Room would have no reliable way to know
   *which* row `update` means.
@@ -424,10 +422,9 @@ This is the whole new file — nothing to show it landing inside, since
 it's a brand-new top-level class.
 
 ### Mechanical Walkthrough
-
 - `@Database(entities = {Item.class}, version = 1)` — **first
   appearance.** Lists every `@Entity` class this database contains
-  (just `Item` for now — a real multi-table app would list several)
+- (just `Item` for now — a real multi-table app would list several)
   and a schema version number, the same concept as Lesson 12's
   `SQLiteOpenHelper` version argument, now driving Room's own
   migration system if the schema ever changes.
@@ -438,7 +435,7 @@ it's a brand-new top-level class.
   real, hand-written Java) while still declaring some methods with no
   body, left for a subclass — here, Room's generated code — to supply.
 - `public abstract ItemDao itemDao();` — **first appearance of an
-  abstract method** — no body, no `@Query`-style annotation either;
+- abstract method** — no body, no `@Query`-style annotation either;
   Room recognizes this pattern (an abstract method returning a `@Dao`
   interface) and generates the implementation automatically.
 - `private static AppDatabase instance;` — **first appearance of a
@@ -462,11 +459,12 @@ it's a brand-new top-level class.
   the simpler version is the honest, correct-for-this-project choice,
   not a corner cut silently.
 - `Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "pocket_inventory.db")`
-  — **first appearance.** `context.getApplicationContext()` — **first
-  appearance** — returns a `Context` tied to the whole app's process
+- — **first appearance.** `context.getApplicationContext()` — **first appearance** — returns a `Context` tied to the whole app's process
+
   lifetime rather than one Activity's (Lesson 5's short-lived
   Activities), appropriate here since the database instance is meant to
-  outlive any single screen. `.build()` — **first appearance** —
+- outlive any single screen.
+- `.build()` — **first appearance** —
   finalizes the builder and returns the real, usable database object,
   same Builder-pattern shape you'll recognize from other Android APIs
   going forward.
@@ -639,7 +637,6 @@ this project's life (Lesson 11 gave `SharedPreferences` this property
 for one number; the whole inventory now has it too).
 
 ### Mechanical Walkthrough
-
 - `ExecutorService` / `Executors.newSingleThreadExecutor()` — **first
   appearance.** `Executors` is a standard-library factory producing
   different kinds of thread pools; `newSingleThreadExecutor()` creates
@@ -661,7 +658,7 @@ for one number; the whole inventory now has it too).
   thread is allowed to touch the UI, a rule enforced by the framework
   and explained fully next lesson.
 - `items.clear()` / `items.addAll(loaded)` — **first appearance of
-  `List.clear()`/`addAll()`** — standard-library methods, already-basic
+- `List.clear()`/`addAll()`** — standard-library methods, already-basic
   once `List.add`/`get` (Lesson 6/7) are familiar.
 - `adapter.notifyDataSetChanged()` — reappearing, Lesson 11, correct
   here because the entire list's content is being replaced at once,
@@ -671,7 +668,7 @@ for one number; the whole inventory now has it too).
   primary key comes back here.
 - `newItem.setId(id)` — reappearing (setter, this lesson), keeping the
   in-memory `Item` object's `id` in sync with the row Room just created
-  — without this, a later `update`/`delete` call on this same object
+- — without this, a later `update`/`delete` call on this same object
   (not built yet, arriving in a later lesson) would have no valid
   primary key to match against.
 

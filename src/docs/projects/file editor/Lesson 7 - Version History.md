@@ -72,9 +72,8 @@ git commit -m "Initial commit: sample content folder"
 ```
 
 ### Mechanical Walkthrough
-
 `git rm -r --cached backend/content` removes every file under
-`backend/content/` from the outer repo's *tracking* — `--cached` is the
+- `backend/content/` from the outer repo's *tracking* — `--cached` is the
 part that matters: without it, `git rm` deletes the actual files from
 disk too, which is not what's wanted here; the files stay exactly where
 they are, only git stops watching them. Adding `backend/content/` to
@@ -196,17 +195,16 @@ a bug neither obvious nor caught yet, found only a couple of units from
 now once its output can actually be read closely.
 
 ### Mechanical Walkthrough
-
 `subprocess.run(["git", "add", relative_path], cwd=CONTENT_DIR, ...)`
 runs `git add` the same way a terminal would, but with `cwd=CONTENT_DIR`
-telling `subprocess` to run it *inside* `content/`'s own repo — critical,
+- telling `subprocess` to run it *inside* `content/`'s own repo — critical,
 since running it from anywhere else would either fail or, worse, operate
 on the wrong repository entirely. `git commit -m message` records
 everything just `add`ed as a new, permanent commit. `target_file.relative_to(CONTENT_DIR)`
 converts the absolute resolved path back into one relative to the
-content root — the form `git` itself expects, and the same relative form
+- content root — the form `git` itself expects, and the same relative form
 already used in every response this API sends back to the frontend. It
-returns a `Path` object, not a string — `f"Edit {relative_path}"` converts
+- returns a `Path` object, not a string — `f"Edit {relative_path}"` converts
 it to one implicitly, the same way any value dropped into an f-string's
 `{}` gets converted; exactly how that conversion happens is where this
 lesson's real bug turns out to be hiding.
@@ -276,25 +274,24 @@ traversal and existence checks every file-based route in this project
 already shares.
 
 ### Mechanical Walkthrough
-
 `git log --format=%H|%aI|%s -- relative_path` asks git for the commit
 history of *one specific file*, not the whole repo. `--format=%H|%aI|%s`
-is git's own template syntax — `%H` the full commit hash, `%aI` the
+- is git's own template syntax — `%H` the full commit hash, `%aI` the
 author date in a machine-parseable format, `%s` the commit's subject
-line — joined with a literal `|` chosen specifically because it's a
+- line — joined with a literal `|` chosen specifically because it's a
 character extremely unlikely to appear inside a real commit message
 itself, unlike a comma or space. `result.stdout.strip().splitlines()`
 splits the output into one string per commit, oldest formatting quirks
 (a trailing blank line) removed by `.strip()` first. `line.split("|", 2)`
-splits each line on `|`, but caps it at two splits — three pieces
-total — so a commit message that itself happens to contain a `|`
+- splits each line on `|`, but caps it at two splits — three pieces total — so a commit message that itself happens to contain a `|`
+
 character doesn't get incorrectly split into more than three pieces.
 `commit_hash, timestamp, message = line.split("|", 2)` is this project's
-first **unpacking assignment** — `.split(...)` returns a list of exactly
+- first **unpacking assignment** — `.split(...)` returns a list of exactly
 three strings here, and naming three variables, comma-separated, on the
 left of a single `=` assigns each one positionally in one statement,
 instead of indexing into the list by hand three separate times
-(`result[0]`, `result[1]`, `result[2]`) — it fails loudly with a
+- (`result[0]`, `result[1]`, `result[2]`) — it fails loudly with a
 `ValueError` if the list's length doesn't match the number of names,
 which is exactly why capping `maxsplit` at `2` above matters: it
 guarantees exactly three pieces, every time.
@@ -382,10 +379,9 @@ return {"path": path, "saved": True}
 ```
 
 ### Mechanical Walkthrough
-
 `.as_posix()` is a `Path` method that returns the path as a string using
 `/` specifically, regardless of which operating system produced the
-`Path` object in the first place — the deliberate opposite of letting
+- `Path` object in the first place — the deliberate opposite of letting
 the OS's own convention leak through implicitly.
 
 ### SE Lens — the actual lesson isn't the fix, it's where the bug hid

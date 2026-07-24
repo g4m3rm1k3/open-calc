@@ -151,12 +151,11 @@ export default function MarkdownNote({ canvas, canvasElRef, anchor, initialText,
 ```
 
 #### Mechanical Walkthrough
-
-`getScaledWidth()`/`getScaledHeight()` — fabric methods that account for
+- `getScaledWidth()`/`getScaledHeight()` — fabric methods that account for
 any scaling applied by a resize, unlike the object's raw `width`/`height`
 properties (which stay at their original values; scaling is stored
 separately as `scaleX`/`scaleY` and multiplied in). `opt.target === anchor`
-— established (Lesson 3's eraser used `opt.target` the same way) — this
+- — established (Lesson 3's eraser used `opt.target` the same way) — this
 effect only reacts to *this specific* object moving, ignoring every other
 `object:moving` event the canvas fires for anything else the user drags.
 Writing `el.style.left = ...` directly, rather than calling a `setState`,
@@ -266,12 +265,11 @@ it weren't there, while its children can still opt back in individually.
 header/textarea/preview content this structure wraps.)
 
 #### Mechanical Walkthrough
-
 The outer `<div>` is sized and positioned exactly over the anchor (via
-the previous unit's `sync()`) but has `pointerEvents: 'none'` — it exists
+- the previous unit's `sync()`) but has `pointerEvents: 'none'` — it exists
 purely as a positioning frame. The inner `<div>` is inset by `8px` on
 every side (`inset: 8`, a CSS shorthand for `top/right/bottom/left: 8px`)
-and re-enables `pointerEvents: 'auto'` — an 8-pixel strip around the
+- and re-enables `pointerEvents: 'auto'` — an 8-pixel strip around the
 note's edge is left genuinely click-through, exactly where fabric draws
 its own resize handles (small squares straddling an object's border),
 while everything inside that strip behaves like a normal, fully
@@ -295,7 +293,7 @@ never intercepts the click it's visually sitting on top of.
 The alternative — making the whole overlay interactive and building a
 custom drag/resize interaction *inside* React (mirroring
 `StickyNote.jsx`'s own hand-rolled `onDragStart`, which tracks
-`mousemove`/`mouseup` itself rather than relying on fabric at all) —
+- `mousemove`/`mouseup` itself rather than relying on fabric at all) —
 would avoid the click-through problem entirely, at the cost of
 duplicating logic fabric already provides for free (bounded resizing,
 rotation, snapping to other objects if Lesson 3's snap-style features
@@ -487,22 +485,23 @@ export default function MarkdownNote({ canvas, canvasElRef, anchor, initialText,
 ```
 
 #### Mechanical Walkthrough
-
-`stripSnippetSyntax` — a function this codebase already shipped
+- `stripSnippetSyntax` — a function this codebase already shipped
 (`MarkdownToolbar.jsx`) specifically for callers with "no real snippet
 support," documented in that file's own header comment as intended for a
-plain-`<textarea>` caller — this lesson is that caller's first real
-appearance. `btn.plain ?? stripSnippetSyntax(btn.snippet)` — established
-`??` (Lesson 1) — most toolbar buttons carry a Monaco tabstop snippet
+- plain-`<textarea>` caller — this lesson is that caller's first real appearance.
+- `btn.plain ?? stripSnippetSyntax(btn.snippet)` — established `??` (Lesson 1) — most toolbar buttons carry a Monaco tabstop snippet
+
 like `**${1:text}**$0`; a plain textarea has no concept of tabstops, so
 `stripSnippetSyntax` strips that syntax down to just `**text**` before
-insertion. `ta.selectionStart`/`selectionEnd` — a `<textarea>`'s own
+- insertion.
+- `ta.selectionStart`/`selectionEnd` — a `<textarea>`'s own
 native cursor-position properties, read to know where to splice the
 inserted text into the existing string — first appearance in this
 codebase's canvas-notes work, though it's the same idea Lesson 4 already
 used on a *fabric* text object (`selectionStart`/`selectionEnd` there
 too) — the same concept, on a native DOM element instead of a fabric
-one. `useState(!initialText)` for `editing` — computed once, at mount:
+- one.
+- `useState(!initialText)` for `editing` — computed once, at mount:
 a brand-new note (no saved text yet) opens ready to type in; a note
 being *reopened* with existing text opens showing the rendered preview,
 since presumably the point of reopening it is to read it, not
@@ -523,7 +522,7 @@ managed structures.
 #### SE Lens
 
 A separate `Map` (anchor id → markdown text) kept in `CanvasNotesPage`'s
-own state — mirroring how `pageCanvasData` already maps page id → canvas
+- own state — mirroring how `pageCanvasData` already maps page id → canvas
 JSON — was the alternative. It was rejected here because it would
 duplicate state that already needs to travel with the fabric object
 during serialization anyway (Lesson 2 already round-trips the *whole*
@@ -556,7 +555,7 @@ inset interactive content) means a user can still grab fabric's native
 resize handles at the object's exposed edge, exactly as freely as any
 other object on the canvas. Typing into the `<textarea>`, using
 `MarkdownToolbar` to insert symbols, and toggling Preview all write into
-`anchor.__markdown` directly (third unit) — so when the page-swap effect
+- `anchor.__markdown` directly (third unit) — so when the page-swap effect
 (Lesson 2) calls `canvas.toDatalessJSON(CUSTOM_PROPS)` before leaving a
 page, every note's text rides along automatically, needing no separate
 tracking of its own.
@@ -578,7 +577,7 @@ way to tell from the UI that anything was ever typed into it.
   actually reach with the mouse — and why.
 - Delete a note (the ✕ button) and confirm `refreshAnchors()` actually
   removes its `<MarkdownNote>` from the page, not just the underlying
-  fabric object — add a temporary `console.log(noteAnchors.length)`
+- fabric object — add a temporary `console.log(noteAnchors.length)`
   right before the `return` in `PageCanvas` to watch the array shrink.
 
 ## Definition of Done

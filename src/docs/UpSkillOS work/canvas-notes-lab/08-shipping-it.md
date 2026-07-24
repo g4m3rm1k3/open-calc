@@ -118,10 +118,9 @@ the Pieces" section — all six follow the same shape: mutate through
 `db.js` first, then mirror the same change into React state.)
 
 #### Mechanical Walkthrough
-
 `if (sections.length <= 1) return` / `if (!section || section.pages.length <= 1) return`
 — both guards sit at the very top of their handler, before any
-`await` — refusing the operation entirely rather than performing it
+- `await` — refusing the operation entirely rather than performing it
 and then trying to recover from an invalid resulting state. Both
 `deleteSection` and `Promise.all(section.pages.map((p) => deletePage(p.id)))`
 run before touching React state — cleaning up the *content* rows
@@ -224,11 +223,10 @@ Sections after renaming: [ 'Getting Started', 'Project Ideas', 'Renamed' ]
 ```
 
 #### Mechanical Walkthrough
-
-`e.target.select()` — a native `<input>`/`<textarea>` method that
+- `e.target.select()` — a native `<input>`/`<textarea>` method that
 selects the entirety of the element's current text, the same thing a
 user gets from pressing ⌘A/Ctrl+A inside a text field. Called from
-`onFocus`, it runs the instant the input actually receives focus —
+- `onFocus`, it runs the instant the input actually receives focus —
 which, combined with `autoFocus`, means the very first thing that
 happens when a rename begins is the existing title becoming fully
 selected, ready to be typed over.
@@ -257,7 +255,7 @@ and a real keystroke sequence ran together.
 
 This is the second real bug this lesson series has caught purely by
 insisting on live verification instead of trusting code that "looks
-right" — Lesson 2's `loadFromJSON`-as-callback mistake was the first.
+- right" — Lesson 2's `loadFromJSON`-as-callback mistake was the first.
 Both were invisible from reading the code alone and only surfaced
 under actual execution — exactly the failure mode the schema's
 Concept Isolation Rule and "real output, not assumed output" discipline
@@ -272,7 +270,7 @@ live in `CanvasNotesPage`. Every one of the six handlers
 (`handleAddSection`, `handleRenameSection`, `handleDeleteSection`,
 `handleAddPage`, `handleRenamePage`, `handleDeletePage`) follows the
 same shape: mutate through `db.js` (Lesson 7) first, then mirror the
-identical change into React's `sections` state — the database and the
+- identical change into React's `sections` state — the database and the
 in-memory tree are never allowed to disagree, because every write goes
 through both in the same function, in the same order, every time. The
 two delete handlers additionally enforce the "always at least one"
@@ -280,11 +278,11 @@ invariant established in this lesson's first unit, refusing outright
 rather than producing a state nothing else was built to handle.
 Composed with everything from Lessons 1 through 7 — the tab hierarchy,
 the shared canvas, drawing tools, text and markdown notes, pasted
-images, and real persistence — `canvas-notes` is now a complete,
+- images, and real persistence — `canvas-notes` is now a complete,
 self-registering lab: verified live this session to be reachable via
 Start Menu search and the generic `/lab/:labKey` route exactly like
 every other lab in this app, with zero special-cased wiring anywhere in
-`App.jsx` — the entire point `lab-registry-autofind/01-...md` set out
+- `App.jsx` — the entire point `lab-registry-autofind/01-...md` set out
 to prove, now demonstrated end-to-end by a real, nontrivial feature
 built entirely the new way.
 
@@ -292,7 +290,7 @@ built entirely the new way.
 
 Verified live, this session: without the `sections.length <= 1` guard,
 deleting a notebook's last remaining section would leave `sections` as
-an empty array — `activeSection`/`activePage` would both resolve to
+- an empty array — `activeSection`/`activePage` would both resolve to
 `undefined`, `PageTabs` would render zero tabs, and the content area
 would permanently show "No page selected" with no add-a-section button
 reachable from anywhere (since `SectionTabs`' own "+" button still
@@ -323,7 +321,7 @@ name each time someone tries to fix it by renaming again.
 - [ ] Deleting the last remaining section or the last remaining page in
       a section is refused, not silently allowed
 - [ ] Deleting a section also deletes every one of its pages' content
-      rows from the `pages` store — nothing orphaned
+- rows from the `pages` store — nothing orphaned
 - [ ] Verified live, this session: full add/rename/delete cycle for
       both tab levels, survives a full page reload; renaming correctly
       replaces the existing title rather than appending to it

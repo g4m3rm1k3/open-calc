@@ -86,7 +86,6 @@ type, syntactically parallel to `<activity>`, `<service>`, and
 `<provider>`.
 
 ### Mechanical Walkthrough
-
 - `extends BroadcastReceiver` — **first appearance.** The fourth and
   final major app component base class in this curriculum's set.
 - `onReceive(Context context, Intent intent)` — **first appearance.**
@@ -103,7 +102,7 @@ type, syntactically parallel to `<activity>`, `<service>`, and
   one actually fired — reappearing string-constant-comparison shape
   from Lesson 21's menu dispatch.
 - `PeriodicWorkRequest.Builder(...)`, `WorkManager.getInstance(context).enqueueUniquePeriodicWork(...)`
-  — reappearing verbatim, Lesson 26, `KEEP` still correctly preventing
+- — reappearing verbatim, Lesson 26, `KEEP` still correctly preventing
   duplicate scheduling even though this is now a *second* call site
   requesting the same unique work name.
 - `<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />`
@@ -116,7 +115,7 @@ type, syntactically parallel to `<activity>`, `<service>`, and
   `InventoryActivity` entry, which was `exported="false"` because it
   only needed to be reachable from within this app.
 - `<intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>`
-  — reappearing structural shape (Lesson 2's `MAIN`/`LAUNCHER` filter),
+- — reappearing structural shape (Lesson 2's `MAIN`/`LAUNCHER` filter),
   a different action string, declaring which specific broadcast this
   receiver wants delivered to it.
 
@@ -208,19 +207,18 @@ Added to `PocketInventoryApplication` — the field alongside the
 inside `onCreate`, after the notification channel setup.
 
 ### Mechanical Walkthrough
-
 - `new BroadcastReceiver() { @Override public void onReceive(...) { ... } }`
-  — **first appearance of an anonymous `BroadcastReceiver`** — the
+- — **first appearance of an anonymous `BroadcastReceiver`** — the
   same anonymous-class shape as Lesson 8's `Parcelable.Creator` and
   Lesson 20's `DiffUtil.Callback`, here because this receiver is
   registered dynamically rather than declared in the Manifest, so it
   never needs a separate named top-level class or a Manifest entry at
   all.
 - `ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)`
-  — reappearing (`getSystemService`, Lesson 26), a different system
+- — reappearing (`getSystemService`, Lesson 26), a different system
   service, cast (Lesson 8) to its specific type.
 - `cm.getActiveNetwork()` — **first appearance.** Returns the
-  currently active `Network` object, or `null` if there is none —
+- currently active `Network` object, or `null` if there is none —
   checked directly here rather than relying solely on the broadcast's
   own extras, since the modern-recommended way to determine *current*
   connectivity state is to query it directly rather than trust
@@ -232,7 +230,7 @@ inside `onCreate`, after the notification channel setup.
   declaration.
 - `registerReceiver(connectivityReceiver, filter)` — **first
   appearance.** Explicitly registers the receiver, right now, tied to
-  this specific `Application` instance's lifetime — the actual
+- this specific `Application` instance's lifetime — the actual
   mechanism that makes dynamic registration exempt from the Manifest-
   declaration restriction just explained: the OS only needs to deliver
   to receivers that are *currently, demonstrably* running, not wake up

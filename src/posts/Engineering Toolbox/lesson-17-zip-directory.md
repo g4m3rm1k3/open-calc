@@ -104,15 +104,15 @@ dedicated unit below, since it's simplest to set once at archive-
 creation time — the next-but-one unit explains exactly what it does.
 
 ### Mechanical Walkthrough
+- `import zipfile`, `import os` — reminders/first appearance.
+- `def zip_directory(source_dir, zip_path):` — basic.
+- `with zipfile.ZipFile( zip_path, "w", zipfile.ZIP_DEFLATED) as zf:` — the concept from this
 
-`import zipfile`, `import os` — reminders/first appearance. `def
-zip_directory(source_dir, zip_path):` — basic. `with zipfile.ZipFile(
-zip_path, "w", zipfile.ZIP_DEFLATED) as zf:` — the concept from this
 unit's lab, reused for real, with a third argument (`zipfile.
-ZIP_DEFLATED`) not yet explained — flagged honestly rather than
+- ZIP_DEFLATED`) not yet explained — flagged honestly rather than
 silently used. `for dirpath, dirnames, filenames in os.walk(
-source_dir):`, `for filename in filenames:` — Lesson 12, reminder.
-`pass` — reminder placeholder.
+- source_dir):`, `for filename in filenames:` — Lesson 12, reminder.
+- `pass` — reminder placeholder.
 
 ### CS Lens
 
@@ -230,10 +230,10 @@ lesson's `relative_snapshot()` and `sync_folders()` relied on, reused
 here for archiving instead of comparing or copying.
 
 ### Mechanical Walkthrough
+- `full_path = os.path.join(dirpath, filename)` — Lesson 2, reminder.
+- `arcname = os.path.relpath(full_path, source_dir)` — Lesson 16, reminder, reused for real.
+- `zf.write(full_path, arcname)` — the concept
 
-`full_path = os.path.join(dirpath, filename)` — Lesson 2, reminder.
-`arcname = os.path.relpath(full_path, source_dir)` — Lesson 16,
-reminder, reused for real. `zf.write(full_path, arcname)` — the concept
 from this unit's lab, reused for real.
 
 ### CS Lens

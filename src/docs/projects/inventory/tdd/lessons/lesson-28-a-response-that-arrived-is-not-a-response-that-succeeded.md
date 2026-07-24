@@ -186,13 +186,12 @@ And the real CSS backing the visible banner:
 ```
 
 ### Mechanical Walkthrough
-
 - `points?: PathPoint[]` / `error?: string` — **(b) reappearing** —
   optional-property syntax, already established since Lessons 17–18,
   now expressing that a real response is *either* shape, never both.
 - `if (data.error) { throw new Error(data.error); }` — **(a) first
   appearance of the mechanism in this project's own fetch functions**,
-  per `fetch-api.md`'s already-named fact — turning a real, parsed error
+- per `fetch-api.md`'s already-named fact — turning a real, parsed error
   field into a real, thrown JS error, so the existing `.catch()`
   (Lesson 26) has something to catch.
 - `data.points!.length` / `data.points!` — **(a) first appearance** —
@@ -201,7 +200,7 @@ And the real CSS backing the visible banner:
   (data.error) throw` above already guarantees `points` is real by the
   time this line runs, even though the type itself still says optional.
 - `const [programError, setProgramError] = useState<string | null>(null)`
-  — **(b) reappearing** `useState`, applied to a new real piece of UI
+- — **(b) reappearing** `useState`, applied to a new real piece of UI
   state.
 - `.then((pts) => { setPoints(pts); setProgramError(null); })` — **(b)
   reappearing** Promise chaining, now clearing a previous real error the

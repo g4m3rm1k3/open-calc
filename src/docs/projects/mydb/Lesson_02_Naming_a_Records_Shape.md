@@ -118,19 +118,19 @@ deliberate: this unit only introduces the *shape*; the next two units
 put it to work.
 
 ### Mechanical Walkthrough
-
 - `struct` — **first appearance.** A keyword that defines a new type
   made of named fields (called *members*), bundled together under one
   name. There's no direct Python equivalent used at your current level
-  — the closest is a class with only `__init__`-assigned attributes and
+- — the closest is a class with only `__init__`-assigned attributes and
   no methods, but C++ gives you this simpler, methods-free shape as its
   own distinct tool.
 - `Student` — the name being given to this new type. Same idea as naming
   a Python class — a name you'll now use as a type everywhere below.
 - `int id;`, `std::string name;`, `int age;` — **first appearance** of
   *member declarations*: each line names a field and its type, with no
-  value yet — just a promise that every `Student` will have these three
-  slots. `int` — a whole-number type — is new by name here, though you
+- value yet — just a promise that every `Student` will have these three slots.
+- `int` — a whole-number type — is new by name here, though you
+
   already understand the idea of "a variable's type is fixed" from
   `std::string` in Lesson 1.
 - `;` after the closing `}` — **first appearance** of this exact
@@ -276,7 +276,6 @@ shown; that's intentional and gets fixed in the next unit, which is
 exactly where the vector actually gets used.
 
 ### Mechanical Walkthrough
-
 - `std::vector<Student>` — **first appearance.** A dynamically-sized
   container, declared with the element type in angle brackets — here,
   `Student`. Unlike a C-style array, it can grow; unlike `std::string`
@@ -286,7 +285,7 @@ exactly where the vector actually gets used.
 - `= { {1, "Alice", 20}, {2, "Bob", 22} };` — **first appearance** of a
   *nested* initializer list: the outer braces build the vector itself,
   and each inner `{...}` builds one `Student` using the same
-  brace-initialization you saw with `Point` in the previous unit —
+- brace-initialization you saw with `Point` in the previous unit —
   reused, not re-explained.
 
 ### CS Lens
@@ -432,7 +431,6 @@ field), closes the file, then reopens it for reading and prints
 everything accumulated so far — unchanged from Lesson 1.
 
 ### Mechanical Walkthrough
-
 - `for (const Student& s : students)` — **first appearance** of
   range-based `for`. Read as "for each element in `students`, call it
   `s`, run the block below." No index variable, no `.size()` call, no
@@ -445,10 +443,10 @@ everything accumulated so far — unchanged from Lesson 1.
   records get bigger than three fields), and `const` promises this loop
   won't modify what `s` refers to. You'll see `&` again, taught on its
   own, once a lesson needs to *modify* elements in place through a
-  reference — for now, treat `const Student&` as "the standard way to
+- reference — for now, treat `const Student&` as "the standard way to
   read (not change) each element of a loop like this."
 - `s.id`, `s.name`, `s.age` — reuses member access (the `.` you already
-  used on `Point` and now `Student`) — basic reuse, not re-explained.
+- used on `Point` and now `Student`) — basic reuse, not re-explained.
 - `out << s.id << "," << s.name << "," << s.age << "\n";` — reuses
   `<<` chaining from Lesson 1 (basic reuse), just against three member
   values with literal commas between them instead of one whole string.

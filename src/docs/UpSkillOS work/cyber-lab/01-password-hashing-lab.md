@@ -105,13 +105,12 @@ source files; the pattern, not each file's UI logic, is this unit's
 subject.)
 
 #### Mechanical Walkthrough
-
-`params = {}` as a default parameter — established JS, not new — means
+- `params = {}` as a default parameter — established JS, not new — means
 a component embedded with no `props` field at all in the lesson (three
 of these six are, deliberately, since `RegistrationLoginFlow` and
 `CollisionDemo` need no starting values, and one lesson's `assessment`
 doesn't touch this at all) never has to null-check `params` itself.
-`params.text ?? 'password123'` — established `??` — supplies a
+- `params.text ?? 'password123'` — established `??` — supplies a
 sensible default whenever the lesson didn't configure that specific
 field, letting each component be embedded either bare (`{ id: 'HashOutput' }`)
 or pre-configured (`{ id: 'HashOutput', props: { text: 'letmein' } }`)
@@ -129,9 +128,9 @@ third-party module rather than a long, ever-growing parameter list.
 
 #### SE Lens
 
-The alternative — `VizFrame` inspecting each component's expected props
+- The alternative — `VizFrame` inspecting each component's expected props
 and spreading them individually (`<VizComponent text={params.text}
-algorithm={params.algorithm} />`) — would require `VizFrame` itself to
+- algorithm={params.algorithm} />`) — would require `VizFrame` itself to
 know the full prop shape of every registered viz, which defeats the
 entire point of an auto-discovered registry: `VizFrame` genuinely has
 no idea what `DictionaryAttack` needs versus what `CollisionDemo`
@@ -142,7 +141,7 @@ anything about any of them.
 
 #### Connect to What Came Before
 
-`lab-registry-autofind/01-...md` established *discovery* — how a new
+- `lab-registry-autofind/01-...md` established *discovery* — how a new
 file becomes reachable with zero central edits. This unit is the
 matching *interface* contract that makes discovery actually usable:
 being found is one problem, being configurable by whoever found you is
@@ -218,13 +217,12 @@ would teach the concept better than the real API itself.)
 (The real file — no further changes needed beyond what's shown above.)
 
 #### Mechanical Walkthrough
-
-`crypto.subtle` — the `SubtleCrypto` interface, part of the Web
+- `crypto.subtle` — the `SubtleCrypto` interface, part of the Web
 Crypto API every modern browser ships. `digest(algorithm, data)`
-returns a Promise resolving to an `ArrayBuffer` — raw bytes, not a
+- returns a Promise resolving to an `ArrayBuffer` — raw bytes, not a
 string, which is why every hash function in this lesson ends with the
 same hex-formatting line (`[...new Uint8Array(buf)].map(b =>
-b.toString(16).padStart(2,'0')).join('')`) — converting raw bytes into
+- b.toString(16).padStart(2,'0')).join('')`) — converting raw bytes into
 the familiar hex string representation is a separate step from
 computing the hash itself. `deriveBits` with `{name:'PBKDF2', hash,
 salt, iterations}` is the same underlying idea as `digest`, just
@@ -343,11 +341,10 @@ working...") now renders; before the fix, only the generic
 calculus-flavored filler sentence appeared in its place.
 
 #### Mechanical Walkthrough
-
-`typeof rawHook === "string"` — a runtime type check distinguishing
+- `typeof rawHook === "string"` — a runtime type check distinguishing
 the two shapes this field can legally have (a bare string, or the
 documented object) before doing anything else with it. Routing a
-string into `{ realWorldContext: rawHook }` — a plain object literal,
+- string into `{ realWorldContext: rawHook }` — a plain object literal,
 not a spread — means the *entire* string becomes the readable prose
 body, deliberately, rather than being silently discarded by a spread
 that was never going to do anything useful with a string in the first
@@ -359,7 +356,7 @@ This is a duck-typing failure: code that assumed one shape ("this is
 always an object") without checking, run against a value with a
 different, unexpected shape. JavaScript didn't throw an error — spread
 on a string is perfectly legal, just not doing what the author of
-`ensureHook` assumed — which is exactly why this class of bug is
+- `ensureHook` assumed — which is exactly why this class of bug is
 dangerous: it doesn't crash, it silently produces a *plausible-looking*
 wrong result. **Recognized in:** any dynamically-typed language's
 "works on the happy path, silently wrong on an edge case nobody wrote a
@@ -505,10 +502,9 @@ navigating away from the lesson entirely before it finished, produced
 zero unmount-related console warnings with this effect in place.
 
 #### Mechanical Walkthrough
-
-`useRef(false)`, not `useState(false)`, for `cancelRef` — established
+- `useRef(false)`, not `useState(false)`, for `cancelRef` — established
 (`canvas-notes-lab/02-...md` used the same "ref, not state" reasoning
-for `prevPageIdRef`) — checking a cancellation flag every loop
+- for `prevPageIdRef`) — checking a cancellation flag every loop
 iteration must never itself trigger a re-render; it only needs to be
 *read*, synchronously, at each iteration boundary. `if (cancelRef.current)
 return` sits at the *top* of the loop body, before that iteration's
@@ -538,7 +534,7 @@ complete, semantically inert.
 
 #### SE Lens
 
-The alternative — deleting `cancelRef` entirely, since `disabled={running}`
+- The alternative — deleting `cancelRef` entirely, since `disabled={running}`
 already prevents the double-click scenario the original comment
 described — was seriously worth considering, and was rejected only
 because a real, different failure remained: an unmounted-component
@@ -649,7 +645,6 @@ is `js-md5` actually agreeing with the verification already done this
 session, not a pasted-in answer.
 
 #### Mechanical Walkthrough
-
 `hex.substr(i, 2)` steps through a hex string two characters at a
 time — one byte is always exactly two hex digits — and
 `parseInt(..., 16)` reads each pair as a base-16 number, rebuilding the
@@ -747,7 +742,7 @@ per-guess hashing one step at a time; its `cancelRef` originally
 checked a flag nothing ever set, fixed to actually cancel the loop if
 the component unmounts mid-run. Building and verifying this one lesson end-to-end surfaced and
 fixed a real bug affecting 114 already-shipped lessons elsewhere in
-this app, and required manually adding one entry to `topicGroups.js` —
+- this app, and required manually adding one entry to `topicGroups.js` —
 confirming that entry-point discovery (`courseLoader.js`, fully
 automatic) and browsing-page curation (`topicGroups.js`, deliberately
 hand-maintained, per its own header comment) are two different,
@@ -766,7 +761,7 @@ fully functional and directly linkable (Start Menu search finds it
 correctly, confirmed live) but invisible from the home page's grouped
 Explore browsing view — a real, if smaller, discoverability gap that
 auto-discovery of the lesson *content* does not, by itself, close.
-Without the unmount-cleanup fix, `cancelRef` is inert — declared,
+- Without the unmount-cleanup fix, `cancelRef` is inert — declared,
 reset, checked, never set — meaning navigating away from the lesson
 while an attack is still animating leaves `runAttack`'s loop running
 against an unmounted component. Verified live, this session, both
@@ -797,7 +792,7 @@ to a browsing user, as near-synonyms, and `topicGroups.js`'s own
 top-level tabs treat them as two separate categories (Programming =
 languages; Computer Science = DSA, logic, runtime, security).
 
-This isn't a new pattern — it's the exact same `{kind, key,
+- This isn't a new pattern — it's the exact same `{kind, key,
 differentiator}` entry insertion into a curated `items` array this
 lesson's "Connect the Pieces" section already covered, applied a
 second time to a different subtopic (`programming.web-development`
@@ -818,7 +813,7 @@ reused verbatim.
 `computer-science.security` entry, clicking through Programming →
 every one of its subtopics (Python, JavaScript, TypeScript, C++, Web
 Development, Canvas & Graphics, Command Line & Git) never surfaces
-`cyber-lab` — confirmed by the exact browsing path a user actually
+- `cyber-lab` — confirmed by the exact browsing path a user actually
 took. Auto-discovery of the lesson *content* (`courseLoader.js`) has
 no opinion about which curated tab a course sits under; that's
 `topicGroups.js`'s job alone, and it only reflects entries someone
@@ -835,11 +830,11 @@ compared directly against the "Hash Anything" demo's JavaScript output,
 and one computing real PBKDF2.
 
 The one genuinely new thing found while building the second cell: this
-app's Pyodide build's `hashlib` module has **no `pbkdf2_hmac`** —
+- app's Pyodide build's `hashlib` module has **no `pbkdf2_hmac`** —
 `AttributeError: module 'hashlib' has no attribute 'pbkdf2_hmac'`,
 confirmed live before it ever reached the lesson. CPython's real
 `hashlib.pbkdf2_hmac` normally exists, but Pyodide's WebAssembly build
-of `hashlib` doesn't include it — a real constraint of *this specific
+- of `hashlib` doesn't include it — a real constraint of *this specific
 runtime*, not of Python or PBKDF2 in general. The fix was to use
 `pycryptodome`'s `Crypto.Protocol.KDF.PBKDF2` instead (already a
 dependency of this course via `002-symmetric-encryption.js`'s AES
@@ -880,7 +875,7 @@ this new Python cell's output).
 - [ ] Six viz primitives built, each following the `{ params = {} }`
       contract, each independently viz-registered
 - [ ] Every hash, collision, and cost-factor demo uses real computation
-      — `crypto.subtle.digest`/`deriveBits`, `js-md5` — verified live,
+- — `crypto.subtle.digest`/`deriveBits`, `js-md5` — verified live,
       this session, including a genuine MD5-colliding pair fetched and
       computationally confirmed, not recalled from memory and trusted
 - [ ] `ensureHook`'s string-spread bug fixed; verified live against the

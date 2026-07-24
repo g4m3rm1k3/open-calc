@@ -161,7 +161,6 @@ the real Settings screen, built next, replaces this proof with the
 genuine feature.
 
 ### Mechanical Walkthrough
-
 - `@Composable` — **first appearance.** Marks a function as describing
   UI — the Compose compiler plugin transforms functions marked this way
   in ways ordinary Kotlin functions aren't, enabling the automatic
@@ -172,9 +171,10 @@ genuine feature.
   conventionally start with a capital letter, like a class, signaling
   "this represents a piece of UI," not an ordinary action.
 - `Text(text = "Hello, $name!")` — **first appearance.** A Compose-
-  provided function (itself `@Composable`) that renders text — the
+- provided function (itself `@Composable`) that renders text — the
   direct conceptual replacement for XML's `<TextView>` (Lesson 3), now
-  a function call instead of a tag. `text = "..."` — **first appearance
+- a function call instead of a tag.
+- `text = "..."` — **first appearance
   of Kotlin named-argument syntax** — explicitly naming which parameter
   a value is for, readable independent of parameter order.
 - `ComposeView(activity)` — **first appearance.** The actual bridge
@@ -184,7 +184,7 @@ genuine feature.
   another `View` that happens to render Compose content inside it.
 - `composeView.setContent { Greeting("World") }` — **first appearance.**
   The actual entry point connecting a `ComposeView` to real
-  `@Composable` content — `{ Greeting("World") }` is Kotlin's trailing-
+- `@Composable` content — `{ Greeting("World") }` is Kotlin's trailing-
   lambda syntax (this lesson's table) supplying the UI-describing
   function to run.
 
@@ -275,9 +275,8 @@ A whole new file — nothing to show it landing inside yet, though its
 `SettingsFragment.java`'s `onViewCreated` from Lesson 21.
 
 ### Mechanical Walkthrough
-
 - `fun ComposeSettingsScreen(context: Context, onSaved: () -> Unit)` —
-  reappearing (`fun`, this lesson's table); `onSaved: () -> Unit` —
+- reappearing (`fun`, this lesson's table); `onSaved: () -> Unit` —
   **first appearance of a Kotlin function type as a parameter** — "a
   parameter that is itself a function, taking no arguments and
   returning nothing" (`Unit` is Kotlin's equivalent of Java's `void`,
@@ -289,59 +288,60 @@ A whole new file — nothing to show it landing inside yet, though its
   `mutableStateOf(...)` creates a special, Compose-tracked value
   holder; `remember { ... }` tells Compose "create this once, and keep
   the *same* holder across recompositions of this function, don't
-  rebuild it from scratch every time this function reruns"; `by` —
-  **first appearance of Kotlin property delegation** — lets `thresholdText`
+- rebuild it from scratch every time this function reruns"; `by` — **first appearance of Kotlin property delegation** — lets `thresholdText`
+
   be read and written as if it were a plain `var`, while every write
   actually goes through the tracked holder underneath. The direct
   payoff: assigning a new value to `thresholdText` anywhere in this
   function automatically triggers **recomposition** — Compose re-
   invokes this function, producing updated UI, with **no**
-  `findViewById`, **no** `.setText(...)` call anywhere — a complete,
+- `findViewById`, **no** `.setText(...)` call anywhere — a complete,
   structural elimination of the imperative view-mutation pattern every
   single screen since Lesson 4 has used.
 - `var errorMessage by remember { mutableStateOf<String?>(null) }` —
-  reappearing shape, `String?` — **first appearance of Kotlin nullable
-  types** — the `?` suffix means this variable is explicitly allowed to
+- reappearing shape, `String?` — **first appearance of Kotlin nullable types** — the `?` suffix means this variable is explicitly allowed to
+
   hold `null` (Kotlin, unlike Java, distinguishes nullable from
   non-nullable types at the language level; a plain `String` type could
   never hold `null` without the `?`).
 - `Column(modifier = Modifier.padding(24.dp)) { ... }` — **first
   appearance.** A layout composable, the direct conceptual replacement
-  for `LinearLayout android:orientation="vertical"` (Lesson 7) — stacks
+- for `LinearLayout android:orientation="vertical"` (Lesson 7) — stacks
   its child composables (everything in the trailing lambda) vertically.
-  `Modifier` — **first appearance** — a chainable configuration object
+- `Modifier` — **first appearance** — a chainable configuration object
   (a similar shape to the Builder pattern already met repeatedly, Lesson
   13/22/26/28) describing how a composable should be measured, laid
-  out, and drawn — `padding(24.dp)` the direct replacement for XML's
+- out, and drawn — `padding(24.dp)` the direct replacement for XML's
   `android:padding` attribute (Lesson 6).
 - `TextField(value = ..., onValueChange = { thresholdText = it }, isError = ...)`
-  — **first appearance.** The Compose replacement for `<EditText>`
+- — **first appearance.** The Compose replacement for `<EditText>`
   (Lesson 9) — critically **stateless on its own**: unlike an
   `EditText`, which holds its own text internally, a Compose `TextField`
   displays exactly `value` and calls `onValueChange` on every keystroke
-  — the *caller* (this function, via `thresholdText`) owns the actual
+- — the *caller* (this function, via `thresholdText`) owns the actual
   state, a pattern called **state hoisting**, explained fully in this
-  unit's SE Lens. `it` — **first appearance of Kotlin's implicit single-
-  parameter name** — inside a lambda with exactly one parameter, `it`
+- unit's SE Lens.
+- `it` — **first appearance of Kotlin's implicit single- parameter name** — inside a lambda with exactly one parameter, `it`
+
   refers to it without declaring a name explicitly, here the newly-typed
   text.
 - `if (errorMessage != null) { Text(text = errorMessage!!) }` —
-  reappearing `if` (already basic), `errorMessage!!` — **first
+- reappearing `if` (already basic), `errorMessage!!` — **first
   appearance of Kotlin's non-null assertion operator** — asserts "I
   know this isn't null right now" (safe here, directly inside the
-  `null`-checking `if` block), throwing if wrong — a real, sharp-edged
+- `null`-checking `if` block), throwing if wrong — a real, sharp-edged
   operator worth using carefully, flagged rather than glossed over.
 - `Button(onClick = { ... }) { Text(text = "Save") }` — **first
-  appearance.** The Compose replacement for `<Button>` (Lesson 3) —
+- appearance.** The Compose replacement for `<Button>` (Lesson 3) —
   `onClick` is a trailing-lambda-shaped parameter (this lesson's table),
   and the **outer** trailing lambda (after the parentheses close) is
-  the button's own *content* — a Compose `Button` doesn't take a `text`
+- the button's own *content* — a Compose `Button` doesn't take a `text`
   parameter directly; it takes arbitrary child composables, here just a
   `Text`, a real structural difference from the XML `Button`'s
   `android:text` attribute worth naming.
 - `thresholdText.toIntOrNull()` — **first appearance.** Kotlin's
   standard-library equivalent of Lesson 9/30's `try`/`catch`-wrapped
-  `Integer.parseInt` — returns the parsed `Int` or `null` on failure,
+- `Integer.parseInt` — returns the parsed `Int` or `null` on failure,
   no exception thrown or caught at all, a real, different idiom for the
   identical underlying need.
 - `prefs.edit().putInt("low_stock_threshold", threshold).apply()` —
@@ -435,17 +435,16 @@ other Fragment in this project is that the returned `View` is a
 `ComposeView` instead of the result of `inflater.inflate(...)`.
 
 ### Mechanical Walkthrough
-
 - `ComposeView composeView = new ComposeView(requireContext())` —
   reappearing (this lesson's first unit), constructed directly rather
-  than inflated from XML — `ComposeView` is a real, ordinary Java-
+- than inflated from XML — `ComposeView` is a real, ordinary Java-
   constructible class despite hosting Kotlin content.
 - `composeView.setContent(compose -> { ... return Unit.INSTANCE; })` —
   **first appearance of calling Kotlin's trailing-lambda API from
   Java.** Java has no trailing-lambda syntax; calling a Kotlin function
   expecting `() -> Unit` from Java means passing an ordinary Java
-  lambda that explicitly `return`s `kotlin.Unit.INSTANCE` — the Java-
-  visible representation of Kotlin's `Unit` type — a real, slightly
+- lambda that explicitly `return`s `kotlin.Unit.INSTANCE` — the Java- visible representation of Kotlin's `Unit` type — a real, slightly
+
   awkward seam this lesson's opening honesty check promised to be
   upfront about.
 - `ComposeSettingsScreenKt.ComposeSettingsScreen(...)` — **first
@@ -453,12 +452,12 @@ other Fragment in this project is that the returned `View` is a
   compiles a file's top-level functions (like `ComposeSettingsScreen`,
   declared directly in `ComposeSettingsScreen.kt`, not inside any
   class) into a synthetic Java class named after the file with `Kt`
-  appended — `ComposeSettingsScreenKt` — a real, mechanical detail of
+- appended — `ComposeSettingsScreenKt` — a real, mechanical detail of
   how Kotlin/Java interop actually works, not an arbitrary naming
   choice.
 - `() -> { Navigation.findNavController(requireView()).navigateUp(); return Unit.INSTANCE; }`
-  — reappearing (`NavController.navigateUp()`, Lesson 19/21), supplied
-  as this screen's `onSaved` callback — the Compose screen calls it
+- — reappearing (`NavController.navigateUp()`, Lesson 19/21), supplied as this screen's `onSaved` callback — the Compose screen calls it
+
   after successfully saving, exactly parallel to `SettingsFragment`'s
   own navigation-away-on-save behavior from Lesson 21.
 

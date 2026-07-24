@@ -128,7 +128,6 @@ import { AnimatePresence } from "framer-motion";
 ```
 
 ### Mechanical Walkthrough
-
 - `leftPanel.tabs.length > 0 && (<SidePanel ... />)` — **(a) first
   appearance** — real conditional rendering: when the condition is
   `false`, React never mounts `<SidePanel>` at all, which is a genuinely
@@ -143,12 +142,12 @@ import { AnimatePresence } from "framer-motion";
   keeps the outgoing element mounted just long enough to run its `exit`
   variant, then lets React actually remove it.
 - `key="sidepanel-left"` / `key="sidepanel-right"` — **(a) first
-  appearance of a key mattering for this reason** — `AnimatePresence`
+- appearance of a key mattering for this reason** — `AnimatePresence`
   identifies which children are entering/leaving/staying by key; without
   a stable key here, it couldn't tell "the left panel is gone" from "a
   new, different panel replaced it."
 - `slideVariants` (`hidden`/`visible`/`exit`) — **(a) first appearance**
-  — real, named animation states, each an `{x, opacity}` pair; `x` uses
+- — real, named animation states, each an `{x, opacity}` pair; `x` uses
   `"-100%"`/`"100%"` (not a fixed pixel value) so the slide distance is
   always exactly the panel's own current width, regardless of which
   side or how wide it's been resized to.
@@ -157,10 +156,10 @@ import { AnimatePresence } from "framer-motion";
   fixed-duration easing curve), so the animation's actual speed depends
   on how far it has to travel, not a flat, arbitrary time.
 - `className="side-panel docked ${side}..."` — **(b) partial
-  reappearing** — `side-panel`/`${side}` unchanged; `docked` is new
+- reappearing** — `side-panel`/`${side}` unchanged; `docked` is new
   (paired with `theme.css`'s own new `.side-panel.undocked` styling,
   covered in a later lesson) but nothing in this diff ever applies
-  `undocked` — a real, named, currently-unreachable CSS branch, not
+- `undocked` — a real, named, currently-unreachable CSS branch, not
   silently glossed over.
 
 ### CS Lens

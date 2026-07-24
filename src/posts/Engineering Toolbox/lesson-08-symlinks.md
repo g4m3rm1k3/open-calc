@@ -99,12 +99,12 @@ The function now walks a folder — the exact recursive shape from Lesson
 but does nothing with that information yet.
 
 ### Mechanical Walkthrough
-
 `import os`, `def explore(path, depth=0):`, `for entry in
-os.listdir(path):`, `full_path = os.path.join(path, entry)` — all
+- os.listdir(path):`, `full_path = os.path.join(path, entry)` — all
 direct reminders of Lesson 7's `directory_size`/`print_tree` structure,
-reused here unchanged. `if os.path.islink(full_path):` — the concept
-from this unit's lab, reused for real. `pass` — placeholder, reminder.
+- reused here unchanged.
+- `if os.path.islink(full_path):` — the concept from this unit's lab, reused for real.
+- `pass` — placeholder, reminder.
 
 ### CS Lens
 
@@ -209,9 +209,9 @@ points to, one hop, as stored — not yet whether that target is real or
 where it ultimately leads.
 
 ### Mechanical Walkthrough
+- `target = os.readlink(full_path)` — the concept from this unit's lab, reused for real.
+- `print("  " * depth + f"{entry} -> {target}")` —
 
-`target = os.readlink(full_path)` — the concept from this unit's lab,
-reused for real. `print("  " * depth + f"{entry} -> {target}")` —
 string repetition for indentation (Lesson 7, reminder), string
 concatenation and an f-string, both already basic.
 
@@ -322,14 +322,15 @@ Each symlink now reports a real status alongside its target — `OK` if
 following it actually leads somewhere, `BROKEN` if it doesn't.
 
 ### Mechanical Walkthrough
+- `exists = os.path.exists(full_path)` — the concept from this unit's lab, reused for real.
+- `status = "OK" if exists else "BROKEN"` — first
 
-`exists = os.path.exists(full_path)` — the concept from this unit's
-lab, reused for real. `status = "OK" if exists else "BROKEN"` — first
 appearance of the conditional (ternary) expression: a single-line
 `if`/`else` that produces a *value* rather than running a statement
 block — deliberately compact for a case this simple; equivalent to a
 full four-line `if`/`else` block, chosen here because there's nothing
-more to the logic than picking one of two strings. `print(...)` — an
+- more to the logic than picking one of two strings.
+- `print(...)` — an
 added `[{status}]` in the f-string, already-basic formatting.
 
 ### CS Lens
@@ -453,14 +454,14 @@ target, their status, and their fully-resolved real destination;
 folders recurse (the exact Lesson 7 pattern); plain files just print.
 
 ### Mechanical Walkthrough
+- `real = os.path.realpath(full_path)` — the concept from this unit's lab, reused for real. The updated `print(...)` — an added `(resolves to
 
-`real = os.path.realpath(full_path)` — the concept from this unit's
-lab, reused for real. The updated `print(...)` — an added `(resolves to
 {real})`, already-basic f-string formatting. `elif os.path.isdir(...)`
-and the recursive `explore(full_path, depth + 1)` call — Lesson 7's
+- and the recursive `explore(full_path, depth + 1)` call — Lesson 7's
 recursion, reminder, now sitting alongside the symlink branch rather
 than being the only case, exactly matching this lesson's earlier SE
-Lens about checking `islink()` before `isdir()`. `else: print(...)` —
+- Lens about checking `islink()` before `isdir()`.
+- `else: print(...)` —
 the plain-file case, unchanged from Lesson 7's `print_tree`.
 
 ### CS Lens

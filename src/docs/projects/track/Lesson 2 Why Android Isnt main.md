@@ -73,7 +73,6 @@ larger) — so no further "enclosing structure" to show; you're looking
 at the complete document as generated.
 
 ### Mechanical Walkthrough
-
 - `<manifest ...>` — **first appearance.** The root declaration of an
   entirely separate file format from Java: XML. Unlike your `.java`
   files, this file is read by the Android build tools and by the OS
@@ -86,22 +85,22 @@ at the complete document as generated.
 - `<application>` — **first appearance.** Describes properties of the
   app as a whole: its icon, its display name, its visual theme.
 - `android:allowBackup`, `android:icon`, `android:label`,
-  `android:theme` — **first appearance**, as a group: these are
+- `android:theme` — **first appearance**, as a group: these are
   attributes, each pointing at a resource rather than a hardcoded
-  value (`@mipmap/...`, `@string/...`, `@style/...` — the `@` syntax
+- value (`@mipmap/...`, `@string/...`, `@style/...` — the `@` syntax
   is its own concept, covered below).
 - `<activity android:name=".MainActivity" ...>` — **first appearance.**
   This is the actual answer to the Problem above: this line is the
   *only* place in your entire project that connects the class
   `MainActivity` to the running app. `.MainActivity` is shorthand for
-  `com.yourname.pocketinventory.MainActivity` — the leading dot means
+- `com.yourname.pocketinventory.MainActivity` — the leading dot means
   "append this to the package name already declared at the top of this
-  manifest" (which you'd find in `build.gradle`, not shown here — not
+- manifest" (which you'd find in `build.gradle`, not shown here — not
   needed yet). Delete this `<activity>` block entirely and
   `MainActivity.java` would still compile fine, but the OS would have
   no idea it exists as something launchable.
 - `<intent-filter>`, `<action android:name="android.intent.action.MAIN" />`,
-  `<category android:name="android.intent.category.LAUNCHER" />` —
+- `<category android:name="android.intent.category.LAUNCHER" />` —
   **first appearance, as a group.** This is the actual declaration of
   *which* activity is the one shown when the user taps your app icon
   on the home screen. `MAIN` means "this is a valid entry point,"
@@ -109,7 +108,7 @@ at the complete document as generated.
   screen." A project can have many Activities; only one (usually) has
   this exact filter combination.
 - `@mipmap/ic_launcher`, `@string/app_name`, `@style/Theme.PocketInventory`
-  — **first appearance, as a group.** The `@type/name` syntax is
+- — **first appearance, as a group.** The `@type/name` syntax is
   Android's *resource reference* system — instead of hardcoding
   `"Pocket Inventory"` as a literal string here, the manifest points
   at a named resource defined elsewhere (`res/values/strings.xml`),
@@ -259,14 +258,13 @@ setup work, inflate your screen's layout) *plus* one visible proof
 that it ran: a log line you can watch appear in real time.
 
 ### Mechanical Walkthrough
-
 - `extends AppCompatActivity` — **first appearance** (the framework
   version of the `Base`/`Child` pattern you just labbed).
 - `@Override` — **first appearance.** A compiler-checked annotation:
   "I intend this method to replace a method of the same name/signature
   in the parent class." Without it, a typo in the method name (say,
   `onCreat`) would silently compile as a brand-new unrelated method
-  that the OS never calls — `@Override` turns that mistake into a
+- that the OS never calls — `@Override` turns that mistake into a
   compile error instead of a silent bug.
 - `protected void onCreate(Bundle savedInstanceState)` — **first
   appearance.** `protected` means callable by the class itself, by
@@ -282,12 +280,12 @@ that it ran: a log line you can watch appear in real time.
   are not shown and should never skip.
 - `setContentView(R.layout.activity_main)` — **first appearance.**
   `R.layout.activity_main` is your first sight of the generated `R`
-  class — covered as its own unit next — and `setContentView` is the
+- class — covered as its own unit next — and `setContentView` is the
   call that actually puts a layout on screen.
 - `android.util.Log.d(...)` — **reappearing pattern** (a static method
   call, already basic), but the *purpose* — writing to Android's
   Logcat system, a dedicated debugging output channel separate from
-  `System.out` — is worth a clause: Logcat survives and is filterable
+- `System.out` — is worth a clause: Logcat survives and is filterable
   in ways plain console output on a phone isn't, which is why Android
   code uses `Log.d`/`Log.e`/etc. instead of `System.out.println` once
   you're off a desktop JVM.
@@ -464,14 +462,13 @@ fields starting Lesson 6) are the ones that matter from here on, now
 with a real reference point for what each level actually guarantees.
 
 ### Mechanical Walkthrough
-
 - `public` — visible everywhere, no restriction at all.
 - `protected` — visible within the same package, *and* to subclasses
   anywhere, even in a different package — this second half is
   specifically why the OS's own framework-internal call to your
   `onCreate` works even though your app's code and Android's own
   platform code aren't in the same package: `AppCompatActivity`'s
-  ancestor classes call `onCreate` on `this`, and `this` — your actual
+- ancestor classes call `onCreate` on `this`, and `this` — your actual
   subclass instance — is exactly the "subclass, anywhere" case
   `protected` allows.
 - *(no modifier at all)* — **package-private** (sometimes called
@@ -540,14 +537,13 @@ public final class R {
 ```
 
 ### Mechanical Walkthrough
-
 - `public final class R` — **first appearance of the pattern**, though
   `public class` itself is already basic. `final` here means this
   class cannot be subclassed — reasonable, since it's pure generated
   data, never meant to be extended.
 - Nested `static final class layout`, `class string`, etc. — **first
   appearance.** Each nested class groups one *type* of resource. This
-  is why you write `R.layout.activity_main` and `R.string.app_name` —
+- is why you write `R.layout.activity_main` and `R.string.app_name` —
   the outer `R` plus the resource-type name plus the specific
   resource's name, three-part addressing.
 - The integer values (`0x7f0b001c`) — **first appearance**, worth one

@@ -100,19 +100,18 @@ has nothing to locate a position within. `mydb.cpp` right now is a
 single function, `main`, that prints one line and exits successfully.
 
 ### Mechanical Walkthrough
-
 Going through every element in order:
 
 - `#include <iostream>` — **first appearance.** A *preprocessor
   directive*: before compilation proper begins, the compiler literally
   pastes in the contents of a header file named `iostream`, which
   declares the input/output tools (`std::cout` among them) used below.
-  Without this line, `std::cout` is a compile error — the compiler has
+- Without this line, `std::cout` is a compile error — the compiler has
   no idea what it is. Python's rough equivalent is `import`, but the
   mechanism is different: Python imports a module *object* at runtime;
   `#include` pastes in *text* before your code is even compiled.
 - `int main()` — **first appearance.** Every C++ program must have
-  exactly one function named `main` — it's the entry point; when you run
+- exactly one function named `main` — it's the entry point; when you run
   the executable, execution starts here and nowhere else. The `int`
   means this function reports back a whole-number result when it
   finishes (that's what `return 0;` supplies). Python scripts don't
@@ -121,7 +120,7 @@ Going through every element in order:
 - `{` / `}` — basic syntax, already familiar in spirit as "a block" even
   coming from Python's indentation-based blocks — not re-explained.
 - `std::cout` — **first appearance.** An object representing "standard
-  output" — your terminal. The `std::` prefix means it lives in the
+- output" — your terminal. The `std::` prefix means it lives in the
   *standard library's namespace*, a naming container that keeps the
   library's names from colliding with your own; you'll see plain `cout`
   again later once we discuss namespaces properly, but for now,
@@ -144,7 +143,7 @@ Going through every element in order:
   `main`'s result. By convention, `0` means "the program succeeded";
   any other number signals a specific kind of failure to whatever
   launched it (your shell, a script, another program). Python scripts
-  have this too — `sys.exit(0)` — but it's opt-in there; in C++, `main`
+- have this too — `sys.exit(0)` — but it's opt-in there; in C++, `main`
   returning a code is the normal, expected shape of the function.
 
 ### CS Lens
@@ -293,10 +292,9 @@ screen at all yet; the whole visible effect of running this program is a
 new or growing file on disk.
 
 ### Mechanical Walkthrough
-
 - `#include <fstream>` — **first appearance.** The header declaring
   file-stream types (`ofstream`, `ifstream`, seen below and in the next
-  unit). Same mechanism as `#include <iostream>` from Unit 1 — reused,
+- unit). Same mechanism as `#include <iostream>` from Unit 1 — reused,
   not re-explained.
 - `#include <string>` — **first appearance.** Declares `std::string`
   itself. You've used string *literals* (`"text"`) since Unit 1 without
@@ -307,7 +305,7 @@ new or growing file on disk.
   `std::string` as a variable type. This declares a variable named
   `record`, of type `std::string`, initialized to that text. Unlike a
   Python variable, which can hold any type and be reassigned to a
-  different one later, `record` is now permanently a string — C++
+- different one later, `record` is now permanently a string — C++
   variables have a fixed type for their entire lifetime, decided at this
   declaration.
 - `std::ofstream` — **first appearance.** "Output file stream" — an
@@ -320,7 +318,7 @@ new or growing file on disk.
   it — worth getting right on day one.
 - `out << record << "\n"` — reuses the `<<` stream-insertion operator
   from Unit 1 (basic reuse, not re-explained), but notice it's the
-  *same* operator working on a *different* stream — `out` here instead
+- *same* operator working on a *different* stream — `out` here instead
   of `std::cout`. That's the payoff of the design: "send this into a
   stream" is one idea that works identically whether the stream is your
   screen or a file.
@@ -488,12 +486,11 @@ reading and prints every line it contains — including every record any
 *previous* run has ever appended, not just this run's.
 
 ### Mechanical Walkthrough
-
 - `std::ifstream` — **first appearance**, mirrors `std::ofstream` from
   Unit 2 as the reading counterpart: "input file stream." Constructing
   it with `("school.db")` opens that file for reading.
 - `std::string line;` — reuses the `std::string` type from Unit 2 (basic
-  reuse), but notice this declaration has no `=` initializer — it starts
+- reuse), but notice this declaration has no `=` initializer — it starts
   as an empty string, meant to be overwritten on each loop pass rather
   than holding one fixed value.
 - `while (...)` — **first appearance.** A loop that keeps re-running its
@@ -504,14 +501,14 @@ reading and prints every line it contains — including every record any
   braces around the block instead of a colon and indentation.
 - `std::getline(in, line)` — **first appearance.** A function that reads
   one line of text from the stream `in`, stores it into the variable
-  `line`, and — this is the part making it work as a loop condition —
+- `line`, and — this is the part making it work as a loop condition —
   returns something that behaves as `true` if a line was successfully
   read, and `false` once the stream has run out of lines. That dual job
   (read AND report success/failure) is exactly why it can sit directly
   inside a `while(...)` condition: the condition check and the read are
   the same call.
 - `std::cout << line << "\n";` — reuses `std::cout` and `<<` from Unit 1
-  and `"\n"` from Unit 2 — no new concepts, just familiar tools
+- and `"\n"` from Unit 2 — no new concepts, just familiar tools
   operating on a new variable.
 
 **Execution trace** — this loop carries state across iterations, so

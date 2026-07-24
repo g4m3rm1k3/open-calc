@@ -53,12 +53,12 @@ dict, unused by anything downstream until now).
 ```
 
 ### Mechanical Walkthrough
-
 `command.get("active_t", 0)` reads a value the *parser* already put on
-every command dict — `compute_steps` doesn't compute anything new here,
+- every command dict — `compute_steps` doesn't compute anything new here,
 it just carries an already-real fact forward into its own per-step
 snapshot, the same way `command_index` already rides alongside each
-point. `{**state.state(), "active_t": ...}` — spreading `state.state()`'s
+- point.
+- `{**state.state(), "active_t": ...}` — spreading `state.state()`'s
 own dict and adding one more key, rather than teaching `MachineState`
 itself about tool numbers at all; `active_t` is real parser-tracked
 modal state, not physical machine state, and doesn't belong on that
@@ -144,9 +144,8 @@ def get_assembly_by_number(tool_number):
 ```
 
 ### Mechanical Walkthrough
-
 The session that looks up `tool` closes (`with get_session() as
-session:` exits) *before* `get_tool_assembly(tool_id)` opens its own —
+- session:` exits) *before* `get_tool_assembly(tool_id)` opens its own —
 `tool_id` is captured as a plain local variable first, so the second
 call doesn't depend on the first session still being open. `.scalars(
 ).first()` (not `.scalar_one_or_none()`, used everywhere a tool number
@@ -229,12 +228,11 @@ const HOLDER_COLOR = 0x4a5568;
 ```
 
 ### Mechanical Walkthrough
-
-Not one line of `toolAssembly.ts` changed for this — `buildToolProfile`/
+- Not one line of `toolAssembly.ts` changed for this — `buildToolProfile`/
 `revolveProfile` take plain data in, return plain geometry out, with no
 dependency on which viewport calls them. `clearToolMeshes` mirrors
 `assemblyViewport.ts`'s own identical dispose-then-rebuild shape
-(`concepts/threejs-mutating-scene-after-creation.md`, reappearing) —
+- (`concepts/threejs-mutating-scene-after-creation.md`, reappearing) —
 the same real reason applies here: a `LatheGeometry`'s vertex data is
 baked in at construction, not mutable in place.
 
@@ -329,12 +327,11 @@ buildToolProfile/revolveProfile calls.
 ```
 
 ### Mechanical Walkthrough
-
 THREE's own X-axis rotation formula: `y' = y·cos(θ) − z·sin(θ)`, `z' =
 y·sin(θ) + z·cos(θ)`. For a local `(0, 1, 0)` point (pure `+y`) with
-`θ = +90°`: `y' = 0`, `z' = 1` — local `+y` maps to world `+z`. With
+- `θ = +90°`: `y' = 0`, `z' = 1` — local `+y` maps to world `+z`. With
 `θ = -90°` (`assemblyViewport.ts`'s own choice): local `+y` maps to
-world `−z` instead. Both are internally consistent — a mesh's own tip
+- world `−z` instead. Both are internally consistent — a mesh's own tip
 still stays at the local origin either way, and the holder still sits
 the correct relative distance from it — but only one of them makes
 `+y` (extending from the tool's tip toward its own holder) line up with
@@ -452,9 +449,8 @@ async function fetchAssemblyByNumber(
 ```
 
 ### Mechanical Walkthrough
-
 `activeToolNumber` (a plain number, derived from `currentState?.
-active_t`) is the effect's own dependency — not `currentState` itself.
+- active_t`) is the effect's own dependency — not `currentState` itself.
 This matters: `currentState` is a *new* object every step (a fresh
 `states[stepIndex]` entry), but `activeToolNumber` only actually
 *changes value* when a real tool change happens — depending on the
@@ -549,8 +545,7 @@ only wired to `ToolCardList`) through:
 ```
 
 ### Mechanical Walkthrough
-
-No new mechanism — `toolsRefreshKey` (a plain number, bumped by
+- No new mechanism — `toolsRefreshKey` (a plain number, bumped by
 `ToolImportPanel`'s own `onImported` callback) already existed
 specifically to solve exactly this class of problem for
 `ToolCardList.tsx`; `BlockList.tsx` simply hadn't been wired to it,
@@ -628,8 +623,7 @@ all.
 ```
 
 ### Mechanical Walkthrough
-
-`setTools((prev) => prev.filter(...))` still runs first — `ToolCardList`
+- `setTools((prev) => prev.filter(...))` still runs first — `ToolCardList`
 itself updates instantly, an optimistic local update, same as before.
 `onDeleted?.()` is the new, real addition: it tells whichever parent
 holds `toolsRefreshKey` (`App.tsx`) that *some* real, external state
@@ -760,15 +754,14 @@ holder:
 ```
 
 ### Mechanical Walkthrough
-
 Tool and holder are converted **independently**, each by its own real
-`is_metric`/`holder_is_metric` flag, not by a single shared assumption —
+- `is_metric`/`holder_is_metric` flag, not by a single shared assumption —
 a real assembly can (and in this project's own current data, does) pair
 an inch tool with an inch holder, but nothing in the schema guarantees
 they always match, so treating them as a single unit would have been a
 real, if currently invisible, second version of the exact same mistake.
 `ToolDimensions` (`toolAssembly.ts`) deliberately does **not** carry
-`is_metric` itself — `buildToolProfile` never needs it, only this
+- `is_metric` itself — `buildToolProfile` never needs it, only this
 conversion step does, so a separate `FetchedTool = ToolDimensions & {
 is_metric: boolean }` type carries it instead, on the raw fetched shape
 only (a real design correction made while writing this exact code —

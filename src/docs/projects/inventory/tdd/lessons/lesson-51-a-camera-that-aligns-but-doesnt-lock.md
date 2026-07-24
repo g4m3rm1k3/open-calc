@@ -60,16 +60,15 @@ camera to it — orbiting away afterward has to keep working normally.
 ```
 
 ### Mechanical Walkthrough
-
 `distance` is read from the camera's *current* position before moving
 anything — preserving it (rather than snapping to some fixed distance)
 is what keeps the zoom level feeling continuous across the jump.
 `target` starts as a *clone* of the current orbit target, with only the
 real depth-axis coordinate overwritten (`target.y = depth` for `G18`,
-`target.x = depth` for `G19`) — the other two, in-plane coordinates are
+- `target.x = depth` for `G19`) — the other two, in-plane coordinates are
 left exactly where the user was already looking, so the snap re-centers
 depth-wise without also recentering the view sideways. `camera.lookAt
-(target)` then `controls.update()` — the second call is real and
+- (target)` then `controls.update()` — the second call is real and
 necessary: `OrbitControls` caches its own internal spherical
 coordinates from the camera's position/target, and won't reflect a
 manually-moved camera on the next render without being told to
@@ -149,15 +148,14 @@ directions.
 ```
 
 ### Mechanical Walkthrough
-
-`Math.sin(0.001) ≈ 0.001`, `Math.cos(0.001) ≈ 0.99999950...` — the
+- `Math.sin(0.001) ≈ 0.001`, `Math.cos(0.001) ≈ 0.99999950...` — the
 camera ends up almost, but not exactly, directly above the target:
 mostly displaced along `+z` (`distance * cos(epsilon)`, essentially the
 full distance), with a real, tiny sideways nudge along `+x`
-(`distance * sin(epsilon)`, a fraction of a percent of the distance) —
+- (`distance * sin(epsilon)`, a fraction of a percent of the distance) —
 visually indistinguishable from a true top-down view, but no longer
 mathematically parallel to `camera.up`. The real alternative rejected
-here — temporarily setting `camera.up` to something like `(0, 1, 0)`
+- here — temporarily setting `camera.up` to something like `(0, 1, 0)`
 for this one view — was considered and deliberately not used: it would
 have needed to be set back to `(0, 0, 1)` the moment the user orbits
 away (to keep matching this project's own real, single Z-up convention
@@ -303,9 +301,8 @@ selecting a plane explicit at the call site:
 ```
 
 ### Mechanical Walkthrough
-
 `ViewportHandle` deliberately exposes exactly one real method
-(`snapToPlaneView`) — not the internal `viewportRef` itself, not
+- (`snapToPlaneView`) — not the internal `viewportRef` itself, not
 `drawPath`/`setTool`/`setDrawPlane`, none of which any parent has ever
 needed to call directly (they're all already driven by plain, ordinary
 props). `App.tsx`'s `handleSelectPlane` is a plain function, recreated

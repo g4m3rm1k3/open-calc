@@ -109,11 +109,10 @@ fields stacked via `toBottomOf` chaining (reappearing pattern from
 Lesson 5/8) and a `Save` button anchored below the last one.
 
 ### Mechanical Walkthrough
-
 - `android:layout_width="0dp"` — **first appearance of this specific
   value.** Inside a `ConstraintLayout`, `0dp` combined with both `Start`
   and `End` constraints set means "stretch to fill whatever space those
-  two constraints leave" — different from `wrap_content` (size to
+- two constraints leave" — different from `wrap_content` (size to
   content) and `match_parent` (fill the immediate parent regardless of
   siblings), a third sizing behavior specific to constraint-based
   layouts, needed here so each `EditText` spans the screen width minus
@@ -125,7 +124,7 @@ Lesson 5/8) and a `Save` button anchored below the last one.
   keyboard writes into.
 - `android:hint="Item name"` — **first appearance.** Placeholder text
   shown only while the field is empty, automatically disappearing once
-  the user types — distinct from `android:text`, which sets *actual*
+- the user types — distinct from `android:text`, which sets *actual*
   content the field would submit if read right now.
 - `android:inputType="text"` / `android:inputType="number"` — **first
   appearance.** Tells the on-screen keyboard which layout to show (a
@@ -217,7 +216,6 @@ unit stops at deliberately, so the next unit's validation has something
 concrete to react to.
 
 ### Mechanical Walkthrough
-
 - `findViewById(R.id.nameInput)` (and its three siblings) — reappearing,
   Lesson 4.
 - `.getText()` — **first appearance.** Returns an `Editable` — a
@@ -228,7 +226,7 @@ concrete to react to.
 - `.toString()` — **first appearance in this context**, though the
   method itself is standard on every Java object. Converts the
   `Editable`'s current content into an actual, independent `String`
-  snapshot — after this call, later edits to the `EditText` no longer
+- snapshot — after this call, later edits to the `EditText` no longer
   affect the variable you stored.
 - `.trim()` — **first appearance.** Removes leading and trailing
   whitespace — relevant because a user tapping into a field and tapping
@@ -499,7 +497,6 @@ operation immediately, so `new Item(...)` at the bottom is only ever
 reached with data already confirmed valid.
 
 ### Mechanical Walkthrough
-
 - `name.isEmpty()` — **first appearance.** `String.isEmpty()` — checks
   for zero-length content; combined with the earlier `.trim()`, this
   also rejects whitespace-only input.
@@ -516,12 +513,13 @@ reached with data already confirmed valid.
   worse, continuing on with bad data.
 - `int quantity;` declared with no initializer — **first appearance of
   this specific shape.** Legal in Java as long as every path guarantees
-  it's assigned before use — here, the `try` block assigns it on
+- it's assigned before use — here, the `try` block assigns it on
   success, and the `catch` block's `return` prevents any path that
   reaches later code without it being set.
 - `try { ... } catch (NumberFormatException e) { ... }` — **first
   appearance in the real project**, direct reuse of the pattern just
-  labbed in `ParseDemo`. `Integer.parseInt(quantityText)` — reappearing
+- labbed in `ParseDemo`.
+- `Integer.parseInt(quantityText)` — reappearing
   (from the lab), first real use on user-typed input.
 - `quantity < 0` — reappearing (`<` comparison, already basic),
   encoding a business rule `inputType="number"` never could: `parseInt`
@@ -530,8 +528,8 @@ reached with data already confirmed valid.
 - `new Item(name, quantity, location)` — reappearing (constructor,
   Lesson 7), now only reachable with validated data.
 - `android.widget.Toast.makeText(this, ..., Toast.LENGTH_SHORT).show()`
-  — **first appearance.** A `Toast` is a small, auto-dismissing
-  message overlay — `makeText` builds it (context, message, a duration
+- — **first appearance.** A `Toast` is a small, auto-dismissing message overlay — `makeText` builds it (context, message, a duration
+
   constant), and nothing appears until `.show()` is called separately.
 - `finish()` — **first appearance.** Explicitly tells the OS this
   Activity is done and should be destroyed and popped off the back
@@ -638,13 +636,12 @@ now applied to the list instead of a text field) instead of the list
 covering the whole screen and hiding a button beneath it.
 
 ### Mechanical Walkthrough
-
 - `android:layout_height="0dp"` on the `RecyclerView` — **reappearing**
   (the stretch-to-fill idea from this lesson's `EditText` fields),
   first use on height instead of width.
 - `app:layout_constraintBottom_toTopOf="@id/addItemButton"` — **first
   appearance of `toTopOf`** targeting a sibling (you've seen
-  `toBottomOf` a sibling before, in Lesson 5/8) — same relative-anchor
+- `toBottomOf` a sibling before, in Lesson 5/8) — same relative-anchor
   idea, opposite edge pairing.
 - `<Button ...>` — reappearing, Lesson 3.
 
@@ -673,10 +670,9 @@ addButton.setOnClickListener(v ->                                               
 ```
 
 ### Mechanical Walkthrough
-
 - `findViewById`, `setOnClickListener`, `new Intent(...)`,
-  `startActivity(...)` — every piece here is **reappearing**, from
-  Lesson 4 and Lesson 8's identical pattern for `ItemDetailActivity` —
+- `startActivity(...)` — every piece here is **reappearing**, from Lesson 4 and Lesson 8's identical pattern for `ItemDetailActivity` —
+
   no new concepts, deliberately: this is the same navigation shape
   applied a third time.
 

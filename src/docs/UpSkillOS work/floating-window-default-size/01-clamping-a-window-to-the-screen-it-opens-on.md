@@ -88,7 +88,6 @@ const [size, setSize] = useState(() => ({ w: initialW, h: initialH }))
 ```
 
 #### Mechanical Walkthrough
-
 `initialW`/`initialH` are computed once, before either `pos` or `size`
 reads them — both now derive from the *same* actual value, instead of
 `pos` reaching for the constant `PANEL_W` while `size` correctly used
@@ -126,7 +125,7 @@ case that would prove it wrong."
 #### Connect to What Came Before
 
 This is the same shape of bug this lesson series has already caught
-twice — Lesson 2's `loadFromJSON`-as-callback mistake and Lesson 8's
+- twice — Lesson 2's `loadFromJSON`-as-callback mistake and Lesson 8's
 rename-input concatenation both looked correct until a specific real
 scenario exercised them for the first time. This is the third: code
 that was correct for every case that had ever actually happened, wrong
@@ -185,14 +184,13 @@ Window fits within the screen width: true
 ```
 
 #### Mechanical Walkthrough
-
-`Math.min(requested, screenSize - margin)` — established arithmetic,
+- `Math.min(requested, screenSize - margin)` — established arithmetic,
 nothing new syntactically — but note it produces a *different actual
 window size* depending on the screen, not just a repositioned one: on
 the 900×700 screen, the window opened at 860×620 (clamped down from
 the requested 1280×860), not 1280×860 shoved partially off-screen.
 This is why the fix belongs at the same spot as `initialW`/`initialH`
-from the previous unit — both `pos` and `size` need to agree on
+- from the previous unit — both `pos` and `size` need to agree on
 whatever the *actually usable* size turned out to be, after clamping,
 not the originally requested one.
 
@@ -221,7 +219,7 @@ metadata discovery instead of repeating it per lab.
 
 #### Connect to What Came Before
 
-Both bugs in this lesson lived in `FloatingWindow.jsx` — code shared
+- Both bugs in this lesson lived in `FloatingWindow.jsx` — code shared
 by every lab in this app, never specific to `canvas-notes`. Fixing
 them here, rather than working around them inside `canvas-notes`
 itself, means every future lab that ever requests a custom window size
@@ -253,7 +251,7 @@ clamp and requesting a size larger than a 900×700 test viewport).
 
 - Give a different lab a custom `width`/`height` in its own `meta.js`
   and confirm it opens correctly sized and centered, without touching
-  `FloatingWindow.jsx` again — proof the fix is genuinely centralized.
+- `FloatingWindow.jsx` again — proof the fix is genuinely centralized.
 - `MIN_W`/`MIN_H` already exist for the resize-drag case. Should a
   lab's *requested* initial size also be clamped to at least `MIN_W`/
   `MIN_H`, in case a future `meta.js` requests something too small to

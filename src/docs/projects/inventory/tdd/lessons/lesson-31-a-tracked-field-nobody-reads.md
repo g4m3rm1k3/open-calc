@@ -183,31 +183,30 @@ unchanged from Lesson 29):
 ```
 
 ### Mechanical Walkthrough
-
 - `is_absolute = command.get("pos_mode", "G90") == "G90"` — **(a) first
-  appearance** — real port of `av()`'s `abs` variable, computed once per
+- appearance** — real port of `av()`'s `abs` variable, computed once per
   command instead of once per whole engine call (this project resolves
   one command at a time, not a whole recorder pass), defaulting to
   `"G90"` for any command dict that predates this field (none exist in
   this project's own test paths, but the default matches the reference's
   own real modal default anyway).
 - `self.x = command["x"] if is_absolute else self.x + command["x"]` —
-  **(a) first appearance** — the real `av()` ternary, applied per axis;
-  `(b) reappearing` — the `if "x" in command:` guard shape itself,
+- **(a) first appearance** — the real `av()` ternary, applied per axis; `(b) reappearing` — the `if "x" in command:` guard shape itself,
+
   unchanged since Lesson 5.
 - `if command.get("went_home"): self.x, self.y, self.z = 0.0, 0.0, 0.0`
-  — **(a) first appearance** — the real, unconditional `G28` write,
+- — **(a) first appearance** — the real, unconditional `G28` write,
   moved from `core/parser.py` into `MachineState.apply()` so it runs
   *before* the axis-resolution lines directly below it, reproducing the
   reference's own two-write ordering inside one method instead of across
   `applyGCode`/`applyMotion`'s two separate real calls.
 - `"pos_mode": self.pos_mode` in the command dict — **(a) first
-  appearance of this field being read by anything** — `Parser` has set
+- appearance of this field being read by anything** — `Parser` has set
   `self.pos_mode` since Lesson 29; this is the first line that ever
   copies it into a command `MachineState` will see.
 - `command["went_home"] = True` replacing the old direct
-  `command["x"]/["y"]/["z"] = self.home[...]` assignment — **(a) first
-  appearance** of the flag; **(b) reappearing** — the `if went_home:`
+- `command["x"]/["y"]/["z"] = self.home[...]` assignment — **(a) first appearance** of the flag; **(b) reappearing** — the `if went_home:`
+
   guard itself, already present since Lesson 29, now doing less work
   directly and delegating the actual position write to `MachineState`.
 

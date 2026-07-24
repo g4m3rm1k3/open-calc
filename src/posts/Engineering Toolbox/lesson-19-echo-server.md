@@ -85,12 +85,13 @@ finishes with a client, instead of ever falling out of the `with`
 block on its own.
 
 ### Mechanical Walkthrough
-
 `import socket`, `HOST`/`PORT`, `with socket.socket(...) as
-server_socket:`, `server_socket.bind(...)`, `server_socket.listen()` —
-all direct reminders of Lesson 18, unchanged. `while True:` — Lesson
+- server_socket:`, `server_socket.bind(...)`, `server_socket.listen()` — all direct reminders of Lesson 18, unchanged.
+- `while True:` — Lesson
+
 10's intentional infinite loop, reminder, wrapping something that
-previously ran once. `conn, addr = server_socket.accept()` — Lesson 18,
+- previously ran once.
+- `conn, addr = server_socket.accept()` — Lesson 18,
 reminder — now inside the loop instead of standing alone.
 
 ### CS Lens
@@ -202,18 +203,20 @@ everything it receives until that client disconnects, then loops back
 to `accept()` for the next one — indefinitely.
 
 ### Mechanical Walkthrough
-
-`with conn:` — Lesson 18, reminder — guarantees this client's socket
+- `with conn:` — Lesson 18, reminder — guarantees this client's socket
 closes even if something inside the block raises an error (this
-lesson's closing section triggers exactly that). `while True:` — a
+- lesson's closing section triggers exactly that).
+- `while True:` — a
 *second*, inner infinite loop, nested inside the outer one — the outer
 loop is "wait for the next client," this inner loop is "keep this one
 client's conversation going until they disconnect." `data =
-conn.recv(1024)` — Lesson 18, reminder. `if not data: ... break` — the
+- conn.recv(1024)` — Lesson 18, reminder.
+- `if not data: ... break` — the
 same empty-bytes-as-disconnection-signal idea from Lesson 18's `recv()`
 unit, reused here as the inner loop's exit condition (distinct from
-Lesson 10's empty-string-from-`read()` sentinel — same *shape* of idea,
-different data source). `conn.sendall(data)` — first appearance:
+- Lesson 10's empty-string-from-`read()` sentinel — same *shape* of idea, different data source).
+- `conn.sendall(data)` — first appearance:
+
 guarantees every byte in `data` is actually transmitted before
 returning, looping internally and retrying as needed — unlike Lesson
 18's plain `.send()`, which only promises to send *some* of what you

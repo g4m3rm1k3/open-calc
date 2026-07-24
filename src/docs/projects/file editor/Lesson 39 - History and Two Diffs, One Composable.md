@@ -256,11 +256,10 @@ to change at all:
 ```
 
 ### Mechanical Walkthrough
-
 Enumerated in order, every item given real behavioral content, not
 just a lesson number to point at — a bare citation isn't a
 restatement, and the Repetition Rule asks for both. `ref([])`/`ref('')`
-(Lesson 33) construct the four pieces of state — a `ref` that, on
+- (Lesson 33) construct the four pieces of state — a `ref` that, on
 `.value`, either holds the current array/string or lets you assign a
 new one, re-rendering whatever reads it. `watch(activeTabPath, () =>
 {...})` (Lesson 37) runs its callback automatically whenever
@@ -288,8 +287,8 @@ parameter, and the unconditional (non-branching) success handler.
 
 `diffCurrent` reuses the guard, the loading message, `authenticatedFetch`,
 and `.then(json)` too, but adds `JSON.stringify({ content:
-editedContent.value })` (Lesson 3) — turning the live, possibly-unsaved
-editor content into the request body — and the `Content-Type` header
+- editedContent.value })` (Lesson 3) — turning the live, possibly-unsaved editor content into the request body — and the `Content-Type` header
+
 that tells the backend to expect JSON, both already-taught, applied
 here for the first time inside this composable specifically because
 this is the first of the three functions that sends anything besides a

@@ -90,7 +90,6 @@ boolean hasCameraPermission = ContextCompat.checkSelfPermission(
 ```
 
 ### Mechanical Walkthrough
-
 - `ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)`
   — **first appearance.** Asks the OS, right now, synchronously,
   whether this specific permission is currently granted —
@@ -100,8 +99,8 @@ boolean hasCameraPermission = ContextCompat.checkSelfPermission(
   flagging directly) holding the same string used in the XML
   declaration above.
 - `== PackageManager.PERMISSION_GRANTED` — **first appearance.**
-  `checkSelfPermission` returns an `int` constant — `PERMISSION_GRANTED`
-  or `PERMISSION_DENIED` — compared directly, the same "constant-
+- `checkSelfPermission` returns an `int` constant — `PERMISSION_GRANTED` or `PERMISSION_DENIED` — compared directly, the same "constant-
+
   comparison as a boolean check" shape as Lesson 10's `RESULT_OK`.
 
 ### CS Lens
@@ -167,16 +166,15 @@ for `addItemLauncher`; the button's click handling added inside
 `onViewCreated`, alongside the Delete menu wiring from Lesson 22.
 
 ### Mechanical Walkthrough
-
 - `ActivityResultLauncher<String>` — reappearing (Lesson 10), new type
   parameter: `String` instead of `Intent`, since this contract's
   "input" is a permission name, not a screen to launch.
 - `new ActivityResultContracts.RequestPermission()` — **first
   appearance.** A different built-in contract from Lesson 10's
-  `StartActivityForResult` — same family, same registration mechanism,
+- `StartActivityForResult` — same family, same registration mechanism,
   purpose-built for exactly one permission at a time.
 - The callback lambda receiving `granted` (a `boolean`, not a
-  `ActivityResult` object this time) — **first appearance of this
+- `ActivityResult` object this time) — **first appearance of this
   specific callback shape**, still the same reappearing "register a
   callback ahead of time" pattern from Lesson 10.
 - `shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)` —
@@ -190,7 +188,7 @@ for `addItemLauncher`; the button's click handling added inside
   `false`, covered in the next unit).
 - `cameraPermissionLauncher.launch(Manifest.permission.CAMERA)` —
   reappearing (`.launch(...)`, Lesson 10), new argument type matching
-  the `RequestPermission` contract — this is what actually triggers the
+- the `RequestPermission` contract — this is what actually triggers the
   OS's real permission dialog.
 
 ### CS Lens

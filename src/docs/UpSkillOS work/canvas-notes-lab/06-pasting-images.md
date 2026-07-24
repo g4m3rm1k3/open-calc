@@ -109,17 +109,17 @@ useEffect(() => {
 what happens to `file` after this point.)
 
 #### Mechanical Walkthrough
-
-`document.activeElement?.tagName` — established
+- `document.activeElement?.tagName` — established
 (`SvgStudioPage.jsx`'s keyboard-shortcut effect already guards the same
 way before acting on Delete/⌘Z/etc.) — reused here for a new event type:
 if focus is inside a real text input (a markdown note's `<textarea>`,
 Lesson 5), the paste is left alone to do what a normal paste does —
 insert text there — rather than being hijacked into adding an image to
-the canvas underneath it. `[...items].find(...)` — spreading an
+- the canvas underneath it.
+- `[...items].find(...)` — spreading an
 "array-like" (`DataTransferItemList` isn't a real `Array`, so it has no
 `.find()` of its own) into a real array first, then using the
-already-established `.find()` (`lab-registry-autofind/01-...md`) —
+- already-established `.find()` (`lab-registry-autofind/01-...md`) —
 first time this codebase has needed to convert a browser API's
 list-like object into a proper array before using array methods on it.
 
@@ -275,19 +275,20 @@ Objects before: 1 | after pasting into the textarea: 1 | unchanged (expected tru
 ```
 
 #### Mechanical Walkthrough
-
-`fabric.FabricImage.fromURL(...)` — first appearance; loads an image
+- `fabric.FabricImage.fromURL(...)` — first appearance; loads an image
 asynchronously from any URL a browser `<img>` tag could load from
 (including, as used here, a `data:` URL) and returns a `Promise`
 resolving to a real fabric object once decoded — the same
 Promise-returning shape Lesson 2 already learned to respect for
-`loadFromJSON`, now seen on a second fabric method. `img.width > 400` —
+- `loadFromJSON`, now seen on a second fabric method.
+- `img.width > 400` —
 `width` here is the image's *natural* pixel dimensions before any
 scaling, established as the same distinction Lesson 4's mechanical
 walkthrough drew between an object's raw dimensions and its *scaled*
 ones. `scaleToWidth(400)` sets `scaleX`/`scaleY` together so the image
 shrinks proportionally — never stretches out of its original aspect
-ratio. `CANVAS_W / 2 - img.getScaledWidth() / 2` — centers the image by
+- ratio.
+- `CANVAS_W / 2 - img.getScaledWidth() / 2` — centers the image by
 subtracting half its (post-scale) width from half the canvas's width,
 the standard "center a box of known size inside a box of known size"
 formula, applied here for the first time in this codebase's canvas
@@ -310,7 +311,7 @@ pointing at a URL that has to still be reachable later.
 The real cost of `readAsDataURL` is size: base64 encoding inflates
 binary data by roughly a third, and the resulting string lives directly
 inside whatever JSON blob this page's canvas content gets serialized
-into (Lesson 2's `toDatalessJSON`) — a page with several pasted
+- into (Lesson 2's `toDatalessJSON`) — a page with several pasted
 screenshots produces a noticeably larger saved document than one with
 none. `URL.createObjectURL` has no such inflation and is nearly free,
 but only within the lifetime of the current page load. Given this
@@ -354,13 +355,13 @@ anything else on the page.
 Verified conceptually and by direct comparison this session (not by
 reverting and re-running, since the failure here is about a format
 choice, not a crash): swapping `readAsDataURL` for
-`URL.createObjectURL(file)` produces a URL that *works immediately* —
+- `URL.createObjectURL(file)` produces a URL that *works immediately* —
 the image appears on the canvas exactly the same as before, since the
 current page load's blob registry is still alive. The failure would
 only surface at the exact moment Lesson 2's `toDatalessJSON` serializes
 the page and, later, something reloads that JSON in a *new* page load
 (a browser refresh, or Increment 7's persistence layer restoring a
-saved notebook) — the `blob:` URL would no longer point at anything,
+- saved notebook) — the `blob:` URL would no longer point at anything,
 and the image would fail to load silently, the same "quietly missing,
 not crashed" failure shape Lesson 5's dropped `__markdown` produced.
 
@@ -370,7 +371,7 @@ not crashed" failure shape Lesson 5's dropped `__markdown` produced.
   lands relative to the first (hint: re-read the centering formula) and
   confirm.
 - Change the size threshold from `400` to `150` and paste a small
-  (under 150px) image. Confirm it does *not* get scaled — `scaleToWidth`
+- (under 150px) image. Confirm it does *not* get scaled — `scaleToWidth`
   is only called conditionally, never unconditionally.
 
 ## Definition of Done
@@ -379,7 +380,7 @@ not crashed" failure shape Lesson 5's dropped `__markdown` produced.
       `event.clipboardData.items` for an image, skipping entirely when
       focus is inside an `INPUT`/`TEXTAREA`
 - [ ] The image is read via `FileReader.readAsDataURL`, not
-      `URL.createObjectURL` — verified by inspecting the string fabric
+- `URL.createObjectURL` — verified by inspecting the string fabric
       actually receives
 - [ ] Oversized images are scaled down (`scaleToWidth`) preserving
       aspect ratio; images already under the threshold are left alone

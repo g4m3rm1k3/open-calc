@@ -202,7 +202,6 @@ instance — triggers neither, leaving both panels exactly as they already
 were rather than reporting a confusing, meaningless error.
 
 ### Mechanical Walkthrough
-
 `activeTabPath.endsWith(".py")` reuses `.endsWith()` from Lesson 10,
 here checking the currently-active tab rather than gating a button
 click. `else if (activeTabPath.endsWith(".nc"))` is this lesson's own
@@ -215,7 +214,7 @@ this project's `<script>` block, since Lesson 3) calls `analyzeFile`
 (defined much further down, since Lesson 12) — a function this project's
 source-code *order* hasn't even reached yet by the time `saveFile` is
 written. This works because both are declared with `function name() {
-... }` — a **function declaration** — and JavaScript makes every
+- ... }` — a **function declaration** — and JavaScript makes every
 function declaration in a script available throughout that entire
 script before any of it runs, regardless of which line it's physically
 written on. This is different from a value like `let authToken = null;`,

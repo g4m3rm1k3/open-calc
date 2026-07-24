@@ -325,7 +325,6 @@ super, inflate the layout, log a trace line) *plus* connects the
 button you built in Lesson 3 to real behavior for the first time.
 
 ### Mechanical Walkthrough
-
 - `findViewById(R.id.openInventoryButton)` — **first appearance.**
   This is the runtime bridge between your XML tree (Lesson 3) and Java
   code: it walks the inflated view tree looking for the view whose
@@ -348,12 +347,12 @@ button you built in Lesson 3 to real behavior for the first time.
   lesson's own Lambda Expressions unit above: `View.OnClickListener` is
   Android's real, already-defined single-method interface (its one
   method is `onClick(View v)`), and this lambda is a real implementation
-  of it, just like `OnTapListener` in the isolated lab — `v` is the
+- of it, just like `OnTapListener` in the isolated lab — `v` is the
   parameter (the `View` that was clicked, unused in this body).
 - `new Intent(this, InventoryActivity.class)` — **first appearance.**
-  Two arguments: `this` (a `Context` — `MainActivity` itself, since
+- Two arguments: `this` (a `Context` — `MainActivity` itself, since
   Activities are a kind of `Context`, meaning "who is making this
-  request") and `InventoryActivity.class` (a `Class` object — Java's
+- request") and `InventoryActivity.class` (a `Class` object — Java's
   built-in reflection mechanism for referring to a class as a value,
   not creating an instance of it — this is exactly the "describe what
   I want without directly constructing it" idea from the `RequestDemo`
@@ -362,7 +361,7 @@ button you built in Lesson 3 to real behavior for the first time.
   call that hands your `Intent` off to the OS. The OS reads it,
   confirms `InventoryActivity` is declared in the Manifest (Lesson 2's
   mechanism, reused), and *only then* creates a real instance and calls
-  its `onCreate()` — the proper OS-managed path the "Problem" section
+- its `onCreate()` — the proper OS-managed path the "Problem" section
   above explained you can't shortcut with `new`.
 
 ### CS Lens

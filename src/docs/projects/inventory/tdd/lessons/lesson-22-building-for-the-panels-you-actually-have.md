@@ -160,10 +160,9 @@ project's existing dark-theme tokens, no new custom properties:
 ```
 
 ### Mechanical Walkthrough
-
 - `interface PanelToggle` / `interface RibbonGroup` — **(b) reappearing**
   one TS interface referencing another as a nested field type
-  (`toggles: PanelToggle[]`) — the identical composition
+- (`toggles: PanelToggle[]`) — the identical composition
   `ToolsResponse { tools: Record<string, Tool> }` already used in
   Lesson 17.
 - `onToggle: () => void` — **(b) reappearing** a callback held as a
@@ -172,21 +171,21 @@ project's existing dark-theme tokens, no new custom properties:
   earlier callback prop already relied on, just stored one level deeper
   inside a data structure instead of passed bare.
 - `groups.map((group) => (...))`, and a second, independent
-  `group.toggles.map((toggle) => (...))` nested directly inside it —
+- `group.toggles.map((toggle) => (...))` nested directly inside it —
   **(b) reappearing** `.map()`-to-render (Lesson 9's `groupSegments`
-  onward) and `key` (`react-key-prop-reconciliation.md`) — applied
+- onward) and `key` (`react-key-prop-reconciliation.md`) — applied
   twice, once per real level of the data (a list of groups, each
   holding its own list of toggles), not a new construct, the same one
   used recursively.
 - `` `btn ribbon-btn${toggle.visible ? " on" : ""}` `` — **(b)
   reappearing**, the exact conditional-class shape
   `ToolCardList.tsx`'s own `` `tcard${isSelected ? " on" : ""}` ``
-  already established — `btn` (Lesson 18) reused as the base look, a new
+- already established — `btn` (Lesson 18) reused as the base look, a new
   `ribbon-btn` class added alongside it for anything specific to this
   context (currently just the `.on` variant, below).
 - `.ribbon`, `.ribbon-group`, `.ribbon-buttons`, `.ribbon-group-label` —
   **(b) reappearing** `css-custom-properties.md`/
-  `css-rule-syntax-selectors-cascade.md`'s mechanism — real, new rules,
+- `css-rule-syntax-selectors-cascade.md`'s mechanism — real, new rules,
   no new custom properties: every `var(--color-...)` reference here was
   already declared by an earlier lesson.
 - `.ribbon-group:last-child` — **(a) first appearance** of the
@@ -339,7 +338,6 @@ sections they control — a single source of truth for "is this panel
 visible," not duplicated state on either side.
 
 ### Mechanical Walkthrough
-
 - `useState(true)`, twice — **(b) reappearing**, identical to every
   earlier `useState` call in this project; `true` specifically so both
   panels start visible, matching the layout before this lesson.
@@ -352,7 +350,7 @@ visible," not duplicated state on either side.
 - `{showDro && ( <>...</> )}` — **(b) reappearing**, the identical
   `&&`-conditional-render shape `ToolImportPanel.tsx` already used
   three times (`{file && (...)}`, `{loading && (...)}`,
-  `{error && (...)}`) — a `<>...</>` fragment here specifically because
+- `{error && (...)}`) — a `<>...</>` fragment here specifically because
   two sibling elements (an `<h1>` and the real panel component) need to
   appear or disappear together as one unit.
 

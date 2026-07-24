@@ -88,7 +88,6 @@ This is the entire file so far — nothing exists in `parser.py` yet for
 this to sit alongside.
 
 ### Mechanical Walkthrough
-
 `from dataclasses import dataclass` and `@dataclass` both reuse Lesson
 10's exact shapes — structure without validation, the right tool again
 for a type this project's own code constructs, never untrusted input.
@@ -96,7 +95,7 @@ for a type this project's own code constructs, never untrusted input.
 `from X import Y` in this project has pulled `Y` from an installed
 package (`fastapi`, `pydantic`) or Python's own standard library
 (`dataclasses`, `ast`, `subprocess`). This is the first time one part of
-*this project's own code* imports directly from another — `gcode.parser`
+- *this project's own code* imports directly from another — `gcode.parser`
 depending on `gcode.lexer`, both written in this same lesson series, the
 same `import` syntax working identically either way. `line_number: int |
 None`, `words: list[Token]`, and `comment: str | None` are three typed
@@ -148,9 +147,8 @@ nothing existing is modified, so there's no enclosing structure to show
 it inside of; the block above is everything there is to see.
 
 ### Mechanical Walkthrough
-
 `line_number = None`, `words = []`, and `comment = None` initialize the
-three eventual `Block` fields before anything is known — the same
+- three eventual `Block` fields before anything is known — the same
 accumulate-then-return shape `list_files` used since Lesson 2, just
 three accumulators instead of one. `for token in tokens:` reuses the
 plain `for` loop from Lesson 2, over this line's already-tokenized
@@ -158,16 +156,16 @@ plain `for` loop from Lesson 2, over this line's already-tokenized
 "COMMENT":` reuses the exact type-checking string comparison from
 Lesson 10's own lexer code, here reading a `Token`'s field instead of
 writing one. `elif token.type == "WORD" and token.letter == "N":` reuses
-`and` — first introduced back in Lesson 1's `require_auth` — combining
+- `and` — first introduced back in Lesson 1's `require_auth` — combining
 two conditions: this token must be a real word, *and* specifically an
 `N`. `int(token.value) if token.value is not None else None` is a
 ternary, reused from Lesson 2, guarding a real case: `token.value` is a
 `float` (`60.0`, from the lexer), and a line number reads more naturally
-as a plain integer (`60`) than a decimal one — `int(...)` converts it,
+- as a plain integer (`60`) than a decimal one — `int(...)` converts it,
 but only when there's an actual number to convert, since a bare `N` with
 no digits would otherwise make `int(None)` crash. The final `else:
 words.append(token)` catches everything that's neither a comment nor an
-`N` word — every ordinary parameter, and also any `UNKNOWN` token from
+- `N` word — every ordinary parameter, and also any `UNKNOWN` token from
 Lesson 10's lexer, preserved rather than silently dropped. `return
 Block(line_number=line_number, words=words, comment=comment)`
 constructs the actual node, all three accumulators handed in by name.
@@ -252,10 +250,9 @@ This is a complete, freestanding new function, added after `parse_block`
 show it inside of; the line above is everything there is to see.
 
 ### Mechanical Walkthrough
-
 `[parse_block(tokens) for tokens in lines]` reuses the exact list
-comprehension shape from Lesson 10's own `tokenize_program` — "the list
-of `parse_block(tokens)`, for every `tokens`" — the identical pattern,
+- comprehension shape from Lesson 10's own `tokenize_program` — "the list of `parse_block(tokens)`, for every `tokens`" — the identical pattern,
+
 one level higher: `tokenize_program` turned lines of text into lines of
 tokens; `parse_program` turns lines of tokens into a list of `Block`s.
 `list[list[Token]]` as the parameter type is `tokenize_program`'s own
@@ -329,7 +326,6 @@ enclosing structure to show it inside of; the block above is everything
 there is to see.
 
 ### Mechanical Walkthrough
-
 The first three checks reuse the identical traversal, existence, and
 `.nc`-only pattern from `tokenize_file`. `parse_program(tokenize_program(content))`
 chains this lesson's function directly onto Lesson 10's — the lexer's
@@ -340,7 +336,7 @@ explicit-dictionary-construction pattern from `tokenize_file`, one level
 deeper: `"words": [{"letter": token.letter, "value": token.value} for
 token in block.words]` is a *nested* list comprehension, converting each
 `Block`'s own list of `Token` objects into a list of small dictionaries
-— every `Token` field serialized explicitly except `type` and `text`,
+- — every `Token` field serialized explicitly except `type` and `text`,
 deliberately left out since, inside a parsed `Block`, every remaining
 word is already known to be a `WORD` token and its `letter`/`value` say
 everything `text` would have said less directly.
@@ -470,7 +466,6 @@ the same reason `renderEditor` has cleared `#run-output` since Lesson
 5, now extended to a fourth panel.
 
 ### Mechanical Walkthrough
-
 `if (activeTabPath === null)`, the `.endsWith(".nc")` guard, and the
 `fetch(...)` shape all reuse `tokenizeFile` exactly, unit for unit.
 `data.blocks.map((block) => { ... })` reuses `.map()` from Lesson 10,
@@ -483,7 +478,7 @@ word.letter + "=" + word.value).join("  ")` reuses the identical
 nested-map-then-join shape `tokenizeFile` already established, over a
 `Block`'s `words` instead of a raw line's tokens. `block.comment ? "  "
 + block.comment : ""` reuses the `||`-adjacent truthy-check idiom from
-Lesson 5's `data.stdout || "(no output)"` — here as a full ternary since
+- Lesson 5's `data.stdout || "(no output)"` — here as a full ternary since
 the "nothing" case needs an empty string, not a fallback message.
 
 ---
@@ -494,13 +489,13 @@ Clicking Blocks on `sample.nc`: `parseFile()` confirms the file is open
 and ends in `.nc`, then sends `POST /parse?path=src/sample.nc`. On the
 backend, `parse_file` runs the shared traversal/existence/extension
 checks, reads the file, and chains `tokenize_program` directly into
-`parse_program` — one call producing the raw tokens, the next
+- `parse_program` — one call producing the raw tokens, the next
 restructuring them into `Block`s, line number and comment pulled out of
 each line's `words` into their own named fields. Every `Block` and its
 nested `Token` list get converted explicitly into plain dictionaries
 before the response returns as JSON. The frontend receives twelve
 blocks, and `parseFile`'s two nested `.map()` calls turn each one back
-into one readable line — `N60: G=0.0  X=10.0  Y=10.0`, line number
+- into one readable line — `N60: G=0.0  X=10.0  Y=10.0`, line number
 first, words in original order, comment trailing if there is one —
 displayed in `#blocks-output`, sitting right next to the raw token view
 Lesson 10 built, each panel showing a different, real stage of the same
@@ -510,7 +505,7 @@ pipeline running against the same file.
 
 Already demonstrated concretely above, not hypothetically:
 `tokenize_line("N60 G00 X10. Y10.")` alone returns `N60` as an ordinary
-`WORD` token, indistinguishable in kind from `G00`, `X10.`, or `Y10.` —
+- `WORD` token, indistinguishable in kind from `G00`, `X10.`, or `Y10.` —
 confirmed directly in this lesson's first unit. Only after `parse_block`
 runs does `N60` become `line_number=60`, structurally separated from the
 three real parameter words left behind in `words`.
@@ -519,12 +514,12 @@ three real parameter words left behind in `words`.
 
 1. Open `src/sample.nc` through the running app, click Blocks, and
    compare its output line by line against clicking Tokens on the same
-   file — confirm every `N` word is gone from the Blocks view and shows
+- file — confirm every `N` word is gone from the Blocks view and shows
    up as that line's number instead.
 2. Add a line to `sample.nc` with no `N` word at all (a bare `G04 P500`,
    for instance) and confirm its block shows `N?:` in the panel.
-3. Trace `parse_block(tokenize_line("G01 (rapid) X10"))` on paper first —
-   predict `line_number`, `words`, and `comment` — then run it and
+- 3. Trace `parse_block(tokenize_line("G01 (rapid) X10"))` on paper first — predict `line_number`, `words`, and `comment` — then run it and
+
    compare. Notice the comment sits *between* two words in the source
    line; confirm it still ends up correctly separated regardless of
    where it appeared.

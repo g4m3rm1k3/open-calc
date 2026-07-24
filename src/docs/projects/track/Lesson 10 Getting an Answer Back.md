@@ -92,7 +92,6 @@ purpose-built `Intent` and formally declared as this Activity's result
 before closing.
 
 ### Mechanical Walkthrough
-
 - `new Intent()` — **first appearance of this specific no-argument
   form.** Every prior `Intent` (Lesson 4, Lesson 8) was built with a
   target (`this, SomeActivity.class`) because it was *starting* a new
@@ -104,7 +103,7 @@ before closing.
 - `setResult(RESULT_OK, resultIntent)` — **first appearance.**
   `RESULT_OK` is a constant (inherited from `Activity`, always
   available without an import) meaning "this operation completed
-  successfully" — its counterpart, `RESULT_CANCELED`, is what an
+- successfully" — its counterpart, `RESULT_CANCELED`, is what an
   Activity finishing *without* calling `setResult` at all reports by
   default, which is exactly how the receiving side (next unit) will
   distinguish "user saved an item" from "user pressed Back out of the
@@ -185,17 +184,16 @@ public class InventoryActivity extends AppCompatActivity {
 ```
 
 ### Mechanical Walkthrough
-
 - `private ActivityResultLauncher<Intent> addItemLauncher` — **first
   appearance.** A field, same declaration shape as any other (Lesson 5),
   holding an object whose entire job is "launch something, and remember
-  what to do when it finishes" — the generic `<Intent>` says this
+- what to do when it finishes" — the generic `<Intent>` says this
   particular launcher expects to start something using an `Intent`, as
   opposed to other kinds of results (like requesting a permission,
   covered in a later lesson) the same API family also supports.
 - `registerForActivityResult(...)` — **first appearance.** Must be
   called while the Activity is being constructed, before it reaches
-  `onCreate` — this is *why* it's assigned directly at the field
+- `onCreate` — this is *why* it's assigned directly at the field
   declaration rather than inside `onCreate` the way everything else in
   this project has been wired so far; the framework needs to register
   this callback very early in the Activity's setup to correctly restore
@@ -220,7 +218,7 @@ public class InventoryActivity extends AppCompatActivity {
   form."
 - `result.getData()` — **first appearance.** Returns the `Intent` that
   `AddItemActivity` built with `setResult`, or `null` if none was ever
-  set — checked explicitly here (`!= null`) before trying to read
+- set — checked explicitly here (`!= null`) before trying to read
   extras from it, since a `RESULT_CANCELED` finish typically has no
   data at all.
 - `result.getData().getParcelableExtra("EXTRA_NEW_ITEM")` —
@@ -376,15 +374,14 @@ live long enough (as fields) for the launcher's callback, which fires
 grow the list live.
 
 ### Mechanical Walkthrough
-
 - `private List<Item> items;` / `private InventoryAdapter adapter;` —
   reappearing (field declarations), new detail: promoted from Lesson
   6/7's local variables specifically because the callback above needs
-  to read and mutate them from outside `onCreate`'s scope — a local
+- to read and mutate them from outside `onCreate`'s scope — a local
   variable's lifetime ends when its method returns; a field's doesn't.
 - `addItemLauncher.launch(new Intent(...))` — **first appearance of
   `.launch(...)`.** The Activity Result API's replacement for
-  `startActivity` when you intend to receive a result — same `Intent`
+- `startActivity` when you intend to receive a result — same `Intent`
   construction as always (Lesson 4/8/9), handed to the launcher instead
   of called directly, so the OS knows to route the eventual result back
   through this specific launcher's registered callback.

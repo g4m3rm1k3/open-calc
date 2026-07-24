@@ -83,7 +83,6 @@ fields and a static initializer block sitting above the class body
 built in the next unit.
 
 ### Mechanical Walkthrough
-
 - `private static final String AUTHORITY = "..."` — reappearing
   (Lesson 25's `FileProvider` authority string, same reversed-domain
   convention).
@@ -100,7 +99,7 @@ built in the next unit.
   Registers "requests for `content://AUTHORITY/items`" against the code
   `ITEMS`.
 - `uriMatcher.addURI(AUTHORITY, "items/#", ITEM_ID)` — **first
-  appearance.** The `#` wildcard matches any numeric segment — so
+- appearance.** The `#` wildcard matches any numeric segment — so
   `content://AUTHORITY/items/3` matches this pattern, registered
   against `ITEM_ID`.
 
@@ -203,30 +202,29 @@ a legitimate, honest design choice explained fully in this unit's SE
 Lens rather than left unexplained.
 
 ### Mechanical Walkthrough
-
 - `extends ContentProvider` — **first appearance.** The fourth and
   final major component base class this curriculum set out to cover,
   first named back in Lesson 2's SE Lens.
 - `onCreate()` returning `true` — **first appearance of this specific
   override**, distinct from every other `onCreate` in this project
-  (Activity, Lesson 2; the throwaway `SQLiteOpenHelper`, Lesson 12) —
+- (Activity, Lesson 2; the throwaway `SQLiteOpenHelper`, Lesson 12) —
   called once, when the provider is first needed, `true` signaling
   successful initialization.
 - `query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)`
-  — **first appearance.** The one method every `ContentProvider` must
-  answer reads: `projection` (which columns are wanted — ignored here
+- — **first appearance.** The one method every `ContentProvider` must answer reads: `projection` (which columns are wanted — ignored here
+
   for simplicity, always returning all four), `selection`/`selectionArgs`
-  (a filter, SQL-`WHERE`-shaped — also unused here), `sortOrder`
+- (a filter, SQL-`WHERE`-shaped — also unused here), `sortOrder`
   (unused) — a real provider would honor all of these; this one
   deliberately keeps scope narrow, always returning every column,
   unfiltered.
 - `uriMatcher.match(uri)` — reappearing (the previous unit's object,
   first real use).
 - `ContentUris.parseId(uri)` — **first appearance.** Extracts the
-  trailing numeric segment from a URI like `.../items/3` as a `long` —
+- trailing numeric segment from a URI like `.../items/3` as a `long` —
   the counterpart read to `UriMatcher`'s `"items/#"` pattern.
 - `AppDatabase.getInstance(getContext())` — reappearing (Lesson 13),
-  `getContext()` — **first appearance on a `ContentProvider`** — a
+- `getContext()` — **first appearance on a `ContentProvider`** — a
   method every provider inherits, returning the app's `Context`,
   needed here the same way every other component has needed one.
 - `MatrixCursor(new String[]{"id", "name", "quantity", "location"})` —
@@ -240,12 +238,12 @@ Lens rather than left unexplained.
   the older, untyped `Cursor` row shape the `ContentProvider` contract
   requires.
 - `getType(Uri uri)` — **first appearance.** Returns a MIME-type-
-  style string describing what a given URI represents — `vnd.android.cursor.dir/...`
-  for a collection, `vnd.android.cursor.item/...` for a single row — a
+- style string describing what a given URI represents — `vnd.android.cursor.dir/...` for a collection, `vnd.android.cursor.item/...` for a single row — a
+
   contract requirement, used by callers wanting to know a URI's shape
   without querying it first.
 - `throw new UnsupportedOperationException("This provider is read-only")`
-  — **first appearance of `UnsupportedOperationException`** — a
+- — **first appearance of `UnsupportedOperationException`** — a
   standard-library unchecked exception (a category briefly touched on
   in Lesson 14's `throws InterruptedException` contrast) specifically
   meaning "this operation is a legitimate part of the interface, but
@@ -312,19 +310,18 @@ other app would need to request in its own Manifest before this
 provider will answer it.
 
 ### Mechanical Walkthrough
-
 - `android:exported="true"` — reappearing (Lesson 27's `BootReceiver`,
   the same reasoning: genuinely meant to be reached from outside this
   app's own process).
 - `android:readPermission="com.yourname.pocketinventory.READ_INVENTORY"`
   — **first appearance.** Requires any caller — including another app
-  on the same device — to hold this specific permission before `query`
+- on the same device — to hold this specific permission before `query`
   is even invoked; the OS enforces this check *before* your code runs
   at all.
 - `<permission android:name="..." android:protectionLevel="normal" />`
   — **first appearance.** Defines a brand-new, custom permission this
   app itself introduces (as opposed to `CAMERA`/`POST_NOTIFICATIONS`,
-  Lesson 24/26, both platform-defined) — `protectionLevel="normal"`
+- Lesson 24/26, both platform-defined) — `protectionLevel="normal"`
   means it's granted automatically at install time, no runtime prompt
   (Lesson 24's dangerous-permission flow doesn't apply to a provider
   this narrow).

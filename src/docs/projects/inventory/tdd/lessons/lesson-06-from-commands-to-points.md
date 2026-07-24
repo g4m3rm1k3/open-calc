@@ -107,12 +107,11 @@ longer — the starting position, plus one recorded position after each
 command is applied.
 
 ### Mechanical Walkthrough
-
 - `from core.machine import MachineState` — **(b) reappearing** import
   syntax, reaching into a sibling module inside `core/` for the first
-  time from *another* `core/` module rather than from `app.py` —
+- time from *another* `core/` module rather than from `app.py` —
   **(a) worth naming**: `core/path.py` importing `core/machine.py`
-  directly is still entirely within the `core` boundary (Lesson 2) —
+- directly is still entirely within the `core` boundary (Lesson 2) —
   that boundary is about `core` never depending on `flask`, not about
   modules inside `core` staying isolated from each other.
 - `state = MachineState()` — **(b) reappearing** instantiation.
@@ -123,7 +122,7 @@ command is applied.
   command's "start" is the origin itself, which no command ever
   explicitly states.
 - `for command in commands: state.apply(command); points.append(state.position())`
-  — already-known basic Python (`for`, `list.append`); `state.apply` is
+- — already-known basic Python (`for`, `list.append`); `state.apply` is
   **(b) reappearing** (Lesson 5); the **(a) genuinely new decision** is
   calling `state.position()` **again**, immediately after each `apply`,
   and keeping *every* one of those results instead of only the loop's
@@ -291,9 +290,8 @@ def path_program():
 ```
 
 ### Mechanical Walkthrough
-
 Identical validation/`try`/`except` shape to `/api/parse` and
-`/api/simulate` — **(c) already established**, no new explanation owed.
+- `/api/simulate` — **(c) already established**, no new explanation owed.
 The **only** difference from `/api/simulate` is the last two lines:
 `compute_path(commands)` (returning every point) instead of manually
 folding with a loop and returning one `position()` call. This is itself

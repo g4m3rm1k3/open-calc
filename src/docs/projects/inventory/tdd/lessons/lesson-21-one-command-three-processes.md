@@ -120,23 +120,22 @@ function startFrontend() {
 ```
 
 ### Mechanical Walkthrough
-
 - `path.join(__dirname, "..", "cnc-web")` — **(b) reappearing**, the
   identical pattern Lesson 20 used for `CNC_SERVICE_DIR`, pointed at a
   different real sibling folder.
 - `spawn("npm", ["run", "dev"], { cwd: CNC_WEB_DIR, shell: isWindows })`
-  — **(b) reappearing** `spawn` itself; **(a) first appearance of the
+- — **(b) reappearing** `spawn` itself; **(a) first appearance of the
   `shell` option**, not shown in `node-child-process-spawn.md`'s own
   isolated lab. Confirmed, this session: on macOS, `which npm` resolves
   to a real, directly-executable file starting with `#!/usr/bin/env node`
   — the operating system itself knows how to run it, no shell needed.
-  On Windows, the installed command is `npm.cmd`, a batch script — the
+- On Windows, the installed command is `npm.cmd`, a batch script — the
   OS cannot execute a `.cmd` file the way it executes a real binary or a
   `#!`-scripted one; `spawn` needs `shell: true` there specifically, so
   the command runs through `cmd.exe` instead of being launched directly.
   `startBackend`'s own `python`/`python3` split (Lesson 20) never needed
   this, because a real Python interpreter *is* a directly-executable
-  file on every platform — the same `spawn` call, two genuinely different
+- file on every platform — the same `spawn` call, two genuinely different
   real requirements, driven by what's actually being spawned.
 - Everything else in `startFrontend` — **(b) reappearing**, identical in
   shape to `startBackend`, just prefixed `[cnc-web]` instead of

@@ -117,13 +117,12 @@ lesson calls as `logger.info(...)`/`logger.warning(...)` at the exact
 point each real fact becomes known — never gathered after the fact.
 
 ### Mechanical Walkthrough
-
 Full first-appearance treatment is in the concept file — this project's
 real `logging.basicConfig`/`getLogger(__name__)` pair _is_ that file's
 own isolated example's structure, applied for real. One project-specific
 detail: `getLogger(__name__)` called separately in `app.py` and
 `core/tools.py` produces two differently-named loggers (`"app"` and
-`"core.tools"`, `__name__` being each module's own real name) — visible
+- `"core.tools"`, `__name__` being each module's own real name) — visible
 directly in this lesson's own real log output below, and exactly the
 "one logger per module, filterable by where it came from" point the
 concept file's Mechanical Walkthrough already makes.
@@ -274,7 +273,6 @@ Get-or-Create, Applied to Imported Reference Data," below, after the
 pieces it depends on are taught.
 
 ### Mechanical Walkthrough
-
 `FormData`/`request.files`/`secure_filename`/`tempfile.mkstemp` are
 fully covered in the three concept files above, and this project's own
 real code matches each one's isolated example closely — but not
@@ -284,20 +282,20 @@ completely: `.save()` specifically was not yet demonstrated in
 What's new or extended, beyond straightforward reuse:
 
 - `upload.save(temp_path)` — **(a) first appearance**, full treatment:
-  `flask-file-upload.md`, extended this lesson specifically to add it —
+- `flask-file-upload.md`, extended this lesson specifically to add it —
   writes the upload's real bytes directly to the given path, the reason
   `tempfile.mkstemp` (above) exists at all here: SQLite (what
   `read_tools_from_file`/`import_tools_from_file` open next) reads a
   database by real file path, not by accepting raw bytes.
 - `os.path.getsize(temp_path)` — **(a) first appearance**, also newly
-  added to `flask-file-upload.md`'s own example — reads the just-saved
+- added to `flask-file-upload.md`'s own example — reads the just-saved
   file's real size straight from the filesystem, used here only to put
   a real, verifiable number in the log line, not as part of the upload
   mechanism itself.
 - `str(error).splitlines()[0]` — **(a) first appearance** — a real
   SQLAlchemy error's `str()` can include the entire failed SQL
   statement (multi-line, and useful *in the log*, not in a client-facing
-  error message) — `.splitlines()[0]` keeps only the first line for the
+- error message) — `.splitlines()[0]` keeps only the first line for the
   `400` response, while `logger.warning` (below) still gets the short
   `reason`, not the full original exception; the *complete* error is
   never silently dropped, it's just routed to the log at `WARNING`
@@ -305,12 +303,12 @@ What's new or extended, beyond straightforward reuse:
 - `except Exception as error:` — **(b) reappearing** `try`/`except`
   (Lesson 4's `python-try-except.md`) and `python-custom-exceptions.md`'s
   own point that a *specific* exception type is usually the better
-  default — extended here for a real, deliberate reason: `read_tools_from_file`
+- default — extended here for a real, deliberate reason: `read_tools_from_file`
   can fail for genuinely open-ended reasons (a file that isn't SQLite at
   all, one that's SQLite but doesn't match the expected schema, a locked
   file, disk I/O errors), coming from three different layers (the OS,
   `sqlite3`, SQLAlchemy) this route doesn't control and can't enumerate
-  in advance — a bare `Exception` is the honest choice at exactly this
+- in advance — a bare `Exception` is the honest choice at exactly this
   kind of boundary (an untrusted external file, not this project's own
   code), not a shortcut taken to avoid thinking about specific failure
   modes. It is still narrower than it could be: a bare `except:` (no
@@ -328,7 +326,7 @@ What's new or extended, beyond straightforward reuse:
   field name, as a real Python list, matching what the client actually
   appended.
 - The `try`/`except`/`finally` shape — **(b) reappearing**, this exact
-  shape from `preview_tool_import` a few lines above — `finally:
+- shape from `preview_tool_import` a few lines above — `finally:
 os.remove(temp_path)` runs whether the body succeeds or raises,
   guaranteeing the temp file never survives past one request either
   way, matching `python-tempfile.md`'s own point that cleanup is never
@@ -448,9 +446,8 @@ _any_ file sharing the real schema, using the identical model classes
 and the identical `_tool_to_dict` shaping function either way.
 
 ### Mechanical Walkthrough
-
 Full first-appearance treatment of the core technique is in the concept
-file. New here: `engine.dispose()` in a `finally` — **(a) first
+- file. New here: `engine.dispose()` in a `finally` — **(a) first
 appearance** — releases the second engine's real connection pool once
 this function is done with it; unlike this project's own long-lived
 `get_engine()` (Lesson 15), a per-request engine like this one has a
@@ -742,7 +739,6 @@ Refresh," later in this lesson; it's included here only because it's
 part of this file's real, current, whole content.)
 
 ### Mechanical Walkthrough
-
 - `<uuid:tool_id>` — **(a) first appearance** of Flask's `uuid` URL
   converter — parses a URL segment directly into a real Python
   `uuid.UUID`, the same way `<int:...>` (used throughout Lessons 13–17)
@@ -753,7 +749,7 @@ part of this file's real, current, whole content.)
   list comprehension, replacing the prior dict comprehension — the
   actual, minimal fix: same data, a shape that can hold duplicates.
 - `tool_id: uuid.UUID | None = None` as a Python default parameter —
-  **(b) reappearing** (`python-default-parameter-values.md`) — `None`
+- **(b) reappearing** (`python-default-parameter-values.md`) — `None`
   specifically chosen (rather than, say, generating a UUID in the
   signature itself) because default argument values in Python are
   evaluated once, at function-definition time, not once per call — a
@@ -952,7 +948,6 @@ def import_tools_from_file(path, tool_ids):
 ```
 
 ### Mechanical Walkthrough
-
 Full first-appearance treatment of get-or-create itself is in the
 concept file. New here, in the real, complete function:
 
@@ -967,7 +962,7 @@ concept file. New here, in the real, complete function:
   one line — each one accumulates a real, distinct outcome the caller
   needs to report back.
 - The `for tool_id in tool_ids:` loop's first `if` — **(c) already
-  established** boolean `or` short-circuiting — checks three genuinely
+- established** boolean `or` short-circuiting — checks three genuinely
   different failure reasons (not found in the source file at all, no
   mill geometry, no endmill/drill row) as one combined "unsupported"
   outcome, matching `read_tools_from_file`'s own reasoning applied here
@@ -977,7 +972,7 @@ concept file. New here, in the real, complete function:
   check: a tool already present, by its real GUID, is skipped rather
   than reinserted.
 - `insert_tool(..., tool_id=row.ID)` — **(b) reappearing**, this
-  lesson's own updated `insert_tool` — the one call site that actually
+- lesson's own updated `insert_tool` — the one call site that actually
   uses the new optional `tool_id` parameter to preserve a tool's real,
   original identity across the copy.
 
@@ -1344,9 +1339,8 @@ neither sibling's own state moved anywhere; `App`'s new job is exactly
 one number and the callback that increments it.
 
 ### Mechanical Walkthrough
-
 - `useState<Set<string>>(new Set())` — **(a) first appearance** of
-  `Set` as React state — chosen specifically because membership
+- `Set` as React state — chosen specifically because membership
   (`.has(id)`) and toggling are both real, native `Set` operations;
   an array would need `.includes()` (linear scan) and manual
   add/remove-by-filtering for the same job.
@@ -1363,7 +1357,7 @@ one number and the callback that increments it.
 - The lifted `toolsRefreshKey` in `App.tsx` — **(b) reappearing**,
   full treatment already in `react-lifting-state-up.md`; the only
   new wrinkle is that what's lifted is a _trigger_, not shared data
-  itself — `App.tsx` never touches the tools list, it only knows
+- itself — `App.tsx` never touches the tools list, it only knows
   "something changed, tell whoever cares."
 
 ### CS Lens

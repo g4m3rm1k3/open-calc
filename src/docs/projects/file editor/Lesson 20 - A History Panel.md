@@ -178,22 +178,22 @@ document.getElementById("history-button").addEventListener("click", historyFile)
 ```
 
 ### Mechanical Walkthrough
-
 The guard clause and `authenticatedFetch` call both reuse shapes
-established since Lesson 19 — no `method` needed at all, since `/history`
+- established since Lesson 19 — no `method` needed at all, since `/history`
 is a plain `GET` route, the same no-options-object shape `loadFolder`
 already uses. `data.commits.length === 0` reuses the empty-check pattern
 from Lesson 13's `analyzeFile`. `data.commits.map((commit) => { ... })`
 reuses `.map()`, now iterating real commit records instead of tokens or
 diagnostics. `commit.hash.slice(0, 7)` is new in one specific way:
 `.slice(start, end)` has already been taught, back in Lesson 2, on an
-*array* — `currentPath.split("/").slice(0, -1)`. `String.prototype.slice`
+- *array* — `currentPath.split("/").slice(0, -1)`.
+- `String.prototype.slice`
 is a genuinely separate method from `Array.prototype.slice`, but an
 identical one: called on a string, it returns a new string containing
-the characters from `start` up to, but excluding, `end` — the same
+- the characters from `start` up to, but excluding, `end` — the same
 half-open range already explained for arrays, the same method name,
 applied to a different type. `commit.hash` is a full 40-character `git`
-hash; `.slice(0, 7)` keeps just the first seven characters — a real
+- hash; `.slice(0, 7)` keeps just the first seven characters — a real
 `git` convention, the same short-hash length `git log --oneline` shows
 by default. `shortHash + "  " + commit.timestamp + "  " + commit.message`
 reuses `+` string concatenation, two spaces between each field for

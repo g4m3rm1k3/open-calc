@@ -126,16 +126,16 @@ const onMouseDown = (opt) => {
 behavior, applied to a new tool.
 
 #### Mechanical Walkthrough
-
 `!opt.target` guards against placing a new text box on top of an
 existing object — a text-tool click only creates something on genuinely
 empty canvas, the same guarding style Lesson 3's eraser branch uses in
 reverse (`&& opt.target`, requiring a hit; this requires a miss).
 `width: 220` is the one dimension `Textbox` actually honors at creation
 — fontSize and everything about how many lines the string becomes is
-computed *from* that width, not set directly. `box.enterEditing()` —
+- computed *from* that width, not set directly.
+- `box.enterEditing()` —
 established (`IText`'s own method, inherited by `Textbox` since it
-extends `IText`) — immediately opens the text cursor so a user can
+- extends `IText`) — immediately opens the text cursor so a user can
 start typing without a second click.
 
 #### CS Lens
@@ -298,9 +298,8 @@ return (
 ```
 
 #### Mechanical Walkthrough
-
 The outer `<div>` is where React's reconciler adds and removes
-`TextFormatToolbar` — its sibling, the inner `<div>`, is a stable node
+- `TextFormatToolbar` — its sibling, the inner `<div>`, is a stable node
 that never gets added or removed itself, only its *contents* get
 silently rearranged by fabric. The inner `<div>` exists for exactly one
 reason: to be the thing fabric is allowed to make a mess inside of,
@@ -357,7 +356,7 @@ to `'text'`; the next click on empty canvas runs the new branch inside
 `PageCanvas`'s existing tool-mouse-down handler (first unit), placing a
 `fabric.Textbox` and immediately entering edit mode. Selecting that
 box — automatic on creation, or later by clicking it with the Select
-tool — fires fabric's `selection:created`/`updated` events, which
+- tool — fires fabric's `selection:created`/`updated` events, which
 `PageCanvas` was already listening for (added this lesson) to decide
 whether to show `TextFormatToolbar`. That toolbar, and the canvas
 itself, now live in a DOM structure (second unit) where React can
@@ -365,7 +364,7 @@ freely mount and unmount the toolbar without ever touching the subtree
 fabric has already claimed for itself. Clicking Bold, Italic, a color
 swatch, or a size option calls `applyTextStyle`, which reads the text
 box's current selection range (or the whole string, if nothing is
-highlighted) and calls fabric's `setSelectionStyles` — the same
+- highlighted) and calls fabric's `setSelectionStyles` — the same
 per-character styling mechanism a real word processor uses, applied
 here for the first time in this codebase.
 
@@ -377,7 +376,7 @@ instant a text box is placed — the entire lab falls back to its error
 boundary, and every other tool (pen, marker, eraser) becomes
 unreachable until the page is reloaded. Separately, reverting
 `o.evented = tool === 'select' || tool === 'eraser'` back to Lesson
-2's version (dropping the `|| tool === 'eraser'`) — unrelated to this
+- 2's version (dropping the `|| tool === 'eraser'`) — unrelated to this
 lesson, but re-checked here since this lesson also touches that same
 line's neighborhood — was re-confirmed still necessary; Eraser's click
 detection depends on it exactly as Lesson 3 established.

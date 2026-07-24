@@ -154,7 +154,6 @@ async function fetchPath(program: string): Promise<PathResult> {
 ```
 
 ### Mechanical Walkthrough
-
 - `points = [{"motion": DEFAULT_MOTION, "command_index": None, ...}]` —
   the synthetic starting point exists before any real command has run,
   so it has no real command to be tagged with; `None` names that
@@ -166,7 +165,7 @@ async function fetchPath(program: string): Promise<PathResult> {
   iteration*, however many there are, gets tagged with the same real
   command index that produced all of them.
 - `states.append(state.state())` — one snapshot per command, in the
-  exact same loop that already walks `commands` to build `points` — no
+- exact same loop that already walks `commands` to build `points` — no
   second pass, no second `MachineState()` instance, since the data
   needed for both was already being computed together.
 
@@ -355,14 +354,13 @@ const backToPreview = useCallback(() => {
 ```
 
 ### Mechanical Walkthrough
-
 - `export interface Playback { ... }` — **(c) already basic** — a plain
   TS interface, the same construct used throughout this project since
   Lesson 17; the only real content worth naming is that every field on
   it is something `App.tsx` actually reads or calls, nothing internal
   leaks through.
 - `states.map((_, i) => i).filter((i) => selectedIndices.has(i))` —
-  **(b) reappearing** — `.map`/`.filter`, both already established;
+- **(b) reappearing** — `.map`/`.filter`, both already established;
   mapping each state to its own index first, then filtering *those*
   indices by membership in the real selected set, is what turns "which
   commands are selected" into "which positions in `states` are eligible,
@@ -387,7 +385,7 @@ const backToPreview = useCallback(() => {
   Reset press) all needed the identical four-line reset, so it exists
   once, not three times.
 - `!hasStarted ? eligibleIndices[eligibleIndices.length - 1] : ...` — a
-  ternary, not two separate code paths that happen to agree — `preview`
+- ternary, not two separate code paths that happen to agree — `preview`
   is not "stepping, frozen at the end"; it is a distinct rule
   (`stepIndex` always tracks the *last* eligible index, live, so
   changing the selection while still in preview updates what's shown
@@ -537,14 +535,13 @@ const toggleSbk = useCallback(() => setSbk((s) => !s), []);
 ```
 
 ### Mechanical Walkthrough
-
 - MAX speed batches up to 30 real steps per animation frame before
-  rescheduling via `requestAnimationFrame` — fast enough to feel
+- rescheduling via `requestAnimationFrame` — fast enough to feel
   instantaneous for most real programs, still yielding to the browser's
   own repaint cycle rather than blocking it in one giant synchronous
   loop.
 - Every other speed mode takes exactly one step, then reschedules via
-  `window.setTimeout(autoRun, delay)` — `playHandleRef` holds whichever
+- `window.setTimeout(autoRun, delay)` — `playHandleRef` holds whichever
   kind of handle is currently in flight (a `requestAnimationFrame` ID or
   a `setTimeout` ID); `clearPlayHandle` calls both `clearTimeout` and
   `cancelAnimationFrame` unconditionally on it, a safe no-op on whichever
@@ -559,7 +556,7 @@ const toggleSbk = useCallback(() => setSbk((s) => !s), []);
   `hasStarted` first (so the very first Cycle Start press, exactly like
   the very first Step press, clears the preview), computes `next`
   *before* writing either the ref or the state so both genuinely agree,
-  then calls `autoRun()` directly only when turning play *on* — turning
+- then calls `autoRun()` directly only when turning play *on* — turning
   it off just cancels whatever's scheduled, since `autoRun` itself
   already exits immediately once `playingRef.current` is false.
 - `setSbk((s) => !s)` — **(b) reappearing** — the same updater-function
@@ -863,13 +860,12 @@ operation's own border (Operations tab, the unit below):
 ```
 
 ### Mechanical Walkthrough
-
 - `isPlaying`/`isReset`/`sbk` each drive exactly one conditional class
-  append (`` `btn${cond ? " btn-x" : ""}` ``) — no separate "which color
+- append (`` `btn${cond ? " btn-x" : ""}` ``) — no separate "which color
   is this button right now" logic anywhere else; the button's own class
   string *is* the single source of truth for its displayed state.
 - `.btn-group .btn { flex: 1; border-radius: 0; margin-right: -1px }`
-  plus `:first-child`/`:last-child` overrides — the standard CSS shape
+- plus `:first-child`/`:last-child` overrides — the standard CSS shape
   for a row of visually-joined buttons (flat borders between them, only
   the two end buttons rounded) rather than a row of independently boxed
   ones.
@@ -885,7 +881,7 @@ operation's own border (Operations tab, the unit below):
 - `:active` on `.btn` — **(a) first appearance**: matches an element for
   the real, brief window between a mouse press and its release, giving
   every button on the bar the same instant, tactile "yes, this
-  registered" feedback `:hover`/`:focus` alone can't — those track
+- registered" feedback `:hover`/`:focus` alone can't — those track
   position and keyboard attention, neither tracks "is this specific
   button being pressed right now."
 
@@ -981,13 +977,12 @@ useEffect(() => {
 ```
 
 ### Mechanical Walkthrough
-
 Same mechanism as the concept file's own isolated example, applied to
 three refs instead of one: `sbkRef`/`speedModeRef`/`custSpeedRef` all
 existed already (`useRef(sbk)` etc., at declaration), but nothing wrote
 to them again after mount. `hasStartedRef`/`cursorRef`/`playingRef`
 happened to avoid this bug by accident, not by a different design rule
-— every real call site that changes them (`step`, `toggleCycle`,
+- — every real call site that changes them (`step`, `toggleCycle`,
 `backToPreview`) already updates both the ref and the state together,
 manually, since those particular values are only ever changed from
 inside this same file's own functions. `sbk`/`speedMode`/`custSpeed`,
@@ -1332,11 +1327,10 @@ same order on every render — it can't sit below an `if (!commands)
 return ...` the way it did before this feature needed to depend on it.
 
 ### Mechanical Walkthrough
-
 Exactly the mechanism `react-effect-dependency-reference-equality.md`
 names: `commands.slice(1)` and `buildOperations(...)` are plain function
 calls, re-evaluated in full on every render regardless of whether
-`commands` itself changed — wrapping each in `useMemo` with the real
+- `commands` itself changed — wrapping each in `useMemo` with the real
 input it actually depends on (`[commands, hasTitle]`, then `[remaining,
 hasRealSeqNumbers]`, then `[operations, titleOffset]`) means each one
 only produces a *new* reference when its own real inputs changed,
@@ -1431,9 +1425,8 @@ The dead `activeTab` variable this replaces (`tabs.find((tab) => tab.id
 still read it.
 
 ### Mechanical Walkthrough
-
 `display: "contents"` (not `"block"`) for the active tab specifically
-— `contents` makes the wrapping `<div>` itself disappear from layout
+- — `contents` makes the wrapping `<div>` itself disappear from layout
 entirely, so its own children lay out exactly as if that `<div>` weren't
 there at all, avoiding an extra, unstyled box in the DOM around every
 tab's real content. Every tab (not just `BlockList`) now stays mounted
@@ -1592,26 +1585,25 @@ if (id === "dro") {
 ```
 
 ### Mechanical Walkthrough
-
 `MachineStatus` lost its own `useEffect`/`fetchState`/`logger` entirely
 — it is now a pure, prop-driven display component, rendering whatever
 `state` it's handed. `App.tsx` became the one real owner of "what is the
 machine's current state," computing `currentState` from the same
 `states` array `revealedPoints` already filters against, keyed by the
-same `playback.stepIndex` — one real source of truth, read in two
+- same `playback.stepIndex` — one real source of truth, read in two
 places, rather than two independent computations of the same thing.
 
-`revealedPoints`'s own filter — **(b) reappearing** `.filter` — keeps a
+- `revealedPoints`'s own filter — **(b) reappearing** `.filter` — keeps a
 point either because it's the synthetic start point (`command_index ===
 null`, always drawn) or because it's *both* eligible (its owning
 command is really selected) *and* at or before the current step. That
 second condition is what makes this whole feature's own title literally
 true in code: a point whose command was never selected can never pass
-`isEligible`, no matter what `playback.stepIndex` is — selecting is what
+- `isEligible`, no matter what `playback.stepIndex` is — selecting is what
 grants a point eligibility to ever be drawn at all, stepping only
 decides how far through the already-eligible set to reveal.
 `useMemo`'s own three dependencies (`points`, `playback.stepIndex`,
-`selectedCommandIndices`) are every real input this filter reads — the
+- `selectedCommandIndices`) are every real input this filter reads — the
 identical discipline the reference-equality unit above already
 established, applied here on the first attempt rather than found as a
 second bug.

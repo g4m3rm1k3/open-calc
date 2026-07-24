@@ -97,11 +97,10 @@ Discarded — the real script below starts fresh.
 Just the shebang — the whole file so far, nothing to elide.
 
 ### Mechanical Walkthrough
-
-`#!` — first appearance: not a comment (even though `#` alone *does*
+- `#!` — first appearance: not a comment (even though `#` alone *does*
 start a comment in bash) — this exact two-character sequence at the very
 start of a file is special-cased by the OS as "here's the interpreter."
-`/bin/bash` — the path to the specific program that will run this
+- `/bin/bash` — the path to the specific program that will run this
 script's contents.
 
 ### CS Lens
@@ -256,9 +255,9 @@ The script now visits every item in whatever folder it's run from, doing
 nothing with each one yet.
 
 ### Mechanical Walkthrough
+- `for file in *; do ... done` — the glob-expansion concept from this unit's lab, reapplied for real.
+- `:` — first appearance: bash's built-in
 
-`for file in *; do ... done` — the glob-expansion concept from this
-unit's lab, reapplied for real. `:` — first appearance: bash's built-in
 no-op command, used purely because `do`/`done` requires *something*
 inside it, same role `pass` played in Python.
 
@@ -365,12 +364,12 @@ The script now visits every item, but only enters the `if` body for
 actual files, skipping directories entirely.
 
 ### Mechanical Walkthrough
-
-`if [ -f "$file" ]; then ... fi` — `if`/`then`/`fi` (bash's block
+- `if [ -f "$file" ]; then ... fi` — `if`/`then`/`fi` (bash's block
 delimiters, functionally like Python's `if:`/indentation but explicit
 keywords instead); `[ ... ]` is itself a command (yes, brackets are a
-program name in disguise — `[` is a real executable test utility) whose
-`-f` flag is this unit's new concept. `"$file"` — reading the loop
+- program name in disguise — `[` is a real executable test utility) whose `-f` flag is this unit's new concept.
+- `"$file"` — reading the loop
+
 variable, wrapped in quotes; quoting matters here and is worth watching
 closely — the closing section of this lesson shows exactly what breaks
 without it.
@@ -469,9 +468,8 @@ Each real file's size is now captured into `size` on every loop
 iteration — but nothing does anything with that number yet.
 
 ### Mechanical Walkthrough
+- `size=$(stat -c%s "$file")` — the `$( )` concept from this unit's lab, reused for real, wrapping `stat -c%s "$file"` — `stat` (a real external
 
-`size=$(stat -c%s "$file")` — the `$( )` concept from this unit's lab,
-reused for real, wrapping `stat -c%s "$file"` — `stat` (a real external
 program, not a bash built-in) with `-c%s` (a format flag meaning "print
 just the size in bytes") applied to `"$file"` (this iteration's file,
 quoted).
@@ -587,10 +585,9 @@ done
 bytes, it prints its name and size.
 
 ### Mechanical Walkthrough
+- `if [ "$size" -gt 1024 ]; then ... fi` — `-gt` from this unit's lab, reused for real; a second, nested `if` inside the first — already-basic nesting, no new concept there.
+- `echo "$file: $size bytes"` — `echo`
 
-`if [ "$size" -gt 1024 ]; then ... fi` — `-gt` from this unit's lab,
-reused for real; a second, nested `if` inside the first — already-basic
-nesting, no new concept there. `echo "$file: $size bytes"` — `echo`
 printing a string with two variables expanded inside it, already-basic
 from the very first throwaway lab of this lesson.
 
@@ -777,20 +774,22 @@ Mode                 LastWriteTime         Length Name
 ```
 
 ### Mechanical Walkthrough
-
-`Get-ChildItem -File` — first appearance of a cmdlet **parameter**:
+- `Get-ChildItem -File` — first appearance of a cmdlet **parameter**:
 `-File` tells `Get-ChildItem` to only return files, doing bash's `[ -f
 ]` job *before* anything even reaches the pipe, not as a separate check
-afterward. `|` — the pipe — visually identical to bash's pipe, but
+- afterward.
+- `|` — the pipe — visually identical to bash's pipe, but
 carrying real objects through it, not text, per the previous unit.
-`Where-Object { ... }` — first appearance: a cmdlet that keeps only
-objects for which the script block (in `{ }`) evaluates true. `$_` —
+- `Where-Object { ... }` — first appearance: a cmdlet that keeps only objects for which the script block (in `{ }`) evaluates true.
+- `$_` —
+
 first appearance: PowerShell's automatic variable meaning "the current
 object flowing through the pipeline," conceptually similar to bash's
 loop variable `$file`, but supplied automatically rather than named by
-you in a `for`. `$_.Length` — property access: reaching into the current
-object to read its real `Length` value — the exact number `Get-ChildItem`
-already attached, no `stat` equivalent needed. `-gt 1024` — same operator
+- you in a `for`.
+- `$_.Length` — property access: reaching into the current object to read its real `Length` value — the exact number `Get-ChildItem` already attached, no `stat` equivalent needed.
+- `-gt 1024` — same operator
+
 name as bash's `-gt`, but here comparing a real integer property, not a
 text value being interpreted as one.
 
@@ -842,13 +841,12 @@ medium.txt: 2000 bytes
 ```
 
 ### Mechanical Walkthrough
-
-`ForEach-Object { ... }` — first appearance: runs its script block once
+- `ForEach-Object { ... }` — first appearance: runs its script block once
 per object arriving from the pipe, same shape as `Where-Object` but for
 "do something with each," not "keep or discard." `"$($_.Name): ...
-bytes"` — first appearance of PowerShell string interpolation: `$( )`
+- bytes"` — first appearance of PowerShell string interpolation: `$( )`
 inside a double-quoted string evaluates the expression inside and
-substitutes the result — visually close to bash's `$( )` from Part A,
+- substitutes the result — visually close to bash's `$( )` from Part A,
 but there it captured a *command's* output; here it evaluates a plain
 *expression* (a property access). Worth noticing that overlap in
 notation across two otherwise different shells.

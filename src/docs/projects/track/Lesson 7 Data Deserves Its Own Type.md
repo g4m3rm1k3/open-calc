@@ -157,7 +157,6 @@ This is the whole new file — nothing larger to show it landing inside
 yet.
 
 ### Mechanical Walkthrough
-
 - `private final String name;` / `private final String location;` —
   **reappearing** (`private final` field, from Lesson 6's `InventoryAdapter.itemNames`),
   applied here to two fields that should never change after
@@ -174,12 +173,12 @@ yet.
   `this.` disambiguation, same pattern as `InventoryAdapter`'s
   constructor.
 - `public String getName()`, `public int getQuantity()`,
-  `public String getLocation()` — **first appearance of the
+- `public String getLocation()` — **first appearance of the
   getter/accessor pattern**, as a group: a public method whose only job
   is returning a private field's value. This is the actual mechanism of
   **encapsulation**: `name` and `location` are `private`, meaning code
   outside this class cannot read or write them directly (`item.name`
-  would not compile from `InventoryActivity`) — the only way in is
+- would not compile from `InventoryActivity`) — the only way in is
   through the methods this class chooses to expose. Right now that's
   "read-only" for `name` and `location` (no setter provided) and
   "read/write" for `quantity`.
@@ -325,9 +324,8 @@ reference-based) and **value equality** (`.equals()`, now field-based)
 two `Item`s.
 
 ### Mechanical Walkthrough
-
 - `equals(Object other)` — **first appearance of overriding `Object`'s
-  `equals`.** Parameter type is `Object`, not `Item` — this is a fixed
+- `equals`.** Parameter type is `Object`, not `Item` — this is a fixed
   part of the contract inherited from Java's root class; you can't
   narrow the parameter type here.
 - `if (this == other) return true;` — **first appearance of this
@@ -335,16 +333,16 @@ two `Item`s.
   literally the same object, skip the field comparisons entirely.
 - `!(other instanceof Item)` — **first appearance of `instanceof`.** A
   runtime type check: "is `other` actually an `Item` (or a subclass)?"
-  Necessary because `other`'s declared type is the generic `Object` —
-  it could be a `String`, an `Integer`, anything — and comparing fields
+- Necessary because `other`'s declared type is the generic `Object` — it could be a `String`, an `Integer`, anything — and comparing fields
+
   against something that isn't even an `Item` would be a compile error
   without first narrowing the type.
 - `Item that = (Item) other;` — **first appearance of an explicit
   cast.** `(Item)` tells the compiler "trust me, treat this `Object`
-  reference as an `Item` from here on" — safe here specifically because
+- reference as an `Item` from here on" — safe here specifically because
   the `instanceof` check just above already confirmed it.
 - `quantity == that.quantity` — **reappearing** (`==` on primitives,
-  from your prior Java class) — correct here specifically because `int`
+- from your prior Java class) — correct here specifically because `int`
   is a primitive, not an object, so `==` already means value comparison,
   unlike the `Item a == b` example above.
 - `name.equals(that.name)` / `location.equals(that.location)` —
@@ -537,14 +535,13 @@ earlier this lesson — the exact encapsulated access path that unit
 argued for, now actually exercised.
 
 ### Mechanical Walkthrough
-
 - `Item item = items.get(position);` — reappearing (`List.get`, Lesson 6),
   new element type.
 - `item.getName()`, `item.getQuantity()`, `item.getLocation()` —
   reappearing (getter calls, defined earlier this lesson), first real
   use outside `Item.java` itself.
 - String concatenation building `"Qty: " + item.getQuantity() + " — " + item.getLocation()`
-  — reappearing (`+` string building, from Lesson 5's tap counter).
+- — reappearing (`+` string building, from Lesson 5's tap counter).
 
 ### The New Code — Activity Builds Real Items
 

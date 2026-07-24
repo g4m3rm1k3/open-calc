@@ -321,22 +321,21 @@ This is the whole new file — `extends AppCompatActivity`, the
 material is the three lines reading from `getIntent()`.
 
 ### Mechanical Walkthrough
-
 - `getIntent()` — **first appearance.** Every Activity started via
   `startActivity(intent)` can retrieve that same `Intent` object back,
   inside itself, by calling this — the receiving side of the exact
   `Intent` your `MainActivity` builds and sends in Lesson 4.
 - `.getStringExtra("EXTRA_NAME")` — **first appearance.** Reads a
-  `String` value out of the `Intent`'s extras, by key — the receiving
+- `String` value out of the `Intent`'s extras, by key — the receiving
   half of `putExtra`, built next on the sending side. Returns `null` if
   the key was never set — worth noting, though not yet guarded against
   here.
 - `.getIntExtra("EXTRA_QUANTITY", 0)` — **first appearance**, same idea
-  as `getStringExtra`, `int` version — requiring a default value
+- as `getStringExtra`, `int` version — requiring a default value
   (`0`) because a primitive `int` (unlike `String`, which can be
   `null`) cannot represent "absent" on its own.
 - `nameText.setText(name)` / `infoText.setText(...)` — reappearing
-  (`setText`, Lesson 5), `"\n"` — **first appearance** of an escape
+- (`setText`, Lesson 5), `"\n"` — **first appearance** of an escape
   sequence for a newline character inside a string literal, forcing the
   quantity and location onto separate lines.
 
@@ -405,24 +404,23 @@ lives, exactly as the SE Lens above predicted: the Adapter stayed
 generic, and this Activity owns the specifics.
 
 ### Mechanical Walkthrough
-
 - `new InventoryAdapter(items, item -> { ... })` — reappearing
   (constructor call), new second argument: a lambda matching
-  `OnItemClickListener`'s single method, `onItemClick(Item item)` — the
+- `OnItemClickListener`'s single method, `onItemClick(Item item)` — the
   parameter name `item` here is your choice, matching the interface's
   parameter *type*, not its parameter *name*.
 - `new Intent(InventoryActivity.this, ItemDetailActivity.class)` —
   reappearing (`Intent` construction, Lesson 4), one new detail:
-  `InventoryActivity.this` rather than a bare `this` — required because
+- `InventoryActivity.this` rather than a bare `this` — required because
   plain `this` inside this lambda would refer to the lambda's own
   context, which (unlike an anonymous inner class, which this
   curriculum hasn't used) a lambda doesn't have in the same way;
   qualifying which `this` is meant removes the ambiguity.
 - `intent.putExtra("EXTRA_NAME", item.getName())` and its two siblings
-  — **first appearance.** `putExtra` is overloaded (multiple versions
+- — **first appearance.** `putExtra` is overloaded (multiple versions
   of the same method name, differing by parameter type — already
   implicitly used any time you called `println` with different argument
-  types) — one version accepts a `String` value, another an `int`,
+- types) — one version accepts a `String` value, another an `int`,
   matched automatically based on what you pass. Each call attaches one
   key-value pair to the `Intent`'s extras bundle.
 - `startActivity(intent)` — reappearing, from Lesson 4.
@@ -595,11 +593,10 @@ of scattered across whichever Activity happens to be sending or
 receiving it.
 
 ### Mechanical Walkthrough
-
 - `implements android.os.Parcelable` — **first appearance of
   `implements`** (as opposed to `extends`, used for every base class so
   far). `implements` fulfills an interface contract rather than
-  inheriting a base class's implementation — `Parcelable` is an
+- inheriting a base class's implementation — `Parcelable` is an
   interface (same category of thing as `OnItemClickListener`, earlier
   this lesson, just framework-defined), requiring specific methods this
   class must supply.
@@ -615,9 +612,9 @@ receiving it.
   required interface method: writes this object's fields into a
   `Parcel`, in a matching order to the read side.
 - `dest.writeString(name)` / `dest.writeInt(quantity)` /
-  `dest.writeString(location)` — **first appearance**, the write-side
+- `dest.writeString(location)` — **first appearance**, the write-side
   counterparts. **Order matters and must match the reading constructor
-  exactly** — this is a real, sharp edge of `Parcelable`: nothing
+- exactly** — this is a real, sharp edge of `Parcelable`: nothing
   checks at compile time that read-order matches write-order; a
   mismatch (writing name, quantity, location but reading quantity,
   name, location) compiles fine and corrupts data silently at runtime.
@@ -628,7 +625,7 @@ receiving it.
   appearance.** A required, exactly-named (`CREATOR`, all-caps by
   convention, must be named exactly this) static field the Android
   framework specifically looks for by reflection when reconstructing a
-  `Parcelable` from a `Parcel` — this is the one piece of the mechanism
+- `Parcelable` from a `Parcel` — this is the one piece of the mechanism
   that isn't just "a method you override," which is worth flagging: the
   framework's contract here relies on a magic field name, not purely on
   the interface's declared methods.
@@ -697,13 +694,12 @@ inside `Item.java`'s `writeToParcel`/constructor pair, not scattered
 across every Activity that happens to send or receive one.
 
 ### Mechanical Walkthrough
-
 - `intent.putExtra("EXTRA_ITEM", item)` — **reappearing** (`putExtra`,
   overloaded again, this time matching the `Parcelable` version since
   `Item` now implements that interface).
 - `getIntent().getParcelableExtra("EXTRA_ITEM")` — **first
   appearance.** The `Parcelable`-typed counterpart to `getStringExtra`/
-  `getIntExtra` — internally, this is what triggers the framework to
+- `getIntExtra` — internally, this is what triggers the framework to
   call `CREATOR.createFromParcel(...)` behind the scenes.
 
 ### Run It

@@ -133,14 +133,13 @@ keywords: the parser (a future lesson) will need the actual text to
 distinguish `SELECT` from `FROM`, not just "this was some keyword."
 
 ### Mechanical Walkthrough
-
 - `enum class TokenType` — reuses the exact shape from the lab (basic
   reuse) — four named values instead of three, otherwise identical.
 - `KEYWORD, IDENTIFIER, STAR, SEMICOLON` — the four kinds this lesson's
   lexer will ever produce, chosen to match exactly `SELECT * FROM
   students;`'s five tokens (`SELECT` and `FROM` both being `KEYWORD`).
-  This list is deliberately incomplete — no `NUMBER`, no `COMMA`, no
-  `WHERE` — matching this lesson's one-statement-shape scope honestly.
+- This list is deliberately incomplete — no `NUMBER`, no `COMMA`, no `WHERE` — matching this lesson's one-statement-shape scope honestly.
+
 - `struct Token { TokenType type; std::string text; };` — reuses
   `struct` (basic reuse, from Lesson 2), bundling the new `TokenType`
   with an already-familiar `std::string`.
@@ -250,14 +249,13 @@ introduced in isolation, immediately followed by the unit that puts it
 to real use.)*
 
 ### Mechanical Walkthrough
-
 - `for (size_t i = 0; i < text.size(); i++)` — **first appearance** of
-  an index-based `for` loop — the three-part form: start `i` at `0`,
+- an index-based `for` loop — the three-part form: start `i` at `0`,
   keep looping while `i < text.size()`, and increment `i` after each
   pass. This is the more powerful, more error-prone alternative to
   range-based `for` that Lesson 2's SE Lens flagged as "reached for only
   when a lesson actually needs an index" — this is that lesson.
-  `size_t` — **first appearance** — an unsigned integer type used for
+- `size_t` — **first appearance** — an unsigned integer type used for
   sizes and indices throughout the standard library; `text.size()`
   returns this type, so `i` is declared to match.
 - `text[i]` — **first appearance** of indexing into a `std::string` by
@@ -464,16 +462,15 @@ then decides, once the whole word is known, whether it's one of the two
 recognized keywords or falls through as a plain identifier.
 
 ### Mechanical Walkthrough
-
 - `for (size_t i = 0; i < sql.size(); i++)` and `char c = sql[i];` —
   reuse the index-based walk from the previous unit exactly (basic
   reuse at this point).
 - `if (std::isspace(c)) { continue; }` — reuses `isspace` (previous
-  unit) and `continue` (Lesson 5) — whitespace produces no token at
+- unit) and `continue` (Lesson 5) — whitespace produces no token at
   all, it's simply skipped.
 - `if (c == '*') { tokens.push_back(...); continue; }`,
-  `if (c == ';') { ... }` — **first appearance** of a single-character
-  literal, `'*'` and `';'` (single quotes — a `char`, not a
+- `if (c == ';') { ... }` — **first appearance** of a single-character literal, `'*'` and `';'` (single quotes — a `char`, not a
+
   `std::string`), compared directly against `c`. `tokens.push_back({...})`
   reuses `push_back` (Lesson 3) with a brace-initialized `Token` (reuses
   `struct` initialization, Lesson 2) built inline.
@@ -481,7 +478,7 @@ recognized keywords or falls through as a plain identifier.
   the entry condition for word accumulation.
 - `std::string word;` then `while (i < sql.size() && std::isalpha(sql[i]))`
   — reuses the inner accumulation loop from the lab exactly, with one
-  addition worth naming: `&&` — **first appearance** of the logical AND
+- addition worth naming: `&&` — **first appearance** of the logical AND
   operator, combining two conditions ("still inside the string" *and*
   "still a letter") so the loop can never read `sql[i]` past the end of
   the string, which would otherwise happen the instant a word runs all
@@ -497,7 +494,7 @@ recognized keywords or falls through as a plain identifier.
   that character too, silently skipping it entirely — proven concretely
   below.
 - `if (word == "SELECT" || word == "FROM")` — reuses `==` string
-  comparison (Lesson 6) and introduces `||` — **first appearance** of
+- comparison (Lesson 6) and introduces `||` — **first appearance** of
   logical OR, `&&`'s sibling: true if *either* side is true. Together,
   this line is the entire (deliberately minimal) keyword list for this
   lesson.

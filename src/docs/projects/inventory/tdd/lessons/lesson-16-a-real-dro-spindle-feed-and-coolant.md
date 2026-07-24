@@ -191,15 +191,14 @@ if "S" in words and self.spindle_dir:
 ```
 
 ### Mechanical Walkthrough
-
 - `words["M"] if isinstance(words["M"], list) else [words["M"]]` — **(a)
   first appearance** of normalizing a value that might be a single item
   or a list into always-a-list.
   *(Full standalone treatment: ../concepts/python-normalize-scalar-or-list.md.)*
   Lesson 2's `tokenize()` already turns a
   *repeated* letter on one line into a real Python `list` (its own
-  duplicate-word behavior) — a line like `"M3 M8"` produces `{"M": [3.0,
-  8.0]}` — so this one line is what lets a single line legitimately turn
+- duplicate-word behavior) — a line like `"M3 M8"` produces `{"M": [3.0, 8.0]}` — so this one line is what lets a single line legitimately turn
+
   on the spindle *and* coolant together, matching the real reference's
   own `for (const m of ms2)` loop over potentially-multiple M-codes per
   block.
@@ -210,8 +209,8 @@ if "S" in words and self.spindle_dir:
 - `if "S" in words and self.spindle_dir:` — **(a) first appearance** of
   this project's own port of the reference's *second* real S-handling
   site: `S` alone, on a line with no `M3`/`M4` at all, still updates
-  `spindle_rpm` — but **only** if the spindle is already running
-  (`self.spindle_dir` is truthy) — verified directly this session: `S`
+- `spindle_rpm` — but **only** if the spindle is already running (`self.spindle_dir` is truthy) — verified directly this session: `S`
+
   sent while the spindle is stopped (`M5` already applied) is correctly
   ignored, matching the real reference's own `&& ch.dir` guard exactly.
 
@@ -404,13 +403,12 @@ function MachineStatus({ program }: MachineStatusProps) {
 ```
 
 ### Mechanical Walkthrough
-
 - `const AXES = ["x", "y", "z"] as const;` — **(a) first appearance** of
   TypeScript's `as const` assertion.
   *(Full standalone treatment: ../concepts/typescript-as-const-assertion.md.)*
 - `AXES.map((axis) => ...)` structure, `.toFixed(4)` — **(a) a real,
   corrected detail**: the reference uses **4** decimal places
-  (`.toFixed(4)`), not 3 — my own first, unread-source draft used 3;
+- (`.toFixed(4)`), not 3 — my own first, unread-source draft used 3;
   fixed once the real line was actually read.
 - `AXIS_LABEL_COLOR` — **(b) reappearing** object-as-lookup-table
   pattern (Lesson 4's `_MOTION_CODES`), ported directly from the
@@ -421,7 +419,7 @@ function MachineStatus({ program }: MachineStatusProps) {
   coloring ternary), ported directly from the reference's own identical
   three-way `ms.dir === "CW" ? ... : ms.dir === "CCW" ? ... : ...` chain.
 - `.sec`/`.dro`/`.dro-ax`/`.dro-num`/`.dro-unit`/`.sgrid`/`.sbox`/
-  `.sbox-l`/`.sbox-v` class names — **(a) chosen deliberately to match
+- `.sbox-l`/`.sbox-v` class names — **(a) chosen deliberately to match
   the reference's own real class names exactly**, not renamed —
   because the real CSS (next unit) was ported verbatim under those exact
   selectors; matching names here is what makes the port a port, not an
@@ -451,12 +449,11 @@ function MachineStatus({ program }: MachineStatusProps) {
 in full in `theme.css`.)
 
 ### Mechanical Walkthrough
-
 - Every rule above is the reference's own real, embedded stylesheet
   (`cnc-sim/cnc/CNCSim.tsx`'s `getCSS()`, lines 1688–1701), with only
   `${C.bg}`/`${C.bd}`/`${C.txt3}`-style template-literal color
   references replaced by this project's own `var(--color-bg)`/
-  `var(--color-border)`/`var(--color-muted)` design tokens (Lesson 12) —
+- `var(--color-border)`/`var(--color-muted)` design tokens (Lesson 12) —
   **structure, spacing, and typography values copied exactly**, not
   reinterpreted.
 - **(a) two new, real tokens added to `theme.css`**, cited from the same

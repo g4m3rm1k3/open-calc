@@ -94,13 +94,12 @@ This is a complete, freestanding new function — the block above is
 everything there is to see.
 
 ### Mechanical Walkthrough
-
 Every `if` reuses ordinary conditional syntax, each one returning
 immediately rather than falling through — the same early-return shape
 every guard clause in this project has used since Lesson 3, applied here
 as a sequence of classification checks instead of validation failures.
 `token.type === "COMMENT"` and `token.type === "UNKNOWN"` are both
-checked *before* any `token.letter` check — deliberately: a `COMMENT`
+- checked *before* any `token.letter` check — deliberately: a `COMMENT`
 token's `letter` field is always `null` (Lesson 10's own `Token`
 dataclass leaves it unset for comments), and checking `type` first means
 that `null` is never compared against `"G"` at all, sidestepping the
@@ -110,7 +109,7 @@ Lesson 5, three equality checks chained rather than a shorter method,
 deliberately: introducing a new array-membership method here would be
 exactly the kind of "small, familiar-seeming construct with unexamined
 behavior" this curriculum's own schema warns against skipping a lab for
-— three `||`-joined comparisons need no new lab because every piece of
+- — three `||`-joined comparisons need no new lab because every piece of
 them is already fully taught. The final `return "token-word";` is
 reached only if every check above it failed — the default classification
 for any ordinary word that isn't a motion code, misc code, or axis.
@@ -215,9 +214,8 @@ document.getElementById("highlight-button").addEventListener("click", highlightF
 ```
 
 ### Mechanical Walkthrough
-
 The guard clause, the `.endsWith(".nc")` check, and the `authenticatedFetch`
-call all reuse the exact shape `tokenizeFile` established in Lesson 10 —
+- call all reuse the exact shape `tokenizeFile` established in Lesson 10 —
 this route was never touched; only what happens with its response is
 new. `data.lines.forEach((lineTokens) => { ... })` reuses `.forEach()`
 from Lesson 2, once per line, exactly the outer loop `tokenizeFile`
@@ -228,7 +226,7 @@ tokens together so each line still reads as its own row. The inner
 time, once per token within that line. `document.createElement("span")`
 reuses the same construction pattern for each individual token.
 `span.textContent = token.text + " "` reuses `+` concatenation, adding
-back a single space `tokenize_line` itself discarded during lexing —
+- back a single space `tokenize_line` itself discarded during lexing —
 Lesson 10's lexer treats whitespace as insignificant and skips it
 entirely, so a space has to be reintroduced here for the rendered line
 to read correctly, not because the original spacing is being preserved.
@@ -306,10 +304,9 @@ own existing `color: #ddd`, the same light gray every other panel's text
 already uses.
 
 ### Mechanical Walkthrough
-
 `color`, on all five rules, reuses the property already used throughout
 this project's CSS since Lesson 5. `text-decoration: underline` on
-`.token-unknown` is new — an underline beneath the text, the same
+- `.token-unknown` is new — an underline beneath the text, the same
 visual convention a spell-checker or a linter uses to flag something
 worth a second look, deliberately chosen here for tokens `tokenize_line`
 itself couldn't classify as a recognized word or comment.

@@ -111,15 +111,14 @@ function getDB() {
 actual read/write functions this file exports.)
 
 #### Mechanical Walkthrough
-
-Two object stores, not one — `sections` (a section's own id, title,
+- Two object stores, not one — `sections` (a section's own id, title,
 order, and its nested `pages: [{id, title}]` array, matching Lesson 1's
 shape almost exactly) and `pages` (keyed by page id, holding only that
 one page's `canvasJSON`). They're split because they change at
 completely different rates: a section's title changes rarely; a page's
 drawing content can change every few seconds while someone's actively
 sketching. `dbPromise` is cached at module scope (not per-component
-state) so every caller — `PageCanvas`, `CanvasNotesPage` — shares the
+- state) so every caller — `PageCanvas`, `CanvasNotesPage` — shares the
 *same* open connection instead of each opening its own.
 
 #### CS Lens
@@ -303,13 +302,13 @@ built now on purpose so the next increment only has to wire up UI, not
 also design the persistence functions it needs.
 
 #### Mechanical Walkthrough
-
-`db.getAll('sections')` — `idb`'s wrapper method for reading every row
+- `db.getAll('sections')` — `idb`'s wrapper method for reading every row
 in a store, the Promise-returning equivalent of a raw
-`objectStore.getAll()` request. `db.put(store, value)` — writes a row;
+- `objectStore.getAll()` request.
+- `db.put(store, value)` — writes a row;
 because both stores use `keyPath: 'id'`, the key is read directly off
 the object being stored (`value.id`) rather than passed as a separate
-argument — this is why `putPage`'s signature takes `id` and
+- argument — this is why `putPage`'s signature takes `id` and
 `canvasJSON` *separately* and assembles `{ id, canvasJSON }` itself,
 rather than requiring the caller to build that shape.
 
@@ -429,12 +428,11 @@ useEffect(() => {
 outside it changed to accommodate this unit.)
 
 #### Mechanical Walkthrough
-
-`let cancelled = false`, declared fresh inside the effect body — a new
+- `let cancelled = false`, declared fresh inside the effect body — a new
 one for every run, since it's declared *inside* the function passed to
 `useEffect`, not outside it. The returned cleanup function
 (`() => { cancelled = true }`) runs the instant a *newer* effect run
-starts (because `pageId` changed again) — so the *previous* run's
+- starts (because `pageId` changed again) — so the *previous* run's
 `cancelled` flips to `true` from outside its own async function, and
 every subsequent `if (cancelled) return` inside that stale run's async
 IIFE catches it at the next checkpoint and bails out before touching
@@ -483,9 +481,9 @@ durable even if the user never switches away from it at all.
 
 ## Connect the Pieces
 
-`db.js` opens one IndexedDB database with two stores — `sections`
+- `db.js` opens one IndexedDB database with two stores — `sections`
 (rarely-changing structure) and `pages` (frequently-changing content,
-keyed by page id) — through `idb`'s Promise-based wrapper over the
+- keyed by page id) — through `idb`'s Promise-based wrapper over the
 native callback API. `CanvasNotesPage` loads `listSections()` once on
 mount, seeding `INITIAL_SECTIONS` into the database if this is the
 notebook's very first run. `PageCanvas`'s page-swap effect now saves
@@ -517,7 +515,7 @@ screen doesn't match the state everything else agrees on."
   using canvas-notes. Watch the `pages` store update roughly 250ms
   after you stop drawing, live.
 - Delete just the `pages` object store's IndexedDB data (via DevTools)
-  without deleting `sections`, then reload. Predict what you'll see —
+- without deleting `sections`, then reload. Predict what you'll see —
   structure but blank pages, or the seed data reappearing — and confirm.
 
 ## Definition of Done

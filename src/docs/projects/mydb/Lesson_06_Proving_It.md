@@ -173,15 +173,14 @@ actually return two students, and is the second one's age actually
 point, whose only job is to run every test function in order.
 
 ### Mechanical Walkthrough
-
 - `#include <cassert>` — **first appearance.** Declares the `assert`
   macro used throughout this file.
 - `std::remove("test.db");` — reuses `std::remove` from Lesson 5 (basic
-  reuse), here as test setup rather than part of `Table`'s own logic —
+- reuse), here as test setup rather than part of `Table`'s own logic —
   deleting any file left over from a previous test run, so every test
   starts from a guaranteed-empty state.
 - `Table table("test.db");` — reuses the `Table` constructor (basic
-  reuse), pointed at a dedicated test filename, never `school.db` — a
+- reuse), pointed at a dedicated test filename, never `school.db` — a
   test that touched real data would risk corrupting it, or worse, would
   pass or fail depending on whatever happened to already be in
   `school.db` from a previous run.
@@ -193,14 +192,14 @@ point, whose only job is to run every test function in order.
   condition is false, the program halts here, naming this exact line.
 - `assert(students[0].name == "Alice");` — reuses `assert` and
   reintroduces indexing (`[0]`, familiar from `std::vector` since
-  Lesson 2) and `==` comparison on `std::string` — comparing two
+- Lesson 2) and `==` comparison on `std::string` — comparing two
   strings for equality with `==` is genuinely basic here (it behaves
   the way you'd expect from Python), not owed a full explanation.
 - `std::endl` — **first appearance.** Inserts a newline, like `"\n"`
   since Lesson 1, but *also* flushes the stream immediately. This
   matters specifically in test code: if a test's later `assert` fails
   and the program aborts, any output still sitting in an unflushed
-  buffer never makes it to the screen — `std::endl` guarantees "passed"
+- buffer never makes it to the screen — `std::endl` guarantees "passed"
   messages appear before that can happen, which is exactly what the
   lab's first line depended on to be visible at all.
 
@@ -418,9 +417,8 @@ blocks is preserved exactly, just triggered by what you type instead of
 by hardcoded calls.
 
 ### Mechanical Walkthrough
-
 - `std::string command;` then `while (std::cin >> command)` — reuses
-  `std::cin >> variable` as a loop condition — **a hard concept
+- `std::cin >> variable` as a loop condition — **a hard concept
   reappearing** (per the Repetition Rule): Lesson 3 already established
   that a stream read reports success or failure and can drive a `while`
   loop; this is the exact same idea Lesson 1's `getline` loop used,
@@ -437,10 +435,10 @@ by hardcoded calls.
   if every earlier one in the chain was false.
 - `break;` — **first appearance.** Immediately exits the *entire*
   enclosing loop (unlike `continue` from Lesson 5, which only skips to
-  the next iteration) — used here so typing `quit` ends the program
+- the next iteration) — used here so typing `quit` ends the program
   instead of looping back to another prompt.
 - Everything inside the `"update"` and `"remove"` branches — reads an
-  `id`, calls the matching `Table` method inside `try`/`catch` — is
+- `id`, calls the matching `Table` method inside `try`/`catch` — is
   **a hard concept reappearing**: the exact `try`/`catch`/`e.what()`
   pattern Lesson 5 built and demonstrated with hardcoded ids, now
   triggered by typed commands instead.
