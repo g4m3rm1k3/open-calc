@@ -55,6 +55,20 @@ file's existence has nothing to do with any particular running program;
 it exists independently, on the file system, until something explicitly
 deletes it.
 
+### Mechanical Walkthrough
+
+No code fence to enumerate — this unit names two properties of storage,
+not syntax:
+
+- **volatile** (RAM) — **first appearance.** Requires continuous power;
+  reclaimed unconditionally the moment the process that owns it exits.
+  Every `class` instance this project has `new`ed so far has lived only
+  here.
+- **non-volatile** (disk, a `.db` file) — **first appearance.** Holds
+  its contents with no power required; survives the process, the app,
+  and a full system restart — existing independently on the file
+  system until something explicitly deletes it.
+
 ### CS Lens
 
 This is the general distinction between **volatile and non-volatile
@@ -128,8 +142,7 @@ record of exactly which external library this project depends on,
 checked into source control so anyone else building this project gets
 the identical version.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-sqlite
 cd lab-sqlite
@@ -158,25 +171,24 @@ Real output:
 Connection state: Open
 ```
 
-*What this proves:* `new SqliteConnection("Data Source=lab.db")` — (first
-appearance) — creates a connection object targeting a file named `lab.db`
-in the current folder; the string `"Data Source=lab.db"` — (first
-appearance) — is a **connection string**, a small, semicolon-separated
-configuration format nearly every database library uses to describe
-where and how to connect (SQLite's is unusually simple — just a file
-path — compared to a server-based database's connection string, which
-would also need a host, port, and credentials). `.Open()` — (first
-appearance) — actually establishes the connection; SQLite specifically
-creates the file itself, empty, the first time you connect to a path that
-doesn't exist yet — no separate "create the database" step required, a
-real, SQLite-specific convenience most server-based databases don't
-offer. `using SqliteConnection connection = ...` — (first appearance of
-the `using` **statement**, distinct from the `using` **directive**
-already used since Lesson 1's `using System;`) — guarantees `connection`
-is properly closed and its resources released the moment it goes out of
-scope, even if an error occurs in between — the same "resource lifetime
-tied to a scope" idea, spelled differently in C# than in any tool you've
-used from Python.
+*What this proves:* `new SqliteConnection("Data Source=lab.db")`
+creates a connection object targeting a file named `lab.db` in the
+current folder; the string `"Data Source=lab.db"` is a **connection
+string**, a small, semicolon-separated configuration format nearly
+every database library uses to describe where and how to connect
+(SQLite's is unusually simple — just a file path — compared to a
+server-based database's connection string, which would also need a
+host, port, and credentials). `.Open()` actually establishes the
+connection; SQLite specifically creates the file itself, empty, the
+first time you connect to a path that doesn't exist yet — no separate
+"create the database" step required, a real, SQLite-specific
+convenience most server-based databases don't offer. `using
+SqliteConnection connection = ...` (the `using` **statement**, distinct
+from the `using` **directive** already used since Lesson 1's `using
+System;`) guarantees `connection` is properly closed and its resources
+released the moment it goes out of scope, even if an error occurs in
+between — the same "resource lifetime tied to a scope" idea, spelled
+differently in C# than in any tool you've used from Python.
 
 Confirm the file was really created:
 
@@ -188,11 +200,31 @@ Real output — a real file now exists, zero bytes or a few, depending on
 your SQLite version's exact empty-database format, on disk, independent
 of whether `lab-sqlite`'s process is still running.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-sqlite` folder, including `lab.db`. `SqliteConnection`
 and its connection-string pattern are not discarded — they connect the
 real project to a real database next.
+
+### Mechanical Walkthrough
+
+- `<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.x" />`
+  — **first appearance.** The `.csproj` equivalent of a `pip install`
+  leaving a line in `requirements.txt` — a permanent, version-pinned
+  record of an external dependency, checked into source control.
+- `new SqliteConnection("Data Source=lab.db")` — **first appearance.**
+  Creates a connection object targeting `lab.db`. The string is a
+  **connection string** — a small, semicolon-separated configuration
+  format nearly every database library uses; SQLite's is unusually
+  simple, just a file path.
+- `connection.Open()` — **first appearance.** Actually establishes the
+  connection — and, SQLite-specifically, creates the file itself if it
+  doesn't already exist, no separate "create the database" step needed.
+- `using SqliteConnection connection = ...` — **first appearance of
+  the `using` statement**, distinct from the `using` directive
+  (Lesson 1's `using System;`). Guarantees `connection` is closed and
+  released the moment it goes out of scope, even if an error occurs.
+- `connection.State` — **first appearance.** Reports the connection's
+  current status (`Open`, here) — read directly as a property.
 
 ### CS Lens
 
@@ -233,8 +265,7 @@ A SQLite database file, freshly created, is completely empty — it has no
 concept of "inventory items" until this project explicitly describes
 that structure to it, in SQL.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Continuing inside a fresh throwaway project (recreate `lab-sqlite` if you
 deleted it, or start a new one the same way):
 
@@ -266,34 +297,49 @@ Table created (or already existed).
 Run it a **second** time, without deleting `lab.db` in between — the
 identical output prints again, with no error.
 
-*What this proves:* `connection.CreateCommand()` — (first appearance) —
-produces a `SqliteCommand` tied to this specific open connection.
-`.CommandText = "..."` — (first appearance) — is the actual SQL to run,
-assigned as a plain string. `CREATE TABLE IF NOT EXISTS Items (...)` —
-(first appearance of this specific SQL statement) — defines a table
-named `Items`, only if one by that name doesn't already exist —
-`IF NOT EXISTS` is exactly why running this program twice in a row
-didn't error the second time: without it, the second run would fail,
-because you cannot create a table that's already there. `Id INTEGER
-PRIMARY KEY AUTOINCREMENT` — (first appearance) — a column named `Id`,
-whole-number type, automatically assigned a unique, incrementing value
-by SQLite itself on every new row — this project never has to invent
-its own unique identifiers by hand. `Name TEXT NOT NULL` — (first
-appearance) — a column named `Name`, text type, with a constraint —
-`NOT NULL` — (first appearance) — that SQLite itself will enforce,
-refusing any row that tries to leave it empty, a second, independent
-layer of protection beneath whatever validation this project's own C#
-code performs (Lesson 11 builds that C#-side validation properly; this
-is the database's own, lower-level backstop). `.ExecuteNonQuery()` —
-(first appearance) — actually runs the command; "NonQuery" specifically
-means "this statement doesn't return rows" (contrast a `SELECT`, which
-does — Lesson 10's subject).
+*What this proves:* `connection.CreateCommand()` produces a
+`SqliteCommand` tied to this specific open connection. `.CommandText =
+"..."` is the actual SQL to run, assigned as a plain string. `CREATE
+TABLE IF NOT EXISTS Items (...)` defines a table named `Items`, only if
+one by that name doesn't already exist — `IF NOT EXISTS` is exactly why
+running this program twice in a row didn't error the second time:
+without it, the second run would fail, because you cannot create a
+table that's already there. `Id INTEGER PRIMARY KEY AUTOINCREMENT` is a
+column named `Id`, whole-number type, automatically assigned a unique,
+incrementing value by SQLite itself on every new row — this project
+never has to invent its own unique identifiers by hand. `Name TEXT NOT
+NULL` is a column named `Name`, text type, with a `NOT NULL` constraint
+that SQLite itself will enforce, refusing any row that tries to leave
+it empty — a second, independent layer of protection beneath whatever
+validation this project's own C# code performs (Lesson 11 builds that
+C#-side validation properly; this is the database's own, lower-level
+backstop). `.ExecuteNonQuery()` actually runs the command; "NonQuery"
+specifically means "this statement doesn't return rows" (contrast a
+`SELECT`, which does — Lesson 10's subject).
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-sqlite` folder again, including `lab.db`. The exact
 `CREATE TABLE` statement above is not discarded — it becomes part of the
 real project next, unchanged.
+
+### Mechanical Walkthrough
+
+- `connection.CreateCommand()` — **first appearance.** Produces a
+  `SqliteCommand` tied to this specific open connection.
+- `.CommandText = "..."` — **first appearance.** The actual SQL to
+  run, assigned as a plain string.
+- `CREATE TABLE IF NOT EXISTS Items (...)` — **first appearance.**
+  `IF NOT EXISTS` is why running this program twice doesn't error the
+  second time.
+- `Id INTEGER PRIMARY KEY AUTOINCREMENT` — **first appearance.** A
+  column SQLite itself assigns a unique, incrementing value to on every
+  new row.
+- `Name TEXT NOT NULL` — **first appearance.** A text column with a
+  `NOT NULL` constraint SQLite enforces directly — a backstop beneath
+  whatever C#-side validation exists (Lesson 11).
+- `.ExecuteNonQuery()` — **first appearance.** Runs the command;
+  "NonQuery" means this statement returns no rows, contrasted against
+  `SELECT` (Lesson 10).
 
 ### CS Lens
 
@@ -336,8 +382,7 @@ directly gluing the user's text into a command string is a real,
 serious, well-known security mistake — worth stopping and naming
 precisely before writing a single line of the real feature.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Continuing in a throwaway project, first see the actual attack, then the
 fix. Add a second table and demonstrate the dangerous version:
 
@@ -400,8 +445,7 @@ row whose `Name` is literally the entire attack string, quotes,
 semicolons, and all — inert, harmless data, exactly the outcome a `Name`
 column should produce for any input, however strange.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-sqlite` folder, including `lab.db`, for the final time.
 Parameterized `INSERT` is not discarded — it's the only way this project
 ever writes user-typed data into SQL, starting now.
@@ -509,8 +553,7 @@ namespace PocketInventory
 show it on screen (unchanged from Lesson 6/7), and — new — persist it to
 the real database, every single time, immediately.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `private const string ConnectionString = "..."` — (first appearance
    of `const`) declares a value that is fixed permanently, at compile
    time — stronger than `readonly` (not introduced here) or a normal
@@ -528,6 +571,41 @@ the real database, every single time, immediately.
    method (Lesson 6/7's object construction, `Items.Add`, clearing
    `NameInput`) is untouched.
 
+### CS Lens
+
+SQL injection is one specific case of a much more general
+vulnerability class: **conflating code and data** — treating
+attacker-controlled text as instructions to execute rather than as an
+inert value, purely because of how a command string got assembled.
+Also recognized in: XSS (Cross-Site Scripting — unescaped user input
+rendered as executable HTML/JavaScript in a browser), classic buffer
+overflow attacks (data written past a buffer's boundary reinterpreted
+as executable machine code), and calling `eval()` on unsanitized input
+in any language that has one. Parameterized queries fix the SQL case
+specifically the same way all of these are fixed in general: keep code
+and data in genuinely separate channels, enforced structurally, rather
+than trying to distinguish them after the fact by inspecting the text.
+
+### SE Lens
+
+**Why require an explicit `@name` placeholder and `AddWithValue` at
+all — why doesn't `Microsoft.Data.Sqlite` just automatically escape
+dangerous characters in any string glued into a command, invisibly?**
+Automatic escaping is exactly the approach that has produced real,
+repeated security vulnerabilities across the software industry for
+decades: it requires the library to correctly recognize and neutralize
+*every* dangerous character sequence, in every possible context, a
+moving target that has been gotten wrong often enough that
+"remembered to escape properly" is not a bar security-conscious code
+relies on. Parameterization sidesteps the problem structurally rather
+than defensively: `@name` tells the database driver, at the protocol
+level, "this position holds exactly one data value, never SQL syntax"
+— there is no escaping step to get wrong, because the attacker's text
+is never parsed as part of the command in the first place, regardless
+of what characters it contains. The cost is genuinely small — one
+extra line per query — against a category of bug that, done wrong, can
+delete an entire table from a single text field.
+
 ### Commands needed
 
 ```bash
@@ -539,7 +617,8 @@ dotnet run
 On your Windows machine: add two or three items, exactly as before —
 nothing looks different on screen. Now fully close the application and
 locate `pocketinventory.db` (it's created in the project's build output
-folder — typically `bin/Debug/net9.0-windows/`). Open it with any SQLite
+folder — typically `bin/Debug/net10.0-windows/`, matching whatever
+`TargetFramework` your own `.csproj` shows, per Lesson 0). Open it with any SQLite
 browser tool (search "DB Browser for SQLite," a free, standard tool for
 exactly this) and confirm every item you added is really there, as real
 rows in a real `Items` table — durable proof, independent of this
@@ -556,8 +635,7 @@ exact gap.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: `InventoryPage`'s constructor calls
 `EnsureDatabaseCreated()` (Concept Unit 3) once, guaranteeing the `Items`
 table exists via an idempotent `CREATE TABLE IF NOT EXISTS`. Clicking Add
@@ -569,8 +647,7 @@ never gluing `item.Name` directly into a SQL string, closing off the SQL
 injection attack this lesson demonstrated concretely, with a real,
 destructive payload, before showing the fix.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily change `SaveItemToDatabase`'s parameterized `INSERT` back to
 direct string interpolation:
 `command.CommandText = $"INSERT INTO Items (Name) VALUES ('{item.Name}')";`
@@ -605,8 +682,7 @@ version of this code that's simply *correct* for realistic input.
   relaunch it — confirm `EnsureDatabaseCreated` correctly recreates it
   from nothing, with no error.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `Microsoft.Data.Sqlite` is a real dependency in
       `PocketInventory.csproj`.
 - [ ] Adding an item writes a real row into `pocketinventory.db`,

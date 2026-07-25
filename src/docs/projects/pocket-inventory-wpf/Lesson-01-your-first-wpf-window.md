@@ -37,8 +37,7 @@ height. Centering three separate elements inside one `Grid` cell would stack
 them on top of each other, overlapping; `Grid` alone doesn't arrange multiple
 children in a sequence.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Create a throwaway WPF project to see this one control in isolation, without
 any of Pocket Inventory's real content nearby.
 
@@ -73,8 +72,7 @@ height by default — a fundamentally different layout rule than `Grid`, which
 requires you to explicitly define rows and columns before it knows where
 anything goes.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-stackpanel` folder. `StackPanel` itself is not thrown away —
 it's about to become part of the real project — only this specific
 three-line demonstration is discarded.
@@ -152,8 +150,7 @@ of a bare `TextBlock` — and that one child internally arranges three
 the window's own title bar text, a property on `Window` itself, unrelated to
 anything inside it.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 Every new distinct element, in order:
 
 1. `<StackPanel ...>` — (first appearance) instantiates
@@ -230,8 +227,7 @@ deliberately blank in XAML because the actual welcome message needs to be
 that string means combining fixed text with a value that changes every day,
 which needs its own concept before touching the code-behind file at all.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 You already know Python's f-strings — `f"Hello, {name}"` — and this looks
 almost identical in C#, which is exactly why it earns its own lab rather than
 being assumed. Create a throwaway console project:
@@ -286,11 +282,26 @@ the identifier `f` immediately followed by a separate string literal, which
 is a syntax error in this position — not silently-wrong output, an outright
 compile failure. The habit to build here is `$`, not `f`.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-interpolation` folder. String interpolation itself is not
 discarded — it's about to compute the real welcome message in
 `MainWindow.xaml.cs`.
+
+### Mechanical Walkthrough
+
+- `$"Welcome to {appName} — screen {screenCount} of many."` — **first
+  appearance.** The `$` prefix marks an interpolated string; each
+  `{expression}` inside it is evaluated and converted to text, spliced
+  directly into the resulting string — C#'s equivalent of Python's
+  `f"..."`.
+- `{appName}` / `{screenCount}` — **first appearance of embedding a
+  variable directly.** Each name inside `{ }` is looked up and its
+  current value substituted — `appName`'s and `screenCount`'s reads are
+  otherwise ordinary variable reads (basic, already-established).
+- `f"Count is {count}"` (no `$`) — **first appearance of the failure
+  case, deliberately triggered.** C# has no `f`-string syntax; this
+  parses as the identifier `f` directly followed by a separate string
+  literal — a compile error (`CS0103`), not silently wrong output.
 
 ### CS Lens
 
@@ -332,8 +343,7 @@ be computed with string interpolation. How does C# code in a completely
 different file — `MainWindow.xaml.cs` — get a reference to an element
 declared in `MainWindow.xaml`?
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Open `MainWindow.xaml.cs` as `dotnet new wpf` generated it — you have not
 edited this file yet in this curriculum:
 
@@ -412,8 +422,7 @@ does the new line set its `Text` — this ordering isn't optional; setting
 `WelcomeMessage.Text` before `InitializeComponent()` runs would fail, because
 the field would still be its default, unset value.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `WelcomeMessage` — (first appearance, connecting to Concept Unit 1) not a
    new variable — this is the generated field the `x:Name` attribute
    produced, now usable exactly like any other C# object reference.
@@ -492,8 +501,7 @@ behavior on top of it.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: `MainWindow.xaml` declares a `StackPanel` (Concept Unit
 1) holding three `TextBlock`s, the middle one tagged `x:Name="WelcomeMessage"`
 with no `Text`. When the app launches, `MainWindow`'s constructor runs
@@ -504,8 +512,7 @@ text and assigns it to `WelcomeMessage.Text`. The window that appears on
 screen is the result of all three units working together: layout, a C#
 language feature, and the generated bridge between markup and code.
 
-### What breaks without this
-
+### What Breaks Without This
 Remove `InitializeComponent();` from the constructor (comment it out) and
 run the app. Real, representative failure: the app throws a
 `NullReferenceException` the moment the next line tries to use
@@ -529,8 +536,7 @@ again. This is the concrete proof behind Concept Unit 3's claim that
   `$"{screenCount + 1}"`, and confirm C# evaluates the whole expression, not
   just a bare variable name, inside the braces.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `MainWindow.xaml`'s `Grid` contains a `StackPanel` with three
       `TextBlock`s, matching the Updated Project shown above.
 - [ ] The app runs and shows today's actual date in the welcome message —

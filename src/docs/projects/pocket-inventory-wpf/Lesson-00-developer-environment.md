@@ -40,8 +40,7 @@ before execution starts. This is worth *seeing* directly, because C# is
 about to do something genuinely different, and "different how" is the whole
 point of this unit.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Create a throwaway file anywhere on your machine — it will not become part
 of Pocket Inventory.
 
@@ -82,11 +81,24 @@ hold a `str` on the next; the *variable* isn't typed, only the *value*
 currently sitting in it is, and Python doesn't check whether a value will
 work with an operation until that operation actually executes.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete `throwaway_typing_demo.py`. It exists only to prove what "interpreted,
 dynamically typed" actually means in practice, using a language you already
 know. It will not appear again.
+
+### Mechanical Walkthrough
+
+- `def add(x, y): return x + y` — **genuinely basic, already-established
+  syntax.** Ordinary Python function, nothing about it is new; it's the
+  baseline the rest of this unit contrasts against.
+- `print(add(10, 20))` — **basic.** Runs and prints `30` — both arguments
+  are `int`, `+` behaves exactly as expected.
+- `print(add(10, "20"))` — **first appearance of the behavior this unit
+  is actually about.** The *syntax* is identical to the line above it;
+  what's new is *when* Python discovers this line is a problem: not
+  before running anything, not even while running line 5 — only at the
+  exact moment this specific line executes and `x + y` tries to add an
+  `int` to a `str`.
 
 ### CS Lens
 
@@ -192,6 +204,37 @@ Lists every SDK version installed side by side (you can have several .NET
 versions installed at once without conflict — each project picks the one it
 targets in its `.csproj`, which the next unit introduces).
 
+### Mechanical Walkthrough
+
+- `dotnet --version` — **first appearance.** `dotnet` is the CLI tool
+  the SDK installs; `--version` reports which SDK version is currently
+  active, without building or running anything.
+- `dotnet --list-sdks` — **first appearance.** Lists every SDK version
+  installed on the machine, side by side — useful once a machine has
+  more than one, which `--version` alone can't show.
+- **IL** (Intermediate Language) — **first appearance.** Not code you
+  write directly; it's what the C# compiler produces from your `.cs`
+  files, and what the CLR actually loads and runs.
+- **JIT compilation** (Just-In-Time) — **first appearance.** The CLR's
+  step of translating IL into real machine code for the specific CPU
+  it's running on, done at launch, not ahead of time.
+- **The .NET SDK** — **first appearance.** The single installer
+  bundling the compiler, the CLR, the `dotnet` CLI, and the project
+  templates this curriculum uses throughout.
+
+### CS Lens
+
+This is **two-phase compilation through an intermediate representation**
+— translate once, ahead of time, to a portable format, then translate
+again, per-machine, to real instructions, right before running. Also
+recognized in: Java's `.class` bytecode running on the JVM (the closest
+direct equivalent — a compiler produces bytecode once, and each JVM
+JIT-compiles it for its own specific CPU), Python's `.pyc` bytecode
+files (compiled once, interpreted rather than JIT'd, but the same
+"intermediate format, not source, not raw machine code" idea), and
+WebAssembly (compiled once from C/C++/Rust/etc., then run by any
+browser's own engine on any CPU architecture).
+
 ### SE Lens
 
 Why does .NET compile to an intermediate format (IL) instead of straight to
@@ -221,8 +264,7 @@ line 6. Does C#, with its separate compile step from Concept Unit 2, actually
 behave differently — or is "the compiler checks types" just a claim so far?
 This unit proves it, using the same shape of program.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Create a console project — a program that runs in a terminal with no window,
 the simplest possible C# project, and the right place to see raw language
 behavior with nothing else going on.
@@ -287,13 +329,11 @@ direct, concrete difference from Concept Unit 1's Python run: Python executed
 the good line and crashed on the bad one; C# refused to run *any* of it,
 because the whole file is checked before any of it executes.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-typing` folder. It proved the concept; it never becomes part
 of Pocket Inventory.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 Every distinct element in the working version, in order:
 
 1. `int Add(int x, int y)` — (first appearance) a **method** declaration.
@@ -372,8 +412,7 @@ redundant. C# has a keyword for this, and it is the single most common
 source of confusion for anyone arriving from Python, because it looks like
 Python's plain `total = 10` but is not the same thing at all.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Create another throwaway console project.
 
 ```bash
@@ -480,10 +519,31 @@ Run it. Real output:
 20
 ```
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-var` folder. Pocket Inventory will use `var` throughout —
 this lab's job was only to prove exactly what it does and does not mean.
+
+### Mechanical Walkthrough
+
+- `var count = 5;` / `var label = "widgets";` — **first appearance.**
+  The compiler infers `int` and `string` respectively from each
+  initializer's literal, once, at declaration — not re-evaluated later.
+- `count = "now a string";` after `var count = 5;` — **first
+  appearance of the enforcement.** Rejected with `CS0029`, the exact
+  same error explicit `int count = 5;` would produce — proof `var`
+  changed nothing about *when* or *whether* the type is checked.
+- `int a, b = 5;` — **reappearing**, basic multi-declarator syntax:
+  legal because each declarator (`a`, `b = 5`) can have its own type
+  independently understood from the shared `int` keyword.
+- `var a, b = 5;` — **first appearance of `var`'s one real syntactic
+  restriction.** Fails with `CS0819`/`CS0818`: `var` requires exactly
+  one initializer to infer from, and a multi-declarator statement gives
+  the compiler no way to decide which (or whether) each variable's type
+  should be inferred.
+- `var a = 5; var b = 10; int c = 15, d = 20;` — **first appearance of
+  the fix.** One `var` declarator per statement sidesteps the ambiguity
+  entirely; `int c = 15, d = 20;` still works multi-declarator, since
+  `int` was never inferred in the first place.
 
 ### CS Lens
 
@@ -578,6 +638,16 @@ this lesson that cannot be verified on a non-Windows machine; run it on your
 Windows install and confirm the folder now contains the files the next unit
 walks through.
 
+### Mechanical Walkthrough
+
+- `dotnet new wpf -o PocketInventory` — **first appearance of this
+  specific template name.** `dotnet new console` (used throughout this
+  lesson's earlier labs) scaffolds a bare console app; `wpf` scaffolds
+  the real project shape — window, XAML, `App.xaml` — the next unit
+  walks through file by file. `-o PocketInventory` — **reappearing**
+  (the `-o` flag, already used in every earlier `dotnet new` call) —
+  names the output folder.
+
 ### SE Lens
 
 Why does .NET restrict WPF to Windows at all, when the CLR itself (Concept
@@ -626,26 +696,43 @@ instruction is meaningless.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
 </Project>
 ```
 
+(The exact number in `net10.0-windows` tracks whichever .NET version is
+current when you run `dotnet new wpf` — .NET ships a new major version every
+November, so this will keep climbing in future years; whatever your own
+generated file says is the right one, not a fixed number to match forever.)
+
 Compare this to the console app's `.csproj` from Concept Unit 3, which had
-`<OutputType>Exe</OutputType>`, `<TargetFramework>net9.0</TargetFramework>`,
-and no `UseWPF` line at all. Three differences, each one meaningful:
+`<OutputType>Exe</OutputType>`, `<TargetFramework>net10.0</TargetFramework>`,
+and no `UseWPF` line at all. Four differences, each one meaningful:
 `OutputType` is `WinExe` instead of `Exe` — a Windows GUI executable, which
 launches without ever attaching a visible console/terminal window, versus a
 plain console executable, which always has one. `TargetFramework` ends in
 `-windows` — this project can now use Windows-only APIs (like WPF itself)
-that a plain `net9.0` project is blocked from referencing at all, by design,
+that a plain `net10.0` project is blocked from referencing at all, by design,
 so a cross-platform console project can never accidentally depend on a
-Windows-only type. `UseWPF` turns on the WPF-specific build tooling that
-compiles `.xaml` files (covered next) into part of the program.
+Windows-only type. `ImplicitUsings` — (first appearance) — when `enable`,
+the compiler silently adds a small, fixed set of the most common `using`
+statements (`System`, `System.Collections.Generic`, `System.Linq`, and a
+handful more, different per project type) to every file in the project,
+without you writing them — this is why code you type from this lesson
+onward can call things like `Console.WriteLine` or use `List<T>` with no
+`using System;` line visibly sitting at the top of the file. It's a project-
+wide setting, not something any single `.cs` file controls, and it's on by
+default in every template `dotnet new` generates today. `UseWPF` turns on
+the WPF-specific build tooling that compiles `.xaml` files (covered next)
+into part of the program.
 
 **`App.xaml` / `App.xaml.cs`** — together, these define the **application**
 as a whole, as opposed to any one window. `App.xaml` declares
@@ -660,6 +747,33 @@ setup) and is paired with `App.xaml` by a shared class name.
 next unit explains, describing what's inside this window. `MainWindow.xaml.cs`
 is that window's own code-behind — C#, not XAML, handling clicks and other
 logic for this specific window.
+
+### Mechanical Walkthrough
+
+- `<OutputType>WinExe</OutputType>` — **first appearance**, contrasted
+  against the console template's `Exe`. Produces a Windows GUI
+  executable — one that launches with no visible console/terminal
+  window attached.
+- `<TargetFramework>net10.0-windows</TargetFramework>` — **first
+  appearance of the `-windows` suffix.** Unlocks Windows-only APIs
+  (WPF itself among them); a plain `net10.0` target is blocked from
+  referencing them at all, by design.
+- `<ImplicitUsings>enable</ImplicitUsings>` — **first appearance.**
+  The compiler silently adds a small, fixed set of common `using`
+  statements to every file, project-wide — why code in this curriculum
+  can call `Console.WriteLine` or use `List<T>` with no visible
+  `using System;` line.
+- `<UseWPF>true</UseWPF>` — **first appearance.** Turns on the
+  WPF-specific build tooling that compiles `.xaml` files into part of
+  the program — without this, `.xaml` files in the project wouldn't
+  build at all.
+- `App.xaml` / `App.xaml.cs` — **first appearance.** Application-wide
+  concerns (shared resources, which window opens first via
+  `StartupUri`) paired with C# code-behind for startup logic —
+  distinct from any one window.
+- `MainWindow.xaml` / `MainWindow.xaml.cs` — **first appearance.** The
+  first real window: declarative XAML markup paired with its own C#
+  code-behind for that window's specific logic.
 
 ### CS Lens
 
@@ -697,8 +811,7 @@ and nothing inside it. You need to actually put something on screen — text
 that says Pocket Inventory is running — and to do that you need to
 understand what the markup language inside this file actually is.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 The scaffolded `MainWindow.xaml` contains a `Grid` element with nothing
 inside it:
 
@@ -771,8 +884,7 @@ text. Everything else in the file — the `Window` tag's attributes, the
 otherwise-empty `Grid` — is unchanged from the template; the `Grid` now has
 one child instead of zero.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 Every distinct element in the new line, in order:
 
 1. `<TextBlock ... />` — (first appearance) instantiates
@@ -901,6 +1013,21 @@ snapshot. `-m "..."` supplies the commit message inline. This message states
 running — rather than just "add files," which git's own diff would already
 tell a reader.
 
+### Mechanical Walkthrough
+
+- `git init` — **first appearance.** Creates a hidden `.git` folder in
+  the current directory — an empty repository, no history yet, ready
+  to start tracking changes from this exact point forward.
+- `git add .` — **first appearance.** Moves every file in the current
+  folder and below from "modified" (git sees it changed, isn't
+  tracking it for the next snapshot yet) to "staged" (included in the
+  next commit). The `.` means "everything here," as opposed to naming
+  individual files.
+- `git commit -m "..."` — **first appearance.** Permanently records
+  everything currently staged as one named snapshot in the project's
+  history. `-m` supplies the message inline rather than opening an
+  editor.
+
 ### SE Lens
 
 Why does a commit message matter if git already tracks every changed line?
@@ -918,8 +1045,7 @@ explains the format itself; every later commit just uses it.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 Start to finish: you installed the .NET SDK (Concept Unit 2), which gave you
 `dotnet`, the compiler, and the CLR. You proved, with real running code, that
 C#'s compiler rejects an entire broken program before executing any of it
@@ -934,10 +1060,10 @@ to put real, visible text on screen (Unit 7) — a working, visible result,
 which Agile Delivery requires of every lesson from here on. Finally, you put
 all of it under version control with a first real commit (Unit 8).
 
-### What breaks without this
-
+### What Breaks Without This
 Delete the `TargetFramework` line's `-windows` suffix from `PocketInventory.csproj`
-(make it just `net9.0`) and run `dotnet build`. Real, representative failure:
+(make it just `net10.0`, or whatever number your own file actually shows)
+and run `dotnet build`. Real, representative failure:
 the WPF-specific types the project depends on (`Window`, `TextBlock`, and
 everything else) are Windows-only APIs, and a `TargetFramework` without
 `-windows` blocks a project from referencing them at all — you'll get a
@@ -960,8 +1086,7 @@ is the direct, hands-on proof behind Concept Unit 6's claim that
   Compare it, line by line, against Concept Unit 3's version — later
   lessons will explain any difference you find as soon as it's relevant.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `dotnet --version` runs successfully on your machine.
 - [ ] You ran the Concept Unit 1 Python example and the Concept Unit 3 C#
       example yourself and can state, in your own words, the difference

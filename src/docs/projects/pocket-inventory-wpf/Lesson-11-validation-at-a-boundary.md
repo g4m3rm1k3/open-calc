@@ -46,7 +46,7 @@ cd lab-whitespace
 Replace `Program.cs`:
 
 ```csharp
-string[] inputs = { "Widget", "", "   ", null };
+string?[] inputs = { "Widget", "", "   ", null };
 
 foreach (string? input in inputs)
 {
@@ -55,19 +55,37 @@ foreach (string? input in inputs)
 }
 ```
 
+`string?[]`, not `string[]` — **first appearance of a nullable array
+element type.** The array holds `null` as one of its four elements, and
+C#'s compiler checks that against the *declared* element type: `string[]`
+means "every element is a real string, never `null`," so a `null`
+literal inside the initializer would be a real compile-time warning
+(`CS8625`) against that promise. `string?[]` states the actual truth —
+"some elements might be `null`" — matching the `string? input` the
+`foreach` below already declares for exactly the same reason.
+
 Run it:
 
 ```bash
 dotnet run
 ```
 
-Real output:
+Real output — verified this session:
 
 ```text
 'Widget' -> blank: False
 '' -> blank: True
 '   ' -> blank: True
 '' -> blank: True
+```
+
+Four iterations, one check per element, concrete values:
+
+```
+Iteration 1: input = "Widget" → isBlank = False
+Iteration 2: input = ""       → isBlank = True
+Iteration 3: input = "   "    → isBlank = True
+Iteration 4: input = null     → isBlank = True
 ```
 
 *What this proves:* `string.IsNullOrWhiteSpace(input)` — (first
@@ -86,6 +104,19 @@ immediately).
 
 Delete the `lab-whitespace` folder. `string.IsNullOrWhiteSpace` is the
 real check `InventoryItem`'s validation logic uses next.
+
+### Mechanical Walkthrough
+
+- `string?[] inputs = { "Widget", "", "   ", null };` — **reappearing**
+  nullable-array element type (this unit's own opening bullet, above).
+- `string.IsNullOrWhiteSpace(input)` — **first appearance.** A
+  `static` method (Lesson 0's meaning: called on the `string` type
+  itself) that returns `true` for `null`, `""`, or a
+  whitespace-only string — three cases, one check.
+- `$"'{input}'"` with `input = null` — **first appearance of this
+  specific behavior.** `null` interpolates as empty text rather than
+  crashing — contrast against `input.Trim()`, which would throw
+  immediately on a `null` `input`.
 
 ### CS Lens
 
@@ -189,6 +220,25 @@ no parameter at all.
 
 Delete the `lab-indexer` folder, `Cabinet`. The real validation
 interface uses an indexer with this exact shape, read-only, next.
+
+### Mechanical Walkthrough
+
+- `public string this[string drawerName] { get; set; }` — **first
+  appearance of an indexer.** A member literally named `this`, taking a
+  parameter in `[...]`, letting instances be indexed with square
+  brackets — the same `get`/`set` shape as an ordinary property
+  (Lesson 6/7), just parameterized.
+- `drawers.TryGetValue(drawerName, out string? contents)` — **first
+  appearance.** Looks up `drawerName` in the dictionary, returning
+  `true`/`false` for found/not-found while also handing back the value
+  (if any) through the `out` parameter — one call doing what a
+  separate "does it exist" check plus a separate lookup would otherwise
+  need two.
+- `cabinet["top"]` (read) — **first appearance of calling an
+  indexer's `get`.** `cabinet["top"] = "Screwdrivers"` (write) — **first
+  appearance of calling an indexer's `set`.** Both use the exact
+  `object[key]` syntax a `Dictionary` or array would, even though
+  `Cabinet` is neither.
 
 ### CS Lens
 
@@ -584,6 +634,28 @@ someone found a way to click "Add" without the visual check having run
   simpler than manually clearing `NewItemDraft.Name` back to empty, and
   correctly resets any future per-field draft state (Epic 3 will add
   more) all at once.
+
+### SE Lens
+
+**The `TextBox`'s binding already shows a red error border on blank
+input — why does `AddButton_Click` also need its own
+`IsNullOrWhiteSpace` check? Isn't the visual validation enough?** The
+red border is real feedback, but it's purely visual: nothing about
+`ValidatesOnDataErrors=True` stops a `Click` handler from running.
+Nothing in WPF's binding system disables the `Button` itself just
+because a bound `TextBox` is currently invalid (that's a real, separate
+feature — `Binding.ValidatesOnDataErrors` plus a `MultiBinding`-driven
+`IsEnabled`, not built here) — a user could still click "Add" between
+keystrokes, or a future code path could call `AddButton_Click`
+programmatically, bypassing the visual check entirely. The `Click`
+handler's own guard is what *actually* guarantees invalid data never
+reaches `Items` or the database — the visual border is UX, immediate
+feedback with no guarantee attached; the handler's check is the real
+boundary enforcement. This is the identical two-layer shape SQLite's
+`NOT NULL` (Lesson 9) added beneath this project's own C#-side checks:
+a friendlier, earlier layer that catches most mistakes visibly, backed
+by a stricter, later layer that cannot be bypassed, each doing a
+genuinely different job.
 
 ### Commands Needed
 

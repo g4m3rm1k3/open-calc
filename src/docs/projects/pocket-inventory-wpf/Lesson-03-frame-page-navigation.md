@@ -38,8 +38,7 @@ and an Add Item screen to both live inside the *same* window's content
 area. Something has to represent "a swappable unit of screen content" that
 is explicitly *not* its own window.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-page
 cd lab-page
@@ -68,11 +67,25 @@ by itself. It requires a **host** — something else, with an actual window
 and an actual `Show()`, willing to display it. `Frame`, the next unit,
 is that host.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-page` folder. `Page` itself is not discarded — it's the
 exact base class Pocket Inventory's home screen and Add Item screen are
 about to be built from.
+
+### Mechanical Walkthrough
+
+- `<Page x:Class="lab_page.SamplePage" ...>` — **first appearance.**
+  Same `x:Class` code-behind pairing as `<Window x:Class="...">`
+  (Lesson 0/1), just a different root element — `Page` describes
+  content meant to be hosted, not a standalone top-level window.
+- `<TextBlock Text="..." FontSize="20" HorizontalAlignment="Center"
+  VerticalAlignment="Center" />` — **reappearing**, ordinary XAML
+  element and attributes already established in earlier lessons.
+- The missing `Show()` method — **first appearance by omission.**
+  `Window` has one; `Page` genuinely does not, at the type level —
+  there is no way to display a `Page` on its own, which is the exact
+  fact this unit exists to establish before `Frame` (next) supplies
+  the missing host.
 
 ### CS Lens
 
@@ -241,8 +254,7 @@ namespace PocketInventory
 }
 ```
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<Frame x:Name="ContentFrame" ...>` — (first appearance) instantiates
    `System.Windows.Controls.Frame`, the control whose entire job is
    hosting and displaying a `Page` — the concrete answer to the previous
@@ -434,8 +446,7 @@ the welcome message, and the class gains its first method beyond the
 constructor: a handler that runs specifically when that button is clicked,
 nothing else.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<Button Content="Add Item" ... />` — (first appearance) instantiates
    `System.Windows.Controls.Button`. `Content` — (first appearance) sets
    what's displayed *inside* the button — named `Content` rather than
@@ -571,6 +582,19 @@ Nothing in this lesson has removed anything from this stack yet — that's
 exactly what Lesson 4's Back button does: pop the top entry off, and
 navigate to it.
 
+### Mechanical Walkthrough
+
+- **back stack** — **first appearance.** The internal structure a
+  `Frame` maintains, recording every `Page` navigated away from, in
+  order.
+- **LIFO** (Last In, First Out) — **first appearance.** The rule
+  governing that structure: the most recently pushed entry is always
+  the first one removed.
+- `Frame.Navigate(...)` pushing the *previous* page, not the new one
+  — **first appearance of this specific mechanic.** Each call records
+  whatever was on screen *before* the navigation, then shows the new
+  destination — the stack holds history, not the current page.
+
 ### CS Lens
 
 **This is a hard concept — the stack data structure — and it recurs
@@ -613,8 +637,7 @@ that calls `GoBack()`, popping this exact stack.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: `MainWindow.xaml`'s `Frame` (Concept Unit 2) loads
 `HomePage.xaml.cs`'s `Page` (Concept Unit 1) via its `Source` attribute the
 moment the window opens, showing the welcome message relocated from
@@ -628,8 +651,7 @@ pushes `HomePage` onto the `Frame`'s own back stack (Concept Unit 4) — a
 structure that already exists and is already correct, waiting for
 Lesson 4 to give it a visible way back.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily delete `NavigationUIVisibility="Hidden"` from the `Frame` in
 `MainWindow.xaml` and run the app. Real, representative result: `Frame`'s
 own default browser-style navigation toolbar (Back/Forward arrows and an
@@ -662,8 +684,7 @@ enabled.
   always constructs and pushes whatever `Page` object you hand it, with no
   awareness of what type it already is.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `MainWindow.xaml`'s content row holds a `Frame`, not a bare
       `TextBlock`; `HomePage.xaml` holds the relocated welcome message.
 - [ ] Clicking "Add Item" swaps in a real `AddItemPage`, in the same

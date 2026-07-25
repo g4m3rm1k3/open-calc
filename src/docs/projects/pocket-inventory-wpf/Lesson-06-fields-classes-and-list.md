@@ -39,8 +39,7 @@ of data, but an inventory item is a *thing*, and "a thing" deserves its
 own name in the program, not just a string sitting in a variable that
 happens to be used for that purpose this one time.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-class
 cd lab-class
@@ -82,8 +81,7 @@ carries. `Console.WriteLine(dog.name)` reads it back. Nothing here is
 possible with a bare `string` alone — `Dog` is a real, new category of
 thing this program now understands.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-class` folder. `Dog` never appears again — the real
 project's type, `InventoryItem`, is built next, in the exact same shape.
 
@@ -112,8 +110,7 @@ namespace PocketInventory
 This is the whole new file — nothing surrounding it yet to show it
 landing inside.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `namespace PocketInventory { ... }` — (hard concept reappearing) the
    same namespace every other file in this project has declared since
    Lesson 0's `MainWindow.xaml.cs` — grouping every type this project
@@ -181,8 +178,7 @@ UI refresh — the exact problem Lesson 7 is about) around what happens
 when `Name` changes. C# has a dedicated language feature for exactly this
 gap.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-property
 cd lab-property
@@ -257,8 +253,7 @@ Rerun — a new line prints every time `cat.Name` is assigned, something a
 bare field could never do, because a field has no code that runs on
 assignment at all; it's just a memory slot.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-property` folder. `Cat` never appears again — the real
 project's `InventoryItem.Name` becomes a property next, using the
 shorthand form this unit's final step introduces.
@@ -295,8 +290,7 @@ namespace PocketInventory
 entirely internal, and entirely about what this class is now *capable*
 of doing later without breaking anyone who already uses `Name`.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `public string Name { get; set; }` — (first appearance of the
    **auto-property** shorthand, hard concept reappearing underneath) this
    single line is compiler sugar for the long-hand version the lab wrote
@@ -356,8 +350,7 @@ Adding items one at a time means this project needs somewhere to keep
 *all* of them, not just the most recent one — and the number of items a
 user will eventually add is completely unknown ahead of time.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-list
 cd lab-list
@@ -393,23 +386,51 @@ Bravo
 Charlie
 ```
 
-*What this proves:* `List<string>` — (first appearance) — is a built-in
-.NET collection type that grows as needed; `.Add(...)` appends one more
-element, and nothing about its size was decided up front the way a C#
-**array** (`string[3]`, not used in this project, but worth naming as the
-fixed-size alternative) would require. `.Count` — (first appearance) —
-reports how many elements are currently stored, always accurate, updated
-automatically by every `Add`. `foreach (string name in names)` — (first
-appearance) — visits every element in order, once each; contrast this
-directly against Python's `for name in names:`, which needs no declared
-type for `name` at all — C#'s `foreach` requires stating `string`
-explicitly, checked by the compiler against what `List<string>` actually
-holds.
+Three `.Add` calls build the list up front; the `foreach` afterward just
+walks the result, in the same order it was built:
 
-### Discard the throwaway example
+```
+Iteration 1: names.Add("Alpha") → names = ["Alpha"]
+Iteration 2: names.Add("Bravo") → names = ["Alpha", "Bravo"]
+Iteration 3: names.Add("Charlie") → names = ["Alpha", "Bravo", "Charlie"]
+```
 
+```
+Iteration 1: name = "Alpha" → printed
+Iteration 2: name = "Bravo" → printed
+Iteration 3: name = "Charlie" → printed
+```
+
+*What this proves:* `List<string>` is a built-in .NET collection type
+that grows as needed; `.Add(...)` appends one more element, and nothing
+about its size was decided up front the way a C# **array**
+(`string[3]`, not used in this project, but worth naming as the
+fixed-size alternative) would require. `.Count` reports how many
+elements are currently stored, always accurate, updated automatically
+by every `Add`. `foreach (string name in names)` visits every element
+in order, once each; contrast this directly against Python's
+`for name in names:`, which needs no declared type for `name` at all —
+C#'s `foreach` requires stating `string` explicitly, checked by the
+compiler against what `List<string>` actually holds.
+
+### Discard the Throwaway Example
 Delete the `lab-list` folder. `List<T>` itself is not discarded — the
 real project uses it, for real, in the very next unit.
+
+### Mechanical Walkthrough
+
+- `List<string> names = new List<string>();` — **first appearance.**
+  `List<T>` is the standard library's generic, growable collection —
+  Lesson 6d's (Java track) `Box<T>` mechanism, already provided.
+  `<string>` fills in what type this specific list holds.
+- `.Add(...)` — **first appearance.** Appends one more element; the
+  list's size grows automatically, with no upfront capacity to decide.
+- `.Count` — **first appearance.** Reports how many elements are
+  currently stored — always accurate, updated by every `Add`.
+- `foreach (string name in names)` — **first appearance.** Visits every
+  element in order, once each. Requires declaring `name`'s type
+  (`string`) explicitly, checked against what `List<string>` actually
+  holds — Python's `for name in names:` needs no such declaration.
 
 ### CS Lens
 
@@ -513,8 +534,7 @@ set for the first time to lay children left-to-right instead of its
 default top-to-bottom) holding the `TextBox` and the styled Add button
 side by side.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<StackPanel ... Orientation="Horizontal">` — (hard concept
    reappearing, new detail) `Orientation` — (first appearance) — an
    enum-backed property (Lesson 0's alignment properties, same category)
@@ -607,8 +627,7 @@ private void AddItemButton_Click(object sender, RoutedEventArgs e)
 }
 ```
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `private List<InventoryItem> items = new List<InventoryItem>();` —
    (hard concept reappearing) this lesson's `List<T>` unit, specialized
    to the real type this project just modeled — declared as a field on
@@ -704,8 +723,7 @@ about removing the one deliberately awkward part of what was just built.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: `InventoryItem` (Concept Unit 1) started as a bare
 field, exactly like the lab's `Dog`, then became a real property
 (Concept Unit 2) — a change invisible to any caller, but one that makes
@@ -719,8 +737,7 @@ from scratch to reflect it, a working but deliberately naive approach
 whose cost was made visible, concretely, by this lesson's own execution
 trace.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily remove just the `ItemListBox.Items.Clear();` line, leaving
 the `foreach` loop that re-adds every item. Run the app and add two
 items. Real, representative failure: `ItemListBox` now shows **four**
@@ -750,8 +767,7 @@ with a genuinely different, wrong-looking failure.
   inside `AddButton_Click`, add three items, and confirm the printed
   count matches this lesson's execution trace exactly.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `InventoryItem.cs` exists with a `Name` property using auto-property
       syntax.
 - [ ] `AddItemPage` has been fully renamed to `InventoryPage`, including

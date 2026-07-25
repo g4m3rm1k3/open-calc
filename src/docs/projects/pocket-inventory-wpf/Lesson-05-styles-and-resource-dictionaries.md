@@ -39,8 +39,7 @@ reference. A real application needs every button of the same *kind* to
 look consistent, and needs that consistency enforced by something other
 than "remembering to copy the same numbers correctly every time."
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-style
 ```
@@ -85,13 +84,11 @@ opts in via `Style="{StaticResource ...}"`. Changing the `Style`'s
 definition, once, changes every element referencing it — the exact DRY
 guarantee direct, per-element attributes can never provide.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-style` folder. `Style` itself is not discarded — it's
 about to define Pocket Inventory's real button and text styling.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<Grid.Resources>` — (first appearance) a property-element (Lesson 2's
    pattern, reused) holding this `Grid`'s own **resources** — named
    values available to anything inside this `Grid`'s subtree.
@@ -209,8 +206,7 @@ generated back in Lesson 0 — it just sat empty. `StartupUri` (also
 generated in Lesson 0, unexplained until relevant, and still not the
 subject of this lesson) is untouched.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<SolidColorBrush x:Key="BrandColorBrush" Color="#2E5945" />` — (first
    appearance) `Background="#2E5945"` from Lesson 2 set a color directly;
    this instantiates a real, named `SolidColorBrush` **object** — WPF
@@ -343,8 +339,7 @@ title, and no per-button `Padding` remain anywhere in this project — every
 one of those values now traces back to exactly one definition, in
 `App.xaml`.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `{StaticResource BrandColorBrush}` — (first appearance, full
    treatment) `StaticResource` is a **markup extension** that resolves,
    once, at the moment the XAML is loaded — it walks the resource lookup
@@ -416,8 +411,7 @@ the next 45 lessons.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: Lesson 2 hardcoded `#2E5945` directly into the header
 `Border`; Lesson 3 and Lesson 4 each hand-typed their own button padding,
 independently, already slightly inconsistent. This lesson's first unit
@@ -432,8 +426,7 @@ referencing element until a matching `x:Key` is found — the exact same
 lexical-scoping shape any nested-function variable lookup uses in any
 language.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily misspell `Style="{StaticResource ToolbarButtonStyle}"` as
 `Style="{StaticResource ToolbarBtnStyle}"` on `BackButton` and run the
 app. Real, representative failure: WPF cannot silently ignore a missing
@@ -462,8 +455,7 @@ an app that refuses to start at all.
   research (or predict, then verify) whether this is a compile error, a
   runtime error, or silently uses one and ignores the other.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `App.xaml` defines `BrandColorBrush`, `HeaderTitleStyle`, and
       `ToolbarButtonStyle`; no hardcoded equivalents remain anywhere in
       `MainWindow.xaml` or `HomePage.xaml`.

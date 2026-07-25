@@ -529,3 +529,46 @@
   outline: 2px dashed #f59e0b !important;
   outline-offset: 2px;
 }
+
+/* ── Lesson markdown lists ───────────────────────────────────────────────── */
+/* Tailwind's base reset strips list-style and spacing from ul/ol/li with
+   nothing restoring it for .md-body, so every bullet/numbered list rendered
+   as an unmarked, unspaced run of text — indistinguishable from a paragraph.
+   Bullets/numbers back, generous spacing, and a hairline separator between
+   items (not after the last one) so a list reads as distinct rows, not one
+   blob. */
+.md-body ul,
+.md-body ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+.md-body ul {
+  list-style: disc outside;
+}
+.md-body ol {
+  list-style: decimal outside;
+}
+.md-body li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .md-body li {
+  border-bottom-color: rgba(226, 232, 240, 0.1);
+}
+.md-body li:last-child {
+  border-bottom: none;
+}
+.md-body li::marker {
+  color: rgb(6, 182, 212);
+}
+/* A list nested inside a list item shouldn't inherit the parent's row
+   separator/padding rhythm — it's a sub-list, not another top-level row. */
+.md-body li > ul,
+.md-body li > ol {
+  margin: 0.5rem 0 0;
+}
+.md-body li > ul > li,
+.md-body li > ol > li {
+  border-bottom: none;
+  padding: 0.25rem 0;
+}

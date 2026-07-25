@@ -157,6 +157,35 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
 3. **Discard the throwaway example.** State plainly that it's deleted and
    will not appear in the project again.
 
+   > **Step ordering, for lessons written from this point forward:**
+   > steps 2-3 (isolate, discard) read better placed *after* steps 4-6
+   > (Project Change, New Code, Updated Project) instead of before them —
+   > see the real project code first, so the isolated lab has something
+   > concrete to explain and relate back to, rather than justifying
+   > itself by abstract foreshadowing alone. When reordered this way, the
+   > isolated lab's own explanation must explicitly reference the real
+   > code just shown ("this is exactly what `X` in the code above is
+   > doing, isolated") — not just teach the concept generically, as if
+   > the reader hadn't just seen it in context. Isolation is still the
+   > point; isolation with a concrete anchor to relate back to is better.
+   > This is a preference for **new** lessons only. Existing lessons
+   > using the original isolate-then-build order are not being revised
+   > to match, and the original order remains fully valid — do not flag
+   > or rewrite them for this reason alone.
+
+   > **Name the concept, for lessons written from this point forward:**
+   > step 2's own instructions above only say to demonstrate the
+   > concept's *behavior* — run it, show output, state what it proves —
+   > without ever requiring the concept's actual *name* to appear
+   > anywhere. Somewhere in this step (naturally, right after the real
+   > output, in the same sentence that states what it proves), say the
+   > name plainly and in bold: "this is called a **lambda expression**,"
+   > not just a description of what it does. A reader should walk away
+   > with a term they could say out loud or search for, not just an
+   > unnamed feel for a pattern. This is a preference for **new** lessons
+   > only, same as the step-ordering note above — existing lessons are
+   > not being revised to add this retroactively.
+
 4. **Project Change.** Before showing the real code, state exactly how it
    lands in the actual project — a _delta_ against the previous lesson's
    end state, never a full project snapshot (that's noise; the whole
@@ -250,6 +279,36 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
 
    The reader must see the actual values a real run produces, not a
    paraphrase of the logic that produces them.
+
+   **A second shape of execution trace: control flow / timing, not
+   changing values.** Some code needs a trace for a different reason —
+   not a loop transforming data, but a sequence of calls where the
+   entire point is *when* each one actually runs relative to the
+   others (a registered callback firing later; a framework invoking an
+   override at a moment the reader doesn't control). There's no
+   tabulate-able value here, only moments, and each one needs real
+   reasoning, not just a position in a list — which means the terse
+   `Iteration N: values` format above is the wrong tool for it. This
+   has failed once already under this schema: an execution trace for
+   exactly this shape was written as full prose sentences wrapped in a
+   code fence, which reads as garbled monospace paragraphs and
+   misrepresents prose-about-code as if it were code or real output.
+   Use a numbered list instead — real markdown, not fenced — one step
+   per statement, the statement itself as an inline code span, followed
+   by prose stating what happens and, where it's the crux, why a reader
+   would expect otherwise. For example:
+
+   1. `doorbell.setCallback(new Chime())` — builds a real `Chime`
+      object, but only *stores* it; nothing calls `onTap()` here.
+   2. `println("Chime registered...")` — prints before any chime
+      sound, proving step 1 didn't already fire it.
+   3. `doorbell.press()` — only now does `Doorbell`'s own code decide
+      to call `callback.onTap()`.
+
+   Never wrap this shape in a code fence. The content is prose that
+   references code, not code itself; a fence misrepresents it as
+   something copy-pasteable or executable, and renders as an
+   unreadable wall of monospace paragraph text.
 
 8. **CS lens.** Name the computational concept this embodies, if any.
    **For a hard concept specifically** (per the Repetition Rule — a
@@ -391,6 +450,12 @@ Read the draft top to bottom and answer honestly:
 - [ ] Does any loop, recursion, or carried-state code have a real
       execution trace — concrete values, step by step — rather than a
       prose paraphrase of what it "generally does"?
+- [ ] Does any timing/control-flow trace (a registered callback firing
+      later, a framework calling an override at an unpredictable
+      moment — no loop, no changing values) use the numbered-list shape
+      instead of the `Iteration N: values` shape? Check specifically for
+      prose sentences wrapped in a code fence — that's this exact
+      failure, and it renders as an unreadable wall of monospace text.
 - [ ] For every hard concept (per the Repetition Rule), does the CS Lens
       name _several_ unrelated real-world recurrences, not just one? A
       single "this is like X" sentence satisfies the Contract's weaker

@@ -39,8 +39,7 @@ outside `InventoryItem` has any way to know when `Name` changes; whatever
 last read it could easily be showing stale, out-of-date information with
 no way to notice.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-notify
 cd lab-notify
@@ -96,8 +95,7 @@ knowing the listener" shape from Lesson 3's `Click` event and Lesson 4's
 `DoorOpened` event, now applied to a **property changing**, rather than a
 button being clicked.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-notify` folder. `Thermometer` never appears again — the
 real project applies this exact mechanism to `InventoryItem.Name` next.
 
@@ -166,8 +164,7 @@ auto-property into the long-hand form with real logic inside `set`, and
 `item.Name = "..."` call, including `InventoryPage`'s `AddButton_Click`
 from Lesson 6, keeps compiling and working exactly as before.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `using System.ComponentModel;` — (hard concept reappearing, Lesson 1's
    `using System;`) `INotifyPropertyChanged` and `PropertyChangedEventArgs`
    both live in this namespace.
@@ -291,8 +288,7 @@ the list at all" — a completely different kind of change, and exactly
 the one `AddButton_Click` currently handles by brute-force rebuilding
 `ItemListBox` from scratch.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-observable
 cd lab-observable
@@ -327,20 +323,43 @@ Collection changed: Add
 Collection changed: Remove
 ```
 
-*What this proves:* `ObservableCollection<T>` — (first appearance) — is a
-`List<T>`-like collection (every method from Lesson 6's `List<T>` — `Add`,
-`Remove`, `Count`, `foreach` — works identically) with one addition: it
-raises a `CollectionChanged` event automatically, every single time its
-contents actually change, with no code inside `Add`/`Remove` themselves
-needing to remember to announce anything — the announcing is built into
-the collection type itself, unlike `InventoryItem`, which had to be
+Three mutations, three separate events, each with a different `e.Action`:
+
+```
+Iteration 1: names.Add("Alpha") → names = ["Alpha"], CollectionChanged fires, e.Action = Add
+Iteration 2: names.Add("Bravo") → names = ["Alpha", "Bravo"], CollectionChanged fires, e.Action = Add
+Iteration 3: names.Remove("Alpha") → names = ["Bravo"], CollectionChanged fires, e.Action = Remove
+```
+
+*What this proves:* `ObservableCollection<T>` is a `List<T>`-like
+collection (every method from Lesson 6's `List<T>` — `Add`, `Remove`,
+`Count`, `foreach` — works identically) with one addition: it raises a
+`CollectionChanged` event automatically, every single time its contents
+actually change, with no code inside `Add`/`Remove` themselves needing
+to remember to announce anything — the announcing is built into the
+collection type itself, unlike `InventoryItem`, which had to be
 hand-written to announce its own changes in the previous unit.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-observable` folder. `ObservableCollection<T>` itself is
 not discarded — it replaces `List<InventoryItem>` in the real project,
 in the next unit.
+
+### Mechanical Walkthrough
+
+- `ObservableCollection<string> names = new ObservableCollection<string>();`
+  — **first appearance.** Same generic-collection shape as `List<T>`
+  (Lesson 6), plus automatic change notification.
+- `names.CollectionChanged += (sender, e) => ...` — **reappearing**
+  `+=` event subscription (Lesson 4's `DoorOpened` lab), now
+  subscribing to an event the .NET library itself raises, rather than
+  one this project declared by hand.
+- `e.Action` — **first appearance.** Describes *what kind* of change
+  just happened (`Add`, `Remove`, and others not used in this lab) —
+  passed automatically as part of the event.
+- `.Add(...)` / `.Remove(...)` — **reappearing**, identical
+  `List<T>` methods (Lesson 6) — the difference here is invisible at
+  the call site: each one also triggers `CollectionChanged` internally.
 
 ### CS Lens
 
@@ -390,8 +409,7 @@ to hear them — right now, the only way anything has ever appeared inside
 Something has to connect the two, declaratively, so the connection itself
 survives without any code-behind maintaining it by hand.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-binding
 ```
@@ -452,8 +470,7 @@ subscribes to `Names.CollectionChanged` **internally, automatically** —
 you never write that subscription yourself; it's part of what
 `ItemsSource="{Binding ...}"` sets up on your behalf.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-binding` folder. `{Binding}`, `DataContext`, and
 `ItemsSource` are not discarded — they connect the real project's
 `ObservableCollection<InventoryItem>` to `InventoryPage`'s real `ListBox`
@@ -559,8 +576,7 @@ Every line Lesson 6 wrote to manually clear and rebuild `ItemListBox` —
 `AddButton_Click` now does exactly two things: construct a new item, and
 clear the input box. It never mentions `ItemListBox` at all.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `public ObservableCollection<InventoryItem> Items { get; } = new ObservableCollection<InventoryItem>();`
    — (hard concept reappearing, new detail) a **read-only auto-property**
    — `{ get; }` with no `set` at all — (first appearance) — meaning
@@ -670,8 +686,7 @@ becomes visible on screen.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: `InventoryItem` (Concept Unit 1) now implements
 `INotifyPropertyChanged`, raising `PropertyChanged` inside `Name`'s
 `set` — infrastructure this lesson builds but doesn't yet have a visible
@@ -686,8 +701,7 @@ against. The result: `AddButton_Click` shrank from Lesson 6's eight-line
 manual-rebuild version to two lines that never mention `ItemListBox` at
 all, and the screen still updates correctly, every time, automatically.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily remove `DataContext = this;` from `InventoryPage`'s
 constructor, leaving `ItemsSource="{Binding Items}"` in the XAML
 untouched. Run the app and click Add. Real, representative failure:
@@ -720,8 +734,7 @@ errors are the actual place to look for it.
   exactly that row live, and connect this to `CollectionChanged`'s
   `Action: Remove` case from this lesson's second unit's lab output.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `InventoryItem` implements `INotifyPropertyChanged` correctly.
 - [ ] `InventoryPage` uses `ObservableCollection<InventoryItem>`, bound
       via `{Binding Items}`, with no manual `ItemListBox` manipulation

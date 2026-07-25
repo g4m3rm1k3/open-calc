@@ -85,6 +85,16 @@ Row 2: Pear
 Row 3: Fig
 ```
 
+`reader.Read()` returning `false` is what actually stops the loop —
+worth seeing as its own step, not folded into "it prints the rows":
+
+```
+Iteration 1: reader.Read() → true, id = 1, name = "Apple" → printed
+Iteration 2: reader.Read() → true, id = 2, name = "Pear" → printed
+Iteration 3: reader.Read() → true, id = 3, name = "Fig" → printed
+Iteration 4: reader.Read() → false → loop ends, no fourth row printed
+```
+
 Run it a **second** time, without deleting `lab.db`: the `INSERT` adds
 three *more* rows on top of the existing ones, and the output now shows
 six rows, `Id` 1 through 6 — a real, visible reminder that nothing about
@@ -92,40 +102,40 @@ this lab guards against re-inserting the same data twice; Lesson 9's
 project code never had this problem because it only ever inserted in
 response to a real, one-time button click, not a script re-run.
 
-*What this proves:* `.ExecuteReader()` — (first appearance) — runs a
-query that returns rows, and hands back a `SqliteDataReader` rather than
-a single value or nothing at all. `reader.Read()` — (first appearance)
-— advances to the next available row and returns `true`, or `false` once
-there are no more — this is the loop condition itself, and it must be
-called *before* reading any column on the first row too; there is no
-"current row" until the first `Read()` succeeds. `reader.GetInt32(0)` /
-`reader.GetString(1)` — (first appearance) — read a specific column's
-value from the *current* row, by zero-based position matching the
-`SELECT` clause's own column order (`Id` first, so position `0`;
-`Name` second, position `1`) — not by column name, and not automatically
-type-converted: asking for `GetInt32` on a column that's actually text
-would throw, which is why the method name itself commits to a type.
-
-### Execution Trace
-
-```
-reader.Read() → true,  current row: Id=1, Name="Apple"
-    GetInt32(0) → 1,  GetString(1) → "Apple"
-    prints "Row 1: Apple"
-reader.Read() → true,  current row: Id=2, Name="Pear"
-    GetInt32(0) → 2,  GetString(1) → "Pear"
-    prints "Row 2: Pear"
-reader.Read() → true,  current row: Id=3, Name="Fig"
-    GetInt32(0) → 3,  GetString(1) → "Fig"
-    prints "Row 3: Fig"
-reader.Read() → false, loop ends
-```
+*What this proves:* `.ExecuteReader()` runs a query that returns rows,
+and hands back a `SqliteDataReader` rather than a single value or
+nothing at all. `reader.Read()` advances to the next available row and
+returns `true`, or `false` once there are no more — this is the loop
+condition itself, and it must be called *before* reading any column on
+the first row too; there is no "current row" until the first `Read()`
+succeeds. `reader.GetInt32(0)` / `reader.GetString(1)` read a specific
+column's value from the *current* row, by zero-based position matching
+the `SELECT` clause's own column order (`Id` first, so position `0`;
+`Name` second, position `1`) — not by column name, and not
+automatically type-converted: asking for `GetInt32` on a column that's
+actually text would throw, which is why the method name itself commits
+to a type.
 
 ### Discard the Throwaway Example
 
 Delete the `lab-reader` folder, including `lab.db`. `SqliteDataReader`
 itself is not discarded — it reads Pocket Inventory's real saved items
 back for real, next.
+
+### Mechanical Walkthrough
+
+- `selectFruits.ExecuteReader()` — **first appearance.** Runs a query
+  that returns rows, and hands back a `SqliteDataReader` rather than a
+  single value or nothing at all — contrasted against `.ExecuteNonQuery()`
+  (Lesson 9), which returns no rows.
+- `while (reader.Read())` — **first appearance.** `Read()` advances to
+  the next available row, returning `true`, or `false` once there are
+  no more — this is the loop condition itself, and there is no
+  "current row" until the first `Read()` succeeds.
+- `reader.GetInt32(0)` / `reader.GetString(1)` — **first appearance.**
+  Read a specific column's value from the *current* row, by zero-based
+  position matching the `SELECT` clause's own column order — not by
+  column name, and not automatically type-converted.
 
 ### CS Lens
 
@@ -384,6 +394,24 @@ how to work with.
   watches; each `Add` here fires `CollectionChanged` exactly like
   Lesson 7's manual button-driven adds do, which is why the `ListBox`
   correctly shows every loaded item with zero additional binding code.
+
+### SE Lens
+
+**Why does `LoadItemsFromDatabase()` return a plain `List<InventoryItem>`
+and make the constructor loop over it, instead of just having it build
+and return the real `ObservableCollection<InventoryItem>` directly, one
+line shorter?** Because `LoadItemsFromDatabase()`'s actual job —
+reading rows out of SQLite and turning each into an `InventoryItem` —
+has nothing to do with `ObservableCollection`'s job of announcing
+changes to a UI. Returning `List<T>` keeps the method honest about what
+it does and doesn't know: it has no awareness that its caller happens
+to be a WPF page's constructor, which means it could be called from a
+unit test, a console tool, or a future second screen with its own
+separate `ObservableCollection`, unchanged. Baking `ObservableCollection`
+into the method's return type would couple a pure data-loading
+operation to one specific UI framework's binding mechanism, for a
+savings of exactly one `foreach` loop — a bad trade the moment this
+method needs to be reused or tested anywhere the UI doesn't exist yet.
 
 ### Commands Needed
 

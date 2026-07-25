@@ -37,8 +37,7 @@ happens anywhere in the app — not just once, at startup. That requires
 C# code that runs in response to an event, but subscribes to it from
 `MainWindow.xaml.cs`, not from a XAML attribute.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new console -o lab-events
 cd lab-events
@@ -89,11 +88,31 @@ subscriber exists, otherwise do nothing and don't crash"). Nothing about
 actually do — the exact same "notify without knowing who's listening"
 shape as Lesson 3's `Click` event, just written from C# instead of XAML.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-events` folder. `+=` event subscription itself is not
 discarded — it's the exact mechanism the next unit uses to listen for
 every navigation `Frame` performs.
+
+### Mechanical Walkthrough
+
+- `public event Action? DoorOpened;` — **first appearance.** Declares
+  `DoorOpened` as an event — something other code subscribes to, not a
+  value to read directly.
+- `alarm.DoorOpened += () => Console.WriteLine(...)` — **first
+  appearance of `+=` on an event.** Not numeric addition — "run this
+  code too, whenever `DoorOpened` fires," in addition to any other
+  existing subscriber. `() => ...` is a lambda (reappearing, Lesson 3's
+  `Click` handler used the same shape).
+- `DoorOpened?.Invoke()` — **first appearance.** What actually fires
+  the event, from inside `DoorAlarm` itself. `?.` here means "only
+  invoke if at least one subscriber exists" — full nullable-operator
+  treatment comes in Lesson 14; for now, it's just what prevents a
+  crash when nothing has subscribed yet.
+- `alarm.Open()` — **reappearing** method call (basic) — triggers the
+  `Console.WriteLine` inside `Open()` first, then `DoorOpened?.Invoke()`
+  second, which is why "Door physically opened." prints before "Alarm:
+  someone opened the door!" — the subscriber runs exactly where
+  `Invoke()` sits in `Open()`'s own code, not before or after it.
 
 ### CS Lens
 
@@ -218,8 +237,7 @@ namespace PocketInventory
 }
 ```
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `IsEnabled="False"` — (first appearance) a property every WPF control
    has; `False` means the button renders visually dimmed and cannot be
    clicked at all — set here as the *starting* state, matching the real
@@ -345,8 +363,7 @@ namespace PocketInventory
 navigation — but only ever does anything at all when going back is
 genuinely possible.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `if (ContentFrame.CanGoBack)` — (hard concept reappearing) checking the
    same property the previous unit already used, here as a **guard**
    before acting rather than to set another property. Worth noting
@@ -438,8 +455,7 @@ code, because the mechanism lives entirely on `MainWindow`'s single
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace, extending Lesson 3's: `MainWindow`'s constructor
 subscribes to `ContentFrame.Navigated` using `+=` (Concept Unit 1) —
 imperative C# subscription, chosen specifically because this behavior
@@ -453,8 +469,7 @@ Clicking the button, once enabled, calls `ContentFrame.GoBack()`
 project's back stack has had, correctly, since the very first
 `Navigate(...)` call in Lesson 3.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily remove the `ContentFrame.Navigated += ContentFrame_Navigated;`
 line from `MainWindow`'s constructor, leaving `BackButton_Click` and the
 `IsEnabled="False"` starting state untouched. Run the app and click "Add
@@ -487,8 +502,7 @@ tracking state correctly again.
   Add Item → Home (via Back) → Add Item again. Then verify your drawing
   against the app's real behavior.
 
-### Definition of done
-
+### Definition of Done
 - [ ] The header shows a Back button, disabled on launch.
 - [ ] Clicking "Add Item" enables it immediately; clicking it returns to
       Home and disables it again.

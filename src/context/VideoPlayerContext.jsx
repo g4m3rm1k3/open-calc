@@ -45,6 +45,14 @@ export function VideoPlayerProvider({ children }) {
     setIsMinimized(false);
   }, []);
 
+  // Unlike selectVideo, this never forces the player open or expanded — it's
+  // used to line up the right video (e.g. background music) for whenever
+  // the player is next opened, without popping it up just because the route
+  // changed underneath the user.
+  const setBackgroundVideo = useCallback((videoData) => {
+    setCurrentVideo(videoData);
+  }, []);
+
   const togglePin = useCallback((vidId) => {
     setPinnedVideos((prev) => {
       let updated;
@@ -143,6 +151,7 @@ export function VideoPlayerProvider({ children }) {
     closePlayer,
     toggleMinimize,
     selectVideo,
+    setBackgroundVideo,
     setLessonId,
     togglePin,
     pinnedVideos,
@@ -150,7 +159,7 @@ export function VideoPlayerProvider({ children }) {
   }), [
     isOpen, isMinimized, currentVideo, lessonId, searchQuery, setSearchQuery,
     customVideos, openPlayer, closePlayer, toggleMinimize, selectVideo,
-    setLessonId, togglePin, pinnedVideos, addCustomVideo,
+    setBackgroundVideo, setLessonId, togglePin, pinnedVideos, addCustomVideo,
   ]);
 
   return (

@@ -38,8 +38,7 @@ what size the window is resized to. `StackPanel` cannot express "give this
 one region all the remaining space" at all; `Grid` can, but only once you
 tell it how many rows exist and how each one should be sized.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-grid-rows
 ```
@@ -81,8 +80,7 @@ purpose — the next unit is entirely about what this line means) is what
 told the `Grid` which row each child belongs to; nothing about a `Border`'s
 own declaration order in the file determined that on its own.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-grid-rows` folder. `RowDefinition` and `*` sizing are not
 discarded — they're about to build Pocket Inventory's real header/content/
 footer layout.
@@ -129,8 +127,7 @@ Lesson 1's `StackPanel` and its three `TextBlock`s are gone entirely — the
 is intentionally a visibly empty window for one step; the next two units
 put real content back, row by row.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<Grid.RowDefinitions>` — (first appearance) a **property element**, not
    an attribute this time — some XAML properties are too complex to fit as
    `name="value"` text (a *list* of rows can't be one attribute string), so
@@ -193,8 +190,7 @@ class from `Grid`, and nothing about `Border` itself has a property called
 `Row`. So what is `Grid.Row="1"` actually doing, and why does it compile at
 all?
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 Create a throwaway console project — this concept has a real C# mechanism
 underneath the XAML syntax, worth seeing in plain code first:
 
@@ -251,8 +247,7 @@ this child belong to," and XAML's `Grid.Row="..."` syntax is a compiler-
 recognized shorthand for calling `Grid`'s own `SetRow(theBorder, 1)`
 underneath.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-attached` folder and the hand-written `GridRowRegistry` —
 real WPF's actual mechanism (`DependencyProperty`, a genuine .NET feature
 this lab only imitates with a plain dictionary) is more capable than this,
@@ -316,8 +311,7 @@ has. Row 2 holds the gray tagline. Row 0 — the header — is still empty;
 the next unit fills it in, and it needs both rows *and* columns to hold
 what a real header needs.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `Grid.Row="1"` — (hard concept reappearing from the lab, first real use)
    an **attached property**: `Row` is not a property `TextBlock` declares —
    it's a property `Grid` declares, that any child of a `Grid` can carry,
@@ -470,8 +464,7 @@ inner `Grid`'s two columns are completely separate layout systems that
 happen to be nested inside one another; changing the inner `Grid`'s columns
 has no effect on the outer `Grid`'s rows, and vice versa.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<Grid Grid.Row="0" ...>` — (hard concepts reappearing, combined for the
    first time) this inner `Grid` is itself a child of the outer `Grid`, so
    it carries `Grid.Row="0"` exactly the way the `TextBlock`s in the
@@ -587,6 +580,24 @@ is running) use for this structure. Every property this lesson set
 exact tree, and every layout decision (`RowDefinition`, `ColumnDefinition`)
 is a rule one specific `Grid` node applies only to its own direct children.
 
+### Mechanical Walkthrough
+
+No code fence to enumerate — this unit names vocabulary, not syntax:
+
+- **node** — **first appearance.** One element in the tree; every XAML
+  element you've placed (`Window`, `Grid`, `Border`, `TextBlock`) is a
+  node.
+- **root** — **first appearance.** The one node with no parent —
+  `Window`, here — every other node is reachable from it.
+- **parent** / **children** — **first appearance.** Every node except
+  the root has exactly one parent; a node can have any number of
+  children, including zero.
+- **leaf** — **first appearance.** A node with no children — `Border`
+  and every `TextBlock` in this lesson's tree.
+- **visual tree** — **first appearance of WPF's own name for this
+  structure.** Not this lesson's analogy — the literal term WPF's own
+  tooling (Live Visual Tree) uses for it.
+
 ### CS Lens
 
 **This is a hard concept — tree data structures — and it recurs
@@ -649,8 +660,7 @@ carries its descendants" property this unit's SE Lens just named.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: the outer `Grid`'s three `RowDefinition`s (Concept Unit
 1) divide the window into header, content, and footer bands, sized `Auto`,
 `*`, and `Auto`. `Grid.Row` attached properties (Concept Unit 2) tell each
@@ -664,8 +674,7 @@ single tree rooted at `Window` (Concept Unit 4), and every layout decision
 this lesson made is a rule that applies to exactly one `Grid` node's own
 direct children, never further.
 
-### What breaks without this
-
+### What Breaks Without This
 Delete just the `<Grid.ColumnDefinitions>` block from the inner header
 `Grid` (leave the `Border` and `TextBlock` with their `Grid.Column="0"`/
 `Grid.Column="1"` attributes untouched) and run the app. Real,
@@ -697,8 +706,7 @@ useful.
   `TextBlock` — rendered as a real, browsable tree, matching the diagram
   this lesson drew by hand.
 
-### Definition of done
-
+### Definition of Done
 - [ ] `MainWindow.xaml`'s outer `Grid` has three rows (`Auto`, `*`, `Auto`)
       holding a nested header `Grid`, the welcome message, and the footer,
       matching the Updated Project shown above.

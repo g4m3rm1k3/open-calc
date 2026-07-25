@@ -19,11 +19,14 @@ import {
   Compass,
   Sidebar as SidebarIcon,
   GripVertical,
+  Maximize2,
+  Music,
 } from "lucide-react";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
 import { selectVideosByKeywords, VIDEO_MAP, VIDEO_LIBRARY } from "../../context/videoSelector.js";
 import { CURRICULUM, ALL_LESSONS } from "../../courses/index.js";
 import { getVideos } from "../../courses/courseLoader.js";
+import { CODING_MUSIC_PLAYLIST } from "../../data/codingMusicPlaylist.js";
 
 // lesson.chapterNumber is a composite key like "calculus-1" — pull the
 // trailing chapter number back out to compare against a video's `chapter`.
@@ -32,7 +35,7 @@ function chapterNumOf(lesson) {
   return m ? parseInt(m[1], 10) : null;
 }
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const courseTitles = {
   precalc: "Pre-Calculus",
@@ -52,6 +55,7 @@ const courseIcons = {
 
 export default function FloatingVideoPlayer() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dragControls = useDragControls();
   const constraintsRef = useRef(null);
   const playerRef = useRef(null);
@@ -66,12 +70,30 @@ export default function FloatingVideoPlayer() {
     closePlayer,
     toggleMinimize,
     selectVideo,
+    setBackgroundVideo,
     customVideos,
     addCustomVideo,
     setLessonId,
     pinnedVideos,
     togglePin,
   } = useVideoPlayer();
+
+  // "Not in a course" = not on a lesson's own route (chapter/:id/:slug).
+  // ChapterPage overview (chapter/:id with no slug) doesn't count as "in a
+  // lesson" either — there's no tutorial video to show for it.
+  const isLessonRoute = /^\/chapter\/[^/]+\/[^/]+/.test(location.pathname);
+
+  // The moment you leave a lesson route, line up background music instead
+  // of leaving whatever tutorial you were last watching sitting there stale.
+  // Deliberately keyed only on isLessonRoute (not on every route change) so
+  // manually picking a different video while already off a lesson route
+  // isn't immediately overridden back to music.
+  useEffect(() => {
+    if (isLessonRoute) return;
+    if (!currentVideo?.isMusic) {
+      setBackgroundVideo(CODING_MUSIC_PLAYLIST[0]);
+    }
+  }, [isLessonRoute]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [customTitle, setCustomTitle] = useState("");
@@ -356,7 +378,15 @@ export default function FloatingVideoPlayer() {
     );
   };
 
-  if (!isOpen || isMinimized) return null;
+  if (!isOpen) return null;
+
+  // Minimized mode never unmounts the iframe below — it just shrinks the
+  // same persistent motion.div to a small corner box and hides the sidebar/
+  // resize-handle chrome around it. Swapping to a *different* element on
+  // minimize (as this used to do by returning null) would remount the
+  // YouTube iframe on every toggle and restart whatever's playing — the
+  // entire point of "minimize" is that it keeps playing in the background.
+  const miniSize = { width: 260, height: 172 };
 
   return (
     <>
@@ -369,7 +399,7 @@ export default function FloatingVideoPlayer() {
       <AnimatePresence mode="wait">
         <motion.div
           key="expanded-player"
-          drag={!isMobile}
+          drag={!isMobile && !isMinimized}
           dragControls={dragControls}
           dragListener={false}
           dragMomentum={false}
@@ -394,39 +424,43 @@ export default function FloatingVideoPlayer() {
           exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
           ref={playerRef}
           style={
-            isMobile
-              ? { width: "100%", height: "100%", top: 0, left: 0 }
-              : { width, height }
+            isMinimized
+              ? { ...miniSize, top: "auto", left: "auto", bottom: 16, right: 16 }
+              : isMobile
+                ? { width: "100%", height: "100%", top: 0, left: 0 }
+                : { width, height }
           }
-          className={`fixed top-0 left-0 z-[9998] shadow-[0_0_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_150px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group/player ${
-            isMobile
+          className={`fixed z-[9998] shadow-[0_0_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_150px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group/player ${
+            isMinimized ? "" : "top-0 left-0"
+          } ${
+            isMobile && !isMinimized
               ? "bg-slate-950 rounded-none"
-              : "bg-white/80 dark:bg-slate-950/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 dark:border-white/5 ring-1 ring-black/5"
+              : `bg-white/80 dark:bg-slate-950/60 backdrop-blur-3xl border border-white/20 dark:border-white/5 ring-1 ring-black/5 ${isMinimized ? "rounded-2xl" : "rounded-[2.5rem]"}`
           }`}
         >
           {/* Header - Holographic Prism Control */}
           <div
-            onPointerDown={(e) => dragControls.start(e)}
-            className={`flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-white/10 select-none transition-all duration-500 transform ${
-              !isMobile && currentVideo
+            onPointerDown={(e) => !isMinimized && dragControls.start(e)}
+            className={`flex-shrink-0 flex items-center justify-between border-b border-white/10 select-none transition-all duration-500 transform ${
+              isMinimized ? "px-3 py-2" : "px-6 py-4"
+            } ${
+              !isMobile && currentVideo && !isMinimized
                 ? "opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0 cursor-grab active:cursor-grabbing"
                 : "opacity-100 translate-y-0 cursor-grab active:cursor-grabbing"
-            } ${isMobile ? "bg-slate-900" : "bg-gradient-to-r from-transparent via-white/5 to-transparent"}`}
+            } ${isMobile && !isMinimized ? "bg-slate-900" : "bg-gradient-to-r from-transparent via-white/5 to-transparent"}`}
           >
             <div className="flex items-center gap-4 truncate">
               <div className="relative flex items-center justify-center shrink-0">
                 <div className="w-9 h-9 rounded-2xl bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center text-white">
-                  <Video size={18} />
+                  {currentVideo?.isMusic ? <Music size={18} /> : <Video size={18} />}
                 </div>
-                {!isMinimized && (
-                  <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full animate-pulse -z-10" />
-                )}
+                <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full animate-pulse -z-10" />
               </div>
               <div className="truncate flex flex-col">
                 <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1.5 truncate">
                   {currentVideo?.title || "Tutorial Hub"}
                 </h3>
-                {lessonId && (
+                {lessonId && !isMinimized && (
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-80 shrink-0">
                       Scientific Insight
@@ -445,12 +479,12 @@ export default function FloatingVideoPlayer() {
               <button
                 onClick={toggleMinimize}
                 className="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-400 transition-all"
-                title="Minimize"
+                title={isMinimized ? "Expand" : "Minimize — keeps playing"}
               >
-                <Minus size={18} />
+                {isMinimized ? <Maximize2 size={16} /> : <Minus size={18} />}
               </button>
               <button
-                onClick={isMobile ? closePlayer : toggleMinimize}
+                onClick={closePlayer}
                 className={`rounded-xl transition-all ${isMobile ? "p-2 bg-red-600 hover:bg-red-700 text-white" : "p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-500"}`}
                 title="Close"
               >
@@ -460,13 +494,13 @@ export default function FloatingVideoPlayer() {
           </div>
 
           <div
-            className={`flex-1 flex overflow-hidden ${isMobile ? "flex-col" : "flex-row"}`}
+            className={`flex-1 flex overflow-hidden ${isMobile && !isMinimized ? "flex-col" : "flex-row"}`}
           >
             {/* Video Player Area */}
             <div
-              className={`flex-1 bg-black relative group order-1 ${isMobile ? "max-h-[40vh] min-h-[240px]" : ""}`}
+              className={`flex-1 bg-black relative group order-1 ${isMobile && !isMinimized ? "max-h-[40vh] min-h-[240px]" : ""}`}
             >
-              {isMobile && !currentVideo && (
+              {isMobile && !isMinimized && !currentVideo && (
                 <div className="absolute inset-0 z-20 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
                   <Play size={40} className="text-brand-500 mb-4" />
                   <h4 className="text-white font-bold mb-2">
@@ -493,19 +527,21 @@ export default function FloatingVideoPlayer() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <button
-                    onClick={() => updateProgress(currentVideo.id, 100)}
-                    className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg border border-white/20 hover:bg-emerald-600 hover:border-emerald-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
-                  >
-                    {videoProgress[currentVideo.id] >= 95
-                      ? "Completed ✓"
-                      : "Mark as Finished"}
-                  </button>
+                  {!isMinimized && !currentVideo.isMusic && (
+                    <button
+                      onClick={() => updateProgress(currentVideo.id, 100)}
+                      className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg border border-white/20 hover:bg-emerald-600 hover:border-emerald-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
+                    >
+                      {videoProgress[currentVideo.id] >= 95
+                        ? "Completed ✓"
+                        : "Mark as Finished"}
+                    </button>
+                  )}
                 </div>
               )}
 
               {/* Mobile sidebar toggle Overlay button */}
-              {!isMobile && (
+              {!isMobile && !isMinimized && (
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-6 h-24 bg-white/10 dark:bg-slate-900/40 backdrop-blur-3xl text-white rounded-l-[1.5rem] border-y border-l border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-indigo-600 transition-all shadow-2xl"
@@ -520,6 +556,7 @@ export default function FloatingVideoPlayer() {
             </div>
 
             {/* Sidebar / List Area */}
+            {!isMinimized && (
             <div
               className={`flex-shrink-0 bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 transition-all order-2 flex flex-col ${
                 isMobile
@@ -688,7 +725,27 @@ export default function FloatingVideoPlayer() {
                           )}
                         </div>
 
-                        {currentLessonVideos ? (
+                        {!isLessonRoute && (
+                          <div className="mb-4">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">
+                              Coding Music
+                            </p>
+                            {CODING_MUSIC_PLAYLIST.map((vid) => (
+                              <VideoRow
+                                key={vid.id}
+                                video={vid}
+                                active={vid.id === currentVideo?.id}
+                                progress={videoProgress[vid.id] || 0}
+                                onClick={() => selectVideo(vid)}
+                                onPin={() => togglePin(vid.id)}
+                                isPinned={pinnedVideos.includes(vid.id)}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {isLessonRoute &&
+                          (currentLessonVideos ? (
                           <>
                             {Object.entries(currentLessonVideos).map(
                               ([section, vids]) => (
@@ -740,7 +797,7 @@ export default function FloatingVideoPlayer() {
                               </button>
                             )}
                           </div>
-                        )}
+                        ))}
                       </motion.div>
                     )}
 
@@ -865,10 +922,11 @@ export default function FloatingVideoPlayer() {
                 )}
               </div>
             </div>
+            )}
           </div>
 
           {/* Resize Handle (Desktop Only) */}
-          {!isMobile && (
+          {!isMobile && !isMinimized && (
             <div
               onMouseDown={startResizing}
               className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[10001] flex items-end justify-end p-1.5 group-hover/player:opacity-100 opacity-20 hover:opacity-100 transition-opacity"

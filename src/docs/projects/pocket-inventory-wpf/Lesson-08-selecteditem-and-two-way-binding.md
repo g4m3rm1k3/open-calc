@@ -34,8 +34,7 @@ knows *which one*, if any, the user has clicked on. Before a detail panel
 can show anything, this project needs a way to ask the `ListBox` that
 exact question.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-selection
 ```
@@ -66,19 +65,36 @@ Run it on your Windows machine, and click each color in turn. Expected
 result, to verify yourself: `SelectionLabel` updates immediately to name
 whichever `ListBoxItem` was just clicked.
 
-*What this proves:* `SelectionChanged` — (first appearance) — is an
-event every selection-capable control raises the instant the user's
-selection changes. `SelectedItem` — (first appearance) — is a property
-holding whichever item is currently selected, or `null` if nothing is.
-Reading `ColorListBox.SelectedItem` from inside the handler is enough to
-know exactly what the user just clicked, with no manual bookkeeping of
+*What this proves:* `SelectionChanged` is an event every
+selection-capable control raises the instant the user's selection
+changes. `SelectedItem` is a property holding whichever item is
+currently selected, or `null` if nothing is. Reading
+`ColorListBox.SelectedItem` from inside the handler is enough to know
+exactly what the user just clicked, with no manual bookkeeping of
 "which item was clicked" maintained separately anywhere.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-selection` folder. `SelectionChanged` and `SelectedItem`
 are not discarded — they connect the real detail panel to real selections
 next.
+
+### Mechanical Walkthrough
+
+- `SelectionChanged="ColorListBox_SelectionChanged"` — **first
+  appearance.** XAML-attribute event wiring — reappearing shape from
+  Lesson 3's `Click="..."`, now on a `ListBox` instead of a `Button`,
+  firing on a different event.
+- `private void ColorListBox_SelectionChanged(object sender,
+  SelectionChangedEventArgs e)` — **reappearing** handler-method shape
+  (Lesson 3), with `SelectionChangedEventArgs` as the specific event's
+  own argument type, in place of `RoutedEventArgs`.
+- `ColorListBox.SelectedItem` — **first appearance.** A property
+  holding whichever item is currently selected (or `null` if none is)
+  — read directly, with no separate variable tracking "what's
+  selected" maintained by hand.
+- `SelectionLabel.Text = $"..."` — **reappearing**, direct property
+  assignment plus string interpolation (Lesson 1), now driven by the
+  just-read `SelectedItem`.
 
 ### CS Lens
 
@@ -121,8 +137,7 @@ where typing flows data back **from** the UI **into** the underlying
 `InventoryItem`. Nothing so far in this project has needed that reverse
 direction.
 
-### Introduce the concept in isolation
-
+### Introduce the Concept in Isolation
 ```bash
 dotnet new wpf -o lab-twoway
 ```
@@ -180,27 +195,42 @@ result, to verify yourself: the `TextBlock` above it updates on every
 single keystroke, live.
 
 *What this proves:* a `TextBlock`'s `Text` binding is **`OneWay`** by
-default — (first appearance, full treatment) — data flows only from the
-source (`CurrentPerson.Nickname`) to the target (the `TextBlock`);
-`TextBlock` has no way to be typed into at all, so a reverse direction
-would be meaningless for it, and WPF correctly never attempts one. A
-`TextBox`'s `Text` binding defaults to **`TwoWay`** — (first appearance)
-— specifically because a `TextBox` genuinely can be edited: data flows
-both directions, source-to-target (showing the current value when the
-page loads) and target-to-source (writing back whatever the user types).
-`UpdateSourceTrigger=PropertyChanged` — (first appearance) — controls
-*when* the target-to-source direction actually fires: `TextBox`'s real
-default, without this, is `LostFocus` — the underlying property only
-updates once the user clicks or tabs away from the field, not on every
+default — data flows only from the source (`CurrentPerson.Nickname`) to
+the target (the `TextBlock`); `TextBlock` has no way to be typed into
+at all, so a reverse direction would be meaningless for it, and WPF
+correctly never attempts one. A `TextBox`'s `Text` binding defaults to
+**`TwoWay`** specifically because a `TextBox` genuinely can be edited:
+data flows both directions, source-to-target (showing the current value
+when the page loads) and target-to-source (writing back whatever the
+user types). `UpdateSourceTrigger=PropertyChanged` controls *when* the
+target-to-source direction actually fires: `TextBox`'s real default,
+without this, is `LostFocus` — the underlying property only updates
+once the user clicks or tabs away from the field, not on every
 keystroke. Setting it explicitly to `PropertyChanged` is what makes the
 `TextBlock` above update live, character by character, rather than only
 once focus leaves the `TextBox`.
 
-### Discard the throwaway example
-
+### Discard the Throwaway Example
 Delete the `lab-twoway` folder. `TwoWay`/`OneWay`, and
 `UpdateSourceTrigger=PropertyChanged`, are not discarded — the real
 project's detail panel uses exactly this configuration next.
+
+### Mechanical Walkthrough
+
+- `class Person : INotifyPropertyChanged` with a `Nickname` property
+  and `PropertyChanged?.Invoke(...)` in its setter — **reappearing**,
+  identical shape to `InventoryItem` (Lesson 7).
+- `Text="{Binding CurrentPerson.Nickname}"` on `TextBlock` — **first
+  appearance of the `OneWay` default.** No `Mode=` stated explicitly —
+  `TextBlock` can't be edited, so WPF defaults its bindings to
+  source-to-target only.
+- `Text="{Binding CurrentPerson.Nickname, UpdateSourceTrigger=PropertyChanged}"`
+  on `TextBox` — **first appearance of the `TwoWay` default**, plus
+  **first appearance of `UpdateSourceTrigger`.** `TextBox` bindings
+  default to `TwoWay` (editable, so both directions make sense); the
+  explicit `UpdateSourceTrigger=PropertyChanged` overrides `TextBox`'s
+  own separate default (`LostFocus`) so the reverse direction fires on
+  every keystroke instead of only when focus leaves the field.
 
 ### CS Lens
 
@@ -320,8 +350,7 @@ The content row is no longer a bare `ListBox` — it's a two-column `Grid`
 (Lesson 2's exact pattern), the list on the left taking remaining space,
 a fixed-width detail panel on the right.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `<ColumnDefinition Width="*" />` / `<ColumnDefinition Width="240" />` —
    (hard concept reappearing, Lesson 2) list column takes all remaining
    space; detail column is a fixed width.
@@ -385,8 +414,7 @@ namespace PocketInventory
 — `AddButton_Click` (Lesson 6) and `ItemListBox_SelectionChanged` (this
 lesson) — neither aware of the other, each doing exactly one job.
 
-### Mechanical walkthrough
-
+### Mechanical Walkthrough
 1. `DetailPanel.DataContext = ItemListBox.SelectedItem;` — (hard concept
    reappearing, `DataContext`, Lesson 7; `SelectedItem`, this lesson's
    first unit) sets `DetailPanel`'s own, local `DataContext` — distinct
@@ -483,8 +511,7 @@ Epic 2's next lesson, SQLite, is where that finally stops being true.
 
 ## Closing
 
-### Connect the pieces
-
+### Connect the Pieces
 One concrete trace: clicking a row raises `SelectionChanged`
 (Concept Unit 1), read via `ItemListBox.SelectedItem` inside the handler
 — which sets `DetailPanel.DataContext` to that exact `InventoryItem`
@@ -499,8 +526,7 @@ already subscribed to, updating the row live. No code anywhere in this
 lesson explicitly told the list to refresh; it refreshed because both
 panels share one real object, not two synchronized copies.
 
-### What breaks without this
-
+### What Breaks Without This
 Temporarily remove `UpdateSourceTrigger=PropertyChanged` from the detail
 `TextBox`'s binding, leaving `Text="{Binding Name}"` with `TextBox`'s
 real default (`LostFocus`). Run the app, select an item, and type a
@@ -531,8 +557,7 @@ concrete and felt rather than abstract. Restore
   reverse direction even on a control, like `TextBox`, that could
   otherwise support it.
 
-### Definition of done
-
+### Definition of Done
 - [ ] Clicking an item in the list shows its name in an editable detail
       panel.
 - [ ] Editing the detail panel's `TextBox` updates the corresponding list
