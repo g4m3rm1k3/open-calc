@@ -24,6 +24,12 @@ as a matched pair), and XAML as a declarative object tree. This lesson
 assumes all of that and builds on the exact `MainWindow.xaml` Lesson 0 left
 behind.
 
+**Terms introduced in this lesson:**
+- **Interpolated string** (`$"..."`) — a string literal whose `{expression}`
+  placeholders (e.g. `{appName}`, `{screenCount}`) are evaluated and
+  spliced into the result directly; C#'s
+  equivalent of Python's `f"..."`.
+
 ---
 
 ## Concept Unit: StackPanel

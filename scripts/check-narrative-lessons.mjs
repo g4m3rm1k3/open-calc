@@ -28,6 +28,24 @@
  *      canonical Title Case (e.g. "Mechanical walkthrough" instead of
  *      "Mechanical Walkthrough") — reported separately from #1/#2 above
  *      since the content isn't missing, just inconsistently spelled.
+ *   7. An execution trace (either shape) with no heading marking where it
+ *      starts — checked independently of #5's loop/constructor trigger,
+ *      since a trace can be required for reasons that trigger can't
+ *      detect (e.g. a hidden-reference/control-flow trace with no loop).
+ *   8. An "Iteration N:" trace line that only reports a before/after value
+ *      with no cause/effect wording — describes the run instead of
+ *      explaining it, per LESSON SCHEMA.md's execution-trace requirement.
+ *   9. (Soft note, like #CS-lens) A sentence using hidden-behavior language
+ *      ("automatically", "under the hood", "the compiler generates") —
+ *      flagged for a human glance to confirm real proof backs it up
+ *      somewhere in the unit, per LESSON SCHEMA.md's hidden-behavior rule.
+ *      Can't verify the proof itself exists automatically; only narrows
+ *      "read every lesson" down to "read N flagged lines."
+ *  10. A term marked **first appearance** with no matching entry in a
+ *      "Terms introduced in this lesson" glossary (or no glossary section
+ *      at all), per LESSON_CONTRACT.md's Glossary Rule — added after
+ *      "ordinary `new`" was used as an implicit, unnamed contrast for an
+ *      entire Concept Unit.
  *
  * What this CANNOT catch, on purpose — don't extend it to pretend it can:
  *   - Whether an explanation is actually *correct* (the Observer vs.
@@ -330,6 +348,120 @@ function checkMissingTraces(fileLabel, text, issues) {
   }
 }
 
+// Canonical execution-trace heading. Required regardless of whether
+// checkMissingTraces' own loop/constructor trigger heuristic fires below —
+// that heuristic can legitimately miss a trace this schema still requires
+// (e.g. a hidden-reference/control-flow trace with no loop and no repeated
+// same-class constructor, like Lesson 6b's Outer/Inner trace, which only
+// escaped checkMissingTraces by coincidence: no trigger, so it was never
+// looked at). Checked at heading levels 2-4 on purpose: '####' nested
+// inside the '###' "Introduce the Concept in Isolation" step is the
+// canonical placement — a level 4 heading doesn't break that step into a
+// separate chunk when this script splits at level 3, so the trace stays
+// correctly scoped as part of the isolation step. A bare '###' sibling
+// heading is also recognized here (so it's flagged as a style question,
+// not silently miscounted as headerless) but should be moved to '####'.
+const TRACE_HEADING_RE = /^#{2,4}\s+.*Execution Trace/im
+
+// Words signaling a trace line is explaining a causal mechanism — why this
+// value, on this iteration, came out this way — rather than just reporting
+// a before/after value. Deliberately permissive: this can't verify an
+// explanation is *correct*, only that some reasoning vocabulary is present
+// at all. A line with none of these is almost certainly a bare value
+// report, the exact failure LESSON SCHEMA.md's trace requirement now calls
+// out by name: "describes the run, doesn't explain it."
+const EXPLANATION_WORD_RE =
+  /\b(because|since|which means|so that|causes?|caused|throws?|thrown|catch(?:es)?|caught|matches?|matched|succeeds?|succeeded|fails?|failed|returns?|returned|calls?|called|runs?|ran|triggers?|triggered|invokes?|invoked|rejects?|rejected|shifts?|shifted)\b/i
+
+// Runs independently of checkMissingTraces' trigger heuristic: any
+// Iteration-N or numbered-walkthrough trace found inside "Introduce the
+// Concept in Isolation" gets checked for a real header and, for the
+// Iteration-N shape, for per-line explanation — whether or not a loop or
+// repeated constructor was what caused the trace to exist in the first
+// place.
+function checkTraceQuality(fileLabel, text, issues) {
+  const units = splitByHeading(text, 2).filter((u) => /^Concept Unit:/i.test(u.heading))
+  for (const unit of units) {
+    const subs = splitByHeading(unit.text, 3)
+    const isolation = subs.find((s) => /^Introduce the Concept in Isolation$/i.test(s.heading))
+    if (!isolation) continue
+
+    const hasIterationTrace = /Iteration \d+:/.test(isolation.text)
+    const hasNumberedWalkthrough = /^\d+\.\s+`/m.test(isolation.text)
+    if (!hasIterationTrace && !hasNumberedWalkthrough) continue
+
+    const globalLine = unit.startLine + isolation.startLine
+
+    if (!TRACE_HEADING_RE.test(isolation.text)) {
+      issues.push({
+        file: fileLabel,
+        line: globalLine,
+        kind: 'trace-missing-header',
+        message: `Concept Unit "${unit.heading}" has trace content in its isolated lab with no heading marking where it starts (e.g. "#### Execution Trace") — nest it one level deeper than the surrounding step headings so a reader can see at a glance where the trace begins`,
+      })
+    }
+
+    if (hasIterationTrace) {
+      const iterationLines = isolation.text.split('\n').filter((l) => /^\s*Iteration \d+:/.test(l))
+      for (const line of iterationLines) {
+        if (!EXPLANATION_WORD_RE.test(line)) {
+          issues.push({
+            file: fileLabel,
+            line: globalLine,
+            kind: 'trace-line-bare',
+            message: `Concept Unit "${unit.heading}": trace line "${line.trim()}" reports a value change but has no cause/effect wording explaining why it happened — describes the run, doesn't explain it`,
+          })
+        }
+      }
+    }
+  }
+}
+
+// Signal phrases for the specific failure LESSON SCHEMA.md's hidden-behavior
+// rule targets: a claim that the compiler/runtime *generated or inserted
+// code or a field* that doesn't appear in source — not just any word like
+// "automatically" or "hidden" used in its ordinary sense (an ArrayList
+// growing "automatically," or a bug "silently" corrupting data, are
+// perfectly fine, already-demonstrated claims that don't need bytecode-level
+// proof). The Lesson 6b bug was specifically "the compiler generated it, not
+// you" / "nothing in Inner's own field list shows this reference exists" —
+// code-generation and hidden-structure claims, a much narrower category
+// than "any sentence using one of these common English words." Keeping the
+// regex this narrow is deliberate, after an earlier, broader version of
+// this check flagged 158 hits across both courses, almost all of them
+// ordinary, already-fine usage — noise defeats the entire point of
+// narrowing "read every lesson" down to "read N flagged lines."
+//
+// Deliberately still a SOFT check, reported unconditionally like
+// note-no-cs-lens: whether a given hit is actually backed by real proof
+// elsewhere in the same Concept Unit is a judgment call this script can't
+// safely make.
+const HIDDEN_BEHAVIOR_PHRASE_RE =
+  /\b(the compiler (?:generat|add|creat|insert|synthesi[sz])[a-z]*|compiler[- ]generated|synthetic (?:field|method|constructor|class)|hidden (?:field|reference|constructor|parameter)|invisible (?:field|reference|constructor|parameter)|the (?:jvm|runtime) (?:generat|add|creat|insert|synthesi[sz])[a-z]*)\b/i
+
+function checkHiddenBehaviorClaims(fileLabel, text, issues) {
+  const units = splitByHeading(text, 2).filter((u) => /^Concept Unit:/i.test(u.heading))
+  for (const unit of units) {
+    const lines = unit.text.split('\n')
+    let inFence = false
+    lines.forEach((line, i) => {
+      if (line.trim().startsWith('```')) {
+        inFence = !inFence
+        return
+      }
+      if (inFence) return
+      if (HIDDEN_BEHAVIOR_PHRASE_RE.test(line)) {
+        issues.push({
+          file: fileLabel,
+          line: unit.startLine + i,
+          kind: 'note-unverified-hidden-behavior',
+          message: `Concept Unit "${unit.heading}": "${line.trim()}" — describes behavior invisible in the reader's own source; confirm real proof (disassembly, generated artifact, actual runtime output) backs this up somewhere in the unit, not just this sentence`,
+        })
+      }
+    })
+  }
+}
+
 // A heading exists (case-insensitively) but isn't spelled in the canonical
 // Title Case — e.g. "### Mechanical walkthrough" instead of "### Mechanical
 // Walkthrough". Reported as its own low-severity kind, separate from
@@ -353,6 +485,142 @@ function checkHeadingCaseDrift(fileLabel, text, issues) {
       }
     }
   })
+}
+
+// The Glossary Rule (LESSON_CONTRACT.md, added after "ordinary `new`" was
+// used as an implicit contrast for an entire Concept Unit without either
+// side of the contrast — `expr.new ClassName()` or plain `new ClassName()`
+// — ever being given its real, look-up-able name): every term marked
+// **first appearance** needs a matching entry in a "Terms introduced in
+// this lesson" glossary, keyed by the term's real name, not a restatement
+// of whatever informal phrase the prose used.
+//
+// The glossary sits in the lesson header (after "What you need to know
+// first," before the first Concept Unit) as a bold run-in label — same
+// convention as "What you will build" / "What you need to know first"
+// themselves, which are bold text, not markdown headings, in every lesson
+// in both series. splitByHeading can't find it, so this parses that region
+// directly instead.
+//
+// Reuses checkDuplicateFirstAppearance's own term-extraction regex, so it
+// shares that check's known scope: only catches the "`term` — **first
+// appearance**" bolded shape, not every "(first appearance...)"
+// parenthetical-unbolded variant already in the corpus. Under-counting is
+// the safe direction for a heuristic like this — it won't false-flag a
+// term that was never claimed in the checked shape to begin with.
+const FIRST_APPEARANCE_RE = /`([^`\n]{1,60})`\s*—\s*\*\*first appearance/gi
+const GLOSSARY_LABEL_RE = /^\*\*Terms introduced in this lesson[:.]?\*\*/im
+
+function extractGlossarySection(text) {
+  const labelMatch = GLOSSARY_LABEL_RE.exec(text)
+  if (!labelMatch) return null
+  const startLine = text.slice(0, labelMatch.index).split('\n').length
+  const rest = text.slice(labelMatch.index + labelMatch[0].length)
+  const end = rest.search(/\n(---|##\s)/)
+  return { startLine, text: end === -1 ? rest : rest.slice(0, end) }
+}
+
+// Each bullet's WHOLE text (bolded name + its one-line definition), not just
+// the bolded name — definitions routinely mention the actual code identifier
+// a first-appearance term needs to match against (e.g. "**Type parameter**
+// — the placeholder name, e.g. `T` in `class Box<T>`" contains "Box<T>",
+// but the bolded name "Type parameter" alone does not). Matching only
+// against bolded names would miss most real coverage that already exists.
+function extractGlossaryEntryBlobs(glossaryText) {
+  const items = glossaryText.split(/\n(?=\s*[-*]\s)/).filter((s) => /^\s*[-*]\s/.test(s))
+  return items.map((item) => normalizeTerm(item))
+}
+
+function normalizeTerm(term) {
+  return term
+    .replace(/`/g, '')
+    // camelCase/PascalCase → space-separated words first (StaticNested →
+    // Static Nested; totalCreated → total Created) — otherwise an
+    // identifier that's one un-spaced token never lines up against prose
+    // that naturally writes its words apart ("static nested class").
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+// A raw "first appearance" term is a call site or a declaration
+// ("prefs.getInt(\"low_stock_threshold\", 5)", "private int quantity;"),
+// not the clean, generic name a glossary entry uses ("SharedPreferences.
+// getInt(key, default)"). Comparing the two full strings almost never
+// substring-matches, because the receiver variable name and literal
+// arguments are noise the glossary entry was never going to repeat.
+// Produces several candidate "core" strings — stripped of args, receiver
+// variable prefixes, and declaration furniture — and a match against ANY
+// of them counts, rather than requiring the raw term to line up whole.
+const DECLARATION_STOPWORDS = new Set([
+  'private', 'public', 'protected', 'static', 'final', 'void', 'new',
+  'class', 'int', 'string', 'boolean', 'double', 'long', 'char', 'float',
+])
+
+function wordCandidates(normalized) {
+  return normalized
+    .split(' ')
+    .filter((w) => w.length >= 3 && !DECLARATION_STOPWORDS.has(w))
+}
+
+function coreTermCandidates(term) {
+  const candidates = new Set([normalizeTerm(term)])
+
+  // Word candidates from the ORIGINAL term (before args-stripping) too —
+  // args-stripping is right for call sites ("prefs.getInt(...)" → the args
+  // are noise) but wrong for expressions where the parenthesized content
+  // IS the meaningful part ("!(other instanceof Item)" → stripping loses
+  // "instanceof" entirely). Keeping both means neither shape loses signal.
+  for (const w of wordCandidates(normalizeTerm(term))) candidates.add(w)
+
+  const noArgs = term.replace(/\([^)]*\)/g, '()')
+  candidates.add(normalizeTerm(noArgs))
+
+  const dotSplit = noArgs.split('.')
+  if (dotSplit.length > 1) {
+    candidates.add(normalizeTerm(dotSplit[dotSplit.length - 1]))
+  }
+
+  for (const w of wordCandidates(normalizeTerm(noArgs))) candidates.add(w)
+
+  return [...candidates].filter(Boolean)
+}
+
+function checkGlossary(fileLabel, text, issues) {
+  const firstAppearanceTerms = new Set()
+  let m
+  const re = new RegExp(FIRST_APPEARANCE_RE.source, FIRST_APPEARANCE_RE.flags)
+  while ((m = re.exec(text))) {
+    firstAppearanceTerms.add(m[1].trim())
+  }
+  if (firstAppearanceTerms.size === 0) return
+
+  const glossary = extractGlossarySection(text)
+  if (!glossary) {
+    issues.push({
+      file: fileLabel,
+      line: null,
+      kind: 'missing-glossary-section',
+      message: `No "Terms introduced in this lesson" glossary, but ${firstAppearanceTerms.size} term(s) marked **first appearance** in this file (per the Glossary Rule) — expected for lessons written before this rule existed; a genuine gap for anything written after it`,
+    })
+    return
+  }
+
+  const entryBlobs = extractGlossaryEntryBlobs(glossary.text)
+
+  for (const term of firstAppearanceTerms) {
+    const candidates = coreTermCandidates(term)
+    const covered = candidates.some((c) => entryBlobs.some((blob) => blob.includes(c)))
+    if (!covered) {
+      issues.push({
+        file: fileLabel,
+        line: glossary.startLine,
+        kind: 'glossary-missing-term',
+        message: `"${term}" is marked **first appearance** but has no matching entry in "Terms introduced in this lesson"`,
+      })
+    }
+  }
 }
 
 // Cross-file check: the same backticked term marked "first appearance"
@@ -406,6 +674,9 @@ function main() {
       checkClosingSections(fileLabel, text, allIssues)
       checkProseInFences(fileLabel, text, allIssues)
       checkMissingTraces(fileLabel, text, allIssues)
+      checkTraceQuality(fileLabel, text, allIssues)
+      checkHiddenBehaviorClaims(fileLabel, text, allIssues)
+      checkGlossary(fileLabel, text, allIssues)
       checkHeadingCaseDrift(fileLabel, text, allIssues)
     }
   }

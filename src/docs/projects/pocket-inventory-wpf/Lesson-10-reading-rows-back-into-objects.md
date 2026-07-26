@@ -6,7 +6,7 @@
 > As a user, I want all previously saved items loaded automatically.
 
 **What you will build**
-Lesson 9 ended honestly incomplete: items are really saved to
+The previous lesson ended honestly incomplete: items are really saved to
 `pocketinventory.db`, but the on-screen list still starts empty every
 time the app relaunches, because nothing has ever read those rows back
 out. This lesson closes that gap — reopen the app, and every item you've
@@ -23,13 +23,23 @@ this lesson closes — `EnsureDatabaseCreated()` runs on every launch, but
 nothing populates `Items` from what's already saved. Lesson 7:
 `ObservableCollection<InventoryItem>`, `Items.Add(...)`.
 
+**Terms introduced in this lesson:**
+- **`ExecuteReader()`** — runs a query that returns rows, handing back
+  a `SqliteDataReader` (contrast: `.ExecuteNonQuery()`, which returns
+  no rows).
+- **`SqliteDataReader.Read()`** — advances to the next available row,
+  returning `true`, or `false` once there are no more.
+- **`reader.GetInt32(index)` / `GetString(index)`** — read a specific
+  column's value from the current row, by zero-based position matching
+  the `SELECT` clause's own column order.
+
 ---
 
 ## Concept Unit: `SqliteDataReader` — Reading Rows Back, One at a Time
 
 ### The Problem
 
-Lesson 9's `SqliteCommand` only ever ran `INSERT` and `CREATE TABLE` —
+The `SqliteCommand` used so far only ever ran `INSERT` and `CREATE TABLE` —
 neither returns any data, which is exactly why both were run with
 `.ExecuteNonQuery()`. Getting rows *back out* of a database needs a
 different method entirely, and a different way of receiving the result:
@@ -85,20 +95,22 @@ Row 2: Pear
 Row 3: Fig
 ```
 
+#### Execution Trace
+
 `reader.Read()` returning `false` is what actually stops the loop —
 worth seeing as its own step, not folded into "it prints the rows":
 
 ```
-Iteration 1: reader.Read() → true, id = 1, name = "Apple" → printed
-Iteration 2: reader.Read() → true, id = 2, name = "Pear" → printed
-Iteration 3: reader.Read() → true, id = 3, name = "Fig" → printed
-Iteration 4: reader.Read() → false → loop ends, no fourth row printed
+Iteration 1: reader.Read() returns true, since a first row is waiting in the result set, advancing the reader onto it and making id = 1 / name = "Apple" available through GetInt32/GetString → prints Row 1: Apple.
+Iteration 2: reader.Read() returns true again, advancing to the second row because the result set still has rows left to visit → prints Row 2: Pear.
+Iteration 3: reader.Read() returns true a third time, advancing to the third and final inserted row → prints Row 3: Fig.
+Iteration 4: reader.Read() returns false, since every row from the result set has now been consumed — this is what actually causes the while loop to end; no fourth row prints because none exists.
 ```
 
 Run it a **second** time, without deleting `lab.db`: the `INSERT` adds
 three *more* rows on top of the existing ones, and the output now shows
 six rows, `Id` 1 through 6 — a real, visible reminder that nothing about
-this lab guards against re-inserting the same data twice; Lesson 9's
+this lab guards against re-inserting the same data twice; the real
 project code never had this problem because it only ever inserted in
 response to a real, one-time button click, not a script re-run.
 
@@ -126,8 +138,8 @@ back for real, next.
 
 - `selectFruits.ExecuteReader()` — **first appearance.** Runs a query
   that returns rows, and hands back a `SqliteDataReader` rather than a
-  single value or nothing at all — contrasted against `.ExecuteNonQuery()`
-  (Lesson 9), which returns no rows.
+  single value or nothing at all — contrasted against `.ExecuteNonQuery()`,
+  which returns no rows.
 - `while (reader.Read())` — **first appearance.** `Read()` advances to
   the next available row, returning `true`, or `false` once there are
   no more — this is the loop condition itself, and there is no
@@ -143,8 +155,8 @@ A `SqliteDataReader` is a real instance of the **iterator pattern** —
 it exposes rows one at a time, on demand, rather than handing back every
 row already loaded into memory at once. This is the identical
 "don't eagerly materialize everything you don't need yet" idea this
-project's own `List<T>` versus array tradeoff already touched in Lesson
-6, now applied to database rows specifically: a table with a million
+project's own `List<T>` versus array tradeoff already touched on before,
+now applied to database rows specifically: a table with a million
 rows would still only ever hold one row's worth of data in memory at
 any single moment while a `SqliteDataReader` walks it.
 
@@ -186,7 +198,7 @@ which the next several lessons (editing, deleting) will need to know
 - **Location:** `InventoryItem`'s field list; `InventoryPage`'s
   constructor, after `EnsureDatabaseCreated()`.
 - **Dependencies:** `SqliteDataReader`, previous unit; `EnsureDatabaseCreated`,
-  Lesson 9.
+  already built.
 
 ### The New Code — Giving `InventoryItem` an `Id`
 
@@ -223,12 +235,12 @@ namespace PocketInventory
 auto-property rather than `Name`'s hand-written long form.
 
 ### Mechanical Walkthrough
-- `public int Id { get; set; }` — reappearing (auto-property syntax,
-  Lesson 6), new detail worth naming directly: unlike `Name`, `Id` never
+- `public int Id { get; set; }` — reappearing (auto-property syntax),
+  new detail worth naming directly: unlike `Name`, `Id` never
   gets a hand-written `set` with a `PropertyChanged?.Invoke(...)` call.
 - That's a deliberate, not lazy, choice — `Id` is set exactly once, when
   an item is loaded or first inserted, and is never bound to an editable
-- `TextBox` the way `Name` is (Lesson 8's detail panel) — nothing in
+- `TextBox` the way `Name` is in the detail panel — nothing in
   this project ever needs to *react* to `Id` changing, so the extra
   ceremony `Name` earned would be pure overhead here.
 
@@ -364,7 +376,7 @@ The constructor now does four things in a fixed, meaningful order:
 build the window's data structures, set `DataContext`, guarantee the
 table exists, and — only once all three of those are true — load every
 saved row and add each one to `Items`, the exact same collection
-`AddButton_Click` and the `{Binding Items}` from Lesson 7 already know
+`AddButton_Click` and the `{Binding Items}` binding already know
 how to work with.
 
 ### Mechanical Walkthrough
@@ -384,16 +396,30 @@ how to work with.
   which is exactly why the next exercise deliberately breaks this on
   purpose.
 - `new InventoryItem { Id = reader.GetInt32(0), Name = reader.GetString(1) }`
-  — reappearing (object-initializer syntax, Lesson 6), reading two
+  — reappearing (object-initializer syntax), reading two
   columns instead of one, mapping each directly onto the matching
   property.
 - `foreach (InventoryItem item in LoadItemsFromDatabase()) { Items.Add(item); }`
-- — reappearing (`foreach`, already-basic; `Items.Add`, Lesson 7) — the
+- — reappearing (`foreach`, already-basic; `Items.Add`, already used) — the
   bridge between the plain `List<InventoryItem>` this method returns and
   the real, bound `ObservableCollection<InventoryItem>` the UI actually
   watches; each `Add` here fires `CollectionChanged` exactly like
-  Lesson 7's manual button-driven adds do, which is why the `ListBox`
+  the earlier manual button-driven adds do, which is why the `ListBox`
   correctly shows every loaded item with zero additional binding code.
+
+### CS Lens
+
+`LoadItemsFromDatabase` is a small instance of **marshaling** — converting
+a flat, low-level representation (columns in a row, addressed by position)
+into a structured, named in-memory object. Nothing here is SQLite-specific
+about the idea itself: the same reshaping happens every time a JSON
+deserializer turns `{"id": 1, "name": "Bolts"}` into a typed object, every
+time a full ORM like Entity Framework or Hibernate automates this exact
+`reader.GetInt32`/`GetString`-style column-to-property mapping so no one
+writes it by hand, and every time a network protocol decodes a raw byte
+buffer into a typed message. Also recognized in: protocol buffer decoding,
+a CSV parser mapping columns to struct fields, and `Dapper`'s automatic
+row-to-object mapping in the .NET ecosystem specifically.
 
 ### SE Lens
 
@@ -430,8 +456,8 @@ closing and reopening the app, not just reading the code.
 
 ### Connection
 
-Items now round-trip correctly: add one, it's saved (Lesson 9) and
-shown (Lesson 7); relaunch, and it's loaded back (this unit) and shown
+Items now round-trip correctly: add one, it's saved (the previous
+lesson's work) and shown (the existing binding); relaunch, and it's loaded back (this unit) and shown
 again, through the exact same binding. One real gap remains, addressed
 in the closing section below: items added *this session* never had
 their real database `Id` captured at all — only items loaded from a
@@ -444,7 +470,7 @@ fresh restart have a correct one.
 ### Connect the Pieces
 
 One concrete trace, start to finish: `InventoryPage`'s constructor runs
-`EnsureDatabaseCreated()` (Lesson 9), then immediately calls
+`EnsureDatabaseCreated()` (already built), then immediately calls
 `LoadItemsFromDatabase()` (this lesson), which opens its own
 `SqliteConnection`, runs `SELECT Id, Name FROM Items`, and walks every
 returned row with a `SqliteDataReader.Read()` loop (this lesson's first
@@ -452,9 +478,9 @@ unit), constructing one real `InventoryItem` per row — now carrying a
 real `Id`, not just a `Name` — and returning them as a plain
 `List<InventoryItem>`. The constructor then adds each one to the real,
 bound `Items` collection, triggering the exact same `{Binding Items}`
-(Lesson 7) the `ListBox` has used since it was built. Add a new item
-this session, and it's both shown immediately (Lesson 7's binding) and
-saved for the *next* session (Lesson 9's `INSERT`) — the full loop this
+(already built) the `ListBox` has used since it was built. Add a new item
+this session, and it's both shown immediately (the existing binding) and
+saved for the *next* session (the existing `INSERT`) — the full loop this
 lesson's opening promised.
 
 ### What Breaks Without This
@@ -477,7 +503,7 @@ Restore the original column order and it loads correctly again.
   practice reading a third column before this project's own schema ever
   needs one.
 - In `pocketinventory.db` (open it with a SQLite browser tool, the same
-  one from Lesson 9), manually run
+  one used before), manually run
   `INSERT INTO Items (Name) VALUES ('Manually Added');` directly against
   the database, completely outside this application. Relaunch Pocket
   Inventory and confirm that row loads correctly too — concrete proof
@@ -500,4 +526,4 @@ Restore the original column order and it loads correctly again.
 - [ ] You swapped the `SELECT` column order on purpose, saw the real
       `SqliteException`, and restored the correct order.
 - [ ] Committed with a message stating why: for example,
-      `git commit -m "Load every saved item back into Items on startup via SqliteDataReader, closing the round-trip Lesson 9's save-only path left open"`.
+      `git commit -m "Load every saved item back into Items on startup via SqliteDataReader, closing the round-trip the save-only path left open"`.

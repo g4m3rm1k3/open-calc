@@ -27,6 +27,31 @@ Lesson 3: `Page`, `NavigationService.Navigate`, and specifically
 real feature. Lesson 5: `{StaticResource ToolbarButtonStyle}`, reused on
 this lesson's new button.
 
+**Terms introduced in this lesson:**
+- **`public` (on a class)** — any other file, in any other namespace,
+  can see and use this type; leaving it off implicitly restricts it to
+  the same project.
+- **`value`** (inside a `set` block) — a special, automatically
+  available name holding whatever was just assigned.
+- **Auto-property** (`{ get; set; }`) — compiler sugar for a
+  hand-written property; generates a hidden backing field plus a plain
+  `get`/`set` pair.
+- **`System.Reflection`** — lets code inspect a type's actual members
+  at runtime, including ones never named in source.
+- **`List<T>`** (`.Add`, `.Count`, `foreach`) — .NET's growable
+  collection type.
+- **`Orientation`** (on `StackPanel`) — an enum-backed property
+  choosing `Vertical` (default) or `Horizontal` child layout.
+- **`TextBox`** — the control that accepts typed keyboard input,
+  unlike `TextBlock` (display-only).
+- **`ListBox`** — a control displaying a scrollable, selectable list
+  of items.
+- **Object initializer syntax** — constructs an object and sets its
+  properties in one expression, without a separate constructor
+  parameter list.
+- **`ListBox.Items`** — a `ListBox`'s own internal collection of what
+  it's currently displaying; `.Clear()` empties it.
+
 ---
 
 ## Concept Unit: `class` — Grouping Data Under One Name
@@ -91,7 +116,7 @@ project's type, `InventoryItem`, is built next, in the exact same shape.
   type this project has never needed until now.
 - **Files affected:** New file `InventoryItem.cs`.
 - **Change type:** Add.
-- **Dependencies:** None beyond Lesson 0's project scaffold.
+- **Dependencies:** None beyond the project's initial scaffold.
 
 ### The New Code
 
@@ -112,8 +137,8 @@ landing inside.
 
 ### Mechanical Walkthrough
 1. `namespace PocketInventory { ... }` — (hard concept reappearing) the
-   same namespace every other file in this project has declared since
-   Lesson 0's `MainWindow.xaml.cs` — grouping every type this project
+   same namespace every other file in this project has declared from the
+   very start — grouping every type this project
    defines under one shared name, so `InventoryItem` and, say, a
    completely unrelated library's own `InventoryItem` (if one existed)
    could never collide.
@@ -302,6 +327,38 @@ of doing later without breaking anyone who already uses `Name`.
    the long-hand form the moment real logic needs to run on assignment —
    without breaking any code that already uses `item.Name`.
 
+   Worth proving, not trusting: back in `lab-property`, add this after
+   `cat.Name = "Whiskers";`, using `Cat` rewritten with the auto-property
+   shorthand:
+
+   ```csharp
+   using System.Reflection;
+
+   foreach (FieldInfo field in typeof(Cat).GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+   {
+       Console.WriteLine($"{field.Name}: {field.GetValue(cat)}");
+   }
+   ```
+
+   `System.Reflection` — (first appearance) — lets code inspect a type's
+   actual members at runtime, including ones never named in any source
+   file you wrote. `BindingFlags.NonPublic | BindingFlags.Instance` asks
+   for exactly the kind of field a hand-written backing field would be:
+   not `public`, and belonging to each instance rather than shared.
+
+   Real output, this session:
+
+   ```text
+   <Name>k__BackingField: Whiskers
+   ```
+
+   A real field, holding the real value `"Whiskers"` — proof the backing
+   field genuinely exists, not just a turn of phrase. Its name,
+   `<Name>k__BackingField`, uses `<` and `>`, characters illegal in any
+   identifier you're allowed to type by hand — the compiler's way of
+   guaranteeing this exact name can never collide with, or be directly
+   written by, anything in your own source.
+
 ### CS Lens
 
 This is **encapsulation**: the object's internal representation (a
@@ -386,19 +443,21 @@ Bravo
 Charlie
 ```
 
+#### Execution Trace
+
 Three `.Add` calls build the list up front; the `foreach` afterward just
 walks the result, in the same order it was built:
 
 ```
-Iteration 1: names.Add("Alpha") → names = ["Alpha"]
-Iteration 2: names.Add("Bravo") → names = ["Alpha", "Bravo"]
-Iteration 3: names.Add("Charlie") → names = ["Alpha", "Bravo", "Charlie"]
+Iteration 1: names.Add("Alpha") runs, appending "Alpha" to the end of the initially empty list → names = ["Alpha"].
+Iteration 2: names.Add("Bravo") runs again, appending "Bravo" after the existing element, since Add always inserts at the end rather than overwriting anything → names = ["Alpha", "Bravo"].
+Iteration 3: names.Add("Charlie") runs a third time, appending to the now two-element list → names = ["Alpha", "Bravo", "Charlie"].
 ```
 
 ```
-Iteration 1: name = "Alpha" → printed
-Iteration 2: name = "Bravo" → printed
-Iteration 3: name = "Charlie" → printed
+Iteration 1: foreach visits index 0 first, because it walks the list in the exact order elements were added, binding name to "Alpha" → prints Alpha.
+Iteration 2: foreach advances to the next element, "Bravo", since each iteration moves forward through the list one position at a time → prints Bravo.
+Iteration 3: foreach reaches the last element, "Charlie", and stops afterward because there are no further elements to visit → prints Charlie.
 ```
 
 *What this proves:* `List<string>` is a built-in .NET collection type
@@ -421,7 +480,8 @@ real project uses it, for real, in the very next unit.
 
 - `List<string> names = new List<string>();` — **first appearance.**
   `List<T>` is the standard library's generic, growable collection —
-  Lesson 6d's (Java track) `Box<T>` mechanism, already provided.
+  the same generic mechanism as the Android track's `Box<T>`, already
+  provided.
   `<string>` fills in what type this specific list holds.
 - `.Add(...)` — **first appearance.** Appends one more element; the
   list's size grows automatically, with no upfront capacity to decide.
@@ -440,7 +500,7 @@ declare one. `List<string>` and a future `List<InventoryItem>` are the
 same underlying implementation, specialized differently, with the
 compiler enforcing that a `List<string>` can never accidentally receive
 an `InventoryItem` or vice versa — the identical static-typing guarantee
-from Lesson 0, now applied to a collection instead of a single value.
+already established, now applied to a collection instead of a single value.
 
 Also recognized in: Java's `ArrayList<T>` (the direct equivalent);
 TypeScript's `Array<T>`/`T[]`; and Python's own `list`, which is
@@ -465,7 +525,7 @@ hold.
 ### Connection
 
 The next unit constructs a real `List<InventoryItem>` inside the actual
-Add Item screen, replacing Lesson 3's placeholder entirely.
+Add Item screen, replacing the placeholder entirely.
 
 ---
 
@@ -475,7 +535,7 @@ Add Item screen, replacing Lesson 3's placeholder entirely.
 
 Time to build the real screen: a `TextBox` for the user to type an item
 name into, an "Add" button, and a list showing every item added so far —
-replacing Lesson 3's `AddItemPage` placeholder text entirely.
+replacing the `AddItemPage` placeholder text entirely.
 
 ### Project Change
 
@@ -491,7 +551,7 @@ replacing Lesson 3's `AddItemPage` placeholder text entirely.
   navigating to `AddItemPage`.
 - **Dependencies:** `InventoryItem`, `List<T>`, both from this lesson.
 
-**A note on the rename, honestly stated:** Lesson 3 named this page
+**A note on the rename, honestly stated:** This page was originally named
 `AddItemPage` because, at the time, adding an item was its only job.
 Starting this lesson, it also displays the growing list — and, from
 Lesson 8 onward, item details too. Renaming it to `InventoryPage` now,
@@ -527,9 +587,9 @@ later. Delete `AddItemPage.xaml` and `AddItemPage.xaml.cs`; create
 
 ### The Updated Project
 
-This is the whole new file — a two-row `Grid` (Lesson 2's exact pattern:
-`Auto` for the input row, `*` for the growing list beneath it), the input
-row itself a horizontal `StackPanel` (Lesson 1's control, `Orientation`
+This is the whole new file — a two-row `Grid` (the exact pattern used
+before: `Auto` for the input row, `*` for the growing list beneath it), the input
+row itself a horizontal `StackPanel` (the same control used before, `Orientation`
 set for the first time to lay children left-to-right instead of its
 default top-to-bottom) holding the `TextBox` and the styled Add button
 side by side.
@@ -537,21 +597,23 @@ side by side.
 ### Mechanical Walkthrough
 1. `<StackPanel ... Orientation="Horizontal">` — (hard concept
    reappearing, new detail) `Orientation` — (first appearance) — an
-   enum-backed property (Lesson 0's alignment properties, same category)
+   enum-backed property (same category as the alignment properties used
+   before)
    whose default is `Vertical` (every `StackPanel` this project has used
    so far relied on that unstated default); `Horizontal` arranges
    children left to right instead.
 2. `<TextBox x:Name="NameInput" Width="240" />` — (first appearance)
    instantiates `System.Windows.Controls.TextBox` — the control that
-   actually accepts typed keyboard input, unlike `TextBlock` (Lesson 0),
+   actually accepts typed keyboard input, unlike `TextBlock`,
    which only ever *displays* text and cannot be typed into at all.
-   `x:Name="NameInput"` — (hard concept reappearing, Lesson 1) — the
+   `x:Name="NameInput"` — (hard concept reappearing) — the
    identical generated-field mechanism, needed here so code-behind can
    read whatever the user typed.
 3. `<Button Content="Add" Style="{StaticResource ToolbarButtonStyle}" ... Click="AddButton_Click" />`
-   — (hard concepts reappearing) Lesson 5's shared button style, applied
+   — (hard concepts reappearing) the shared button style already
+   established, applied
    for the first time to a button outside the header; `Click="..."`, the
-   exact XAML event-wiring syntax from Lesson 3.
+   exact XAML event-wiring syntax used before.
 4. `<ListBox x:Name="ItemListBox" Grid.Row="1" .../>` — (first
    appearance) instantiates `System.Windows.Controls.ListBox` — a control
    that displays a scrollable, selectable list of items; empty for now,
@@ -639,7 +701,7 @@ private void AddItemButton_Click(object sender, RoutedEventArgs e)
    its `Name` property in one expression, without a separate constructor
    parameter list — equivalent to `InventoryItem newItem = new InventoryItem();
    newItem.Name = NameInput.Text;` written as two lines, expressed here as
-   one. `NameInput.Text` — (hard concept reappearing, Lesson 1's
+   one. `NameInput.Text` — (hard concept reappearing — the
    `.Text` property, now read instead of written) — reads whatever the
    user currently has typed into the `TextBox`.
 3. `items.Add(newItem);` — (hard concept reappearing, this lesson's lab)
@@ -728,7 +790,7 @@ One concrete trace: `InventoryItem` (Concept Unit 1) started as a bare
 field, exactly like the lab's `Dog`, then became a real property
 (Concept Unit 2) — a change invisible to any caller, but one that makes
 Lesson 7 possible without breaking this lesson's code. `InventoryPage`
-(Concept Unit 4, replacing Lesson 3's `AddItemPage`) holds a real
+(Concept Unit 4, replacing the earlier `AddItemPage`) holds a real
 `List<InventoryItem>` (Concept Unit 3), growing by one every time
 `AddButton_Click` runs — reading the typed name from a real `TextBox`,
 constructing a new `InventoryItem` with object-initializer syntax,

@@ -15,7 +15,7 @@ The transferable problem: Android doesn't let one Activity directly
 call methods on another the way normal Java objects call each other —
 each Activity is a somewhat isolated component the *OS* manages the
 lifecycle of, not something you instantiate with `new` yourself
-(Lesson 2a/2c's "the OS builds the object and calls methods on it"
+(the same "the OS builds the object and calls methods on it"
 idea, now mattering for a second screen too). Getting from one screen
 to another requires going *through* the OS, using an object called an
 `Intent`. Today you learn why that indirection exists.
@@ -33,11 +33,11 @@ polymorphism, and the Observer pattern, all proved by hand with
 
 ### The Problem
 
-From Lesson 2a, you know `new SomeClass()` builds an object and, for
+You already know `new SomeClass()` builds an object and, for
 an ordinary class, that's the whole story — the object exists and is
 ready to use immediately. If Activities worked the same way, you'd
 write `InventoryActivity screen = new InventoryActivity();
-screen.show();` and be done. Recall from Lesson 2c that `onCreate()` is
+screen.show();` and be done. But recall that `onCreate()` is
 called *by the OS*, not by you, and that the Manifest is what tells the
 OS an Activity exists at all. An object you construct yourself with
 `new` never goes through that OS-owned startup path — its `onCreate()`
@@ -52,7 +52,7 @@ The underlying idea worth isolating here isn't Android-specific: it's
 data, rather than calling it directly.** A tiny non-Android analogy.
 
 Create a new folder for this lab (same convention as every lab so
-far — plain folder, no `package` line needed, per Lesson 2a). Inside
+far — plain folder, no `package` line needed). Inside
 it, create a file named exactly `RequestDemo.java`:
 
 ```java
@@ -145,7 +145,7 @@ public class InventoryActivity extends AppCompatActivity {
 }
 ```
 
-Every piece here is a **reappearing concept** from Lesson 2c — same
+Every piece here is a **reappearing concept** — same
 `extends AppCompatActivity`, same `onCreate` override, same
 `setContentView`/`R.layout` pattern — just now for a second class. No
 new syntax in this file; the newness is that there are now *two* of
@@ -168,17 +168,17 @@ cannot launch this Activity directly.
 ### Mechanical Walkthrough
 
 - `public class InventoryActivity extends AppCompatActivity` — **reappearing**,
-  identical shape to `MainActivity` (Lesson 2c) — a second class the OS
+  identical shape to `MainActivity` — a second class the OS
   can manage the same way it manages the first.
 - `protected void onCreate(Bundle savedInstanceState)` with `@Override`
   and `super.onCreate(savedInstanceState)` — **reappearing**, same
-  Template Method contract from Lesson 2c: the OS calls this, you never
+  Template Method contract: the OS calls this, you never
   call it yourself, and `super.onCreate(...)` still has to run first.
-- `setContentView(R.layout.activity_inventory)` — **reappearing**
-  (Lesson 2c), now pointing at this Activity's own layout resource
-  instead of `MainActivity`'s.
+- `setContentView(R.layout.activity_inventory)` — **reappearing** — the
+  same call that actually puts a layout on screen, now pointing at this
+  Activity's own layout resource instead of `MainActivity`'s.
 - `<activity android:name=".InventoryActivity" ... />` — **reappearing**
-  Manifest declaration shape (Lesson 2b), now for a second Activity —
+  Manifest declaration shape, now for a second Activity —
   the same "the OS can't manage what it doesn't know exists" rule
   applies to every Activity, not just the first one.
 - `android:exported="false"` — **first appearance.** Explicitly states
@@ -197,7 +197,7 @@ The Manifest entry without a launcher `<intent-filter>` demonstrates
 isn't allowed to be used for, rather than everything being globally
 reachable by default. Also recognized in: file permission bits
 (`chmod`), API endpoint authentication scopes, and the package-private
-access level from Lesson 2d — same idea of "visible only under specific
+access level — same idea of "visible only under specific
 conditions," applied to a whole OS component instead of a Java field.
 
 ### SE Lens
@@ -228,7 +228,7 @@ produce a real, working screen.
 The button you're about to wire needs to say "when a tap happens, do
 this" — but a tap happens *later*, at some unpredictable moment chosen
 by the user, not while `onCreate` is running. If that sentence sounds
-familiar, it should: it's the exact problem Lesson 2c's `Doorbell`/
+familiar, it should: it's the exact problem the `Doorbell`/
 `Chime` lab already solved, for a doorbell instead of a button. You
 already know the *mechanism* — an interface with one method, a class
 that implements it, an object handed over now and called later. What
@@ -242,7 +242,7 @@ The same shape as `Doorbell`/`Chime`, rebuilt as a fake button instead
 of a doorbell — so the parallel is exact, not just similar.
 
 Create a new folder for this lab (same convention as every lab so
-far — plain folder, no `package` line needed, per Lesson 2a). Inside
+far — plain folder, no `package` line needed). Inside
 it, create a file named exactly `OnTapListener.java`:
 
 ```java
@@ -252,7 +252,7 @@ interface OnTapListener {
 ```
 
 In the same folder, create `FakeButton.java`. Note this class has no
-`public` keyword (Lesson 2c's package-private class, reused) and no
+`public` keyword (the package-private class shape, reused) and no
 `main` — nothing runs `FakeButton` directly:
 
 ```java
@@ -307,24 +307,24 @@ Listener ran!
 
 ### Mechanical Walkthrough — Before the "Why," What Each Piece Is
 
-- `interface OnTapListener { void onTap(); }` — **reappearing**, from
-  Lesson 2c's `TapCallback` — same shape, new name. An interface with
+- `interface OnTapListener { void onTap(); }` — **reappearing** — same
+  shape as `TapCallback`, new name. An interface with
   exactly one method, like this one, is called a **functional
   interface** — that specific shape is what makes the lambda syntax
   below legal, and is worth naming even on a reappearance since it's
   the exact property this whole unit depends on.
-- `class FakeButton` — **reappearing**, from Lesson 2c's `Doorbell` —
-  same package-private-class shape (no `public` keyword, fine since
+- `class FakeButton` — **reappearing** — same package-private-class
+  shape as `Doorbell` (no `public` keyword, fine since
   this whole lab lives in one throwaway file).
-- `private OnTapListener listener;` — **reappearing**, from Lesson 2c's
-  `private TapCallback callback;` — same polymorphism idea: a field
+- `private OnTapListener listener;` — **reappearing** — same idea as
+  `private TapCallback callback;`: this is polymorphism, a field
   typed as an interface can hold any object fulfilling that contract,
   decided at the point it's actually called, not when the field was
   declared.
 - `void setOnTapListener(OnTapListener listener) { this.listener = listener; }`
   — **reappearing concepts, recombined.** An instance method
-  (Lesson 2a) taking a parameter, storing it into a field using `this`
-  (Lesson 2a) to disambiguate the field from the parameter of the same
+  taking a parameter, storing it into a field using `this`
+  to disambiguate the field from the parameter of the same
   name.
 - `listener.onTap();` — **reappearing dot-notation method call.**
   Whatever object was stored in `listener` gets its `onTap()` called
@@ -394,7 +394,7 @@ Anonymous-class listener ran!
 Both compile to functionally the same thing — verified this session,
 both print correctly, just with a different message so you can tell
 them apart. `new OnTapListener() { ... }` explicitly writes `new`
-(Lesson 2a) followed immediately by a class body with no name — Java
+followed immediately by a class body with no name — Java
 generates an unnamed class implementing `OnTapListener` on the spot.
 The lambda `() -> System.out.println(...)` is genuinely shorthand for
 exactly this shape, for the specific case of a functional interface —
@@ -413,8 +413,8 @@ Two lenses apply to this same lab, at two different levels, and it's
 worth keeping them separate rather than picking one name and moving on.
 
 At the **design level**, what you just built and ran is **reappearing**
-— the same Observer pattern `Doorbell`/`Chime` already proved in Lesson
-2c: something holds a reference to a listener it doesn't control the
+— the same Observer pattern `Doorbell`/`Chime` already proved:
+something holds a reference to a listener it doesn't control the
 identity of, and calls it later, when it decides the moment is right.
 `LambdaDemo`'s output is the same kind of proof `ObserverDemo`'s was:
 "Listener ran!" only printed after `simulateTap()` ran, never at
@@ -435,7 +435,7 @@ interface's exact signature, checked at compile time; Python and
 JavaScript don't require that upfront contract at all.
 
 If "Observer pattern" ever feels abstract later in this curriculum,
-either `Doorbell`/`Chime` (Lesson 2c, the long way) or `FakeButton`/
+either `Doorbell`/`Chime` (the long way) or `FakeButton`/
 `LambdaDemo` (here, the short way) is the concrete example to come back
 to and rerun.
 
@@ -513,23 +513,23 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-`onCreate` as a whole now does everything it did in Lesson 2c (call
+`onCreate` as a whole now does everything it did before (call
 super, inflate the layout, log a trace line) *plus* connects the
-button you built in Lesson 3 to real behavior for the first time.
+button you already built to real behavior for the first time.
 
 ### Mechanical Walkthrough (revised 07/25 — findViewById + Observer-vs-Template-Method fixed)
 
-- `findViewById(R.id.openInventoryButton)` — **reappearing**, from
-  Lesson 2c's edge-to-edge Concept Unit (`findViewById(R.id.main)`),
-  now finding a different view by a different id. As a reminder: this
-  is the runtime bridge between your XML tree (Lesson 3) and Java
+- `findViewById(R.id.openInventoryButton)` — **reappearing** (the same
+  call as `findViewById(R.id.main)` earlier), now finding a different
+  view by a different id. As a reminder: this
+  is the runtime bridge between your XML tree and Java
   code — it walks the inflated view tree looking for the view whose
   `@+id/openInventoryButton` you declared, and returns it as an object
   you can call methods on. `R.id.openInventoryButton` is the same
-  generated-constant pattern as `R.layout` from Lesson 2e, just under
+  generated-constant pattern as `R.layout`, just under
   the `id` nested class instead of `layout`.
 - `Button openButton = ...` — reusing already-basic variable
-  declaration syntax (Lesson 2a); the *type* `Button` matching the XML
+  declaration syntax; the *type* `Button` matching the XML
   `<Button>` tag is worth noting but not a new concept on its own.
 - `.setOnClickListener(v -> { ... })` — `setOnClickListener(...)`
   itself is a **first appearance**: it registers a callback to run
@@ -540,7 +540,7 @@ button you built in Lesson 3 to real behavior for the first time.
   decision), now against a real Android interface,
   `View.OnClickListener`, instead of the throwaway `OnTapListener`.
   Worth being precise about what's *not* the same here: this is
-  Observer, not Template Method — `onCreate` (Lesson 2c) is the
+  Observer, not Template Method — `onCreate` is the
   framework calling a fixed, inherited lifecycle slot; this is you
   registering a standalone callback with an object, no inheritance
   involved. Both are Inversion of Control (the framework, not you,
@@ -554,7 +554,7 @@ button you built in Lesson 3 to real behavior for the first time.
   parameter (the `View` that was clicked, unused in this body).
 - `new Intent(this, InventoryActivity.class)` — **first appearance.**
   Two arguments: `this` (here, meaning "the `MainActivity` object this
-  code is running inside of" — Lesson 2a's `this`, now read from inside
+  code is running inside of" — now read from inside
   a lambda; Android specifically needs a `Context`, meaning "who is
   making this request," and an Activity is a kind of `Context`) and
   `InventoryActivity.class` (a `Class` object — Java's built-in
@@ -564,8 +564,10 @@ button you built in Lesson 3 to real behavior for the first time.
   Android's real `Intent` class instead of a `HashMap`).
 - `startActivity(intent)` — **first appearance.** This is the actual
   call that hands your `Intent` off to the OS. The OS reads it,
-  confirms `InventoryActivity` is declared in the Manifest (Lesson 2b's
-  mechanism, reused), and *only then* creates a real instance and calls
+  confirms `InventoryActivity` is declared in the Manifest — the same
+  "the OS can't manage what it doesn't know exists" rule from this
+  lesson's first Concept Unit, now enforced at the actual moment of
+  navigation instead of just at app startup — and *only then* creates a real instance and calls
   its `onCreate()` — the proper OS-managed path the "Problem" section
   above explained you can't shortcut with `new`.
 
@@ -602,14 +604,14 @@ reachable — only that the class exists.
 ## Connect the Pieces
 
 Full trace: user taps the button → the `View.OnClickListener` lambda
-registered on Lesson 3's button (now wired) runs → it builds an
+registered on the button (now wired) runs → it builds an
 `Intent` describing "start `InventoryActivity`" → `startActivity` hands
 that off to the OS → the OS checks the Manifest entry from this
 lesson's first Concept Unit → confirms it's declared and not
 externally exported-only → creates a real `InventoryActivity` instance
 (the OS's own version of `new`, the exact thing you proved you can't do
 yourself) → calls `onCreate()` on it, the same OS-driven calling
-pattern you first observed in Lesson 2c, now happening for a second
+pattern you first observed for `MainActivity`, now happening for a second
 class you wrote yourself.
 
 ## What Breaks Without This
@@ -629,7 +631,7 @@ match. Restore the Manifest entry afterward.
    Manifest-only break above, which compiled fine and only failed at
    runtime. Articulate for yourself why one is caught by the compiler
    and the other isn't.
-2. Add a second button to `activity_main.xml` from Lesson 3's pattern,
+2. Add a second button to `activity_main.xml` using the same pattern,
    wire it with its own `setOnClickListener`, and have it also open
    `InventoryActivity` — confirming the same target can be reached from
    multiple places.
@@ -638,7 +640,7 @@ match. Restore the Manifest entry afterward.
 
 - [ ] Tapping "Open Inventory" actually navigates to the second screen.
 - [ ] You can explain why `new InventoryActivity()` directly wouldn't
-      have worked, referencing the lifecycle concept from Lesson 2c.
+      have worked, referencing how the OS-managed lifecycle works.
 - [ ] You ran the `RequestDemo` lab and can connect it to what `Intent`
       is really doing.
 - [ ] You ran both the lambda and the anonymous-class versions of the

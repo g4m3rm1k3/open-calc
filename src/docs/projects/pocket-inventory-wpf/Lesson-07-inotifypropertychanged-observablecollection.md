@@ -6,8 +6,8 @@
 > As a user, I want the list to update itself.
 
 **What you will build**
-Lesson 6 ended with a working but honestly clunky mechanism: every single
-click of "Add" wiped `ItemListBox` completely and rebuilt it from scratch,
+The app currently has a working but honestly clunky mechanism: every single
+click of "Add" wipes `ItemListBox` completely and rebuilds it from scratch,
 just to reflect one new entry. This lesson deletes every line of that
 manual rebuild — `ItemListBox.Items.Clear()`, the `foreach` loop, all of
 it — and replaces it with a `ListBox` that keeps itself in sync
@@ -26,13 +26,44 @@ the exact manual-refresh code this lesson deletes. Lesson 4: `event`,
 `+=` subscription — this lesson's `INotifyPropertyChanged` is a second,
 different use of the same underlying `event` keyword.
 
+**Terms introduced in this lesson:**
+- **Interface** (`: INotifyPropertyChanged`) — a contract with no
+  implementation of its own; names required members any implementing
+  class must provide.
+- **`string.Empty`** — a built-in constant equal to `""`, preferred
+  over a literal empty string in idiomatic C#.
+- **Null-conditional operator** (`?.`) — calls a member only if the
+  left-hand side isn't `null`; otherwise does nothing rather than
+  throwing.
+- **`PropertyChangedEventArgs`** — the event-argument object every
+  `PropertyChanged` subscriber receives, carrying the name of which
+  property changed.
+- **`nameof`** — a compiler operator turning an identifier into its
+  literal string name, checked at compile time against renames.
+- **`PropertyChangedEventHandler`** — the delegate type
+  `INotifyPropertyChanged`'s `PropertyChanged` event requires.
+- **`ObservableCollection<T>`** — a `List<T>`-like collection that
+  automatically raises a `CollectionChanged` event whenever its
+  contents change.
+- **`CollectionChanged` / `e.Action`** — the event an
+  `ObservableCollection<T>` raises on mutation; `e.Action` describes
+  what kind of change occurred (`Add`, `Remove`, etc.).
+- **`DataContext`** — the object a WPF element's `{Binding ...}`
+  expressions resolve against; inherited from a parent unless set
+  explicitly.
+- **Read-only auto-property** (`{ get; }`) — an auto-property with no
+  `set`; can never be reassigned after construction, though a mutable
+  collection's own contents can still change.
+- **`DisplayMemberPath`** — tells a `ListBox` which property of each
+  bound object to actually display.
+
 ---
 
 ## Concept Unit: `INotifyPropertyChanged` — an Object Announcing Its Own Changes
 
 ### The Problem
 
-`InventoryItem.Name` (Lesson 6) is a property, deliberately, specifically
+`InventoryItem.Name` is a property, deliberately, specifically
 so a future lesson could add real logic to its `set` block without
 breaking any existing caller — this is that lesson. Right now, nothing
 outside `InventoryItem` has any way to know when `Name` changes; whatever
@@ -91,8 +122,8 @@ Something changed: Temperature
 *What this proves:* `Thermometer` announces every single change to
 `Temperature`, to anyone who's subscribed, without ever needing to know
 who that is or what they'll do about it — the exact same "notify without
-knowing the listener" shape from Lesson 3's `Click` event and Lesson 4's
-`DoorOpened` event, now applied to a **property changing**, rather than a
+knowing the listener" shape from the `Click` event and the `DoorOpened`
+event before, now applied to a **property changing**, rather than a
 button being clicked.
 
 ### Discard the Throwaway Example
@@ -104,7 +135,7 @@ real project applies this exact mechanism to `InventoryItem.Name` next.
 - **Reference Source:** No reference counterpart.
 - **Files affected:** `InventoryItem.cs`.
 - **Change type:** Replace.
-- **Location:** `Name`'s auto-property declaration from Lesson 6.
+- **Location:** `Name`'s auto-property declaration from before.
 - **Dependencies:** None new.
 
 ### The New Code
@@ -158,19 +189,18 @@ namespace PocketInventory
 ```
 
 `InventoryItem` is now the whole file's only type, and this is exactly
-the moment Lesson 6's SE Lens predicted: `Name` expands from a one-line
+the moment predicted earlier: `Name` expands from a one-line
 auto-property into the long-hand form with real logic inside `set`, and
 **nothing anywhere else in this project has to change** — every existing
-`item.Name = "..."` call, including `InventoryPage`'s `AddButton_Click`
-from Lesson 6, keeps compiling and working exactly as before.
+`item.Name = "..."` call, including `InventoryPage`'s `AddButton_Click`,
+keeps compiling and working exactly as before.
 
 ### Mechanical Walkthrough
-1. `using System.ComponentModel;` — (hard concept reappearing, Lesson 1's
-   `using System;`) `INotifyPropertyChanged` and `PropertyChangedEventArgs`
+1. `using System.ComponentModel;` — (hard concept reappearing — the
+   `using System;` pattern already used) `INotifyPropertyChanged` and `PropertyChangedEventArgs`
    both live in this namespace.
 2. `: INotifyPropertyChanged` — (first appearance of implementing an
-   **interface**, distinct from `: Window`/`: Page`'s inheritance,
-   Lesson 0/3) an interface is a **contract with no implementation of its
+   **interface**, distinct from `: Window`/`: Page`'s inheritance) an interface is a **contract with no implementation of its
    own** — it names required members (here, exactly one: the
    `PropertyChanged` event) that any class choosing to implement it must
    provide. Unlike `: Window`, `InventoryItem` doesn't *become a kind of*
@@ -183,11 +213,11 @@ from Lesson 6, keeps compiling and working exactly as before.
    new empty string object at every use (a genuinely minor detail, stated
    honestly as a convention, not a load-bearing correctness difference
    here). This field is the real backing storage the long-hand property
-   below reads and writes — the exact role Lesson 6's lab's `nameStorage`
-   played, and the exact hidden field the Lesson 6 auto-property shorthand
+   below reads and writes — the exact role the earlier lab's `nameStorage`
+   played, and the exact hidden field the auto-property shorthand
    was generating for you, invisibly, the whole time.
 4. `set { name = value; PropertyChanged?.Invoke(...); }` — (hard concept
-   reappearing, Lesson 6's lab) `value`, reused exactly; the new second
+   reappearing from the earlier lab) `value`, reused exactly; the new second
    line is this unit's entire point.
 5. `PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));`
    — (hard concept reappearing from this lesson's own lab, several new
@@ -208,17 +238,18 @@ from Lesson 6, keeps compiling and working exactly as before.
    improvement over typing the literal string `"Name"` by hand, which the
    compiler could never catch drifting out of sync with a rename.
 6. `public event PropertyChangedEventHandler? PropertyChanged;` — (hard
-   concept reappearing, Lesson 4's `event Action? DoorOpened;`, one new
+   concept reappearing — the `event Action? DoorOpened;` shape used
+   before, one new
    piece explained properly for the first time) `PropertyChangedEventHandler`
    — (first appearance) — a specific delegate type (a type describing a
    method signature, the same underlying idea `RoutedEventArgs`-shaped
-   handlers have used since Lesson 3, just named and reused here as
+   handlers have used since the very first click handler, just named and reused here as
    .NET's own standard shape for exactly this kind of notification) — the
    required exact type `INotifyPropertyChanged`'s contract demands.
    **The trailing `?`** — first given full treatment here, though it
-   quietly appeared once already, unexplained, on Lesson 4's
+   quietly appeared once already, unexplained, on the earlier
    `Action? DoorOpened` — is a **nullable reference type annotation**.
-   This project's `.csproj` (Lesson 0) has `<Nullable>enable</Nullable>`
+   This project's `.csproj` has `<Nullable>enable</Nullable>`
    turned on, which means the C# compiler tracks, for every reference
    type, whether a given usage is allowed to be `null` — a plain
    `PropertyChangedEventHandler PropertyChanged` (no `?`) would be a
@@ -231,8 +262,8 @@ from Lesson 6, keeps compiling and working exactly as before.
 
 ### CS Lens
 
-**The Observer pattern, reappearing from Lesson 3 — deepened.** Lesson
-3's `Click` event was a *UI element* notifying *application code* that a
+**The Observer pattern, reappearing — deepened.** The earlier
+`Click` event was a *UI element* notifying *application code* that a
 user interacted with it. This lesson runs the identical mechanism in the
 opposite direction: a plain data object — `InventoryItem`, with no UI
 awareness whatsoever — notifying *anything interested* that its own state
@@ -271,7 +302,7 @@ limitation worth knowing rather than discovering by surprise later.
 
 `InventoryItem` now correctly announces changes to `Name` — but nothing
 is listening to those announcements yet, and this lesson's actual visible
-goal (Lesson 6's manual refresh, deleted) is about the *collection*
+goal (the manual refresh, deleted) is about the *collection*
 changing, not one item's property changing. The next unit builds the
 collection-level equivalent of what this unit just built at the property
 level.
@@ -323,16 +354,18 @@ Collection changed: Add
 Collection changed: Remove
 ```
 
+#### Execution Trace
+
 Three mutations, three separate events, each with a different `e.Action`:
 
 ```
-Iteration 1: names.Add("Alpha") → names = ["Alpha"], CollectionChanged fires, e.Action = Add
-Iteration 2: names.Add("Bravo") → names = ["Alpha", "Bravo"], CollectionChanged fires, e.Action = Add
-Iteration 3: names.Remove("Alpha") → names = ["Bravo"], CollectionChanged fires, e.Action = Remove
+Iteration 1: names.Add("Alpha") runs, appending "Alpha" — because ObservableCollection<T> raises CollectionChanged automatically on every mutation, the subscribed lambda fires immediately afterward → names = ["Alpha"], e.Action = Add.
+Iteration 2: names.Add("Bravo") runs the same way, triggering a second, independent CollectionChanged event for this specific addition → names = ["Alpha", "Bravo"], e.Action = Add.
+Iteration 3: names.Remove("Alpha") runs, and since removal is a different kind of mutation than addition, the event fires again but this time reports e.Action = Remove → names = ["Bravo"].
 ```
 
 *What this proves:* `ObservableCollection<T>` is a `List<T>`-like
-collection (every method from Lesson 6's `List<T>` — `Add`, `Remove`,
+collection (every method from `List<T>` before — `Add`, `Remove`,
 `Count`, `foreach` — works identically) with one addition: it raises a
 `CollectionChanged` event automatically, every single time its contents
 actually change, with no code inside `Add`/`Remove` themselves needing
@@ -348,17 +381,17 @@ in the next unit.
 ### Mechanical Walkthrough
 
 - `ObservableCollection<string> names = new ObservableCollection<string>();`
-  — **first appearance.** Same generic-collection shape as `List<T>`
-  (Lesson 6), plus automatic change notification.
+  — **first appearance.** Same generic-collection shape as `List<T>`,
+  plus automatic change notification.
 - `names.CollectionChanged += (sender, e) => ...` — **reappearing**
-  `+=` event subscription (Lesson 4's `DoorOpened` lab), now
+  `+=` event subscription (the same mechanism as the `DoorOpened` lab), now
   subscribing to an event the .NET library itself raises, rather than
   one this project declared by hand.
 - `e.Action` — **first appearance.** Describes *what kind* of change
   just happened (`Add`, `Remove`, and others not used in this lab) —
   passed automatically as part of the event.
 - `.Add(...)` / `.Remove(...)` — **reappearing**, identical
-  `List<T>` methods (Lesson 6) — the difference here is invisible at
+  `List<T>` methods — the difference here is invisible at
   the call site: each one also triggers `CollectionChanged` internally.
 
 ### CS Lens
@@ -482,7 +515,7 @@ next.
 - **Files affected:** `InventoryPage.xaml`; `InventoryPage.xaml.cs`.
 - **Change type:** Replace.
 - **Location:** `InventoryPage`'s `items` field and `AddButton_Click`
-  from Lesson 6; the `ListBox` declaration in `InventoryPage.xaml`.
+  from before; the `ListBox` declaration in `InventoryPage.xaml`.
 - **Dependencies:** `InventoryItem` (now implementing
   `INotifyPropertyChanged`, this lesson's first unit).
 
@@ -571,7 +604,7 @@ namespace PocketInventory
 }
 ```
 
-Every line Lesson 6 wrote to manually clear and rebuild `ItemListBox` —
+Every line written before to manually clear and rebuild `ItemListBox` —
 `ItemListBox.Items.Clear();`, the entire `foreach` loop — is gone.
 `AddButton_Click` now does exactly two things: construct a new item, and
 clear the input box. It never mentions `ItemListBox` at all.
@@ -583,7 +616,7 @@ clear the input box. It never mentions `ItemListBox` at all.
    `Items` itself can never be reassigned to point at a *different*
    `ObservableCollection` after construction, though its *contents* can
    still change freely via `.Add(...)`/`.Remove(...)`; `public`, this
-   time necessary (not just good habit, as in Lesson 6) because XAML's
+   time necessary (not just good habit, as before) because XAML's
    `{Binding Items}` needs to reach this property from outside the class
    entirely.
 2. `DataContext = this;` — (hard concept reappearing from the lab)
@@ -597,13 +630,13 @@ clear the input box. It never mentions `ItemListBox` at all.
    without it, a bound `ListBox` would show each item's default
    `ToString()` result (typically just the type name, `PocketInventory.InventoryItem`,
    not remotely useful) rather than its `Name`. This is the direct
-   binding-based replacement for Lesson 6's manual `ItemListBox.Items.Add(item.Name)` —
+   binding-based replacement for the earlier manual `ItemListBox.Items.Add(item.Name)` —
    the same underlying goal, "show this specific piece of each object,"
    now declared once in XAML instead of re-executed by hand on every
    change.
 5. `Items.Add(new InventoryItem { Name = NameInput.Text });` — (hard
-   concept reappearing, Lesson 6's object-initializer syntax and
-   `.Add(...)`) the entire remaining body of the click handler —
+   concept reappearing — the object-initializer syntax and
+   `.Add(...)` already used) the entire remaining body of the click handler —
    everything about actually displaying this new item is now handled
    automatically, upstream of this line, by the binding itself.
 
@@ -626,7 +659,7 @@ User types "Shop Rags", clicks Add:
     ListBox adds exactly one new row: "Shop Rags" — "Hex Bolts" is never touched
 ```
 
-Contrast this directly against Lesson 6's execution trace: there, every
+Contrast this directly against the earlier execution trace: there, every
 click cleared and rebuilt *every* row, including ones that hadn't
 changed. Here, each click's `CollectionChanged` event carries enough
 information (`Action: Add`, and which item) that the `ListBox` only ever
@@ -645,7 +678,7 @@ line of code either side had to write.
 
 ### SE Lens
 
-**This lesson's named principle, made concrete.** Lesson 6's click
+**This lesson's named principle, made concrete.** The earlier click
 handler had to know, explicitly, that a `ListBox` named `ItemListBox`
 existed and needed manual rebuilding — a real coupling between "business
 logic" (add an item) and "UI mechanics" (redraw a specific control). This
@@ -653,8 +686,8 @@ lesson's version could have its `ListBox` swapped for a completely
 different control tomorrow — Lesson 16 does exactly this, replacing
 `ListBox` with `DataGrid` — and `AddButton_Click` would need **zero
 changes**, because it was never coupled to the specific control
-displaying `Items` in the first place. This is the direct payoff Lesson
-1's SE Lens already previewed in the abstract ("swapping a control
+displaying `Items` in the first place. This is the direct payoff already
+previewed in the abstract earlier ("swapping a control
 without touching the underlying data") — now real, working code, not a
 forward promise.
 
@@ -666,9 +699,9 @@ dotnet run
 
 ### Run it
 
-On your Windows machine: adding items behaves identically to Lesson 6,
+On your Windows machine: adding items behaves identically to before,
 from the user's point of view — but open `InventoryPage.xaml.cs` side by
-side with Lesson 6's version and confirm, directly, that
+side with the earlier version and confirm, directly, that
 `ItemListBox.Items.Clear()` and the manual `foreach` rebuild are both
 completely gone.
 
@@ -692,12 +725,12 @@ One concrete trace: `InventoryItem` (Concept Unit 1) now implements
 `set` — infrastructure this lesson builds but doesn't yet have a visible
 trigger for, honestly, since nothing in this project edits an existing
 item's `Name` yet. `ObservableCollection<InventoryItem>` (Concept Unit 2)
-replaces Lesson 6's plain `List<InventoryItem>`, raising
+replaces the earlier plain `List<InventoryItem>`, raising
 `CollectionChanged` automatically on every `Add`. `{Binding Items}` and
 `DisplayMemberPath="Name"` (Concept Unit 3) connect that collection
 directly to `ItemListBox`, with `DataContext = this` making `InventoryPage`'s
 own `Items` property the thing every binding in the page resolves
-against. The result: `AddButton_Click` shrank from Lesson 6's eight-line
+against. The result: `AddButton_Click` shrank from the earlier eight-line
 manual-rebuild version to two lines that never mention `ItemListBox` at
 all, and the screen still updates correctly, every time, automatically.
 
@@ -739,7 +772,7 @@ errors are the actual place to look for it.
 - [ ] `InventoryPage` uses `ObservableCollection<InventoryItem>`, bound
       via `{Binding Items}`, with no manual `ItemListBox` manipulation
       anywhere in the code-behind.
-- [ ] Adding items still works exactly as it did in Lesson 6, from the
+- [ ] Adding items still works exactly as it did before, from the
       user's point of view.
 - [ ] You reproduced the silent missing-`DataContext` failure and found
       the real binding error in Visual Studio's Output window.

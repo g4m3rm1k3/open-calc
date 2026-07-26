@@ -65,7 +65,7 @@ for (int i = 0; i < 5; i++) {
 `new android.widget.TextView(this)` builds a View entirely in Java, no
 XML at all. Every `TextView` you've made until now came from an XML
 file being inflated; this constructs one directly, the same `new` +
-constructor pattern from Lesson 2a, just on a framework class instead
+constructor pattern you already know, just on a framework class instead
 of one you wrote. `container.addView(row)` adds `row` as a new child of
 `container`, at runtime, after the screen has already been built — XML
 describes the *initial* tree; `addView` mutates it afterward.
@@ -109,24 +109,25 @@ is the real answer.
 - `<LinearLayout ... android:orientation="vertical" .../>` — **first
   appearance.** A layout container that stacks its children one after
   another in a single direction, no constraint-solving involved —
-  `android:layout_width`/`height` are reappearing (Lesson 3).
-- `findViewById(R.id.scratchContainer)` — **reappearing** (Lesson 2c),
-  same lookup-by-id pattern, now returning a `LinearLayout` instead of
+  `android:layout_width`/`height` are reappearing, already-basic layout
+  syntax.
+- `findViewById(R.id.scratchContainer)` — **reappearing** — same
+  lookup-by-id pattern, now returning a `LinearLayout` instead of
   the `ConstraintLayout` root.
 - `for (int i = 0; i < 5; i++)` — **reappearing** loop syntax
   (basic, already-established).
 - `new android.widget.TextView(this)` — **first appearance of building
   a View entirely in Java**, no XML at all. Same `new` + constructor
-  shape as any object (Lesson 2a), just on a framework class; `this`
+  shape as any object, just on a framework class; `this`
   passed as the constructor argument is the `Context` every Android
-  View needs to exist (Lesson 2c's `AppCompatActivity` itself is a
+  View needs to exist (`AppCompatActivity` itself is a
   valid `Context`).
 - `row.setText("Item " + i)` — **reappearing** method call and string
   concatenation, now on a View built in Java instead of one inflated
   from XML.
 - `container.addView(row)` — **first appearance.** Adds `row` as a new
   child of `container` at runtime, after the screen already exists —
-  XML describes the *initial* tree (Lesson 3); `addView` mutates it
+  XML describes the *initial* tree; `addView` mutates it
   afterward, the same way `Iteration N`'s trace above shows each call
   growing the tree by exactly one node.
 
@@ -227,11 +228,11 @@ screen's arrangement.
   container (`ConstraintLayout`) as root with views nested inside; here
   the row *is* just one view, so it's both root and content. The
   `TextView` tag itself and `android:layout_width`/`height` are
-  reappearing from Lesson 3.
+  reappearing, already-basic layout syntax.
 - `android:padding="16dp"` — **first appearance.** Space added *inside*
-  a view's own edges (as opposed to `layout_margin`, from Lesson 5,
-  which adds space *outside* a view, between it and its neighbors).
-- `android:textSize="18sp"` — reappearing, from Lesson 3.
+  a view's own edges (as opposed to `layout_margin`, which adds space
+  *outside* a view, between it and its neighbors).
+- `android:textSize="18sp"` — reappearing, already-basic layout syntax.
 
 ### The New Code — the Screen Layout
 
@@ -259,7 +260,7 @@ Replace the entire contents of `activity_inventory.xml`:
 ### The Updated Project
 
 This replaces the wizard-generated placeholder file wholesale — same
-`ConstraintLayout` root pattern from Lesson 3, now containing exactly
+`ConstraintLayout` root pattern as before, now containing exactly
 one child, the `RecyclerView`, constrained to fill the entire screen on
 all four edges.
 
@@ -267,11 +268,11 @@ all four edges.
 
 - `<androidx.recyclerview.widget.RecyclerView>` — **first appearance.**
   Same full-class-path tag pattern as `ConstraintLayout` itself
-  (Lesson 3) — this instantiates the real `RecyclerView` class from the
+  — this instantiates the real `RecyclerView` class from the
   library you just added as a dependency, which is why Sync had to
   succeed first: without it, this tag would fail to resolve.
 - The four `app:layout_constraint*_to*Of="parent"` lines — reappearing,
-  from Lesson 3, filling the whole screen the same way the original
+  filling the whole screen the same way the original
   placeholder `TextView` did.
 
 ### CS Lens
@@ -283,7 +284,7 @@ description gets instantiated many times against different data, rather
 than each occurrence being separately authored. Also recognized in: a
 server-side HTML templating engine rendering one row template per
 database record, a spreadsheet formula copied down a column, and class
-definitions themselves (one `class`, many instances — Lesson 2a).
+definitions themselves (one `class`, many instances).
 
 ### SE Lens
 

@@ -190,46 +190,56 @@ export default function StartMenu({ onClose }) {
     visible: { opacity: 1, y: 0 },
   }
 
-  // Shared item button — used in every section
+  // Shared item button — used in every section. `children` (currently just
+  // the Favourites section's "remove" control) is rendered as a sibling of
+  // the button, not inside it — a <button> nested inside a <button> is
+  // invalid HTML, and browsers respond by silently re-parenting the inner
+  // one out of the outer one, which is exactly the validateDOMNesting
+  // warning this used to throw. The wrapping div carries `relative group`
+  // instead of the button, so both the button's own absolutely-positioned
+  // decorations and a sibling `children` control still anchor and
+  // group-hover correctly.
   const ItemBtn = ({ pin, onClick, children }) => {
     const meta = pin.color && GLASS_META[pin.color]
-    
-    return (
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onClick}
-        onContextMenu={(e) => showCtxMenu(e, pin)}
-        className={`relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left transition-all group overflow-hidden bg-white/60 dark:bg-slate-800/40 hover:bg-white/90 dark:hover:bg-slate-700/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] ${meta ? 'border-b-2 ' + meta.border : ''}`}
-      >
-        {meta && (
-          <>
-            {/* Subtle color tint */}
-            <div className={`absolute inset-0 opacity-[0.15] dark:opacity-[0.25] bg-gradient-to-br ${meta.header} mix-blend-multiply dark:mix-blend-screen pointer-events-none group-hover:opacity-[0.25] dark:group-hover:opacity-[0.35] transition-opacity duration-300`} />
-            
-            {/* Highlight glare */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent dark:from-white/10 opacity-50 pointer-events-none" />
-            
-            {/* Animated hover gradient */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -translate-x-full group-hover:translate-x-full transition-all duration-700 pointer-events-none" />
 
-            {/* Large faded background icon */}
-            <div className={`absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[80px] opacity-[0.06] dark:opacity-[0.12] -mr-4 drop-shadow-sm`}>
-              {pin.emoji}
-            </div>
-          </>
-        )}
-        {isPinned(pin.id) && (
-          <span className="absolute top-1.5 right-1.5 text-[10px] leading-none opacity-80 select-none z-10 drop-shadow-sm">⭐</span>
-        )}
-        <span className="text-2xl flex-shrink-0 relative z-10 drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{pin.emoji}</span>
-        <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 tracking-tight ${
-          meta ? meta.text : 'text-slate-700 dark:text-slate-100'
-        }`}>
-          {pin.label}
-        </span>
+    return (
+      <div className="relative group">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onClick}
+          onContextMenu={(e) => showCtxMenu(e, pin)}
+          className={`relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left transition-all w-full overflow-hidden bg-white/60 dark:bg-slate-800/40 hover:bg-white/90 dark:hover:bg-slate-700/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] ${meta ? 'border-b-2 ' + meta.border : ''}`}
+        >
+          {meta && (
+            <>
+              {/* Subtle color tint */}
+              <div className={`absolute inset-0 opacity-[0.15] dark:opacity-[0.25] bg-gradient-to-br ${meta.header} mix-blend-multiply dark:mix-blend-screen pointer-events-none group-hover:opacity-[0.25] dark:group-hover:opacity-[0.35] transition-opacity duration-300`} />
+
+              {/* Highlight glare */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent dark:from-white/10 opacity-50 pointer-events-none" />
+
+              {/* Animated hover gradient */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -translate-x-full group-hover:translate-x-full transition-all duration-700 pointer-events-none" />
+
+              {/* Large faded background icon */}
+              <div className={`absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[80px] opacity-[0.06] dark:opacity-[0.12] -mr-4 drop-shadow-sm`}>
+                {pin.emoji}
+              </div>
+            </>
+          )}
+          {isPinned(pin.id) && (
+            <span className="absolute top-1.5 right-1.5 text-[10px] leading-none opacity-80 select-none z-10 drop-shadow-sm">⭐</span>
+          )}
+          <span className="text-2xl flex-shrink-0 relative z-10 drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{pin.emoji}</span>
+          <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 tracking-tight ${
+            meta ? meta.text : 'text-slate-700 dark:text-slate-100'
+          }`}>
+            {pin.label}
+          </span>
+        </motion.button>
         {children}
-      </motion.button>
+      </div>
     )
   }
 

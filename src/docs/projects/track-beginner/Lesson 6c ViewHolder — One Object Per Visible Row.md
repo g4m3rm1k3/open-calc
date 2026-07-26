@@ -9,7 +9,7 @@ and set their content. The naive approach would be calling
 which happens continuously as the user scrolls. `findViewById` walks
 the view tree to find a match; doing that repeatedly for every scroll
 frame is wasted, repeated work — the same "work you don't need to
-redo" theme as Lesson 6a's `addView()` loop, just at a smaller scale.
+redo" theme as the earlier `addView()` loop, just at a smaller scale.
 
 **What you need to know first:** Lesson 6a (the row layout,
 `list_item_inventory.xml`, exists), Lesson 6b (`static` on a nested
@@ -29,7 +29,7 @@ approach would be calling `findViewById` fresh, every single time a row
 needs to be updated — which happens continuously as the user scrolls.
 `findViewById` walks the view tree to find a match; doing that
 repeatedly for every scroll frame is wasted, repeated work — the same
-"work you don't need to redo" theme as Lesson 6a's first Concept Unit,
+"work you don't need to redo" theme as the `addView()` loop earlier,
 just at a smaller scale.
 
 ### Project Change
@@ -39,7 +39,7 @@ just at a smaller scale.
   understand in isolation — **do not create `InventoryAdapter.java`
   yet.** A bare `static class` cannot legally be the only thing in a
   `.java` file: `static` on a class only means something for a class
-  nested *inside* another one — Lesson 6b's Nested Classes unit — and
+  nested *inside* another one, and
   there's no outer class here yet for it to nest inside. Saving this
   fragment alone would fail to compile. Lesson 6e wraps it inside
   `InventoryAdapter` and gives you the complete, real, compilable file
@@ -70,30 +70,30 @@ file by itself.
 ### Mechanical Walkthrough
 
 - `static class InventoryViewHolder extends RecyclerView.ViewHolder` —
-  the `static class` part is **reappearing**, from Lesson 6b's Nested
-  Classes unit — `InventoryViewHolder` gives up the hidden reference to
-  its enclosing `Adapter` for exactly the reason that unit named: it
-  only ever needs its own row's views, never the `Adapter` itself.
+  the `static class` part is **reappearing** — `InventoryViewHolder`
+  gives up the hidden reference to its enclosing `Adapter` for exactly
+  the reason already covered: it only ever needs its own row's views,
+  never the `Adapter` itself.
   `extends RecyclerView.ViewHolder` is the required base class — the
   library's own contract for what counts as a "holder of a row's
   views," same "must extend the framework's class" idea as
-  `AppCompatActivity` (Lesson 2c), different base class.
-- `TextView itemNameText;` — **reappearing** (field declaration, from
-  Lesson 2a), new detail: package-private (no modifier) rather than
+  `AppCompatActivity`, different base class.
+- `TextView itemNameText;` — **reappearing** (field declaration), new
+  detail: package-private (no modifier) rather than
   `private`, a deliberate choice so the enclosing `Adapter` class
-  (Lesson 6e) can read this field directly without a getter method —
+  can read this field directly without a getter method —
   reasonable for a small, tightly-coupled helper class like this one.
 - `InventoryViewHolder(View itemView)` — **reappearing** (a
-  constructor, Lesson 2a), same shape: a method with no return type,
+  constructor), same shape: a method with no return type,
   matching the class's own name, that runs exactly once when
   `new InventoryViewHolder(...)` is called, setting up the object
   before anyone else can use it.
-- `super(itemView)` — **reappearing concept** (Lesson 2c's parent-call
+- `super(itemView)` — **reappearing concept** (the parent-call
   pattern), now on a constructor instead of `onCreate`:
   `RecyclerView.ViewHolder`'s own constructor requires the row's root
   `View` and stores it internally (accessible later as `.itemView`).
 - `itemView.findViewById(R.id.itemNameText)` — **reappearing**
-  (`findViewById`, Lesson 4), new detail: called on `itemView` (the
+  (`findViewById`), new detail: called on `itemView` (the
   inflated `list_item_inventory.xml` root) rather than on an Activity —
   `findViewById` works the same way on any View, searching its own
   subtree, which here is a single `TextView`, not a whole screen.
@@ -149,8 +149,9 @@ Lesson 6e resolves this by giving it a real outer class to live inside.
 1. Without running anything, write out — on paper or in a comment —
    what you predict happens if `itemNameText` were declared `private`
    instead of package-private, and `InventoryAdapter` later tried to
-   read `holder.itemNameText` directly (Lesson 6e does exactly this).
-   Check your prediction against Lesson 2d's access-modifier rules.
+   read `holder.itemNameText` directly (the real `Adapter` does exactly
+   this). Check your prediction against what you know about access
+   modifiers.
 
 ## Definition of Done
 

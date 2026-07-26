@@ -7,8 +7,8 @@
 
 **What you will build**
 A detail panel appears beside the item list, showing the currently
-selected item's name in an editable field — and, because Lesson 7 already
-taught `InventoryItem` to announce its own changes, editing that name
+selected item's name in an editable field — and, because `InventoryItem`
+already announces its own changes, editing that name
 updates the list row live, with no refresh code anywhere. The
 transferable problem underneath "add a detail panel" is a design
 temptation worth naming directly: it would be easy to give the detail
@@ -22,6 +22,18 @@ Lesson 7: `INotifyPropertyChanged` on `InventoryItem` (this lesson is
 where its payoff finally becomes visible), `{Binding}`, `DataContext`.
 Lesson 6: `InventoryPage`'s `ListBox`/`TextBox` layout, which this lesson
 extends with a second column.
+
+**Terms introduced in this lesson:**
+- **`SelectedItem`** — a property, on a selection control like
+  `ListBox`, holding whichever item is currently selected, or `null` if
+  none is.
+- **`OneWay` binding** — data flows source-to-target only; `TextBlock`
+  defaults to this since it can't be edited.
+- **`TwoWay` binding** — data flows both directions; `TextBox` defaults
+  to this since it's editable.
+- **`UpdateSourceTrigger`** — controls when a `TwoWay` binding pushes a
+  UI edit back to its source; `PropertyChanged` fires on every
+  keystroke, versus `TextBox`'s own default of `LostFocus`.
 
 ---
 
@@ -82,24 +94,24 @@ next.
 
 - `SelectionChanged="ColorListBox_SelectionChanged"` — **first
   appearance.** XAML-attribute event wiring — reappearing shape from
-  Lesson 3's `Click="..."`, now on a `ListBox` instead of a `Button`,
+  `Click="..."` before, now on a `ListBox` instead of a `Button`,
   firing on a different event.
 - `private void ColorListBox_SelectionChanged(object sender,
-  SelectionChangedEventArgs e)` — **reappearing** handler-method shape
-  (Lesson 3), with `SelectionChangedEventArgs` as the specific event's
+  SelectionChangedEventArgs e)` — **reappearing** handler-method shape,
+  with `SelectionChangedEventArgs` as the specific event's
   own argument type, in place of `RoutedEventArgs`.
 - `ColorListBox.SelectedItem` — **first appearance.** A property
   holding whichever item is currently selected (or `null` if none is)
   — read directly, with no separate variable tracking "what's
   selected" maintained by hand.
 - `SelectionLabel.Text = $"..."` — **reappearing**, direct property
-  assignment plus string interpolation (Lesson 1), now driven by the
+  assignment plus string interpolation, now driven by the
   just-read `SelectedItem`.
 
 ### CS Lens
 
 `SelectionChanged` is the **Observer pattern**, reappearing a third time
-in this project (Lesson 3's `Click`, Lesson 7's `PropertyChanged`/
+in this project (the `Click` event, `PropertyChanged`/
 `CollectionChanged`, now user *selection* specifically) — the same
 underlying shape, a different trigger. Worth naming what's constant
 across all three: something happens, a control raises an event, and
@@ -130,7 +142,7 @@ The next unit builds the actual detail panel — a second column in
 
 ### The Problem
 
-Lesson 7's `DisplayMemberPath="Name"` shows `Name`'s value on screen —
+The existing `DisplayMemberPath="Name"` shows `Name`'s value on screen —
 data flowing one direction, from the object to the UI. The detail panel
 needs the *opposite capability too*: a `TextBox` the user can type into,
 where typing flows data back **from** the UI **into** the underlying
@@ -219,7 +231,7 @@ project's detail panel uses exactly this configuration next.
 
 - `class Person : INotifyPropertyChanged` with a `Nickname` property
   and `PropertyChanged?.Invoke(...)` in its setter — **reappearing**,
-  identical shape to `InventoryItem` (Lesson 7).
+  identical shape to `InventoryItem`.
 - `Text="{Binding CurrentPerson.Nickname}"` on `TextBlock` — **first
   appearance of the `OneWay` default.** No `Mode=` stated explicitly —
   `TextBlock` can't be edited, so WPF defaults its bindings to
@@ -279,9 +291,9 @@ bound `TwoWay` back to that same `InventoryItem`.
 - **Files affected:** `InventoryPage.xaml`; `InventoryPage.xaml.cs`.
 - **Change type:** Add.
 - **Location:** `InventoryPage`'s content row (`Grid.Row="1"` from
-  Lesson 6), currently holding only `ItemListBox` directly.
+  before), currently holding only `ItemListBox` directly.
 - **Dependencies:** `InventoryItem.Name`'s `INotifyPropertyChanged`
-  implementation, Lesson 7.
+  implementation, already built.
 
 ### The New Code — the Layout
 
@@ -347,17 +359,17 @@ bound `TwoWay` back to that same `InventoryItem`.
 ```
 
 The content row is no longer a bare `ListBox` — it's a two-column `Grid`
-(Lesson 2's exact pattern), the list on the left taking remaining space,
+(the exact pattern used before), the list on the left taking remaining space,
 a fixed-width detail panel on the right.
 
 ### Mechanical Walkthrough
 1. `<ColumnDefinition Width="*" />` / `<ColumnDefinition Width="240" />` —
-   (hard concept reappearing, Lesson 2) list column takes all remaining
+   (hard concept reappearing) list column takes all remaining
    space; detail column is a fixed width.
 2. `SelectionChanged="ItemListBox_SelectionChanged"` — (hard concept
    reappearing, this lesson's first unit) wired for real this time.
-3. `<StackPanel x:Name="DetailPanel" ...>` — (hard concept reappearing,
-   Lesson 1) note this `StackPanel` has **no `{Binding}` on itself at
+3. `<StackPanel x:Name="DetailPanel" ...>` — (hard concept reappearing)
+   note this `StackPanel` has **no `{Binding}` on itself at
    all** — its own `DataContext` isn't set yet; the next code block is
    what supplies it, from code-behind, the moment a selection happens.
 4. `<TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />`
@@ -411,16 +423,16 @@ namespace PocketInventory
 ```
 
 `InventoryPage` now handles two independent events from user interaction
-— `AddButton_Click` (Lesson 6) and `ItemListBox_SelectionChanged` (this
+— `AddButton_Click` (built earlier) and `ItemListBox_SelectionChanged` (this
 lesson) — neither aware of the other, each doing exactly one job.
 
 ### Mechanical Walkthrough
 1. `DetailPanel.DataContext = ItemListBox.SelectedItem;` — (hard concept
-   reappearing, `DataContext`, Lesson 7; `SelectedItem`, this lesson's
+   reappearing — `DataContext`, already used; `SelectedItem`, this lesson's
    first unit) sets `DetailPanel`'s own, local `DataContext` — distinct
    from `InventoryPage`'s own `DataContext = this` set in the
    constructor — to whichever `InventoryItem` was just clicked. WPF's
-   `DataContext` inheritance (briefly noted in Lesson 7) means every
+   `DataContext` inheritance (briefly noted earlier) means every
    child inside `DetailPanel`, including the `TextBox`, now resolves its
    own `{Binding Name}` against this specific `InventoryItem`, not
    against `InventoryPage` itself anymore — a `DataContext` set on any
@@ -438,7 +450,7 @@ User clicks "Hex Bolts" in the list:
 
 User types an extra character, "Hex Bolts!", in the detail TextBox:
     TwoWay binding, UpdateSourceTrigger=PropertyChanged, writes back immediately
-    InventoryItem.Name's setter (Lesson 7) runs: name = "Hex Bolts!"
+    InventoryItem.Name's setter runs: name = "Hex Bolts!"
     PropertyChanged?.Invoke(...) fires, naming "Name" as changed
     ItemListBox's own internal binding to this same object's Name (via
     DisplayMemberPath) is subscribed to that exact event
@@ -446,13 +458,13 @@ User types an extra character, "Hex Bolts!", in the detail TextBox:
     written in this lesson to make that specific update happen
 ```
 
-The final line is the entire point of this lesson, and of Lesson 7's
-otherwise-unproven `INotifyPropertyChanged` work: nothing in
+The final line is the entire point of this lesson, and of the
+otherwise-unproven `INotifyPropertyChanged` work built earlier: nothing in
 `ItemListBox_SelectionChanged` or anywhere else told the list to update
 when the name changed. It updated because both the list row and the
 detail `TextBox` are bound to the exact same `InventoryItem` object in
 memory — not two separate copies — and that object announces its own
-changes to anyone listening, per Lesson 7.
+changes to anyone listening, exactly as designed.
 
 ### CS Lens
 
@@ -482,7 +494,7 @@ of binding the panel directly to the `InventoryItem` object itself? A
 separate property would mean *two* places holding "the current name" —
 the real `InventoryItem.Name`, and a copy on `InventoryPage` — and every
 future feature touching either one would need to remember to keep both
-in sync by hand, exactly the manual-bookkeeping problem Lesson 7 already
+in sync by hand, exactly the manual-bookkeeping problem already
 eliminated for the list itself. Binding directly to the shared object
 means there is structurally nothing to keep in sync — there's only ever
 one value.
@@ -499,7 +511,7 @@ On your Windows machine: add two or three items, click one in the list —
 its name appears in the detail panel's `TextBox`. Edit it there, letter
 by letter, and watch the list row update live, in real time, with no
 lag, no click-away-to-refresh needed — direct, visible proof of every
-concept this lesson (and Lesson 7) built.
+concept this lesson (and the one before it) built.
 
 ### Connection
 
@@ -519,9 +531,9 @@ object, not a copy. The detail `TextBox`'s `{Binding Name, UpdateSourceTrigger=P
 (Concept Unit 2) resolves against that `DataContext`, `TwoWay` by
 `TextBox`'s own default, updating live on every keystroke rather than
 only on lost focus. Every keystroke writes through to the real
-`InventoryItem.Name` property, whose `set` block — built in Lesson 7,
+`InventoryItem.Name` property, whose `set` block — built earlier,
 unused until this exact moment — fires `PropertyChanged`, which the list
-row's own internal binding (from `DisplayMemberPath`, also Lesson 7) is
+row's own internal binding (from `DisplayMemberPath`, also built earlier) is
 already subscribed to, updating the row live. No code anywhere in this
 lesson explicitly told the list to refresh; it refreshed because both
 panels share one real object, not two synchronized copies.

@@ -24,6 +24,42 @@ conditionals, and how to run a script from a terminal. That knowledge of
 behaves, and this lesson never assumes it does — every construct here gets
 explained from zero, even the ones that look familiar.
 
+**Terms introduced in this lesson:**
+- **Dynamic typing** — a value's type is checked while the program
+  runs, against the actual value present at that moment, not a fixed,
+  declared type.
+- **Interpreted execution model** — no separate step reads and
+  validates the entire program before any of it runs; each line
+  executes as it's reached.
+- **Static typing** — every variable, parameter, and return value has
+  a type fixed at compile time and checked before the program runs at
+  all.
+- **`dotnet` CLI** — the command-line tool the .NET SDK installs.
+- **IL** (Intermediate Language) — what the C# compiler produces from
+  `.cs` files; what the CLR actually loads and runs.
+- **JIT compilation** (Just-In-Time) — the CLR's step of translating
+  IL into real machine code for the specific CPU it's running on.
+- **Type inference** (`var`) — the compiler derives a type from
+  context (an initializer expression) instead of requiring an explicit
+  annotation.
+- **`<OutputType>`** — the `.csproj` setting choosing what kind of
+  executable a project builds (`Exe` console vs. `WinExe` windowed).
+- **`<TargetFramework>`'s `-windows` suffix** — unlocks Windows-only
+  APIs (WPF among them) that a plain, non-`-windows` target cannot
+  reference.
+- **`<ImplicitUsings>`** — the compiler silently adds a small, fixed
+  set of common `using` statements to every file, project-wide.
+- **`<UseWPF>`** — turns on the WPF-specific build tooling that
+  compiles `.xaml` files into part of the program.
+- **`App.xaml` / `App.xaml.cs`** — application-wide startup concerns
+  (shared resources, which window opens first), distinct from any one
+  window.
+- **`MainWindow.xaml` / `MainWindow.xaml.cs`** — the first real
+  window's declarative markup paired with its own C# code-behind.
+- **`git init` / `git add` / `git commit`** — version control basics:
+  creating a repository, staging changes, and permanently recording a
+  named snapshot of everything staged.
+
 ---
 
 ## Concept Unit: Interpreted, Dynamically-Typed Execution
@@ -1027,6 +1063,18 @@ tell a reader.
   everything currently staged as one named snapshot in the project's
   history. `-m` supplies the message inline rather than opening an
   editor.
+
+### CS Lens
+
+A git repository is a **directed acyclic graph of immutable snapshots** —
+each commit points backward at the commit(s) it came from, nothing ever
+overwrites an earlier commit in place, and there's no cycle back to an
+earlier state except by creating a brand-new commit that happens to match
+it. Also recognized in: a filesystem with snapshotting (ZFS, Btrfs, Time
+Machine), a database's write-ahead log replayed to reconstruct any past
+state, an "undo" stack in any editor (each entry a snapshot, never mutated
+once written), and a blockchain's chain of blocks, each referencing the
+hash of the one before it.
 
 ### SE Lens
 

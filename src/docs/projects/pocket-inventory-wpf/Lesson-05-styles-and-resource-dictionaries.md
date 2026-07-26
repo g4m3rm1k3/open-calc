@@ -32,7 +32,7 @@ button), whose padding this lesson also centralizes.
 
 ### The Problem
 
-`BackButton` (Lesson 4) has `Padding="8,4"`. Lesson 3's Add Item button has
+`BackButton` has `Padding="8,4"`. The Add Item button has
 `Padding="16,8"` — already inconsistent, purely by accident of two
 different lessons choosing slightly different numbers with no shared
 reference. A real application needs every button of the same *kind* to
@@ -89,13 +89,13 @@ Delete the `lab-style` folder. `Style` itself is not discarded — it's
 about to define Pocket Inventory's real button and text styling.
 
 ### Mechanical Walkthrough
-1. `<Grid.Resources>` — (first appearance) a property-element (Lesson 2's
-   pattern, reused) holding this `Grid`'s own **resources** — named
+1. `<Grid.Resources>` — (first appearance) a property-element (the same
+   pattern used before, reused) holding this `Grid`'s own **resources** — named
    values available to anything inside this `Grid`'s subtree.
 2. `<Style x:Key="RoundedButton" TargetType="Button">` — (first
    appearance) `x:Key` — a required unique name identifying this specific
    resource among any others declared alongside it, distinct from
-   `x:Name` (Lesson 1): `x:Name` generates a C# field reference; `x:Key`
+   `x:Name`: `x:Name` generates a C# field reference; `x:Key`
    only ever labels an entry in a resource lookup, with no code-behind
    field generated at all. `TargetType="Button"` restricts this `Style`
    to elements of exactly that type — a `Style` written for `Button`
@@ -158,8 +158,8 @@ live somewhere genuinely application-wide, not attached to one specific
 - **Files affected:** `App.xaml`.
 - **Change type:** Add.
 - **Location:** `App.xaml`'s `<Application.Resources>` element — present,
-  empty, since Lesson 0's scaffold (named in Lesson 0's file-anatomy unit
-  but never filled in until now).
+  empty, since the project was first scaffolded (named in that
+  file-anatomy walkthrough but never filled in until now).
 - **Dependencies:** None beyond the scaffolded project.
 
 ### The New Code
@@ -202,13 +202,13 @@ live somewhere genuinely application-wide, not attached to one specific
 ```
 
 `Application.Resources` was already part of the file `dotnet new wpf`
-generated back in Lesson 0 — it just sat empty. `StartupUri` (also
-generated in Lesson 0, unexplained until relevant, and still not the
+generated at the very start — it just sat empty. `StartupUri` (also
+generated then, unexplained until relevant, and still not the
 subject of this lesson) is untouched.
 
 ### Mechanical Walkthrough
 1. `<SolidColorBrush x:Key="BrandColorBrush" Color="#2E5945" />` — (first
-   appearance) `Background="#2E5945"` from Lesson 2 set a color directly;
+   appearance) `Background="#2E5945"` used before set a color directly;
    this instantiates a real, named `SolidColorBrush` **object** — WPF
    colors used as a `Background`/`Foreground` are always actually
    `Brush` objects underneath, even when set as a plain hex string
@@ -217,11 +217,13 @@ subject of this lesson) is untouched.
    reusable by name, instead of a fresh, equivalent-but-separate one
    being created every place `#2E5945` was previously typed.
 2. `<Style x:Key="HeaderTitleStyle" TargetType="TextBlock">` — (hard
-   concept reappearing) same shape as the lab, extracting Lesson 2's
-   title `TextBlock`'s `FontSize="24"`/`FontWeight="Bold"` values.
+   concept reappearing) same shape as the lab, extracting the
+   title `TextBlock`'s `FontSize="24"`/`FontWeight="Bold"` values already
+   used.
 3. `<Style x:Key="ToolbarButtonStyle" TargetType="Button">` — (hard
    concept reappearing) one shared padding value, chosen as a single
-   compromise between Lesson 3's `16,8` and Lesson 4's `8,4` — the actual
+   compromise between the Add Item button's `16,8` and the Back button's
+   `8,4` — the actual
    moment this lesson's opening inconsistency gets resolved.
 
 ### CS Lens
@@ -324,7 +326,7 @@ references to the resources just defined.
 </Grid>
 ```
 
-And `HomePage.xaml`'s Add Item button (Lesson 3) picks up the identical
+And `HomePage.xaml`'s Add Item button picks up the identical
 style:
 
 ```xml
@@ -391,7 +393,7 @@ dotnet run
 
 ### Run it
 
-On your Windows machine, the app looks visually identical to Lesson 4's —
+On your Windows machine, the app looks visually identical to before —
 this lesson's entire point is that *nothing about the running app
 changed*, only where its values are defined. Prove the real payoff:
 change `App.xaml`'s `BrandColorBrush` color to a different hex value and
@@ -412,9 +414,9 @@ the next 45 lessons.
 ## Closing
 
 ### Connect the Pieces
-One concrete trace: Lesson 2 hardcoded `#2E5945` directly into the header
-`Border`; Lesson 3 and Lesson 4 each hand-typed their own button padding,
-independently, already slightly inconsistent. This lesson's first unit
+One concrete trace: the header `Border` was hardcoded with `#2E5945`
+directly; the Add Item and Back buttons each hand-typed their own button
+padding, independently, already slightly inconsistent. This lesson's first unit
 proved, with a throwaway `Grid.Resources` example, that a `Style` applied
 via `StaticResource` lets many elements share one definition. The second
 unit moved that idea to `App.xaml`'s `Application.Resources` — the

@@ -2,20 +2,53 @@
 
 **What you will build:** Tapping a row in the inventory list opens a
 new `ItemDetailActivity` showing that specific item's full details.
-The transferable problem: Lesson 4 taught `Intent` as a way to ask the
-OS to start an Activity, but never handed that Activity any data — and
+The transferable problem: you already know `Intent` as a way to ask the
+OS to start an Activity, but it never handed that Activity any data — and
 `InventoryAdapter` has no business calling `startActivity` itself (it
 doesn't even have easy access to a `Context` meant for navigation).
 Two separate problems, solved with two separate tools: a callback
 interface to report *which* item was tapped, and a way to actually
-carry an `Item` object across the OS-mediated `Intent` boundary from
-Lesson 4.
+carry an `Item` object across that same OS-mediated `Intent` boundary.
 
 **What you need to know first:** Lesson 4 (`Intent`, `startActivity`,
 declaring a new Activity in the Manifest, lambdas implementing
 single-method interfaces, via `Doorbell`/`Chime` and `OnTapListener`).
 Lesson 6 (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
 7 (`Item`, its fields and `equals()`/`hashCode()`).
+
+**Terms introduced in this lesson:**
+- **`getAdapterPosition()`** — returns a `ViewHolder`'s current position
+  in the list at the moment it's called, read fresh rather than cached.
+- **`getIntent()`** — retrieves, inside a started Activity, the same
+  `Intent` object that started it.
+- **Intent extras** (`putExtra`, `getStringExtra`, `getIntExtra`) —
+  key-value data attached to an `Intent`; written with `putExtra` on
+  the sending side, read back with the matching `getXExtra` method on
+  the receiving side.
+- **Escape sequence** (e.g. `"\n"`) — a character sequence inside a
+  string literal representing a character that can't be typed directly
+  — here, a newline.
+- **`implements`** — fulfills an interface's method contract, as
+  opposed to `extends`, which inherits a base class's implementation.
+- **Constructor overloading** — declaring more than one constructor for
+  the same class, distinguished by parameter list; Java picks which one
+  runs based on the arguments supplied at the call site.
+- **`Parcelable`** — an Android framework interface for serializing an
+  object's fields so it can cross the boundary between two Activities
+  inside an `Intent`.
+- **`Parcel`** — the framework's serialized-bytes container that
+  actually crosses the `Intent` boundary.
+- **`Parcel.readString()` / `readInt()` and `writeString()` /
+  `writeInt()`** — read a value back out of a `Parcel`, or write one
+  into it, in a fixed order that the read side and write side must
+  agree on exactly.
+- **`writeToParcel(Parcel dest, int flags)`** — the required
+  `Parcelable` method; writes an object's own fields into a `Parcel`.
+- **`describeContents()`** — a required `Parcelable` method; returns
+  `0` unless the object holds a file descriptor.
+- **`CREATOR`** — a required, exactly-named static field the Android
+  framework looks for via reflection when reconstructing a `Parcelable`
+  object.
 
 ---
 
@@ -27,7 +60,7 @@ Lesson 6 (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
 exactly which `Item` belongs to which row. But `InventoryAdapter` has
 no reasonable way to call `startActivity` itself — it isn't an
 Activity, doesn't hold an Activity's navigation context by design, and
-Lesson 6 built it to know nothing about screens at all, only about
+it was built to know nothing about screens at all, only about
 turning data into rows. Something needs to sit between "a row was
 tapped" and "navigate to detail," without collapsing those two
 responsibilities into one class.
@@ -124,7 +157,7 @@ the next Concept Unit supplies it for real.
 ### Introduce the Concept in Isolation
 
 `OnItemClickListener` just used a shape you've seen a version of
-before — `View.OnClickListener` (Lesson 4) is Android's own
+before — `View.OnClickListener` is Android's own
 single-method interface, implemented with a lambda. This unit defined
 your **own** interface, same shape, for your own purpose. See that
 shape in isolation, with no Android involved at all. Create a folder
@@ -191,14 +224,14 @@ reused.
   **first appearance of a user-defined interface**, same underlying
   idea as `Greeter` in the lab, now nested inside `InventoryAdapter`
   (a nested interface, same visibility-organizing idea as the nested
-  `InventoryViewHolder` class from Lesson 6). One abstract method with
+  `InventoryViewHolder` class). One abstract method with
   no body — an interface declares *what* can be called, never *how*.
 - `private final OnItemClickListener listener;` — reappearing
-  (`private final` field, Lesson 6/7), new type.
+  (`private final` field), new type.
 - Constructor gaining a second parameter — reappearing (constructor
   pattern), same `this.` assignment idiom.
 - `itemView.setOnClickListener(v -> ...)` — **reappearing concept**
-  (Observer-pattern registration + lambda, Lesson 4), moved to a new
+  (Observer-pattern registration + lambda), moved to a new
   location: **the whole row** (`itemView`, the ViewHolder's root view)
   rather than one button inside it — tapping anywhere on the row
   triggers this, not a specific child view.
@@ -216,7 +249,7 @@ reused.
 
 A single-abstract-method interface used this way is the **Strategy /
 Observer pattern**, same family as `View.OnClickListener` itself and
-`RecyclerView.Adapter`'s `LayoutManager` split from Lesson 6 — behavior
+`RecyclerView.Adapter`'s `LayoutManager` split — behavior
 is supplied as a value (an object implementing one method) rather than
 hardcoded. Also recognized in: comparator objects passed to a sort
 function, dependency-injected strategy objects in general, and any
@@ -229,7 +262,7 @@ separately-compiled module supplies the behavior.
 `startActivity` itself**, which would technically work and save writing
 an interface? The alternative — Adapter starts Activities directly —
 violates the **Single Responsibility Principle**: `InventoryAdapter`'s
-one job, as built in Lesson 6, is turning data into rows; adding
+one job is turning data into rows; adding
 navigation logic on top means any future screen that wants to reuse
 this same Adapter (a search-results screen, a "recently added" list)
 is now stuck with whatever navigation behavior was hardcoded in, unable
@@ -246,7 +279,7 @@ behavior per screen later without touching this file again.
 
 `InventoryActivity` can now be notified *which* `Item` was tapped. The
 next question: how does that `Item`'s data reach a brand-new
-`ItemDetailActivity`, given that Lesson 4 already established you can't
+`ItemDetailActivity`, given that you already know you can't
 just hand it a Java object reference the way you'd pass one method
 argument to another — `Intent` is the only channel across that OS-
 mediated boundary.
@@ -262,8 +295,8 @@ mediated boundary.
 ### The New Code — the Detail Screen
 
 Right-click the package → New → Activity → Empty Views Activity, name
-it `ItemDetailActivity` (same wizard flow as `InventoryActivity` in
-Lesson 4 — **reappearing**, not re-explained). Replace
+it `ItemDetailActivity` (same wizard flow as `InventoryActivity`
+before — **reappearing**, not re-explained). Replace
 `activity_item_detail.xml`'s contents:
 
 ```xml
@@ -296,7 +329,7 @@ Lesson 4 — **reappearing**, not re-explained). Replace
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-Every tag and attribute here is **reappearing** from Lesson 3/5 — a
+Every tag and attribute here is **reappearing** — a
 `ConstraintLayout` root, two `TextView`s stacked via `toBottomOf`,
 already covered.
 
@@ -331,7 +364,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
 This is the whole new file — `extends AppCompatActivity`, the
 `onCreate` override, `super.onCreate`, `setContentView` are all
-**reappearing** from Lesson 2/4, unexplained again on purpose. The new
+**reappearing**, unexplained again on purpose. The new
 material is the three lines reading from `getIntent()`.
 
 ### Mechanical Walkthrough
@@ -339,7 +372,7 @@ material is the three lines reading from `getIntent()`.
 - `getIntent()` — **first appearance.** Every Activity started via
   `startActivity(intent)` can retrieve that same `Intent` object back,
   inside itself, by calling this — the receiving side of the exact
-  `Intent` your `MainActivity` builds and sends in Lesson 4.
+  `Intent` your `MainActivity` already builds and sends.
 - `.getStringExtra("EXTRA_NAME")` — **first appearance.** Reads a
   `String` value out of the `Intent`'s extras, by key — the receiving
   half of `putExtra`, built next on the sending side. Returns `null` if
@@ -350,7 +383,7 @@ material is the three lines reading from `getIntent()`.
   (`0`) because a primitive `int` (unlike `String`, which can be
   `null`) cannot represent "absent" on its own.
 - `nameText.setText(name)` / `infoText.setText(...)` — reappearing
-  (`setText`, Lesson 5), `"\n"` — **first appearance** of an escape
+  (`setText`), `"\n"` — **first appearance** of an escape
   sequence for a newline character inside a string literal, forcing the
   quantity and location onto separate lines.
 
@@ -364,7 +397,7 @@ material is the three lines reading from `getIntent()`.
 ### The New Code
 
 Confirm the Manifest has (the wizard should have added this
-automatically, same as `InventoryActivity`'s entry in Lesson 4):
+automatically, same as `InventoryActivity`'s entry before):
 
 ```xml
 <activity android:name=".ItemDetailActivity" android:exported="false" />
@@ -426,7 +459,7 @@ generic, and this Activity owns the specifics.
   parameter name `item` here is your choice, matching the interface's
   parameter *type*, not its parameter *name*.
 - `new Intent(InventoryActivity.this, ItemDetailActivity.class)` —
-  reappearing (`Intent` construction, Lesson 4), one new detail:
+  reappearing (`Intent` construction), one new detail:
   `InventoryActivity.this` rather than a bare `this` — required because
   plain `this` inside this lambda would refer to the lambda's own
   context, which (unlike an anonymous inner class, covered in this
@@ -439,7 +472,7 @@ generic, and this Activity owns the specifics.
   types) — one version accepts a `String` value, another an `int`,
   matched automatically based on what you pass. Each call attaches one
   key-value pair to the `Intent`'s extras bundle.
-- `startActivity(intent)` — reappearing, from Lesson 4.
+- `startActivity(intent)` — reappearing.
 
 ### Run It
 
@@ -452,7 +485,7 @@ three separate `putExtra`/`get*Extra` pairs.
 
 Keying values by string and reading them back by the same string is
 **string-keyed dictionary passing** — the same idea as `Bundle` from
-Lesson 5's `onSaveInstanceState`, in fact literally the same underlying
+`onSaveInstanceState` earlier, in fact literally the same underlying
 `Bundle` class (an `Intent`'s extras *are* a `Bundle`). Also recognized
 in: HTTP query parameters (`?name=...&quantity=...`), environment
 variables passed to a subprocess, and any config object read by string
@@ -481,9 +514,9 @@ that cost firsthand.
 ### The Problem
 
 Three fields, three matching `putExtra`/`get*Extra` pairs — already a
-little repetitive, and worth noticing the same failure shape as Lesson
-7's parallel-lists problem: if `Item` gains a fourth field (the
-exercise in Lesson 7 suggested a `sku`), it is entirely possible to add
+little repetitive, and worth noticing the same failure shape as the
+parallel-lists problem from earlier: if `Item` gains a fourth field (an
+earlier exercise suggested a `sku`), it is entirely possible to add
 it to `Item.java` and forget to add the matching `putExtra`/`getStringExtra`
 pair here — no compiler error, just a `null` or `0` silently showing up
 in `ItemDetailActivity`. A better fix ties the packaging logic to the
@@ -626,8 +659,8 @@ public class Item implements android.os.Parcelable {                       // �
 }
 ```
 
-`Item` as a whole is now a normal data-holder (everything from Lesson
-7, unchanged) **plus** a self-contained description of how to serialize
+`Item` as a whole is now a normal data-holder (everything built earlier,
+unchanged) **plus** a self-contained description of how to serialize
 and rebuild itself — every field this class has, in one place, instead
 of scattered across whichever Activity happens to be sending or
 receiving it.
@@ -640,7 +673,7 @@ name, just `new InterfaceName() { ... }` with a body right there. This
 is an **anonymous class**, and it exists for a specific reason worth
 proving directly: `Parcelable.Creator` requires *two* methods
 (`createFromParcel`, `newArray`), and every lambda this curriculum has
-used so far — Lesson 4's `OnTapListener`, this lesson's own
+used so far — the earlier `OnTapListener`, this lesson's own
 `OnItemClickListener` — only ever worked because each of those
 interfaces had exactly *one* abstract method. See what happens when
 that's no longer true. Create a folder for this lab. Inside it, create
@@ -728,8 +761,8 @@ Real output — verified this session:
 
 *What this proves:* `new Calculator() { ... }` builds a real object
 that implements `Calculator`, both methods included, in one expression
-— no separate named `.java` file (the `Chime`-style long way, Lesson
-2c), and no lambda (impossible here, just proven). This is exactly the
+— no separate named `.java` file (the `Chime`-style long way), and no
+lambda (impossible here, just proven). This is exactly the
 tool `CREATOR` above needed: `Parcelable.Creator<Item>` has two
 required methods, so an anonymous class — not a lambda — is what
 implements it inline.
@@ -898,7 +931,7 @@ as that listener, builds an `Intent` targeting `ItemDetailActivity` and
 calls `intent.putExtra("EXTRA_ITEM", item)`, which — because `Item`
 implements `Parcelable` — triggers `writeToParcel` to serialize all
 three fields into the `Intent`'s `Bundle` → `startActivity` hands it to
-the OS (Lesson 4's mechanism, unchanged) → `ItemDetailActivity.onCreate`
+the OS (the same mechanism, unchanged) → `ItemDetailActivity.onCreate`
 calls `getIntent().getParcelableExtra("EXTRA_ITEM")`, which triggers
 `CREATOR.createFromParcel` → the `Item(Parcel in)` constructor rebuilds
 a new but field-identical `Item` object → its getters populate the
@@ -917,7 +950,7 @@ Walkthrough. Restore the correct order afterward.
 
 ## Exercises
 
-1. Add the `sku` field from Lesson 7's exercise (if you did it) to
+1. Add the `sku` field from an earlier exercise (if you did it) to
    `Item`'s `Parcelable` methods — one line each in the constructor and
    `writeToParcel` — and display it on the detail screen. Notice this
    is still three small edits, all inside `Item.java`, rather than

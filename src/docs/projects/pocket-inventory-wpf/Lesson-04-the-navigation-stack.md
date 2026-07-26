@@ -6,14 +6,14 @@
 > As a user, I want to return to the Home screen from anywhere.
 
 **What you will build**
-Lesson 3 built a one-way door: clicking "Add Item" replaces the home
+The app currently has a one-way door: clicking "Add Item" replaces the home
 screen with the Add Item screen, permanently, with no way back except
 closing the entire application. This lesson adds a real, deliberately
 designed Back button to the header — the same header that's visible on
 every screen — that correctly returns to whatever screen came before, and
 correctly disables itself the moment there's nowhere left to go back to.
-Nothing about the underlying mechanism is new; Lesson 3's closing unit
-already proved the back stack exists and works. This lesson is entirely
+Nothing about the underlying mechanism is new; the back stack was already
+proven to exist and work by tracing it by hand. This lesson is entirely
 about giving it a real, visible, correctly-behaving control.
 
 **What you need to know first**
@@ -22,13 +22,31 @@ its closing unit's back-stack trace — this lesson picks up exactly where
 that trace left off. Lesson 2: the header `Grid`'s columns, which this
 lesson adds a third one to.
 
+**Terms introduced in this lesson:**
+- **`event`** — declares a member other code subscribes to, not a
+  value read directly.
+- **`+=` on an event** — subscribes an additional handler to run when
+  the event fires, without replacing any existing subscriber.
+- **`?.Invoke()`** — fires an event, using `?.` to skip invocation
+  safely when no subscriber exists yet.
+- **`IsEnabled`** — a property every WPF control has; `false` renders
+  it visually dimmed and unclickable.
+- **`Frame.Navigated`** — an event every `Frame` raises automatically
+  whenever a navigation, forward or backward, finishes.
+- **`NavigationEventArgs`** — carries details about the navigation
+  that just occurred.
+- **`Frame.CanGoBack`** — a read-only `bool` property, `true` exactly
+  when the back stack has at least one entry.
+- **`Frame.GoBack()`** — pops the top entry off the back stack and
+  navigates to it.
+
 ---
 
 ## Concept Unit: Subscribing to an Event From C#, With `+=`
 
 ### The Problem
 
-Lesson 3's `Click="AddItemButton_Click"` wired an event entirely inside
+The `Click="AddItemButton_Click"` attribute wired an event entirely inside
 XAML. The Back button's behavior needs something XAML's `Click="..."`
 attribute cannot express on its own: the button must start out
 **disabled** (there's nothing to go back to when the app first opens) and
@@ -86,7 +104,7 @@ value types, Lesson 14; here it just means "only invoke if at least one
 subscriber exists, otherwise do nothing and don't crash"). Nothing about
 `DoorAlarm` needed to know, when it was written, what any subscriber would
 actually do — the exact same "notify without knowing who's listening"
-shape as Lesson 3's `Click` event, just written from C# instead of XAML.
+shape as the `Click` event before, just written from C# instead of XAML.
 
 ### Discard the Throwaway Example
 Delete the `lab-events` folder. `+=` event subscription itself is not
@@ -101,8 +119,8 @@ every navigation `Frame` performs.
 - `alarm.DoorOpened += () => Console.WriteLine(...)` — **first
   appearance of `+=` on an event.** Not numeric addition — "run this
   code too, whenever `DoorOpened` fires," in addition to any other
-  existing subscriber. `() => ...` is a lambda (reappearing, Lesson 3's
-  `Click` handler used the same shape).
+  existing subscriber. `() => ...` is a lambda (reappearing — the
+  `Click` handler earlier used the same shape).
 - `DoorOpened?.Invoke()` — **first appearance.** What actually fires
   the event, from inside `DoorAlarm` itself. `?.` here means "only
   invoke if at least one subscriber exists" — full nullable-operator
@@ -116,8 +134,8 @@ every navigation `Frame` performs.
 
 ### CS Lens
 
-This is the **Observer pattern**, reappearing from Lesson 3's `Click`
-event — the same underlying idea, now seen from its second possible
+This is the **Observer pattern**, reappearing from the `Click`
+event before — the same underlying idea, now seen from its second possible
 syntax. WPF (and .NET generally) offers two ways to subscribe to the same
 kind of notification: declaratively, in markup (`Click="..."`), or
 imperatively, in code (`+=`). Both attach a method to be called later; they
@@ -127,7 +145,7 @@ happens when the event fires.
 ### SE Lens
 
 Why does this lesson's Back button need the `+=` form instead of another
-XAML `Click="..."` attribute, the way Lesson 3's Add Item button used?
+XAML `Click="..."` attribute, the way the Add Item button used before?
 Because this lesson also needs to subscribe to a *second*, different
 event — `Frame.Navigated`, covered next — purely to update the Back
 button's enabled state, with no XAML attribute available for that
@@ -150,7 +168,7 @@ inside `MainWindow`'s constructor.
 ### The Problem
 
 The Back button needs to know, at every moment, whether going back is
-currently even possible — disabled when the back stack (Lesson 3) is
+currently even possible — disabled when the back stack is
 empty, enabled the instant it isn't. That state changes every time
 navigation happens anywhere in the app, which means something needs to
 run *after every single navigation*, not just once.
@@ -160,9 +178,9 @@ run *after every single navigation*, not just once.
 - **Reference Source:** No reference counterpart.
 - **Files affected:** `MainWindow.xaml`; `MainWindow.xaml.cs`.
 - **Change type:** Add.
-- **Location:** A new column in the header `Grid` (`Grid.Row="0"` from
-  Lesson 2); `MainWindow`'s constructor.
-- **Dependencies:** `ContentFrame`, Lesson 3.
+- **Location:** A new column in the header `Grid` (`Grid.Row="0"`,
+  already established); `MainWindow`'s constructor.
+- **Dependencies:** `ContentFrame`, already built.
 
 ### The New Code — the Button
 
@@ -249,15 +267,15 @@ namespace PocketInventory
    navigation — forward *or* backward — finishes.
 3. `private void ContentFrame_Navigated(object sender, NavigationEventArgs e)`
    — (first appearance of this specific event's signature, hard concept
-   reappearing overall) same event-handler shape as Lesson 3's
-   `AddItemButton_Click`, different parameter type:
+   reappearing overall) same event-handler shape as `AddItemButton_Click`
+   before, different parameter type:
    `NavigationEventArgs` — (first appearance) carries details about the
    navigation that just occurred (which `Page` it navigated to, among
    other things this project doesn't need yet).
 4. `ContentFrame.CanGoBack` — (first appearance) a read-only `bool`
    property on `Frame`, `true` exactly when its back stack has at least
    one entry — the live, queryable answer to "is there anything to go
-   back to," computed from the same stack Lesson 3 traced by hand.
+   back to," computed from the same stack traced by hand before.
 5. `BackButton.IsEnabled = ContentFrame.CanGoBack;` — reads that live
    `bool` and writes it directly into the button's own `IsEnabled`
    property, every time this handler runs — which, because it's
@@ -300,8 +318,8 @@ enabled — doesn't do anything yet. The final unit gives it real behavior.
 ### The Problem
 
 `BackButton_Click` doesn't exist yet. Wiring it needs exactly one new
-method call: the operation that actually pops the back stack Lesson 3
-described and this lesson has been tracking the state of.
+method call: the operation that actually pops the back stack already
+described, and this lesson has been tracking the state of.
 
 ### Project Change
 
@@ -358,8 +376,8 @@ namespace PocketInventory
 ```
 
 `MainWindow` now has two event handlers working together: one that keeps
-`BackButton.IsEnabled` truthful at all times, and one, wired via Lesson
-3's `Click="BackButton_Click"` XAML attribute, that actually performs the
+`BackButton.IsEnabled` truthful at all times, and one, wired via the
+`Click="BackButton_Click"` XAML attribute, that actually performs the
 navigation — but only ever does anything at all when going back is
 genuinely possible.
 
@@ -376,11 +394,11 @@ genuinely possible.
    bug.
 2. `ContentFrame.GoBack();` — (first appearance) pops the top entry off
    the `Frame`'s back stack and navigates to it — the exact operation
-   Lesson 3's closing unit predicted this lesson would build, now real.
+   predicted earlier, now real.
 
 ### Execution trace
 
-Continuing Lesson 3's exact trace, now with the Back button in play:
+Continuing the earlier trace, now with the Back button in play:
 
 ```
 App launches:
@@ -407,13 +425,13 @@ written anywhere for "this specific navigation happened to be a Back."
 
 ### CS Lens
 
-**Stack semantics, deepened from Lesson 3.** Lesson 3 proved the stack
-existed and traced it by hand, from the outside, using the browser-style
+**Stack semantics, deepened.** The stack was already proven to
+exist, traced by hand from the outside, using the browser-style
 default toolbar as evidence. This lesson closes the loop: `GoBack()` is
 the actual **pop** operation, `CanGoBack` is a live **is-empty** check,
 and both are now driven entirely by this project's own, deliberately
-designed control — not a borrowed default toolbar. The push happens
-inside `Navigate(...)` (Lesson 3); the pop happens inside `GoBack()`
+designed control — not a borrowed default toolbar. The push already happens
+inside `Navigate(...)`; the pop happens inside `GoBack()`
 (this lesson) — together, the complete push/pop pair that defines a stack
 as a data structure, both now directly wired to real, visible buttons.
 
@@ -456,18 +474,18 @@ code, because the mechanism lives entirely on `MainWindow`'s single
 ## Closing
 
 ### Connect the Pieces
-One concrete trace, extending Lesson 3's: `MainWindow`'s constructor
+One concrete trace, extending the earlier one: `MainWindow`'s constructor
 subscribes to `ContentFrame.Navigated` using `+=` (Concept Unit 1) —
 imperative C# subscription, chosen specifically because this behavior
 needs to run after *every* navigation, not just one button's click.
-Every time navigation happens anywhere — Lesson 3's forward `Navigate`
-calls, or this lesson's backward `GoBack()` — `ContentFrame_Navigated`
+Every time navigation happens anywhere — a forward `Navigate`
+call, or this lesson's backward `GoBack()` — `ContentFrame_Navigated`
 fires and re-reads `ContentFrame.CanGoBack` (Concept Unit 2), keeping
 `BackButton.IsEnabled` truthful at all times with no manual bookkeeping.
 Clicking the button, once enabled, calls `ContentFrame.GoBack()`
 (Concept Unit 3) — the literal pop half of the push/pop pair this
 project's back stack has had, correctly, since the very first
-`Navigate(...)` call in Lesson 3.
+`Navigate(...)` call.
 
 ### What Breaks Without This
 Temporarily remove the `ContentFrame.Navigated += ContentFrame_Navigated;`

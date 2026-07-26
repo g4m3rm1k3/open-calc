@@ -523,14 +523,23 @@ inside; you've already seen its real position.
   implementation of the contract, called later). Worth restating
   precisely: this is **Observer**, not the Template Method shape
   `onCreate` uses — nobody is subclassing anything here.
-- `findViewById(R.id.main)` — **first appearance.** Walks the inflated
-  view tree looking for the view whose id matches — here,
-  `R.id.main`, the id on `activity_main.xml`'s own root
-  `ConstraintLayout` (Lesson 1's wizard default already set this;
-  Lesson 3 preserves it when it replaces the file). Returns that view
-  as an object you can call methods on. `R.id.main` is the same
-  generated-constant pattern as `R.layout.activity_main` from Lesson
-  2e, just under the `id` nested class instead of `layout`.
+- `findViewById(R.id.main)` — **first appearance.** "Inflate," used
+  loosely just above and from here on, means the step where Android
+  reads your XML layout file and builds the real, in-memory `View`
+  objects it describes — a `ConstraintLayout` object, a `TextView`
+  object, and so on, wired together exactly as the XML nested them.
+  `setContentView(R.layout.activity_main)` (above, this same unit)
+  triggers that step for the whole screen, before this line ever runs.
+  `findViewById` walks the tree that inflation just built, looking for
+  the one view whose id matches — here, `R.id.main`, the id on
+  `activity_main.xml`'s own root `ConstraintLayout` (Lesson 1's wizard
+  default already set this; Lesson 3 preserves it when it replaces the
+  file). Returns that view as an object you can call methods on.
+  `R.id.main` is the same generated-constant pattern as
+  `R.layout.activity_main` from Lesson 2e, just under the `id` nested
+  class instead of `layout`. (The class that actually performs
+  inflation, `LayoutInflater`, is Lesson 6e's subject — this is the
+  concept; that lesson is the mechanism.)
 - `(v, insets) -> { ... }` — **reappearing mechanism, new syntax.** You
   already know the mechanism — this is `Chime` again, a real
   implementation of a single-method interface, handed to something

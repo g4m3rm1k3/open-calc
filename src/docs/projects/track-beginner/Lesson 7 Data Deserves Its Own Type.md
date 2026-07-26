@@ -1,7 +1,7 @@
 # Lesson 7: Data Deserves Its Own Type — Modeling an Item
 
 **What you will build:** A real `Item` class (name, quantity, location)
-replacing the bare `List<String>` from Lesson 6, with the inventory
+replacing the bare `List<String>` used before, with the inventory
 list now showing quantity and location alongside each name. The
 transferable problem: as soon as one piece of data (an item's name)
 needs *companions* (its quantity, where it's stored), the temptation is
@@ -17,13 +17,29 @@ unrepresentable instead of just unlikely.
 class/object/`new`/field/constructor syntax, reused here for two new,
 unrelated classes. Lesson 2d's `private`. Lesson 6d's explicit casting.
 
+**Terms introduced in this lesson:**
+- **`List.remove(value)`** — removes the first element equal to the
+  given value, shifting every later element one position earlier
+  (contrast: `List.get(index)`, index-based lookup, already used).
+- **Mutable field** — a (non-`final`) field allowed to be reassigned
+  after construction (`quantity`, here — stock goes up and down).
+- **Getter / accessor** — a public method whose only job is returning a
+  private field's value.
+- **Setter** — a public method whose only job is reassigning a private
+  field's value.
+- **`equals(Object other)`** — the method every class inherits from
+  `Object`, overridden here to define what "equal" means for `Item`
+  specifically.
+- **`instanceof`** — a runtime check asking whether an object is
+  actually an instance of a given type (or one of its subtypes).
+
 ---
 
 ## Concept Unit: Parallel Lists Fall Out of Sync
 
 ### The Problem
 
-Extending Lesson 6's approach the "obvious" way would mean adding
+Extending the current approach the "obvious" way would mean adding
 `List<String> quantities` and `List<String> locations` alongside
 `itemNames`, all three kept aligned by shared index — position `2` in
 every list describes the same item. Nothing in the type system enforces
@@ -33,7 +49,7 @@ produces with the smallest possible example.
 ### Introduce the Concept in Isolation
 
 Create a folder for this lesson's labs (plain folder, no `package`
-line needed — same convention as every lab so far, per Lesson 2a).
+line needed — same convention as every lab so far).
 Inside it, create a file named exactly `ParallelListsDemo.java`:
 
 ```java
@@ -77,12 +93,14 @@ Bob: 90
 Carol: 75
 ```
 
+#### Execution Trace
+
 Two lists, one loop, shifted out of alignment the moment `names` lost
 an element `scores` never did:
 
 ```
-Iteration 1: i = 0, names.get(0) = "Bob", scores.get(0) = 90 → prints "Bob: 90"
-Iteration 2: i = 1, names.get(1) = "Carol", scores.get(1) = 75 → prints "Carol: 75"
+Iteration 1: i = 0 — names.get(0) now returns "Bob", because removing "Alice" shifted every later name one position earlier; scores.get(0) still returns 90, Alice's original score, since scores was never modified → prints "Bob: 90", pairing Bob with the wrong score.
+Iteration 2: i = 1 — names.get(1) returns "Carol" for the same reason; scores.get(1) returns 75, which was Bob's original score, since scores still holds its original three values at their original indices → prints "Carol: 75", one misattribution further off than the previous line.
 ```
 
 This proves the failure concretely: Bob is now shown with Alice's old
@@ -104,7 +122,7 @@ it gets one list of one type, built next.
 ### Mechanical Walkthrough
 
 - `List<String> names` / `List<Integer> scores` — **reappearing**
-  (`List<T>`, `ArrayList`, Lesson 6d/6e), two independent collections,
+  (`List<T>`, `ArrayList`), two independent collections,
   the actual setup this whole bug depends on.
 - `names.remove("Alice")` — **first appearance of `List.remove` by
   value** (as opposed to `List.get` by index, already used) — removes
@@ -265,6 +283,23 @@ SUMMER10: 3 uses left
 After one redemption: 2
 ```
 
+#### Execution Trace
+
+`usesRemaining` is mutated state carried across these four lines, not a
+single isolated call — worth walking through exactly, not just trusting
+the two printed lines:
+
+1. `Coupon summer = new Coupon("SUMMER10", 3);` — builds a real `Coupon`
+   object; `usesRemaining` starts at `3`.
+2. `System.out.println(summer.getCode() + ...)` — reads the object's
+   *current* state and prints it: `SUMMER10: 3 uses left`.
+3. `summer.setUsesRemaining(summer.getUsesRemaining() - 1);` — reads the
+   current value (`3`), computes `3 - 1 = 2`, and writes `2` back into
+   that *same* object's `usesRemaining` field.
+4. `System.out.println("After one redemption: " + summer.getUsesRemaining());`
+   — reads the field again. It's now `2`, proving step 3's mutation
+   actually stuck: `After one redemption: 2`.
+
 *What this proves:* `Coupon` is the exact same shape `Item.java` above
 just used, with different field names — `code`, like `Item`'s `name`
 and `location`, is `private final` with a getter and no setter, because
@@ -286,7 +321,7 @@ real version of this same shape; nothing here is reused.
 ### Mechanical Walkthrough
 
 - `private final String name;` / `private final String location;` —
-  **reappearing** (`private final` field, from Lesson 6's
+  **reappearing** (`private final` field, same idea as
   `InventoryAdapter.itemNames`), applied here to two fields that should
   never change after construction — a name or storage location being
   edited in place isn't a real operation this app needs (renaming would
@@ -296,7 +331,7 @@ real version of this same shape; nothing here is reused.
   quantity *does* need to change over the item's life (stock goes up
   and down), so it's left reassignable.
 - `public Item(String name, int quantity, String location) { ... }` —
-  reappearing (constructor, from Lesson 2a), new detail worth a clause:
+  reappearing (constructor), new detail worth a clause:
   three parameters this time, each assigned to its matching field via
   `this.` disambiguation.
 - `public String getName()`, `public int getQuantity()`,
@@ -305,7 +340,7 @@ real version of this same shape; nothing here is reused.
   is returning a private field's value — the exact shape `Coupon.getCode()`
   and `Coupon.getUsesRemaining()` just proved in isolation. This is the
   actual mechanism of **encapsulation**: `name` and `location` are
-  `private` (Lesson 2d), meaning code outside this class cannot read or
+  `private`, meaning code outside this class cannot read or
   write them directly — the only way in is through the methods this
   class chooses to expose.
 - `public void setQuantity(int quantity)` — **first appearance of the
@@ -485,11 +520,13 @@ false
 false
 ```
 
+#### Execution Trace
+
 Two constructions, same values, both checks say "different":
 
 ```
-Iteration 1: new CoordinateBad(3, 4) → a built, a.x = 3, a.y = 4
-Iteration 2: new CoordinateBad(3, 4) → b built, b.x = 3, b.y = 4
+Iteration 1: new CoordinateBad(3, 4) runs the constructor, which sets a.x = 3 and a.y = 4 on a freshly allocated object.
+Iteration 2: new CoordinateBad(3, 4) runs the constructor again with identical arguments, producing the same field values (b.x = 3, b.y = 4) — but since each new call allocates its own distinct object, a and b sit at two different memory locations even though every field matches, which is why the equality checks below both come back false.
 ```
 
 `a == b` is `false` because `a` and `b` are two separate objects in
@@ -584,8 +621,8 @@ and `CoordinateDemo.java` — nothing here is reused; `Item.java`'s own
   it could be a `String`, an `Integer`, anything — and comparing fields
   against something that isn't even an `Item` would be a compile error
   without first narrowing the type.
-- `Item that = (Item) other;` — **reappearing** explicit cast, from
-  Lesson 6d's `(Integer) box.get()` — `(Item)` tells the compiler "trust
+- `Item that = (Item) other;` — **reappearing** explicit cast — same
+  mechanism as `(Integer) box.get()` earlier — `(Item)` tells the compiler "trust
   me, treat this `Object` reference as an `Item` from here on," safe
   here specifically because the `instanceof` check just above already
   confirmed it.
@@ -642,7 +679,7 @@ example of.
 ### The Problem
 
 `InventoryAdapter` and `InventoryActivity` still work in terms of
-`List<String>` from Lesson 6. Time to upgrade both to the real type.
+`List<String>`. Time to upgrade both to the real type.
 
 ### Project Change
 
@@ -680,18 +717,18 @@ Replace `list_item_inventory.xml`'s contents:
 
 ### The Updated Project
 
-Where Lesson 6 had a single `TextView` as the row's root, the root is
-now a `LinearLayout` (reappearing, from Lesson 6a's throwaway
+Where the row's root used to be a single `TextView`, the root is
+now a `LinearLayout` (reappearing — the same container from the throwaway
 `addView` lab, now landing in the real project for real) stacking two
 `TextView`s vertically — the item name at 18sp, and a second line at
 14sp for quantity and location.
 
 ### Mechanical Walkthrough
 
-- `<LinearLayout ... android:orientation="vertical">` — **reappearing**
-  (Lesson 6a), now permanent: `orientation="vertical"` stacks children
+- `<LinearLayout ... android:orientation="vertical">` — **reappearing**,
+  now permanent: `orientation="vertical"` stacks children
   top-to-bottom, as opposed to `ConstraintLayout`'s relationship-based
-  positioning from Lesson 3 — a simpler container appropriate when
+  positioning — a simpler container appropriate when
   children just need to flow in one direction, not participate in
   complex constraint relationships.
 - Two `TextView`s, `android:padding` on the parent instead of each
@@ -783,14 +820,14 @@ argued for, now actually exercised.
 
 ### Mechanical Walkthrough
 
-- `Item item = items.get(position);` — reappearing (`List.get`, Lesson
-  6e), new element type.
+- `Item item = items.get(position);` — reappearing (`List.get`),
+  new element type.
 - `item.getName()`, `item.getQuantity()`, `item.getLocation()` —
   reappearing (getter calls, defined earlier this lesson), first real
   use outside `Item.java` itself.
 - String concatenation building
   `"Qty: " + item.getQuantity() + " — " + item.getLocation()` —
-  reappearing (`+` string building, from Lesson 5's tap counter).
+  reappearing (`+` string building, same as the tap counter earlier).
 
 ### The New Code — Activity Builds Real Items
 
@@ -835,10 +872,10 @@ public class InventoryActivity extends AppCompatActivity {
 ### Mechanical Walkthrough
 
 - `new Item("Hex Bolts, M6", 240, "Bin 4")` and its four siblings —
-  reappearing (constructor call, Lesson 2a), first real use of `Item`'s
+  reappearing (constructor call), first real use of `Item`'s
   own constructor outside a throwaway lab.
 - Everything else (`ArrayList`, `RecyclerView`, `LinearLayoutManager`,
-  `setAdapter`) — reappearing from Lesson 6e, unchanged except the
+  `setAdapter`) — reappearing, unchanged except the
   element type.
 
 ### SE Lens
@@ -874,7 +911,7 @@ list.
 Full trace: `InventoryActivity` builds five `Item` objects, each one
 bundling a name, quantity, and location that can never drift apart from
 each other, because they live inside one object rather than three
-synchronized lists → `InventoryAdapter` (upgraded from Lesson 6) holds
+synchronized lists → `InventoryAdapter` (upgraded from before) holds
 that `List<Item>` and, in `onBindViewHolder`, calls `item.getName()`,
 `item.getQuantity()`, `item.getLocation()` — the public, encapsulated
 surface `Item.java` deliberately exposes — to fill in the two-line row
@@ -925,4 +962,4 @@ confirm the same line now logs `true`.
 
 Lesson 8 is next: tapping a row to see its full detail on a second
 screen — passing an actual `Item` between Activities, and why that's
-not as simple as passing a `String` was in Lesson 4.
+not as simple as passing a `String` was before.

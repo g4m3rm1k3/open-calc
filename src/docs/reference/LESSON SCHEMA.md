@@ -256,8 +256,9 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    things, explicitly: **(a) first appearance** — full treatment, what it
    is, what it does, what it returns, regardless of how basic it looks;
    **(b) a hard concept reappearing** (per the Repetition Rule — a
-   pattern, a principle, a named CS idea) — a real restatement naming
-   which earlier lesson taught it, never silence, even if it's "only" a
+   pattern, a principle, a named CS idea) — a real restatement of what
+   the concept or pattern *is*, by name, never silence and never a bare
+   lesson-number citation, even if it's "only" a
    clause; **(c) genuinely basic, already-established syntax** (a
    variable read, a already-taught operator) — silently reusable, no
    restatement owed. The failure this enumeration exists to catch is
@@ -265,6 +266,22 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    (b) because explaining it felt unnecessary in the moment — the
    enumeration step exists specifically so that sorting is checked
    against the actual code, item by item, rather than trusted to memory.
+
+   > **Cite the concept, not the lesson, for lessons written from this
+   > point forward:** when (b) applies, name the concept or pattern and
+   > restate briefly what it does — "the same Observer pattern
+   > `Doorbell`/`Chime` already proved," not "reappearing from Lesson
+   > 2c." A parenthetical lesson citation with nothing else ("—
+   > reappearing (Lesson 2c)") is not a restatement; it's an assertion
+   > the reader has to go verify by opening another file, and it fails
+   > this rule exactly like silence does. Never hyperlink to the
+   > earlier lesson either — the site's search finds where a concept
+   > was introduced and everywhere else it's used; that's the lookup
+   > path, not an in-body citation. The one place a lesson number
+   > belongs is the header's "What you need to know first" list and the
+   > closing "next lesson" pointer — never inside a Concept Unit's own
+   > prose. This is a preference for **new** lessons only, same as the
+   > two callouts above.
 
    **Execution trace, if this code carries a loop, recursion, or state
    across steps.** A prose description of what a loop "generally does"
@@ -278,7 +295,15 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    ```
 
    The reader must see the actual values a real run produces, not a
-   paraphrase of the logic that produces them.
+   paraphrase of the logic that produces them. Values alone are not
+   enough, either: showing `i 0 → 3` is a description of what changed,
+   not an explanation of why — every line needs both. State what in the
+   code caused that specific value, on that specific iteration, to come
+   out the way it did (which condition matched, which branch ran, which
+   argument was passed) — not just the before/after values themselves.
+   A trace a reader could reproduce by staring at bare numbers with no
+   sentence attached has described the run, not explained it, and fails
+   this requirement exactly as a prose paraphrase would.
 
    **A second shape of execution trace: control flow / timing, not
    changing values.** Some code needs a trace for a different reason —
@@ -304,6 +329,25 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
       sound, proving step 1 didn't already fire it.
    3. `doorbell.press()` — only now does `Doorbell`'s own code decide
       to call `callback.onTap()`.
+
+   **A claim about hidden or invisible behavior needs the same proof, not
+   just a confident sentence.** "The compiler generated it," "this
+   happens automatically," "the framework does this behind the scenes" —
+   any sentence describing behavior the reader cannot see by reading
+   their own source is exactly the kind of claim this section's own
+   "prose isn't proof" standard applies to, and it's easy to forget that
+   mid-explanation because the sentence *sounds* like an explanation
+   rather than an assertion. If a real tool can show it — disassembling
+   a compiled file, inspecting a generated artifact, printing an object's
+   actual runtime shape — show that output. This failed once already:
+   Lesson 6b's own trace opened with "prose asserting `Inner` secretly
+   holds a reference isn't proof," then two lines later asserted "nothing
+   in `Inner`'s own field list shows this reference exists, because the
+   compiler generated it, not you" — with no verification at all,
+   violating the standard it had just stated. The fix: compile the code
+   for real and run `javap -p` against the compiled class, showing the
+   actual synthesized field (`final Outer this$0;`) the compiler
+   added — an assertion turned into inspectable evidence.
 
    Never wrap this shape in a code fence. The content is prose that
    references code, not code itself; a fence misrepresents it as
@@ -449,13 +493,25 @@ Read the draft top to bottom and answer honestly:
       violation even when the explanation is accurate.
 - [ ] Does any loop, recursion, or carried-state code have a real
       execution trace — concrete values, step by step — rather than a
-      prose paraphrase of what it "generally does"?
+      prose paraphrase of what it "generally does"? And for each step in
+      that trace: is the value change actually explained (which
+      condition matched, which branch ran, why this iteration produced
+      this value), or does the line just report a before/after value
+      with no reasoning attached? A trace of bare values with nothing
+      explaining them fails this exactly as a prose paraphrase would.
 - [ ] Does any timing/control-flow trace (a registered callback firing
       later, a framework calling an override at an unpredictable
       moment — no loop, no changing values) use the numbered-list shape
       instead of the `Iteration N: values` shape? Check specifically for
       prose sentences wrapped in a code fence — that's this exact
       failure, and it renders as an unreadable wall of monospace text.
+- [ ] Does any sentence assert hidden or invisible behavior — "the
+      compiler generated it," "this happens automatically," "the
+      framework does this internally" — with no verification attached?
+      If a real tool can show it (disassembling a compiled file,
+      inspecting a generated artifact, printing an object's actual
+      runtime shape), that output belongs in the lesson; a confident
+      sentence is not a substitute for it, even when it's correct.
 - [ ] For every hard concept (per the Repetition Rule), does the CS Lens
       name _several_ unrelated real-world recurrences, not just one? A
       single "this is like X" sentence satisfies the Contract's weaker

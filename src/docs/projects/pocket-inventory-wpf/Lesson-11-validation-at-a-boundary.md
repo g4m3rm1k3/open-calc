@@ -24,6 +24,26 @@ it.
 `INotifyPropertyChanged` on `InventoryItem`. Lesson 9: `AddButton_Click`,
 `SaveItemToDatabase`. Lesson 6: `class`, properties.
 
+**Terms introduced in this lesson:**
+- **Nullable array element type** (`string?[]`) — declares an array
+  whose elements may be `null`, contrasted against `string[]`, which
+  promises every element is non-null.
+- **`string.IsNullOrWhiteSpace(input)`** — returns `true` for `null`,
+  for `""`, and for a string containing only whitespace characters.
+- **Indexer** — a member literally named `this`, taking a parameter in
+  `[...]`, letting instances be indexed with square brackets like a
+  `Dictionary` or array.
+- **`Dictionary.TryGetValue(key, out value)`** — looks up a key,
+  returning `true`/`false` for found/not-found while also handing back
+  the value through an `out` parameter, in one call.
+- **`IDataErrorInfo`** — a built-in .NET interface WPF's binding
+  system checks for on any bound object, to surface per-property
+  validation errors.
+- **Expression-bodied member** (`=>` on a property) — shorthand for a
+  `get`-only property body.
+- **`ValidatesOnDataErrors`** — tells a binding to actually check
+  `IDataErrorInfo` on its source object on every update.
+
 ---
 
 ## Concept Unit: `string.IsNullOrWhiteSpace`
@@ -79,17 +99,19 @@ Real output — verified this session:
 '' -> blank: True
 ```
 
+#### Execution Trace
+
 Four iterations, one check per element, concrete values:
 
 ```
-Iteration 1: input = "Widget" → isBlank = False
-Iteration 2: input = ""       → isBlank = True
-Iteration 3: input = "   "    → isBlank = True
-Iteration 4: input = null     → isBlank = True
+Iteration 1: input = "Widget" — IsNullOrWhiteSpace returns False, because "Widget" is neither null, nor empty, nor all-whitespace, the only case this method treats as blank.
+Iteration 2: input = "" — returns True, since an empty string has zero characters, satisfying the "empty" case this method explicitly checks for.
+Iteration 3: input = "   " — returns True, because every character present is whitespace, which this method treats identically to an empty string.
+Iteration 4: input = null — returns True, since this method checks for null before ever touching the string's characters, which is exactly why it doesn't throw the way input.Trim() would.
 ```
 
 *What this proves:* `string.IsNullOrWhiteSpace(input)` — (first
-appearance) — a `static` method (Lesson 0's meaning: called on the
+appearance) — a `static` method (meaning: called on the
 `string` type itself, not on any specific string instance) that
 returns `true` for `null`, for `""`, and for a string containing only
 whitespace characters — three different "not really something" cases,
@@ -110,7 +132,7 @@ real check `InventoryItem`'s validation logic uses next.
 - `string?[] inputs = { "Widget", "", "   ", null };` — **reappearing**
   nullable-array element type (this unit's own opening bullet, above).
 - `string.IsNullOrWhiteSpace(input)` — **first appearance.** A
-  `static` method (Lesson 0's meaning: called on the `string` type
+  `static` method (called on the `string` type
   itself) that returns `true` for `null`, `""`, or a
   whitespace-only string — three cases, one check.
 - `$"'{input}'"` with `input = null` — **first appearance of this
@@ -125,8 +147,8 @@ point it crosses from outside your program's control into code that
 will act on it, rather than trusting it implicitly because it arrived
 through a UI element that "looks like" it constrains what can be typed.
 A `TextBox` places no real restriction on its contents at all; the
-restriction has to be enforced in code, explicitly, the same way Lesson
-9's `NumberFormatException` lab already proved a text field can hold
+restriction has to be enforced in code, explicitly, the same way an
+earlier lab already proved a text field can hold
 anything regardless of what a form's *label* implies it should contain.
 
 Also recognized in: web forms requiring server-side validation even
@@ -212,7 +234,7 @@ taking a parameter in `[...]`, letting instances of `Cabinet` be indexed
 with square brackets exactly like a `Dictionary` or an array, even
 though `Cabinet` isn't either of those things — `cabinet["top"]` calls
 the indexer's `get`; `cabinet["top"] = "Screwdrivers"` calls its `set`,
-identical shape to the `Name` property's `get`/`set` from Lesson 6/7,
+identical shape to the `Name` property's `get`/`set` from before,
 just parameterized by whatever's inside the `[...]` instead of taking
 no parameter at all.
 
@@ -226,8 +248,8 @@ interface uses an indexer with this exact shape, read-only, next.
 - `public string this[string drawerName] { get; set; }` — **first
   appearance of an indexer.** A member literally named `this`, taking a
   parameter in `[...]`, letting instances be indexed with square
-  brackets — the same `get`/`set` shape as an ordinary property
-  (Lesson 6/7), just parameterized.
+  brackets — the same `get`/`set` shape as an ordinary property,
+  just parameterized.
 - `drawers.TryGetValue(drawerName, out string? contents)` — **first
   appearance.** Looks up `drawerName` in the dictionary, returning
   `true`/`false` for found/not-found while also handing back the value
@@ -342,14 +364,14 @@ namespace PocketInventory
 ```
 
 `InventoryItem` now implements two interfaces — `INotifyPropertyChanged`
-(Lesson 7, announcing *that* something changed) and `IDataErrorInfo`
+(already implemented, announcing *that* something changed) and `IDataErrorInfo`
 (this lesson, answering *whether* the current state is valid) — genuinely
 different, complementary contracts, both satisfied by one class.
 
 ### Mechanical Walkthrough
 
 - `IDataErrorInfo` — (first appearance) — a real, built-in .NET
-  interface (`System.ComponentModel`, already `using` since Lesson 7)
+  interface (`System.ComponentModel`, already `using` from before)
   WPF's binding system specifically checks for on any bound object.
 - `public string Error => string.Empty;` — (first appearance of
   **expression-bodied member syntax**, `=>` used on a property instead
@@ -362,8 +384,8 @@ different, complementary contracts, both satisfied by one class.
   previous unit), the interface's actual per-property check: WPF calls
   this, automatically, passing the *name* of whichever bound property
   it wants validated, every time that property's value changes.
-- `propertyName == nameof(Name)` — reappearing (`nameof`, mentioned in
-  Lesson 0, first real use) — comparing the passed-in property name
+- `propertyName == nameof(Name)` — reappearing (`nameof`, mentioned
+  earlier, first real use) — comparing the passed-in property name
   against `Name` specifically, safely: renaming the `Name` property
   later would fail to compile here until this line is updated too, the
   same compile-time-safety reasoning `nameof` always buys you.
@@ -377,7 +399,7 @@ different, complementary contracts, both satisfied by one class.
 ### CS Lens
 
 `IDataErrorInfo` is the **Strategy pattern** again — reappearing from
-Lesson 3's `Frame`/`Page` split (there, arrangement strategy; here,
+the `Frame`/`Page` split before (there, arrangement strategy; here,
 validation strategy): WPF's binding system doesn't know or care *how*
 `InventoryItem` decides what's valid — it only knows to call this
 specific indexer and interpret an empty-versus-non-empty string. A
@@ -402,7 +424,7 @@ specific message, from one implementation.
 
 ### The Problem
 
-`NameInput` isn't bound to anything yet — Lesson 9/10 read its `.Text`
+`NameInput` isn't bound to anything yet — the code so far read its `.Text`
 imperatively, inside `AddButton_Click`, which is exactly why nothing
 currently stops a blank submission. Real `IDataErrorInfo` validation
 only fires through a real binding.
@@ -440,16 +462,16 @@ only fires through a real binding.
 
 ### Mechanical Walkthrough
 - `Text="{Binding NewItemDraft.Name, ...}"` — reappearing (`{Binding}`,
-  Lesson 7/8), new path: `NewItemDraft.Name`, reading through a property
+  already used), new path: `NewItemDraft.Name`, reading through a property
   on `InventoryPage` (built next) rather than directly off `InventoryPage`
 - itself — the identical `Property.SubProperty` binding-path shape
-  Lesson 8's `CurrentPerson.Nickname` lab already proved works.
+  the `CurrentPerson.Nickname` lab already proved works.
 - `ValidatesOnDataErrors=True` — (first appearance) — tells this
   specific binding to actually check `IDataErrorInfo` on its source
 - object, on every update — without this, `InventoryItem`'s indexer
   exists but nothing ever calls it.
-- `UpdateSourceTrigger=PropertyChanged` — reappearing, Lesson 8, needed
-  for exactly the reason it was needed there: live, per-keystroke
+- `UpdateSourceTrigger=PropertyChanged` — reappearing, needed
+  for exactly the reason it was needed before: live, per-keystroke
   updates, so the error indicator appears and disappears in real time
   rather than only on lost focus.
 
@@ -476,7 +498,7 @@ private void AddButton_Click(object sender, RoutedEventArgs e)
 
 Wait — `InventoryPage` itself has no `INotifyPropertyChanged` machinery
 yet, and reassigning `NewItemDraft` needs to notify the binding, the
-same problem Lesson 7's very first unit solved for `InventoryItem`.
+same problem already solved for `InventoryItem` earlier.
 `InventoryPage` needs the identical treatment, applied to itself this
 time:
 
@@ -620,14 +642,14 @@ someone found a way to click "Add" without the visual check having run
 
 - `public InventoryItem NewItemDraft { get; set; } = new InventoryItem();`
   → immediately replaced with the hand-written version — reappearing
-  pattern from Lesson 7's `Name`, applied to `InventoryPage` itself for
+  pattern from `Name`'s earlier treatment, applied to `InventoryPage` itself for
   the first time: a *page* implementing `INotifyPropertyChanged`, not
   just a data model, because `NewItemDraft` is a bound property whose
   *reassignment* (not just its internal `Name` changing) needs to be
   announced.
 - `if (string.IsNullOrWhiteSpace(NewItemDraft.Name)) { return; }` —
   reappearing (this lesson's first unit; `return` as an early guard,
-  Lesson 9's Android-track sibling names this same fail-fast shape,
+  the Android track's sibling lesson names this same fail-fast shape,
   worth recognizing here too).
 - `NewItemDraft = new InventoryItem();` — reappearing (constructor
   call), replacing the entire draft object after a successful add —
@@ -652,7 +674,7 @@ handler's own guard is what *actually* guarantees invalid data never
 reaches `Items` or the database — the visual border is UX, immediate
 feedback with no guarantee attached; the handler's check is the real
 boundary enforcement. This is the identical two-layer shape SQLite's
-`NOT NULL` (Lesson 9) added beneath this project's own C#-side checks:
+`NOT NULL` (already added) beneath this project's own C#-side checks:
 a friendlier, earlier layer that catches most mistakes visibly, backed
 by a stricter, later layer that cannot be bypassed, each doing a
 genuinely different job.
@@ -674,9 +696,9 @@ empty. Type a real name — the red border disappears immediately, and
 
 ### Connection
 
-Epic 2 closes here: a real item, modeled as its own type (Lesson 6),
-observing its own changes (Lesson 7), selectable and editable live
-(Lesson 8), saved to and loaded from a real database (Lessons 9–10),
+Epic 2 closes here: a real item, modeled as its own type,
+observing its own changes, selectable and editable live,
+saved to and loaded from a real database,
 and now rejected at the door when it's invalid (this lesson) — the full
 vertical slice this project's design notes promised, for the smallest
 possible item. Epic 3 grows this exact item, one real field at a time.
@@ -688,7 +710,7 @@ possible item. Epic 3 grows this exact item, one real field at a time.
 ### Connect the Pieces
 
 One concrete trace: `NameInput.Text` is bound, `TwoWay` by default
-(Lesson 8), to `NewItemDraft.Name` — reassigned freshly after every
+(as established before), to `NewItemDraft.Name` — reassigned freshly after every
 successful add via `InventoryPage`'s own new `INotifyPropertyChanged`
 implementation. `ValidatesOnDataErrors=True` (this lesson) makes that
 binding also check `InventoryItem`'s `IDataErrorInfo` indexer on every

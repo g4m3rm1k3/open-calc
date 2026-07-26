@@ -14,6 +14,21 @@ hope you guessed right.
 concept, in one line — flagged, not deeply explained, since the whole
 point of this lesson is showing why you usually don't want to need it).
 
+**Terms introduced in this lesson:**
+- **`Object`** — the root class of every type in Java; every class you
+  write is automatically a kind of `Object`, whether declared or not.
+- **Cast** — an explicit claim to the compiler about an expression's
+  actual runtime type (e.g. `(Integer) box.get()`); checked at runtime,
+  and can fail.
+- **Type parameter** — the placeholder name (e.g. `T` in `class
+  Box<T>`) a generic class declares, filled in with a real, concrete
+  type at the point of use.
+- **Generic type** — a class or interface declared with one or more
+  type parameters (`Box<T>`), instantiated with a specific type
+  argument (`Box<String>`).
+- **Diamond operator** (`<>`) — infers a generic type's argument from
+  context instead of repeating it explicitly on both sides.
+
 ---
 
 ## Concept Unit: Generics — One Class, Many Types, Checked at Compile Time
@@ -31,7 +46,7 @@ right.
 
 See the actual failure first, with a deliberately "flexible" box that
 holds anything at all. Create a folder for this lesson's labs (plain
-folder, no `package` line — Lesson 2a's convention). Inside it, create
+folder, no `package` line — the same convention as every lab so far). Inside it, create
 `ObjectBox.java`:
 
 ```java
@@ -70,7 +85,7 @@ public class GenericsDemoBad {
 ```
 
 `(Integer) box.get()` — **first appearance of a cast in running code**
-(Lesson 2d mentioned casting exists; this is it, used for real). `box.get()`
+(casting was mentioned as a concept earlier; this is it, used for real). `box.get()`
 returns a plain `Object`, but this line claims, explicitly, "trust me,
 what's actually in there is an `Integer`" — a cast doesn't convert
 anything; it's a claim to the compiler, checked at runtime, that may
@@ -89,6 +104,26 @@ Real output — this compiles fine, then crashes:
 Exception in thread "main" java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer (java.lang.String and java.lang.Integer are in module java.base of loader 'bootstrap')
 	at GenericsDemoBad.main(GenericsDemoBad.java:6)
 ```
+
+#### Execution Trace
+
+`value` is state stored in one step and read back in a later one —
+worth walking through exactly, not just trusting the crash:
+
+1. `ObjectBox box = new ObjectBox();` — builds a real `ObjectBox`
+   object; its `value` field starts out empty (`null`).
+2. `box.set("hello");` — stores a real `String`, `"hello"`, into
+   `value`. `value`'s declared type is `Object`, so nothing here checks
+   or remembers that what was actually stored was a `String`
+   specifically.
+3. `Integer number = (Integer) box.get();` — reads `value` back out
+   (still, underneath, the exact same `String` object stored in step 2)
+   and *claims* to the compiler it's really an `Integer`. This is the
+   line where the claim gets checked, at runtime, against what's
+   actually there — and fails.
+4. The cast failing means `number` is never assigned at all —
+   execution jumps straight to the uncaught exception shown above;
+   `System.out.println(number)` never runs.
 
 What this proves: `ObjectBox` compiled without complaint even though
 `box` was set to a `String` and read back as an `Integer` — `Object`
@@ -239,7 +274,7 @@ real `List` holding real `String`s, with the compiler rejecting any
 attempt to insert or retrieve the wrong type, the same guarantee
 `Box<T>` just demonstrated. `RecyclerView.Adapter<VH>` itself, which
 `InventoryAdapter` will extend, is also generic — its own `<VH>` type
-parameter is filled in with `InventoryViewHolder` from Lesson 6c,
+parameter is filled in with `InventoryViewHolder`,
 using this exact mechanism a second time in the same lesson.
 
 ---

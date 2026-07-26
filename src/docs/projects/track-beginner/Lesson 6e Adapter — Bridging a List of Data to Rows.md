@@ -9,14 +9,37 @@ the `RecyclerView` widget), Lesson 6b (`static` nested classes), Lesson
 6c (the `InventoryViewHolder` fragment — this lesson is where it
 finally becomes a real, saved file), Lesson 6d (generics, `List<String>`).
 
+**Terms introduced in this lesson:**
+- **`final` (on a field)** — restricts a field's reference to being
+  assigned exactly once, never reassigned afterward.
+- **`@NonNull`** — an annotation asserting a parameter or return value
+  must never be `null`; checked by Android Studio's static analysis,
+  not by the compiler itself.
+- **`onCreateViewHolder`** — the Adapter method `RecyclerView` calls
+  only when it needs to build a brand-new row holder, not once per data
+  item.
+- **`LayoutInflater`** — the class responsible for turning an XML
+  layout resource into real `View` objects at runtime.
+- **`onBindViewHolder`** — the Adapter method `RecyclerView` calls
+  every time a holder, new or recycled, needs to display a different
+  data item.
+- **`List.get(index)`** — standard-library method; index-based lookup
+  into a `List`.
+- **`getItemCount()`** — the Adapter method `RecyclerView` calls to
+  learn the total number of rows to display.
+- **`ArrayList`** — a concrete, resizable implementation of the `List`
+  interface.
+- **`LinearLayoutManager`** — a `RecyclerView` `LayoutManager`
+  implementation that arranges rows in a single scrolling list.
+
 ---
 
 ## Concept Unit: `Adapter` — Bridging a List of Data to a Finite Number of Rows
 
 ### The Problem
 
-You now have a row layout and a way to cache a row's view references
-(Lesson 6c). Nothing yet connects your actual data (a list of item
+You now have a row layout and a way to cache a row's view references.
+Nothing yet connects your actual data (a list of item
 names) to those rows, and nothing tells `RecyclerView` how many rows
 exist or how to arrange them (vertically, horizontally, in a grid). Two
 separate jobs, handled by two separate collaborators: the `Adapter`
@@ -26,11 +49,11 @@ separate jobs, handled by two separate collaborators: the `Adapter`
 
 - **Reference Source:** No reference counterpart.
 - **Files affected:** New file `InventoryAdapter.java` (contains the
-  `ViewHolder` from Lesson 6c as a nested class); `InventoryActivity.java`
+  previewed `ViewHolder` fragment as a nested class); `InventoryActivity.java`
   (wire it up).
 - **Change type:** Create, then add.
-- **Dependencies:** The `ViewHolder` shape from Lesson 6c, generics
-  from Lesson 6d.
+- **Dependencies:** The `ViewHolder` shape already previewed, and
+  generics.
 
 ### The New Code
 
@@ -86,7 +109,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
 
 ### The Updated Project
 
-This is the whole new file — the `InventoryViewHolder` from Lesson 6c
+This is the whole new file — the `InventoryViewHolder` fragment
 now sits inside it as a nested class, exactly as promised, and the
 outer `InventoryAdapter` class supplies the three methods
 `RecyclerView.Adapter` requires plus a constructor and the data it
@@ -97,31 +120,30 @@ wraps.
 - `class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`
   — split into two ideas: extending `RecyclerView.Adapter` is the
   required base class contract (same "must extend the framework's
-  class" idea as `AppCompatActivity` in Lesson 2c, different base
-  class); the `<...>` part is **reappearing**, from Lesson 6d's
-  Generics unit — `RecyclerView.Adapter<VH>` is a generic class much
+  class" idea as `AppCompatActivity`, different base
+  class); the `<...>` part is **reappearing** — `RecyclerView.Adapter<VH>`
+  is a generic class much
   like `Box<T>` was, and this line fills in its type parameter with
   `InventoryViewHolder`, telling the compiler *which* ViewHolder
   subtype this specific adapter works with, so that methods like
   `onCreateViewHolder` below can be declared to return
   `InventoryViewHolder` specifically rather than a plain
-  `RecyclerView.ViewHolder` the caller would have to cast (Lesson 6d's
-  casting).
+  `RecyclerView.ViewHolder` the caller would have to cast.
 - `private final List<String> itemNames;` — **first appearance of
   `final` on a field.** `final` means this field's reference can be
   assigned exactly once (in the constructor) and never reassigned
   afterward — appropriate here because the Adapter is handed one list
   object to display and isn't meant to swap it out for a different list
-  later. `List<String>` is **reappearing** (Lesson 6d's Generics unit),
-  applied to the standard library's `List` interface: this specific
+  later. `List<String>` is **reappearing** — the same generics
+  mechanism, applied to the standard library's `List` interface: this specific
   list is locked to holding `String`s only, compiler-enforced.
 - `InventoryAdapter(List<String> itemNames) { this.itemNames = itemNames; }`
-  — **reappearing** (constructor, from Lesson 2a/6c), new detail worth
+  — **reappearing** (constructor), new detail worth
   a clause: `this.itemNames` disambiguates the field from the parameter
   of the same name — `this.` explicitly means "the field on this
   object," not the parameter that's shadowing it.
 - `@NonNull` — **first appearance.** An annotation (same category as
-  `@Override` from Lesson 2c, different purpose): a documentation-and-
+  `@Override`, different purpose): a documentation-and-
   tooling hint that this parameter or return value must never be
   `null`, checked by Android Studio's static analysis, not by the
   compiler itself.
@@ -129,14 +151,17 @@ wraps.
   **first appearance.** Called by `RecyclerView` only when it actually
   needs a *new* holder object — not once per data item, but only enough
   times to fill the screen plus a small buffer, which is the literal
-  mechanism behind the "reuse, don't rebuild" promise from Lesson 6a's
-  first Concept Unit. `viewType` isn't used yet (relevant when a list
+  mechanism behind the "reuse, don't rebuild" promise the wasteful
+  `addView()` loop motivated. `viewType` isn't used yet (relevant when a list
   has multiple different row layouts — not this project, yet).
 - `LayoutInflater.from(parent.getContext())` — **first appearance.**
   `LayoutInflater` is the class responsible for turning an XML layout
   resource into real View objects — the same process `setContentView`
   triggers for you automatically for a whole screen; here you're
-  calling it yourself for a single row layout instead.
+  calling it yourself for a single row layout instead. This is the
+  actual mechanism behind "inflate," a word this curriculum has used
+  loosely since `findViewById` first appeared — that's the concept;
+  `LayoutInflater`, here, is the real class that does it.
 - `.inflate(R.layout.list_item_inventory, parent, false)` — **first
   appearance.** Three arguments: which layout resource to inflate, the
   `parent` ViewGroup it will eventually live inside (needed so the
@@ -145,8 +170,8 @@ wraps.
   handles attaching the returned view at the right time; passing `true`
   here is a common real bug that duplicates the view in the tree.
 - `return new InventoryViewHolder(itemView);` — reappearing
-  (constructor call, `new`, already basic since Lesson 4's
-  `new Intent(...)`).
+  (constructor call, `new`, already basic since `new Intent(...)`
+  earlier).
 - `onBindViewHolder(@NonNull InventoryViewHolder holder, int position)`
   — **first appearance.** Called far more often than `onCreateViewHolder`
   — every time a holder (new *or* recycled) needs to display a
@@ -156,9 +181,9 @@ wraps.
 - `itemNames.get(position)` — **first appearance of `List.get`** —
   standard-library method, index-based lookup, conceptually the same as
   array indexing.
-- `holder.itemNameText.setText(name)` — reappearing (`setText`, Lesson
-  5), reading the cached field directly (package-private access,
-  explained in Lesson 6c) instead of calling `findViewById` again —
+- `holder.itemNameText.setText(name)` — reappearing (`setText`),
+  reading the cached field directly (package-private access,
+  already covered) instead of calling `findViewById` again —
   this line is the actual payoff of the whole ViewHolder unit.
 - `getItemCount()` — **first appearance.** `RecyclerView` calls this to
   know how many total rows exist — it has no other way to know your
@@ -191,7 +216,7 @@ recyclerView.setAdapter(new InventoryAdapter(itemNames));
 (Add the matching imports: `java.util.ArrayList`, `java.util.List`,
 `androidx.recyclerview.widget.RecyclerView`,
 `androidx.recyclerview.widget.LinearLayoutManager` — Alt+Enter on each
-red underline, as in Lesson 4.)
+red underline, same as before.)
 
 ### The Updated Project
 
@@ -224,7 +249,7 @@ anything: a `LayoutManager` (arrangement logic) and an `Adapter`
 ### Mechanical Walkthrough
 
 - `new ArrayList<>()` — **first appearance.** A concrete, resizable
-  `List` implementation — the `<>` (diamond operator, Lesson 6d) means
+  `List` implementation — the `<>` (diamond operator) means
   "infer the type parameter from the left-hand side" (`List<String>`),
   so you don't have to repeat `<String>` on both sides.
 - `.add(...)` — reappearing pattern (already-basic method call).
@@ -260,7 +285,7 @@ graphics libraries.
 **Why does the framework demand three separate override methods
 (`onCreateViewHolder`, `onBindViewHolder`, `getItemCount`) instead of
 one method that just returns "the view for row N"?** The alternative —
-one combined method — is closer to what the wasteful loop in Lesson 6a
+one combined method — is closer to what the wasteful loop from earlier
 did: construct-and-populate together, every time. Splitting "construct
 a holder" from "populate a holder with data" is what makes recycling
 possible at all: `RecyclerView` can call `onCreateViewHolder` rarely
@@ -269,8 +294,8 @@ possible at all: `RecyclerView` can call `onCreateViewHolder` rarely
 full construction cost on every single row update. The cost of this
 design is exactly what you just wrote: three methods and a separate
 `ViewHolder` class instead of one — more ceremony for a small list,
-real savings at scale, which is the entire justification Lesson 6a's
-first Concept Unit set up.
+real savings at scale, which is the entire justification the earlier
+`addView()` scaling problem set up.
 
 ---
 

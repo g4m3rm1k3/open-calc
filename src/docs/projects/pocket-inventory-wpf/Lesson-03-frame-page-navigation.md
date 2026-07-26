@@ -25,6 +25,26 @@ specifically — the `*`-sized content region. Lesson 1: `x:Name`, string
 interpolation, and the `WelcomeMessage` field, which this lesson relocates
 out of `MainWindow.xaml.cs` into a new file entirely.
 
+**Terms introduced in this lesson:**
+- **`Page`** — WPF content meant to be hosted inside something else
+  (a `Frame`), not a standalone top-level window; has no `Show()`
+  method of its own, unlike `Window`.
+- **`Frame`** — a control that hosts and swaps `Page` content inside
+  one window, without the window itself closing or reopening.
+- **`NavigationUIVisibility`** — a `Frame` property controlling
+  whether its own built-in back/forward navigation UI is shown.
+- **Event handler** — a method matching the exact signature an event
+  expects (e.g. `object sender, RoutedEventArgs e`), wired to run when
+  that event fires.
+- **`NavigationService`** — a property every `Page` has, providing
+  access to the `Frame` currently hosting it.
+- **`Frame.Navigate(...)`** — tells the hosting `Frame` to swap its
+  current content for a new `Page`.
+- **Back stack** — the internal structure a `Frame` maintains,
+  recording every `Page` navigated away from, in order.
+- **LIFO** (Last In, First Out) — the rule governing a stack: the most
+  recently pushed entry is always the first one removed.
+
 ---
 
 ## Concept Unit: `Page` — Content That Isn't a Window

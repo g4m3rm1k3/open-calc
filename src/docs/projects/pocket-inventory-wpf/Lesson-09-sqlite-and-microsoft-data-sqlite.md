@@ -25,6 +25,39 @@ Lesson 0: the .NET SDK, and specifically how a project's dependencies
 (NuGet packages, the .NET equivalent of a Python `pip install`) get
 added — this lesson's first real one.
 
+**Terms introduced in this lesson:**
+- **Volatile storage** (RAM) — requires continuous power; reclaimed
+  unconditionally the moment the process that owns it exits.
+- **Non-volatile storage** (disk) — holds its contents with no power
+  required; survives the process, the app, and a full system restart.
+- **`dotnet add package`** — downloads a named package from NuGet and
+  adds it as a dependency to the project's `.csproj` file.
+- **Connection string** — a small, semicolon-separated configuration
+  format describing where and how to connect to a database.
+- **`SqliteConnection.Open()`** — actually establishes the database
+  connection; SQLite creates the file itself if it doesn't already
+  exist.
+- **`using` statement** — guarantees a resource is properly closed and
+  released the moment it goes out of scope, even if an error occurs
+  (distinct from the `using` directive).
+- **`SqliteConnection.State`** — reports a connection's current status
+  (e.g. `Open`), read directly as a property.
+- **`SqliteCommand`** — an object, produced by
+  `connection.CreateCommand()`, tied to a specific open connection,
+  carrying the SQL to run via `.CommandText`.
+- **`CREATE TABLE IF NOT EXISTS`** — creates a table only if it
+  doesn't already exist, so running the statement twice doesn't error.
+- **`INTEGER PRIMARY KEY AUTOINCREMENT`** — a column SQLite itself
+  assigns a unique, incrementing value to on every new row.
+- **`ExecuteNonQuery()`** — runs a command that returns no rows
+  (contrast: `SELECT`, which does).
+- **Parameter placeholder** (`@name`) — a placeholder in SQL text,
+  filled in via `.Parameters.AddWithValue(...)` rather than direct
+  string substitution — the mechanism that prevents SQL injection.
+- **`const`** — declares a value fixed permanently at compile time;
+  stronger than a normal field, since it can never be changed
+  anywhere, including in the class's own constructor.
+
 ---
 
 ## Concept Unit: Process Memory Versus Persistent Storage
@@ -184,7 +217,7 @@ first time you connect to a path that doesn't exist yet — no separate
 "create the database" step required, a real, SQLite-specific
 convenience most server-based databases don't offer. `using
 SqliteConnection connection = ...` (the `using` **statement**, distinct
-from the `using` **directive** already used since Lesson 1's `using
+from the `using` **directive** already used since the very first `using
 System;`) guarantees `connection` is properly closed and its resources
 released the moment it goes out of scope, even if an error occurs in
 between — the same "resource lifetime tied to a scope" idea, spelled
@@ -221,7 +254,7 @@ real project to a real database next.
   doesn't already exist, no separate "create the database" step needed.
 - `using SqliteConnection connection = ...` — **first appearance of
   the `using` statement**, distinct from the `using` directive
-  (Lesson 1's `using System;`). Guarantees `connection` is closed and
+  (the `using System;` pattern already used). Guarantees `connection` is closed and
   released the moment it goes out of scope, even if an error occurs.
 - `connection.State` — **first appearance.** Reports the connection's
   current status (`Open`, here) — read directly as a property.
@@ -346,8 +379,8 @@ real project next, unchanged.
 A table's column definitions are a **schema** — a fixed, declared shape
 every row must conform to, checked by the database itself, not just
 trusted to whatever C# code happens to write. This is the identical
-"static typing catches a category of error before it happens" idea from
-Lesson 0, now enforced by the database rather than the compiler — even
+"static typing catches a category of error before it happens" idea
+already established, now enforced by the database rather than the compiler — even
 code from a completely different program, written in a completely
 different language, touching this same `.db` file, could never insert a
 row missing a `Name`.
@@ -406,7 +439,7 @@ INSERT INTO Items (Name) VALUES ('Widget'); DROP TABLE Items; --')
 ```
 
 *What this proves, before you even run the rest:* string interpolation
-(Lesson 1) glued the attacker-controlled text directly into the SQL
+glued the attacker-controlled text directly into the SQL
 command, and that text contained a real, complete second statement —
 `DROP TABLE Items` — plus `--`, SQL's own comment marker, silencing
 whatever trailing text was left over. This is **SQL injection** — (first
@@ -550,7 +583,7 @@ namespace PocketInventory
 ```
 
 `AddButton_Click` now does three things instead of two: build the item,
-show it on screen (unchanged from Lesson 6/7), and — new — persist it to
+show it on screen (unchanged from before), and — new — persist it to
 the real database, every single time, immediately.
 
 ### Mechanical Walkthrough
@@ -568,8 +601,8 @@ the real database, every single time, immediately.
 4. `SaveItemToDatabase(newItem);` inside `AddButton_Click` — (first
    appearance of this specific call site) the one new line connecting
    this lesson's work to the existing flow — everything else in the
-   method (Lesson 6/7's object construction, `Items.Add`, clearing
-   `NameInput`) is untouched.
+   method (the object construction, `Items.Add`, clearing
+   `NameInput`, already built) is untouched.
 
 ### CS Lens
 
@@ -618,7 +651,7 @@ On your Windows machine: add two or three items, exactly as before —
 nothing looks different on screen. Now fully close the application and
 locate `pocketinventory.db` (it's created in the project's build output
 folder — typically `bin/Debug/net10.0-windows/`, matching whatever
-`TargetFramework` your own `.csproj` shows, per Lesson 0). Open it with any SQLite
+`TargetFramework` your own `.csproj` shows). Open it with any SQLite
 browser tool (search "DB Browser for SQLite," a free, standard tool for
 exactly this) and confirm every item you added is really there, as real
 rows in a real `Items` table — durable proof, independent of this
@@ -640,7 +673,7 @@ One concrete trace: `InventoryPage`'s constructor calls
 `EnsureDatabaseCreated()` (Concept Unit 3) once, guaranteeing the `Items`
 table exists via an idempotent `CREATE TABLE IF NOT EXISTS`. Clicking Add
 still builds an `InventoryItem` and adds it to the on-screen
-`ObservableCollection`, exactly as Lesson 6/7 built — and now also calls
+`ObservableCollection`, exactly as built before — and now also calls
 `SaveItemToDatabase` (Concept Unit 4), which opens a fresh
 `SqliteConnection` (Concept Unit 2) and runs a parameterized `INSERT`,
 never gluing `item.Name` directly into a SQL string, closing off the SQL

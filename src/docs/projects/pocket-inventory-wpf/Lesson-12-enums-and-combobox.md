@@ -30,6 +30,30 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
 `NewItemDraft`, the current `InventoryPage.xaml` Add row and
 `DetailPanel`.
 
+**Terms introduced in this lesson:**
+- **`enum`** (e.g. `enum Season { Spring, Summer, Fall, Winter }`) —
+  declares a brand-new type whose only legal values are a fixed, named
+  set of members (`Season.Fall`, qualified by the enum's name),
+  enforced by the compiler everywhere it's used.
+- **`Enum.GetValues(typeof(T))`** — a `static` method returning every
+  member of a given enum type, in declared order.
+- **Casting an enum to `int`** (e.g. `(int)current`) — every enum
+  member is secretly an integer underneath, assigned in declared order
+  starting at `0`.
+- **`Array`** — the general, non-generic collection type
+  `Enum.GetValues` returns (predates generics in .NET's history).
+- **`ComboBox`** — a dropdown control restricted to choosing one item
+  from whatever `ItemsSource` supplies; unlike `TextBox`, no arbitrary
+  typed value is possible.
+- **Enum stored as text** — SQLite has no enum column type, so a
+  member's name is stored as plain text rather than its underlying
+  integer.
+- **`enumValue.ToString()`** — every enum member has this method,
+  returning its declared name as a string.
+- **`Enum.Parse<T>(string)`** — the reverse of `ToString()`: given a
+  string and an enum type, finds the member whose name matches
+  exactly, throwing if none does.
+
 ---
 
 ## Concept Unit: `enum` — Declaring a Closed Set of Named Values
@@ -75,7 +99,7 @@ enum Season
 ```
 
 (The `enum` declaration has to come *after* the executable statements
-in this file, not before — Lesson 0's top-level-statements rule:
+in this file, not before — the top-level-statements rule:
 executable code always comes first, type declarations after, in a
 top-level-statements `Program.cs`.)
 
@@ -98,21 +122,23 @@ Fall
 Winter
 ```
 
+#### Execution Trace
+
 `Enum.GetValues` returns every member in declared order — the `foreach`
 below `"---"` just walks that list, one member at a time:
 
 ```
-Iteration 1: season = Spring → printed
-Iteration 2: season = Summer → printed
-Iteration 3: season = Fall → printed
-Iteration 4: season = Winter → printed
+Iteration 1: season = Spring — the first element Enum.GetValues returns, because Spring is declared first in the enum definition and this method walks members in declared order → prints Spring.
+Iteration 2: season = Summer — the foreach advances to the next member in declared order, since Summer was declared immediately after Spring → prints Summer.
+Iteration 3: season = Fall — advances to the third declared member, because Fall was declared immediately after Summer → prints Fall.
+Iteration 4: season = Winter — reaches the last declared member, and the loop ends afterward because Enum.GetValues returned exactly four elements → prints Winter.
 ```
 
 *What this proves:* `enum Season { Spring, Summer, Fall, Winter }`
 declares a brand-new **type**, `Season`, whose only legal values are
 exactly those four named members — nothing else is a `Season`, ever,
 and the compiler enforces this at every point a `Season` is used, the
-identical static-typing guarantee from Lesson 0 now applied to "one of
+identical static-typing guarantee already established, now applied to "one of
 a fixed list" instead of "a number" or "a string." `Season.Fall` refers
 to one specific member, qualified by its enum's name, the same
 `Type.Member` shape as `Math.PI` or any `static` member access already
@@ -124,8 +150,8 @@ order, starting at 0, unless overridden — not needed in this project).
 `current == Season.Fall` compares two enum values the same way any
 value is compared, returning `True`. `Enum.GetValues(typeof(Season))`
 is a `static` method that returns every member of a given enum type, in
-declared order, as a collection you can loop over with `foreach`
-(Lesson 6) — this exact call is what feeds a WPF dropdown every valid
+declared order, as a collection you can loop over with `foreach` —
+this exact call is what feeds a WPF dropdown every valid
 choice automatically, in this lesson's next unit, instead of
 hand-typing each option twice.
 
@@ -149,7 +175,7 @@ project's enum, `Category`, is built next, in the exact same shape.
   now comparing two enum values.
 - `Enum.GetValues(typeof(Season))` — **first appearance.** A `static`
   method returning every member of a given enum type, in declared
-  order, as a collection `foreach` (Lesson 6) can walk.
+  order, as a collection `foreach` can walk.
 
 ### CS Lens
 
@@ -168,7 +194,7 @@ later, there.
 ### SE Lens
 
 Why not just validate a `string` category against an allowed list at
-the point it's saved, the same way Lesson 11 validated `Name`? Because
+the point it's saved, the same way `Name` was validated earlier? Because
 that validation would have to be repeated, correctly, at every single
 place a category is written — the Add form today, an Edit form later,
 a CSV import in Lesson 35 — and any one of those call sites forgetting
@@ -193,8 +219,8 @@ check, but because an invalid one literally cannot compile.
 - **Reference Source:** No reference counterpart.
 - **Files affected:** `InventoryItem.cs`.
 - **Change type:** Add.
-- **Dependencies:** The `enum` shape from the previous unit; Lesson 7's
-  `INotifyPropertyChanged` get/set pattern, reused identically for both
+- **Dependencies:** The `enum` shape from the previous unit; the
+  `INotifyPropertyChanged` get/set pattern already established, reused identically for both
   new properties.
 
 ### The New Code
@@ -312,10 +338,10 @@ correctly in sync with no special-casing per property.
 - `public enum Category { ... }` — reappearing (this lesson's own
   lab), `public` this time (first appearance of `public` on an
   `enum` specifically) so `InventoryPage`, in a different file, can
-  reference it — the identical reasoning Lesson 6 gave for `public`
+  reference it — the identical reasoning already given for `public`
   on `InventoryItem` itself.
 - `private Category category;` / `public Category Category { get; set... }`
-  — reappearing (Lesson 7's exact property shape, applied to `Name`
+  — reappearing (the exact property shape already used, applied to `Name`
   originally), new detail worth naming: this is the first property on
   `InventoryItem` whose type is neither `string` nor `int` — it's the
   `enum` this lesson just declared, and the property's `set` block is
@@ -330,7 +356,7 @@ correctly in sync with no special-casing per property.
 
 ### CS Lens
 
-Both new properties reuse the exact Observer-pattern shape (Lesson 7)
+Both new properties reuse the exact Observer-pattern shape
 `Name` already established — a concrete demonstration that
 `INotifyPropertyChanged` isn't a one-off trick tied to `string`
 specifically; it's a general shape any property, of any type, can
@@ -340,9 +366,9 @@ follow to announce its own changes.
 
 Why does adding two fields touch only one file so far (`InventoryItem.cs`),
 rather than needing to update several places just to introduce them?
-Because Lesson 6's original decision to model "an inventory item" as
+Because the original decision to model "an inventory item" as
 its own type, before any UI code existed, is paying off exactly as
-that lesson's SE Lens predicted: `InventoryItem` is the one shared
+predicted earlier: `InventoryItem` is the one shared
 shape every other part of this project — the form, the list, the
 database — will be updated *against* next, but the fact itself lives
 in exactly one place.
@@ -389,8 +415,8 @@ public Array CategoryValues => Enum.GetValues(typeof(Category));    // ← new
 
 - `public Array CategoryValues => Enum.GetValues(typeof(Category));`
   — (first appearance of `=>` on a property reading live, non-constant
-  data — Lesson 11's `Error => string.Empty` used this same
-  expression-bodied shape, but always returned the same fixed value;
+  data — the `Error => string.Empty` property used this same
+  expression-bodied shape earlier, but always returned the same fixed value;
   this one re-evaluates `Enum.GetValues(...)` every time something
   reads `CategoryValues`) — reappearing (`Enum.GetValues`, this
   lesson's lab), now feeding a real property a `ComboBox` in XAML can
@@ -407,7 +433,7 @@ public Array CategoryValues => Enum.GetValues(typeof(Category));    // ← new
 
 Exposing `CategoryValues` as a property WPF's binding system can read
 is the same **data binding as the single source of truth** idea
-Lesson 7 established for `Items` — the `ComboBox`'s list of choices
+already established for `Items` — the `ComboBox`'s list of choices
 isn't hand-typed into XAML (five `<ComboBoxItem>` elements, easy to
 let drift out of sync with the real `enum`) or duplicated anywhere;
 it's read, live, from the one place `Category`'s real values are
@@ -437,8 +463,8 @@ a `Location`, but the Add row and `DetailPanel` still only show `Name`.
 - **Reference Source:** No reference counterpart.
 - **Files affected:** `InventoryPage.xaml`.
 - **Change type:** Add.
-- **Location:** The Add row's `StackPanel` (Lesson 6); `DetailPanel`
-  (Lesson 8).
+- **Location:** The Add row's `StackPanel` (already built); `DetailPanel`
+  (already built).
 - **Dependencies:** `CategoryValues`, previous unit; `Category` and
   `Location`, two units back.
 
@@ -488,14 +514,14 @@ rhythm the original `TextBox`/`Button` pair already established.
   choosing one item from whatever `ItemsSource` supplies — unlike
   `TextBox`, there is no way to type an arbitrary value into it at all.
 - `ItemsSource="{Binding CategoryValues}"` — reappearing (`{Binding}`,
-  Lesson 7; `ItemsSource`, Lesson 8's `ListBox`), same mechanism, new
+  already used; `ItemsSource`, the same mechanism as the `ListBox` before), same mechanism, new
   source: every value `CategoryValues` currently returns becomes one
   selectable row in the dropdown, automatically re-populated if that
   property's underlying data ever changed (it won't, here — `enum`
   members are fixed at compile time — but the mechanism is the same
   regardless).
 - `SelectedItem="{Binding NewItemDraft.Category}"` — reappearing
-  (`SelectedItem`, Lesson 8), same binding-path shape as
+  (`SelectedItem`, already used), same binding-path shape as
   `NewItemDraft.Name`, now on the enum-typed property instead of the
   string one — proof this binding mechanism genuinely doesn't care
   what type the bound property is.
@@ -525,7 +551,7 @@ rhythm the original `TextBox`/`Button` pair already established.
 
 `DetailPanel` now shows all three facts about whichever item is
 currently selected — `Name` and `Location` both editable inline, the
-same live two-way binding Lesson 8 already proved for `Name`;
+same live two-way binding already proved for `Name`;
 `Category` shown read-only here on purpose (a `TextBlock`, not a
 second `ComboBox`) — editing an existing item's category isn't part of
 this lesson's user story, and Lesson 21 (*Reusing a View for Create and
@@ -535,8 +561,8 @@ belongs.
 ### Mechanical Walkthrough
 
 - `<TextBlock Text="{Binding Category}" .../>` — reappearing
-  (`TextBlock`, Lesson 0; `{Binding}` with no explicit path prefix,
-  Lesson 8 — resolves against `DetailPanel`'s inherited `DataContext`,
+  (`TextBlock`, already used; `{Binding}` with no explicit path prefix,
+  same mechanism as before — resolves against `DetailPanel`'s inherited `DataContext`,
   the selected `InventoryItem`, exactly like the existing `Name`
   binding above it). Displaying an enum this way prints its member
   name directly (`"Tools"`, not `0`) — the same `ToString()` behavior
@@ -581,7 +607,7 @@ project hasn't needed for `Name` (already a plain string) at all.
 - **Files affected:** `InventoryPage.xaml.cs` — `EnsureDatabaseCreated`,
   `SaveItemToDatabase`, `LoadItemsFromDatabase`.
 - **Change type:** Modify.
-- **Dependencies:** Lesson 9's `CREATE TABLE`/`INSERT`, Lesson 10's
+- **Dependencies:** the existing `CREATE TABLE`/`INSERT`, the existing
   `SELECT`/row-mapping.
 
 ### The New Code — the Table Shape
@@ -734,7 +760,7 @@ namespace PocketInventory
 `EnsureDatabaseCreated`, `SaveItemToDatabase`, and `LoadItemsFromDatabase`
 now agree on the same three-column shape — `Name`, `Category`,
 `Location` — the load and save halves of one contract, exactly as
-Lesson 10's Connection section named it, now covering two more facts
+named earlier, now covering two more facts
 without changing that underlying shape at all.
 
 ### Mechanical Walkthrough
@@ -794,7 +820,7 @@ dotnet run
 On your Windows machine: pick a category from the new dropdown, type a
 location, type a name, click Add — the new item appears with its
 category and location both intact. Fully quit and reopen the app
-(Lesson 10's promise, still holding): every item, including its
+(the persistence promise from before, still holding): every item, including its
 category and location, is back exactly as it was. Open
 `pocketinventory.db` in a SQLite browser if you have one — the
 `Category` column holds readable text like `Tools`, not a bare number.
@@ -802,10 +828,10 @@ category and location, is back exactly as it was. Open
 ### Connection
 
 `InventoryItem` grew from one fact to three, and every layer this
-project has already built — the model (Lesson 6), the observable
-binding (Lesson 7), the detail panel (Lesson 8), and SQLite persistence
-(Lessons 9–10) — absorbed that growth without any of those earlier
-lessons' own code needing to change shape, only to be extended with
+project has already built — the model, the observable
+binding, the detail panel, and SQLite persistence
+— absorbed that growth without any of that earlier
+code needing to change shape, only to be extended with
 more of the same pattern. This is Epic 3's whole premise, proven for
 real on its first lesson.
 
@@ -821,7 +847,7 @@ One concrete trace: a user opens the new `ComboBox`, bound via
 `SelectedItem="{Binding NewItemDraft.Category}"` writes
 `Category.Safety` straight into the draft item's property (second
 unit), which announces the change via the same `INotifyPropertyChanged`
-shape `Name` has used since Lesson 7. Clicking Add hands that same
+shape `Name` has used from the very start. Clicking Add hands that same
 draft to `SaveItemToDatabase`, where `item.Category.ToString()` (fifth
 unit) turns it into the text `"Safety"` for the `INSERT`. Reopening the
 app calls `LoadItemsFromDatabase`, where `Enum.Parse<Category>(...)`

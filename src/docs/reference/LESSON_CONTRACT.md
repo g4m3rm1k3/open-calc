@@ -784,7 +784,7 @@ explicit. Not assumed. Not left for the student to recognise on their own.
 "We pass the environment to `evaluateAt`."
 
 **With the connection:**
-"We pass the same `Environment` object we built in lesson 08 — the one that stores
+"We pass the same `Environment` object built earlier — the one that stores
 variable bindings like `A = 42`. The evaluator needs it here because the function
 body might reference a variable the user has stored. When `evaluateAt` calls
 `parseExpression`, the environment travels with it so that `x + A` inside a function
@@ -823,11 +823,17 @@ The restatement is short — one or two sentences connecting the concept to the
 specific code in front of the student. The goal is reinforcement through repeated
 encounter in different contexts, not repetition for its own sake.
 
-**Example — open/closed principle in lesson 19:**
+**Example — open/closed principle, reappearing:**
 "This is the open/closed principle again — the same principle that shaped the
-dispatch table in lesson 09. The intersection solver adds new behaviour (finding
+dispatch table earlier. The intersection solver adds new behaviour (finding
 intersections) without modifying the bisection solver. Existing code is closed for
 modification; new behaviour is open for addition by composing what exists."
+
+Name the principle and restate it — never cite the lesson number where it first
+appeared, and never link to it. "The same principle that shaped the dispatch table
+earlier" is a real restatement; "the same principle from lesson 09" is a citation the
+reader has to go verify, not an explanation. A learner who needs the original full
+treatment has the site's search to find it — the lesson prose is not the index.
 
 **Reappearance deepens; it does not just repeat.** A one-or-two-sentence restatement
 is the floor for a hard concept's *n*th appearance, not the ceiling. Where the new
@@ -928,10 +934,43 @@ Every lesson must have these sections, in this order:
 
 1. **What you will build** — one paragraph. The working software this lesson produces.
 2. **What you need to know first** — explicit links to prerequisite lessons or concepts.
-3. **The lesson** — code and explanation in smallest-runnable-unit steps, each with walkthrough and both lenses.
-4. **Connect the pieces** — a short section after all code is written that maps the new code to the full system.
-5. **What breaks without this** — one concrete failure mode. Show the actual error or wrong behaviour.
-6. **Definition of done** — a checklist the student verifies themselves, including a git commit.
+3. **Terms introduced in this lesson** (glossary) — see "The Glossary Rule" below.
+4. **The lesson** — code and explanation in smallest-runnable-unit steps, each with walkthrough and both lenses.
+5. **Connect the pieces** — a short section after all code is written that maps the new code to the full system.
+6. **What breaks without this** — one concrete failure mode. Show the actual error or wrong behaviour.
+7. **Definition of done** — a checklist the student verifies themselves, including a git commit.
+
+### The Glossary Rule
+
+"Name the concept" (above) is easy to satisfy for a CS idea explained up
+front — "this is a symbol table" — and easy to silently violate for a
+*syntax form* that gets used and described thoroughly without ever being
+given its own real, look-up-able name. This failed once already: a
+lesson used "ordinary `new`" as an implicit contrast for an entire
+Concept Unit — walking through exactly what the *other* `new`
+(`expr.new ClassName()`) does, in detail, correctly — without ever
+stating that it has an official name at all (a **qualified class
+instance creation expression**, per the Java Language Specification,
+§15.9), and without naming "ordinary `new`" either (an **unqualified**
+one). The mechanism was taught correctly; neither side of the contrast
+had a name a reader could look up afterward.
+
+Every lesson gets a short glossary, immediately after "What you need to
+know first," title **"Terms introduced in this lesson."** One line per
+term:
+
+> **Qualified class instance creation expression** — `expr.new
+> ClassName()`; an existing object supplies the new object's enclosing
+> instance.
+
+Every term in this lesson's body marked **first appearance** must have
+a matching glossary entry. If a term only has an informal, descriptive
+name in the prose ("the other `new`," "the hidden reference thing"),
+that is the signal to go find its real name — a language spec, a
+library's own documentation, an established CS term — before the
+glossary entry can be written, not after. A glossary entry that
+restates the informal phrase back is not a fix; the point is forcing an
+actual name to exist, not adding a section for its own sake.
 
 ---
 
@@ -948,6 +987,11 @@ Before a lesson is published, verify every item:
 - [ ] Every significant code block has a walkthrough — not just lenses
 - [ ] Every code block is explained through both the CS lens and the SE lens
 - [ ] No concept is left implicit — every pattern is named
+- [ ] Every term marked **first appearance** has a matching entry in
+      "Terms introduced in this lesson," using the term's real,
+      look-up-able name (a language-spec term, a library's own name for
+      it) — not a restatement of whatever informal phrase the prose used
+      to describe it, per the Glossary Rule
 - [ ] Maths is derived, not assumed
 - [ ] No concept is assumed from a prior lesson — every concept used is explained here
 - [ ] "What breaks without this" is concrete and specific, not hypothetical
@@ -1006,6 +1050,8 @@ Before a lesson is published, verify every item:
 **The Aha Moment**
 - [ ] When code from a prior lesson is reused, the connection is made explicit in prose
 - [ ] Hard concepts (patterns, principles, algorithms) are briefly restated when they reappear
+- [ ] Reappearing concepts are named and restated in prose, never cited by lesson number
+      or hyperlinked — search is the lookup path, not the lesson text
 - [ ] Basic syntax (for loops, if statements, assignment) is not re-explained after its first lesson
 
 **Maximum Extraction**

@@ -6,6 +6,7 @@ import {
   useRef,
   createContext,
   useContext,
+  memo,
 } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -1471,7 +1472,16 @@ function splitMarkdownSections(markdown) {
   return sections;
 }
 
-function SectionedMarkdown({
+// Memoized so that a parent re-render triggered by something this component
+// doesn't care about (MarkdownHub's scroll-driven `activeHeadingId`, ticking
+// on nearly every scroll frame while reading) doesn't force this whole tree
+// — several unmemoized <ReactMarkdown> blocks running remark-gfm/remark-math/
+// rehype-raw/rehype-katex from scratch — to re-parse on every scroll tick.
+// All props below are either primitives or already-memoized objects
+// (`ui`/`accentColor` come from ThemeContext's useMemo'd `themeStyles`), so
+// this memo boundary actually holds instead of being defeated by fresh
+// object identities every render.
+const SectionedMarkdown = memo(function SectionedMarkdown({
   content,
   ui,
   accentColor,
@@ -1671,7 +1681,7 @@ function SectionedMarkdown({
     </div>
     </HeadingIdCtx.Provider>
   );
-}
+});
 
 export default function MarkdownHub() {
   const navigate = useNavigate();

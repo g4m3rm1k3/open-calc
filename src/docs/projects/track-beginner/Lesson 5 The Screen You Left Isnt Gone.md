@@ -4,11 +4,11 @@
 *order* of lifecycle calls visible on every navigation and rotation,
 plus a small on-screen tap counter that proves state gets destroyed —
 and then a fix using `onSaveInstanceState` that proves it doesn't have
-to be. The transferable problem: Lesson 2c showed that `onCreate` is
+to be. The transferable problem: you already know `onCreate` is
 called by the OS, once. This lesson shows it isn't the *only* method
 the OS calls, and that the OS can destroy and recreate your entire
-Activity object — losing every field in it, the same fields Lesson 2a
-taught you belong to one specific object — for reasons that have
+Activity object — losing every field in it, the same fields that
+belong to one specific object — for reasons that have
 nothing to do with the user closing your app: pressing Back, rotating
 the screen, or the system reclaiming memory all trigger it.
 
@@ -26,7 +26,7 @@ and Lesson 4 (`InventoryActivity`, `Intent`, navigating from
 
 Tap "Open Inventory," then press the device/emulator **Back** button.
 You land back on `MainActivity` — and if you watch Logcat, its
-`onCreate called` line from Lesson 2c does **not** print again. So
+`onCreate called` line does **not** print again. So
 `MainActivity` wasn't recreated. But it also isn't the same as if
 `InventoryActivity` had simply been hidden — press Back again and the
 whole app closes, meaning `InventoryActivity` is well and truly gone,
@@ -36,9 +36,9 @@ what order?
 
 ### Introduce the Concept in Isolation
 
-No new syntax is needed here — `Log.d` was already taught in Lesson
-2c, and every method you're about to override is called the same way
-`onCreate` already is (same Template Method pattern from Lesson 2c).
+No new syntax is needed here — `Log.d` was already taught, and every
+method you're about to override is called the same way
+`onCreate` already is (the same Template Method pattern).
 This unit is purely about *watching real, already-understood tools
 reveal an order you haven't seen yet*, so there's no throwaway lab to
 isolate and discard.
@@ -155,8 +155,7 @@ public class MainActivity extends AppCompatActivity {
 Logcat, not just its birth (`onCreate`) — the class is unchanged in
 behavior, purely instrumented so the next step can be observed instead
 of guessed at. Apply the same five overrides, same pattern, to
-`InventoryActivity.java` (which already has only `onCreate` from
-Lesson 4).
+`InventoryActivity.java` (which already has only `onCreate` so far).
 
 ### Mechanical Walkthrough
 
@@ -176,10 +175,12 @@ Lesson 4).
   (Back pressed, or code called `finish()`) or because the OS is
   reclaiming it (covered in the next Concept Unit).
 - `super.onStart()` / `super.onResume()` / etc. — **reappearing
-  concept**, same as `super.onCreate()` from Lesson 2c: each parent
+  concept**, same as `super.onCreate()`: each parent
   version does real framework work you must not skip.
 - `@Override`, `protected void`, `android.util.Log.d(...)` — all
-  **reappearing**, already covered in Lesson 2c.
+  **reappearing**, routine by now: the override-marking annotation, the
+  access level that lets the OS call an inherited method, and the
+  Logcat-writing static call.
 
 ### Run It — Execution Trace
 
@@ -245,8 +246,8 @@ only happens when a screen is genuinely finished with. It doesn't.
 Rotate the emulator (Ctrl+F11, or the rotate button on the emulator
 toolbar) while sitting on `MainActivity`, and watch Logcat: you'll see
 `onPause`, `onStop`, `onDestroy` — then immediately `onCreate` again,
-with a **brand-new object** (Lesson 2a's "each `new` builds a
-completely separate object," now happening to you without you calling
+with a **brand-new object** (the same "each `new` builds a
+completely separate object" idea, now happening to you without you calling
 `new` yourself). Any plain Java field on that object is gone. Prove it
 with something visible, not just a log line.
 
@@ -279,7 +280,7 @@ Add one more `TextView` to `activity_main.xml`, below `titleText`:
 
 `activity_main.xml` now contains three children instead of two — the
 title, this new tap counter directly beneath it (`toBottomOf="@id/titleText"`,
-the same relative-constraint idea from Lesson 3, just referencing a
+the same relative-constraint idea as before, just referencing a
 sibling view's ID instead of `"parent"`), and the button, unchanged, at
 the bottom:
 
@@ -327,13 +328,13 @@ the bottom:
 ### Mechanical Walkthrough
 
 - `app:layout_constraintTop_toBottomOf="@id/titleText"` — **reappearing
-  concept** (constraints, from Lesson 3), worth one clause for the new
+  concept** (constraints), worth one clause for the new
   shape: previous constraints all anchored to `"parent"`; this one
   anchors to a *sibling view's ID* instead — the same relationship
   idea, just between two children rather than child-to-parent.
 - Everything else in this block — `TextView`, `android:id="@+id/..."`,
-  `wrap_content`, `android:text`, margins — **reappearing**, all from
-  Lesson 3.
+  `wrap_content`, `android:text`, margins — **reappearing**, all
+  already-basic layout syntax by now.
 
 ### The New Code — Part 2: A Field That Gets Lost
 
@@ -414,14 +415,14 @@ public class MainActivity extends AppCompatActivity {
 
 `onCreate` now does everything from before, plus wires a second
 listener that mutates `tapCount` and reflects it on screen — a plain
-instance field (Lesson 2a), initialized once per object, exactly the
+instance field, initialized once per object, exactly the
 kind of state that only survives as long as the object holding it
 does.
 
 ### Mechanical Walkthrough
 
 - `private int tapCount = 0;` — **reappearing concept** (an instance
-  field, from Lesson 2a's `LightSwitch.isOn`), new detail worth naming:
+  field, same idea as `LightSwitch.isOn`), new detail worth naming:
   you've declared local variables before (e.g. `openButton`, which only
   lives for one call to `onCreate`), but this is your first field
   *inside `MainActivity` specifically* — it lives at the class level,
@@ -429,9 +430,9 @@ does.
   calls on the same object (for instance, between one tap and the
   next).
 - `findViewById(R.id.titleText)` / `findViewById(R.id.tapCountText)` —
-  **reappearing**, same mechanism as `openInventoryButton` in Lesson 4.
+  **reappearing**, same mechanism as `openInventoryButton` earlier.
 - `titleText.setOnClickListener(v -> {...})` — **reappearing**, same
-  Observer-pattern registration and lambda syntax from Lesson 4, new
+  Observer-pattern registration and lambda syntax as before, new
   target view.
 - `tapCount++` — **first appearance of the increment operator.**
   Shorthand for `tapCount = tapCount + 1;` — same idea as Python's
@@ -451,8 +452,8 @@ at once: Logcat prints `onPause`, `onStop`, `onDestroy`, then
 `onCreate` again — and the on-screen counter resets to "Taps: 0," even
 though `tapCount` was, say, 4 a second ago. The object holding that `4`
 was destroyed; a brand-new `MainActivity` with a brand-new `tapCount =
-0` replaced it, the exact mechanism from Lesson 2a's constructor unit,
-just triggered by the OS instead of your own code.
+0` replaced it — the exact mechanism you already know from building
+objects with `new`, just triggered by the OS instead of your own code.
 
 ### CS Lens
 
@@ -486,8 +487,8 @@ explicitly rescue it — which is exactly the next Concept Unit.
 
 You now know `tapCount` disappears on rotation. `onCreate`'s
 `Bundle savedInstanceState` parameter has been sitting there,
-unexplained, since Lesson 1 — this is finally the lesson where it does
-something.
+unexplained, since your very first `onCreate` — this is finally the
+lesson where it does something.
 
 ### Project Change
 
@@ -605,7 +606,7 @@ the object holding it does not.
   adding to, which is why you call it rather than skip it.
 - `outState.putInt("tapCount", tapCount)` — **first appearance.**
   `Bundle` is a String-keyed container (conceptually close to the
-  `Map<String, String>` from Lesson 4's `RequestDemo` lab, but with
+  `Map<String, String>` used in the `RequestDemo` lab, but with
   type-specific methods per value type — `putInt`, and later you'll see
   `putString`, `putBoolean`, etc. — rather than one generic `put`).
   `"tapCount"` is just a string key you chose; it must match on the
@@ -708,7 +709,7 @@ Restore the override afterward.
       the Room database lessons later in this series).
 - [ ] Commit: message explaining why (e.g. "Log full Activity lifecycle
       order and rescue tapCount across configuration changes via
-      onSaveInstanceState, since Lesson 5 proved fields don't survive
+      onSaveInstanceState, since fields were observed not to survive
       rotation on their own").
 
 Lesson 6 is next: the inventory list itself — `RecyclerView`, the
