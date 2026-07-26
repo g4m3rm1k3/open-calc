@@ -23,6 +23,43 @@ Lesson 1: `StackPanel`, string interpolation, and the `WelcomeMessage`
 field this lesson keeps and relocates — you need the exact `MainWindow.xaml`
 and `MainWindow.xaml.cs` Lesson 1 left behind, since this lesson edits both.
 
+**Terms introduced in this lesson:**
+- **Property element** (`<Grid.RowDefinitions>`) — XAML's tag syntax
+  for setting a property whose value is too complex for a plain
+  `name="value"` attribute (here, a list of rows), as opposed to
+  writing it as an attribute directly on the tag.
+- **`RowDefinition`** / **`ColumnDefinition`**, with **`Auto`** (as
+  tall/wide as its content needs) and **`*`** (take all space not
+  claimed by any other row/column) sizing — the rules a `Grid` uses to
+  divide space, computed fresh every time the window resizes.
+- **Constraint satisfaction** — declaring *rules* about how space
+  should be divided (row/column sizes) and letting the layout system
+  compute the actual pixel values, rather than computing and hardcoding
+  those numbers yourself.
+- **Attached property** (`Grid.Row`, `Grid.Column`) — a property owned
+  by a parent (`Grid`) but set directly on a child (any element placed
+  inside it); the storage genuinely lives with the parent, not the
+  child, which is why it's meaningless outside that specific parent.
+- **`Border`** — a simple control whose job is drawing a background
+  and/or outline behind whatever it holds (or nothing, if used alone as
+  a plain rectangle).
+- **Hex color code** (`#2E5945`) — a color specified as three pairs of
+  hexadecimal digits (red, green, blue), giving access to any color
+  rather than only a fixed set of named ones.
+- **Composition of independent coordinate systems** — nesting one
+  layout container inside another so each one solves its own, local
+  arrangement problem with zero knowledge of the other; the results
+  combine automatically without either container needing to know the
+  other exists.
+- **Tree** — a data structure of **nodes**, where every node has
+  exactly one **parent** except one special **root** node (which has
+  none), and any number of **children**; a node with no children is a
+  **leaf**. No node can (directly or indirectly) contain itself.
+- **Visual tree** — WPF's own real name for the tree of nested elements
+  a XAML file describes (`Window` → `Grid` → its children, and so on);
+  not an analogy — the literal term WPF's own tooling (Visual Studio's
+  Live Visual Tree window) uses for it.
+
 ---
 
 ## Concept Unit: `Grid.RowDefinitions` and Row Sizing

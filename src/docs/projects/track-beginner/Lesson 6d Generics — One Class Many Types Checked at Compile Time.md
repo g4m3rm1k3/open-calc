@@ -15,8 +15,21 @@ concept, in one line — flagged, not deeply explained, since the whole
 point of this lesson is showing why you usually don't want to need it).
 
 **Terms introduced in this lesson:**
+- **Top type** — a type every other type is a subtype of; `Object` is
+  Java's top type, which is exactly what lets it hold a reference to
+  any object at all.
 - **`Object`** — the root class of every type in Java; every class you
   write is automatically a kind of `Object`, whether declared or not.
+- **Upcasting** (Java Language Specification §5.1.5, **Widening
+  Reference Conversion**) — treating a more specific type as its
+  supertype (e.g. a `String` stored into an `Object`-typed field);
+  implicit, no cast written, and — per the JLS's own words — "never
+  requires a special action at run time."
+- **Downcasting** (JLS §5.1.6, **Narrowing Reference Conversion**) —
+  treating a general type as a more specific one (e.g. `(Integer)
+  box.get()`); requires an explicit cast, and "may require a test at
+  run time" — this is the exact mechanism that fails in this lesson's
+  crash.
 - **Cast** — an explicit claim to the compiler about an expression's
   actual runtime type (e.g. `(Integer) box.get()`); checked at runtime,
   and can fail.
@@ -28,6 +41,19 @@ point of this lesson is showing why you usually don't want to need it).
   argument (`Box<String>`).
 - **Diamond operator** (`<>`) — infers a generic type's argument from
   context instead of repeating it explicitly on both sides.
+- **Generic programming** — writing one class or method that works
+  correctly across many types, checked by the compiler for each
+  specific use, instead of duplicating code per type or giving up
+  type-checking entirely.
+- **`ClassCastException`** — the specific Java error thrown when a
+  cast's claim about an object's real type turns out to be false.
+- **Raw type** (e.g. `Box box = new Box();`) — using a generic class
+  with its type parameter left off entirely; compiles for backward
+  compatibility with pre-generics code, but silently drops all
+  compile-time type checking.
+- **`object.getClass()`** — a method every object has (since every
+  class is ultimately an `Object`), returning a description of that
+  object's actual runtime type.
 
 ---
 
@@ -65,10 +91,15 @@ class ObjectBox {
 
 `Object` — **first appearance.** Every class in Java, including every
 one you've written, is automatically a kind of `Object` — it's the
-one type broad enough to hold a reference to *any* object at all,
+**top type**, broad enough to hold a reference to *any* object at all,
 `String`, `Integer`, `LightSwitch`, anything. `set`/`get` here accept
 and return that broadest possible type, which is exactly what makes
-this class "flexible" and also exactly what's about to go wrong.
+this class "flexible" and also exactly what's about to go wrong. Every
+call to `set(...)` with a specific type — `box.set("hello")`, below —
+is quietly **upcasting**: treating that specific `String` as the more
+general `Object` it's declared to accept. This direction needs no cast
+syntax at all and can't fail; a `String` genuinely always *is* an
+`Object`.
 
 In the same folder, create `GenericsDemoBad.java`:
 
@@ -86,10 +117,12 @@ public class GenericsDemoBad {
 
 `(Integer) box.get()` — **first appearance of a cast in running code**
 (casting was mentioned as a concept earlier; this is it, used for real). `box.get()`
-returns a plain `Object`, but this line claims, explicitly, "trust me,
-what's actually in there is an `Integer`" — a cast doesn't convert
+returns a plain `Object`, but this line **downcasts** it: claims,
+explicitly, "trust me, what's actually in there is an `Integer`" — the
+opposite direction from `box.set("hello")`'s upcast, and the reason it
+needs an explicit `(Integer)` written at all. A cast doesn't convert
 anything; it's a claim to the compiler, checked at runtime, that may
-turn out to be false.
+turn out to be false — which is exactly what happens two lines from now.
 
 Compile and run this yourself:
 

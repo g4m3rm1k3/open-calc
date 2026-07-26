@@ -51,6 +51,14 @@ added — this lesson's first real one.
   assigns a unique, incrementing value to on every new row.
 - **`ExecuteNonQuery()`** — runs a command that returns no rows
   (contrast: `SELECT`, which does).
+- **SQL injection** — a security vulnerability where attacker-controlled
+  text, glued directly into a SQL command string, gets executed as part
+  of that command instead of treated as an inert value.
+- **Conflating code and data** — the general vulnerability class SQL
+  injection belongs to: treating attacker-controlled text as
+  instructions to execute rather than a value, purely because of how a
+  command string got assembled (also the root cause of XSS and classic
+  buffer-overflow exploits).
 - **Parameter placeholder** (`@name`) — a placeholder in SQL text,
   filled in via `.Parameters.AddWithValue(...)` rather than direct
   string substitution — the mechanism that prevents SQL injection.

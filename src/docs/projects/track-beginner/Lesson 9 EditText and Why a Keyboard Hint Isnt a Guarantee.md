@@ -31,6 +31,19 @@ five hardcoded seed items, the click-lambda that opens
 - **`Integer.parseInt(String)`** — a `static` method converting a
   `String` to the `int` it represents, throwing `NumberFormatException`
   if the string isn't a valid whole number.
+- **`try`/`catch`** — a structured escape hatch: code inside `try` that
+  fails doesn't crash the whole program; the matching `catch` block
+  decides what "recovery" means instead, and everything after the
+  failure point inside `try` is skipped.
+- **`NumberFormatException`** — the specific exception `Integer.parseInt`
+  throws when given text that isn't a valid whole number.
+- **Layout partitioning** — splitting a screen into a fixed-size region
+  (a form) and a fill-remaining-space region (a scrolling list), each
+  sized by a rule stated once rather than a hardcoded number.
+- **Boundary between presentation and validation** — a UI hint that
+  shapes how input is collected (which keyboard shows) says nothing
+  about whether that input is actually correct; the two are easy to
+  conflate and that conflation is a common, real source of bugs.
 - **`notifyItemInserted(position)`** — a `RecyclerView.Adapter` method
   telling the `RecyclerView` exactly which position just gained a new
   row.

@@ -26,6 +26,24 @@ interpolation, and the `WelcomeMessage` field, which this lesson relocates
 out of `MainWindow.xaml.cs` into a new file entirely.
 
 **Terms introduced in this lesson:**
+- **Restricting a type's capability on purpose** — deliberately leaving
+  something out of a type (here, `Page` has no `Show()`) so the
+  compiler rules out a mistake entirely, rather than relying on a
+  convention or a comment to prevent it.
+- **`Button`** — a clickable control; its `Content` (what displays
+  inside it) can hold more than plain text, which is why it's named
+  `Content` rather than `Text`.
+- **`Padding`** — space *inside* an element's own border, between its
+  edge and its content (contrast `Margin`, space *outside* an element).
+- **Event** — a signal a control raises when something specific
+  happens to it (a completed click, here); other code "wires up" to
+  react when that signal fires, without the control needing to know
+  what that reaction does.
+- **XAML event wiring** (`Click="MethodName"`) — an XAML attribute
+  saying "when this event fires, call this C# method by name."
+- **Observer pattern** — a control notifying arbitrary, unrelated code
+  that something happened (a click), without the control needing to
+  know anything about what that code will do in response.
 - **`Page`** — WPF content meant to be hosted inside something else
   (a `Frame`), not a standalone top-level window; has no `Show()`
   method of its own, unlike `Window`.
@@ -44,6 +62,9 @@ out of `MainWindow.xaml.cs` into a new file entirely.
   recording every `Page` navigated away from, in order.
 - **LIFO** (Last In, First Out) — the rule governing a stack: the most
   recently pushed entry is always the first one removed.
+- **Push / pop** — the two operations a stack allows: adding an entry
+  to the top (push) and removing the top entry (pop) — both always at
+  the same end, never in the middle.
 
 ---
 

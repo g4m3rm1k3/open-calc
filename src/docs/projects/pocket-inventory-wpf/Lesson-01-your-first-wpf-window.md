@@ -25,6 +25,21 @@ assumes all of that and builds on the exact `MainWindow.xaml` Lesson 0 left
 behind.
 
 **Terms introduced in this lesson:**
+- **Panel** — WPF's general term for any element whose entire job is
+  arranging its children (as opposed to an element like `TextBlock`,
+  which displays content but arranges nothing).
+- **`StackPanel`** — a panel that arranges its children in a single
+  vertical (default) or horizontal sequence, one after another.
+- **`x:Name`** — assigns an element a name the code-behind file can
+  refer to directly; not a property of the element itself, but an
+  instruction to the XAML compiler (`x:` marks XAML-language features,
+  as opposed to properties of whatever object the tag represents).
+- **`Margin`** — space around an element's outer edge, as four
+  comma-separated numbers: left, top, right, bottom, in that order.
+- **Layout algorithm** — the general idea a panel embodies: taking a
+  list of children and deciding where each one goes; swapping one panel
+  type for another changes the whole arrangement with no change to the
+  children themselves.
 - **Interpolated string** (`$"..."`) — a string literal whose `{expression}`
   placeholders (e.g. `{appName}`, `{screenCount}`) are evaluated and
   spliced into the result directly; C#'s

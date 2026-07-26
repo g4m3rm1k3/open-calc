@@ -7,6 +7,12 @@ quietly re-derive the original, weaker version of this plan from scratch.
 
 ## Why this project exists
 
+**The goal is to teach C# and WPF. The app is a tool, not the goal.**
+Pocket Inventory is the vehicle this curriculum uses to teach the
+language and the framework — it is not itself the point, and if a
+choice ever has to be made between "what this lesson's app needs next"
+and "what teaches C#/WPF best right now," the teaching goal wins.
+
 Written for a student taking a university course in C# and WPF. The
 assignments are small, disconnected programs (a console app here, a WPF form
 there), and each one re-teaches the same fundamentals from zero before it

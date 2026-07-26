@@ -305,6 +305,22 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    sentence attached has described the run, not explained it, and fails
    this requirement exactly as a prose paraphrase would.
 
+   **This creates a real tension with the fenced `Iteration N: values`
+   format itself, and it has already failed once under this rule.**
+   Satisfying "explain why," honestly, tends to produce a full sentence
+   with a subordinate clause ("...because `id` is a plain, non-static
+   field, this copy belongs to `a` alone") — and a fence full of long,
+   unwrapped prose sentences is exactly the second shape's own
+   failure mode (below), just reached from the values side instead of
+   the timing side. **The test is about the shape of the content, not
+   which of the two triggers (changing values vs. timing) produced it:**
+   if a line is still terse and tabulate-able (`i 0 → 3, tokens =
+   [...]`), keep it fenced. The moment explaining "why" pushes a line
+   into a real sentence, drop the fence and switch to the second
+   shape's unfenced numbered-list format below, even though the
+   underlying data is still "changing values," not timing. A fenced
+   block of full sentences is not a valid third option.
+
    **A second shape of execution trace: control flow / timing, not
    changing values.** Some code needs a trace for a different reason —
    not a loop transforming data, but a sequence of calls where the
@@ -505,6 +521,13 @@ Read the draft top to bottom and answer honestly:
       instead of the `Iteration N: values` shape? Check specifically for
       prose sentences wrapped in a code fence — that's this exact
       failure, and it renders as an unreadable wall of monospace text.
+- [ ] Does an `Iteration N:` value-trace line's own "why" explanation
+      read as a full sentence with a subordinate clause ("...because
+      `x` is...")? If so, is it still sitting inside a code fence? A
+      fence full of long, unwrapped prose sentences is the values-side
+      version of the exact same failure as the bullet above — drop the
+      fence and use the unfenced numbered-list shape instead, even
+      though the underlying data is changing values, not timing.
 - [ ] Does any sentence assert hidden or invisible behavior — "the
       compiler generated it," "this happens automatically," "the
       framework does this internally" — with no verification attached?

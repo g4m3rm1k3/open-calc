@@ -31,6 +31,14 @@ lesson adds a third one to.
   safely when no subscriber exists yet.
 - **`IsEnabled`** — a property every WPF control has; `false` renders
   it visually dimmed and unclickable.
+- **Single source of truth** — deriving a value live from the one real
+  place it's tracked (here, `CanGoBack` from the actual stack), instead
+  of maintaining a second, separate copy by hand that could drift out
+  of sync with reality.
+- **Symmetry** (as a design principle) — every action that changes
+  state (`Navigate`, pushing forward) has a matching, working way to
+  undo it (`GoBack`, popping) — a structural promise, not something
+  left to be added later if needed.
 - **`Frame.Navigated`** — an event every `Frame` raises automatically
   whenever a navigation, forward or backward, finishes.
 - **`NavigationEventArgs`** — carries details about the navigation

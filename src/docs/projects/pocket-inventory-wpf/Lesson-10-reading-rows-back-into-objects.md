@@ -24,6 +24,10 @@ nothing populates `Items` from what's already saved. Lesson 7:
 `ObservableCollection<InventoryItem>`, `Items.Add(...)`.
 
 **Terms introduced in this lesson:**
+- **Iterator pattern** — exposing items one at a time, on demand,
+  rather than handing back everything already loaded into memory at
+  once; a table with a million rows still only holds one row's worth
+  of data in memory at any single moment while being walked this way.
 - **`ExecuteReader()`** — runs a query that returns rows, handing back
   a `SqliteDataReader` (contrast: `.ExecuteNonQuery()`, which returns
   no rows).
@@ -100,12 +104,18 @@ Row 3: Fig
 `reader.Read()` returning `false` is what actually stops the loop —
 worth seeing as its own step, not folded into "it prints the rows":
 
-```
-Iteration 1: reader.Read() returns true, since a first row is waiting in the result set, advancing the reader onto it and making id = 1 / name = "Apple" available through GetInt32/GetString → prints Row 1: Apple.
-Iteration 2: reader.Read() returns true again, advancing to the second row because the result set still has rows left to visit → prints Row 2: Pear.
-Iteration 3: reader.Read() returns true a third time, advancing to the third and final inserted row → prints Row 3: Fig.
-Iteration 4: reader.Read() returns false, since every row from the result set has now been consumed — this is what actually causes the while loop to end; no fourth row prints because none exists.
-```
+1. `reader.Read()` — returns `true`, since a first row is waiting in
+   the result set, advancing the reader onto it and making `id = 1` /
+   `name = "Apple"` available through `GetInt32`/`GetString` — prints
+   `Row 1: Apple`.
+2. `reader.Read()` — returns `true` again, advancing to the second row
+   because the result set still has rows left to visit — prints
+   `Row 2: Pear`.
+3. `reader.Read()` — returns `true` a third time, advancing to the
+   third and final inserted row — prints `Row 3: Fig`.
+4. `reader.Read()` — returns `false`, since every row from the result
+   set has now been consumed — this is what actually causes the
+   `while` loop to end; no fourth row prints because none exists.
 
 Run it a **second** time, without deleting `lab.db`: the `INSERT` adds
 three *more* rows on top of the existing ones, and the output now shows

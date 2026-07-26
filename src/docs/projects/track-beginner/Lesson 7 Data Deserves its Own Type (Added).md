@@ -4,10 +4,10 @@
 replacing the bare `List<String>` used before, with the inventory
 list now showing quantity and location alongside each name. The
 transferable problem: as soon as one piece of data (an item's name)
-needs *companions* (its quantity, where it's stored), the temptation is
+needs _companions_ (its quantity, where it's stored), the temptation is
 to add a second list and a third, kept in sync by matching index. This
 lesson is about why that temptation is a trap, and what a language's
-class system is actually *for* — not "an OOP requirement," but a tool
+class system is actually _for_ — not "an OOP requirement," but a tool
 for making an invalid state (a name with no matching quantity)
 unrepresentable instead of just unlikely.
 
@@ -18,6 +18,7 @@ class/object/`new`/field/constructor syntax, reused here for two new,
 unrelated classes. Lesson 2d's `private`. Lesson 6d's explicit casting.
 
 **Terms introduced in this lesson:**
+
 - **`List.remove(value)`** — removes the first element equal to the
   given value, shifting every later element one position earlier
   (contrast: `List.get(index)`, index-based lookup, already used).
@@ -51,6 +52,14 @@ unrelated classes. Lesson 2d's `private`. Lesson 6d's explicit casting.
 - **`java.util.Objects.hash(...)`** — a standard-library helper that
   combines several values' individual hash codes into one, so
   `hashCode()` rarely needs to be hand-written from scratch.
+- **Autoboxing** — Java silently wrapping a primitive (`int`, `boolean`,
+  etc.) in its object equivalent (`Integer`, `Boolean`) whenever a
+  method's declared parameter type requires an object, not a
+  primitive. _[added]_
+- **Same-typed constructor parameters** — when two or more constructor
+  (or method) parameters share the same type, the compiler cannot
+  detect an argument-order mistake between them; nothing but careful
+  reading catches a transposed pair. _[added]_
 
 ---
 
@@ -157,7 +166,7 @@ it gets one list of one type, built next.
 - `for (int i = 0; i < names.size(); i++)` — **reappearing** loop
   syntax (already-basic).
 - `names.get(i) + ": " + scores.get(i)` — **reappearing** (`List.get`,
-  string concatenation) — reads both lists at the *same* index `i`,
+  string concatenation) — reads both lists at the _same_ index `i`,
   which is exactly the assumption `names.remove(...)` just broke.
 
 ### CS Lens
@@ -167,7 +176,7 @@ the type system (`List<String>` and `List<Integer>` as two independent
 collections) permits a state (a name with no corresponding score, or
 the wrong one) that is never actually valid in your program's logic.
 Also recognized in: database tables lacking a foreign-key constraint
-that *should* tie two rows together, two Git branches that must be
+that _should_ tie two rows together, two Git branches that must be
 merged together manually versus a single source of truth, and any pair
 of variables a comment says "keep these in sync" about instead of the
 compiler enforcing it.
@@ -251,7 +260,7 @@ project's specific fields: some private data, reachable only through
 methods this class itself chooses to expose. Create a folder for this
 lab (same convention as always). Inside it, create a file named exactly
 `Coupon.java` — a class that has nothing to do with Pocket Inventory,
-deliberately, so the *pattern* is visible without this project's
+deliberately, so the _pattern_ is visible without this project's
 details riding along:
 
 ```java
@@ -317,15 +326,15 @@ the two printed lines:
 1. `Coupon summer = new Coupon("SUMMER10", 3);` — builds a real `Coupon`
    object; `usesRemaining` starts at `3`.
 2. `System.out.println(summer.getCode() + ...)` — reads the object's
-   *current* state and prints it: `SUMMER10: 3 uses left`.
+   _current_ state and prints it: `SUMMER10: 3 uses left`.
 3. `summer.setUsesRemaining(summer.getUsesRemaining() - 1);` — reads the
    current value (`3`), computes `3 - 1 = 2`, and writes `2` back into
-   that *same* object's `usesRemaining` field.
+   that _same_ object's `usesRemaining` field.
 4. `System.out.println("After one redemption: " + summer.getUsesRemaining());`
    — reads the field again. It's now `2`, proving step 3's mutation
    actually stuck: `After one redemption: 2`.
 
-*What this proves:* `Coupon` is the exact same shape `Item.java` above
+_What this proves:_ `Coupon` is the exact same shape `Item.java` above
 just used, with different field names — `code`, like `Item`'s `name`
 and `location`, is `private final` with a getter and no setter, because
 a coupon's code shouldn't change after it's created. `usesRemaining`,
@@ -353,12 +362,45 @@ real version of this same shape; nothing here is reused.
   instead mean replacing the whole `Item`, a later-lesson concern).
 - `private int quantity;` — **first appearance of a mutable
   (non-`final`) field.** Deliberately different from the two above:
-  quantity *does* need to change over the item's life (stock goes up
+  quantity _does_ need to change over the item's life (stock goes up
   and down), so it's left reassignable.
 - `public Item(String name, int quantity, String location) { ... }` —
   reappearing (constructor), new detail worth a clause:
   three parameters this time, each assigned to its matching field via
   `this.` disambiguation.
+
+  **→ Two of these three parameters are the same type, and the
+  compiler cannot tell them apart.** _[added]_ `name` and `location`
+  are both `String`. `new Item("Hex Bolts, M6", 240, "Bin 4")` is only
+  correct because you, the caller, remembered the declared order —
+  `new Item("Bin 4", 240, "Hex Bolts, M6")` compiles exactly as cleanly,
+  runs exactly as cleanly, and silently stores the location as the
+  name and the name as the location. Nothing about Java's type system
+  catches a transposed pair of same-typed parameters; the parameter
+  _names_ in the declaration (`name`, `location`) are documentation for
+  the reader, not something the compiler checks argument order against
+  at the call site. This is a real, common bug class in Java (and in
+  most languages with positional arguments) — the usual real-world
+  mitigations are IDE parameter-name hints shown inline at the call
+  site, or, for classes with several same-typed fields, a builder
+  pattern that names each value at the call site instead of relying on
+  position (a later-lesson concern, not needed here yet).
+
+  **→ Why `public` here, when `InventoryAdapter`'s constructor back in
+  Lesson 6e had no modifier at all (package-private)?** _[added]_
+  Both are constructors on otherwise similarly-shaped classes, with
+  opposite access levels, and that contrast is deliberate, not an
+  inconsistency: `InventoryAdapter` only ever needs to be constructed
+  from `InventoryActivity`, in the same package — package-private is
+  the tightest access level that still allows that one caller through.
+  `Item` is this project's core data model; it's `public` because a
+  general-purpose data type is exactly the kind of class you'd expect
+  a _different_ package to eventually need to construct too (a future
+  persistence layer reading items back from disk, a networking layer
+  receiving them from a server) — even though nothing outside this
+  package constructs an `Item` yet, the access level reflects what kind
+  of class this is, not just what's strictly needed today.
+
 - `public String getName()`, `public int getQuantity()`,
   `public String getLocation()` — **first appearance of the
   getter/accessor pattern**, as a group: a public method whose only job
@@ -370,7 +412,7 @@ real version of this same shape; nothing here is reused.
   class chooses to expose.
 - `public void setQuantity(int quantity)` — **first appearance of the
   setter pattern.** The deliberate asymmetry with the two getters-only
-  fields is the point: this class's public surface *is* its rules —
+  fields is the point: this class's public surface _is_ its rules —
   anyone holding an `Item` can change how much of it there is, but not
   rename it or relocate it, without that class needing to write a
   single `if` statement to enforce it. The type itself expresses the
@@ -392,7 +434,7 @@ revealing its internal implementation to the layer above).
 
 **Why not just make all three fields `public` and skip the getter/setter
 ceremony entirely** — Java allows this, and for a true one-off script
-it's tempting? The alternative — public fields — means *any* code
+it's tempting? The alternative — public fields — means _any_ code
 anywhere in the project can reach in and set `item.quantity = -50` or
 reassign `item.name` after the fact, with nothing to stop it, because
 there's no single chokepoint to add a rule later (e.g. "quantity can
@@ -400,7 +442,7 @@ never go negative"). Getters and setters cost you boilerplate now —
 five extra methods for three fields — in exchange for a single place
 to add validation later without touching every caller. This project
 doesn't add that validation yet (Lesson 9 will, for user-entered
-quantities); the point right now is that the *seam* exists to add it
+quantities); the point right now is that the _seam_ exists to add it
 into, which a public field would not provide.
 
 ---
@@ -504,7 +546,7 @@ See the exact fix `Item.java` just received, on a smaller, unrelated
 class, so the mechanism is visible with only two fields instead of
 three. Create a folder for this lab. Inside it, create
 `CoordinateBad.java` — a class with no `equals()` override at all,
-matching what `Item` looked like *before* this unit's change:
+matching what `Item` looked like _before_ this unit's change:
 
 ```java
 public class CoordinateBad {
@@ -561,7 +603,7 @@ Two constructions, same values, both checks say "different":
 
 `a == b` is `false` because `a` and `b` are two separate objects in
 memory — expected, and unrelated to what either one contains. `a.equals(b)`
-is *also* `false`, which is the surprising part: `Object`'s inherited
+is _also_ `false`, which is the surprising part: `Object`'s inherited
 `.equals()` defaults to doing exactly the same reference check `==`
 does, so it gives the identical answer even though every field matches.
 
@@ -621,7 +663,7 @@ false
 true
 ```
 
-*What this proves:* `a == b` is still `false` — identity never changes,
+_What this proves:_ `a == b` is still `false` — identity never changes,
 and shouldn't; `a` and `b` remain two separate objects. `a.equals(b)`
 now reads `true` — the exact fix `Item.equals()` just gave `Item`,
 proven here on a simpler, two-field class so the mechanism is visible
@@ -642,6 +684,21 @@ and `CoordinateDemo.java` — nothing here is reused; `Item.java`'s own
   `equals`.** Parameter type is `Object`, not `Item` — this is a fixed
   part of the contract inherited from Java's root class; you can't
   narrow the parameter type here.
+
+  **→ What happens if you get this wrong anyway.** _[added]_ If you
+  wrote `equals(Item other)` instead of `equals(Object other)`,
+  `@Override` would immediately reject the compile — there is no
+  `equals(Item)` method on `Object` to override, so this is the exact
+  same signature-mismatch check from Lesson 6e's
+  `onCreateViewHolder`/`@Override` discussion, just tripped by a
+  narrowed parameter type instead of a misspelled method name. Without
+  `@Override`, the mistake would compile silently as a brand-new,
+  unrelated method — one that happens to also be named `equals` — and
+  Java's actual `equals()` machinery (used by collections, `==`-adjacent
+  checks, etc.) would keep calling the _inherited_, still-broken
+  `Object.equals()`, never your new one, since only the exact
+  `equals(Object)` signature is recognized as the override.
+
 - `if (this == other) return true;` — **first appearance of this
   specific guard**, worth a clause: a cheap short-circuit — if it's
   literally the same object, skip the field comparisons entirely.
@@ -651,6 +708,19 @@ and `CoordinateDemo.java` — nothing here is reused; `Item.java`'s own
   it could be a `String`, an `Integer`, anything — and comparing fields
   against something that isn't even an `Item` would be a compile error
   without first narrowing the type.
+
+  **→ This one line is also quietly handling `null`, with no separate
+  check.** _[added]_ In Java, `instanceof` on a `null` reference always
+  evaluates to `false` — never throws, never needs a guard. So if
+  `equals(null)` is called (a legal, common call — many collection
+  classes do this internally), `other instanceof Item` is `false`,
+  `!(...)` is `true`, and the method correctly returns `false` — with
+  no `if (other == null) return false;` line needed anywhere above it.
+  It's easy to assume you need that explicit null check first (plenty
+  of Java style guides add one anyway, redundantly, for readability) —
+  but the language guarantees `instanceof` alone already handles it
+  correctly.
+
 - `Item that = (Item) other;` — **reappearing** explicit cast — same
   mechanism as `(Integer) box.get()` earlier — `(Item)` tells the compiler "trust
   me, treat this `Object` reference as an `Item` from here on," safe
@@ -662,7 +732,7 @@ and `CoordinateDemo.java` — nothing here is reused; `Item.java`'s own
   unlike the `Item a == b` case above.
 - `name.equals(that.name)` / `location.equals(that.location)` —
   **reappearing** (`.equals()` call syntax), applied to `String`, which
-  — worth restating — already has its *own* correctly-implemented
+  — worth restating — already has its _own_ correctly-implemented
   `equals()` overriding the same default `Object` behavior you just
   fixed on `Item`; that's why comparing two `String`s with `.equals()`
   has always given the sensible answer, even before this lesson
@@ -672,6 +742,20 @@ and `CoordinateDemo.java` — nothing here is reused; `Item.java`'s own
   values' individual hash codes into one — you're not expected to
   hand-write a hash-combining algorithm; this is the conventional way
   to implement `hashCode()` once you know which fields `equals()` uses.
+
+  **→ `quantity` is an `int`, and this method only accepts objects —
+  what actually happens there?** _[added]_ `Objects.hash(...)`'s real
+  declared signature is `hash(Object... values)` — a varargs array of
+  `Object`. `name` and `location` are already `String` (an object type)
+  and pass straight through; `quantity` is a primitive `int`, not an
+  object, yet this line compiles and works correctly anyway. Java is
+  silently wrapping `quantity` in an `Integer` object to satisfy the
+  method's actual signature — a conversion called **autoboxing**. This
+  is the identical invisible mechanism behind putting an `int` into a
+  generic collection (a `List<Integer>` can't literally hold primitive
+  `int`s either, for the same reason `Object... values` can't here) —
+  it happens constantly in Java and this is the first place in this
+  curriculum it's occurring under the hood without being named.
 
 ### CS Lens
 
@@ -690,10 +774,10 @@ detector says they represent "the same" logical file across a commit?).
 **Why does `hashCode()` have to be overridden too, instead of just
 `equals()`?** Skipping it isn't a compile error — the code above would
 still compile without `hashCode()` — but Java's contract requires that
-two objects considered `.equals()` must also return the *same*
+two objects considered `.equals()` must also return the _same_
 `hashCode()`. Hash-based collections (`HashSet`, `HashMap` — not used
 yet in this project, but coming) rely on that contract to find objects
-efficiently: they use `hashCode()` first to narrow down *where* an
+efficiently: they use `hashCode()` first to narrow down _where_ an
 object might be, then `equals()` to confirm. Break the contract (override
 `equals()` alone) and such a collection can report `false` for
 `set.contains(item)` even when an `.equals()`-equal item is genuinely
@@ -904,6 +988,16 @@ public class InventoryActivity extends AppCompatActivity {
 - `new Item("Hex Bolts, M6", 240, "Bin 4")` and its four siblings —
   reappearing (constructor call), first real use of `Item`'s
   own constructor outside a throwaway lab.
+
+  **→ This is the live version of the same-typed-parameter risk noted
+  above.** _[added]_ Every one of these five calls has a `String`,
+  `int`, `String` shape — `new Item("Bin 4", 240, "Hex Bolts, M6")`
+  would compile and run exactly as cleanly as the correct line above
+  it, silently storing every one of this row's names and locations
+  swapped. Worth deliberately checking each of the five against the
+  original list once, by eye, rather than trusting that the pattern
+  held for all five just because the first one is correct.
+
 - Everything else (`ArrayList`, `RecyclerView`, `LinearLayoutManager`,
   `setAdapter`) — reappearing, unchanged except the
   element type.
@@ -915,8 +1009,8 @@ display string itself — why not add one method to `Item`, like
 `getDisplayText()`, that returns `"Qty: 240 — Bin 4"` already
 formatted, and call just that?** It would be less code right here. The
 cost is what it does to `Item`'s job: `Item` is this project's data
-model — it should describe *what an inventory item is*, not *how one
-specific screen wants to show it*. Baking `"Qty: " + quantity + " — " + location`
+model — it should describe _what an inventory item is_, not _how one
+specific screen wants to show it_. Baking `"Qty: " + quantity + " — " + location`
 into `Item` ties the model to one exact display format; the moment a
 second screen wants to show items differently (a compact list with no
 labels, a search-results screen showing only the name), either it's
@@ -973,6 +1067,17 @@ confirm the same line now logs `true`.
    actually grow the set? Real output, verified this session, for the
    `Item` this lesson built: `1` — confirm your own run matches, and
    explain why in terms of this lesson's `equals()`/`hashCode()` work.
+3. _(added)_ In a throwaway `main()` (discard after), deliberately swap
+   two same-typed constructor arguments — e.g.
+   `new Item("Bin 4", 240, "Hex Bolts, M6")` — and print
+   `.getName()` and `.getLocation()` on the result. Confirm it compiles
+   with zero errors or warnings, and that the printed values are
+   swapped. This is the same "no error, no warning, no crash" shape as
+   the `getItemCount()` returning `0` exercise from Lesson 6e — the
+   type system permitted an invalid state here, same as the
+   parallel-lists bug did at the start of this lesson, just one level
+   further in (inside a single object's constructor call, not across
+   two lists).
 
 ## Definition of Done
 
@@ -986,6 +1091,12 @@ confirm the same line now logs `true`.
       row, sourced from `Item` objects.
 - [ ] You can explain the difference between `==` and `.equals()` on
       objects, in your own words, using a concrete example.
+- [ ] _(added)_ You can explain why `!(other instanceof Item)` alone is
+      enough to correctly handle `equals(null)`, with no separate null
+      check.
+- [ ] _(added)_ You can explain, without looking back at this file, why
+      `Item`'s constructor is `public` while `InventoryAdapter`'s
+      (Lesson 6e) has no access modifier at all.
 - [ ] Commit: message explaining why (e.g. "Replace parallel-list-prone
       String items with a real Item type, encapsulating name/quantity/
       location and defining value equality").

@@ -46,6 +46,11 @@
  *      at all), per LESSON_CONTRACT.md's Glossary Rule — added after
  *      "ordinary `new`" was used as an implicit, unnamed contrast for an
  *      entire Concept Unit.
+ *  11. A single fenced line mixing a code-like fragment with several
+ *      prose connective words ("which", "because", "before"...) and no
+ *      backticks separating them — code and its own explanation crammed
+ *      onto one unwrapped line inside a fence, distinct from #3's
+ *      multi-line wrapped-paragraph shape of the same underlying bug.
  *
  * What this CANNOT catch, on purpose — don't extend it to pretend it can:
  *   - Whether an explanation is actually *correct* (the Observer vs.
@@ -240,6 +245,46 @@ function checkProseInFences(fileLabel, text, issues) {
       }
     } else if (inBlock) {
       buf.push(line)
+    }
+  })
+}
+
+// A second, per-LINE prose-in-fence signature, distinct from the wrapped-
+// paragraph one above: a single unwrapped line that mixes real code-like
+// tokens (a call, a dotted access, an assignment) with a dense run of
+// grammatical English connective words — "runs the constructor, which
+// increments the one shared totalCreated ... because id is a plain,
+// non-static field, this copy belongs to a alone." Real code (or real
+// terminal output) doesn't contain words like "which"/"because"/"before"/
+// "respectively" in any quantity; a line that has both a code-shaped
+// fragment AND several of these in a row is prose-about-code that never
+// got backticks, crammed onto one line inside a fence instead of becoming
+// an inline-code span inside an unfenced numbered-list item. This is
+// exactly what "explain why" (LESSON SCHEMA.md's execution-trace rule)
+// produces when the fence isn't dropped afterward — caught once already
+// in Lesson 6b's Counter trace and seven siblings, all fixed by hand; nothing
+// currently catches this mechanically, which is why it's being added now.
+const PROSE_CONNECTIVE_RE =
+  /\b(which|because|before|since|into|after|than|itself|belongs|respectively|afterward|instead|though|therefore|however|meanwhile|specifically|eventually|genuinely|whichever)\b/gi
+const CODE_SHAPED_RE = /\w+\([^)]*\)|\w+\.\w+\(|\w+\.\w+\b|[A-Za-z_]\w*\s*=\s*[^=]/
+
+function checkCodeProseInterleaving(fileLabel, text, issues) {
+  const lines = text.split('\n')
+  let inBlock = false
+  lines.forEach((line, i) => {
+    if (line.trim().startsWith('```')) {
+      inBlock = !inBlock
+      return
+    }
+    if (!inBlock) return
+    const connectives = line.match(PROSE_CONNECTIVE_RE) || []
+    if (connectives.length >= 2 && CODE_SHAPED_RE.test(line)) {
+      issues.push({
+        file: fileLabel,
+        line: i + 1,
+        kind: 'code-prose-interleaved-in-fence',
+        message: `Line ${i + 1} inside a code fence mixes a code-like fragment with ${connectives.length} prose connective words (${[...new Set(connectives.map((w) => w.toLowerCase()))].join(', ')}) and no backticks separating them — likely code-and-its-explanation crammed onto one line inside a fence; convert to an unfenced numbered-list item with the code as an inline span, per LESSON SCHEMA.md's execution-trace shape rules`,
+      })
     }
   })
 }
@@ -587,6 +632,21 @@ function coreTermCandidates(term) {
   return [...candidates].filter(Boolean)
 }
 
+// Some lessons (all of pocket-inventory-wpf's early ones, 00-05) mark first
+// appearances as "(first appearance)" — unbolded, parenthetical — instead
+// of "— **first appearance**". The strict, bolded regex above is the only
+// thing that drives per-term glossary-missing-term checking, but relying
+// on it ALONE to decide whether a file needs a glossary at all is exactly
+// what let three real, densely-populated files (Lesson 6c, WPF Lesson 02,
+// WPF Lesson 05) go completely unflagged and unnoticed all night — each
+// had real "(first appearance)" content and zero glossary, but zero
+// matches for the strict pattern, so checkGlossary returned before ever
+// looking. This lighter, presence-only trigger closes that: it can't
+// pinpoint individual missing terms the way the strict regex can, but it
+// guarantees a file using either style at least gets flagged for a human
+// to look at, rather than silently passing.
+const UNBOLDED_FIRST_APPEARANCE_RE = /\(first appearance/gi
+
 function checkGlossary(fileLabel, text, issues) {
   const firstAppearanceTerms = new Set()
   let m
@@ -594,15 +654,17 @@ function checkGlossary(fileLabel, text, issues) {
   while ((m = re.exec(text))) {
     firstAppearanceTerms.add(m[1].trim())
   }
-  if (firstAppearanceTerms.size === 0) return
+  const unbolded = text.match(UNBOLDED_FIRST_APPEARANCE_RE) || []
+  if (firstAppearanceTerms.size === 0 && unbolded.length === 0) return
 
   const glossary = extractGlossarySection(text)
   if (!glossary) {
+    const total = firstAppearanceTerms.size || unbolded.length
     issues.push({
       file: fileLabel,
       line: null,
       kind: 'missing-glossary-section',
-      message: `No "Terms introduced in this lesson" glossary, but ${firstAppearanceTerms.size} term(s) marked **first appearance** in this file (per the Glossary Rule) — expected for lessons written before this rule existed; a genuine gap for anything written after it`,
+      message: `No "Terms introduced in this lesson" glossary, but ${total} term(s) marked (or "**") first appearance in this file (per the Glossary Rule) — expected for lessons written before this rule existed; a genuine gap for anything written after it`,
     })
     return
   }
@@ -673,6 +735,7 @@ function main() {
       checkConceptUnits(fileLabel, text, allIssues)
       checkClosingSections(fileLabel, text, allIssues)
       checkProseInFences(fileLabel, text, allIssues)
+      checkCodeProseInterleaving(fileLabel, text, allIssues)
       checkMissingTraces(fileLabel, text, allIssues)
       checkTraceQuality(fileLabel, text, allIssues)
       checkHiddenBehaviorClaims(fileLabel, text, allIssues)

@@ -403,11 +403,19 @@ Counter.totalCreated=3
 Three constructions, one shared value climbing, three separate `id`
 fields each frozen at a different moment:
 
-```
-Iteration 1: new Counter() runs the constructor, which increments the one shared totalCreated (0 → 1) before copying that value into a's own id — because id is a plain, non-static field, this copy belongs to a alone.
-Iteration 2: new Counter() runs again, incrementing that same shared totalCreated (1 → 2) — since there is only one totalCreated for the whole class, not one per instance, a's copy from Iteration 1 is untouched by this call.
-Iteration 3: new Counter() runs a third time, incrementing totalCreated once more (2 → 3) into c's own id — a.id and b.id stay frozen at 1 and 2 respectively, because each was copied once, at its own construction, and never recalculated afterward.
-```
+1. `Counter a = new Counter();` — runs the constructor, which
+   increments the one shared `totalCreated` (`0 → 1`) before copying
+   that value into `a`'s own `id` — because `id` is a plain,
+   non-`static` field, this copy belongs to `a` alone.
+2. `Counter b = new Counter();` — runs again, incrementing that same
+   shared `totalCreated` (`1 → 2`) — since there is only one
+   `totalCreated` for the whole class, not one per instance, `a`'s copy
+   from step 1 is untouched by this call.
+3. `Counter c = new Counter();` — runs a third time, incrementing
+   `totalCreated` once more (`2 → 3`) into `c`'s own `id` — `a.id` and
+   `b.id` stay frozen at `1` and `2` respectively, because each was
+   copied once, at its own construction, and never recalculated
+   afterward.
 
 What this proves: `id` (no `static`) gets its own separate copy per
 `Counter` instance — `1`, `2`, `3`, one each, exactly like the

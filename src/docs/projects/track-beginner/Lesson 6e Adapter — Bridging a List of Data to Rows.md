@@ -12,9 +12,22 @@ finally becomes a real, saved file), Lesson 6d (generics, `List<String>`).
 **Terms introduced in this lesson:**
 - **`final` (on a field)** — restricts a field's reference to being
   assigned exactly once, never reassigned afterward.
+- **Annotation** (e.g. `@NonNull`, `@Override`) — a piece of metadata
+  attached to code (`@Name` syntax) that doesn't change what the code
+  does at runtime by itself; instead it's read by the compiler, an
+  IDE's static analysis, or a framework, to enable a check or a
+  behavior.
 - **`@NonNull`** — an annotation asserting a parameter or return value
   must never be `null`; checked by Android Studio's static analysis,
   not by the compiler itself.
+- **`@Override`** — an annotation asserting this method is replacing
+  (overriding) a method already defined on the class or interface being
+  extended/implemented; the compiler rejects it if no such method
+  actually exists, catching typos in the method name/signature that
+  would otherwise silently create an unrelated new method instead.
+- **Strategy pattern** — packaging an algorithm (here, row arrangement)
+  as its own swappable, independent object, rather than baking that
+  logic directly into the class that uses it.
 - **`onCreateViewHolder`** — the Adapter method `RecyclerView` calls
   only when it needs to build a brand-new row holder, not once per data
   item.
@@ -54,6 +67,35 @@ separate jobs, handled by two separate collaborators: the `Adapter`
 - **Change type:** Create, then add.
 - **Dependencies:** The `ViewHolder` shape already previewed, and
   generics.
+
+### The Contract You're Filling In
+
+`extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`
+means implementing a shape someone else already declared — read that
+real, actual shape before writing the class that fills it in, rather
+than inferring it from how the three overrides below happen to be
+used. From `androidx.recyclerview.widget.RecyclerView` itself, not
+this project's code (verified against the real class, this session):
+
+```java
+public abstract static class Adapter<VH extends ViewHolder> {
+    public abstract VH onCreateViewHolder(ViewGroup parent, int viewType);
+    public abstract void onBindViewHolder(VH holder, int position);
+    public abstract int getItemCount();
+}
+```
+
+Three real facts this makes checkable instead of assumed: `VH` is a
+genuine **bounded type parameter** — Lesson 6d's generics mechanism,
+constrained specifically to `ViewHolder` or one of its subtypes, not
+something invented for this example. All three methods are `abstract`,
+with no body at all in the real class — there is nothing to inherit
+*behavior* from, only a requirement to supply your own. And
+`onCreateViewHolder` really is declared to *return* `VH` — which is
+exactly why it's legal for `InventoryAdapter`'s own version, below, to
+return `InventoryViewHolder` specifically rather than a plain
+`RecyclerView.ViewHolder`: `InventoryViewHolder` fills in `VH` for this
+one adapter.
 
 ### The New Code
 

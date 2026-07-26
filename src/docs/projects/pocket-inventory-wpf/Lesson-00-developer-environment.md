@@ -34,9 +34,17 @@ explained from zero, even the ones that look familiar.
 - **Static typing** — every variable, parameter, and return value has
   a type fixed at compile time and checked before the program runs at
   all.
+- **.NET SDK** — the single installer bundling the C# compiler, the
+  CLR, the `dotnet` CLI, and the project templates this curriculum
+  uses throughout.
 - **`dotnet` CLI** — the command-line tool the .NET SDK installs.
 - **IL** (Intermediate Language) — what the C# compiler produces from
   `.cs` files; what the CLR actually loads and runs.
+- **Two-phase compilation through an intermediate representation** —
+  translate once, ahead of time, to a portable format (IL); translate
+  again, per-machine, to real CPU instructions, right before running
+  (JIT). Splitting compilation this way is what lets the same compiled
+  program run on different CPU architectures unmodified.
 - **JIT compilation** (Just-In-Time) — the CLR's step of translating
   IL into real machine code for the specific CPU it's running on.
 - **Type inference** (`var`) — the compiler derives a type from
@@ -51,6 +59,14 @@ explained from zero, even the ones that look familiar.
   set of common `using` statements to every file, project-wide.
 - **`<UseWPF>`** — turns on the WPF-specific build tooling that
   compiles `.xaml` files into part of the program.
+- **Code-behind** (`.xaml.cs`) — the C# file paired with a `.xaml`
+  markup file, holding that window or page's actual logic (event
+  handlers, computed values) — structure and behavior kept in two
+  separate files instead of one.
+- **Separation of concerns** — splitting a `.xaml` file (structure —
+  what something looks like) from its `.xaml.cs` code-behind
+  (behavior — what happens when you interact with it), so a change to
+  one never risks touching the other.
 - **`App.xaml` / `App.xaml.cs`** — application-wide startup concerns
   (shared resources, which window opens first), distinct from any one
   window.

@@ -972,6 +972,60 @@ glossary entry can be written, not after. A glossary entry that
 restates the informal phrase back is not a fix; the point is forcing an
 actual name to exist, not adding a section for its own sake.
 
+**The bar is broader than the "first appearance" marker alone.** That
+marker catches most of what needs defining, but not all of it — a
+named CS/SE principle or design pattern bolded inside a CS Lens or SE
+Lens ("Strategy pattern," "single source of truth," "boundary
+validation") is exactly the kind of term this rule exists for, whether
+or not it happens to sit next to the literal words "first appearance."
+The actual test, stated by the user directly: would this be evident to
+someone who knows only loops, data types, and functions — nothing about
+this specific language's, framework's, or field's own vocabulary? If
+not — a language construct (`try`/`catch`, generics, an annotation, an
+indexer), a framework component (`ListBox`, `Frame`, `SharedPreferences`),
+or a named pattern/idiom/principle (the Observer pattern, encapsulation,
+serialization, SQL injection) — it earns an entry, regardless of which
+heading it was first mentioned under. Routine, load-bearing basics
+(`if`, `for`, `int`, a plain function call) never do — the glossary
+exists to catch what's *not* obvious at that baseline, not to relist
+what already is. A term genuinely **reappearing** from an earlier
+lesson does not get a second entry here, per the Repetition Rule — the
+glossary belongs in the file where a term is first explained, not
+every file that goes on to use it.
+
+### The Parent Contract Rule
+
+A real, costly failure this curriculum caused: a lesson had the reader
+write `class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`,
+override `onCreateViewHolder`/`onBindViewHolder`/`getItemCount`, and
+read `holder.itemNameText` directly off a `ViewHolder` — all narrated
+correctly in prose, with never once showing `RecyclerView.Adapter`'s or
+`RecyclerView.ViewHolder`'s own actual declared shape. The reader was
+left to reverse-engineer the parent's real contract from how the
+subclass happened to use it: that `VH` is a genuine bounded type
+parameter (`<VH extends ViewHolder>`), that all three methods really
+are `abstract` with no body to reference, that `ViewHolder.itemView` is
+actually `public final` (which is *why* reading it directly is safe),
+that `ViewHolder`'s constructor signature is exactly `(View itemView)`
+— none of it false, all of it correctly implied, but implied is the
+problem: getting from "correctly implied" to "confirmed" cost the user
+two real days on this one section.
+
+Whenever a lesson has the reader `extends` or `implements` a type from
+a framework whose source isn't shown elsewhere in the lesson, show the
+parent's actual declared shape — the real method signatures, the real
+field declarations, the real type-parameter bounds — before showing
+the reader's own implementation of it. Not a prose description of the
+contract; the contract itself, as a code block, verified against the
+real framework source (not written from memory or inferred from usage)
+the same way a language-spec citation is verified elsewhere in this
+schema. Label it plainly, e.g. "The contract you're filling in (from
+`androidx.recyclerview.widget.RecyclerView`, not your code)." This
+turns "reverse-engineer the parent from how the subclass uses it" into
+"read the parent, then read the subclass that fills it in" — the
+correct order, and the one that costs nothing to get right once the
+real signature is in hand.
+
 ---
 
 ## Checklist

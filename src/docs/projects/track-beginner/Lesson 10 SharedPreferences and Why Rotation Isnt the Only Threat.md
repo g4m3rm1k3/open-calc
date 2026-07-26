@@ -19,6 +19,11 @@ stays alive the whole time). Lesson 9 (`EditText`, the exact
 field). Lesson 6e/7 (`InventoryAdapter`, `Item`).
 
 **Terms introduced in this lesson:**
+- **Volatile vs. non-volatile state** — memory that exists only while a
+  process runs, versus storage that outlives the process entirely.
+- **"Read fresh state on every becomes-active transition"** — never
+  trusting that data read once at startup is still current; re-reading
+  it every time a screen becomes visible again instead.
 - **`getSharedPreferences(name, mode)`** — returns a `SharedPreferences`
   object backed by a named file the OS manages on internal storage.
 - **`SharedPreferences`** — Android's small key-value persistent

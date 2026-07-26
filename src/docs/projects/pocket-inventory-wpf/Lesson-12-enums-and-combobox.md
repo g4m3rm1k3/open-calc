@@ -31,6 +31,11 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
 `DetailPanel`.
 
 **Terms introduced in this lesson:**
+- **Serialization** (in miniature, here) — converting an in-memory
+  value into a representation a different system can hold (a SQLite
+  column, here), with an explicit, matching rule for converting it
+  back — every persistence boundary needs this pair of operations for
+  any type that isn't already a native column type.
 - **`enum`** (e.g. `enum Season { Spring, Summer, Fall, Winter }`) —
   declares a brand-new type whose only legal values are a fixed, named
   set of members (`Season.Fall`, qualified by the enum's name),
@@ -127,12 +132,17 @@ Winter
 `Enum.GetValues` returns every member in declared order — the `foreach`
 below `"---"` just walks that list, one member at a time:
 
-```
-Iteration 1: season = Spring — the first element Enum.GetValues returns, because Spring is declared first in the enum definition and this method walks members in declared order → prints Spring.
-Iteration 2: season = Summer — the foreach advances to the next member in declared order, since Summer was declared immediately after Spring → prints Summer.
-Iteration 3: season = Fall — advances to the third declared member, because Fall was declared immediately after Summer → prints Fall.
-Iteration 4: season = Winter — reaches the last declared member, and the loop ends afterward because Enum.GetValues returned exactly four elements → prints Winter.
-```
+1. `season = Spring` — the first element `Enum.GetValues` returns,
+   because `Spring` is declared first in the enum definition and this
+   method walks members in declared order — prints `Spring`.
+2. `season = Summer` — the `foreach` advances to the next member in
+   declared order, since `Summer` was declared immediately after
+   `Spring` — prints `Summer`.
+3. `season = Fall` — advances to the third declared member, because
+   `Fall` was declared immediately after `Summer` — prints `Fall`.
+4. `season = Winter` — reaches the last declared member, and the loop
+   ends afterward because `Enum.GetValues` returned exactly four
+   elements — prints `Winter`.
 
 *What this proves:* `enum Season { Spring, Summer, Fall, Winter }`
 declares a brand-new **type**, `Season`, whose only legal values are

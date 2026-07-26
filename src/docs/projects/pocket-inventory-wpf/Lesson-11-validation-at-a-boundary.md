@@ -25,6 +25,10 @@ it.
 `SaveItemToDatabase`. Lesson 6: `class`, properties.
 
 **Terms introduced in this lesson:**
+- **Boundary validation** — checking untrusted input at the exact
+  point it crosses from outside your program's control into code that
+  will act on it, rather than trusting it because it arrived through a
+  UI element that merely looks like it constrains what can be typed.
 - **Nullable array element type** (`string?[]`) — declares an array
   whose elements may be `null`, contrasted against `string[]`, which
   promises every element is non-null.
@@ -103,12 +107,18 @@ Real output — verified this session:
 
 Four iterations, one check per element, concrete values:
 
-```
-Iteration 1: input = "Widget" — IsNullOrWhiteSpace returns False, because "Widget" is neither null, nor empty, nor all-whitespace, the only case this method treats as blank.
-Iteration 2: input = "" — returns True, since an empty string has zero characters, satisfying the "empty" case this method explicitly checks for.
-Iteration 3: input = "   " — returns True, because every character present is whitespace, which this method treats identically to an empty string.
-Iteration 4: input = null — returns True, since this method checks for null before ever touching the string's characters, which is exactly why it doesn't throw the way input.Trim() would.
-```
+1. `input = "Widget"` — `IsNullOrWhiteSpace` returns `False`, because
+   `"Widget"` is neither `null`, nor empty, nor all-whitespace, the
+   only case this method treats as blank.
+2. `input = ""` — returns `True`, since an empty string has zero
+   characters, satisfying the "empty" case this method explicitly
+   checks for.
+3. `input = "   "` — returns `True`, because every character present
+   is whitespace, which this method treats identically to an empty
+   string.
+4. `input = null` — returns `True`, since this method checks for
+   `null` before ever touching the string's characters, which is
+   exactly why it doesn't throw the way `input.Trim()` would.
 
 *What this proves:* `string.IsNullOrWhiteSpace(input)` — (first
 appearance) — a `static` method (meaning: called on the
@@ -303,6 +313,30 @@ invalid, with no custom drawing code written for it.
 - **Change type:** Add.
 - **Dependencies:** the indexer shape from the previous unit;
   `string.IsNullOrWhiteSpace`, this lesson's first unit.
+
+### The Contract You're Implementing
+
+`IDataErrorInfo` means fitting `InventoryItem` into a shape .NET itself
+already declared — worth reading that real shape before writing
+`InventoryItem`'s implementation of it. From `System.ComponentModel`
+itself, not this project's code (verified against the real interface,
+this session):
+
+```csharp
+public interface IDataErrorInfo
+{
+    string Error { get; }
+    string this[string columnName] { get; }
+}
+```
+
+Two real facts this makes checkable instead of assumed: the interface
+requires exactly two members, both **read-only** (`get` only, no
+`set`) — `Error`, one message for the whole object, and an indexer,
+one message per named property. Nothing here requires the indexer's
+parameter to be named `propertyName` specifically (this project's own
+choice, for clarity) — the interface only cares about the `string`
+type, not the parameter's name.
 
 ### The New Code
 

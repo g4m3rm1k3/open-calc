@@ -17,6 +17,29 @@ class — this lesson uses that exact shape), Lesson 2a (fields,
 constructors, `this`), Lesson 2c (`super(...)` calling a parent
 constructor).
 
+**Terms introduced in this lesson:**
+- **Adapter** — the `RecyclerView.Adapter` class this project builds
+  as `InventoryAdapter` in Lesson 6e; connects a list of data to rows
+  on screen. In Lesson 6b's own terminology, this is the **Outer**
+  class — `InventoryViewHolder` is the **Inner** one — just called by
+  its real project name instead of a generic lab name. Mentioned here,
+  before it exists, only because `InventoryViewHolder` (this lesson) is
+  the nested class that will live *inside* it — a genuine forward
+  reference, not a term this lesson defines in full.
+- **Framework** — a large, pre-written library of code (here, Google's
+  own Android framework) that your own code plugs into by following
+  its rules, rather than something you call as an optional utility.
+  `extends`ing a framework class is how you tell it "treat my class as
+  one of your own official types" — a strict, compiler-checked
+  requirement, not a suggestion.
+- **Constructor** — a method with the exact same name as its class and
+  no return type at all; it runs exactly once, at the precise moment
+  `new SomeClass(...)` executes, and its only job is initial setup
+  before anything else is allowed to touch the object.
+- **Flyweight pattern** — reusing one already-built, expensive-to-create
+  object (here, a holder with its views already looked up) instead of
+  rebuilding it from scratch every time it's needed again.
+
 ---
 
 ## Concept Unit: `ViewHolder` — One Object Per Visible Row, Not Per Data Item
@@ -46,6 +69,34 @@ just at a smaller scale.
   to actually create.
 - **Change type:** Preview only — nothing saved to disk yet.
 
+### The Contract You're Extending
+
+`extends RecyclerView.ViewHolder` means fitting into a shape someone
+else already declared — worth reading that real, actual shape before
+writing a single line that extends it, rather than inferring it from
+how `InventoryViewHolder` happens to use it. From
+`androidx.recyclerview.widget.RecyclerView` itself, not this project's
+code (verified against the real class, this session):
+
+```java
+public abstract static class ViewHolder {
+    public final View itemView;
+
+    public ViewHolder(View itemView) {
+        this.itemView = itemView;
+    }
+}
+```
+
+Three real facts this makes checkable instead of assumed: `ViewHolder`
+is `abstract` — you're required to subclass it, never construct a bare
+one. `itemView` is `public final` — set exactly once, by the
+constructor, which is *why* reading `holder.itemNameText` (built from
+it) directly is safe: nothing can ever reassign it out from under you.
+And the constructor's signature is exactly `(View itemView)` — one
+argument, that exact type — which is what makes `super(itemView)`,
+below, unambiguous rather than a guess.
+
 ### The New Code
 
 ```java
@@ -70,24 +121,36 @@ file by itself.
 ### Mechanical Walkthrough
 
 - `static class InventoryViewHolder extends RecyclerView.ViewHolder` —
-  the `static class` part is **reappearing** — `InventoryViewHolder`
-  gives up the hidden reference to its enclosing `Adapter` for exactly
-  the reason already covered: it only ever needs its own row's views,
-  never the `Adapter` itself.
+  the `static class` part is **reappearing** — in Lesson 6b's own
+  vocabulary, `InventoryAdapter` (built in Lesson 6e) is the **Outer**
+  class here, and `InventoryViewHolder` is the **Inner** one, just
+  called by its real project name instead of the generic lab names.
+  `static` here means `InventoryViewHolder` gives up the hidden
+  reference to that enclosing `Outer`/`Adapter` for exactly the reason
+  already covered: it only ever needs its own row's views, never the
+  `Adapter` itself.
   `extends RecyclerView.ViewHolder` is the required base class — the
-  library's own contract for what counts as a "holder of a row's
-  views," same "must extend the framework's class" idea as
-  `AppCompatActivity`, different base class.
+  Android *framework*'s (Google's own pre-written library this whole
+  project is built on top of) contract for what counts as a "holder of
+  a row's views." `extends` here is not a suggestion; it's a strict,
+  compiler-checked requirement — `RecyclerView` will only ever accept a
+  class that genuinely `extends RecyclerView.ViewHolder`, the same
+  "must extend the framework's class" requirement `AppCompatActivity`
+  already enforced back in Lesson 2c, just a different base class for
+  a different purpose.
 - `TextView itemNameText;` — **reappearing** (field declaration), new
   detail: package-private (no modifier) rather than
   `private`, a deliberate choice so the enclosing `Adapter` class
   can read this field directly without a getter method —
   reasonable for a small, tightly-coupled helper class like this one.
 - `InventoryViewHolder(View itemView)` — **reappearing** (a
-  constructor), same shape: a method with no return type,
-  matching the class's own name, that runs exactly once when
-  `new InventoryViewHolder(...)` is called, setting up the object
-  before anyone else can use it.
+  constructor). Precisely: a constructor is a method with the exact
+  same name as its class and no return type at all; it runs exactly
+  once, at the precise moment `new InventoryViewHolder(...)` executes,
+  and its only job is initial setup — here, taking the raw inflated
+  layout (`itemView`) and immediately calling `findViewById` to lock
+  this row's views into memory before anything else is allowed to
+  touch the object.
 - `super(itemView)` — **reappearing concept** (the parent-call
   pattern), now on a constructor instead of `onCreate`:
   `RecyclerView.ViewHolder`'s own constructor requires the row's root

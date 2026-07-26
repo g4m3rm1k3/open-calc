@@ -26,6 +26,44 @@ title `TextBlock`'s font properties — every value this lesson extracts.
 Lesson 4: the header's `Button`s (`BackButton`, and Lesson 3's Add Item
 button), whose padding this lesson also centralizes.
 
+**Terms introduced in this lesson:**
+- **Resource** — a named value (a color, a `Style`, anything) declared
+  once and made available, by name, to a whole subtree of elements.
+- **`Style`** — a named bundle of property-value pairs (`Setter`s),
+  applied to any element of a matching type that opts in; changing the
+  `Style`'s own definition changes every element referencing it.
+- **`Setter`** — one property-value pair inside a `Style` (which
+  property to set, and what to set it to).
+- **`x:Key`** (contrast `x:Name`) — a required unique name identifying
+  a resource for lookup purposes only; unlike `x:Name`, it generates no
+  C# code-behind field.
+- **Prototype-based configuration** — every styled element derives its
+  appearance from one shared definition, looked up by name, instead of
+  each element independently declaring its own full set of values.
+- **Markup extension** (`{...}` syntax, e.g. `{StaticResource ...}`) —
+  curly braces inside an attribute value telling the XAML parser "this
+  isn't a literal string, resolve it as an expression" instead.
+- **`StaticResource`** — a markup extension that resolves a resource
+  reference once, at the moment the XAML loads, by searching outward
+  from the referencing element through each enclosing scope up to the
+  application root, using the first match found.
+- **Lexical scoping** — resolving a reference by searching outward
+  through enclosing scopes until a match is found, stopping at the
+  first one; the same shape a nested function's variable lookup uses
+  in any language with closures.
+- **`DynamicResource`** — the alternative to `StaticResource` that
+  re-resolves a reference every time it's needed, for the rarer case
+  where a resource's value can genuinely change while the app runs
+  (not needed by this lesson).
+- **`SolidColorBrush`** — the real object type underneath any WPF color
+  property; a plain hex string like `"#2E5945"` is silently converted
+  into one of these, which is why giving one an explicit `x:Key` makes
+  it referenceable and reusable by name.
+- **`XamlParseException`** — the error WPF throws at startup when a
+  XAML file references something (like a misspelled resource key) that
+  can't actually be resolved; the window never opens rather than
+  silently falling back to a wrong default.
+
 ---
 
 ## Concept Unit: `Style` — a Named Bundle of Property Values

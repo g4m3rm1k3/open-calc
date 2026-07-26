@@ -27,6 +27,11 @@ the exact manual-refresh code this lesson deletes. Lesson 4: `event`,
 different use of the same underlying `event` keyword.
 
 **Terms introduced in this lesson:**
+- **Model / View** — the "model" is a plain data object with no UI
+  awareness (`InventoryItem`); the "view" is whatever's actually
+  displayed on screen. `INotifyPropertyChanged` lets a model announce
+  its own changes to any interested view, without knowing anything
+  about what that view is.
 - **Interface** (`: INotifyPropertyChanged`) — a contract with no
   implementation of its own; names required members any implementing
   class must provide.
@@ -69,6 +74,31 @@ breaking any existing caller — this is that lesson. Right now, nothing
 outside `InventoryItem` has any way to know when `Name` changes; whatever
 last read it could easily be showing stale, out-of-date information with
 no way to notice.
+
+### The Contract You're Implementing
+
+`: INotifyPropertyChanged` below means fitting `Thermometer` (and soon
+`InventoryItem`) into a shape .NET itself already declared — worth
+reading that real shape first, rather than inferring it from how the
+lab happens to implement it. From `System.ComponentModel`
+itself, not this project's code (verified against the real interface,
+this session):
+
+```csharp
+public interface INotifyPropertyChanged
+{
+    event PropertyChangedEventHandler? PropertyChanged;
+}
+```
+
+One real fact this makes checkable instead of assumed: the entire
+interface requires exactly one member — the `PropertyChanged` event
+itself. Everything else in the lab below (the `Temperature` property,
+its `set` block calling `PropertyChanged?.Invoke(...)`) is this
+project's own design, not something the interface demands — the
+interface's actual bar is this low, and knowing that precisely is what
+makes "did I implement this correctly?" answerable by inspection
+instead of guesswork.
 
 ### Introduce the Concept in Isolation
 ```bash
@@ -358,11 +388,16 @@ Collection changed: Remove
 
 Three mutations, three separate events, each with a different `e.Action`:
 
-```
-Iteration 1: names.Add("Alpha") runs, appending "Alpha" — because ObservableCollection<T> raises CollectionChanged automatically on every mutation, the subscribed lambda fires immediately afterward → names = ["Alpha"], e.Action = Add.
-Iteration 2: names.Add("Bravo") runs the same way, triggering a second, independent CollectionChanged event for this specific addition → names = ["Alpha", "Bravo"], e.Action = Add.
-Iteration 3: names.Remove("Alpha") runs, and since removal is a different kind of mutation than addition, the event fires again but this time reports e.Action = Remove → names = ["Bravo"].
-```
+1. `names.Add("Alpha")` — runs, appending `"Alpha"` — because
+   `ObservableCollection<T>` raises `CollectionChanged` automatically
+   on every mutation, the subscribed lambda fires immediately
+   afterward — `names = ["Alpha"]`, `e.Action = Add`.
+2. `names.Add("Bravo")` — runs the same way, triggering a second,
+   independent `CollectionChanged` event for this specific addition —
+   `names = ["Alpha", "Bravo"]`, `e.Action = Add`.
+3. `names.Remove("Alpha")` — runs, and since removal is a different
+   kind of mutation than addition, the event fires again but this time
+   reports `e.Action = Remove` — `names = ["Bravo"]`.
 
 *What this proves:* `ObservableCollection<T>` is a `List<T>`-like
 collection (every method from `List<T>` before — `Add`, `Remove`,

@@ -24,6 +24,9 @@ item persistence arrives later).
 - **`List.remove(index)`** — removes whatever element currently sits at
   the given index, shifting every later element one position earlier
   (contrast: `List.remove(value)`, already used).
+- **Fine-grained change notification** — telling a listener precisely
+  *what* changed and *how* (one row inserted at position 3), instead of
+  a blunt "something changed, redraw everything."
 - **`notifyItemRemoved(position)`** — a `RecyclerView.Adapter` method
   telling the `RecyclerView` exactly which position was removed.
 - **`ItemTouchHelper`** — an Android class providing swipe/drag
@@ -99,11 +102,16 @@ index 2 = Delta
 
 #### Execution Trace
 
-```
-Iteration 1: i = 0 — names.get(0) still returns "Alpha", unchanged, since index 0 sat before the removed element and nothing shifts ahead of a removal point → prints "index 0 = Alpha".
-Iteration 2: i = 1 — names.get(1) now returns "Charlie", not "Bravo", because removing index 1 shifted every later element one position earlier, so the element that used to answer to index 2 now answers to index 1 → prints "index 1 = Charlie".
-Iteration 3: i = 2 — names.get(2) now returns "Delta" for the same reason: it shifted down from its original index 3 to index 2 → prints "index 2 = Delta".
-```
+1. `i = 0` — `names.get(0)` still returns `"Alpha"`, unchanged, since
+   index `0` sat before the removed element and nothing shifts ahead
+   of a removal point — prints `"index 0 = Alpha"`.
+2. `i = 1` — `names.get(1)` now returns `"Charlie"`, not `"Bravo"`,
+   because removing index `1` shifted every later element one
+   position earlier, so the element that used to answer to index `2`
+   now answers to index `1` — prints `"index 1 = Charlie"`.
+3. `i = 2` — `names.get(2)` now returns `"Delta"` for the same reason:
+   it shifted down from its original index `3` to index `2` — prints
+   `"index 2 = Delta"`.
 
 "Bravo" was at index `1` before the removal. After `names.remove(1)`,
 "Charlie" — previously at index `2` — is now at index `1`, and "Delta"
@@ -319,6 +327,39 @@ from raw touch events.
 - **Location:** Inside `onCreate`, after the `RecyclerView`'s adapter is
   attached.
 - **Dependencies:** `removeItem`, previous unit.
+
+### The Contract You're Filling In
+
+`new ItemTouchHelper.SimpleCallback(...) { ... }` below is an anonymous
+subclass — extending a real framework class without ever naming a new
+class of your own. Worth reading that real class's own shape first,
+rather than inferring it from which two methods happen to be
+overridden. From `androidx.recyclerview.widget.ItemTouchHelper` itself,
+not this project's code (verified against the real class, this
+session):
+
+```java
+public abstract static class SimpleCallback extends ItemTouchHelper.Callback {
+    public SimpleCallback(int dragDirs, int swipeDirs) { /* ... */ }
+
+    public abstract boolean onMove(RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    RecyclerView.ViewHolder target);
+    public abstract void onSwiped(RecyclerView.ViewHolder viewHolder, int direction);
+}
+```
+
+Two real facts this makes checkable instead of assumed: `SimpleCallback`
+itself `extends` a fuller, more complex framework class,
+`ItemTouchHelper.Callback` — `SimpleCallback` exists specifically to
+supply reasonable default behavior for everything `Callback` requires
+*except* `onMove` and `onSwiped`, which it deliberately leaves
+`abstract`, unfilled, for you. And the constructor signature —
+`(int dragDirs, int swipeDirs)` — is exactly why this project's own
+call passes `0` (no dragging allowed) and
+`ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT` (swipe either
+direction) as its two arguments, not something to guess the meaning of
+from position alone.
 
 ### The New Code
 

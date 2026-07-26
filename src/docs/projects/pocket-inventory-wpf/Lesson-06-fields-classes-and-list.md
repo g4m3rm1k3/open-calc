@@ -31,6 +31,10 @@ this lesson's new button.
 - **`public` (on a class)** — any other file, in any other namespace,
   can see and use this type; leaving it off implicitly restricts it to
   the same project.
+- **"The data shape gets decided first"** — modeling what a thing
+  actually is (its fields) before writing any UI code that displays it,
+  rather than starting from the `TextBox` and reverse-engineering a
+  data model from the screen.
 - **`value`** (inside a `set` block) — a special, automatically
   available name holding whatever was just assigned.
 - **Auto-property** (`{ get; set; }`) — compiler sugar for a
@@ -38,6 +42,10 @@ this lesson's new button.
   `get`/`set` pair.
 - **`System.Reflection`** — lets code inspect a type's actual members
   at runtime, including ones never named in source.
+- **Generic type** (`List<T>`) — `T` is a placeholder the actual type
+  fills in at the point you declare one; the compiler enforces that a
+  `List<string>` can never accidentally receive an `InventoryItem`, or
+  vice versa.
 - **`List<T>`** (`.Add`, `.Count`, `foreach`) — .NET's growable
   collection type.
 - **`Orientation`** (on `StackPanel`) — an enum-backed property
@@ -448,17 +456,25 @@ Charlie
 Three `.Add` calls build the list up front; the `foreach` afterward just
 walks the result, in the same order it was built:
 
-```
-Iteration 1: names.Add("Alpha") runs, appending "Alpha" to the end of the initially empty list → names = ["Alpha"].
-Iteration 2: names.Add("Bravo") runs again, appending "Bravo" after the existing element, since Add always inserts at the end rather than overwriting anything → names = ["Alpha", "Bravo"].
-Iteration 3: names.Add("Charlie") runs a third time, appending to the now two-element list → names = ["Alpha", "Bravo", "Charlie"].
-```
+1. `names.Add("Alpha")` — runs, appending `"Alpha"` to the end of the
+   initially empty list — `names = ["Alpha"]`.
+2. `names.Add("Bravo")` — runs again, appending `"Bravo"` after the
+   existing element, since `Add` always inserts at the end rather than
+   overwriting anything — `names = ["Alpha", "Bravo"]`.
+3. `names.Add("Charlie")` — runs a third time, appending to the now
+   two-element list — `names = ["Alpha", "Bravo", "Charlie"]`.
 
-```
-Iteration 1: foreach visits index 0 first, because it walks the list in the exact order elements were added, binding name to "Alpha" → prints Alpha.
-Iteration 2: foreach advances to the next element, "Bravo", since each iteration moves forward through the list one position at a time → prints Bravo.
-Iteration 3: foreach reaches the last element, "Charlie", and stops afterward because there are no further elements to visit → prints Charlie.
-```
+Then the `foreach` walks that same list:
+
+1. `foreach` visits index `0` first, because it walks the list in the
+   exact order elements were added, binding `name` to `"Alpha"` —
+   prints `Alpha`.
+2. `foreach` advances to the next element, `"Bravo"`, since each
+   iteration moves forward through the list one position at a time —
+   prints `Bravo`.
+3. `foreach` reaches the last element, `"Charlie"`, and stops
+   afterward because there are no further elements to visit — prints
+   `Charlie`.
 
 *What this proves:* `List<string>` is a built-in .NET collection type
 that grows as needed; `.Add(...)` appends one more element, and nothing

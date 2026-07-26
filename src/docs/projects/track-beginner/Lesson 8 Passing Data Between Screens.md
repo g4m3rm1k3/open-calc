@@ -33,6 +33,21 @@ Lesson 6 (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
 - **Constructor overloading** — declaring more than one constructor for
   the same class, distinguished by parameter list; Java picks which one
   runs based on the arguments supplied at the call site.
+- **Single Responsibility Principle** — a class should have one job;
+  giving `InventoryAdapter` navigation logic on top of its actual job
+  (turning data into rows) would make it harder to reuse for a
+  different screen with different tap behavior.
+- **Strategy / Observer pattern** — behavior supplied as a value (an
+  object implementing one method) rather than hardcoded, so the caller
+  can be handed different behavior without its own code changing.
+- **Serialization / deserialization** — converting an in-memory object
+  into a linear sequence of bytes that can cross a boundary a plain
+  object reference can't (a process boundary, a network socket, a disk
+  file), plus the matching step to rebuild the object on the other
+  side.
+- **`Serializable`** — Java's own built-in serialization interface;
+  `Parcelable` gives up its zero-effort simplicity in exchange for
+  faster, no-reflection performance.
 - **`Parcelable`** — an Android framework interface for serializing an
   object's fields so it can cross the boundary between two Activities
   inside an `Intent`.
@@ -531,6 +546,42 @@ hand-matched string keys can.
 - **Change type:** Modify.
 - **Dependencies:** none new — `Parcelable` is part of the Android
   framework already available.
+
+### The Contract You're Implementing
+
+`implements android.os.Parcelable` means fitting `Item` into a shape
+Android itself already declared — worth reading that real shape before
+writing `Item`'s implementation of it, rather than inferring it from
+the code below. From `android.os.Parcelable` itself, not this project's
+code (verified against the real interface, this session):
+
+```java
+public interface Parcelable {
+    int describeContents();
+    void writeToParcel(Parcel dest, int flags);
+
+    interface Creator<T> {
+        T createFromParcel(Parcel source);
+        T[] newArray(int size);
+    }
+}
+```
+
+Three real facts this makes checkable instead of assumed: `Parcelable`
+itself only actually requires two methods — `describeContents()` and
+`writeToParcel(...)` — matching exactly the two `@Override`s below,
+nothing more. `Creator<T>` is a *separate*, nested interface, not a
+class — which is why `Item`'s own `CREATOR` field below has to
+construct an anonymous object implementing it, rather than calling
+some inherited method. And note what's *not* in this interface at
+all: nothing here requires a field named `CREATOR`, or a constructor
+shaped like `Item(Parcel in)` — those two are a convention Android's
+runtime looks for by exact name via reflection when reconstructing a
+`Parcelable`, not something the `Parcelable` type itself enforces the
+way `describeContents()`/`writeToParcel()` are enforced by the
+compiler. Missing either of the compiler-checked methods is a compile
+error; getting `CREATOR`'s name wrong is a silent runtime failure
+instead — worth knowing which kind of mistake each one actually is.
 
 ### The New Code — `Item` Describes How to Package Itself
 
