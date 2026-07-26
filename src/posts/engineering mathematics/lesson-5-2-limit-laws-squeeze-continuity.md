@@ -6,7 +6,7 @@
 
 ## What This Lesson Is About
 
-Lesson 5.1 computed every limit either by staring at a table of
+Lesson 1 computed every limit either by staring at a table of
 values or by asking SymPy — useful for building intuition, but not a
 method that scales to complicated expressions or that lets you prove
 anything by hand. This lesson supplies the missing algebra: **limit
@@ -16,13 +16,13 @@ the same "known constructs combine predictably" idea that's justified
 formula manipulation since Lesson 1.1. The **Squeeze Theorem**
 handles cases algebra alone can't reach — including, finally, a real
 proof of $\lim_{x\to0}\frac{\sin x}{x}=1$, left as a numerical
-observation in Lesson 5.1. And **continuity** gets its precise
-definition at last, unifying every discontinuity type from Lesson 5.1
+observation in Lesson 1. And **continuity** gets its precise
+definition at last, unifying every discontinuity type from Lesson 1
 into one clean three-part test. The lesson closes with the
 **Intermediate Value Theorem**, which guarantees roots exist under
 mild conditions — and directly motivates **bisection**, a genuinely
 useful root-finding algorithm built from nothing but IVT and
-Lesson 5.1's limit machinery.
+Lesson 1's limit machinery.
 
 ---
 
@@ -47,7 +47,7 @@ formalized for another two millennia.
 ## What You Need To Know First
 
 - **Limits, one-sided limits, the informal $\sin x/x\to1$
-  observation** — Lesson 5.1.
+  observation** — Lesson 1.
 - **Unit circle, radian measure, area of a sector** — Lesson 2.1.
 - **Rational function asymptote reasoning** — Lesson 1.5, now
   formalized via limit laws.
@@ -117,7 +117,7 @@ plt.show()
 ```
 
 $f(x)=x^2\sin(1/x)$ **oscillates wildly** near $x=0$ (the same
-oscillation failure mode from Lesson 5.1's $\sin(1/x)$ example) — but
+oscillation failure mode from Lesson 1's $\sin(1/x)$ example) — but
 because $-1\le\sin(1/x)\le1$ always, $-x^2\le x^2\sin(1/x)\le x^2$
 everywhere, and both bounds $\to0$ as $x\to0$. Squeeze Theorem:
 $\lim_{x\to0}x^2\sin(1/x)=0$, despite the function's wild oscillation
@@ -128,7 +128,7 @@ couldn't reach, since $x^2\sin(1/x)$ has no clean simplification.
 
 ### Proving $\lim_{x\to0}\dfrac{\sin x}{x}=1$
 
-Lesson 5.1 left this numerical. Here is the real proof, via geometric
+Lesson 1 left this numerical. Here is the real proof, via geometric
 squeeze — for $0<x<\pi/2$, compare the areas of three regions built
 from the unit circle:
 
@@ -185,7 +185,7 @@ $f$ is **continuous at $x=a$** if all three conditions hold:
 2. $\lim_{x\to a}f(x)$ exists.
 3. $\lim_{x\to a}f(x) = f(a)$.
 
-Every discontinuity type from Lesson 5.1 is exactly one of these
+Every discontinuity type from Lesson 1 is exactly one of these
 three conditions failing:
 
 | Failure | Type |
@@ -228,7 +228,7 @@ necessary defensive check — condition 1 ("$f(a)$ is defined") can
 fail outright (a `ZeroDivisionError` from an undefined expression),
 and the function needs to catch that rather than crash, correctly
 reporting "not continuous" in that case too. This directly reuses
-Lesson 5.1's classification logic, now organized around the three
+Lesson 1's classification logic, now organized around the three
 named conditions rather than the informal jump/infinite/removable
 labels.
 
@@ -340,7 +340,7 @@ to justify a root search.
    no algebraic simplification exists — geometric area bounds,
    traceable straight back to Archimedes.
 3. **Continuity**: the precise three-condition test unifying every
-   discontinuity type from Lesson 5.1.
+   discontinuity type from Lesson 1.
 4. **IVT**: continuity's direct practical payoff — root existence
    guaranteed by a sign change.
 5. **Bisection**: IVT turned into a working algorithm, applicable to
@@ -359,7 +359,7 @@ same limit; proves $\lim_{x\to0}\sin x/x=1$ geometrically (Archimedes-
 style area comparison).
 
 **Continuity**: $f(a)$ defined, $\lim_{x\to a}f(x)$ exists, and they
-match — unifies every Lesson 5.1 discontinuity type as one of these
+match — unifies every Lesson 1 discontinuity type as one of these
 three conditions failing.
 
 **IVT**: a continuous function hits every value between $f(a)$ and
@@ -370,7 +370,7 @@ IVT, applicable to any continuous function, including opaque/
 simulation-based ones.
 
 **New Python/CS concepts:**
-- Three-condition continuity checker (unifying Lesson 5.1's ad hoc
+- Three-condition continuity checker (unifying Lesson 1's ad hoc
   classifier)
 - Bisection algorithm — halving search, a direct forward reference to
   $O(\log n)$ (Lesson 8.8)
@@ -498,7 +498,7 @@ As $x\to0$: $\frac{\sin x}{x}\to1$ (this lesson's proven result), and
 $\frac{\sin x}{1+\cos x}\to\frac{0}{2}=0$ (direct substitution, since
 both $\sin$ and $\cos$ are continuous). By the product limit law:
 $$\lim_{x\to0}\frac{1-\cos x}{x} = 1\times0=0 \qquad\blacksquare$$
-This companion limit is exactly what Lesson 5.6 needs to derive the
+This companion limit is exactly what Lesson 6 needs to derive the
 derivative of $\sin x$ from first principles — another instance of
 this lesson's tools being built specifically for near-term reuse.
 </details>

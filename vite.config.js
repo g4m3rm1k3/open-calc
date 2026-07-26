@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
+import { isEmbeddable } from "./backend/checkEmbed.mjs";
 
 function emitVersionJson() {
   return {
@@ -20,10 +21,10 @@ function devFsPlugin() {
     name: "dev-fs-api",
     apply: "serve",
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (!req.url?.startsWith("/api/dev-fs") && !req.url?.startsWith("/api/github")) return next();
+      server.middlewares.use(async (req, res, next) => {
+        if (!req.url?.startsWith("/api/dev-fs") && !req.url?.startsWith("/api/github") && !req.url?.startsWith("/api/check-embed")) return next();
         const url = new URL(req.url, "http://localhost");
-        const action = url.pathname.replace("/api/dev-fs/", "").replace("/api/dev-fs", "");
+        const action = url.pathname.replace("/api/dev-fs/", "").replace("/api/dev-fs", "").replace("/api/", "");
         const root = process.cwd();
 
         const json = (data, status = 200) => {
@@ -35,6 +36,20 @@ function devFsPlugin() {
         try {
           if (action === "ping") {
             return json({ ok: true, mode: "vite-dev" });
+
+          } else if (action === "check-embed" && req.method === "GET") {
+            const targetUrl = url.searchParams.get("url");
+            const requestOrigin = url.searchParams.get("origin") || "";
+            if (!targetUrl) return json({ error: "Missing url" }, 400);
+            try {
+              const resObj = await fetch(targetUrl, { method: "HEAD", headers: { "User-Agent": "Mozilla/5.0" } });
+              const xfo = resObj.headers.get("x-frame-options") || "";
+              const csp = resObj.headers.get("content-security-policy") || "";
+              const embeddable = isEmbeddable({ xfo, csp, requestOrigin, targetUrl });
+              return json({ url: targetUrl, embeddable });
+            } catch (e) {
+              return json({ url: targetUrl, embeddable: false, error: e.message });
+            }
 
           // GitHub PR creation — same logic as backend/server.mjs but runs inside Vite dev server
           } else if (req.method === "POST" && req.url?.startsWith("/api/github/pr")) {

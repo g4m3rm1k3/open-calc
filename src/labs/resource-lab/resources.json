@@ -1,0 +1,38 @@
+[
+  {
+    "title": "FreeCodeCamp",
+    "description": "Learn to code — for free. Build projects. Earn certifications.",
+    "url": "https://www.freecodecamp.org/",
+    "tags": ["Web Dev", "Learning"]
+  },
+  {
+    "title": "Objectos Blog",
+    "description": "Tech blog with web development articles",
+    "url": "https://www.objectos.com.br/blog/index.html",
+    "tags": ["Web Dev", "Blog"]
+  },
+  {
+    "title": "MDN Web Docs",
+    "description": "Resources for developers, by developers",
+    "url": "https://developer.mozilla.org/",
+    "tags": ["Web Dev", "Reference"]
+  },
+  {
+    "title": "W3Schools",
+    "description": "Online Web Tutorials",
+    "url": "https://www.w3schools.com/",
+    "tags": ["Web Dev", "Tutorials"]
+  },
+  {
+    "title": "GeeksForGeeks",
+    "description": "A computer science portal for geeks",
+    "url": "https://www.geeksforgeeks.org/",
+    "tags": ["CS", "Tutorials"]
+  },
+  {
+    "title": "TutorialsPoint",
+    "description": "Simply Easy Learning",
+    "url": "https://www.tutorialspoint.com/",
+    "tags": ["CS", "Tutorials"]
+  }
+]

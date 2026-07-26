@@ -329,7 +329,7 @@ Lesson 6.6 (vibration) and Lesson 6.9 (coupled oscillators).*
 | 5.4 | **Continuity** | Math, Physics |
 | 5.5 | **The Intermediate Value Theorem** | Math, CS |
 
-*CS anchor: bisection method (Lesson 5.5) is the IVT turned into
+*CS anchor: bisection method (Lesson 5) is the IVT turned into
 an algorithm. It is also the root-finding step inside constraint
 solvers in CAD software.*
 
@@ -351,8 +351,8 @@ solvers in CAD software.*
 The derivative is introduced with position-velocity-acceleration
 as the motivating example — the reason Newton invented it.*
 
-*CS anchor: the chain rule (Lesson 5.9) is the exact operation
-performed in neural network backpropagation. Lesson 5.9 derives
+*CS anchor: the chain rule (Lesson 9) is the exact operation
+performed in neural network backpropagation. Lesson 9 derives
 it and Lesson 9.13 applies it.*
 
 **Chapter 5C — Integration**
@@ -367,7 +367,7 @@ it and Lesson 9.13 applies it.*
 | 5.20 | **Improper Integrals** | Math, Physics |
 | 5.21 | **Numerical Integration — Trapezoid and Simpson** | Math, CS |
 
-*CS anchor: Lesson 5.21 (numerical integration) is what a physics
+*CS anchor: Lesson 21 (numerical integration) is what a physics
 engine does every frame. Euler's method, the trapezoid rule, and
 Runge-Kutta are all numerical integration — applied in Lesson 6.3.*
 
@@ -383,7 +383,7 @@ Runge-Kutta are all numerical integration — applied in Lesson 6.3.*
 | 5.27 | **Double and Triple Integrals** | Math, Physics |
 | 5.28 | **The Jacobian and Change of Variables** | Math, CS, Physics |
 
-*CS anchor: gradient descent (Lesson 5.24) is the optimisation
+*CS anchor: gradient descent (Lesson 24) is the optimisation
 algorithm that trains every neural network. The gradient is the
 direction to move; the learning rate is the step size.*
 

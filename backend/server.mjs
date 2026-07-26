@@ -6,6 +6,7 @@ import crypto from 'node:crypto'
 import { DAPSession } from './codelens/DAPBridge.mjs'
 import { GoAdapter } from './codelens/adapters/GoAdapter.mjs'
 import { checkTools } from './codelens/toolcheck.mjs'
+import { isEmbeddable } from './checkEmbed.mjs'
 
 const args = new Set(process.argv.slice(2))
 const host = args.has('--host-lan') ? '0.0.0.0' : (readOption('--host') ?? process.env.OPEN_CALC_BACKEND_HOST ?? '127.0.0.1')
@@ -100,6 +101,10 @@ const server = createServer(async (request, response) => {
     if (request.method === 'GET' && url.pathname === '/api/codelens/tools') {
       const tools = await checkTools()
       return json(response, 200, tools)
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/check-embed') {
+      return handleCheckEmbed(response, url)
     }
 
     if (url.pathname.startsWith('/api/dev-fs')) return handleDevFs(request, response, url)
@@ -445,6 +450,22 @@ async function handleLessonOverride(request, response, url) {
   }
 
   return json(response, 405, { error: 'Method not allowed' })
+}
+
+async function handleCheckEmbed(response, url) {
+  const targetUrl = url.searchParams.get('url')
+  const requestOrigin = url.searchParams.get('origin') || ''
+  if (!targetUrl) return json(response, 400, { error: 'Missing url query parameter' })
+  try {
+    const res = await fetch(targetUrl, { method: 'HEAD', headers: { 'User-Agent': 'Mozilla/5.0' } })
+    const xfo = res.headers.get('x-frame-options') || ''
+    const csp = res.headers.get('content-security-policy') || ''
+    const embeddable = isEmbeddable({ xfo, csp, requestOrigin, targetUrl })
+    return json(response, 200, { url: targetUrl, embeddable })
+  } catch (e) {
+    // If the HEAD request fails (e.g., DNS error or firewall), assume it can't be embedded either.
+    return json(response, 200, { url: targetUrl, embeddable: false, error: e.message })
+  }
 }
 
 async function handleUpdateCheck(response) {

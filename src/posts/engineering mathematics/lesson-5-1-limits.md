@@ -262,7 +262,7 @@ approximating one $\varepsilon$ at a time.
 ### Computing Limits: Substitution and Algebraic Simplification
 
 **Direct substitution** works whenever $f$ is continuous at $a$
-(Lesson 5.2 will define continuity precisely; for now, "no gaps,
+(Lesson 2 will define continuity precisely; for now, "no gaps,
 jumps, or holes at that point"): $\lim_{x\to a}f(x)=f(a)$.
 
 **When substitution gives $0/0$** (an "indeterminate form"): algebraic
@@ -296,7 +296,7 @@ in Stage 4.
 
 **The famous $\lim_{x\to0}\dfrac{\sin x}{x}=1$.** Direct substitution
 gives $0/0$; no simple factoring resolves it (this limit's proof
-needs a geometric squeeze argument, properly given in Lesson 5.2).
+needs a geometric squeeze argument, properly given in Lesson 2).
 For now, confirm it numerically, the same table-of-values habit from
 the opening example:
 
@@ -387,7 +387,7 @@ cancellation**). The *mathematical* limit as $h\to0$ is exactly 12
 (confirmed by SymPy below), but no finite floating-point `h` can ever
 fully reach it — every prior lesson's "pick a small `h`" was always
 an approximation to a true limit that only symbolic computation, or
-Lesson 5.3's proper derivative definition, can reach exactly.
+Lesson 3's proper derivative definition, can reach exactly.
 
 ```python
 import sympy as sp
@@ -406,7 +406,7 @@ Exact limit as h->0: 12
 SymPy computes the limit **exactly**, symbolically, with no `h` ever
 actually plugged in as a number — no floating-point error possible,
 because no floating-point arithmetic ever happens. This is precisely
-what Lesson 5.3 formalizes as the derivative.
+what Lesson 3 formalizes as the derivative.
 
 ---
 
@@ -424,7 +424,7 @@ Concrete trace: the central-difference slope of $f(x)=x^3$ at $x=2$.
    \frac{f(x+h)-f(x-h)}{2h}$ is a well-defined mathematical object,
    computable exactly via SymPy, with a value (12) that every
    previous numerical approximation was only ever estimating.
-4. **Forward to Lesson 5.3**: this exact limit, in its simpler
+4. **Forward to Lesson 3**: this exact limit, in its simpler
    one-sided form $\lim_{h\to0}\frac{f(x+h)-f(x)}{h}$, *is* the
    formal definition of the derivative — the single idea the next
    several lessons build the rest of calculus from.

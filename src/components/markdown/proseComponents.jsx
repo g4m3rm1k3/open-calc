@@ -13,6 +13,25 @@ import 'katex/dist/katex.min.css'
 export const PROSE_REMARK_PLUGINS = [remarkGfm, remarkMath]
 export const PROSE_REHYPE_PLUGINS = [rehypeRaw, [rehypeKatex, { throwOnError: false, errorColor: '#ef4444' }]]
 
+// Post markdown references images by bare filename (e.g. `![alt](chart.png)`)
+// because the image sits alongside the .md file under src/posts. That path
+// isn't servable directly by the browser, so resolve it to the actual built
+// asset URL instead. Keyed by lowercased basename since posts only ever
+// reference their own co-located images, not each other's.
+const POST_IMAGES = import.meta.glob('../../posts/**/*.{png,jpg,jpeg,gif,svg,webp}', {
+  query: '?url',
+  import: 'default',
+  eager: true,
+})
+const POST_IMAGE_BY_NAME = new Map(
+  Object.entries(POST_IMAGES).map(([path, url]) => [path.split('/').pop().toLowerCase(), url])
+)
+
+function resolveImageSrc(src) {
+  if (!src || /^([a-z]+:)?\/\//i.test(src) || src.startsWith('/') || src.startsWith('data:')) return src
+  return POST_IMAGE_BY_NAME.get(src.split('/').pop().toLowerCase()) || src
+}
+
 function Heading({ level, children }) {
   const tag = `h${level}`
   const text = typeof children === 'string' ? children : ''
@@ -68,6 +87,18 @@ export const proseComponents = {
 
   em({ children }) {
     return <em className="italic text-slate-700 dark:text-slate-300">{children}</em>
+  },
+
+  img({ src, alt }) {
+    return (
+      <img
+        src={resolveImageSrc(src)}
+        alt={alt || ''}
+        loading="lazy"
+        className="max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 my-6 mx-auto shadow-sm"
+        onError={(e) => { e.currentTarget.style.opacity = '0.3' }}
+      />
+    )
   },
 
   ul({ children }) {

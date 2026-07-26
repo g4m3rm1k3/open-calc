@@ -6,7 +6,7 @@
 
 ## What This Lesson Is About
 
-Lesson 5.4's tree differentiator raised `NotImplementedError` the
+Lesson 4's tree differentiator raised `NotImplementedError` the
 moment it met anything more complicated than bare $x^n$ — it had no
 way to differentiate $(x^2+1)^5$ or $\sin(3x)$, because those aren't
 sums, products, or plain powers of $x$; they're **compositions**, one
@@ -47,10 +47,10 @@ explicitly, was his practical solution.
 ## What You Need To Know First
 
 - **Differentiation rules, the tree differentiator, its
-  `NotImplementedError` gap** — Lesson 5.4.
+  `NotImplementedError` gap** — Lesson 4.
 - **Circle and ellipse tangent-line formulas, derived geometrically**
   — Lessons 3.2, 3.4.
-- **Leibniz notation** — Lesson 5.3.
+- **Leibniz notation** — Lesson 3.
 
 ---
 
@@ -69,7 +69,7 @@ $$\frac{\Delta y}{\Delta x} = \frac{\Delta y}{\Delta u}\cdot\frac{\Delta u}{\Del
 
 Taking the limit as $\Delta x\to0$ (and, correspondingly,
 $\Delta u\to0$, assuming $g$ is differentiable hence continuous —
-Lesson 5.3): each factor approaches its respective derivative,
+Lesson 3): each factor approaches its respective derivative,
 $\dfrac{dy}{du}\cdot\dfrac{du}{dx}$. **This derivation has a genuine
 gap worth flagging honestly**: it silently divides by $\Delta u$,
 which can be exactly zero for some $\Delta x\ne0$ even as
@@ -104,16 +104,16 @@ $$\frac{d}{dx}\sin(3x) = 3\cos(3x)$$
 
 ---
 
-### Resolving Lesson 5.4's Gap: Chain Rule in the Tree Differentiator
+### Resolving Lesson 4's Gap: Chain Rule in the Tree Differentiator
 
-Lesson 5.4's `differentiate` function refused any `'pow'` node whose
+Lesson 4's `differentiate` function refused any `'pow'` node whose
 base wasn't literally `('var',)`. Fix it properly, and add a
 `'compose'` node for general function composition:
 
 ```python
 def differentiate(expr):
     """
-    Extends Lesson 5.4's differentiator with the chain rule, resolving
+    Extends Lesson 4's differentiator with the chain rule, resolving
     its NotImplementedError for non-trivial power bases and adding
     general function composition.
     """
@@ -158,7 +158,7 @@ def to_string(expr):
     if kind == 'sin': return f"sin({to_string(expr[1])})"
     if kind == 'cos': return f"cos({to_string(expr[1])})"
 
-# (x^2 + 1)^5 -- previously raised NotImplementedError in Lesson 5.4
+# (x^2 + 1)^5 -- previously raised NotImplementedError in Lesson 4
 expr = ('pow', ('add', ('pow', ('var',), ('const', 2)), ('const', 1)), ('const', 5))
 deriv = differentiate(expr)
 print(f"f(x)  = {to_string(expr)}")
@@ -167,24 +167,24 @@ print(f"f'(x) unsimplified = {to_string(deriv)}")
 
 **Walkthrough.** The `'pow'` branch's fix is minimal but essential:
 instead of assuming `differentiate(base)` is always `1` (true only
-when `base == ('var',)`, Lesson 5.4's restriction), it's now called
+when `base == ('var',)`, Lesson 4's restriction), it's now called
 *genuinely recursively* and multiplied in — exactly the chain rule
 formula, $n\cdot\text{base}^{n-1}\cdot\frac{d}{dx}[\text{base}]$. When
 `base` really is `('var',)`, `differentiate(base)` returns `('const',
-1)`, and multiplying by 1 recovers Lesson 5.4's original plain power
+1)`, and multiplying by 1 recovers Lesson 4's original plain power
 rule exactly as a special case — confirming the chain rule
 *generalizes* the power rule rather than replacing it, matching the
 mathematical relationship between the two. The new `'sin'`/`'cos'`
 branches are a first, direct application of the chain rule to
 non-polynomial functions, using $\frac{d}{dx}\sin(u)=\cos(u)\cdot u'$
 — itself a chain-rule application, with $\cos x$ as the to-be-proved
-building block from Lesson 5.6.
+building block from Lesson 6.
 
 ---
 
 ### The Chain Rule and Rational Exponents
 
-Lesson 5.4 stated, without proof, that the power rule extends to
+Lesson 4 stated, without proof, that the power rule extends to
 rational exponents like $x^{1/2}$. The chain rule (combined with
 implicit differentiation, next section) finally proves this. Let
 $y=x^{1/n}$ for a positive integer $n$; then $y^n=x$. Differentiate
@@ -303,7 +303,7 @@ computed three separate ways across this curriculum.
    mathematical starting point.
 4. **The tree differentiator**: extended in this lesson to finally
    handle the compositions (`(x^2+1)^5`, `sin(3x)`) that stalled it
-   in Lesson 5.4, via the identical chain-rule formula used for the
+   in Lesson 4, via the identical chain-rule formula used for the
    circle/ellipse.
 
 Three independent methods, one answer — the kind of cross-
@@ -459,7 +459,7 @@ print("✓ Challenge 3 passed!")
 
 ### Extension
 
-**4. ★** Lesson 5.4's tree differentiator's `'pow'` branch, before
+**4. ★** Lesson 4's tree differentiator's `'pow'` branch, before
 this lesson's fix, was only correct when the base was literally
 `('var',)`. Explain precisely *why* the old version
 (`('mul', ('const', n), ('pow', base, ('const', n-1)))`, without the
@@ -478,7 +478,7 @@ derivative factor entirely*. For $(x^2+1)^5$ at $x=2$: base
 $=x^2+1=5$, correct derivative is $5(5)^4\cdot(2\cdot2)=5\cdot625\cdot
 4=12500$, but the old (unguarded) formula would have produced just
 $5(5)^4=3125$ — off by a factor of exactly $4$ (which is $g'(2)=2x=4$,
-the missing chain-rule factor). This is precisely why Lesson 5.4's
+the missing chain-rule factor). This is precisely why Lesson 4's
 explicit `NotImplementedError` guard mattered: it's far better for
 buggy code to fail loudly on an unsupported case than to silently
 return a plausible-looking but numerically wrong answer — exactly the
