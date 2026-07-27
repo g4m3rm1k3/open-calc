@@ -219,37 +219,38 @@ def init_db():
 - **Dependencies** — none beyond Python's standard library.
 
 ### Mechanical Walkthrough
+
 - `DB_PATH = Path(__file__).resolve().parent.parent / "instance" /
-- "cnc.db"` — **(b) reappearing** `Path`/`__file__` navigation (the same
+  "cnc.db"` — **(b) reappearing** `Path`/`__file__` navigation (the same
   real pattern used implicitly by Flask's own `templates`/`static`
   lookup since Lesson 1, now written explicitly); `.parent.parent` walks
   up from `core/storage.py` to `cnc-service/`, then into a new
-- `instance/` folder — **(a) a real, named convention, not Flask's own
+  `instance/` folder — **(a) a real, named convention, not Flask's own
   mechanism**: `instance/` is a common real-world convention for "local,
   environment-specific data that shouldn't be committed to version
   control" (Flask itself has a similar, same-named concept,
-- `app.instance_path` — deliberately not used here, since `core/` must
+  `app.instance_path` — deliberately not used here, since `core/` must
   never import `flask` at all, the Lesson 2 boundary, so this project
   borrows the *name* as a plain folder, not Flask's own API).
 - `get_connection()` / `DB_PATH.parent.mkdir(parents=True,
-- exist_ok=True)` — **(a) first appearance** of `Path.mkdir` with these
+  exist_ok=True)` — **(a) first appearance** of `Path.mkdir` with these
   two real keyword arguments: `parents=True` creates any missing parent
   directories too (not just the final one); `exist_ok=True` means "don't
   raise an error if it already exists" — together, safe to call on
   *every* connection, not just the first.
 - `sqlite3.connect(DB_PATH)` — **(b) reappearing**, now a **real file
-- path** instead of `":memory:"` — SQLite creates the file itself, on
+  path** instead of `":memory:"` — SQLite creates the file itself, on
   disk, the first time this runs, if it doesn't already exist.
 - `connection.row_factory = sqlite3.Row` — **(a) first appearance.** By
   default, `sqlite3` rows behave like plain tuples (positional access
-- only, `row[0]`, `row[1]`) — the disposable `pets` lab used exactly
+  only, `row[0]`, `row[1]`) — the disposable `pets` lab used exactly
   this default. `sqlite3.Row` changes returned rows to support
   **both** positional *and* name-based access (`row["name"]`), and,
-- critically, `dict(row)` — used throughout this project's real
+  critically, `dict(row)` — used throughout this project's real
   functions to hand back plain dicts, the same shape every other route
   already returns.
 - `CREATE TABLE IF NOT EXISTS tools (...)` — **(b) reappearing** `CREATE
-- TABLE` syntax; **(a) the `IF NOT EXISTS` clause is new** — makes this
+  TABLE` syntax; **(a) the `IF NOT EXISTS` clause is new** — makes this
   statement safe to run every time the app starts, not just the first —
   real, if genuinely simple: this is **not** a real migration system
   (there's no way to *change* an existing table's columns later without
@@ -446,6 +447,7 @@ def seed_tools_if_empty():
 ```
 
 ### Mechanical Walkthrough
+
 - `tool["name"], ..., tool.get("subtype"), ...` — **(b) reappearing**
   dict indexing/`.get`-with-default (Lesson 2/10); required fields use
   `[...]` (a `KeyError`, a real, if currently uncaught, failure if
@@ -461,10 +463,10 @@ def seed_tools_if_empty():
   for the first time — converting every row to a plain dict, the same
   shape `/api/tools` (Lesson 13) already promised its caller.
 - `connection.execute("SELECT COUNT(*) FROM tools").fetchone()[0]` —
-- **(a) first appearance** of SQL's `COUNT(*)` **aggregate function** —
+  **(a) first appearance** of SQL's `COUNT(*)` **aggregate function** —
   returns the number of matching rows as a single value, not the rows
   themselves; `.fetchone()` (rather than `.fetchall()`) gets the one
-- resulting row; `[0]` reads its first (only) column — real, standard
+  resulting row; `[0]` reads its first (only) column — real, standard
   SQL, not a Python-side count of an already-fetched list, which would
   require fetching every row just to discard them.
 - `if count == 0: for tool in SEED_TOOLS: insert_tool(tool)` — **(a)
@@ -475,6 +477,41 @@ def seed_tools_if_empty():
   verified, not assumed, to run exactly once per real database file's
   lifetime (confirmed this session: restarting the server after seeding
   did **not** duplicate the four seed tools).
+
+### Execution Trace
+
+`seed_tools_if_empty()` against a freshly-created, empty database, then
+two real `get_tool_by_name` lookups:
+
+```
+seed_tools_if_empty():
+  count = SELECT COUNT(*) FROM tools → 0 (table just created, no rows yet)
+  if count == 0:  → True
+    for tool in SEED_TOOLS:  (4 real tools, Lesson 13's own data)
+      tool={name:"end_mill_4fl", ...}: insert_tool(tool) → 1 real row written
+      tool={name:"end_mill_2fl", ...}: insert_tool(tool) → 2nd row written
+      tool={name:"ball_mill_4fl", ...}: insert_tool(tool) → 3rd row written
+      tool={name:"drill_hss", ...}: insert_tool(tool) → 4th row written
+  → table now has exactly 4 real rows
+
+A second call to seed_tools_if_empty() (e.g. server restart):
+  count = SELECT COUNT(*) FROM tools → 4 (not 0 this time)
+  if count == 0:  → False → the for loop never runs at all
+  → still exactly 4 rows, nothing duplicated
+
+get_tool_by_name("drill_hss"):
+  row = SELECT * FROM tools WHERE name = "drill_hss" → the real 4th row found
+  → dict(row) → {"id": 4, "name": "drill_hss", "diameter_mm": 6.0, ...}
+
+get_tool_by_name("does_not_exist"):
+  row = SELECT * FROM tools WHERE name = "does_not_exist" → no match, fetchone() → None
+  → dict(row) if row else None → None (never calls dict(None))
+```
+
+The seed guard's own `if count == 0:` is what makes the second call a
+genuine no-op — the loop body is identical code both times, it simply
+never executes the second time, rather than re-inserting and needing a
+separate duplicate check per tool.
 
 ### Commands and Real Output
 
@@ -543,6 +580,7 @@ def create_tool():
 ```
 
 ### Mechanical Walkthrough
+
 - `init_db()` / `seed_tools_if_empty()` called **at module load time**
   (directly under `app = Flask(__name__)`, not inside any route
   function) — **(a) a real, deliberate placement**: this runs exactly
@@ -555,14 +593,14 @@ def create_tool():
   *(Full standalone treatment: ../concepts/flask-url-path-parameters.md.)*
   `<name>` matches
   any path segment in that position and passes it as a real argument to
-- the view function below it (`def get_tool(name):`) — Flask converts
+  the view function below it (`def get_tool(name):`) — Flask converts
   `/api/tools/drill_hss` into a call to `get_tool("drill_hss")`
   automatically.
 - `if tool is None: return {"error": ...}, 404` — **(b) reappearing**
   tuple-return-for-status-code (Lesson 2); **(a) `404`, first real,
   deliberate application-level use** in this project — the standard HTTP
   status for "nothing exists at this specific address," distinct from
-- Lesson 2's `400` ("what you sent was malformed") — a real, meaningful
+  Lesson 2's `400` ("what you sent was malformed") — a real, meaningful
   difference: `/api/tools/does_not_exist` is a well-formed request for a
   resource that genuinely isn't there, not a malformed one.
   *(Full standalone treatment, including this exact deliberate-vs-automatic
@@ -580,10 +618,42 @@ def create_tool():
   catching any real, honest discrepancy (a column default applied by
   SQLite itself, for instance) rather than an assumed echo.
 - `, 201` — **(a) first appearance** of HTTP `201 Created` (added to
-- `../concepts/http-status-codes.md` while auditing this lesson) — the
+  `../concepts/http-status-codes.md` while auditing this lesson) — the
   specific, correct status for "a new resource now exists," distinct
   from a plain `200` ("here's data, nothing changed on the server"),
   matching real HTTP convention.
+
+### Execution Trace
+
+The comprehension against a real, deliberately incomplete request body —
+`{"name": "face_mill_50", "type": "Face Mill", "diameter_mm": 50}`
+(missing 7 of the 10 required fields):
+
+```
+REQUIRED_TOOL_FIELDS = ("name", "type", "diameter_mm", "corner_radius_mm",
+  "flute_length_mm", "total_length_mm", "shank_diameter_mm",
+  "flute_count", "material", "description")
+
+field="name":              "name" not in body?              → False, skip
+field="type":               "type" not in body?              → False, skip
+field="diameter_mm":        "diameter_mm" not in body?       → False, skip
+field="corner_radius_mm":   "corner_radius_mm" not in body?  → True → include
+field="flute_length_mm":    "flute_length_mm" not in body?   → True → include
+field="total_length_mm":    "total_length_mm" not in body?   → True → include
+field="shank_diameter_mm":  "shank_diameter_mm" not in body? → True → include
+field="flute_count":        "flute_count" not in body?       → True → include
+field="material":           "material" not in body?          → True → include
+field="description":        "description" not in body?       → True → include
+
+missing = ["corner_radius_mm", "flute_length_mm", "total_length_mm",
+           "shank_diameter_mm", "flute_count", "material", "description"]
+if missing:  → True (non-empty list) → return 400 with all 7 named at once
+```
+
+The comprehension visits all 10 fields every time, regardless of how
+many are missing — it never stops early at the first miss, which is
+exactly what lets the response report every real gap in one 400
+instead of the client discovering them one submission at a time.
 
 ### Commands and Real Output — Verified Live, Including Real Persistence
 

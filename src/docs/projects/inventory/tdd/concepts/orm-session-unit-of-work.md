@@ -60,6 +60,35 @@ visible from a fresh session: ['Rex']
 - `with Session(engine) as session:` uses the Session as a **context manager** — guaranteeing the underlying connection is properly closed when the block exits, even if an exception occurs partway through, without requiring an explicit `.close()` call in every code path (including error paths) the way a raw connection would.
 - Each `Session` is typically short-lived in a web application — created for one request (or one logical unit of work), used, and closed — rather than one long-lived Session shared across an entire application's lifetime, which risks real, subtle bugs from stale, cached object state persisting across unrelated operations.
 
+## Execution Trace
+
+`session.new`'s own real state, traced across the commit boundary:
+
+```
+session.add(Pet(name="Rex"))
+  → the Pet object is staged, not yet inserted
+  → session.new = IdentitySet({<Pet object>})  (one pending object)
+  → prints "pending before commit: IdentitySet({<Pet object>})"
+
+session.commit()
+  → flushes the pending Pet as a real INSERT, then commits the transaction
+  → the object is no longer "new" — it's now a committed, persistent row
+  → session.new = IdentitySet({})  (empty — nothing pending anymore)
+  → prints "pending after commit: IdentitySet({})"
+
+second_session = a completely separate Session, same engine
+second_session.execute(select(Pet)).scalars().all()
+  → queries the real database fresh — not the first session's own memory
+  → finds the row committed above
+  → prints "visible from a fresh session: ['Rex']"
+```
+
+`session.new` is real, live bookkeeping that changes shape at exactly
+one moment — the `commit()` call — going from "one pending object" to
+"nothing pending," and the second session's own successful query is
+what proves the row is now real database state, not something that
+only existed inside the first session's own Python memory.
+
 ## CS Lens
 
 This is the **Unit of Work** pattern: tracking every change made during one logical operation and committing them all together, as a single, coherent transaction, rather than issuing each individual database write immediately and independently. This lets an ORM batch several real changes into one efficient database round-trip, and gives an application one clear, natural point (`.commit()`) to decide "this whole unit of work is now genuinely done and correct."

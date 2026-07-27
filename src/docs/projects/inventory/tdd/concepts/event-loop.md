@@ -48,6 +48,25 @@ loop: stopping
 - The `while True` loop's only real work is deciding how to react once something *does* arrive; the waiting itself is not implemented as repeatedly checking — it's the queue's own blocking behavior doing the waiting.
 - `if event == "stop": break` is how this particular loop terminates cleanly, so the example finishes instead of hanging forever — a real server's loop typically has no such exit at all, by design.
 
+## Execution Trace
+
+The queue is pre-loaded with 3 items (`"tick"`, `"tick"`, `"stop"`)
+before `event_loop()` ever runs — traced against the real output above:
+
+```
+Iteration 1: events.get() → "tick"  (queue: ["tick", "stop"] remaining)
+  "tick" == "stop"? No → print "loop: reacting to 'tick'"
+Iteration 2: events.get() → "tick"  (queue: ["stop"] remaining)
+  "tick" == "stop"? No → print "loop: reacting to 'tick'"
+Iteration 3: events.get() → "stop"  (queue: [] remaining)
+  "stop" == "stop"? Yes → print "loop: stopping"; break
+```
+
+The loop ran exactly 3 times — once per item that was ever put in the
+queue — and every single iteration's first action was the same blocking
+`events.get()` call; nothing distinguishes "waiting for the next event"
+from "reacting to one" except which event happened to come back.
+
 ## CS Lens
 
 An event loop is a loop whose entire body is "wait for something to happen, then react" — as opposed to a normal script's "run start to finish, then exit." The waiting is a **blocking wait**, not active polling: the program consumes no CPU while idle, and the operating system (or, here, the `Queue` implementation) wakes it only when there's real work.

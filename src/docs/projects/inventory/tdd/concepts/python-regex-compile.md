@@ -48,6 +48,38 @@ uncompiled: 0.1842s, compiled: 0.1213s
 - `compiled.findall(text)` — the same operation as `re.findall(pattern_text, text)`, called as a method on the pre-built pattern object instead of passing the raw string each time.
 - Every regex operation (`.search`, `.findall`, `.finditer`, `.match`) is available as a method on a compiled `Pattern`, mirroring the module-level functions exactly.
 
+## Execution Trace
+
+The two loops run the identical 50 iterations each — what differs is
+what happens *inside* each iteration, not the loop shape:
+
+```
+Uncompiled loop:
+  Iteration 1:  re.findall(r"\d+", text) → parses "\d+" into an internal
+                pattern representation, THEN scans text → result discarded
+  Iteration 2:  re.findall(r"\d+", text) → parses "\d+" again (Python's
+                internal pattern cache may short-circuit this in
+                practice, per the SE Lens below) → scans text again
+  ...
+  Iteration 50: same as above
+  → uncompiled_time = total wall-clock time for all 50 parse+scan passes
+
+Compiled loop:
+  (parsing already happened once, before this loop even starts:
+   compiled = re.compile(r"\d+"))
+  Iteration 1:  compiled.findall(text) → scans text directly, no parsing
+  Iteration 2:  compiled.findall(text) → scans text directly, no parsing
+  ...
+  Iteration 50: same as above
+  → compiled_time = total wall-clock time for 50 scan-only passes
+```
+
+Both loops do the identical real scanning work (50 passes over the
+same 130,000-character `text`) — the only structural difference is that
+`re.compile(...)` moves the one-time parsing cost *before* the loop
+starts, so it's paid once regardless of how many times the loop runs
+afterward, rather than potentially being repeated inside it.
+
 ## CS Lens
 
 This is a form of **memoization at the API level** — doing expensive setup work (parsing a pattern into its internal matching representation) once, and reusing the result across many calls, rather than repeating the setup work every time.

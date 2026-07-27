@@ -51,6 +51,30 @@ undefined
 - `.forEach()` cannot be **chained** the way `.map()`/`.filter()` can (`.forEach(...).map(...)` is meaningless, since `.forEach()`'s return value carries no data) — this is itself a signal of intent: a `.forEach()` call is always the *end* of a chain, never the middle.
 - Both methods receive the same callback arguments (element, index, full array) and iterate in the same order — the only real difference is what happens to the callback's return value: `.map()` collects it; `.forEach()` discards it.
 
+## Execution Trace
+
+Both calls iterate the identical `names = ["Rex", "Fido", "Buddy"]`,
+traced against the real output above:
+
+```
+names.map((name) => { console.log(...); }):
+  name="Rex":   logs "Hello, Rex"   → callback returns undefined (no return statement) → collected: [undefined]
+  name="Fido":  logs "Hello, Fido"  → returns undefined → collected: [undefined, undefined]
+  name="Buddy": logs "Hello, Buddy" → returns undefined → collected: [undefined, undefined, undefined]
+  mapResult = [undefined, undefined, undefined]
+
+names.forEach((name) => { console.log(...); }):
+  name="Rex":   logs "Hello, Rex"   → return value discarded
+  name="Fido":  logs "Hello, Fido"  → return value discarded
+  name="Buddy": logs "Hello, Buddy" → return value discarded
+  forEachResult = undefined
+```
+
+Both loops call the identical callback, in the identical order, with
+the identical side effect (`console.log`) — the only difference
+anywhere in this trace is what happens to each call's return value
+*after* it returns: collected into a real array, or thrown away.
+
 ## CS Lens
 
 This is the practical distinction between code run for its **return value** versus code run for its **side effects** — `.map()` is a pure transformation (assuming its callback is pure), producing a new value with no observable effect beyond that; `.forEach()` is explicitly about causing something to happen (mutating some outside state, performing I/O), with its return value deliberately discarded as irrelevant. Naming this distinction explicitly, via which method is chosen, documents *intent* directly in the code, not just in a comment.

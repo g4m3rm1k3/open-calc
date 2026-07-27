@@ -37,6 +37,7 @@ discipline this project has used from the start, applied here to a
 question docs alone couldn't answer: *is this code actually called?*
 
 ### Mechanical Walkthrough
+
 A real, command-line grep across the reference's own source settled it:
 
 ```
@@ -50,11 +51,11 @@ cnc/CNCEngine.test.ts:302:describe("buildFullToolProfile", ...
 ```
 
 `TOOL_TEMPLATES` itself is real and used (seeding the reference's own
-- default tool table) — but `getHolderProfile`/`buildFullToolProfile`
+default tool table) — but `getHolderProfile`/`buildFullToolProfile`
 only ever appear in `CNCEngine.test.ts`. Confirmed further: the
 reference's actual "Tool Shape Preview" canvas
 (`ToolEditForm.jsx`'s own `toolCvsRef`, drawn in `CNCSim.jsx`) hand-draws
-- a hardcoded icon per `tool.type` — it never calls
+a hardcoded icon per `tool.type` — it never calls
 `buildFullToolProfile` at all. There is no working reference display of
 tool/holder 3D geometry anywhere in the running app — real code, dead
 on arrival, exercised only by its own unit tests.
@@ -107,6 +108,7 @@ table_info`, row counts, cross-referencing ID sets) is precisely the
 technique used here, generalized.
 
 ### Mechanical Walkthrough
+
 Every real step, run directly against `Untitled.TOOLDB`, in order:
 
 **1. What's actually in this file?**
@@ -122,7 +124,7 @@ for row in cur.fetchall():
 "
 ```
 
-- 76 real tables — `TlAssembly`, `TlAssemblyComponent`, `TlHolder`,
+76 real tables — `TlAssembly`, `TlAssemblyComponent`, `TlHolder`,
 `TlGraphicsFile`, `TlProfileData`, and 71 more.
 
 **2. Row counts — which of these are actually populated?**
@@ -207,6 +209,7 @@ radius, StartAngle, SweepAngle`) needed a real interpretation — what do
 these numbers actually describe?
 
 ### Mechanical Walkthrough
+
 One real holder's full profile, read directly and hand-traced:
 
 ```
@@ -228,15 +231,16 @@ for r in cur.fetchall(): print(r)
 ```
 
 Traced by hand: `(0,0)→(0.25,0)` (a face, out to radius 0.25),
-- `(0.25,0)→(0.25,3)` (straight up at a constant radius — a cylindrical shank), `(0.25,3)→(1.0,3)` (a step outward — a shoulder), `(1.0,3)→ (1.0,4)` (straight up again — a larger-diameter body), `(1.0,4)→(0,4)`
-
+`(0.25,0)→(0.25,3)` (straight up at a constant radius — a cylindrical
+shank), `(0.25,3)→(1.0,3)` (a step outward — a shoulder), `(1.0,3)→
+(1.0,4)` (straight up again — a larger-diameter body), `(1.0,4)→(0,4)`
 (back to the axis, closing the outline). `x` is radius; `y` is axial
 (Z) position — a real, revolve-ready lathe-style cross-section, ordered
 segment by segment, each one's end matching the next one's start.
 
 Checked across every real segment in both this file (56 rows) and
 Mastercam's own official system library (15,015 rows, `Type` always
-- `2` — a line): arcs (`radius`/`StartAngle`/`SweepAngle`) never actually
+`2` — a line): arcs (`radius`/`StartAngle`/`SweepAngle`) never actually
 occur in real Mastercam holder data. Those columns are kept in the
 model below, honestly unexercised, not invented.
 
@@ -247,6 +251,15 @@ described as an ordered chain of straight segments rather than a filled
 region or a mesh — the standard way to describe a revolve profile (a
 2D outline swept 360° around an axis to produce a solid) in CAD/CAM
 software.
+
+Also recognized in: SVG's own `<polyline>`/`<path>` line-segment
+commands, this project's own G-code toolpath itself (a chain of
+straight/arc moves describing where the tool goes, not a filled
+region), and GPS turn-by-turn navigation data (a route stored as an
+ordered sequence of coordinate points, not a continuous curve) — the
+same underlying tradeoff every time: an exact curve traded for an
+approximation simple enough to store, transmit, and process as plain
+data.
 
 ### SE Lens
 
@@ -418,18 +431,19 @@ class TlAssemblyItem(Base):
 ```
 
 ### Mechanical Walkthrough
-- `ForeignKey("TlTool.ID")` removed entirely from `TlAssemblyItem.ID` —
+
+`ForeignKey("TlTool.ID")` removed entirely from `TlAssemblyItem.ID` —
 SQLite here never enforces foreign keys anyway (no `PRAGMA
 foreign_keys` anywhere in `core/storage.py`), so nothing changes at
 runtime; what changes is that the relationship can no longer be
 *inferred* from that FK, so both sides now say explicitly, in
 `primaryjoin`, exactly how to join (`TlTool.ID == foreign(TlAssemblyItem.ID)`
-- and its mirror) — the `foreign()` annotation marking which side plays
+and its mirror) — the `foreign()` annotation marking which side plays
 the FK-like role a real column-level `ForeignKey` used to play
 automatically. Both relationships are `viewonly=True`: every real write
 already happens by constructing `TlAssemblyItem(ID=tool_id, ...)` or
 `TlAssemblyItem(ID=holder.ID, ...)` directly (`insert_tool`,
-- `_copy_tool_assembly` below) — nothing ever wrote through
+`_copy_tool_assembly` below) — nothing ever wrote through
 `.catalog_item =`/`.tool =`, so marking both read-only costs nothing
 and is simply honest about how they're actually used.
 
@@ -511,6 +525,12 @@ class TlProfileData(Base):
     StartAngle: Mapped[float] = mapped_column(default=0.0)
     SweepAngle: Mapped[float] = mapped_column(default=0.0)
 ```
+
+`TlAssemblyComponent` is the same `composite-natural-primary-key`
+pattern named above, reapplied: one row per item participating in a
+given assembly, keyed by the pair of IDs below rather than an invented
+single one, and carrying the real `CScalar` stickout value confirmed in
+the previous unit:
 
 ```python
 class TlAssemblyComponent(Base):
@@ -629,10 +649,11 @@ class TlAssembly(Base):
 ```
 
 ### Mechanical Walkthrough
-- `TlHolder.profile` — the same `primaryjoin`/`foreign()` shape as the
+
+`TlHolder.profile` — the same `primaryjoin`/`foreign()` shape as the
 shared-catalog unit above, here for a genuinely one-directional,
 one-real-owner relationship (a profile segment always belongs to
-- exactly one holder) — `viewonly=True` for the same reason: real writes
+exactly one holder) — `viewonly=True` for the same reason: real writes
 go through `_copy_tool_assembly` (below), never through this attribute.
 `order_by="TlProfileData.Segment"` guarantees the profile always comes
 back in real outline order, matching the order the segments were
@@ -746,6 +767,10 @@ def get_tool_assembly(tool_id):
         }
 ```
 
+`get_tool_assembly` is the plain Python entry point; the actual HTTP
+surface wrapping it is one small route, added alongside this project's
+other real `/api/tools/...` endpoints:
+
 ```python
 @app.route("/api/tools/<uuid:tool_id>/assembly")
 def get_assembly(tool_id):
@@ -761,6 +786,7 @@ def get_assembly(tool_id):
 ```
 
 ### Mechanical Walkthrough
+
 - `points` is built by taking every segment's own *start* point in
   order, then appending the very last segment's *end* point once —
   since consecutive real segments share an endpoint
@@ -774,8 +800,52 @@ def get_assembly(tool_id):
 - The route checks `get_tool_by_id(tool_id) is None` first, specifically
   so a request for a tool that doesn't exist at all (404) reads
   differently from a request for a real tool with no assembly
-- (`200`, `{"assembly": null}`) — two different real situations, not
+  (`200`, `{"assembly": null}`) — two different real situations, not
   conflated into one error response.
+
+### Execution Trace
+
+`points`'s own construction is a loop building state across steps, so a
+description of what it "generally does" isn't enough — traced against
+the real 5-segment holder profile already hand-traced in the revolve-
+profile unit above (`(0, 0.0,0.0, 0.25,0.0)`, `(1, 0.25,0.0, 0.25,3.0)`,
+`(2, 0.25,3.0, 1.0,3.0)`, `(3, 1.0,3.0, 1.0,4.0)`,
+`(4, 1.0,4.0, 0.0,4.0)`), read in `Segment` order (`order_by` confirmed
+in the composite-key unit above):
+
+```
+Before the comprehension: points = []
+Segment 0: x0,y0 = 0.0, 0.0  → points = [{x:0.0,y:0.0}]
+Segment 1: x0,y0 = 0.25, 0.0 → points = [{x:0.0,y:0.0}, {x:0.25,y:0.0}]
+Segment 2: x0,y0 = 0.25, 3.0 → points = [..., {x:0.25,y:3.0}]
+Segment 3: x0,y0 = 1.0, 3.0  → points = [..., {x:1.0,y:3.0}]
+Segment 4: x0,y0 = 1.0, 4.0  → points = [..., {x:1.0,y:4.0}]
+After the loop: 5 points, one per segment's own start point.
+Final append: holder.profile[-1] is segment 4; its own x1,y1 = 0.0, 4.0
+  → points.append({x:0.0,y:4.0})
+Final points (6 total): (0,0) → (0.25,0) → (0.25,3) → (1,3) → (1,4) → (0,4)
+```
+
+The 6th point, `(0, 4)`, is the one real coordinate no segment's own
+`x0,y0` ever holds — it exists only as segment 4's `x1,y1`. Without the
+`if holder.profile: points.append(...)` line, the comprehension alone
+would silently drop it and the outline would never close back to the
+axis, even though every other point would look correct in isolation.
+
+`stickout`'s search is a real short-circuiting scan, traced against one
+real assembly's two component rows (the two-row shape confirmed in the
+`CScalar` unit above, using `2.6` as one of that unit's own real values):
+
+```
+Component 1 (the tool's own row): CScalar = 0.0 → falsy → generator skips it
+Component 2 (the holder's own row): CScalar = 2.6 → truthy → next() returns 2.6, stops
+stickout = 2.6
+```
+
+If both rows carried `0.0` (a real, valid case — no recorded stickout),
+the generator would exhaust with nothing truthy found, and `next()`'s own
+second argument, `0.0`, would be returned instead of raising
+`StopIteration` — the fallback exists specifically for that case.
 
 ### CS Lens / SE Lens
 
@@ -949,14 +1019,64 @@ whole, not elided, even though only the last two lines are new:
 ```
 
 ### Mechanical Walkthrough
+
 `_copy_tool_assembly` takes the *source* session (already open, reading
 the uploaded file) as one argument, and separately opens this project's
-- own `get_session()` to write into — two different databases, exactly
+own `get_session()` to write into — two different databases, exactly
 the same "read from one, write to the other" shape `import_tools_from_file`
 already uses for tools themselves. `already_have_holder`/
 `already_have_assembly` guards make this idempotent: importing the same
 file twice (a real, already-handled case for tools) doesn't try to
 insert the same holder/assembly rows again.
+
+### Execution Trace
+
+`_copy_tool_assembly` run for real against `Untitled.TOOLDB`'s own
+first assembly (`TA5120`) — its holder has 18 real `TlProfileData`
+segments, its assembly has 2 real `TlAssemblyComponent` rows:
+
+```
+First import (a fresh project database, neither row exists yet):
+  assembly = source_session query on MainTool → found (TA5120)
+  assembly.MainHolder is not None → continue
+  holder = source_session query on TlHolder.ID → found
+  holder is not None → continue
+
+  already_have_holder = False (fresh database)
+    → not already_have_holder branch runs:
+      session.add(TlHolder(...))                    (1 row)
+      holder_catalog = source_session query           → found
+      session.add(TlAssemblyItem(...))               (1 row)
+      for seg in holder.profile:                      (18 real segments)
+        session.add(TlProfileData(...))                → 18 session.add calls,
+                                                           one per real segment,
+                                                           in Segment order
+                                                           (the relationship's
+                                                           own order_by)
+
+  already_have_assembly = False
+    → not already_have_assembly branch runs:
+      session.add(TlAssembly(...))                    (1 row)
+      for component in assembly.components:            (2 real components)
+        session.add(TlAssemblyComponent(...))           → 2 session.add calls
+
+  session.commit()   → 1 holder + 1 catalog item + 18 profile rows +
+                        1 assembly + 2 component rows = 23 real inserts,
+                        one commit
+
+Second import of the SAME tool (already-populated project database):
+  assembly, holder found exactly as before
+  already_have_holder = True  → the entire holder/profile-loop branch
+    is skipped — 0 of the 18 segments re-inserted
+  already_have_assembly = True → the assembly/component-loop branch is
+    skipped too — 0 of the 2 components re-inserted
+  session.commit()   → 0 real inserts; a genuine no-op, not an error
+```
+
+The two loops (18 iterations, 2 iterations) only ever run once per real
+holder/assembly, no matter how many times the tool that references them
+gets imported — the guard checks, not the loops themselves, are what
+make repeated imports safe.
 
 ### CS Lens / SE Lens
 

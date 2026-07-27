@@ -57,6 +57,35 @@ rejected: NOT NULL constraint failed: pets.name
 - `NOT NULL` is a real, database-enforced constraint: any `INSERT` that would leave this column empty is rejected outright, raising a real error (`sqlite3.IntegrityError`) rather than silently storing an incomplete row — enforced at the storage layer itself, independent of whatever validation application code may or may not have already done.
 - A column with no explicit constraint (`age` here) is allowed to be `NULL` — SQL's real representation of "no value," distinct from `0` or an empty string, and distinct from Python's own `None` only in name (SQLite converts between them automatically).
 
+## Execution Trace
+
+Two real inserts, a real read-back loop, then a real rejected insert —
+traced against the real output above:
+
+```
+INSERT (name="Rex", age=3)   → id auto-assigned 1 → row (1, "Rex", 3)
+INSERT (name="Milo", no age) → id auto-assigned 2 → age has no
+  constraint → stored as NULL → row (2, "Milo", None)
+commit()
+
+for row in SELECT * FROM pets:
+  Row 1: (1, "Rex", 3)   → print (1, 'Rex', 3)
+  Row 2: (2, "Milo", None) → print (2, 'Milo', None)
+  (loop ends — only 2 rows exist)
+
+try: INSERT (age=5, no name)
+  → the database checks the NOT NULL constraint on `name` BEFORE
+    storing anything → name is missing → constraint violated
+  → raises sqlite3.IntegrityError("NOT NULL constraint failed: pets.name")
+except sqlite3.IntegrityError as e:
+  → print("rejected:", e)
+```
+
+The loop only ever sees the 2 rows that actually made it into the
+table — the third, rejected insert never became a row at all, so it
+never appears in the loop's own output; the rejection happened at
+`INSERT` time, not as a later filtering step.
+
 ## CS Lens
 
 A schema is a **contract enforced by the storage layer itself** — the same general idea as a type system (see `typescript-interfaces.md`) or a function's own input validation, applied specifically to what a database will accept as a stored row. Enforcing structure here, in addition to (not instead of) any validation happening in application code, is a real instance of **defense in depth**: even a bug that lets bad data slip past every check *above* the database is still caught by the schema itself.

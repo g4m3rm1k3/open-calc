@@ -129,8 +129,10 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   const [stdinValue, setStdinValue] = useState('')
   const showStdin = isRunnable && needsStdin(lang, editorCode)
 
+  const fontSizePx = parseInt(getCodeFontSize(codeTypography?.fontSize)) || 14
+  const lineHeight = fontSizePx * 1.5
   const lineCount = editorCode.split('\n').length
-  const editorHeight = Math.min(Math.max(lineCount * 20 + 24, 80), 560)
+  const editorHeight = Math.min(Math.max(lineCount * lineHeight + 24, 80), 560)
 
   const prevCode = useRef(trimmedCode)
   useEffect(() => {

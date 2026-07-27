@@ -118,6 +118,7 @@ print(tokenize("G0 X10"))
 - **Dependencies** — none beyond Python's standard library.
 
 ### Mechanical Walkthrough
+
 - `core/__init__.py`, **empty** — **(a) first appearance.** A file named
   exactly `__init__.py` inside a folder is what (traditionally) tells
   Python "this folder is a package — a collection of modules importable
@@ -125,7 +126,7 @@ print(tokenize("G0 X10"))
   files. It can be completely empty, as here — its *presence* is the
   signal, not its contents. Named honestly: Python 3.3+ can actually treat
   folders without an `__init__.py` as "namespace packages" too, so this
-- file is technically optional on this Python version (`3.13.14`) — it's
+  file is technically optional on this Python version (`3.13.14`) — it's
   included anyway because it's the explicit, unambiguous, widely-
   recognized convention, and being explicit here costs nothing.
 - `from core.lexer import tokenize` — **(b) reappearing**, same
@@ -139,7 +140,14 @@ This is **modularity / information hiding** — a module that only exposes
 what other code needs (`tokenize`) and hides how it works internally. The
 `core` package as a whole enforces a **dependency direction**: `core`
 never imports `flask` or `app`; `app.py` imports `core`. Dependencies only
-point one way.
+point one way — this is also the SOLID **Dependency Inversion Principle**:
+the high-level policy (`core`, the actual G-code logic) doesn't depend on
+the low-level detail (`app.py`, the HTTP framework used to expose it); the
+detail depends on the policy instead. Nothing here inverts a dependency
+through an injected abstraction the way a textbook DIP example usually
+does — this project's own version of it is simpler, just a one-way import
+boundary — but the same principle, "the important thing shouldn't depend
+on the replaceable thing," is what's actually being enforced.
 
 Also recognized in: any layered architecture (a database layer with no
 knowledge of the UI on top of it), the classic "domain layer knows nothing
@@ -308,6 +316,7 @@ pattern repeatedly across a whole line, building up the token dict. The
 about the pattern alone.
 
 ### Mechanical Walkthrough
+
 - `_WORD_RE = re.compile(r"...")` — **(a) first appearance** of
   `re.compile`: pre-building a `Pattern` object once, instead of passing
   the raw pattern string to `re.findall`/`re.search` every call (as the
@@ -328,13 +337,13 @@ about the pattern alone.
     both `"G0"` and `"G 0"` to match identically.
   - `([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)` — capture group 2, the number,
     built from smaller pieces: `[-+]?` (an optional leading `+` or `-`
-- sign), `\d*` (zero or more digits before a decimal point — zero,
+    sign), `\d*` (zero or more digits before a decimal point — zero,
     because `.5` alone is a valid number), `\.?` (an optional literal
-- decimal point — the `\` escapes `.`, which would otherwise mean "any character"), `\d+` (one or more digits — required, since something
-
+    decimal point — the `\` escapes `.`, which would otherwise mean "any
+    character"), `\d+` (one or more digits — required, since something
     has to be a digit for this to be a number at all), then
-- `(?:[eE][-+]?\d+)?` — an optional, non-capturing group (`(?:...)` — parentheses that group pieces together without creating
-
+    `(?:[eE][-+]?\d+)?` — an optional, non-capturing group
+    (`(?:...)` — parentheses that group pieces together without creating
     a numbered capture, used here purely to attach the trailing `?` to
     the whole scientific-notation suffix at once) matching scientific
     notation like `1e-3` if present.
@@ -435,17 +444,18 @@ here since this unit's walkthrough is about this function specifically,
 not the pattern above it.)
 
 ### Mechanical Walkthrough
+
 - `def tokenize(line):` — already-known basic Python.
 - `words = {}` — an empty dict literal, already-known basic Python; this
   is the structure being built up, one word at a time.
 - `for match in _WORD_RE.finditer(line):` — **(a) first appearance.**
   `.finditer(line)` runs the compiled pattern against `line` and returns
-- an **iterator** — something a `for` loop can step through one item at a time — yielding one `Match` object per place the pattern matched,
-
+  an **iterator** — something a `for` loop can step through one item at a
+  time — yielding one `Match` object per place the pattern matched,
   left to right, in order. (`.findall`, used in the disposable regex lab,
   returns a plain list of strings/tuples immediately; `.finditer` instead
   yields full `Match` objects lazily, one at a time, which is what makes
-- `.group(1)` / `.group(2)`, used next, available at all — `findall`
+  `.group(1)` / `.group(2)`, used next, available at all — `findall`
   would have already reduced each match down to a plain tuple, losing the
   richer `Match` object.)
 - `letter = match.group(1).upper()` — `match.group(1)` retrieves capture
@@ -457,19 +467,18 @@ not the pattern above it.)
   converts it to an actual number. Already-known basic Python conversion,
   applied to newly-available data (a regex capture group).
 - `if letter in ("N", "O"): continue` — **(b) hard concept reappearing**
-- (`continue`, a loop-control keyword — if already covered in "basic
+  (`continue`, a loop-control keyword — if already covered in "basic
   Python," reused without re-explanation; if not yet seen, it skips the
   rest of *this* loop iteration and moves to the next match, without
-- running the code below it).
-- `N` is a sequence number (`N10` — a line
+  running the code below it). `N` is a sequence number (`N10` — a line
   label, not a G-code instruction) and `O` marks a sub-program number
-- (`O100`) in the reference dialects — neither is a real "word" this
+  (`O100`) in the reference dialects — neither is a real "word" this
   project's engine acts on yet, so both are explicitly discarded here,
   matching the real reference's own identical exclusion at line 1214.
 - `if letter not in words: words[letter] = value` — the first time a
   letter appears on this line, store its value directly.
 - `elif isinstance(words[letter], list): words[letter].append(value)` —
-- **(a) first appearance** of `isinstance` — checks whether
+  **(a) first appearance** of `isinstance` — checks whether
   `words[letter]`'s *current* value is already a `list` (meaning this
   letter has appeared at least twice before); if so, this third-or-later
   repeat just appends onto the existing list.
@@ -480,6 +489,44 @@ not the pattern above it.)
   a second one shows up — matching the real reference's identical
   behavior at lines 1217–1220.
 - `return words` — already-known basic Python.
+
+### Execution Trace
+
+The "Incremental Practice" table above shows *final* results for 8 real
+inputs, but never the loop's own step-by-step state — worth tracing
+directly for the one genuinely interesting case, `"G01 X10 Y10 X20"`
+(a repeated letter, `X`, appearing twice):
+
+```
+Before the loop: words = {}
+
+Match 1: "G01" → letter="G", value=1.0
+  "G" in words? No → words["G"] = 1.0
+  words = {'G': 1.0}
+
+Match 2: "X10" → letter="X", value=10.0
+  "X" in words? No → words["X"] = 10.0
+  words = {'G': 1.0, 'X': 10.0}
+
+Match 3: "Y10" → letter="Y", value=10.0
+  "Y" in words? No → words["Y"] = 10.0
+  words = {'G': 1.0, 'X': 10.0, 'Y': 10.0}
+
+Match 4: "X20" → letter="X", value=20.0
+  "X" in words? Yes (10.0). isinstance(words["X"], list)? No (it's a float)
+  → words["X"] = [words["X"], 20.0] = [10.0, 20.0]
+  words = {'G': 1.0, 'X': [10.0, 20.0], 'Y': 10.0}
+
+finditer exhausted (4 matches, no more) → loop ends
+Final: {'G': 1.0, 'X': [10.0, 20.0], 'Y': 10.0}
+```
+
+Match 4 is the one branch the other 7 test inputs in the table never
+exercise — `X` already holding a plain `float` (not yet a `list`) is
+exactly the condition that converts it into a two-element list, the
+`else` branch on its *first* repeat. A real third `X` on the same line
+would instead hit the `elif isinstance(..., list)` branch and `.append()`
+onto that same list, not build a new one.
 
 ### CS Lens
 
@@ -601,8 +648,9 @@ project whose answer depends on what the *client* sends, not just a fixed
 value.
 
 ### Mechanical Walkthrough
+
 - `from flask import Flask, render_template, request` — **(b) reappearing**
-- import syntax; `request` is **(a) first appearance** — a Flask-provided
+  import syntax; `request` is **(a) first appearance** — a Flask-provided
   object representing the *current* incoming HTTP request being handled
   (available inside any route function while it runs).
 - `@app.route("/api/tokenize", methods=["POST"])` — **(b) hard concept
@@ -613,13 +661,13 @@ value.
   only — the HTTP method meant for "here is data, act on it," as opposed
   to `GET`'s "just give me something, I'm not sending you data." A `GET`
   request to this exact path would now get Flask's own built-in
-- `405 Method Not Allowed`, without any code written for that case — the
+  `405 Method Not Allowed`, without any code written for that case — the
   same way Lesson 1's Exercises showed a `404` for an unmatched path
   entirely for free.
 - `body = request.get_json(silent=True)` — **(a) first appearance.**
   `.get_json()` reads the request's body and parses it as JSON, returning
   a Python `dict`/`list`/etc. `silent=True` tells it: if the body isn't
-- valid JSON at all, return `None` instead of raising an exception —
+  valid JSON at all, return `None` instead of raising an exception —
   verified for real below, sending genuinely malformed text.
 - `if not isinstance(body, dict) or "line" not in body:` — **(a) first
   appearance** of real request validation. Two real failure cases folded
@@ -787,6 +835,7 @@ click, it sends whatever text is in the input box to the real tokenizer
 and shows the structured result.
 
 ### Mechanical Walkthrough
+
 - `<input id="line-input" type="text" value="G0 X10 Y20" />` — **(a)
   first appearance** of an HTML `<input>` element: a box the user can
   type into. `type="text"` (as opposed to `type="number"`, `type="checkbox"`,
@@ -794,41 +843,40 @@ and shows the structured result.
   `value="..."` sets its *initial* contents, shown before the user
   types anything.
 - `<button id="tokenize-button">Tokenize</button>` — **(a) first
-- appearance** of a `<button>` element — clickable, with no default
+  appearance** of a `<button>` element — clickable, with no default
   behavior of its own (unlike a `<form>`'s submit button, not used here);
   its behavior comes entirely from the JavaScript attached below.
 - `document.getElementById("tokenize-button")` — **(b) reappearing**
   (Lesson 1).
 - `.addEventListener("click", () => { ... })` — **(a) first appearance.**
   `.addEventListener(eventName, callback)` registers `callback` to run
-- every time the named event happens on this element — here, `"click"`.
+  every time the named event happens on this element — here, `"click"`.
   Nothing runs immediately when this line executes; the arrow function is
   only *stored*, to be called later, potentially many times (once per
   click), or never, if the button is never clicked. This is the same
   general "store a function to run later" idea as Lesson 1's `.then`,
   applied to a user action instead of a network response finishing.
 - `const line = document.getElementById("line-input").value;` — **(a)
-- first appearance** of reading `.value` from an `<input>` — the box's
+  first appearance** of reading `.value` from an `<input>` — the box's
   *current* text, whatever the user has typed at the moment of the click
   (not the original `value="..."` attribute, which only set the starting
   content).
 - `fetch("/api/tokenize", { method: "POST", headers: {...}, body: ... })`
-- — **(b) hard concept reappearing** (`fetch`, Lesson 1) with **(a) a
+  — **(b) hard concept reappearing** (`fetch`, Lesson 1) with **(a) a
   genuinely new second argument**: Lesson 1's `fetch` took only a URL,
   defaulting to a `GET` request with no body. This call passes an options
   object: `method: "POST"` matches the server's `methods=["POST"]`
-- restriction exactly — a `GET` here would hit that route's `405`, shown
+  restriction exactly — a `GET` here would hit that route's `405`, shown
   in the previous unit. `headers: { "Content-Type": "application/json" }`
   tells the server what format the body is in, so `request.get_json()`
   on the Flask side knows to parse it as JSON rather than something
-- else.
-- `body: JSON.stringify({ line: line })` — **(b) reappearing**
+  else. `body: JSON.stringify({ line: line })` — **(b) reappearing**
   `JSON.stringify` (Lesson 1), here converting a small JavaScript object
   *into* JSON text to send, the exact reverse direction of Lesson 1's use
   of it (there, converting *received* data into readable text for
   display).
 - The rest (`.then((response) => response.json())`, `.then((data) => {
-- ... .textContent = ... })`) — **(c) already established**, identical
+  ... .textContent = ... })`) — **(c) already established**, identical
   pattern to Lesson 1's status fetch, reused with no new explanation
   owed.
 

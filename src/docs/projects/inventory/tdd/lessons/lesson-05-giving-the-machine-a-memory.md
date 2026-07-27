@@ -184,6 +184,7 @@ real reference's own initial position — and `apply()` moves it one
 command at a time, `position()` reporting wherever it currently is.
 
 ### Mechanical Walkthrough
+
 - `class MachineState: def __init__(self): self.x = 0.0; ...` — **(b)
   hard concept reappearing**, the exact `Counter`/`Parser` class shape
   from Lesson 4, applied to a third kind of instance state. `0.0` (a
@@ -197,7 +198,7 @@ command at a time, `position()` reporting wherever it currently is.
 - `def apply(self, command):` — **(a) first appearance** of this specific
   method name in this project, though the shape (`self`, one parameter)
   is already established; `command` is one dict, shaped exactly like
-- Lesson 4's `Parser` output (`{"motion": ..., "x": ..., ...}`) — though,
+  Lesson 4's `Parser` output (`{"motion": ..., "x": ..., ...}`) — though,
   worth noting explicitly, `apply` never reads `command["motion"]` at all.
   This lesson's `MachineState` only cares about position, not which
   motion mode produced it — a real, deliberate scope limit: distinguishing
@@ -207,7 +208,7 @@ command at a time, `position()` reporting wherever it currently is.
 - `if "x" in command: self.x = command["x"]` (and the `y`/`z` equivalents)
   — **(a) first appearance** of the actual fold logic: check whether this
   specific command mentions this specific axis; if so, overwrite; if not,
-- `self.x` simply isn't touched this call, which — because it's an
+  `self.x` simply isn't touched this call, which — because it's an
   instance attribute, not a local variable — means it still holds
   whatever the *previous* call to `apply` last set it to. This single
   fact (an untouched instance attribute keeps its old value across calls)
@@ -258,6 +259,17 @@ directly, or expecting a `Parser`-specific object instead of a plain dict
 — would work today, at the cost of coupling two things that don't
 actually need to know about each other, making either one harder to
 change alone later.
+
+Naming the shape of this decision directly: keeping `Parser` and
+`MachineState` as two separate, narrowly-connected objects — rather than
+having one inherit from or extend the other, or folding both into one
+larger class — is **composition over inheritance**. Nothing here is a
+subtype of anything else; `compute_path` (next unit) simply *uses* both
+objects together, each doing one job. The alternative this rules out
+isn't just "one big class" — it's specifically the temptation to make,
+say, a `MachineState` that *is a* `Parser` (or vice versa) to share
+convenience methods, which would force the two to change in lockstep even
+in the many cases where only one of them actually needs to.
 
 ---
 
@@ -366,6 +378,7 @@ where they *end up* — the fold's final answer, deliberately separate from
 the list that produced it.
 
 ### Mechanical Walkthrough
+
 - The validation and `try`/`except` block — **(c) already
   established**, byte-for-byte the same shape as `/api/parse` (Lesson 4);
   no new explanation owed, per the Repetition Rule.
@@ -379,9 +392,37 @@ the list that produced it.
   already returns — this route simply *does something further* with it
   rather than returning it directly.
 - `return {"position": state.position()}` — **(b) reappearing**
-- dict-to-JSON auto-conversion; `state.position()` — **(b) reappearing**
+  dict-to-JSON auto-conversion; `state.position()` — **(b) reappearing**
   from this lesson's own first unit, called exactly once, after every
   command has already been applied.
+
+### Execution Trace
+
+`"G0 X10\nX20 Y5\nZ-3"`, run for real against a fresh `MachineState()`,
+`state.position()` printed after every `apply()` call to show the fold
+accumulating (not part of the real route, which only returns the final
+position — added here to see every intermediate step):
+
+```
+Before the loop: state.position() = {'x': 0.0, 'y': 0.0, 'z': 0.0}
+
+command 1 ("G0 X10"):  state.apply({'x': 10.0, ...})
+  → position: {'x': 10.0, 'y': 0.0, 'z': 0.0}
+
+command 2 ("X20 Y5"):  state.apply({'x': 20.0, 'y': 5.0, ...})
+  → position: {'x': 20.0, 'y': 5.0, 'z': 0.0}
+
+command 3 ("Z-3"):     state.apply({'z': -3.0, ...})
+  → position: {'x': 20.0, 'y': 5.0, 'z': -3.0}
+
+Loop ends (3 commands, all applied) → return {"position": {'x': 20.0, 'y': 5.0, 'z': -3.0}}
+```
+
+`/api/simulate` only ever returns the very last of these three
+snapshots — the same real `commands` list `/api/parse` would return in
+full is consumed here down to one value, which is exactly the
+fold-vs-scan distinction (`fold-vs-scan.md`) applied to this project's
+own real data.
 
 ### CS Lens
 
@@ -450,8 +491,9 @@ document.getElementById("simulate-button").addEventListener("click", () => {
 ```
 
 ### Mechanical Walkthrough
-- Every individual piece here — `addEventListener`, reading `.value`, `fetch` with a `POST`/JSON body, `.then` chaining, `JSON.stringify` — is
 
+Every individual piece here — `addEventListener`, reading `.value`,
+`fetch` with a `POST`/JSON body, `.then` chaining, `JSON.stringify` — is
 **(c) already established**, identical in shape to the Parse button added
 in Lesson 4. **(a) The one genuinely new decision**, worth naming
 explicitly rather than silently copying: this button writes its result

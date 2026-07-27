@@ -77,6 +77,25 @@ print(result)
 - `kept + new_values` — appends the real, new replacement value(s) for
   the group, onto whatever unrelated values survived filtering.
 
+## Execution Trace
+
+`replace_group(["red", "large"], is_color, ["green"])`:
+
+```
+kept = [c for c in codes if not in_group(c)]
+  c="red":   in_group("red")   → is_color("red")   → True  → not True  → False → excluded
+  c="large": in_group("large") → is_color("large")  → False → not False → True  → kept
+  kept = ["large"]
+
+return kept + new_values → ["large"] + ["green"] → ["large", "green"]
+```
+
+Compare against the naive version, which never inspects `codes` at
+all — `naive_result = ["green"]` simply discards the whole list and
+replaces it — the loop above is precisely the step that lets `"large"`
+survive: each element is judged individually, by what it *means*, not
+thrown out wholesale because a change was needed somewhere in the list.
+
 ## CS Lens
 
 This is a **partition-based merge**: split a collection into "belongs to

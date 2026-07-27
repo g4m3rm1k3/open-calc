@@ -50,6 +50,36 @@ scan: [3, 4, 8, 9, 14]
 - The fold version only ever returns `total` once, after the loop finishes — every intermediate value is computed but immediately discarded, overwritten by the next iteration.
 - The scan version additionally appends `total` to `history` on *every* iteration — nothing about the accumulation itself changed; an extra line preserves what the fold version throws away.
 
+## Execution Trace
+
+Both functions run against `numbers = [3, 1, 4, 1, 5]` — traced side by
+side to show exactly where they diverge:
+
+```
+running_total_fold:
+  Start: total = 0
+  n=3: total = 0+3 = 3    (not kept anywhere)
+  n=1: total = 3+1 = 4    (not kept anywhere)
+  n=4: total = 4+4 = 8    (not kept anywhere)
+  n=1: total = 8+1 = 9    (not kept anywhere)
+  n=5: total = 9+5 = 14   → returned
+  Final: 14
+
+running_total_scan:
+  Start: total = 0, history = []
+  n=3: total = 0+3 = 3    → history.append(3)  → history = [3]
+  n=1: total = 3+1 = 4    → history.append(4)  → history = [3, 4]
+  n=4: total = 4+4 = 8    → history.append(8)  → history = [3, 4, 8]
+  n=1: total = 8+1 = 9    → history.append(9)  → history = [3, 4, 8, 9]
+  n=5: total = 9+5 = 14   → history.append(14) → history = [3, 4, 8, 9, 14]
+  Final: [3, 4, 8, 9, 14]
+```
+
+`total` takes the exact same 5 values, in the exact same order, in
+both functions — the scan version's only real difference is that it
+never throws any of them away. `history[-1]` (`14`) always equals the
+fold's own return value, for exactly this reason.
+
 ## CS Lens
 
 A **fold** reduces a sequence to one final accumulated value. A **scan** (sometimes called a running/cumulative fold) produces a sequence of the same length as the input, where each output is the fold's result *up to that point*. A scan contains strictly more information than a fold — the fold is recoverable from a scan (its last element), but a fold alone cannot reconstruct a scan (the intermediate values are gone).

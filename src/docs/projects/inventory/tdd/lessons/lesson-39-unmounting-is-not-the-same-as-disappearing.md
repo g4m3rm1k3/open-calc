@@ -128,6 +128,7 @@ import { AnimatePresence } from "framer-motion";
 ```
 
 ### Mechanical Walkthrough
+
 - `leftPanel.tabs.length > 0 && (<SidePanel ... />)` — **(a) first
   appearance** — real conditional rendering: when the condition is
   `false`, React never mounts `<SidePanel>` at all, which is a genuinely
@@ -142,12 +143,12 @@ import { AnimatePresence } from "framer-motion";
   keeps the outgoing element mounted just long enough to run its `exit`
   variant, then lets React actually remove it.
 - `key="sidepanel-left"` / `key="sidepanel-right"` — **(a) first
-- appearance of a key mattering for this reason** — `AnimatePresence`
+  appearance of a key mattering for this reason** — `AnimatePresence`
   identifies which children are entering/leaving/staying by key; without
   a stable key here, it couldn't tell "the left panel is gone" from "a
   new, different panel replaced it."
 - `slideVariants` (`hidden`/`visible`/`exit`) — **(a) first appearance**
-- — real, named animation states, each an `{x, opacity}` pair; `x` uses
+  — real, named animation states, each an `{x, opacity}` pair; `x` uses
   `"-100%"`/`"100%"` (not a fixed pixel value) so the slide distance is
   always exactly the panel's own current width, regardless of which
   side or how wide it's been resized to.
@@ -156,10 +157,10 @@ import { AnimatePresence } from "framer-motion";
   fixed-duration easing curve), so the animation's actual speed depends
   on how far it has to travel, not a flat, arbitrary time.
 - `className="side-panel docked ${side}..."` — **(b) partial
-- reappearing** — `side-panel`/`${side}` unchanged; `docked` is new
+  reappearing** — `side-panel`/`${side}` unchanged; `docked` is new
   (paired with `theme.css`'s own new `.side-panel.undocked` styling,
   covered in a later lesson) but nothing in this diff ever applies
-- `undocked` — a real, named, currently-unreachable CSS branch, not
+  `undocked` — a real, named, currently-unreachable CSS branch, not
   silently glossed over.
 
 ### CS Lens
@@ -172,7 +173,66 @@ this" and "this is actually gone," which a `display: none` toggle would
 never need (the element was never destroyed in the first place) and
 could never provide (there's no unmount to intercept).
 
+**REAPPEARING**, two concepts already taught, both worth naming
+explicitly where this exact code exercises them: `onSelectTab={(id) =>
+setLeftPanel((panel) => ({ ...panel, activeTab: id }))}` is a **closure**
+(Lessons 1/19/23's own concept) — the arrow function closes over
+`setLeftPanel` itself, carrying it along wherever `<SidePanel>` hands the
+callback off to, with no need to pass `setLeftPanel` as a prop
+explicitly. And `(panel) => ({ ...panel, activeTab: id })` is a
+**functional, immutable update** — it never mutates `panel` in place, it
+builds and returns a brand-new object every time. That's worth naming
+directly *because* this exact lesson also touches `viewport.ts`
+(Lessons 8/37/38), which does the opposite on purpose: `drawPath`
+mutates the same `THREE.Scene` object in place, call after call, rather
+than ever rebuilding one from scratch. Same codebase, same session even,
+two genuinely different state-update disciplines — React's own
+render model requires the immutable kind (a mutated object wouldn't
+trigger a re-render, since React compares references, not contents),
+while Three.js's retained-mode scene graph is built specifically to be
+mutated efficiently in place. Neither is "the correct" way in general;
+each fits the model it lives inside.
+
 ### SE Lens
+
+**Design rationale, named directly — this unit has none of the reference
+to lean on** (confirmed above: no counterpart exists), so every visual
+choice below is this project's own, and deserves the same "alternative
+considered, real cost" treatment a code decision gets:
+
+- **Slide, not fade or a hard cut.** A fade communicates "this content is
+  changing"; a slide additionally communicates *direction* — which side
+  the panel lives on and where it's going, reinforcing the docked
+  mental model (`side-panel left`/`side-panel right`) the user already
+  has from the ribbon toggle that opened it. A hard cut (React's own
+  default, with no `AnimatePresence` at all) was already this project's
+  actual starting point before this lesson — genuinely functional, but
+  gives the user no visual continuity between "panel there" and "panel
+  gone," which is the concrete gap this lesson closes.
+- **Spring physics (`stiffness: 350, damping: 30`), not a fixed-duration
+  ease.** A fixed duration finishes in the same time whether the panel
+  traveled 200px or 600px (resized wide beforehand), which reads as
+  either sluggish or rushed depending on width. A spring's duration
+  scales naturally with distance — the real reason `x` uses `"-100%"`/
+  `"100%"` instead of a pixel value in the first place (Mechanical
+  Walkthrough, above): both choices exist specifically to keep the
+  animation feeling consistent across `SidePanel`'s own real, user-
+  resizable width (Lesson 23).
+- **The real, significant tradeoff, never previously named:** the panel
+  fully unmounts and disappears rather than collapsing to a thin,
+  always-visible icon rail — a real, common alternative in docked-panel
+  UIs (VS Code's own activity bar is exactly this shape) that keeps one
+  affordance permanently visible: *there is a hidden panel here, click
+  to reopen it*. This project's own choice trades that discoverability
+  away for simplicity (one less UI element, one less piece of layout
+  state to track) and for maximizing canvas space the moment a panel
+  closes — reasonable for a 3D viewport, where screen real estate is
+  the scarcer resource most of the time. But it's a real cost: a
+  first-time user who closes every tab on a side has no visual cue
+  left that panels exist at all, short of remembering the ribbon
+  toggle that opened them. Not fixed here — named, since discovering it
+  wasn't what triggered this lesson, but it's the kind of tradeoff that
+  should be a deliberate choice, not a default nobody weighed.
 
 The real, honest, currently-unreachable branch: `SidePanel`'s own render
 still has `activeTab ? activeTab.content : <div className="side-panel-empty">

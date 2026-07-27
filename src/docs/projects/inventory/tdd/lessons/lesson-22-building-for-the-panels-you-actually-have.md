@@ -160,9 +160,10 @@ project's existing dark-theme tokens, no new custom properties:
 ```
 
 ### Mechanical Walkthrough
+
 - `interface PanelToggle` / `interface RibbonGroup` — **(b) reappearing**
   one TS interface referencing another as a nested field type
-- (`toggles: PanelToggle[]`) — the identical composition
+  (`toggles: PanelToggle[]`) — the identical composition
   `ToolsResponse { tools: Record<string, Tool> }` already used in
   Lesson 17.
 - `onToggle: () => void` — **(b) reappearing** a callback held as a
@@ -171,27 +172,68 @@ project's existing dark-theme tokens, no new custom properties:
   earlier callback prop already relied on, just stored one level deeper
   inside a data structure instead of passed bare.
 - `groups.map((group) => (...))`, and a second, independent
-- `group.toggles.map((toggle) => (...))` nested directly inside it —
+  `group.toggles.map((toggle) => (...))` nested directly inside it —
   **(b) reappearing** `.map()`-to-render (Lesson 9's `groupSegments`
-- onward) and `key` (`react-key-prop-reconciliation.md`) — applied
+  onward) and `key` (`react-key-prop-reconciliation.md`) — applied
   twice, once per real level of the data (a list of groups, each
   holding its own list of toggles), not a new construct, the same one
   used recursively.
 - `` `btn ribbon-btn${toggle.visible ? " on" : ""}` `` — **(b)
   reappearing**, the exact conditional-class shape
   `ToolCardList.tsx`'s own `` `tcard${isSelected ? " on" : ""}` ``
-- already established — `btn` (Lesson 18) reused as the base look, a new
+  already established — `btn` (Lesson 18) reused as the base look, a new
   `ribbon-btn` class added alongside it for anything specific to this
   context (currently just the `.on` variant, below).
 - `.ribbon`, `.ribbon-group`, `.ribbon-buttons`, `.ribbon-group-label` —
   **(b) reappearing** `css-custom-properties.md`/
-- `css-rule-syntax-selectors-cascade.md`'s mechanism — real, new rules,
+  `css-rule-syntax-selectors-cascade.md`'s mechanism — real, new rules,
   no new custom properties: every `var(--color-...)` reference here was
   already declared by an earlier lesson.
 - `.ribbon-group:last-child` — **(a) first appearance** of the
   `:last-child` pseudo-class specifically (Lesson 18 used `:hover`, a
   different pseudo-class) — removes the group divider after the final
   group, so the ribbon's right edge doesn't end with a stray border.
+
+### Execution Trace
+
+The nested `.map()` against 2 real groups, one with 2 toggles, one with 1:
+
+```
+groups = [
+  {label:"View", toggles:[{id:"dro",label:"DRO",visible:true,...},
+                           {id:"tools",label:"Tools",visible:false,...}]},
+  {label:"Layout", toggles:[{id:"code",label:"Code",visible:true,...}]}
+]
+
+Outer map, group 1 (label="View"):
+  <div key="View" className="ribbon-group">
+    Inner map over toggles:
+      toggle={id:"dro",visible:true}:
+        className = `btn ribbon-btn${true ? " on" : ""}` = "btn ribbon-btn on"
+        → <button key="dro" className="btn ribbon-btn on">DRO</button>
+      toggle={id:"tools",visible:false}:
+        className = `btn ribbon-btn${false ? " on" : ""}` = "btn ribbon-btn"
+        → <button key="tools" className="btn ribbon-btn">Tools</button>
+    <div className="ribbon-group-label">View</div>
+  </div>
+
+Outer map, group 2 (label="Layout"):
+  <div key="Layout" className="ribbon-group">
+    Inner map over toggles:
+      toggle={id:"code",visible:true}:
+        className = "btn ribbon-btn on"
+        → <button key="code" className="btn ribbon-btn on">Code</button>
+    <div className="ribbon-group-label">Layout</div>
+  </div>
+
+Result: 2 <div className="ribbon-group">, containing 2 and 1 buttons
+respectively — 3 real buttons total from one outer map of 2 groups.
+```
+
+The inner `.map()` runs completely independently for each group — group
+2's single toggle never sees or is affected by group 1's own two, since
+each outer iteration gets its own fresh call to the inner map over that
+group's own `toggles` array only.
 
 ### CS Lens
 
@@ -338,6 +380,7 @@ sections they control — a single source of truth for "is this panel
 visible," not duplicated state on either side.
 
 ### Mechanical Walkthrough
+
 - `useState(true)`, twice — **(b) reappearing**, identical to every
   earlier `useState` call in this project; `true` specifically so both
   panels start visible, matching the layout before this lesson.
@@ -350,7 +393,7 @@ visible," not duplicated state on either side.
 - `{showDro && ( <>...</> )}` — **(b) reappearing**, the identical
   `&&`-conditional-render shape `ToolImportPanel.tsx` already used
   three times (`{file && (...)}`, `{loading && (...)}`,
-- `{error && (...)}`) — a `<>...</>` fragment here specifically because
+  `{error && (...)}`) — a `<>...</>` fragment here specifically because
   two sibling elements (an `<h1>` and the real panel component) need to
   appear or disappear together as one unit.
 

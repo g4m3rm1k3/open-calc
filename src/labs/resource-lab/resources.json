@@ -34,5 +34,11 @@
     "description": "Simply Easy Learning",
     "url": "https://www.tutorialspoint.com/",
     "tags": ["CS", "Tutorials"]
+  },
+    {
+    "title": "W3Schools",
+    "description": "Learn to Code",
+    "url": "https://www.w3schools.com/",
+    "tags": ["CS", "Web Dev", "Tutorials"]
   }
 ]

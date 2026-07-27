@@ -40,9 +40,11 @@ appearance in your own work.
 
 ### Project Change
 
-- **Reference Source** — `cnc/CNCSim.jsx`'s own `geoms` entries (real
+- **Reference Source** — `cnc-sim/cnc/CNCSim.jsx` line 1898 (`const
+  [geoms, setGeoms] = useState([])`) and the entry shapes literal
+  throughout `onMouseDown` (lines 3355–3472, cited in full below) — real
   inspiration for *what* needs representing, not ported code — its own
-  `x`/`y`-only shape doesn't survive the move to true 3D).
+  `x`/`y`-only shape doesn't survive the move to true 3D.
 - **Files affected** — `cnc-web/src/sketch.ts` (new).
 - **Change type** — add.
 - **Location** — new file.
@@ -76,8 +78,9 @@ export type SketchEntity =
 ```
 
 ### Mechanical Walkthrough
+
 `"polyline"` alone covers three of the reference's own five real tools
-- — `line`/`rect`/`contour` all end up as this one variant, differing
+— `line`/`rect`/`contour` all end up as this one variant, differing
 only in how many points they hold and whether `closed` is `true`.
 `circle`/`arc` stay their own real variants, since they carry real
 parameters (`center`, `radius`, angles) a plain point list can't
@@ -124,10 +127,10 @@ two real axes the currently selected plane actually varies in.
 
 ### Project Change
 
-- **Reference Source** — `cnc/CNCSim.jsx`'s own `rect` branch (real
-  inspiration for the shape; the reference's own version only ever
-  works in flat `x`/`y`, since it has no real concept of a selectable
-  plane at all).
+- **Reference Source** — `cnc-sim/cnc/CNCSim.jsx` lines 3381–3399, the
+  `rect` branch inside `onMouseDown` (real inspiration for the shape; the
+  reference's own version only ever works in flat `x`/`y`, since it has
+  no real concept of a selectable plane at all).
 - **Files affected** — `cnc-web/src/sketch.ts`.
 - **Change type** — add.
 - **Location** — `rectCorners`.
@@ -164,12 +167,13 @@ export function rectCorners(corner1: Point3, corner2: Point3, plane: DrawPlane):
 ```
 
 ### Mechanical Walkthrough
+
 `corner2InA` shares `corner1`'s own value on `axisB`, but takes
-- `corner2`'s own value on `axisA` — one real corner, adjacent to
+`corner2`'s own value on `axisA` — one real corner, adjacent to
 `corner1` along the `axisA` direction. `corner2InB` is the mirror case.
 Together with the two real clicked corners, all four are real,
 resolved points, in real winding order (`corner1 → corner2InA →
-- corner2 → corner2InB`, then closed back to `corner1`) — a real,
+corner2 → corner2InB`, then closed back to `corner1`) — a real,
 standard rectangle, regardless of which two axes `plane` actually
 names.
 
@@ -281,8 +285,9 @@ export function circumcircle(
 ```
 
 ### Mechanical Walkthrough
+
 `d` is (twice) the signed area of the triangle formed by the three real
-- points — `Math.abs(d) < 0.001` is the real, direct test for "these
+points — `Math.abs(d) < 0.001` is the real, direct test for "these
 three points are collinear" (a triangle with zero real area), the
 degenerate case where no real circumcircle exists at all. `ux`/`uy`
 (the real circumcenter) come from the standard real circumcircle
@@ -430,17 +435,56 @@ export function entityPoints(entity: SketchEntity): Point3[] {
 ```
 
 ### Mechanical Walkthrough
+
 `tessellateCircle` walks a full `2π` sweep in `segments` even steps,
 placing each real point at `center + radius * (cos, sin)` along
 whichever two real axes the plane names. `tessellateArc` does the
 identical real thing, but only across the arc's own real, normalized
-- `sweep` (not a full circle) — the same direction-normalization
+`sweep` (not a full circle) — the same direction-normalization
 technique (`% (Math.PI * 2)`, then adjusted by sign to match `ccw`)
 already confirmed correct in the circumcircle unit above.
 `entityPoints` is the one real place that decides, per entity type,
-- how to turn stored parameters into a real point list — `polyline`
+how to turn stored parameters into a real point list — `polyline`
 just returns its own points (closing the loop back to the start if
 `closed`), `circle`/`arc` tessellate.
+
+### Execution Trace
+
+`tessellateCircle` run for real (Node, `segments=4` for a compact
+trace) — a `G17` circle, `center={x:0,y:0,z:5}`, `radius=10`:
+
+```
+i=0: angle=0        → x=0+10*cos(0)=10,        y=0+10*sin(0)=0
+i=1: angle=π/2       → x≈6.1e-16 (≈0),          y=10
+i=2: angle=π         → x=-10,                    y≈1.2e-15 (≈0)
+i=3: angle=3π/2      → x≈-1.8e-15 (≈0),          y=-10
+i=4: angle=2π        → x=10,                     y≈-2.4e-15 (≈0)
+```
+
+`i=0` and `i=4` land back at `(10, 0)` (within floating-point noise) —
+a real, closed loop, confirming the `Run It` claim about first/last
+points coinciding. `z` stays `5` throughout — spread from `center`,
+never touched, since `G17` only varies `x`/`y`.
+
+`tessellateArc` run for real — same center/radius, `startAngle=0`,
+`endAngle=π/2` (a quarter turn, positive direction), but `ccw=false`
+(a clockwise arc requested):
+
+```
+sweep = (π/2 - 0) % 2π = π/2   (≈1.5708, positive)
+!ccw && sweep > 0 → sweep -= 2π → sweep = π/2 - 2π ≈ -4.7124
+  (-270°, not -90° — the LONG way around clockwise, not the short way)
+
+i=0: angle = 0 + (-4.7124*0)/3 = 0        → (10, 0)
+i=1: angle = 0 + (-4.7124*1)/3 ≈ -1.5708  → (≈0, -10)
+i=2: angle ≈ -3.1416                      → (-10, ≈0)
+i=3: angle ≈ -4.7124                      → (≈0, 10)
+```
+
+The naive `endAngle - startAngle` (a raw `+90°`) would have swept the
+short way; the real, normalized `sweep` instead produces the long way
+around — the exact case the sign-adjustment exists to get right,
+demonstrated with real, computed angles rather than asserted.
 
 ### CS Lens
 
@@ -480,12 +524,12 @@ needs an open-ended number ended by a real, separate signal.
 
 ### Project Change
 
-- **Reference Source** — `cnc/CNCSim.jsx`'s own `onMouseDown` (its real
-  per-tool branches) and `onContextMenu` (finishing a contour) — a
-  direct, faithful port of the real decision logic, with the reference's
-  own `s2w()`/`snapWorld()` screen-projection step removed entirely
-  (every point this hook receives already arrives pre-resolved in real
-  3D, Lesson 50).
+- **Reference Source** — `cnc-sim/cnc/CNCSim.jsx` lines 3355–3472
+  (`onMouseDown`, its real per-tool branches) and lines 3489–3500
+  (`onContextMenu`, finishing a contour) — a direct, faithful port of the
+  real decision logic, with the reference's own `s2w()`/`snapWorld()`
+  screen-projection step removed entirely (every point this hook receives
+  already arrives pre-resolved in real 3D, Lesson 50).
 - **Files affected** — `cnc-web/src/useSketch.ts` (new).
 - **Change type** — add.
 - **Location** — new file.
@@ -609,6 +653,55 @@ never commits on its own at all — every click just appends, and only
 `handleFinishContour` (wired to a real right-click in the next unit)
 ever turns the accumulated points into a real, closed entity.
 
+### Execution Trace
+
+`handlePointClick`'s own state — `drawPoints` — carries across every
+call for as long as a shape is in progress, so a description of "it
+accumulates points" isn't enough on its own. Traced against `drawTool
+= "arc"` (the most state-rich real branch — 3 clicks, plus a real
+failure path), using `P1`/`P2`/`P3` as three arbitrary real-world click
+points on the active plane (the trace only depends on *how many* points
+have accumulated, never their specific coordinates):
+
+```
+Before any click: drawPoints = [], sketchEntities = [...whatever existed already]
+
+Click 1 (point P1):
+  next = [...drawPoints, P1] = [P1]
+  next.length (1) < 3  → setDrawPoints([P1])
+  drawPoints is now [P1]; sketchEntities unchanged
+
+Click 2 (point P2):
+  next = [...drawPoints, P2] = [P1, P2]
+  next.length (2) < 3  → setDrawPoints([P1, P2])
+  drawPoints is now [P1, P2]; sketchEntities still unchanged
+
+Click 3 (point P3):
+  next = [...drawPoints, P3] = [P1, P2, P3]
+  next.length (3) < 3  → False, falls to the else branch
+  result = circumcircle(P1, P2, P3, plane)
+  Case A — P1/P2/P3 not collinear: result is a real {center, radius, ...}
+    → sketchEntities = [...sketchEntities, {type:"arc", plane, ...result}]
+    → setDrawPoints([])  — machine resets to its empty start state
+  Case B — P1/P2/P3 collinear: result is falsy (per the previous unit's
+  own silent-recovery contract)
+    → the `if (result)` guard skips the append entirely — sketchEntities
+      unchanged
+    → setDrawPoints([])  — still resets, even though nothing committed
+```
+
+Two different real outcomes (Case A commits a new entity, Case B doesn't)
+both end at the *same* next state — `drawPoints = []` — which is exactly
+why "the machine resets" and "the machine committed a shape" have to be
+tracked as two separable facts, not inferred from one another.
+
+`line`/`rect`/`circle` are the identical shape with a shorter accumulate
+phase (commit at 2 points, not 3, no failure case); `contour` is the one
+real outlier — it never self-commits at any click count, only ever
+appending, until `handleFinishContour` (a separate function entirely)
+supplies the "I'm done" transition the other four tools get for free
+from their own fixed click counts.
+
 ### CS Lens
 
 This is a small, real **state machine** — `drawTool` names which real
@@ -616,6 +709,16 @@ machine is active, `drawPoints` is that machine's own accumulated
 state, and each click is a real transition, sometimes staying in an
 "in progress" state, sometimes committing and resetting to the empty
 start state.
+
+**REAPPEARING** (`regular-language-finite-state-machine.md`, established
+for the G-code lexer/parser): the exact same shape, a new instance of it.
+`drawTool` picks which of five small machines is active; `drawPoints`
+is that one machine's current state; each click is a transition,
+exactly like a token advancing the lexer's own state one step. That
+concept file's own "Also recognized in" list (traffic lights, TCP
+connection states, every real compiler's lexer, UI workflow steppers)
+applies here without changes — add this hook itself as one more real
+instance of the same recurring shape.
 
 ### SE Lens
 
@@ -652,8 +755,10 @@ entirely while active.
 
 ### Project Change
 
-- **Reference Source** — `cnc/CNCSim.jsx`'s own `onMouseDown`/
-  `onContextMenu` (the real mode-switching behavior, ported faithfully).
+- **Reference Source** — `cnc-sim/cnc/CNCSim.jsx` lines 3355–3472/
+  3489–3500 (`onMouseDown`/`onContextMenu`, same real functions cited in
+  the previous unit — the mode-switching behavior specifically, ported
+  faithfully).
 - **Files affected** — `cnc-web/src/viewport.ts`.
 - **Change type** — add.
 - **Location** — new `raycastAtEvent`, `handlePointerDown`,
@@ -705,6 +810,10 @@ entirely while active.
   renderer.domElement.addEventListener("contextmenu", handleContextMenu);
 ```
 
+`currentDrawTool`, read by every handler above, is only ever changed by
+one real function — the actual mode switch itself, called from outside
+`viewport.ts` whenever a UI toggle picks a different tool:
+
 ```ts
   // Real, per direct instruction (this project's own choice, not a
   // reference behavior): a real sketch tool disables orbiting entirely
@@ -719,16 +828,17 @@ entirely while active.
 ```
 
 ### Mechanical Walkthrough
+
 `raycastAtEvent` is the same real raycasting logic Lesson 50 already
 established for `handlePointerMove`, now factored out into its own
 function so `handlePointerDown` can reuse it exactly rather than
 duplicating the NDC-conversion/raycast steps. `handlePointerDown`
-- checks `event.button !== 0` — the real convention for "was this the
+checks `event.button !== 0` — the real convention for "was this the
 left mouse button" — so a right-click (already handled separately by
 `handleContextMenu`) never also gets misread as a real draw click.
 `controls.enabled = tool === "select"` is the one real line doing all
 the mode-switching work: `OrbitControls` itself, internally, already
-- checks this flag before starting a drag on `pointerdown` — nothing
+checks this flag before starting a drag on `pointerdown` — nothing
 here has to separately intercept or cancel an orbit; disabling it at
 the source is enough.
 
@@ -827,7 +937,8 @@ switching back to Select immediately restores normal orbiting.
 ```
 
 ### Mechanical Walkthrough
-- Not repeated in depth — `threejs-geometry-material-object.md` covers
+
+Not repeated in depth — `threejs-geometry-material-object.md` covers
 the real geometry/material/mesh (here, `Line`) separation;
 `threejs-mutating-scene-after-creation.md` covers exactly why
 `setSketchEntities` disposes and rebuilds rather than mutating
@@ -840,7 +951,29 @@ already established for this project.
 
 ### CS Lens / SE Lens
 
-Not repeated — fully covered by the two reappearing concept files.
+Not repeated for the Three.js mechanics — fully covered by the two
+reappearing concept files. One real design question they don't cover,
+worth naming directly: the reference's own dashed-blue preview line
+(Reference Source, above) carries **two** distinct visual signals at
+once — a different color, and a different stroke pattern (dashed vs.
+solid). This project's own `SKETCH_PREVIEW_COLOR`/`SKETCH_COLOR` port
+keeps only the color difference; the dashed-vs-solid distinction was
+dropped without being named as a real, deliberate simplification. The
+real cost: committed-vs-in-progress now rests on color alone as the
+*only* signal, which is a real accessibility gap for a color-vision-
+deficient user (the single most common form, red-green deficiency,
+wouldn't necessarily affect this specific color pair, but the general
+principle — never encode meaningful state in color alone — is violated
+here regardless of which two colors happen to be chosen). `THREE.Line`
+does support a real dashed variant (`THREE.LineDashedMaterial` in place
+of the plain `LineBasicMaterial` used here, paired with a call to the
+same `line.computeLineDistances()` method this project's own
+toolpath-rendering `Line2`/`LineMaterial` setup already calls,
+`cnc-web/src/viewport.ts` line 278, for an unrelated reason — `Line2`
+needs it too, dashed or not) — porting the reference's own second
+signal back in would have been a small, real addition using a class
+this project hasn't used yet, not an unfamiliar mechanism. Not fixed
+here; named, since it wasn't caught until this review.
 
 ### Commands
 
@@ -925,12 +1058,13 @@ The one new, real CSS rule this row needed (everything else — `.btn`,
 ```
 
 ### Mechanical Walkthrough
+
 `App.tsx` never touches `sketch.sketchEntities`/`drawPoints` directly
-- beyond passing them straight through to `<Viewport>` — every real
+beyond passing them straight through to `<Viewport>` — every real
 decision about what a click *means* already happened inside
 `useSketch` itself. `StatusBar.tsx`'s own new tool-button row reuses
 the identical `.btn-group`/`.btn`/`.btn-sm` classes already established
-- for the plane-selector row, styled active with `.btn-gr` (green — the
+for the plane-selector row, styled active with `.btn-gr` (green — the
 same "armed/active" color `PlaybackControls`' own Cycle Start button
 already uses) rather than reusing the plane row's own blue, so the two
 real button groups stay visually distinct from each other.
@@ -1013,7 +1147,13 @@ branch exists specifically to prevent.
   deliberately deferred, distinct future work.
 - **No delete/edit of an already-committed sketch entity** — the
   reference has a real "click an existing shape to select/delete it"
-  interaction this pass doesn't port.
+  interaction this pass doesn't port. There's also no undo of a *commit*
+  itself (finishing an arc, say, can't be stepped back). The pattern that
+  would actually close this gap is the GoF **Command** pattern (each
+  commit recorded as an object with its own inverse/undo operation) or,
+  more simply, a **Memento** — snapshotting `sketchEntities` before each
+  commit so "undo" is just restoring the previous snapshot. Neither
+  exists in this codebase yet; naming the real gap, not solving it here.
 - **No snapping** (grid snap, snap-to-existing-point) — the reference's
   own `snapWorld()` is real, deliberately not ported this pass; every
   click lands exactly where the raycaster resolves it.

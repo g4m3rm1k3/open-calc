@@ -57,6 +57,35 @@ error TS2741: Property 'age' is missing in type '{ name: string; }' but required
 - An equivalent, alternate syntax exists — `Array<Dog>` — using generic syntax (see `typescript-generics.md`) instead of the bracket shorthand; both mean the same thing, and `T[]` is simply the more common, terser convention for arrays specifically.
 - `pack.map(...)` — TypeScript knows `dog` inside the callback is a `Dog` (not just some generic, unknown element type), because the array's element type was declared — this is what allows `dog.name` to be typed-checked too, not just accepted blindly.
 
+## Execution Trace
+
+`tsc` checks `badPack: Dog[]`'s two elements against `Dog`, one at a time:
+
+```
+Element 0: { name: "Rex", age: 3 }
+  has "name" (string)? Yes.  has "age" (number)? Yes.
+  → matches Dog's shape → no error
+
+Element 1: { name: "NoAge" }
+  has "name" (string)? Yes.  has "age" (number)? No — missing entirely.
+  → does NOT match Dog's shape
+  → error TS2741: Property 'age' is missing in type '{ name: string; }'
+    but required in type 'Dog'.
+```
+
+`Dog[]` doesn't just check "is this an array" once at the top — it
+re-applies the full `Dog` shape check to every individual element, which
+is why the first, valid element passes silently while the second,
+incomplete one is caught specifically.
+
+Real (valid) `pack.map((dog) => dog.name)`, run at runtime:
+
+```
+dog={name:"Rex",age:3}:  → "Rex"
+dog={name:"Fido",age:5}: → "Fido"
+Final: ["Rex", "Fido"]
+```
+
 ## CS Lens
 
 This is a **parameterized collection type** — the array type itself is generic over what it contains, so "array of numbers," "array of strings," and "array of `Dog`" are all distinct, separately-checked types, rather than one undifferentiated "array" type that could hold anything.

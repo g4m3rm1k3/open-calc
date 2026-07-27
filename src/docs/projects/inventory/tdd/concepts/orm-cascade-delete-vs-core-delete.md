@@ -80,6 +80,55 @@ remaining cars: []
 - `delete(GasEngine).where(GasEngine.id == car_id)` is **SQLAlchemy Core** syntax — a `DELETE` statement built and executed directly, with no relationship inference involved at all. `session.execute(...)` runs it as a plain SQL statement against the current transaction; nothing about `relationship()` declarations is consulted.
 - Running the Core deletes in explicit dependency order (children — the tables holding the foreign keys — before the parent they reference) is what actually satisfies the real database-level constraint; the ORM's inference was trying (incorrectly, in this shape) to automate exactly this ordering.
 
+## Execution Trace
+
+Attempt 1 (`session.delete()` on loaded objects), traced against the
+real `AssertionError`:
+
+```
+car = the loaded Car(id=1), with car.gas_engine = GasEngine(id=1)
+car.gas_engine is not None → True → session.delete(car.gas_engine)  (marked, not yet issued)
+car.electric_engine is not None → False (never created) → skipped
+session.delete(car)  (marked, not yet issued)
+session.commit() → triggers a flush:
+  unit of work examines Car's own relationship()s to figure out real
+  dependency order before issuing any DELETE
+  → sees GasEngine.id is a foreign key to car.id AND GasEngine's own
+    primary key at the same time
+  → tries to UPDATE gas_engine SET id = NULL (its normal "blank out the
+    FK first" strategy) before deleting the row
+  → NULL into a primary key column is invalid → AssertionError, raised
+    from inside SQLAlchemy itself, before any real SQL even reaches the
+    database
+→ prints "FAILS: AssertionError Dependency rule on column 'car.id'
+   tried to blank-out primary key column 'gas_engine.id'"
+```
+
+Attempt 2 (explicit Core deletes, in dependency order):
+
+```
+car_id = 1 (queried fresh)
+execute(delete(GasEngine).where(GasEngine.id == 1))
+  → real DELETE FROM gas_engine WHERE id = 1, no relationship inference
+    involved at all — the row is just gone
+execute(delete(ElectricEngine).where(ElectricEngine.id == 1))
+  → real DELETE FROM electric_engine WHERE id = 1 — 0 rows affected
+    (none existed), not an error
+execute(delete(Car).where(Car.id == 1))
+  → real DELETE FROM car WHERE id = 1 — now safe, since gas_engine's
+    own referencing row is already gone
+session.commit() → all three real deletes committed together
+query: select(Car) → [] (no cars remain)
+→ prints "remaining cars: []"
+```
+
+The two attempts delete the exact same real rows, in the same real
+order (child before parent) — the only difference is *which mechanism*
+issues the deletes: the ORM's own automatic dependency inference (which
+breaks specifically because `GasEngine.id` is both a foreign key and a
+primary key at once), or plain, explicit SQL statements that never
+consult `relationship()` at all.
+
 ## CS Lens
 
 This is a real, concrete case of an **automated inference layer producing an incorrect result for a valid input it wasn't designed to handle** — the general risk of any system that tries to derive behavior from declared structure rather than have that behavior stated explicitly. The unit of work's dependency processor is itself a form of **topological sort** (ordering operations so every dependency runs before whatever depends on it) — the same underlying idea as a build system ordering compilation steps, or a package manager ordering installs — it simply has a bug in how it classifies a shared-primary-key foreign key.

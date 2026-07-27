@@ -23,6 +23,149 @@ Lesson 11's own `Viewport.tsx` mounting effect (`useEffect(() => {...},
 
 ---
 
+## Concept Unit: A Function That Returns Its Own Cleanup
+
+*(Correction, this session: this unit was originally skipped — the whole
+lesson was written as one "no new concept" unit, on the reasoning that
+`cleanup()` was just "a new method," not a new construct. That was wrong.
+`Viewport.tsx`'s own mounting `useEffect(() => {...})` returning a
+function isn't project-specific plumbing — it's React's real, general
+convention for pairing setup with teardown, and it appears in this
+project for the first time in this exact lesson, with no prior isolated
+lab. Per the Concept Isolation Rule's "familiar-sounding is a trap"
+clause, that's a real gap, fixed here rather than left standing.)*
+
+### The Problem
+
+`Viewport.tsx`'s mounting effect has always returned nothing — an empty
+cleanup, since Lesson 11. Once `createViewport` actually has real
+resources worth releasing, something has to call the release path at the
+right moment: when the component that acquired them goes away. React's
+own answer is a convention, not a special API: a setup function can
+*return another function*, and React calls that returned function later,
+automatically, at teardown time.
+
+### Introduce the Concept in Isolation
+
+The general shape, with no React involved at all — plain JavaScript,
+run for real this session:
+
+```js
+function setupTimer(label) {
+  console.log(`${label}: setup running`);
+  const id = setInterval(() => console.log(`${label}: tick`), 1000);
+  return function cleanup() {
+    console.log(`${label}: cleanup running`);
+    clearInterval(id);
+  };
+}
+
+const teardownA = setupTimer("A");
+const teardownB = setupTimer("B");
+console.log("--- tearing down A only ---");
+teardownA();
+console.log("--- B is still running, would keep ticking ---");
+teardownB();
+console.log("--- both torn down ---");
+```
+
+**Real output, run this session (`node`):**
+```
+A: setup running
+B: setup running
+--- tearing down A only ---
+A: cleanup running
+--- B is still running, would keep ticking ---
+B: cleanup running
+--- both torn down ---
+```
+
+**What this proves:** `setupTimer` returns a *closure* (Lessons 1/19's
+own concept, reapplied) — `cleanup` closes over `id`, the exact interval
+this specific call started, not some shared or global one. Calling
+`teardownA()` stops only `A`'s timer; `B`'s keeps running until its own,
+separately-returned `teardownB()` is called. Nothing forces the caller to
+ever call the returned function — the pairing is a *convention*
+(setup hands back its own teardown), not something the language enforces.
+
+### Execution Trace
+
+Two sequential `setupTimer()` calls, each returning its own independent
+`cleanup` — traced against the real output above:
+
+```
+Call 1: setupTimer("A")
+  logs "A: setup running"
+  id_A = setInterval(...) — a real, running timer, distinct from any other
+  returns cleanup_A, a closure over id_A specifically
+
+Call 2: setupTimer("B")
+  logs "B: setup running"
+  id_B = setInterval(...) — a second real timer, id_B != id_A
+  returns cleanup_B, a closure over id_B specifically
+
+teardownA()  (= cleanup_A)
+  logs "A: cleanup running"
+  clearInterval(id_A)  ← only id_A stops; id_B is untouched, still ticking
+
+teardownB()  (= cleanup_B)
+  logs "B: cleanup running"
+  clearInterval(id_B)  ← id_B stops; both timers now cleared
+```
+
+Calling `teardownA()` never touches `id_B` — each `cleanup` only ever
+has access to the one `id` its own call to `setupTimer` created, because
+each is a separate closure over separate local state, not a shared one.
+
+### Discard
+
+This `setupTimer`/`teardownA`/`teardownB` example is deleted now. It
+will not appear in the project again — it existed only to prove the
+general "a setup function can return its own cleanup function, and each
+call's cleanup only affects that call's own resources" shape, before
+meeting React's own specific version of it below.
+
+### CS Lens
+
+React's `useEffect(() => { ...setup...; return () => { ...cleanup... }; })`
+is this exact pattern, with one real difference: React, not the caller,
+decides *when* to invoke the returned function (on unmount, or before
+re-running the effect) — the caller never calls it directly, the way
+`teardownA()` was called by hand above.
+
+Also recognized in: Python's context managers (`__enter__`/`__exit__`,
+or a generator-based `@contextmanager`, pairing setup and teardown
+around a `with` block); Go's `defer`, scheduling a cleanup call the
+moment the enclosing function returns; and any "subscribe" API (DOM's
+`addEventListener` paired with `removeEventListener`, a pub/sub
+library's `subscribe()` returning an `unsubscribe()` function) — the
+same real shape recurring: acquire something, get back the one thing
+that knows how to release it.
+
+### SE Lens
+
+The real alternative — a separate, explicitly-named `teardownViewport()`
+function the caller has to remember to import and call at the right
+moment — would work, but puts the *pairing* on the caller to get right
+by convention alone, with no structural link between the two functions.
+Returning the cleanup from the setup function itself makes the pairing
+impossible to get wrong: whoever has the setup's result automatically
+has its teardown too, right there, not somewhere else in the codebase
+that has to be found and kept in sync by hand.
+
+### Commands
+
+None new — run directly with `node <file>.js`.
+
+### Run It
+
+Shown above, real output. This connects directly into the next unit:
+`Viewport.tsx`'s own mounting effect gets a real, non-empty return for
+the first time, and `createViewport`'s own new `cleanup()` (below) is
+exactly what that returned function calls.
+
+---
+
 ## Project Change (no new concept): A Real Teardown Path
 
 ### The Problem
@@ -64,14 +207,92 @@ return { drawPath, updateColors, cleanup };
 
 ### The Updated Project
 
-`viewport.ts`'s relevant pieces, in order:
+`viewport.ts`'s relevant pieces, in order. Everything from `width`
+through the end of `updateColors` below is unchanged from Lessons 8, 9,
+and 11 — only `isDisposed` itself, declared at the top, is new:
 
 ```typescript
 export function createViewport(container: HTMLElement) {
   let isDisposed = false;
   let colors = themeColors();
-  ...
+  const width = container.clientWidth || 700;
+  const height = container.clientHeight || 400;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setClearColor(colors.background, 1);
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+  camera.up.set(0, 0, 1);
+  camera.position.set(300, -300, 400);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.target.set(0, 0, 0);
+
+  const ambientLight = new THREE.AmbientLight(colors.lightAmbient, 0.7);
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(colors.lightDirectional, 0.8);
+  directionalLight.position.set(100, 100, 300);
+  scene.add(directionalLight);
+
+  let grid = new THREE.GridHelper(500, 50, colors.grid, colors.grid);
+  grid.rotation.x = Math.PI / 2;
+  scene.add(grid);
+
+  const pathGroup = new THREE.Group();
+  scene.add(pathGroup);
+
+  let lastPoints: PathPoint[] = [];
+
+  function drawPath(points: PathPoint[]) {
+    lastPoints = points;
+    while (pathGroup.children.length) {
+      pathGroup.remove(pathGroup.children[0]);
+    }
+    if (points.length < 2) return;
+    const segments = groupSegments(points);
+    segments.forEach((segment) => {
+      const vectors = segment.points.map((p) => new THREE.Vector3(p.x, p.y, p.z));
+      const geometry = new THREE.BufferGeometry().setFromPoints(vectors);
+      const color = segment.motion === "G0" ? colors.rapid : colors.feed;
+      const material = new THREE.LineBasicMaterial({ color });
+      const line = new THREE.Line(geometry, material);
+      pathGroup.add(line);
+    });
+  }
+
+  // Re-reads the CSS variables and pushes them into every place a color was
+  // captured once at creation time above. Needed because a theme switch
+  // (App.tsx calling applyTheme) only ever changes the CSS custom
+  // properties themselves — nothing about that touches this closed-over
+  // `colors` object, so without this, flipping themes would visibly update
+  // every flat panel while leaving the 3D scene showing the old theme's
+  // colors until the next full reload.
+  function updateColors() {
+    colors = themeColors();
+    renderer.setClearColor(colors.background, 1);
+    ambientLight.color.set(colors.lightAmbient);
+    directionalLight.color.set(colors.lightDirectional);
+    // GridHelper bakes its color into per-vertex geometry data at
+    // construction — there's no `.color` property to reassign, so the only
+    // way to show a new color is to build a fresh one in its place.
+    scene.remove(grid);
+    grid = new THREE.GridHelper(500, 50, colors.grid, colors.grid);
+    grid.rotation.x = Math.PI / 2;
+    scene.add(grid);
+    drawPath(lastPoints);
+  }
 ```
+
+That setup feeds two long-lived callbacks — the RAF render loop and the
+resize observer — both of which now need to stop touching a disposed
+renderer the moment `cleanup()` has run. `render()` itself is unchanged
+from Lesson 8 except for that one new guard:
 
 ```typescript
   function render() {
@@ -82,6 +303,9 @@ export function createViewport(container: HTMLElement) {
   }
   render();
 ```
+
+The resize observer picks up the identical guard, and is followed
+immediately by the real teardown this lesson exists to add:
 
 ```typescript
   const resizeObserver = new ResizeObserver(() => {
@@ -169,6 +393,23 @@ that acquisition with any release path at all — correct only under the
 unstated assumption that the page itself would be torn down before
 `createViewport` was ever called a second time, an assumption ordinary
 development-time hot-reloading breaks constantly.
+
+Also recognized in: mutex/scoped-lock objects in C++, Python's `with`
+statement and context managers, Java's try-with-resources, and a
+database connection pool that assumes every borrowed connection gets
+returned — all the same real question ("who's responsible for release,
+and what happens if they never run") with different enforcement
+mechanisms.
+
+A second, separate hard concept in this same code, worth naming on its
+own: `isDisposed`'s real job is guarding against an **async callback
+outliving its owner** — the render loop's `requestAnimationFrame`
+callback can already be queued, waiting to fire, at the exact moment
+`cleanup()` runs; without the guard, it fires anyway, against resources
+that no longer exist. This is the identical shape as a `fetch` resolving
+after a React component has unmounted, or a `setTimeout` firing after
+the object that scheduled it has been torn down — a callback doesn't
+know its owner is gone unless something explicitly tells it.
 
 ### SE Lens
 

@@ -74,6 +74,33 @@ SELECT pets.id, pets.name, pets.age FROM pets WHERE pets.age > :age_1
 - A **Session** manages a real, live database connection and tracks pending changes (added objects, modified attributes) until explicitly committed — the object-relational equivalent of a raw connection plus its transaction state (see `sql-transactions-and-commit.md`).
 - The ORM's generated SQL is always correctly parameterized — there is no string-concatenation step anywhere in this model for a developer to get wrong, which is a real, structural safety improvement over raw SQL, where parameterization is a discipline that must be applied correctly every single time by hand.
 
+## Execution Trace
+
+Both versions insert one row, then filter for `age > 2`:
+
+```
+Raw SQL:
+  connection.execute("INSERT INTO pets (name, age) VALUES (?, ?)", ("Rex", 3))
+    → one real row inserted: (id=1, name="Rex", age=3)
+  connection.execute("SELECT * FROM pets WHERE age > ?", (2,)).fetchall()
+    → checks row (1,"Rex",3): 3 > 2? Yes → included
+    → returns [(1, "Rex", 3)]
+
+ORM:
+  session.add(Pet(name="Rex", age=3)) → a pending Python object, no row yet
+  session.commit() → the pending object is now a real row: (id=1, name="Rex", age=3)
+  session.execute(select(Pet).where(Pet.age > 2)).scalars().all()
+    → Pet.age > 2 compiles to the identical SQL: WHERE pets.age > :age_1
+    → checks row (1,"Rex",3): 3 > 2? Yes → included
+    → returns [Pet(id=1, name="Rex", age=3)]
+```
+
+Both paths check the identical single row against the identical
+condition and reach the identical answer — the printed
+`select(Pet).where(Pet.age > 2)` confirms the ORM version isn't
+skipping SQL, just generating it from Python expressions instead of a
+hand-written string.
+
 ## CS Lens
 
 An ORM is an **abstraction layer** translating between two different representations of the same information — Python objects and relational rows — in both directions: Python code becomes generated SQL going one way, and SQL result rows become real Python objects coming back. This is structurally similar to `lexer-preprocessing-before-parsing.md`'s text-to-structure direction, just applied between two already-structured representations (objects and rows) rather than between raw text and structure.

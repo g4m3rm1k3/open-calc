@@ -222,26 +222,26 @@ This is the entire new file — nothing surrounds it yet to return to; the
 next unit is where it first gets imported and called for real.
 
 ### Mechanical Walkthrough
+
 - `type LogLevel = "debug" | "info" | "warn" | "error"` — **(b)
-- reappearing** — a union type (`typescript-union-types.md`), narrowing
+  reappearing** — a union type (`typescript-union-types.md`), narrowing
   to exactly the four real severities this project uses, the same
   narrowing `ThemeDefinition["type"]` already did for theme kinds
   (Lesson 24).
 - `Record<LogLevel, number>` and `Record<LogLevel, (message: string) => void>`
-- — **(b) reappearing** — `typescript-record-utility-type.md` (Lesson
+  — **(b) reappearing** — `typescript-record-utility-type.md` (Lesson
   23), mapping every possible `LogLevel` to a number and to a function,
   respectively — TypeScript checks both records are exhaustive (missing
   a level would be a real compile error, not a silent gap).
 - `{ debug: 0, info: 1, warn: 2, error: 3 }` — **(a) first appearance of
-- the mechanism** — a hand-rolled priority ordering.
-- `logging-and-observability.md`
+  the mechanism** — a hand-rolled priority ordering. `logging-and-observability.md`
   already covers *why* a level threshold matters (Python's `logging`
   provides this natively via `basicConfig(level=...)`); JavaScript has no
   standard-library equivalent, so this project rolls the smallest real
   version by hand: lower priority number means less severe.
 - `console.debug` / `console.info` / `console.warn` / `console.error`
   assigned as object values — **(a) first appearance**, per
-- `javascript-console-log-levels.md` — four genuinely different browser
+  `javascript-console-log-levels.md` — four genuinely different browser
   methods, not `console.log` under four names.
 - `LEVEL_PRIORITY[level] < LEVEL_PRIORITY[CONFIGURED_LEVEL]` — **(a)
   first appearance of the mechanism** — the actual filtering check: a
@@ -262,7 +262,7 @@ next unit is where it first gets imported and called for real.
 - `export function createLogger(scope: string) { ... return { debug: ..., info: ..., warn: ..., error: ... }; }`
   — **(a) first appearance of the mechanism** — a factory function
   returning a small object of scoped closures, this project's own JS
-- equivalent of Python's `logging.getLogger(__name__)` (Lesson 18) —
+  equivalent of Python's `logging.getLogger(__name__)` (Lesson 18) —
   every caller gets its own named `scope` (`"App"`, `"MachineStatus"`),
   the same "filterable by where it came from" idea, built by hand since
   JS has no `getLogger` registry to call instead.

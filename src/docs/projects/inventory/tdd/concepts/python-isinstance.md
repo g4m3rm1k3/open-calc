@@ -45,6 +45,32 @@ False
 - `isinstance` also accepts a tuple of types, checking "is it any one of these": `isinstance(value, (int, float))`.
 - `type(value) == SomeType` only matches the *exact* type, ignoring the inheritance relationship entirely — a genuinely different, stricter check.
 
+## Execution Trace
+
+Four checks against the same real `fido = Dog()`:
+
+```
+isinstance(fido, Dog)
+  → fido's actual type is Dog → matches directly → True
+
+isinstance(fido, Animal)
+  → fido's actual type is Dog, not Animal directly
+  → isinstance walks Dog's inheritance chain: Dog → Animal
+  → Animal found in that chain → True
+
+type(fido) == Dog
+  → type(fido) is exactly Dog → Dog == Dog → True
+
+type(fido) == Animal
+  → type(fido) is exactly Dog, not Animal
+  → Dog == Animal → False (no inheritance walk — this is a direct
+    equality check between two type objects)
+```
+
+The third and fourth checks both use `type(fido)`, which returns the
+same exact value (`Dog`) both times — it's the comparison target
+(`Dog` vs. `Animal`) that changes, not what `type()` itself returns.
+
 ## CS Lens
 
 This is a **runtime type check** — asking a question about a value's type while the program is running, as opposed to a statically-typed language catching type mismatches before the program ever runs. `isinstance` specifically respects **polymorphism**: code written to accept "any `Animal`" correctly accepts a `Dog`, a `Cat`, or any other subclass, without needing to know about each one individually.

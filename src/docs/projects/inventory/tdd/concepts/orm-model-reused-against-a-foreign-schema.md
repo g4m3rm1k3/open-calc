@@ -108,6 +108,45 @@ sqlite3.OperationalError: no such column: items.priority
   other missing-column bug — nothing about the error message hints that
   the real cause is "this file is foreign, not local."
 
+## Execution Trace
+
+Before adding `priority`, the loop over both real files:
+
+```
+path="owned.db": engine points at owned.db
+  select(Item) → SQL: SELECT items.id, items.name FROM items
+  owned.db's real schema has exactly (id, name) → query succeeds
+  → prints "owned.db ['widget']"
+
+path="foreign.db": engine points at foreign.db
+  select(Item) → identical SQL: SELECT items.id, items.name FROM items
+  foreign.db's real schema also has exactly (id, name) → query succeeds
+  → prints "foreign.db ['gadget']"
+```
+
+After adding `priority: Mapped[int] = mapped_column(default=0)` to
+`Item`, the identical loop, same two files:
+
+```
+path="owned.db": engine points at owned.db (already migrated to add priority)
+  select(Item) → SQL: SELECT items.id, items.name, items.priority FROM items
+  owned.db's real schema now has (id, name, priority) → query succeeds
+  → prints "owned.db ['widget']"
+
+path="foreign.db": engine points at foreign.db (never migrated)
+  select(Item) → the SAME new SQL: SELECT items.id, items.name, items.priority FROM items
+  foreign.db's real schema still only has (id, name) — no priority column
+  → sqlite3.OperationalError: no such column: items.priority
+  → loop never reaches a third path (there isn't one); the exception
+    propagates out of the `with Session(...)` block
+```
+
+The query text sent to *both* files changed identically the moment
+`Item` gained a new column — `Item` has no way to generate one query
+for "files that already have `priority`" and a different one for files
+that don't. The loop's second iteration is where that one shared
+assumption finally meets a real file it doesn't hold for.
+
 ## CS Lens
 
 This is a real instance of the **Liskov substitution**-adjacent idea

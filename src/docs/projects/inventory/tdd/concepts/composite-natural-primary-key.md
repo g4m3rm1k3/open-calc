@@ -84,6 +84,31 @@ these rows individually addressable.
   any other column — nothing about using a composite key changes how
   the table is queried day to day.
 
+## Execution Trace
+
+Three real rows inserted, then read back — traced against the real
+output above:
+
+```
+Insert: OutlineSegment(shape_id=1, position=0, x=0.0, y=0.0)
+Insert: OutlineSegment(shape_id=1, position=1, x=1.0, y=0.0)
+Insert: OutlineSegment(shape_id=2, position=0, x=0.0, y=0.0)
+session.commit() → all three rows written, keyed by (shape_id, position)
+
+Query: order_by(shape_id, position) — sorts by the composite key itself
+Row 1: (shape_id=1, position=0) → "1 0 0.0 0.0"
+Row 2: (shape_id=1, position=1) → "1 1 1.0 0.0"
+Row 3: (shape_id=2, position=0) → "2 0 0.0 0.0"
+```
+
+Note `(shape_id=1, position=0)` and `(shape_id=2, position=0)` are two
+different, valid rows — `position=0` repeats across shapes, which is
+exactly why `position` alone couldn't be the primary key; only the real
+*pair* is guaranteed unique. Attempting a fourth insert of
+`(shape_id=1, position=0)` again — the exact same pair as row 1 — would
+raise a real `IntegrityError` at `commit()`, the composite key doing the
+same job a surrogate `id`'s own uniqueness constraint would.
+
 ## CS Lens
 
 This is a **natural key** (a key made of data the entity already has,

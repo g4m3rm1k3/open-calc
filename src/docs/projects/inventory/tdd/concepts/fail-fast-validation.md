@@ -52,11 +52,12 @@ except InvalidOrderError as e:
     print("fail-fast version failed before charging anything:", e)
 ```
 
-**Real output:**
+**Real output — corrected, this session: the third line named the wrong
+item; re-run directly to confirm.**
 ```
 charged for widget
 lazy version failed after already charging some items: gadget has a negative price
-fail-fast version failed before charging anything: gizmo has a negative price
+fail-fast version failed before charging anything: gadget has a negative price
 ```
 
 **What this proves:** the lazy version already printed `"charged for widget"` — a real, committed side effect — before discovering the order was invalid. The fail-fast version validated the *entire* list first, and failed before charging for anything at all, including the perfectly valid `"widget"` and `"gizmo"` entries. For an operation with a real side effect (charging someone), that difference is the difference between a clean rejection and a partially-completed, now-inconsistent operation.
@@ -66,6 +67,32 @@ fail-fast version failed before charging anything: gizmo has a negative price
 - `process_order_lazy` interleaves validation and processing — it discovers `"gadget"` is invalid only after already having "charged" for `"widget"`.
 - `process_order_fail_fast` performs a complete validation pass over every item *before* any processing begins — the loop that checks prices touches nothing else; only after it completes without raising does any real work happen.
 - Both raise the identical exception type with a similar message — the difference is entirely about *when* the check happens relative to any side effects, not what gets checked.
+
+## Execution Trace
+
+Both functions run against the identical
+`order = [("widget", 10), ("gadget", -5), ("gizmo", 20)]`:
+
+```
+process_order_lazy(order):
+  ("widget", 10): 10 < 0? No  → total=10 → print "charged for widget"
+  ("gadget", -5): -5 < 0? Yes → raise InvalidOrderError("gadget has a negative price")
+  → exits here, "gizmo" is never even reached
+
+process_order_fail_fast(order):
+  Validation-only pass:
+    ("widget", 10): 10 < 0? No
+    ("gadget", -5): -5 < 0? Yes → raise InvalidOrderError("gadget has a negative price")
+  → exits here, inside the validation loop — the sum() and second
+    "charged for" loop below it never run at all
+```
+
+The real, visible difference: `process_order_lazy` already printed
+`"charged for widget"` — a real, committed side effect — before it ever
+reached `"gadget"` and failed. `process_order_fail_fast` raises on the
+exact same item, but its *first* loop only ever checks prices, so
+nothing gets "charged" (the second loop, and the real work) before the
+whole order is confirmed valid.
 
 ## CS Lens
 

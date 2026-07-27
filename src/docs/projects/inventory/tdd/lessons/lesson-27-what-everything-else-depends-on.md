@@ -401,8 +401,9 @@ existing `useEffect(() => { fetchState(program)... }, [program])`
 whatever that prop happens to be fed from.
 
 ### Mechanical Walkthrough
+
 - `const [code, setCode] = useState(DEFAULT_PROGRAM)` — **(b)
-- reappearing** — `useState`, seeded with what used to be the only value
+  reappearing** — `useState`, seeded with what used to be the only value
   that ever existed.
 - `useEffect(() => { const timer = setTimeout(...); return () => clearTimeout(timer); }, [code])`
   — **(a) first appearance of the mechanism, reappearing idea** — per
@@ -413,12 +414,12 @@ whatever that prop happens to be fed from.
   before the *next* effect, or on unmount — clears whatever timer the
   *previous* render had scheduled, before it can fire.
 - `[debouncedCode]` as the second effect's dependency array — **(b)
-- reappearing** — the same `useEffect` dependency mechanism already
+  reappearing** — the same `useEffect` dependency mechanism already
   established (Lesson 16 and throughout), now depending on a value that
   changes over time instead of running once (`[]`, this file's own
   previous form).
 - `async function handleUploadFile(file: File) { try { ... } catch { ... } }`
-- — **(b) reappearing** — `async`/`await` (`typescript-async-await.md`),
+  — **(b) reappearing** — `async`/`await` (`typescript-async-await.md`),
   `try`/`catch` around a real fallible operation, per Lesson 26's own
   established convention — the *first* time this project's error-logging
   habit gets applied to something other than a `fetch` call, proving it

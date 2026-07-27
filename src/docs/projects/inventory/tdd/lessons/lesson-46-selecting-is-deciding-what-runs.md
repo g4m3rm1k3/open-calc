@@ -154,6 +154,7 @@ async function fetchPath(program: string): Promise<PathResult> {
 ```
 
 ### Mechanical Walkthrough
+
 - `points = [{"motion": DEFAULT_MOTION, "command_index": None, ...}]` —
   the synthetic starting point exists before any real command has run,
   so it has no real command to be tagged with; `None` names that
@@ -165,9 +166,54 @@ async function fetchPath(program: string): Promise<PathResult> {
   iteration*, however many there are, gets tagged with the same real
   command index that produced all of them.
 - `states.append(state.state())` — one snapshot per command, in the
-- exact same loop that already walks `commands` to build `points` — no
+  exact same loop that already walks `commands` to build `points` — no
   second pass, no second `MachineState()` instance, since the data
   needed for both was already being computed together.
+
+### Execution Trace
+
+`compute_steps` run for real against the full `O0003.nc` (30 commands):
+
+```
+points[0] = {motion:"G0", command_index:None, x:0, y:0, z:0}
+  (the synthetic starting point, added before the loop runs at all)
+
+index=0 (command 0, "O0003 (CIRCULAR POCKET)", no real move):
+  before = len(points) = 1
+  not a cycle, not an arc → points.append(one point at the unchanged
+    position) → len(points) = 2
+  for point in points[1:2]: point["command_index"] = 0
+  states.append(state.state())  → states[0]
+
+index=1 (command 1, "N1101", no real move): same shape → points[2]
+  tagged command_index=1
+
+index=2 (command 2, "G21 G90 G17", no real move): points[3] tagged
+  command_index=2
+
+  ... (7 more single-point, single-state iterations for T1 M06, S1800
+  M03, G43 H1 Z1.0, T2 M08, G00 X0 Y0 Z5., G01 Z-3. F80, G01 X15. F150)
+
+index=10 (command 10, "G02 I-15. J0. F200" — a real arc):
+  before = len(points) = 12
+  is_arc = true (motion in _ARC_MODES, real I/J words present)
+  _add_arc_points(...) appends 47 points in this ONE call — the arc's
+    own real geometry, subdivided into small segments — not 1
+  for point in points[12:59]: point["command_index"] = 10
+    → all 47 new points, whatever their count turned out to be, get
+      the same command index in one pass over the slice
+  states.append(state.state())  → states[10] (one snapshot, same as
+    every other iteration — states never multiplies with point count)
+```
+
+Real, confirmed counts: `len(points) == 279` for this 30-command
+program (most commands contribute exactly 1 point; the two real arcs
+each contribute dozens), but `len(states) == 30` — exactly one snapshot
+per command regardless of how many points that command produced. The
+`before = len(points)` / `points[before:]` slice is what lets a single
+loop iteration tag a variable-sized batch of points with one command
+index, without the arc/cycle-expansion code needing to know anything
+about tagging at all.
 
 ### CS Lens
 
@@ -354,13 +400,14 @@ const backToPreview = useCallback(() => {
 ```
 
 ### Mechanical Walkthrough
+
 - `export interface Playback { ... }` — **(c) already basic** — a plain
   TS interface, the same construct used throughout this project since
   Lesson 17; the only real content worth naming is that every field on
   it is something `App.tsx` actually reads or calls, nothing internal
   leaks through.
 - `states.map((_, i) => i).filter((i) => selectedIndices.has(i))` —
-- **(b) reappearing** — `.map`/`.filter`, both already established;
+  **(b) reappearing** — `.map`/`.filter`, both already established;
   mapping each state to its own index first, then filtering *those*
   indices by membership in the real selected set, is what turns "which
   commands are selected" into "which positions in `states` are eligible,
@@ -385,7 +432,7 @@ const backToPreview = useCallback(() => {
   Reset press) all needed the identical four-line reset, so it exists
   once, not three times.
 - `!hasStarted ? eligibleIndices[eligibleIndices.length - 1] : ...` — a
-- ternary, not two separate code paths that happen to agree — `preview`
+  ternary, not two separate code paths that happen to agree — `preview`
   is not "stepping, frozen at the end"; it is a distinct rule
   (`stepIndex` always tracks the *last* eligible index, live, so
   changing the selection while still in preview updates what's shown
@@ -395,6 +442,40 @@ const backToPreview = useCallback(() => {
   the user's own report once this shipped correctly: the first press of
   Step visibly clears the full preview and reveals only the first
   point, in one action.
+
+### Execution Trace
+
+The pure logic (`eligibleIndices`, `stepIndex`, `step()`) run for real —
+a representative 30-command program (matching `O0003.nc`'s own real
+command count) with 4 commands (indices 7, 8, 9, 10) selected:
+
+```
+eligibleIndices = states.map((_,i)=>i).filter(i => selectedIndices.has(i))
+  = [7, 8, 9, 10]
+
+Preview (hasStarted=false, before any Step press):
+  stepIndex = eligibleIndices[eligibleIndices.length - 1] = eligibleIndices[3] = 10
+  (the LAST eligible command, live — the complete selected toolpath)
+
+step() call 1:
+  hasStarted: false → true (first call, flips and falls through)
+  cursor (-1) < eligibleIndices.length-1 (3) → cursor = 0
+  stepIndex = eligibleIndices[0] = 7
+
+step() call 2: cursor = 1 → stepIndex = eligibleIndices[1] = 8
+step() call 3: cursor = 2 → stepIndex = eligibleIndices[2] = 9
+step() call 4: cursor = 3 → stepIndex = eligibleIndices[3] = 10
+
+step() call 5 (cursor already at eligibleIndices.length-1 = 3):
+  cursor (3) >= eligibleIndices.length-1 (3) → early return, cursor
+    stays 3, stepIndex stays 10 (no further step possible)
+```
+
+Preview's own `stepIndex` (10, the last eligible index) and stepping's
+*final* `stepIndex` (also 10, after 4 real steps) land on the same
+number — not a coincidence, but not the same computation either: one
+reads `eligibleIndices`' last element directly every render; the other
+arrives there one real step at a time, through `cursor`.
 
 ### CS Lens
 
@@ -535,13 +616,14 @@ const toggleSbk = useCallback(() => setSbk((s) => !s), []);
 ```
 
 ### Mechanical Walkthrough
+
 - MAX speed batches up to 30 real steps per animation frame before
-- rescheduling via `requestAnimationFrame` — fast enough to feel
+  rescheduling via `requestAnimationFrame` — fast enough to feel
   instantaneous for most real programs, still yielding to the browser's
   own repaint cycle rather than blocking it in one giant synchronous
   loop.
 - Every other speed mode takes exactly one step, then reschedules via
-- `window.setTimeout(autoRun, delay)` — `playHandleRef` holds whichever
+  `window.setTimeout(autoRun, delay)` — `playHandleRef` holds whichever
   kind of handle is currently in flight (a `requestAnimationFrame` ID or
   a `setTimeout` ID); `clearPlayHandle` calls both `clearTimeout` and
   `cancelAnimationFrame` unconditionally on it, a safe no-op on whichever
@@ -556,13 +638,49 @@ const toggleSbk = useCallback(() => setSbk((s) => !s), []);
   `hasStarted` first (so the very first Cycle Start press, exactly like
   the very first Step press, clears the preview), computes `next`
   *before* writing either the ref or the state so both genuinely agree,
-- then calls `autoRun()` directly only when turning play *on* — turning
+  then calls `autoRun()` directly only when turning play *on* — turning
   it off just cancels whatever's scheduled, since `autoRun` itself
   already exits immediately once `playingRef.current` is false.
 - `setSbk((s) => !s)` — **(b) reappearing** — the same updater-function
   form of `setState` already established, guaranteed to flip from
   whatever the state genuinely is at update time, not whatever `sbk`
   happened to close over.
+
+### Execution Trace
+
+MAX speed's own batch loop, run for real, `eligible.length = 4`
+(matching the previous unit's own representative selection), `cursor`
+starting at `-1`:
+
+```
+for (i=0; i<30 && playingRef.current && cursor<3; i++):
+  i=0: cursor(-1)<3 → step(): cursor(-1)>=3? no → cursor=0
+  i=1: cursor(0)<3  → step(): cursor(0)>=3? no  → cursor=1
+  i=2: cursor(1)<3  → step(): cursor(1)>=3? no  → cursor=2
+  i=3: cursor(2)<3  → step(): cursor(2)>=3? no  → cursor=3
+  i=4: cursor(3)<3 is FALSE → for-loop condition itself stops the loop
+    (only 4 iterations ran, nowhere near the 30 cap; step()'s own
+    internal "cursor >= length-1" guard was never the thing that
+    stopped it — the for-loop's own condition caught it one beat
+    earlier, every time)
+
+After the loop: playingRef.current is still true (step() never flipped
+it, since its internal guard was never triggered)
+  if (playingRef.current && cursor < eligible.length-1)
+    → true && (3 < 3) → false
+  → else branch: playingRef.current = false; setIsPlaying(false)
+  → no requestAnimationFrame(autoRun) reschedule; playback stops clean
+```
+
+Two different guards check the same "are we at the end?" question —
+the for-loop's own condition (checked *before* each `step()` call) and
+`step()`'s internal check (checked *inside* `step()`, first thing) —
+and for a short `eligible` array like this one, the outer guard always
+wins the race, so the inner one's own early-return branch never
+actually fires in this trace. A longer `eligible` (more than 30 past
+the cursor) is what would let the loop instead exhaust its 30-iteration
+cap and reschedule via `requestAnimationFrame` for the next frame,
+picking up 30 more.
 
 ### CS Lens / SE Lens
 
@@ -860,12 +978,13 @@ operation's own border (Operations tab, the unit below):
 ```
 
 ### Mechanical Walkthrough
+
 - `isPlaying`/`isReset`/`sbk` each drive exactly one conditional class
-- append (`` `btn${cond ? " btn-x" : ""}` ``) — no separate "which color
+  append (`` `btn${cond ? " btn-x" : ""}` ``) — no separate "which color
   is this button right now" logic anywhere else; the button's own class
   string *is* the single source of truth for its displayed state.
 - `.btn-group .btn { flex: 1; border-radius: 0; margin-right: -1px }`
-- plus `:first-child`/`:last-child` overrides — the standard CSS shape
+  plus `:first-child`/`:last-child` overrides — the standard CSS shape
   for a row of visually-joined buttons (flat borders between them, only
   the two end buttons rounded) rather than a row of independently boxed
   ones.
@@ -881,7 +1000,7 @@ operation's own border (Operations tab, the unit below):
 - `:active` on `.btn` — **(a) first appearance**: matches an element for
   the real, brief window between a mouse press and its release, giving
   every button on the bar the same instant, tactile "yes, this
-- registered" feedback `:hover`/`:focus` alone can't — those track
+  registered" feedback `:hover`/`:focus` alone can't — those track
   position and keyboard attention, neither tracks "is this specific
   button being pressed right now."
 
@@ -977,12 +1096,13 @@ useEffect(() => {
 ```
 
 ### Mechanical Walkthrough
+
 Same mechanism as the concept file's own isolated example, applied to
 three refs instead of one: `sbkRef`/`speedModeRef`/`custSpeedRef` all
 existed already (`useRef(sbk)` etc., at declaration), but nothing wrote
 to them again after mount. `hasStartedRef`/`cursorRef`/`playingRef`
 happened to avoid this bug by accident, not by a different design rule
-- — every real call site that changes them (`step`, `toggleCycle`,
+— every real call site that changes them (`step`, `toggleCycle`,
 `backToPreview`) already updates both the ref and the state together,
 manually, since those particular values are only ever changed from
 inside this same file's own functions. `sbk`/`speedMode`/`custSpeed`,
@@ -1206,6 +1326,57 @@ every other "on" status in this project, not a new color.
   the direct correction exactly: selecting is what grants eligibility at
   all, not a filter narrowing an implicit "everything" default.
 
+### Execution Trace
+
+`operationCommandIndexRanges` run for real against `O0003.nc`'s own 30
+commands: index 0 is the title comment (stripped before grouping, so
+`titleOffset = 1`); `buildOperations` on the remaining 29 produces two
+real operations, sizes 15 and 14 (`N1101`'s group, lines 2–16; `N2101`'s
+group, lines 17–31):
+
+```
+cursor = 1
+op0 (15 commands): start=1, cursor += 15 → 16, end = 15
+  → {start: 1, end: 15}
+op1 (14 commands): start=16, cursor += 14 → 30, end = 29
+  → {start: 16, end: 29}
+operationRanges = [{1,15}, {16,29}]
+```
+
+Then a plain click on operation 0, followed by a Shift+click on
+operation 1:
+
+```
+toggleOperationSelection(0, shiftKey=false):
+  no shiftKey branch → next.has(0)? no → next.add(0)
+  selectedOperations = {0}, lastClickedRef.current = 0
+
+toggleOperationSelection(1, shiftKey=true):
+  shiftKey && lastClickedRef.current(0) !== null → range branch
+  lo = min(0,1) = 0, hi = max(0,1) = 1
+  for i=0; i<=1; i++: next.add(i)  → adds 0 (already there), adds 1
+  selectedOperations = {0, 1}, lastClickedRef.current = 1
+```
+
+The reporting effect then expands both selected operation indices back
+into real command indices:
+
+```
+indices = new Set()
+for opIndex of {0, 1}:
+  opIndex=0: range = {1,15} → for i=1..15: indices.add(i)   (15 adds)
+  opIndex=1: range = {16,29} → for i=16..29: indices.add(i)  (14 adds)
+indices = {1, 2, ..., 29}   (every real command except the title at 0 —
+  29 elements, matching len(commands)-1 exactly)
+```
+
+Two nested loops, two different index spaces: `toggleOperationSelection`
+walks *operation* indices (0, 1 — there are only 2 operations here);
+the reporting effect walks *command* indices (1 through 29) — the same
+`{start, end}` ranges `operationCommandIndexRanges` computed are what
+lets the second loop translate one space into the other without
+re-deriving anything.
+
 ### CS Lens
 
 Not repeated for the range-map itself (`cumulative-offset-range-
@@ -1327,10 +1498,11 @@ same order on every render — it can't sit below an `if (!commands)
 return ...` the way it did before this feature needed to depend on it.
 
 ### Mechanical Walkthrough
+
 Exactly the mechanism `react-effect-dependency-reference-equality.md`
 names: `commands.slice(1)` and `buildOperations(...)` are plain function
 calls, re-evaluated in full on every render regardless of whether
-- `commands` itself changed — wrapping each in `useMemo` with the real
+`commands` itself changed — wrapping each in `useMemo` with the real
 input it actually depends on (`[commands, hasTitle]`, then `[remaining,
 hasRealSeqNumbers]`, then `[operations, titleOffset]`) means each one
 only produces a *new* reference when its own real inputs changed,
@@ -1425,8 +1597,9 @@ The dead `activeTab` variable this replaces (`tabs.find((tab) => tab.id
 still read it.
 
 ### Mechanical Walkthrough
+
 `display: "contents"` (not `"block"`) for the active tab specifically
-- — `contents` makes the wrapping `<div>` itself disappear from layout
+— `contents` makes the wrapping `<div>` itself disappear from layout
 entirely, so its own children lay out exactly as if that `<div>` weren't
 there at all, avoiding an extra, unstyled box in the DOM around every
 tab's real content. Every tab (not just `BlockList`) now stays mounted
@@ -1585,28 +1758,57 @@ if (id === "dro") {
 ```
 
 ### Mechanical Walkthrough
+
 `MachineStatus` lost its own `useEffect`/`fetchState`/`logger` entirely
 — it is now a pure, prop-driven display component, rendering whatever
 `state` it's handed. `App.tsx` became the one real owner of "what is the
 machine's current state," computing `currentState` from the same
 `states` array `revealedPoints` already filters against, keyed by the
-- same `playback.stepIndex` — one real source of truth, read in two
+same `playback.stepIndex` — one real source of truth, read in two
 places, rather than two independent computations of the same thing.
 
-- `revealedPoints`'s own filter — **(b) reappearing** `.filter` — keeps a
+`revealedPoints`'s own filter — **(b) reappearing** `.filter` — keeps a
 point either because it's the synthetic start point (`command_index ===
 null`, always drawn) or because it's *both* eligible (its owning
 command is really selected) *and* at or before the current step. That
 second condition is what makes this whole feature's own title literally
 true in code: a point whose command was never selected can never pass
-- `isEligible`, no matter what `playback.stepIndex` is — selecting is what
+`isEligible`, no matter what `playback.stepIndex` is — selecting is what
 grants a point eligibility to ever be drawn at all, stepping only
 decides how far through the already-eligible set to reveal.
 `useMemo`'s own three dependencies (`points`, `playback.stepIndex`,
-- `selectedCommandIndices`) are every real input this filter reads — the
+`selectedCommandIndices`) are every real input this filter reads — the
 identical discipline the reference-equality unit above already
 established, applied here on the first attempt rather than found as a
 second bug.
+
+### Execution Trace
+
+`revealedPoints`'s filter run for real against `O0003.nc`'s own 279
+computed points (this lesson's first unit), with only operation 0
+selected (`selectedCommandIndices = {1..15}`, `N1101`'s own real range)
+and `stepIndex = 5`:
+
+```
+for each of 279 points, p.command_index === null || (isEligible(p.command_index) && p.command_index <= 5):
+  the synthetic start point (command_index=null) → kept unconditionally
+  points with command_index 1-5 (5 real commands, none of them arcs,
+    1 point each) → isEligible true, 1<=5 through 5<=5 all true → kept
+  points with command_index 6-15 → isEligible true (still inside the
+    selected range) but command_index <= 5 is false → dropped
+  points with command_index 16-29 (operation 1, never selected) →
+    isEligible false → dropped, regardless of stepIndex
+
+revealed count = 6  (1 synthetic + 5 real, matching indices 1-5)
+```
+
+Raising `stepIndex` to `29` (as far as it goes) with the *same*
+selection still only reveals 140 points, every one with
+`command_index <= 15` — operation 1's own 139 points (command_index
+16-29) never enter `revealed` at all, no matter how far stepping goes,
+because `isEligible` gates them first. Selecting decides *which*
+points can ever be drawn; stepping only decides how many of the
+already-eligible ones currently are.
 
 ### CS Lens
 

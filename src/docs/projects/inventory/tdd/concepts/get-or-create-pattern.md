@@ -59,6 +59,39 @@ total tags: 2
 - `if existing is not None: return existing` — **(c) already established** `is`-comparison against `None` (`python-is-vs-equals.md`) — the actual branch this whole pattern is named for: check first, only create on the "no" path.
 - `session.add(new_tag)` / `session.commit()` — **(c) already established** ORM insert (`orm-session-unit-of-work.md`), reached only when the check above found nothing.
 
+## Execution Trace
+
+Three sequential calls, traced against the real output above
+(`1 1 2` / `True` / `total tags: 2`):
+
+```
+Call 1: get_or_create_tag(session, "urgent")
+  existing = query for Tag.name == "urgent" → None (table is empty)
+  existing is not None? → False
+  new_tag = Tag(name="urgent"); session.add(new_tag); session.commit()
+  → new_tag.id = 1 (assigned by the database on commit)
+  → returns new_tag (id=1)
+  a = <Tag id=1, name="urgent">
+
+Call 2: get_or_create_tag(session, "urgent")
+  existing = query for Tag.name == "urgent" → the real row from Call 1 (id=1)
+  existing is not None? → True
+  → returns existing immediately, no insert, no new id assigned
+  b = <Tag id=1, name="urgent">  (same row as a)
+
+Call 3: get_or_create_tag(session, "later")
+  existing = query for Tag.name == "later" → None (no such row yet)
+  existing is not None? → False
+  new_tag = Tag(name="later"); session.add(new_tag); session.commit()
+  → new_tag.id = 2
+  c = <Tag id=2, name="later">
+```
+
+`a.id == b.id` is `True` specifically because Call 2 never reached the
+`session.add`/`commit` lines at all — the query at the top of Call 2
+found Call 1's own committed row and returned early. Only two real
+inserts ever happened across three calls.
+
 ## CS Lens
 
 This is **idempotency** applied to a single function rather than a whole API endpoint — calling `get_or_create_tag(session, "urgent")` any number of times produces the same real end state (exactly one `"urgent"` row) as calling it once, matching `idempotent-initialization-guard.md`'s core idea but scoped to one row's existence rather than a whole table's.

@@ -64,6 +64,36 @@ missing: None
 - `session.execute(query)` actually runs the query against the database; `.scalars()` unwraps each raw result row down to the real model object itself (rather than a one-element-tuple wrapper SQLAlchemy would otherwise return); `.all()` collects every matching result into a real Python list.
 - `.scalar_one_or_none()` is a terminal method expecting **zero or one** result: returns the single object if exactly one row matched, `None` if none matched, and raises a real error if *more than one* row matched — correctly treating an unexpected duplicate as a genuine data problem rather than silently picking one arbitrarily. `.scalar_one()` is the stricter sibling, raising an error instead of returning `None` when nothing matches — the correct choice specifically when "nothing found" itself should be treated as an error, not a normal, expected outcome.
 
+## Execution Trace
+
+Three real queries against the same two-row table
+(`Pet(name="Rex", age=3)`, `Pet(name="Milo", age=5)`), traced against
+the real output above:
+
+```
+select(Pet).order_by(Pet.age):
+  rows sorted by age ascending: Rex(3), Milo(5)
+  .scalars().all() → [Pet(Rex), Pet(Milo)]
+  → prints "all: ['Rex', 'Milo']"
+
+select(Pet).where(Pet.name == "Rex"):
+  checks Rex: name == "Rex"? Yes → matches
+  checks Milo: name == "Rex"? No → excluded
+  exactly 1 match → .scalar_one_or_none() returns Pet(Rex), not None
+  → prints "found: Rex"
+
+select(Pet).where(Pet.name == "Fido"):
+  checks Rex: name == "Fido"? No → excluded
+  checks Milo: name == "Fido"? No → excluded
+  0 matches → .scalar_one_or_none() returns None (not an error)
+  → prints "missing: None"
+```
+
+The third query is the one worth noticing: zero rows matching is a
+real, valid outcome `.scalar_one_or_none()` is specifically built to
+handle without raising — the same query run with `.scalar_one()`
+instead would have raised `NoResultFound` on this exact input.
+
 ## CS Lens
 
 This is a **fluent, composable query-building API** — each method (`.where(...)`, `.order_by(...)`) returns a new, extended query object, letting a complex query be built up incrementally from smaller, independently-understandable pieces, while remaining entirely inert (nothing executes) until a terminal method (`session.execute(...)`, then `.scalars()`/`.scalar_one_or_none()`/etc.) actually runs it. This lazy-construction-then-explicit-execution shape recurs anywhere a query or computation is built up as data before being run.

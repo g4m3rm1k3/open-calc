@@ -82,6 +82,29 @@ so there's nothing to configure.
   referencing one fixed dict by name — the same code runs correctly
   against *any* real bank passed to it.
 
+## Execution Trace
+
+The same input, `43`, run through `apply_m_data_driven` twice with two
+different banks:
+
+```
+Call 1: apply_m_data_driven(43, MACHINE_M_CODES["okuma"])
+  bank = {"spindle_cw": [3, 43], "coolant_flood": [8, 51]}
+  43 in bank["spindle_cw"] ([3, 43])?    → True  → return "spindle_cw"
+
+Call 2: apply_m_data_driven(43, MACHINE_M_CODES["fanuc"])
+  bank = {"spindle_cw": [3], "coolant_flood": [8]}
+  43 in bank["spindle_cw"] ([3])?        → False
+  43 in bank["coolant_flood"] ([8])?     → False
+  → falls through to return "unknown"
+```
+
+`apply_m_data_driven`'s own source code never changed between the two
+calls — only the `bank` argument did. `apply_g_hardcoded(0)`, by
+contrast, has no second argument to vary at all: `code == 0` is checked
+against a fixed literal baked into the function itself, so there's only
+ever one real call shape to trace.
+
 ## CS Lens
 
 This is the same real tension as **compile-time vs. run-time

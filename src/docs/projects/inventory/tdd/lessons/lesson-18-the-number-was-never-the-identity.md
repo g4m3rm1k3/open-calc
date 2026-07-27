@@ -117,12 +117,13 @@ lesson calls as `logger.info(...)`/`logger.warning(...)` at the exact
 point each real fact becomes known — never gathered after the fact.
 
 ### Mechanical Walkthrough
+
 Full first-appearance treatment is in the concept file — this project's
 real `logging.basicConfig`/`getLogger(__name__)` pair _is_ that file's
 own isolated example's structure, applied for real. One project-specific
 detail: `getLogger(__name__)` called separately in `app.py` and
 `core/tools.py` produces two differently-named loggers (`"app"` and
-- `"core.tools"`, `__name__` being each module's own real name) — visible
+`"core.tools"`, `__name__` being each module's own real name) — visible
 directly in this lesson's own real log output below, and exactly the
 "one logger per module, filterable by where it came from" point the
 concept file's Mechanical Walkthrough already makes.
@@ -273,6 +274,7 @@ Get-or-Create, Applied to Imported Reference Data," below, after the
 pieces it depends on are taught.
 
 ### Mechanical Walkthrough
+
 `FormData`/`request.files`/`secure_filename`/`tempfile.mkstemp` are
 fully covered in the three concept files above, and this project's own
 real code matches each one's isolated example closely — but not
@@ -282,20 +284,20 @@ completely: `.save()` specifically was not yet demonstrated in
 What's new or extended, beyond straightforward reuse:
 
 - `upload.save(temp_path)` — **(a) first appearance**, full treatment:
-- `flask-file-upload.md`, extended this lesson specifically to add it —
+  `flask-file-upload.md`, extended this lesson specifically to add it —
   writes the upload's real bytes directly to the given path, the reason
   `tempfile.mkstemp` (above) exists at all here: SQLite (what
   `read_tools_from_file`/`import_tools_from_file` open next) reads a
   database by real file path, not by accepting raw bytes.
 - `os.path.getsize(temp_path)` — **(a) first appearance**, also newly
-- added to `flask-file-upload.md`'s own example — reads the just-saved
+  added to `flask-file-upload.md`'s own example — reads the just-saved
   file's real size straight from the filesystem, used here only to put
   a real, verifiable number in the log line, not as part of the upload
   mechanism itself.
 - `str(error).splitlines()[0]` — **(a) first appearance** — a real
   SQLAlchemy error's `str()` can include the entire failed SQL
   statement (multi-line, and useful *in the log*, not in a client-facing
-- error message) — `.splitlines()[0]` keeps only the first line for the
+  error message) — `.splitlines()[0]` keeps only the first line for the
   `400` response, while `logger.warning` (below) still gets the short
   `reason`, not the full original exception; the *complete* error is
   never silently dropped, it's just routed to the log at `WARNING`
@@ -303,12 +305,12 @@ What's new or extended, beyond straightforward reuse:
 - `except Exception as error:` — **(b) reappearing** `try`/`except`
   (Lesson 4's `python-try-except.md`) and `python-custom-exceptions.md`'s
   own point that a *specific* exception type is usually the better
-- default — extended here for a real, deliberate reason: `read_tools_from_file`
+  default — extended here for a real, deliberate reason: `read_tools_from_file`
   can fail for genuinely open-ended reasons (a file that isn't SQLite at
   all, one that's SQLite but doesn't match the expected schema, a locked
   file, disk I/O errors), coming from three different layers (the OS,
   `sqlite3`, SQLAlchemy) this route doesn't control and can't enumerate
-- in advance — a bare `Exception` is the honest choice at exactly this
+  in advance — a bare `Exception` is the honest choice at exactly this
   kind of boundary (an untrusted external file, not this project's own
   code), not a shortcut taken to avoid thinking about specific failure
   modes. It is still narrower than it could be: a bare `except:` (no
@@ -326,11 +328,48 @@ What's new or extended, beyond straightforward reuse:
   field name, as a real Python list, matching what the client actually
   appended.
 - The `try`/`except`/`finally` shape — **(b) reappearing**, this exact
-- shape from `preview_tool_import` a few lines above — `finally:
+  shape from `preview_tool_import` a few lines above — `finally:
 os.remove(temp_path)` runs whether the body succeeds or raises,
   guaranteeing the temp file never survives past one request either
   way, matching `python-tempfile.md`'s own point that cleanup is never
   automatic.
+
+### Execution Trace
+
+The client-side loop against the 3 real tool IDs the "Verified" run
+below actually imports (`["9b994e2d-...", "618b5ce9-...", "a2da4b9d-..."]`):
+
+```
+body = new FormData()
+body.append("file", file)   ← one field, set once
+
+for id of ["9b994e2d-...", "618b5ce9-...", "a2da4b9d-..."]:
+  id="9b994e2d-...": body.append("tool_id", "9b994e2d-...")
+    → body now has "tool_id" → ["9b994e2d-..."]
+  id="618b5ce9-...": body.append("tool_id", "618b5ce9-...")
+    → body now has "tool_id" → ["9b994e2d-...", "618b5ce9-..."]
+  id="a2da4b9d-...": body.append("tool_id", "a2da4b9d-...")
+    → body now has "tool_id" → ["9b994e2d-...", "618b5ce9-...", "a2da4b9d-..."]
+
+fetch(..., { method: "POST", body })  ← one request, "tool_id" sent 3 times
+```
+
+Server side, `request.form.getlist("tool_id")` against that same request:
+
+```
+tool_ids = request.form.getlist("tool_id")
+  → reads every value sent under the "tool_id" field name, in the order
+    they were appended
+  → tool_ids = ["9b994e2d-...", "618b5ce9-...", "a2da4b9d-..."]
+if not tool_ids: → False (3 real values) → continue
+len(tool_ids) → 3 → logged: "Import requested: 3 tool(s) from ..."
+```
+
+`request.form.get("tool_id")` (singular, no `list`) would have returned
+only `"9b994e2d-..."` — the first of the three — silently dropping the
+other two; `.getlist()` is what makes the loop on the client side and
+the read on the server side actually agree on how many tools were
+selected.
 
 ### Verified, Run for Real
 
@@ -446,13 +485,52 @@ _any_ file sharing the real schema, using the identical model classes
 and the identical `_tool_to_dict` shaping function either way.
 
 ### Mechanical Walkthrough
+
 Full first-appearance treatment of the core technique is in the concept
-- file. New here: `engine.dispose()` in a `finally` — **(a) first
+file. New here: `engine.dispose()` in a `finally` — **(a) first
 appearance** — releases the second engine's real connection pool once
 this function is done with it; unlike this project's own long-lived
 `get_engine()` (Lesson 15), a per-request engine like this one has a
 real, bounded lifetime and should be cleaned up explicitly rather than
 left to linger.
+
+### Execution Trace
+
+`read_tools_from_file("Untitled.TOOLDB")`, run for real this session —
+this real file's own 4 tools all happen to have a real `mill` row *and*
+either an `endmill` or `drill` row, so every row takes the same,
+included path (the skip branches are real, live code, just not
+triggered by this specific file — traced honestly below rather than
+inventing a row that isn't actually there):
+
+```
+tools = [], skipped = 0
+
+row 1 (ToolNumber=1): row.mill is None? → No (has a real TlToolMill row)
+  row.mill.endmill is None and row.mill.drill is None? → No (has endmill)
+  → tools.append(_tool_to_dict(row)) → tools = [{"tool_number":1,
+    "name":"0.5 Bull endmill", "diameter":0.5, ...}]
+
+row 2 (ToolNumber=2): row.mill is None? → No
+  row.mill.endmill is None and row.mill.drill is None? → No (has endmill)
+  → tools.append(...) → tools = [..., {"tool_number":2,
+    "name":".3125 CT 1\"LOC", "diameter":0.3125, ...}]
+
+(rows 3 and 4 follow the identical included path)
+
+Loop ends (4 rows checked, 0 skipped).
+logger.info("Read 4 tool(s) from Untitled.TOOLDB: 4 usable, 0 skipped")
+return tools  (4 entries)
+```
+
+The two `if`/`continue` checks exist specifically for real files this
+project's own small test file doesn't happen to contain — a row whose
+`TlToolMill` is entirely missing, or one whose mill row has neither a
+real `endmill` nor `drill` row underneath it (a tool shape this project
+doesn't model, like a lathe tool). Either check firing would `continue`
+straight past `tools.append(...)`, incrementing `skipped` instead —
+real, reachable code, verified absent from this particular file rather
+than assumed untested.
 
 ### CS Lens / SE Lens
 
@@ -516,6 +594,41 @@ def remove_tool(tool_id):
     logger.info("Deleted tool id=%s", tool_id)
     return "", 204
 ```
+
+### Execution Trace
+
+The exact scenario the direct feedback names — two real tools sharing
+`ToolNumber = 3` (e.g. two different, real end mills both mounted as
+station T3 on separate setups) — traced through the buggy version first:
+
+```
+rows = [Tool(ID="aaa...", ToolNumber=3, name="end_mill_10mm"),
+        Tool(ID="bbb...", ToolNumber=3, name="end_mill_8mm")]
+
+Buggy dict comprehension:
+  {str(row.ToolNumber): _tool_to_dict(row) for row in rows}
+  row 1: key = str(3) = "3" → dict["3"] = {tool "aaa...", end_mill_10mm}
+  row 2: key = str(3) = "3" → dict["3"] = {tool "bbb...", end_mill_8mm}
+    ← SAME key as row 1 — this assignment OVERWRITES it
+  Final: {"3": {tool "bbb...", end_mill_8mm}}
+  → "aaa..." (end_mill_10mm) is silently gone — never in an error, never
+    logged, just absent from the result
+```
+
+```
+Fixed list comprehension:
+  [_tool_to_dict(row) for row in rows]
+  row 1: append({tool "aaa...", end_mill_10mm}) → [entry 1]
+  row 2: append({tool "bbb...", end_mill_8mm}) → [entry 1, entry 2]
+  Final: [{tool "aaa...", end_mill_10mm}, {tool "bbb...", end_mill_8mm}]
+  → both tools present — a list has no concept of "key," so there was
+    never anything for the second row to collide with
+```
+
+The dict version's real bug isn't in `_tool_to_dict` or the query — it's
+that `str(row.ToolNumber)` was never a *unique* key to begin with, and a
+Python dict silently accepts the second `dict[key] = ...` as an
+overwrite, with no warning that the first value was ever there.
 
 `delete_tool` itself needed a small real change too — it used to look
 up the id it needed from `tool_number` internally; now it's handed the
@@ -739,6 +852,7 @@ Refresh," later in this lesson; it's included here only because it's
 part of this file's real, current, whole content.)
 
 ### Mechanical Walkthrough
+
 - `<uuid:tool_id>` — **(a) first appearance** of Flask's `uuid` URL
   converter — parses a URL segment directly into a real Python
   `uuid.UUID`, the same way `<int:...>` (used throughout Lessons 13–17)
@@ -749,7 +863,7 @@ part of this file's real, current, whole content.)
   list comprehension, replacing the prior dict comprehension — the
   actual, minimal fix: same data, a shape that can hold duplicates.
 - `tool_id: uuid.UUID | None = None` as a Python default parameter —
-- **(b) reappearing** (`python-default-parameter-values.md`) — `None`
+  **(b) reappearing** (`python-default-parameter-values.md`) — `None`
   specifically chosen (rather than, say, generating a UUID in the
   signature itself) because default argument values in Python are
   evaluated once, at function-definition time, not once per call — a
@@ -761,6 +875,33 @@ part of this file's real, current, whole content.)
   same "produce a new array, don't mutate the old one" discipline),
   replacing the prior dict-based `delete next[key]` mutation-of-a-copy
   pattern.
+
+### Execution Trace
+
+`prev.filter((t) => t.id !== id)` against the real, now-representable
+duplicate-`T1` scenario (`prev` has two real `T1` rows with different
+real ids), deleting the second one (`id="bbb..."`):
+
+```
+prev = [{id:"aaa...", tool_number:1, name:"end_mill_10mm"},
+        {id:"bbb...", tool_number:1, name:"end_mill_8mm"},
+        {id:"ccc...", tool_number:2, name:"drill_hss"}]
+
+handleDelete("bbb...") → deleteToolById("bbb...") → server deletes that
+  one real row → setTools((prev) => prev.filter((t) => t.id !== "bbb..."))
+
+t={id:"aaa...", tool_number:1, ...}: "aaa..." !== "bbb..."? → True → kept
+t={id:"bbb...", tool_number:1, ...}: "bbb..." !== "bbb..."? → False → dropped
+t={id:"ccc...", tool_number:2, ...}: "ccc..." !== "bbb..."? → True → kept
+
+next = [{id:"aaa...", tool_number:1, ...}, {id:"ccc...", tool_number:2, ...}]
+```
+
+`.filter()` checks every element against `id`, not just `tool_number` —
+this is exactly why the *other* real `T1` tool (`"aaa..."`) survives
+the delete: filtering by the real, unique `id` is what makes deleting
+one of two same-numbered tools even possible, the same fix this whole
+lesson is about, now reaching the frontend's own local state update.
 
 ### Verified, the Real Duplicate Scenario, This Session
 
@@ -948,6 +1089,7 @@ def import_tools_from_file(path, tool_ids):
 ```
 
 ### Mechanical Walkthrough
+
 Full first-appearance treatment of get-or-create itself is in the
 concept file. New here, in the real, complete function:
 
@@ -962,7 +1104,7 @@ concept file. New here, in the real, complete function:
   one line — each one accumulates a real, distinct outcome the caller
   needs to report back.
 - The `for tool_id in tool_ids:` loop's first `if` — **(c) already
-- established** boolean `or` short-circuiting — checks three genuinely
+  established** boolean `or` short-circuiting — checks three genuinely
   different failure reasons (not found in the source file at all, no
   mill geometry, no endmill/drill row) as one combined "unsupported"
   outcome, matching `read_tools_from_file`'s own reasoning applied here
@@ -972,9 +1114,42 @@ concept file. New here, in the real, complete function:
   check: a tool already present, by its real GUID, is skipped rather
   than reinserted.
 - `insert_tool(..., tool_id=row.ID)` — **(b) reappearing**, this
-- lesson's own updated `insert_tool` — the one call site that actually
+  lesson's own updated `insert_tool` — the one call site that actually
   uses the new optional `tool_id` parameter to preserve a tool's real,
   original identity across the copy.
+
+### Execution Trace
+
+`get_or_create_material`/`get_or_create_manufacturer`, called once per
+imported tool inside the loop — traced against the real, cited before/
+after materials data below (`Carbide` already existed; the source
+file's manufacturer, `Mastercam`, didn't):
+
+```
+Call: get_or_create_material("Carbide", "...")
+  existing = get_material_id_by_name("Carbide")
+    → this project's own seed data already has a "Carbide" row
+    → existing = <real material id>
+  existing is not None?  → True → return existing immediately
+  → no new_id generated, no TlMaterial row added — the loop's Materials
+    table stays at exactly the same 2 rows it started with
+
+Call: get_or_create_manufacturer("Mastercam", "Mastercam Imported Data")
+  existing = get_manufacturer_id_by_name("Mastercam")
+    → this project's own seed data has no "Mastercam" row yet
+    → existing = None
+  existing is not None?  → False → continue past the early return
+  new_id = uuid.uuid4()  → a brand-new, real UUID
+  session.add(TlManufacturer(ID=new_id, Name="Mastercam",
+    Description="Mastercam Imported Data")); session.commit()
+  → return new_id  ← a genuinely new row now exists
+```
+
+Both functions run the identical shape — the only reason one returns
+early and the other inserts a new row is what `get_..._id_by_name`
+happens to find, which is exactly why "Carbide" stays at one real row
+even after 3 tools (all carbide) are imported in the same pass, while
+"Mastercam" goes from absent to present exactly once.
 
 ### Verified, Run for Real
 
@@ -1339,8 +1514,9 @@ neither sibling's own state moved anywhere; `App`'s new job is exactly
 one number and the callback that increments it.
 
 ### Mechanical Walkthrough
+
 - `useState<Set<string>>(new Set())` — **(a) first appearance** of
-- `Set` as React state — chosen specifically because membership
+  `Set` as React state — chosen specifically because membership
   (`.has(id)`) and toggling are both real, native `Set` operations;
   an array would need `.includes()` (linear scan) and manual
   add/remove-by-filtering for the same job.
@@ -1357,8 +1533,44 @@ one number and the callback that increments it.
 - The lifted `toolsRefreshKey` in `App.tsx` — **(b) reappearing**,
   full treatment already in `react-lifting-state-up.md`; the only
   new wrinkle is that what's lifted is a _trigger_, not shared data
-- itself — `App.tsx` never touches the tools list, it only knows
+  itself — `App.tsx` never touches the tools list, it only knows
   "something changed, tell whoever cares."
+
+### Execution Trace
+
+`toggleSelected` against the 3 real preview tool ids this lesson
+already cites (`"9b994e2d-..."`, `"618b5ce9-..."`, `"a2da4b9d-..."`),
+clicked in order, then the first one clicked again to deselect it:
+
+```
+Start: selected = Set() (empty)
+
+toggleSelected("9b994e2d-..."):
+  next = new Set(selected) → Set() (copy of empty set)
+  next.has("9b994e2d-...")? → False → next.add("9b994e2d-...")
+  → selected = Set{"9b994e2d-..."}
+
+toggleSelected("618b5ce9-..."):
+  next = new Set(selected) → Set{"9b994e2d-..."} (copy)
+  next.has("618b5ce9-...")? → False → next.add("618b5ce9-...")
+  → selected = Set{"9b994e2d-...", "618b5ce9-..."}
+
+toggleSelected("a2da4b9d-..."):
+  next = new Set(selected) → copy of the 2-item set
+  next.has("a2da4b9d-...")? → False → next.add("a2da4b9d-...")
+  → selected = Set{"9b994e2d-...", "618b5ce9-...", "a2da4b9d-..."}
+
+toggleSelected("9b994e2d-...") again (deselecting the first one):
+  next = new Set(selected) → copy of the 3-item set
+  next.has("9b994e2d-...")? → True → next.delete("9b994e2d-...")
+  → selected = Set{"618b5ce9-...", "a2da4b9d-..."}
+```
+
+Every call builds a brand-new `Set` from a copy of the previous one —
+`next.has(id)` is what decides which branch runs, `add` or `delete`,
+so the same function correctly handles both "select" and "deselect"
+depending purely on whether that id is already in the set when it's
+called.
 
 ### CS Lens
 

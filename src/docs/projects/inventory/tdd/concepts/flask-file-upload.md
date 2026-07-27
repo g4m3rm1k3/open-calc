@@ -91,6 +91,30 @@ with app.test_client() as c:
 - `f.save(path)` — **(a) first appearance** — a second, real method on the same uploaded-file object, distinct from `.read()`: writes the upload's bytes directly to a real path on disk, in one call, with no manual `open(...).write(...)` needed on either end. Requires a real path to write to first — paired here with `tempfile.mkstemp` (full treatment: `python-tempfile.md`), never a hand-built path, for the same untrusted-filename reason `secure_filename` exists at all.
 - `os.path.getsize(path)` — **(a) first appearance** — a real stdlib call that reads a file's current size, in bytes, straight from the filesystem — used here only to prove `.save()` really wrote something, not as part of the upload mechanism itself.
 
+## Execution Trace
+
+Two real requests against the same route, each exercising a different
+branch — traced against the real output above:
+
+```
+Request 1: POST /upload, file=(BytesIO(b"hello world"), "../../etc/passwd")
+  f = request.files.get("file")  → the uploaded file object, not None
+  f is None or f.filename == ""?  → False → continue
+  name = secure_filename("../../etc/passwd")  → "etc_passwd"
+  data = f.read()  → b"hello world" (11 bytes)
+  → return {"filename": "etc_passwd", "bytes": 11}, implicit 200
+
+Request 2: POST /upload, data={} (no file field at all)
+  f = request.files.get("file")  → None (key not present)
+  f is None or f.filename == ""?  → True → early return
+  → return {"error": "no file"}, 400
+```
+
+Both requests run through the identical function body up to the
+presence check — the only thing that differs between them is what
+`request.files.get("file")` actually returns, which is exactly what the
+`if f is None or f.filename == "":` guard exists to branch on.
+
 ## CS Lens
 
 This is the same **trust boundary** concept `input-validation-at-boundary.md` already named, applied to a value (a filename) that's easy to forget is untrusted because it *looks* like harmless metadata rather than "user input" in the way a form field obviously is. A path-traversal attempt via a crafted filename is a real, common, historically exploited category of vulnerability — not a hypothetical.

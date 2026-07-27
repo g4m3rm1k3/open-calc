@@ -148,11 +148,51 @@ class MachineState:
         }
 ```
 
-`core/parser.py`'s `_parse_block`, the command-building tail (everything
-above it — the G-code loop, the still-unchanged old M-code block —
-unchanged from Lesson 29):
+`core/parser.py`'s `_parse_block` in full — the G-code loop and the
+M-code block above the command dict are unchanged from Lesson 29; only
+the command dict itself and the `went_home` branch at the bottom change:
 
 ```python
+    def _parse_block(self, words):
+        for letter in words:
+            if letter not in _SUPPORTED_WORDS:
+                raise UnsupportedCodeError(f"{letter}-word is not supported yet")
+
+        went_home = False
+        if "G" in words:
+            g_values = words["G"] if isinstance(words["G"], list) else [words["G"]]
+            for g_value in g_values:
+                if self._apply_g_code(g_value, words):
+                    went_home = True
+
+        if "M" in words:
+            m_values = words["M"] if isinstance(words["M"], list) else [words["M"]]
+            for m_value in m_values:
+                m_int = int(m_value)
+                if m_int not in _SUPPORTED_M_CODES:
+                    raise UnsupportedCodeError(
+                        f"M{m_int} is not a supported M-code yet"
+                    )
+                if m_int == _SPINDLE_CW:
+                    self.spindle_dir = "CW"
+                elif m_int == _SPINDLE_CCW:
+                    self.spindle_dir = "CCW"
+                elif m_int == _SPINDLE_STOP:
+                    self.spindle_dir = ""
+                elif m_int == _COOLANT_MIST:
+                    self.coolant_mist = True
+                elif m_int == _COOLANT_FLOOD:
+                    self.coolant_flood = True
+                elif m_int == _COOLANT_OFF:
+                    self.coolant_flood = False
+                    self.coolant_mist = False
+
+        if "S" in words and self.spindle_dir:
+            self.spindle_rpm = words["S"]
+
+        if "F" in words:
+            self.current_feed = words["F"]
+
         command = {
             "motion": self.current_motion,
             "feed": self.current_feed,
@@ -163,7 +203,7 @@ unchanged from Lesson 29):
             # Real field MachineState.apply() needs (cnc/engineMotion.ts's
             # applyMotion "av()" helper): decides whether X/Y/Z words below
             # are absolute positions or offsets from the current position.
-            "pos_mode": self.pos_mode,
+            "pos_mode": self.pos_mode,                                    # ← new
         }
         for axis in ("X", "Y", "Z"):
             if axis in words:
@@ -178,35 +218,44 @@ unchanged from Lesson 29):
             # outright (previously, this pre-resolved home right here and
             # let any X/Y/Z word on the same line simply overwrite it below,
             # instead of building on top of it).
-            command["went_home"] = True
+            command["went_home"] = True                                   # ← changed
         return command
 ```
 
+Before this lesson, the `went_home` branch wrote `command["x"]`/`["y"]`/
+`["z"]` directly from `self.home`, which any `X`/`Y`/`Z` word on that same
+line then silently overwrote a few lines later, in the axis loop above it
+— the exact bug this lesson's "Connect the Pieces" traces. Setting a flag
+instead, and letting `MachineState.apply()` do the actual home write
+first, is what lets the same line's axis words build on top of it instead
+of losing to it.
+
 ### Mechanical Walkthrough
+
 - `is_absolute = command.get("pos_mode", "G90") == "G90"` — **(a) first
-- appearance** — real port of `av()`'s `abs` variable, computed once per
+  appearance** — real port of `av()`'s `abs` variable, computed once per
   command instead of once per whole engine call (this project resolves
   one command at a time, not a whole recorder pass), defaulting to
   `"G90"` for any command dict that predates this field (none exist in
   this project's own test paths, but the default matches the reference's
   own real modal default anyway).
 - `self.x = command["x"] if is_absolute else self.x + command["x"]` —
-- **(a) first appearance** — the real `av()` ternary, applied per axis; `(b) reappearing` — the `if "x" in command:` guard shape itself,
-
+  **(a) first appearance** — the real `av()` ternary, applied per axis;
+  `(b) reappearing` — the `if "x" in command:` guard shape itself,
   unchanged since Lesson 5.
 - `if command.get("went_home"): self.x, self.y, self.z = 0.0, 0.0, 0.0`
-- — **(a) first appearance** — the real, unconditional `G28` write,
+  — **(a) first appearance** — the real, unconditional `G28` write,
   moved from `core/parser.py` into `MachineState.apply()` so it runs
   *before* the axis-resolution lines directly below it, reproducing the
   reference's own two-write ordering inside one method instead of across
   `applyGCode`/`applyMotion`'s two separate real calls.
 - `"pos_mode": self.pos_mode` in the command dict — **(a) first
-- appearance of this field being read by anything** — `Parser` has set
+  appearance of this field being read by anything** — `Parser` has set
   `self.pos_mode` since Lesson 29; this is the first line that ever
   copies it into a command `MachineState` will see.
 - `command["went_home"] = True` replacing the old direct
-- `command["x"]/["y"]/["z"] = self.home[...]` assignment — **(a) first appearance** of the flag; **(b) reappearing** — the `if went_home:`
-
+  `command["x"]/["y"]/["z"] = self.home[...]` assignment — **(a) first
+  appearance** of the flag; **(b) reappearing** — the `if went_home:`
   guard itself, already present since Lesson 29, now doing less work
   directly and delegating the actual position write to `MachineState`.
 
@@ -219,6 +268,15 @@ produced zero difference in any `compute_path` output until this lesson,
 because nothing between "the field is set" and "a position gets
 computed" ever read it. A correct write with no corresponding read is
 observably identical to no write at all.
+
+Also recognized in: a static analyzer's own "unused variable" warning
+(the write happened, nothing ever reads it back); an event emitted with
+zero subscribers listening for it; a feature flag that's fully wired into
+config but never actually checked by the code path it was meant to gate;
+and a database column that's faithfully populated on every insert but
+never appears in a single `SELECT` anywhere in the codebase — in each
+case, the data exists and is correct, but existing isn't the same claim
+as mattering.
 
 ### SE Lens
 

@@ -29,9 +29,11 @@ unreachable by anything that sets it.
 ### The Problem, Named Honestly Before Anything Else
 
 Checked directly, this session, before treating this recolor as
-ordinary: `cnc-sim/cnc/theme/useCncTheme.js`'s own real palette,
-`rapid: "#ff8b8b"` / `feed: "#46d89f"` (both real theme variants in that
-file agree: red for rapid, green for feed) — the *exact* values this
+ordinary: `cnc-sim/cnc/theme/useCncTheme.js` lines 36–37 (dark variant),
+`rapid: "#ff8b8b"` / `feed: "#46d89f"`, and lines 86–87 (light variant),
+`rapid: "#c03535"` / `feed: "#198754"` (both real theme variants in that
+file agree: red for rapid, green for feed, despite different exact hex
+values) — the *exact* dark-variant values this
 project's own `theme.css` used, unchanged, from Lesson 9 through Lesson
 39. This diff changes them to `#fde047` (yellow) / `#38bdf8` (blue) — a
 real, confirmed divergence from the reference's own established
@@ -171,8 +173,13 @@ The ribbon's active-toggle state, a real gradient instead of a flat fill:
 The settings modal and its backdrop, the same glass treatment:
 
 ```css
-.config-modal-backdrop {
-  ...
+.config-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   /* Slight glassmorphism on the backdrop */
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
@@ -240,6 +247,16 @@ flat, semi-transparent panel with a sharp view straight through it;
 using `backdrop-filter` alone, on an opaque background, would blur
 nothing visible at all.
 
+Also recognized in: Photoshop's separate blend-mode (how a layer's
+color combines with what's beneath it) versus filter/effect stack (what
+happens to the pixels themselves — blur, sharpen, distort); CSS's own
+`background-color` versus `filter`/`box-shadow` as genuinely independent
+properties that happen to be layered visually; and any audio pipeline's
+separate gain (a value question) versus convolution/reverb (a "what
+gets processed" question) — in each case, two orthogonal knobs get
+mistaken for one because their combined *effect* reads as a single,
+unified look.
+
 ### SE Lens
 
 The real, honest distinction this lesson opened with: everything else in
@@ -250,6 +267,35 @@ project inherited from the reference and had never touched since Lesson
 9. Whether yellow/blue is a *better* choice is a real, legitimate design
 opinion; whether it's *still faithful to the reference* is a separate,
 factual question, and the honest answer, checked directly, is no.
+
+**Two further design questions worth asking directly, not just the
+fidelity one above:**
+
+- **Does glassmorphism itself fit a CNC simulator?** Translucent, blurred
+  panels are a real, current aesthetic trend (macOS's own "Liquid Glass"/
+  Fluent-style panels), not a neutral default — and this is an app where
+  an operator needs to read DRO/spindle/coolant state at a glance, often
+  while also watching the 3D toolpath behind those same panels. A blurred
+  3D scene showing through text-bearing panels is a real, opposing
+  legibility concern this lesson never raises, only the visual-appeal
+  side of it. It isn't fixed here (this pass is honestly, deliberately a
+  style pass), but the tradeoff is real: `blur(16px)` (Mechanical
+  Walkthrough, above) is a value chosen for how it *looks*, not verified
+  against how it reads at a glance during active simulation.
+- **Is the red/green → yellow/blue recolor a usability regression, not
+  just a style change?** Red/green isn't an arbitrary pair this project
+  happened to inherit — it's a real, widely-used industrial/CNC
+  safety-color convention (red = fast motion/caution, green = safe/
+  normal feed), the same association behind traffic lights and most
+  real machine-control panels an operator may already have muscle memory
+  for. The fidelity question above (checked directly against
+  `useCncTheme.js`) answers "did this project keep the reference's
+  values" honestly — but it never asks the separate, arguably more
+  important question for *this specific domain*: does moving away from
+  a real safety convention cost something a CNC operator would actually
+  rely on. Not answered here, since it wasn't what this lesson set out
+  to investigate — named so it isn't mistaken for a question that was
+  already considered and dismissed.
 
 ### Commands
 

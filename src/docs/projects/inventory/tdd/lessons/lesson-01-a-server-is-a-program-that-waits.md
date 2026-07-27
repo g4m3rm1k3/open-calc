@@ -333,6 +333,7 @@ precedes it yet, so there's no larger enclosing structure to show it
 inside of.
 
 ### Mechanical Walkthrough
+
 *(Full standalone treatment of the `import` statement itself:
 `../concepts/python-import-statement.md`.)*
 
@@ -341,8 +342,7 @@ Enumerating every element in order:
 - `from flask import Flask, render_template` — **(a) first appearance.**
   `flask` is the package we just installed. `from X import Y` pulls
   specific names out of a module instead of requiring the longer
-- `flask.Flask` every time.
-- `Flask` (capital F) is a *class* — a blueprint
+  `flask.Flask` every time. `Flask` (capital F) is a *class* — a blueprint
   for creating application objects. `render_template` is a *function* we
   imported now because we'll need it two units from here — imports are
   declared once, up front, even if used slightly later in the same file.
@@ -650,6 +650,7 @@ returns data instead of a page — it's already establishing a pattern the
 next lesson's real routes will follow.
 
 ### Mechanical Walkthrough
+
 - `FAKE_MACHINE_STATUS = {...}` — a dict literal, already-known basic
   Python; note only the shape, since it's a deliberate, forward-looking
   choice: `position` as a *nested* dict (not three separate top-level
@@ -666,7 +667,7 @@ next lesson's real routes will follow.
   Flask behavior: returning a `dict` directly from a route function.
   Flask detects that the returned value is a `dict`, automatically calls
   Python's `json` module to convert it to a JSON-formatted string, and
-- sets the HTTP response's `Content-Type` header to `application/json` —
+  sets the HTTP response's `Content-Type` header to `application/json` —
   all without being asked. This is **not standard Python** — a plain
   Python function returning a dict just returns a dict object; this
   auto-conversion is Flask-specific behavior worth naming explicitly so it
@@ -768,6 +769,7 @@ network server that keeps running (per this lesson's opening definition of
 "server") until stopped.
 
 ### Mechanical Walkthrough
+
 - `if __name__ == "__main__":` — **(a) first appearance**, a very common
   Python idiom worth explaining precisely rather than assuming: recall
   `__name__` is automatically set by Python to identify the current file.
@@ -795,7 +797,7 @@ network server that keeps running (per this lesson's opening definition of
   live console can execute arbitrary Python on the server for anyone who
   can reach the error page. **Named as real, current debt:** this project
   will need to turn `debug` off (or condition it on an environment
-- variable) before it is ever exposed beyond `localhost` — not a problem
+  variable) before it is ever exposed beyond `localhost` — not a problem
   today, since nothing here leaves this one machine, but a real,
   remembered fact, not a silent gap.
 - With no `host`/`port` arguments given, Flask defaults to
@@ -931,6 +933,7 @@ fetch completes — replaces it with the real data just retrieved from the
 server, with no page reload.
 
 ### Mechanical Walkthrough
+
 - `<pre id="status">loading...</pre>` — HTML, not previously taught in
   this project: `<pre>` is an HTML element that displays its text exactly
   as written (preserving whitespace/line breaks), which matters below
@@ -954,8 +957,7 @@ server, with no page reload.
   new ideas: `.then(...)` is how you attach "do this once the Promise
   resolves" — Promises are the standard JavaScript way of sequencing
   work that depends on something slow (a network request) finishing
-- first.
-- `(response) => response.json()` is an **arrow function** — a
+  first. `(response) => response.json()` is an **arrow function** — a
   more compact way to write `function (response) { return response.json(); }`.
   The part before `=>` is the parameter list (here, one parameter,
   `response`); the part after is the expression it returns. `response` is
@@ -979,13 +981,12 @@ server, with no page reload.
   element's contents with plain text. **Named explicitly as a security
   choice, not just a convenience:** the alternative, `.innerHTML`, would
   instead parse whatever string it's given *as HTML* and could execute
-- embedded `<script>` tags — the standard XSS (Cross-Site Scripting)
+  embedded `<script>` tags — the standard XSS (Cross-Site Scripting)
   attack vector. Today's data is our own hardcoded, trusted dict, so
-- there's no real attacker here yet — but `.textContent` is the correct
+  there's no real attacker here yet — but `.textContent` is the correct
   default habit to build now, before this project ever displays anything
-- a user typed.
-- `JSON.stringify(data, null, 2)` — **(a) first appearance** — is the reverse of `response.json()`: it converts a
-
+  a user typed. `JSON.stringify(data, null, 2)` — **(a) first
+  appearance** — is the reverse of `response.json()`: it converts a
   JavaScript object back into JSON text. Its three arguments: the value to
   convert; a "replacer" (here `null`, meaning "include everything,
   unfiltered" — a filtering function could be passed instead, not needed

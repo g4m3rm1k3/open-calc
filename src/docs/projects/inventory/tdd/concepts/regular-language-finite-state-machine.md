@@ -56,6 +56,31 @@ xabc -> False
 - Each character read causes at most one state transition, based only on the *current* state and that one character — never on the history of characters seen before reaching this state.
 - Reaching `"accept"` after all input is consumed means the whole string matched the pattern; any other final state means it didn't.
 
+## Execution Trace
+
+All 5 real test strings, character by character, traced against the
+real output above:
+
+```
+"ac":    start --a--> seen_a --c--> accept.  End of input, state=accept → True
+"abc":   start --a--> seen_a --b--> seen_a (stays) --c--> accept.  → True
+"abbbc": start --a--> seen_a --b--> seen_a --b--> seen_a --b--> seen_a --c--> accept.  → True
+"abcx":  start --a--> seen_a --b--> seen_a --c--> accept --x--> reject
+         (the "accept" branch: state = "reject", nothing allowed after c)
+         End of input, state=reject → False
+"xabc":  start --x--> reject (start branch: ch is not "a" → reject)
+         --a--> break (the "reject" branch exits the loop immediately,
+         "b" and "c" are never even read)
+         End (via break), state=reject → False
+```
+
+`"abbbc"` is the one worth noticing for the "finite" part of "finite
+state machine": however many `b`s appear, the machine stays in the
+exact same `seen_a` state — it never counts them, never remembers "how
+many so far," because `seen_a` has no way to hold that information;
+zero, one, or a thousand `b`s all look identical to the machine's own
+one variable.
+
 ## CS Lens
 
 A **regular language** is the formal-languages term for exactly the class of patterns a finite state machine (and therefore a regular expression) can recognize. A key, provable limit: no finite state machine can match "balanced parentheses of arbitrary depth" (or check that a count of one thing equals a count of another) — doing that requires remembering an unbounded amount of information (how deep you are), which a *finite* set of states structurally cannot hold. This is why real programming-language parsers need something more powerful (a full grammar and parser) layered on top of, or instead of, plain regex — a real, concrete boundary rather than an abstract theoretical footnote.

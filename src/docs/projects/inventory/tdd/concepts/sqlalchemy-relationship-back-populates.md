@@ -65,6 +65,39 @@ Le Guin
 - `back_populates="author"` (on `Author.books`) and `back_populates="books"` (on `Book.author`) — each names the attribute *on the other class* that represents the same real relationship from the opposite direction. This is what keeps the two navigable directions in sync: adding a `Book` with `author=a` (as the example does) automatically makes that book show up in `a.books` too, without either side being updated by hand separately.
 - `relationship(...)` with **no** `back_populates` at all is valid too (seen elsewhere in this project, for a relationship only ever navigated in one direction) — `back_populates` is specifically for keeping *two* navigable directions consistent with each other, not required for a `relationship()` to work at all.
 
+## Execution Trace
+
+Two books added with `author=a` (never touching `a.books` directly),
+then read back from both directions — traced against the real output above:
+
+```
+a = Author(name="Le Guin")
+session.add(a)
+session.add(Book(title="The Dispossessed", author=a))
+  → back_populates syncs the reverse direction automatically:
+    a.books now includes this Book, even though a.books was never
+    assigned to directly
+session.add(Book(title="The Left Hand of Darkness", author=a))
+  → same automatic sync → a.books now has both books
+session.commit()
+
+row = select(Author).scalar_one() → the real, committed Author (Le Guin)
+print(row.name) → "Le Guin"
+print([b.title for b in row.books]):
+  b=Book("The Dispossessed"):        → "The Dispossessed"
+  b=Book("The Left Hand of Darkness"): → "The Left Hand of Darkness"
+  → ['The Dispossessed', 'The Left Hand of Darkness']
+
+book = select(Book).where(title LIKE "%Dispossessed%").scalar_one()
+  → The Dispossessed, found by title
+print(book.author.name) → follows the "one" direction back → "Le Guin"
+```
+
+`a.books` was never written to directly anywhere in this trace — both
+entries in it came entirely from `back_populates` watching the
+*opposite* assignment (`Book(..., author=a)`) and keeping the reverse
+list in sync automatically.
+
 ## CS Lens
 
 This is an ORM **navigation property** — an attribute that doesn't store a value directly but instead computes/fetches related data on access, backed by the real foreign key underneath. The two-way `back_populates` link is a concrete, small-scale instance of a much older, general idea: keeping *two* separate representations of one fact consistent with each other automatically rather than leaving that consistency to manual, error-prone bookkeeping.

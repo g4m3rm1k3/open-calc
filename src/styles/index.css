@@ -572,3 +572,2098 @@
   border-bottom: none;
   padding: 0.25rem 0;
 }
+
+/* ==========================================================================
+   MODULE 6 LAYER 4: COMPONENT SUBGRID & OVERLAY ARCHITECTURE
+   ========================================================================== */
+@layer components {
+  /* Synchronized Subgrid Pricing Gallery!
+     Establishes an explicit 3-row master coordinate track matrix (header, body, footer)
+     and instructs nested card children to directly inherit parental tracks via subgrid,
+     guaranteeing universal multi-card horizontal button alignment without JS! */
+  .subgrid-pricing-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-rows: auto minmax(120px, auto) 56px;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  /* Subgrid Child Card Item */
+  .subgrid-pricing-card {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    gap: normal;
+    background-color: rgb(30, 41, 59);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .subgrid-card-header { border-bottom: 1px solid rgb(51, 65, 85); padding-bottom: 0.75rem; color: rgb(248, 250, 252); font-size: 1.25rem; font-weight: 800; }
+  .subgrid-card-desc   { color: rgb(203, 213, 225); font-size: 0.95rem; line-height: 1.5; }
+  .subgrid-card-footer { display: flex; align-items: center; justify-content: center; }
+
+  /* Declarative In-Flow Media Hero Overlap!
+     Deploys grid-template-areas: "hero-portal" to stack background imagery, gradient
+     shaders, and interactive captions inside identical coordinates while maintaining
+     100% in-flow layout awareness! Automatically expands to tallest child height! */
+  .grid-hero-overlay-portal {
+    display: grid;
+    grid-template-areas: "hero-portal";
+    width: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(51, 65, 85);
+  }
+
+  .hero-media-layer {
+    grid-area: hero-portal;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .hero-shader-layer {
+    grid-area: hero-portal;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 10%, transparent 60%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hero-content-layer {
+    grid-area: hero-portal;
+    align-self: end;
+    z-index: 3;
+    padding: 2.5rem;
+    color: rgb(248, 250, 252);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+  }
+}
+
+/* ==========================================================================
+   MODULE 7 LAYER 4: COMPONENT MICRO-POSITIONING & ANCHOR SYSTEM
+   ========================================================================== */
+@layer components {
+  /* Universal Containing Block Anchor Root!
+     Assigns position: relative directly onto card containers to establish an authoritative
+     out-of-flow containing block anchor matrix in C++ layout memory without moving
+     the card's physical normal flow layout by a single millimeter! */
+  .oc-card-anchor {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background-color: rgb(30, 41, 59);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.85rem;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Out-of-Flow Corner Docked Badge!
+     Calculates physical pixel boundaries straight from the padding edge of .oc-card-anchor.
+     Deploys logical inset properties to guarantee automatic RTL mirroring! */
+  .oc-corner-badge {
+    position: absolute;
+    inset-block-start: -0.75rem;
+    inset-inline-end: 1.5rem;
+    z-index: 10;
+    background: linear-gradient(135deg, rgb(6, 182, 212), rgb(59, 130, 246));
+    color: rgb(248, 250, 252);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    box-shadow: 0 2px 10px rgba(6, 182, 212, 0.4);
+  }
+
+  /* Layout-Isolated Interactive Button Nudge!
+     Utilizes declarative relative in-flow offsets to shift visual paint representation
+     upward on hover without dragging neighboring sibling text out of alignment or
+     triggering synchronous CPU layout reflow loops! */
+  .oc-btn-relative-nudge {
+    position: relative;
+    inset-block-start: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: rgb(59, 130, 246);
+    color: white;
+    font-weight: 700;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: inset-block-start 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .oc-btn-relative-nudge:hover {
+    inset-block-start: -3px;
+    box-shadow: 0 6px 20px -2px rgba(59, 130, 246, 0.5);
+  }
+
+  .oc-btn-relative-nudge:active {
+    inset-block-start: 0;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  }
+}
+
+/* ==========================================================================
+   MODULE 7 LESSON 2: OUT-OF-FLOW DETACHMENT & VIEWPORT ANCHORING SYSTEM
+   ========================================================================== */
+
+@layer base {
+  /* Global Scroll Anchor Protection!
+     Guarantees that when keyboard assistive users press TAB or execute anchor link jumps 
+     (<a href="#target">), the browser scrolling engine leaves 6.5rem of breathing room 
+     above the target element—preventing top page headings from being permanently occluded 
+     underneath persistent position: fixed application toolbars! */
+  html {
+    scroll-padding-top: 6.5rem;
+  }
+
+  :focus {
+    scroll-margin-top: 6.5rem;
+  }
+}
+
+@layer components {
+  /* Senior Practice: Resilient Out-of-Flow Dropdown Portal!
+     Anchors straight to an immediate relative parent (.oc-card-anchor or toggle btn) 
+     and projects over underlying document prose with literally zero geometric sizing footprint 
+     in normal layout calculation queues! */
+  .oc-dropdown-portal {
+    position: absolute;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline-start: 0;
+    width: 280px;
+    z-index: 50;
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Senior Practice: Declarative Algebraic Equilibrium Fixed Modal!
+     Deploys inset: 0 alongside margin: auto to command the layout engine's simultaneous 
+     linear equations ($W_{left} + W_{width} + M_{auto} = W_{CB}$) to center the dialog 
+     across monitor viewports in single-pass C++ speed without Flexbox or JS! */
+  .oc-modal-fixed-center {
+    position: fixed;
+    inset: 0;
+    width: 500px;
+    max-width: 90vw;
+    height: 320px;
+    max-height: 85vh;
+    margin: auto;
+    z-index: 9999;
+    background-color: rgb(30, 41, 59);
+    border: 2px solid rgb(59, 130, 246);
+    border-radius: 1rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+  }
+
+  /* Senior Practice: Defensive No-Transform Hijack Shield!
+     An architectural engineering utility class designed to explicitly purge transform, 
+     filter, and containment roots from modal wrapper components—guaranteeing nested 
+     position: fixed dialogs never get intercepted or trapped away from the screen! */
+  .oc-no-transform-hijack {
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    contain: none !important;
+  }
+
+  /* ==========================================================================
+     MODULE 7 LESSON 3: STICKY NAVIGATION & STACKING ISOLATION SYSTEM
+     ========================================================================== */
+
+  /* Senior Practice: Modular Atomic Stacking Context Shield!
+     Assigns isolation: isolate directly onto design cards and dashboard panels to establish 
+     a clean, authoritative Stacking Context in rendering RAM—completely confining internal 
+     popup z-indexes without altering visual color blending or causing Z-index inflation! */
+  .oc-isolated-card {
+    isolation: isolate;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: rgb(30, 41, 59);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Senior Practice: Resilient Sticky Table Section Header!
+     Deploys hybrid positioning to retain an invariant Normal Flow box in layout RAM while 
+     dynamically docking to the monitor viewport edge during extensive document scrolling! */
+  .oc-sticky-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 20;
+    background-color: rgb(15, 23, 42);
+    color: rgb(248, 250, 252);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid rgb(59, 130, 246);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Senior Practice: Defensive No-Overflow Sticky Trap Shield!
+     An architectural engineering utility class designed to explicitly enforce visible overflow 
+     across table wrappers and page sections—guaranteeing nested position: sticky headings 
+     never get intercepted or trapped by intermediate scroll containers! */
+  .oc-no-overflow-trap {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* ==========================================================================
+   MODULE 8 LESSON 1: PERCEPTUAL OKLCH PALETTES, WIDE-GAMUT P3 & COLOR-MIX
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: BASE DESIGN PALETTE & TOKENS (@layer base) */
+@layer base {
+  /* Senior Practice: Authoring Design System Variables in Perceptual Oklch!
+     Decouples Lightness (L), Chroma (C), and Hue (H) to guarantee invariant human visual 
+     brightness across all themes while enabling algorithmic state derivation! */
+  :root {
+    --oc-primary-h: 250;                     /* Royal Blue Base Hue Angle */
+    --oc-accent-h: 145;                      /* Emerald Green Base Hue Angle */
+    
+    /* Perceptual Oklch Tokens (Standard sRGB monitor safe limits C <= 0.25) */
+    --oc-primary-base: oklch(0.60 0.22 var(--oc-primary-h));
+    --oc-primary-hover: color-mix(in oklch, var(--oc-primary-base) 82%, white);
+    --oc-primary-active: color-mix(in oklch, var(--oc-primary-base) 82%, black);
+    
+    --oc-accent-base: oklch(0.70 0.24 var(--oc-accent-h));
+    --oc-surface-bg: oklch(0.18 0.03 240);
+    --oc-surface-card: oklch(0.24 0.04 240);
+    --oc-text-main: oklch(0.95 0.01 240);    /* L >= 0.95 guarantees WCAG APCA compliance! */
+  }
+
+  /* Progressive Wide-Gamut Display-P3 Enhancement!
+     When the browser detects modern OLED or Retina hardware screens, dynamically scale up 
+     Chroma coordinates (C = 0.31+) to project super-saturated, ultra-vivid physical pigments! */
+  @media (color-gamut: p3) {
+    :root {
+      --oc-primary-base: oklch(0.60 0.31 var(--oc-primary-h));
+      --oc-accent-base: oklch(0.70 0.35 var(--oc-accent-h));
+    }
+  }
+}
+
+/* LAYER 5 EXTENSION: PERCEPTUAL COLOR & GRADIENT UTILITIES (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: Perceptual Polar Gradient Hero Background!
+     Deploys explicit 'in oklch' color space routing to interpolate around the polar cylinder 
+     in Video RAM—completely eliminating muddy sRGB desaturated brownish-gray dead zones! */
+  .oc-gradient-oklch {
+    background: linear-gradient(
+      135deg in oklch,
+      oklch(0.55 0.28 270),
+      oklch(0.75 0.25 180)
+    );
+    color: var(--oc-text-main);
+    box-shadow: 0 10px 30px -5px color-mix(in oklch, var(--oc-primary-base) 40%, transparent);
+  }
+
+  /* Dynamic Interactive Action Button utilizing native Level 5 color-mix algebra! */
+  .oc-btn-perceptual {
+    background-color: var(--oc-primary-base);
+    color: var(--oc-text-main);
+    font-weight: 700;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .oc-btn-perceptual:hover {
+    background-color: var(--oc-primary-hover);
+  }
+
+  .oc-btn-perceptual:active {
+    background-color: var(--oc-primary-active);
+  }
+}
+
+/* ==========================================================================
+   MODULE 8 LESSON 2: COMPOSITED GPU SHADOWS, BLEND MODES & CONIC TEXTURES
+   ========================================================================== */
+
+/* LAYER 4 EXTENSION: COMPONENT CARD ARCHITECTURE (@layer components) */
+@layer components {
+  /* Senior Practice: High-Performance Composited Shadow Card Elevation!
+     Decouples Gaussian blur convolution from interactive hover loops by pre-rasterizing a 
+     deep shadow onto an absolutely positioned ::after tile and purely transitioning layer opacity! */
+  .oc-card-shadow-gpu {
+    position: relative;
+    background-color: var(--oc-surface-card);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); /* Resting shadow */
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .oc-card-shadow-gpu::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: 0 35px 70px -10px rgba(0, 0, 0, 0.85), 0 0 25px -5px var(--oc-primary-base);
+    opacity: 0;                                    /* Resting state in GPU layer memory! */
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1); /* Pure O(1) hardware speed! */
+  }
+
+  .oc-card-shadow-gpu:hover,
+  .oc-card-shadow-gpu:focus-within {
+    transform: translateY(-5px);
+  }
+
+  .oc-card-shadow-gpu:hover::after,
+  .oc-card-shadow-gpu:focus-within::after {
+    opacity: 1;                                    /* Zero CPU repaint cross-fade! */
+  }
+}
+
+/* LAYER 5 EXTENSION: GRAPHIC, BLEND & CONIC UTILITIES (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: GPU Alpha Silhouette Drop-Shadow!
+     Deploys post-processing texture filter to extract transparent alpha channels in VRAM—
+     perfectly shadowing SVG logos, transparent PNGs, and polygon clip-paths! */
+  .oc-silhouette-shadow {
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.65));
+  }
+
+  /* Senior Practice: Atomic Isolated Blending Container & Badge!
+     Enforces isolation: isolate onto the wrapper node to establish an impenetrable VRAM Stacking 
+     Context ceiling—guaranteeing mix-blend-mode children never leak into external backgrounds! */
+  .oc-blend-container {
+    isolation: isolate;
+    position: relative;
+    background: linear-gradient(135deg in oklch, var(--oc-surface-bg), var(--oc-surface-card));
+  }
+
+  .oc-blend-badge {
+    mix-blend-mode: overlay;
+    background-color: var(--oc-accent-base);
+    color: var(--oc-text-main);
+    font-weight: 800;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);    /* Defensive typographic accessibility shield! */
+  }
+
+  /* Programmatic Conic Gradient Analytics Meter! */
+  .oc-conic-meter {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg in oklch,
+      var(--oc-primary-base) 0% 65%,              /* 65% Progress Sector */
+      rgb(51, 65, 85) 65% 100%                    /* 35% Remaining Track */
+    );
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ==========================================================================
+   MODULE 9 LESSON 1: TYPOGRAPHY, FONT METRICS, LINE BOXES & TABULAR NUMERALS
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: BASE TYPOGRAPHIC & REPLACED ELEMENT RESETS (@layer base) */
+@layer base {
+  /* Senior Practice: Authoritative Unitless Multiplier & Faux-Font Shield!
+     Standardizes body line height to unitless decimals (1.5) to prevent heading collisions 
+     and deploys font-synthesis: none to block algorithmic faux-bold smudging in rendering VRAM! */
+  body {
+    line-height: 1.5;
+    font-synthesis: none;
+    font-size-adjust: 0.547; /* CLS layout shift protection during network web font download! */
+  }
+
+  /* Senior Practice: Anonymous Inline Replaced Element Descender Gap Annihilation!
+     Blockifies all media elements globally—completely terminating inline formatting context 
+     membership and eviscerating ~4px baseline descender gaps underneath imagery! */
+  img, svg, video, canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* LAYER 5 EXTENSION: TYPOGRAPHIC SCALING & TABULAR UTILITIES (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: Fluid Viewport Typographic Scaling Hierarchy!
+     Deploys linear algebraic scaling equations inside clamp() to smoothly interpolate heading 
+     dimensions between mobile screens (1.5rem) and 4K monitors (2.5rem) without breakpoint reflows! */
+  .oc-type-fluid-heading {
+    font-size: clamp(1.5rem, 1.125rem + 1.875vw, 2.5rem);
+    line-height: 1.25;                                   /* Compact unitless ratio for display headings! */
+    font-weight: 800;
+    letter-spacing: -0.025em;                            /* Optical tight kerning for large titles! */
+  }
+
+  /* Senior Practice: OpenType Tabular Monospaced Financial Numerals!
+     Commands font feature shaping tables to allocate identical horizontal width to every numerical 
+     digit—guaranteeing razor-sharp column alignment across financial tables and analytics meters! */
+  .oc-table-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "calt" 1;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0;
+    font-variation-settings: "wght" 750, "opsz" 32;      /* Precise custom weight & optical contrast! */
+  }
+}
+
+/* ==========================================================================
+   MODULE 9 LESSON 2: LOGICAL PROPERTIES, WRITING MODES & BIDI ISOLATION SHIELDS
+   ========================================================================== */
+
+/* LAYER 4 EXTENSION: UNIVERSAL LOGICAL COMPONENT CARDS (@layer components) */
+@layer components {
+  /* Senior Practice: Universal Logical Elevation Card!
+     Eradicates legacy physical spacing (width, margin-left, padding-right) by standardizing 
+     strictly around inline-size, padding-inline, and margin-block—enabling a single immutable 
+     class to deploy identically across English, Arabic, and Hebrew dashboards! */
+  .oc-card-logical {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 450px;
+    background-color: var(--oc-surface-card);
+    border: 1px solid rgb(71, 85, 105);
+    border-inline-start: 6px solid var(--oc-primary-base); /* Flips automatically in RTL! */
+    border-radius: 0.75rem;
+    padding-inline: 1.75rem;
+    padding-block: 1.5rem;
+    margin-block-end: 1.25rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    text-align: start;
+  }
+}
+
+/* LAYER 5 EXTENSION: INTERNATIONAL TEXT & WRAPPING UTILITIES (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: Unbreakable & CJK Safe Text Wrapping Shield!
+     Deploys overflow-wrap: anywhere to force long URLs and cryptographic tokens to break safely 
+     across mobile tracks while applying word-break: keep-all to preserve CJK character cohesion! */
+  .oc-text-wrap-safe {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  /* Explicit Unicode BiDi Isolate Utility! */
+  .oc-bidi-shield {
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+
+  /* Orthogonal Vertical CJK Column Utility! */
+  .oc-type-vertical-cjk {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    line-height: 1.75;
+  }
+}
+
+/* ==========================================================================
+   MODULE 10: GENERATED CONTENT, REPLACED ELEMENTS, ASPECT RATIOS & GPU EFFECTS
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: BASE PRINT ATTR-BINDING & MEDIA CLS RESUMING (@layer base) */
+@layer base {
+  /* Senior Practice: Defensive Print Stylesheet Link Expansion!
+     Dynamically binds link href attributes to print out explicit URL strings on paper while 
+     strictly filtering internal anchor jumps (#) and javascript: triggers via negation! */
+  @media print {
+    a[href]:not([href^="#"]):not([href^="javascript:"])::after {
+      content: " (" attr(href) ")" / "";
+      font-size: 0.85em;
+      color: rgb(100, 116, 139);
+    }
+  }
+
+  /* Senior Practice: Universal Media CLS Defense!
+     Enforces fluid horizontal width across all replaced media elements while binding resilient 
+     intrinsic aspect-ratio calculations—preventing cumulative layout shift during network streaming! */
+  img, svg, video, canvas, iframe {
+    display: block;
+    max-inline-size: 100%;
+    height: auto;
+    aspect-ratio: attr(width) / attr(height); /* Calculates placeholder ratio directly from HTML sizing attributes! */
+  }
+}
+
+/* LAYER 4 EXTENSION: DOCUMENTATION COUNTERS & FROSTED GLASS (@layer components) */
+@layer components {
+  /* Senior Practice: Automated Hierarchical Technical Outline Counters!
+     Instantiates lexical counter scoping boundaries via counter-reset and evaluates recursive 
+     dotted numbering via counters()—completely eliminating manual DOM section numbering! */
+  .oc-doc-outline {
+    list-style-type: none;
+    counter-reset: oc-section 0;
+    padding-inline-start: 1.5rem;
+  }
+
+  .oc-doc-outline > li {
+    counter-increment: oc-section;
+    margin-block: 0.5rem;
+    position: relative;
+  }
+
+  .oc-doc-outline > li::before {
+    content: counters(oc-section, ".") " " / ""; /* Dotted numbering; trailing slash silences TTS! */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: var(--oc-primary-base);
+    margin-inline-end: 0.5rem;
+  }
+
+  /* Senior Practice: Hardware Frosted Glassmorphism Elevation Card!
+     Establishes VRAM stacking isolation ceilings, applies moderate Gaussian backdrop blurring, 
+     and overlays semi-transparent surface background alpha colors for fluid 120 FPS rendering! */
+  .oc-card-glass-gpu {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 460px;
+    isolation: isolate;                                  /* VRAM stacking ceiling! */
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(15, 23, 42, 0.75);            /* Alpha background reveals blurred texture! */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    padding-inline: 2rem;
+    padding-block: 1.75rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+    color: rgb(241, 245, 249);
+  }
+}
+
+/* LAYER 5 EXTENSION: ATTR TOOLTIPS, RASTER CROPPING & GPU MASKING (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: Zero-JS Declarative Attribute-Bound Tooltip!
+     Binds live HTML data-tooltip string literals into virtual style box, deploying defensive 
+     wrapping geometry and GPU transitions without executing heavy JavaScript tooltip scripts! */
+  .oc-tooltip-attr {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .oc-tooltip-attr::after {
+    content: attr(data-tooltip) / "";            /* Shields screen readers from duplicate vocalization! */
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    inline-size: max-content;
+    max-inline-size: 260px;                      /* Defensive wrapping constraint! */
+    overflow-wrap: anywhere;
+    background-color: rgb(15, 23, 42);
+    color: rgb(241, 245, 249);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgb(71, 85, 105);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+  }
+
+  .oc-tooltip-attr:hover::after,
+  .oc-tooltip-attr:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Accessible Decorative Icon Badge! */
+  .oc-badge-star::before {
+    content: "★" / "";                           /* Total acoustic screen reader silence! */
+    color: rgb(250, 204, 21);
+    margin-inline-end: 0.35rem;
+  }
+
+  /* Senior Practice: 16:9 Widescreen Responsive Cropping Tile!
+     Reserves exact 16:9 layout height in vertical DOM flow prior to streaming while deploying 
+     object-fit: cover to scale and crop internal raster buffers cleanly in VRAM! */
+  .oc-media-aspect-16x9 {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center center;
+    border-radius: 0.5rem;
+  }
+
+  /* Senior Practice: Accessible 1:1 Portrait Avatar Crop! */
+  .oc-avatar-crop {
+    inline-size: 3rem;
+    block-size: 3rem;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center 20%;                         /* Keeps human facial features centered! */
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));   /* Alpha contour shadowing! */
+  }
+
+  /* Retro Pixel Art & Financial Barcode Sharp Scaling! */
+  .oc-image-pixelated {
+    image-rendering: pixelated;                          /* Forces sharp nearest-neighbor interpolation! */
+  }
+
+  /* Zero-Reflow Composited Vector Polygon Clip-Path Utility! */
+  .oc-shape-polygon {
+    clip-path: polygon(0 0, 95% 0, 100% 18%, 100% 100%, 5% 100%, 0 82%);
+  }
+}
+
+/* ==========================================================================
+   MODULE 11: CUSTOM PROPERTIES, CASCADE SCOPING, HOUDINI REGISTER & DYNAMIC STATE
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: BASE DESIGN TOKEN REGISTRY & HOUDINI TYPED SCHEMAS (@layer base) */
+@layer base {
+  :root {
+    /* Senior Practice: Global Design Token Channel Decomposition!
+       Stores raw comma-separated RGB channel numerics to unlock dynamic alpha opacity composition 
+       without duplicating stylesheet variable registrations across light/dark themes! */
+    --oc-primary-rgb: 59, 130, 246;                      /* Vibrant Blue channel numerics */
+    --oc-accent-rgb: 16, 185, 129;                       /* Emerald Green channel numerics */
+    --oc-surface-bg: rgb(15, 23, 42);
+    --oc-text-main: rgb(241, 245, 249);
+    
+    /* Dimensionless Sizing Token Registry for Algebraic Calc Unwrapping! */
+    --oc-space-unit-num: 16;
+    
+    /* Declarative Vestibular Motion Duration Registry! */
+    --oc-motion-speed: 0.25s;
+    --oc-motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Senior Practice: Declarative W3C Houdini Custom Property Registrations!
+     Injects typed schema definitions directly into browser rendering compilers—unlocking continuous 
+     120 FPS GPU mathematical animation interpolation while blocking unwanted inheritance bleeding! */
+  @property --oc-conic-angle {
+    syntax: "<angle>";
+    inherits: false;                                     /* Regional encapsulation boundary! */
+    initial-value: 0deg;
+  }
+
+  @property --oc-gradient-color-start {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(59, 130, 246);                    /* Vibrant Brand Blue */
+  }
+
+  @property --oc-gradient-color-end {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(16, 185, 129);                    /* Emerald Green Accent */
+  }
+
+  @property --oc-border-track {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 3px;
+  }
+
+  /* Senior Practice: Zero-JS Vestibular Accessibility Motion & Rotation Shield!
+     Automatically extinguishes interface motion animation durations globally and snatches spinning 
+     gradient loops off GPU execution pipes when OS settings detect vestibular preferences! */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --oc-motion-speed: 0.01ms !important;
+    }
+    * {
+      --oc-conic-angle: 135deg !important;               /* Static diagonal architectural peace! */
+    }
+  }
+}
+
+/* LAYER 4 EXTENSION: SCOPED ELEVATIONS & HOUDINI ANIMATED BORDERS (@layer components) */
+@layer components {
+  /* Senior Practice: Universal Scoped Elevation Theme Card!
+     Composes dynamic matching alpha box-shadow lighting utilizing raw RGB channel tokens while 
+     enforcing algebraic calc() unit unwrapping to calculate consistent fluid spacing padding! */
+  .oc-card-scoped {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 450px;
+    background-color: var(--oc-surface-bg);
+    border: 1px solid rgba(var(--oc-primary-rgb), 0.4);  /* Dynamic alpha channel composition! */
+    border-inline-start: 6px solid rgb(var(--oc-primary-rgb));
+    border-radius: 0.75rem;
+    padding-inline: calc(var(--oc-space-unit-num) * 1.5px); /* Algebraic mathematical unwrapping! */
+    padding-block: calc(var(--oc-space-unit-num) * 1.25px);
+    color: var(--oc-text-main);
+    box-shadow: 0 15px 30px -10px rgba(var(--oc-primary-rgb), 0.35);
+    transition: transform var(--oc-motion-speed) var(--oc-motion-ease), box-shadow var(--oc-motion-speed) ease;
+  }
+
+  .oc-card-scoped:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -8px rgba(var(--oc-primary-rgb), 0.55);
+  }
+
+  /* Regional Scoping Override: Seamlessly transforms card palette directly into Emerald Accent! */
+  .oc-card-scoped-emerald {
+    --oc-primary-rgb: var(--oc-accent-rgb);              /* Local scope register shadowing! */
+  }
+
+  /* Senior Practice: Hardware GPU Animated Conical Border Elevation Card!
+     Utilizes typed custom property interpolation to smoothly rotate conical gradient backgrounds 
+     around card boundaries at 120 FPS while morphing colors cleanly across hover interactions! */
+  .oc-card-animated-conic {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 460px;
+    border-radius: 1rem;
+    padding: var(--oc-border-track);                    /* Typed border track geometry! */
+    background: conic-gradient(
+      from var(--oc-conic-angle),
+      var(--oc-gradient-color-start) 0%,
+      var(--oc-gradient-color-end) 50%,
+      var(--oc-gradient-color-start) 100%
+    );
+    animation: oc-spin-angle 6s linear infinite;
+    transition: --oc-gradient-color-start 0.5s ease, --oc-gradient-color-end 0.5s ease;
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .oc-card-animated-conic:hover,
+  .oc-card-animated-conic:focus-within {
+    --oc-gradient-color-start: rgb(249, 115, 22);        /* Smoothly interpolates directly to Vibrant Orange! */
+    --oc-gradient-color-end: rgb(236, 72, 153);          /* Smoothly interpolates directly to Neon Pink! */
+  }
+
+  .oc-card-animated-conic > .oc-card-surface {
+    background-color: rgb(15, 23, 42);
+    border-radius: calc(1rem - var(--oc-border-track));
+    padding-inline: 2rem;
+    padding-block: 1.75rem;
+    color: rgb(241, 245, 249);
+  }
+}
+
+/* LAYER 5 EXTENSION: RESILIENT FALLBACKS & ANIMATION KEYFRAMES (@layer utilities) */
+@layer utilities {
+  /* Senior Practice: Multi-Tier Resilient Fallback Shield Utility!
+     Evaluates recursive fallback chaining var(--a, var(--b, fallback)) to guarantee visual layout 
+     stability during dynamic asynchronous JavaScript theme token fetching! */
+  .oc-token-fallback-border {
+    border-inline-start: 6px solid var(--oc-dynamic-status, var(--oc-primary-base, rgb(59, 130, 246)));
+  }
+
+  /* Safe Vestibular Motion Wrapper Utility! */
+  .oc-a11y-motion-safe {
+    transition-duration: var(--oc-motion-speed);
+  }
+
+  @keyframes oc-spin-angle {
+    0%   { --oc-conic-angle: 0deg; }
+    100% { --oc-conic-angle: 360deg; }                   /* Continuous GPU hardware rotation! */
+  }
+
+  /* Vestibular Safe Animation Stop Utility! */
+  @media (prefers-reduced-motion: reduce) {
+    .oc-card-animated-conic {
+      animation: none !important;
+      --oc-conic-angle: 135deg !important;               /* Static diagonal peace! */
+    }
+  }
+}
+
+/* ==========================================================================
+   MODULE 12: TRANSITIONS, KEYFRAME ANIMATIONS, SCROLL REVEALS & COMPOSITING
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: EASING TOKENS & KEYFRAME SCHEMA REGISTRIES (@layer base) */
+@layer base {
+  :root {
+    /* Senior Practice: Curated Apple-Grade Spring & Elastic Easing Token Registries!
+       Provides standardized non-linear exponential deceleration and anticipation overshoot Bézier 
+       curves across platform interactions to convey natural physical mass and momentum! */
+    --oc-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --oc-ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --oc-transition-fast: 0.2s;
+    --oc-transition-spring: 0.45s;
+    
+    /* Algorithmic Staggered Chronology Token Registry! */
+    --oc-stagger-step: 65ms;
+  }
+
+  /* Senior Practice: Declarative W3C Composited Keyframe Registries!
+     Confines keyframe percentage milestones strictly to Stage 4 VRAM composited properties (transform, 
+     opacity, filter)—guaranteeing sustained 120 FPS hardware speed at zero CPU reflow cost! */
+  @keyframes oc-keyframe-elevation-reveal {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 36px, 0) scale(0.92);
+      filter: blur(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes oc-keyframe-pulse-glow {
+    0%, 100% {
+      opacity: 0.85;
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.03);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.65);
+    }
+  }
+
+  /* Senior Practice: Universal Vestibular Accessibility Motion Firewall!
+     Instantly halts spinning animations, restricts iterations strictly to 1, and downgrades scroll timelines 
+     straight to auto when OS preference settings detect vestibular sensitivity—protecting users without JS! */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-timeline: auto !important;
+      animation-delay: 0s !important;
+    }
+  }
+}
+
+/* LAYER 4 EXTENSION: COMPOSITED CARDS, ACCORDIONS & SCROLL REVEALS (@layer components) */
+@layer components {
+  /* Senior Practice: Hardware Composited Apple Spring Elevation Card!
+     Confines transition target property lists strictly to VRAM composited registers (transform, opacity, 
+     box-shadow) while deploying Apple Spring easing curves for fluid 120 FPS interactive elevation! */
+  .oc-card-spring-gpu {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 440px;
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(51, 65, 85);
+    border-radius: 1rem;
+    padding: 2rem;
+    color: rgb(241, 245, 249);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    /* Strict comma-separated property targeting; ZERO wildcard all slowdowns! */
+    transition: transform var(--oc-transition-spring) var(--oc-ease-spring),
+                box-shadow var(--oc-transition-spring) var(--oc-ease-spring),
+                border-color var(--oc-transition-fast) ease;
+    will-change: transform;                              /* VRAM layer promotion hint! */
+    -webkit-font-smoothing: antialiased; backface-visibility: hidden; /* WebKit text blur shield! */
+  }
+
+  .oc-card-spring-gpu:hover,
+  .oc-card-spring-gpu:focus-visible {
+    transform: translate3d(0, -8px, 0) scale(1.02);      /* 100% composited GPU translation! */
+    border-color: rgb(59, 130, 246);
+    box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.4);
+  }
+
+  /* Senior Practice: Zero-JS Smooth Expanding Grid Accordion Component!
+     Deploys grid-template-rows interpolation between 0fr and 1fr to smoothly transition natural 
+     height auto content without executing JavaScript measurement loops or layout reflow lags! */
+  .oc-accordion-track {
+    display: grid;
+    grid-template-rows: 0fr;                             /* Collapses vertical height strictly to 0! */
+    transition: grid-template-rows var(--oc-transition-spring) var(--oc-ease-spring);
+    background-color: rgb(30, 41, 59);
+    border-radius: 0.5rem;
+  }
+
+  .oc-accordion-track[aria-expanded="true"],
+  .oc-accordion-track.oc-expanded {
+    grid-template-rows: 1fr;                             /* Smoothly interpolates to exact content height! */
+  }
+
+  .oc-accordion-track > .oc-accordion-overflow-shield {
+    overflow: hidden;                                    /* Necessary clipping boundary for 0fr tracks! */
+  }
+
+  .oc-accordion-track > .oc-accordion-overflow-shield > .oc-accordion-content {
+    padding-inline: 1.5rem;
+    padding-block: 1.25rem;
+    color: rgb(203, 213, 225);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Senior Practice: W3C Zero-JS Scroll-Driven Viewport Reveal Card!
+     Binds keyframe progression directly to asynchronous hardware GPU scrolling threads via animation-timeline: view(),
+     smoothly revealing cards into display framebuffers without executing JavaScript scroll event listeners! */
+  .oc-scroll-reveal-card {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 460px;
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(51, 65, 85);
+    border-inline-start: 6px solid rgb(16, 185, 129);
+    border-radius: 1rem;
+    padding: 2rem;
+    color: rgb(241, 245, 249);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+    
+    /* Hardware scroll timeline binding! */
+    animation: oc-keyframe-elevation-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 50%;
+  }
+
+  /* Senior Practice: Staggered Chronological Grid Reveal Tile!
+     Utilizes mathematical calc() unwrapping over local --item-index integers to choreograph cascading 
+     entrance revelations across item lists while deploying animation-fill-mode: both for total persistence! */
+  .oc-stagger-grid-tile {
+    position: relative;
+    inline-size: 100%;
+    background-color: rgb(30, 41, 59);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    color: rgb(241, 245, 249);
+    contain: layout paint;                               /* Insulation boundary against sibling reflows! */
+    
+    /* Algorithmic delay mathematical calculation: */
+    animation: oc-keyframe-elevation-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--item-index, 0) * var(--oc-stagger-step));
+  }
+}
+
+/* LAYER 5 EXTENSION: ANIMATION PERSISTENCE, PROMOTIONS & LEAPS (@layer utilities) */
+@layer utilities {
+  /* Hardware VRAM Acceleration Promotion Utility! */
+  .oc-promote-vram {
+    will-change: transform;
+    -webkit-font-smoothing: antialiased; backface-visibility: hidden;
+  }
+
+  /* Negative Delay Timeline Leap Utility! (Instantly jumps animation 50% forward!) */
+  .oc-transition-jumpstart {
+    transition-delay: -0.2s !important;
+  }
+
+  /* Absolute Fill-Mode Both Persistence Utility! */
+  .oc-animate-persist-both {
+    animation-fill-mode: both !important;
+  }
+
+  /* Interactive Play State Halting Utility! */
+  .oc-animate-pause-hover:hover,
+  .oc-animate-pause-hover:focus-visible {
+    animation-play-state: paused !important;
+  }
+}
+
+/* ==========================================================================
+   MODULE 13: RESPONSIVE DESIGN, FLUID TYPOGRAPHY, CONTAINERS & INTRINSIC GRIDS
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: FLUID TYPOGRAPHY, SPATIAL MATH & DVH SHELLS (@layer base) */
+@layer base {
+  :root {
+    /* Senior Practice: Curated Apple-Grade Fluid Typography Math Registries!
+       Encapsulates linear equation algebra (y = mx + b) inside W3C clamp() comparison expressions!
+       Combines conservative root rem floors alongside slope viewport percentages (vw/cqi) to ensure 
+       continuous hardware interpolation across viewfinders while preserving 200% desktop zoom compliance! */
+    --oc-fluid-title-hero: clamp(2rem, 1.35rem + 3.25vw, 4.5rem);       /* Scales from 32px up to 72px! */
+    --oc-fluid-heading-primary: clamp(1.5rem, 1.1rem + 2vw, 3rem);      /* Scales from 24px up to 48px! */
+    --oc-fluid-heading-secondary: clamp(1.25rem, 1.05rem + 1vw, 2rem);  /* Scales from 20px up to 32px! */
+    --oc-fluid-body-text: clamp(0.95rem, 0.88rem + 0.35vw, 1.2rem);     /* Scales from 15px up to 19px! */
+
+    /* Senior Practice: Fluid Spatial Layout Spacing Registries!
+       Eliminates discrete media query stepping across section margins, container gaps, and card padding! */
+    --oc-space-fluid-sm: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);
+    --oc-space-fluid-md: clamp(1.5rem, 1.1rem + 2vw, 3rem);
+    --oc-space-fluid-lg: clamp(2.5rem, 1.8rem + 3.5vw, 6rem);
+  }
+
+  /* Senior Practice: Zero-Crop Resilient Application Shell Sizing!
+     Standardizes root layout containers around dynamic mobile viewport heights (min-block-size: 100dvh) 
+     backed by conservative small viewport fallback stacking (100svh) to eradicate URL toolbar cropping! */
+  .oc-app-shell {
+    min-block-size: 100svh;                              /* Conservative fallback for static toolbars */
+    min-block-size: 100dvh;                              /* Live Dynamic Viewport URL toolbar tracking! */
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Universal Responsive Typography Enforcement & Zoom Protection */
+  .oc-title-hero {
+    font-size: var(--oc-fluid-title-hero);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .oc-title-primary {
+    font-size: var(--oc-fluid-heading-primary);
+    font-weight: 800;
+    line-height: 1.2;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .oc-body-text {
+    font-size: var(--oc-fluid-body-text);
+    line-height: 1.6;
+    color: rgb(203, 213, 225);
+  }
+
+  /* Senior Practice: Level 4 Accessibility Preference Media Overrides!
+     Insulates bandwidth-constrained audiences on metering mobile networks against heavy data usage 
+     while enhancing architectural outline contrast for visually impaired readers! */
+  @media (prefers-reduced-data: reduce) {
+    .oc-hero-background-media {
+      background-image: none !important;                 /* Suppress multi-megabyte image downloads! */
+      background-color: rgb(15, 23, 42);
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    .oc-card-scoped,
+    .oc-responsive-widget-card,
+    .oc-fluid-widget-card {
+      border-width: 2px !important;
+      border-color: rgb(255, 255, 255) !important;       /* Maximum optical reading contrast! */
+    }
+  }
+}
+
+/* LAYER 4 EXTENSION: MODULAR CONTAINERS & INTRINSIC CARD GRIDS (@layer components) */
+@layer components {
+  /* Senior Practice: Architectural Macro Container Insertion Slot!
+     Establishes horizontal size containment (container-type: inline-size) in layout RAM to sever 
+     cyclic infinite reflow loops while empowering internal components to query regional slot width! */
+  .oc-container-slot {
+    position: relative;
+    inline-size: 100%;
+    container: oc-widget-cell / inline-size;             /* Named structural container boundary! */
+  }
+
+  /* Senior Practice: Modular Self-Adapting Container Card!
+     Authored with default compact vertical stack layout for narrow sidebars; utilizes container length 
+     units (cqi) inside fluid clamp() equations to dynamically scale internal typography against cell width! */
+  .oc-responsive-widget-card {
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(51, 65, 85);
+    border-inline-start: 6px solid rgb(59, 130, 246);
+    border-radius: 1rem;
+    padding-inline: clamp(1rem, 4cqi, 2rem);             /* Responsive container length spacing! */
+    padding-block: 1.5rem;
+    color: rgb(241, 245, 249);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;                              /* Default compact vertical stack! */
+    gap: 1rem;
+    transition: transform var(--oc-transition-spring) var(--oc-ease-spring), border-color var(--oc-transition-fast) ease;
+  }
+
+  .oc-responsive-widget-card .oc-widget-title {
+    font-size: clamp(1.15rem, 4.5cqi, 1.75rem);          /* Fluid typography scaling against container width! */
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  /* Authoritative Scoped Container Query Overrides: 
+     When parent insertion slot exceeds 480px, widget smoothly morphs straight into wide horizontal flex! */
+  @container oc-widget-cell (inline-size >= 480px) {
+    .oc-responsive-widget-card {
+      flex-direction: row;                               /* Seamless horizontal layout translation! */
+      align-items: center;
+      justify-content: space-between;
+      border-inline-start-color: rgb(16, 185, 129);      /* Morph border directly to Emerald Accent! */
+    }
+    
+    .oc-responsive-widget-card .oc-widget-actions {
+      flex-shrink: 0;
+    }
+  }
+
+  /* Senior Practice: Zero-Breakpoint Intrinsic Responsive Auto-Fit Grid!
+     Deploys repeat(auto-fit, minmax(280px, 1fr)) to dynamically evaluate container pixel geometry in RAM!
+     Collapses empty structural column tracks down to 0px and stretches visible cards equally via 1fr 
+     proportional coefficients—achieving 100% responsive grid adaptability without a single media query! */
+  .oc-grid-intrinsic-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--oc-space-fluid-md);
+    inline-size: 100%;
+    align-items: stretch;
+  }
+
+  /* Senior Practice: Modular Container-Length Fluid Card Component!
+     Substitutes screen viewport units (vw) with container sizing units (cqi) inside clamp() formulas—
+     empowering cards to dynamically self-scale typography against structural parent slots! */
+  .oc-fluid-widget-card {
+    background-color: rgb(15, 23, 42);
+    border: 1px solid rgb(51, 65, 85);
+    border-inline-start: 6px solid rgb(59, 130, 246);
+    border-radius: 1rem;
+    padding-inline: clamp(1.25rem, 0.8rem + 3.5cqi, 2.5rem);      /* Container length padding! */
+    padding-block: clamp(1.25rem, 0.9rem + 2.5cqi, 2rem);
+    color: rgb(241, 245, 249);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform var(--oc-transition-spring) var(--oc-ease-spring), border-color var(--oc-transition-fast) ease;
+  }
+
+  .oc-fluid-widget-card .oc-fluid-card-title {
+    font-size: clamp(1.15rem, 0.9rem + 3.5cqi, 1.6rem);           /* Regional container length typography! */
+    font-weight: 800;
+  }
+}
+
+/* LAYER 5 EXTENSION: DEFENSIVE BOUNDS, MEDIA RANGES & INTRINSIC OVERRIDES (@layer utilities) */
+@layer utilities {
+  /* Authoritative Single-Line Maximum Ceiling Override Utility!
+     Supercedes legacy max-width: 640px; width: 100%; pairing via high-speed min() math! */
+  .oc-width-capped-md {
+    inline-size: min(100%, 640px) !important;
+    margin-inline: auto;
+  }
+
+  .oc-width-capped-lg {
+    inline-size: min(100%, 960px) !important;
+    margin-inline: auto;
+  }
+
+  /* Dynamic Viewport Full-Height Override Utility! */
+  .oc-force-dvh-height {
+    min-block-size: 100dvh !important;
+  }
+
+  /* Absolute Zero-Breakpoint Auto-Fit Upgrade Utility! */
+  .oc-grid-force-fit {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  }
+
+  /* Level 4 Media Query Range Hidden Utilities! */
+  @media (width < 640px) {
+    .oc-hide-mobile-range {
+      display: none !important;
+    }
+  }
+
+  @media (640px <= width <= 1024px) {
+    .oc-hide-tablet-range {
+      display: none !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   MODULE 14: FORMS, INPUTS, VALIDATION HOOKS & NATIVE UI CONTROL STYLING
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: BRAND ACCENT TINTING, VALIDATION SHIELDS & AUTOFILL (@layer base) */
+@layer base {
+  :root {
+    /* Senior Practice: Form Branding, Validation & Autofill Palette Registries! */
+    --oc-form-accent: rgb(59, 130, 246);
+    --oc-form-focus: rgb(56, 189, 248);
+    --oc-form-border: rgb(71, 85, 105);
+    --oc-form-bg: rgb(15, 23, 42);
+    --oc-form-valid: rgb(16, 185, 129);
+    --oc-form-invalid: rgb(239, 68, 68);
+  }
+
+  /* Senior Practice: Declarative Native Brand Accent Tinting!
+     Standardizes operating system checkboxes, radio inputs, range sliders, and progress tracks around primary colors! */
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"],
+  progress {
+    accent-color: var(--oc-form-accent);
+  }
+
+  /* Senior Practice: Universal Selective Accessibility Keyboard Focus Shield!
+     Suppresses intrusive outlines during standard mouse pointer clicks while projecting an unmistakable 
+     high-contrast offset border ring strictly during interactive keyboard tab navigation loops! */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--oc-form-focus);
+    outline-offset: 3px;
+  }
+
+  /* Senior Practice: Authoritative Dual-Layer Autofill Neutralization Shield!
+     Defeats aggressive browser password manager canary-yellow background overrides by deploying an 
+     inset optical box-shadow mask paired with an infinite 5000-second background transition delay! */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px var(--oc-form-bg) inset !important;
+    -webkit-text-fill-color: rgb(241, 245, 249) !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+  }
+
+  /* Senior Practice: Interaction-Aware Universal Validation Feedback Shield!
+     Suppresses screaming visual error borders during page initialization; activates high-contrast 
+     validation feedback strictly after the user has attempted modification and blurred the field! */
+  input:user-invalid,
+  select:user-invalid,
+  textarea:user-invalid {
+    border-color: var(--oc-form-invalid) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+  }
+
+  input:user-valid:not(:placeholder-shown),
+  select:user-valid {
+    border-color: var(--oc-form-valid);
+  }
+}
+
+/* LAYER 4 EXTENSION: ZERO-JS TOGGLES & FLOATING FORM LABELS (@layer components) */
+@layer components {
+  /* Senior Practice: Authoritative Accessible Zero-Size Visual Clipping Shield!
+     Conceals native inputs from sighted computer monitors while retaining 100% keyboard tab index 
+     visibility and screen reader assistive functionality! Supercedes illegal display: none hacks! */
+  .oc-visually-hidden-input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Senior Practice: Zero-JS GPU Composited Toggle Switch Wrapper!
+     Deploys pure CSS sibling combinators (input:checked + .track) to execute seamless hardware 
+     thumb translations in VRAM without attaching a single JavaScript click listener! */
+  .oc-toggle-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .oc-toggle-track {
+    inline-size: 52px;
+    block-size: 28px;
+    background-color: rgb(51, 65, 85);
+    border: 2px solid rgb(71, 85, 105);
+    border-radius: 9999px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: background-color var(--oc-transition-fast) ease, border-color var(--oc-transition-fast) ease;
+  }
+
+  .oc-toggle-thumb {
+    inline-size: 20px;
+    block-size: 20px;
+    background-color: rgb(241, 245, 249);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    transition: transform var(--oc-transition-spring) var(--oc-ease-spring);
+    will-change: transform;                              /* VRAM compositing hint! */
+  }
+
+  /* Authoritative Pure CSS Sibling Combinator Toggle Overrides: */
+  .oc-visually-hidden-input:checked + .oc-toggle-track {
+    background-color: var(--oc-form-valid);              /* Switch track directly to Emerald Accent! */
+    border-color: var(--oc-form-valid);
+  }
+
+  .oc-visually-hidden-input:checked + .oc-toggle-track .oc-toggle-thumb {
+    transform: translate3d(24px, 0, 0);                  /* 100% composited hardware translation! */
+    background-color: rgb(255, 255, 255);
+  }
+
+  /* Sibling Keyboard :focus-visible Protection Binding: */
+  .oc-visually-hidden-input:focus-visible + .oc-toggle-track {
+    outline: 3px solid var(--oc-form-focus);
+    outline-offset: 3px;
+  }
+
+  /* Senior Practice: Architectural Floating Label Input Container!
+     Establishes relative geometric positioning coordinates to anchor sibling floating labels. */
+  .oc-floating-container {
+    position: relative;
+    inline-size: 100%;
+    margin-block-start: 0.5rem;
+  }
+
+  /* Zero-JS Floating Label Input Field:
+     Authored with asymmetric top vertical padding (22px vs 8px) to allocate clean interior room 
+     for elevated label titles without increasing overall box height during typing! */
+  .oc-input-floating {
+    inline-size: 100%;
+    padding-block-start: 1.35rem;
+    padding-block-end: 0.5rem;
+    padding-inline: 1rem;
+    background-color: var(--oc-form-bg);
+    border: 2px solid var(--oc-form-border);
+    border-radius: 0.5rem;
+    color: rgb(241, 245, 249);
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--oc-transition-fast) ease, box-shadow var(--oc-transition-fast) ease;
+  }
+
+  .oc-input-floating:focus-visible {
+    border-color: var(--oc-form-focus);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  }
+
+  /* Zero-JS Floating Label Title Sibling:
+     Positioned directly over input baseline by default; utilizes pointer-events: none to guarantee 
+     user mouse clicks pass straight through the label text down into the underlying input box! */
+  .oc-floating-label {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: 1rem;
+    font-size: 1rem;
+    color: rgb(148, 163, 184);
+    pointer-events: none;                                /* Insulates against click interception! */
+    transform-origin: left top;
+    transition: transform var(--oc-transition-spring) var(--oc-ease-spring), color var(--oc-transition-fast) ease;
+    will-change: transform;
+  }
+
+  /* Authoritative Pure CSS Sibling Combinator Label Elevator:
+     When focused OR when input character buffer holds non-empty text (:not(:placeholder-shown)),
+     translate label cleanly upward into elevated top interior padding zone at 120 FPS speed! */
+  .oc-input-floating:focus ~ .oc-floating-label,
+  .oc-input-floating:not(:placeholder-shown) ~ .oc-floating-label {
+    transform: translate3d(0, -0.6rem, 0) scale(0.75);   /* GPU composited ascent! */
+    color: var(--oc-form-focus);
+    font-weight: 700;
+  }
+
+  /* Sibling Error Color Synchronization Override: */
+  .oc-input-floating:user-invalid ~ .oc-floating-label {
+    color: var(--oc-form-invalid);
+  }
+}
+
+/* LAYER 5 EXTENSION: APPEARANCE RESETS, AUTO-FILL STRIPPING & OVERRIDES (@layer utilities) */
+@layer utilities {
+  /* Authoritative Full Vendor Appearance Reset Utility! */
+  .oc-appearance-none {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+  }
+
+  /* W3C Native File Upload Selector Utility!
+     Customizes interior browse upload buttons without obsolete vendor pseudo extensions! */
+  .oc-file-upload-input::file-selector-button {
+    background-color: rgb(30, 41, 59);
+    color: rgb(241, 245, 249);
+    font-weight: 700;
+    padding-inline: 1.25rem;
+    padding-block: 0.5rem;
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-inline-end: 1rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .oc-file-upload-input::file-selector-button:hover {
+    background-color: rgb(51, 65, 85);
+  }
+
+  /* Authoritative Pre-Interaction Validation Flashing Shield Utility!
+     For legacy browsers lacking :user-invalid support, combines emptiness evaluators to suppress initial errors! */
+  .oc-validation-shield:not(:placeholder-shown):invalid {
+    border-color: var(--oc-form-invalid) !important;
+  }
+
+  /* Absolute Zero-Tap Highlight Override Utility! */
+  .oc-tap-transparent {
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  /* Mobile Safari Auto-Fill Button Suppression Utility! */
+  .oc-hide-webkit-contacts::-webkit-contacts-auto-fill-button {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   MODULE 15: CSS ARCHITECTURE, DESIGN SYSTEMS, OKLCH & CUBE CSS SYNTHESIS
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: STRATIFIED DESIGN TOKEN REGISTRIES & ADVANCED COLOR PALETTES (@layer base) */
+@layer base {
+  :root {
+    /* Senior Practice: Authoritative W3C Color-Scheme Activation!
+       Instructs browser engine display gamuts to support native dual light-dark() functions and system skinning! */
+    color-scheme: light dark;
+
+    /* ======================================================================
+       TIER 1: PRIMITIVE LITHOS TOKENS (Raw physical numbers & OKLCH color vectors)
+       ====================================================================== */
+    /* Perceptually Uniform OKLCH Brand Scales (Guaranteed visual brightness linearity!): */
+    --oc-lithos-blue-500: oklch(0.60 0.22 250);
+    --oc-lithos-blue-600: oklch(0.52 0.24 250);
+    --oc-lithos-emerald-500: oklch(0.65 0.20 155);
+    --oc-lithos-emerald-600: oklch(0.56 0.22 155);
+    --oc-lithos-amber-500: oklch(0.75 0.18 65);
+    --oc-lithos-red-500: oklch(0.62 0.25 25);
+
+    /* Achromatic Neutral Scale Registries: */
+    --oc-lithos-slate-50: oklch(0.98 0.005 240);
+    --oc-lithos-slate-100: oklch(0.94 0.01 240);
+    --oc-lithos-slate-800: oklch(0.24 0.03 250);
+    --oc-lithos-slate-900: oklch(0.16 0.03 250);
+
+    /* Geometric Lithos Spacing & Radius Scales: */
+    --oc-lithos-space-2: 0.5rem;
+    --oc-lithos-space-4: 1rem;
+    --oc-lithos-space-6: 1.5rem;
+    --oc-lithos-space-8: 2rem;
+    --oc-lithos-radius-md: 0.5rem;
+    --oc-lithos-radius-lg: 0.75rem;
+
+    /* ======================================================================
+       TIER 2: SEMANTIC ALIAS TOKENS (UI Functional Purpose & Theme Roles)
+       ====================================================================== */
+    /* Default Light Mode Semantic Mapping: */
+    --oc-theme-primary: var(--oc-lithos-blue-500);
+    --oc-theme-primary-hover: var(--oc-lithos-blue-600);
+    --oc-theme-accent: var(--oc-lithos-amber-500);
+    --oc-theme-danger: var(--oc-lithos-red-500);
+
+    /* W3C Native Light-Dark Dual Surface & Typography Registries: */
+    --oc-theme-surface: light-dark(var(--oc-lithos-slate-50), var(--oc-lithos-slate-900));
+    --oc-theme-card: light-dark(rgb(255, 255, 255), var(--oc-lithos-slate-800));
+    --oc-theme-text: light-dark(var(--oc-lithos-slate-900), var(--oc-lithos-slate-50));
+    --oc-theme-border: light-dark(rgb(226, 232, 240), rgb(71, 85, 105));
+
+    /* Functional Semantic Spacing Mappings: */
+    --oc-theme-pad: var(--oc-lithos-space-6);
+    --oc-theme-gap: var(--oc-lithos-space-4);
+    --oc-theme-radius: var(--oc-lithos-radius-lg);
+  }
+
+  /* ======================================================================
+     RUNTIME ENTERPRISE THEME OVERRIDE SWITCH ([data-theme="dark"])
+     ====================================================================== */
+  [data-theme="dark"] {
+    /* Rebind Primary Brand Alias from Blue to vibrant Emerald at zero reflow cost! */
+    --oc-theme-primary: var(--oc-lithos-emerald-500);
+    --oc-theme-primary-hover: var(--oc-lithos-emerald-600);
+    color-scheme: dark;                                   /* Authoritative scheme inversion! */
+  }
+}
+
+/* LAYER 4 EXTENSION: CUBE CSS COMPOSITION & SCOPED TOKENS (@layer components) */
+@layer components {
+  /* Senior Practice: CUBE CSS Compositional Flow Stack (OOCSS Structure from Skin)!
+     Utilizes universal adjacent sibling combinators (* + *) to inject uniform fluid rhythm spacing 
+     between child interface cards without binding decorative colors or backgrounds! */
+  .oc-layout-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    inline-size: 100%;
+  }
+
+  .oc-layout-stack > * + * {
+    margin-block-start: var(--oc-theme-gap, 1rem);        /* Universal compositional flow gap! */
+  }
+
+  /* Senior Practice: Architectural Scoped Component Token Box!
+     Isolates component styling behind private prefixed custom properties (--_variable) to eliminate 
+     global variable collision while enabling zero-reflow inline customization! */
+  .oc-token-widget {
+    /* TIER 3: SCOPED LOCAL TOKENS (--_property) */
+    --_widget-bg: var(--oc-theme-card);
+    --_widget-border: var(--oc-theme-border);
+    --_widget-color: var(--oc-theme-text);
+    --_widget-pad: var(--oc-theme-pad);
+    --_widget-radius: var(--oc-theme-radius);
+    --_widget-accent: var(--oc-theme-primary);
+
+    background-color: var(--_widget-bg);
+    border: 2px solid var(--_widget-border);
+    border-radius: var(--_widget-radius);
+    padding: var(--_widget-pad);
+    color: var(--_widget-color);
+    
+    /* W3C COLOR-MIX() PROGRAMMATIC HARDWARE BOX-SHADOW:
+       Synthesizes a clean 25% transparent alpha glow directly from our active brand accent color 
+       without compiling static hexadecimal opacity literals! */
+    box-shadow: 0 10px 25px -5px color-mix(in oklch, var(--_widget-accent) 25%, transparent);
+    transition: border-color var(--oc-transition-fast) ease, box-shadow var(--oc-transition-fast) ease, transform var(--oc-transition-spring) var(--oc-ease-spring);
+    contain: layout paint;                                /* Hardware containment perimeter! */
+  }
+
+  .oc-token-widget__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 1rem;
+  }
+
+  .oc-token-widget__title {
+    font-size: clamp(1.25rem, 1.1rem + 1.2vw, 1.75rem);   /* Fluid BEM component typography! */
+    font-weight: 800;
+  }
+
+  /* Interactive Hover & Keyboard Focus States via Programmatic Color Mixing: */
+  .oc-token-widget:hover {
+    border-color: var(--_widget-accent);
+    /* Elevate shadow alpha intensity to 40% on hover algorithmically! */
+    box-shadow: 0 15px 35px -5px color-mix(in oklch, var(--_widget-accent) 40%, transparent);
+    transform: translate3d(0, -3px, 0);                   /* VRAM composited hardware ascent! */
+  }
+
+  .oc-token-widget:focus-visible {
+    outline: 3px solid var(--_widget-accent);
+    outline-offset: 3px;
+  }
+
+  /* Senior Practice: CUBE CSS ARIA & Attribute State Exceptions!
+     Replaces fragile .is-active or .is-loading class names with declarative attribute exceptions 
+     that simultaneously inform screen reader assistive software of dynamic interface changes! */
+  .oc-token-widget[aria-expanded="true"] {
+    border-color: var(--oc-theme-primary);
+    box-shadow: 0 20px 40px -10px color-mix(in oklch, var(--oc-theme-primary) 50%, transparent);
+  }
+
+  .oc-token-widget[data-state="success"] {
+    border-color: var(--oc-lithos-emerald-500);
+    background-color: color-mix(in oklch, var(--oc-lithos-emerald-500) 15%, var(--oc-theme-card));
+  }
+
+  .oc-token-widget[data-state="loading"] {
+    opacity: 0.65;
+    pointer-events: none;                                 /* Insulates against click events during loading! */
+  }
+}
+
+/* LAYER 5 EXTENSION: ATOMIC OVERRIDE TRUMPS & ARCHITECTURAL UTILITIES (@layer utilities) */
+@layer utilities {
+  /* Authoritative Atomic Spacing Override Utilities! */
+  .oc-m-0 { margin: 0 !important; }
+  .oc-mt-0 { margin-block-start: 0 !important; }
+  .oc-p-0 { padding: 0 !important; }
+
+  /* Atomic Visual Typography & Color Override Trumps!
+     Residing inside @layer utilities guarantees instantaneous victory over component styling in RAM! */
+  .oc-text-emerald { color: var(--oc-lithos-emerald-500) !important; }
+  .oc-text-amber { color: var(--oc-lithos-amber-500) !important; }
+  .oc-text-primary { color: var(--oc-theme-primary) !important; }
+  .oc-text-center { text-align: center !important; }
+
+  /* Universal Visual Display Hiding Utility! */
+  .oc-hidden-utility { display: none !important; }
+}
+
+/* ==========================================================================
+   MODULE 16: DEVTOOLS DIAGNOSTIC WORKFLOWS, BOX MODEL WIREFRAMES & VRAM RENDERING
+   ========================================================================== */
+
+/* LAYER 4 EXTENSION: DIAGNOSTIC CONTAINMENT, MARGIN INSULATION & VRAM CARDS (@layer components) */
+@layer components {
+  /* Senior Practice: Authoritative Margin Collapse Neutralization Shield!
+     Establishes an independent Block Formatting Context (BFC) via hardware layout containment and 
+     flex formatting—guaranteeing that interior child component margins never leak across parent 
+     borders or unpredictably collapse into adjacent DOM sibling elements! */
+  .oc-isolate-margins {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    contain: layout;                                      /* Isolates BFC calculation memory! */
+  }
+
+  /* Senior Practice: Accessible DevTools Focus Verification Target!
+     Authored specifically to support clean DevTools state-locking (:hov -> :focus-visible), projecting 
+     an unmistakable 3px offset high-contrast ring for automated A11y contrast verification! */
+  .oc-debug-focus-target {
+    padding-inline: 1.25rem;
+    padding-block: 0.75rem;
+    background-color: var(--oc-theme-primary, rgb(59, 130, 246));
+    color: rgb(255, 255, 255);
+    font-weight: 700;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform var(--oc-transition-spring) var(--oc-ease-spring);
+  }
+
+  .oc-debug-focus-target:focus-visible {
+    outline: 3px solid var(--oc-theme-accent, rgb(245, 158, 11));
+    outline-offset: 4px;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.5);             /* Enhances high-contrast edge demarcation! */
+  }
+
+  /* Senior Practice: Authoritative Performance Containment Shield!
+     Insulates complex data cards, chart dashboards, and interactive widgets behind strict layout 
+     and paint boundaries—guaranteeing that interior DOM style updates never trigger Forced 
+     Synchronous Layouts or CPU repaints across external page elements! */
+  .oc-perf-shield {
+    contain: layout paint;                                /* Insulates layout & paint calculation RAM! */
+    background-color: var(--oc-theme-card, rgb(30, 41, 59));
+    color: var(--oc-theme-text, rgb(241, 245, 249));
+    border: 2px solid var(--oc-theme-border, rgb(71, 85, 105));
+    border-radius: var(--oc-theme-radius, 0.75rem);
+    padding: var(--oc-theme-pad, 1.5rem);
+    -webkit-font-smoothing: antialiased;                   /* Guarantees sub-pixel typography clarity in VRAM! */
+  }
+
+  /* Senior Practice: Dynamic GPU VRAM Promoted Interactive Card!
+     Confines all visual hover transitions exclusively to Stage 4 composited properties (transform, opacity).
+     Maintains will-change at idle auto settings, promoting to VRAM textures strictly during interaction! */
+  .oc-vram-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--oc-theme-card);
+    border: 2px solid var(--oc-theme-border);
+    border-radius: 0.75rem;
+    will-change: auto;                                    /* Idle state: Zero VRAM memory reservation! */
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+    contain: layout paint;
+  }
+
+  .oc-vram-card:hover {
+    will-change: transform;                               /* Dynamic advisory promotion to GPU texture! */
+    border-color: var(--oc-theme-primary);
+    transform: translate3d(0, -6px, 0) scale(1.015);      /* Stage 4 VRAM execution: Zero reflow! */
+    box-shadow: 0 15px 35px -5px color-mix(in oklch, var(--oc-theme-primary) 35%, transparent);
+  }
+}
+
+/* LAYER 5 EXTENSION: DIAGNOSTIC WIREFRAME TRUMPS & A11Y REDUCED MOTION SHIELD (@layer utilities) */
+@layer utilities {
+  /* Authoritative DevTools Box Model Diagnostic Wireframe Utility!
+     Applies a clean, non-destructive outline (outlines occupy ZERO physical box model width!) 
+     across targeted containers and all internal child nodes to visually audit alignment, 
+     padding cushion boundaries, and sub-pixel element rendering without reflowing layout! */
+  .oc-debug-wireframe,
+  .oc-debug-wireframe * {
+    outline: 1px dashed rgb(245, 158, 11) !important;
+    outline-offset: -1px !important;
+  }
+
+  /* Universal Visual Overflow & Clipping Diagnostic Shield!
+     Forces containers to display hidden overflow borders in bright magenta to instantly locate 
+     sub-pixel layout tearing or accidental child box leakage during DevTools audits! */
+  .oc-debug-overflow-alert {
+    outline: 2px solid rgb(236, 72, 153) !important;
+    overflow: visible !important;                         /* Unmasks clipped phantom child nodes! */
+  }
+
+  /* Authoritative Stage 4 VRAM Transition Utility! */
+  .oc-animate-gpu {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+  }
+
+  /* Atomic Hardware Layer Promotion & Demotion Trumps! */
+  .oc-force-promote { will-change: transform, opacity !important; }
+  .oc-release-vram { will-change: auto !important; }
+  .oc-contain-strict { contain: strict !important; }
+
+  /* ======================================================================
+     MANDATORY ACCESSIBILITY DEFENSE: PREFERS-REDUCED-MOTION SHIELD
+     ====================================================================== */
+  @media (prefers-reduced-motion: reduce) {
+    /* Instantly collapse all hardware transformations and transition durations across 
+       the entire application to safeguard users against vestibular motion disorder discomfort! */
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+      transform: none !important;                         /* Neutralizes spatial sliding & scaling! */
+    }
+  }
+}
+
+/* ==========================================================================
+   MODULE 17: SPECIALIZED CONTEXTS, TRIGONOMETRIC GEOMETRY & PAGED MEDIA
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: ELASTOKINETIC SPRING EASING REGISTRIES (@layer tokens) */
+@layer tokens {
+  :root {
+    /* Senior Practice: Authoritative Custom Spring Easing Tokens!
+       Clamps horizontal time progression strictly within [0, 1] while elevating Y control 
+       coordinates out of bounds (>1.0) to synthesize kinetic hardware bounce and momentum! */
+    --oc-ease-spring-gentle: cubic-bezier(0.34, 1.25, 0.64, 1.00);
+    --oc-ease-spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1.15);
+    --oc-ease-spring-pop:    cubic-bezier(0.17, 1.85, 0.42, 1.25);
+  }
+}
+
+/* LAYER 4 EXTENSION: TRIGONOMETRIC RADIAL MENUS, MATRIX CARDS & VECTOR SPRITES (@layer components) */
+@layer components {
+  /* Senior Practice: Architectural Radial Navigation Container & Node!
+     Evaluates polar angle calculations cleanly from custom property indices (--_idx) and translates 
+     items along Cartesian paths using native W3C sin() and cos() without JavaScript scripts! */
+  .oc-radial-wheel {
+    --_radius: 130px;                                     /* Default local radial distance token! */
+    position: relative;
+    inline-size: calc(var(--_radius) * 2 + 4rem);
+    block-size: calc(var(--_radius) * 2 + 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .oc-radial-node {
+    position: absolute;
+    /* Calculate polar distribution angle from index custom property (--idx): */
+    --_angle: calc(var(--idx, 0) * 45deg);
+    
+    /* Trigonometric Polar-to-Cartesian Offset Pipeline: */
+    transform: translate(
+      calc(var(--_radius) * cos(var(--_angle))),
+      calc(var(--_radius) * sin(var(--_angle)))
+    );
+    transition: transform 0.4s var(--oc-ease-spring-bounce), opacity 0.3s ease;
+    will-change: auto;
+  }
+
+  .oc-radial-node:hover,
+  .oc-radial-node:focus-visible {
+    will-change: transform;
+    /* Elevate scale vector on hover with spring overshoot! */
+    transform: translate(
+      calc(var(--_radius) * cos(var(--_angle))),
+      calc(var(--_radius) * sin(var(--_angle)))
+    ) scale(1.25);
+  }
+
+  /* Senior Practice: High-Speed Affine Matrix Skew Card!
+     Applies direct 2D linear matrix projections to construct immersive geometric cards at zero reflow cost! */
+  .oc-matrix-card {
+    background-color: var(--oc-theme-card);
+    border: 2px solid var(--oc-theme-border);
+    border-radius: var(--oc-theme-radius);
+    padding: var(--oc-theme-pad);
+    /* Transform via explicit 6-value affine matrix (scaleX, skewY, skewX, scaleY, tx, ty): */
+    transform: matrix(1, -0.05, 0, 1, 0, 0);
+    transition: transform 0.4s var(--oc-ease-spring-gentle);
+  }
+
+  .oc-matrix-card:hover {
+    /* Revert matrix skew to upright unity on interactive hover! */
+    transform: matrix(1, 0, 0, 1, 0, -6);
+  }
+
+  /* Senior Practice: Authoritative SVG Icon Sprite Primitive!
+     Designed specifically to reference icons across <use href="#id"> Shadow DOM bridges.
+     Inherits parent typography colors via currentColor and preserves razor-sharp borders during zoom! */
+  .oc-svg-icon {
+    display: inline-block;
+    inline-size: 1.5em;
+    block-size: 1.5em;
+    vertical-align: middle;
+    fill: var(--_icon-fill, currentColor);
+    stroke: var(--_icon-stroke, none);
+    stroke-width: var(--_icon-stroke-width, 2px);
+    transition: transform 0.25s var(--oc-ease-spring-gentle), color 0.2s ease;
+    contain: layout paint;                               /* Insulates vector drawing buffer! */
+  }
+
+  /* Force internal vector paths to respect non-scaling strokes across all zoom breakpoints! */
+  .oc-svg-icon *,
+  .oc-svg-icon::part(path) {
+    vector-effect: non-scaling-stroke !important;
+  }
+
+  /* Architectural Email Presentation Table Cell Primitive: */
+  .oc-email-cell {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--oc-lithos-slate-800, #1e293b);
+    padding: 20px;
+  }
+}
+
+/* LAYER 5 EXTENSION: ATOMIC SPRING TRUMPS & PRINT VISIBILITY (@layer utilities) */
+@layer utilities {
+  /* Authoritative Spring Transition Override Trumps! */
+  .oc-animate-spring { transition: transform 0.45s var(--oc-ease-spring-bounce) !important; }
+  .oc-animate-pop    { transition: transform 0.55s var(--oc-ease-spring-pop) !important; }
+
+  /* Atomic Vector & Pagination Override Trumps! */
+  .oc-vector-non-scaling { vector-effect: non-scaling-stroke !important; }
+  .oc-page-break-avoid   { break-inside: avoid !important; page-break-inside: avoid !important; }
+  .oc-print-hidden       { display: none !important; }
+}
+
+/* ==========================================================================
+   AUTHORITATIVE SPECIALIZED DEFENSE: PAGED MEDIA & PDF EXPORT SHIELD
+   ========================================================================== */
+@media print {
+  /* Senior Practice: Define standardized printed paper boundaries and bleeding margins! */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
+  /* Universal Print Hygiene Reset:
+     Strips heavy dark backgrounds, box shadows, and decorative animations to preserve physical 
+     printer ink and ensure crystalline readability in exported PDF documents! */
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: rgb(0, 0, 0) !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Strip extraneous interactive interface chrome from printed paper reports! */
+  nav,
+  aside,
+  footer,
+  .oc-hide-webkit-contacts,
+  [role="navigation"],
+  .btn-controls,
+  button,
+  .oc-print-hidden {
+    display: none !important;
+  }
+
+  /* Authoritative Pagination Defense: Prohibits print compilers from tearing interface cards in half! */
+  .oc-token-widget,
+  .oc-vram-card,
+  .oc-perf-shield,
+  .oc-matrix-card,
+  table,
+  figure,
+  blockquote {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    border: 1px solid rgb(0, 0, 0) !important;
+    margin-block-end: 1.5rem !important;
+  }
+
+  /* Ensure table headings repeat cleanly across multi-page printed data tables! */
+  thead { display: table-header-group !important; }
+  tr    { break-inside: avoid !important; }
+
+  /* Senior Practice: Automatic Hyperlink URL Citation Extraction!
+     Reveals clickable destination web URLs directly in printed parentheses for paper document readers! */
+  a[href^="http"]::after,
+  a[href^="https"]::after {
+    content: " (" attr(href) ")" !important;
+    font-size: 0.85em !important;
+    font-weight: 700 !important;
+    color: rgb(71, 85, 105) !important;
+  }
+
+  /* Prevent URL extraction on internal anchor jump links or simple javascript triggers: */
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "" !important;
+  }
+}
+
+/* ==========================================================================
+   MODULE 18: CSS TESTING, VERIFICATION & PRODUCTION ENGINEERING
+   ========================================================================== */
+
+/* LAYER 1 EXTENSION: DETERMINISTIC FONT SMOOTHING RESET (@layer reset) */
+@layer reset {
+  /* Senior Practice: Authoritative Sub-Pixel Rendering Reset!
+     Standardizes typography antialiasing across desktop developers and headless CI Linux runners
+     to completely eliminate cross-OS font edge diff test flakes during Playwright VRT assertions! */
+  html,
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* LAYER 4 EXTENSION: STORYBOOK STATE MATRICES, DYNAMIC BADGES & DEPRECATION SHIMS (@layer components) */
+@layer components {
+  /* Senior Practice: Co-located Interactive Pseudo & State Matrix Classes!
+     Empowers Playwright to capture a single full-page Storybook snapshot verifying 
+     idle, hover, focus, error, and disabled states simultaneously in under 300ms! */
+  .oc-token-widget:hover,
+  .oc-token-widget.is-test-hover {
+    border-color: var(--oc-theme-primary, rgb(59, 130, 246));
+    transform: translate3d(0, -4px, 0) scale(1.02);
+  }
+
+  .oc-token-widget:focus-visible,
+  .oc-token-widget.is-test-focus {
+    outline: 3px solid var(--oc-theme-accent, rgb(245, 158, 11));
+    outline-offset: 4px;
+  }
+
+  .oc-token-widget[aria-invalid="true"],
+  .oc-token-widget.is-test-error {
+    border-color: var(--oc-lithos-rose-500, rgb(244, 63, 94));
+    background-color: color-mix(in oklch, var(--oc-lithos-rose-500) 15%, var(--oc-theme-card));
+  }
+
+  .oc-token-widget[disabled],
+  .oc-token-widget.is-test-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    border-style: dashed;
+  }
+
+  /* Senior Practice: Dynamic Status Badge Primitives!
+     Designed specifically to be instantiated via runtime JavaScript string concatenation 
+     ("oc-badge-" + status). Protected against AST PurgeCSS deletion via safelist /^oc-badge-/! */
+  .oc-badge-success {
+    background-color: color-mix(in oklch, var(--oc-lithos-emerald-500) 15%, var(--oc-theme-card));
+    color: var(--oc-lithos-emerald-500, rgb(16, 185, 129));
+    border: 1px solid var(--oc-lithos-emerald-500);
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .oc-badge-warning {
+    background-color: color-mix(in oklch, var(--oc-lithos-amber-500) 15%, var(--oc-theme-card));
+    color: var(--oc-lithos-amber-500, rgb(245, 158, 11));
+    border: 1px solid var(--oc-lithos-amber-500);
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .oc-badge-error {
+    background-color: color-mix(in oklch, var(--oc-lithos-rose-500) 15%, var(--oc-theme-card));
+    color: var(--oc-lithos-rose-500, rgb(244, 63, 94));
+    border: 1px solid var(--oc-lithos-rose-500);
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Senior Practice: Zero-Downtime Graceful Deprecation Shim!
+     Maintains aliased fallback styling for deprecated legacy component classes (.oc-card-old) 
+     while emitting developer console warning logs. Scheduled for deletion in Major Release v3.0.0! */
+  .oc-legacy-card,
+  .oc-card-old {
+    /* Aliased directly to modern architectural primitive (.oc-vram-card) without code duplication! */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--oc-theme-card);
+    border: 2px dashed var(--oc-lithos-amber-500, rgb(245, 158, 11)); /* Developer warning border! */
+    border-radius: var(--oc-theme-radius, 0.75rem);
+    contain: layout paint;
+  }
+}
+
+/* LAYER 5 EXTENSION: DETERMINISTIC CI FREEZE, A11Y UTILITIES & FORCED COLORS SHIELD (@layer utilities) */
+@layer utilities {
+  /* Authoritative CI VRT Deterministic Freeze Override Trump!
+     Activated programmatically during CI testing or via reduced-motion viewports.
+     Collapses transitions to 0.001ms (preserving transitionend script hooks) and hides carets! */
+  .oc-test-freeze,
+  .oc-test-freeze *,
+  .oc-test-freeze *::before,
+  .oc-test-freeze *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+    caret-color: transparent !important;                  /* Neutralizes blinking input carets! */
+  }
+
+  /* Authoritative Screen Reader Utility Trump!
+     Hardcoded into compiler safelists ('oc-sr-only', 'oc-visually-hidden') to guarantee that 
+     assistive accessible text descriptions are never stripped during production build purging! */
+  .oc-visually-hidden,
+  .oc-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border-width: 0 !important;
+  }
+
+  /* ======================================================================
+     AUTHORITATIVE ACCESSIBILITY DEFENSE: FORCED-COLORS MODE SHIELD
+     ====================================================================== */
+  @media (forced-colors: active) {
+    /* Guarantee that interactive widgets and custom focus outlines retain unmistakable 
+       high-contrast system colors when Windows High-Contrast Mode strips author background palettes! */
+    .oc-token-widget,
+    .oc-vram-card,
+    .oc-perf-shield,
+    .oc-matrix-card,
+    .oc-badge-success,
+    .oc-badge-warning,
+    .oc-badge-error {
+      border: 2px solid ButtonText !important;
+    }
+
+    .oc-token-widget:focus-visible,
+    .oc-token-widget.is-test-focus {
+      outline: 3px solid Highlight !important;
+      outline-offset: 4px !important;
+    }
+  }
+}

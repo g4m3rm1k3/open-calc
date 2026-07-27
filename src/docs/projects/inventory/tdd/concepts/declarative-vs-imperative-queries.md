@@ -44,13 +44,20 @@ result = connection.execute(
 print(result)
 ```
 
-**Real output (both versions):**
+**Real output (both versions) — corrected, this session: the order was
+previously shown backwards; re-run directly to confirm.**
 ```
-[{'name': 'Rex', 'age': 3}, {'name': 'Milo', 'age': 5}]
-[('Rex', 3), ('Milo', 5)]
+[{'name': 'Milo', 'age': 5}, {'name': 'Rex', 'age': 3}]
+[('Milo', 5), ('Rex', 3)]
 ```
 
-**What this proves:** both versions produce the same logical result (Rex and Milo, sorted by name), but the Python version explicitly names every step (loop, compare, append, sort) while the SQL version states only the desired outcome — filtering condition and sort order — with zero code describing *how* to actually scan, filter, or sort the underlying data.
+**What this proves:** both versions produce the same logical result
+(Milo before Rex — alphabetical by name, "M" before "R" — both with age
+> 2, Fido correctly excluded), but the Python version explicitly names
+every step (loop, compare, append, sort) while the SQL version states
+only the desired outcome — filtering condition and sort order — with
+zero code describing *how* to actually scan, filter, or sort the
+underlying data.
 
 ## Mechanical Walkthrough
 
@@ -58,6 +65,32 @@ print(result)
 - **Declarative** code specifies *properties of the desired result* — "rows where age > 2," "ordered by name" — without specifying any particular algorithm for achieving it. `SELECT ... WHERE ... ORDER BY` is a description of an outcome, handed to SQLite's own query engine, which decides internally how to actually scan, filter, and sort the data.
 - Because a declarative query doesn't commit to *how* the result is produced, the underlying engine is free to change its actual strategy (adding an index that makes the `WHERE` clause vastly faster, for instance) without the query itself changing at all — the "what" and the "how" are genuinely decoupled.
 - Neither style is universally superior — they're different tools: imperative code is often necessary and natural for control flow and step-by-step logic a declarative system has no vocabulary for; declarative queries excel specifically at data retrieval/transformation questions with a clear, describable target shape.
+
+## Execution Trace
+
+The imperative version's real step-by-step state, traced against
+`pets = [Rex/3, Milo/5, Fido/1]`:
+
+```
+Before the loop: result = []
+
+pet = {name: "Rex", age: 3}:  age (3) > 2  → True  → result.append(Rex)
+                               result = [Rex]
+pet = {name: "Milo", age: 5}: age (5) > 2  → True  → result.append(Milo)
+                               result = [Rex, Milo]
+pet = {name: "Fido", age: 1}: age (1) > 2  → False → not appended
+                               result = [Rex, Milo]  (unchanged)
+
+result.sort(key=lambda p: p["name"]) → compares "Rex" vs "Milo" alphabetically
+  "Milo" < "Rex" → result = [Milo, Rex]
+```
+
+The declarative version has no equivalent trace to walk — `SELECT *
+FROM pets WHERE age > 2 ORDER BY name` names the same filter and sort as
+one description, and whatever loop/comparison SQLite's own query engine
+actually runs internally to satisfy it is exactly what this concept
+means by "how" being decoupled from "what": that internal execution
+plan isn't something the query itself exposes or commits to.
 
 ## CS Lens
 

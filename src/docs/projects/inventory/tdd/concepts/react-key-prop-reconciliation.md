@@ -57,6 +57,42 @@ function List() {
 - Without a `key` at all, React falls back to using array index implicitly, printing a real, explicit console warning ("Each child in a list should have a unique 'key' prop") specifically because this fallback is a common, real source of the exact bug demonstrated above.
 - The correct key is a value that is **stable** (the same logical item always has the same key, across every render) and **unique** among siblings in that specific list — a database ID, a UUID, or any other value guaranteed not to change or collide is appropriate; an array index is neither stable under reordering nor meaningfully tied to the item's actual identity.
 
+## Execution Trace
+
+Clicking "Add to front" once, traced against both keying strategies:
+
+```
+key={item.id}:
+  Before: [{id:1,"Apple"} key=1, {id:2,"Banana"} key=2]
+  After insert: [{id:0,"Cherry"} key=0, {id:1,"Apple"} key=1, {id:2,"Banana"} key=2]
+  React's reconciler compares keys, not positions:
+    key=1 existed before (was Apple, still Apple) → same identity → PATCH in place, no remount
+    key=2 existed before (was Banana, still Banana) → same identity → PATCH in place, no remount
+    key=0 is new → MOUNT a brand-new <li> for it
+  → only Cherry's <li> is newly created; Apple/Banana's own DOM nodes
+    (and any internal state they held) are reused untouched
+
+key={index}:
+  Before: index 0 → Apple, index 1 → Banana
+  After insert: index 0 → Cherry, index 1 → Apple, index 2 → Banana
+  React's reconciler compares keys, which are now just positions:
+    key=0 existed before (was Apple) — now maps to Cherry → React thinks
+      this is the SAME element, just with different text → PATCH the
+      existing <li> that used to be Apple's, now showing "Cherry" — but
+      any state that <li> was holding stays attached, now misapplied to Cherry
+    key=1 existed before (was Banana) — now maps to Apple → same
+      misattribution: Banana's old state, now on Apple's <li>
+    key=2 is new (index 2 didn't exist before) → MOUNT a brand-new <li> for Banana
+  → every <li> except the last one gets patched with a state mismatch;
+    only the LAST item in the list actually gets a fresh mount, which
+    is the opposite of what actually changed (Cherry, at the front)
+```
+
+Both traces process the same 3 real items after the same insert — the
+only thing that changes is which value React treats as each item's
+identity, and that one difference determines whether "patch in place"
+lands on the correct DOM node or a coincidentally-same-position one.
+
 ## CS Lens
 
 This is the same underlying problem `deep-equality-vs-reference-equality.md` names in a different context — establishing whether two things, compared across two points in time, are "the same thing" — applied here specifically to tracking identity across a diffing/reconciliation algorithm. Any algorithm comparing two versions of a collection to compute a minimal set of changes (a diff) needs some notion of identity to match elements between the two versions; `key` is React's explicit, developer-supplied answer to "how should I match these."

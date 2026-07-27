@@ -429,11 +429,12 @@ interface PathResponse {
 ```
 
 ### Mechanical Walkthrough
+
 - `interface Point { x: number; y: number; z: number; }` — **(b)
   reappearing** interface syntax, applied to the exact real shape Lesson
   6's `MachineState.position()` returns.
 - `interface PathResponse { points: Point[]; }` — **(a) first appearance**
-- of `Point[]`: an **array type** — a list where every element must
+  of `Point[]`: an **array type** — a list where every element must
   satisfy the `Point` interface. `PathResponse` names the *whole* real
   JSON body `/api/path` returns (`{"points": [...]}`), not just one point.
   *(Full standalone treatment: ../concepts/typescript-array-types.md.)*
@@ -503,18 +504,19 @@ const pointsElement = document.querySelector<HTMLPreElement>("#points")!;
 ```
 
 ### Mechanical Walkthrough
+
 - `document.querySelector<HTMLPreElement>("#points")` — **(b)
   reappearing** `document.querySelector` (functionally identical to
   Lesson 1's `getElementById`, matching any CSS selector instead of only
-- an id — here, `"#points"` selects by id, same target, different
+  an id — here, `"#points"` selects by id, same target, different
   syntax); **(a) new**: the `<HTMLPreElement>` generic argument tells
   TypeScript *which specific* element type to assume the result is,
-- rather than the general `Element` it would otherwise infer — necessary
+  rather than the general `Element` it would otherwise infer — necessary
   because `.textContent` (used below) exists on the general type too,
   but this annotation is what lets more specific `<pre>`-only properties
   be used safely if ever needed later.
 - The trailing `!` — **(b) reappearing**, the non-null assertion just
-- proven — asserting that an element with `id="points"` really exists in
+  proven — asserting that an element with `id="points"` really exists in
   `index.html` (it does, added this lesson), so TypeScript doesn't force
   a null-check for a case that, here, genuinely cannot happen.
 
@@ -660,13 +662,14 @@ still uses `.then()`, since the *caller* isn't itself an `async`
 function here — both styles interoperate freely.
 
 ### Mechanical Walkthrough
+
 - `async function fetchPath(program: string): Promise<Point[]>` — **(b)
-- reappearing** `async`, just proven; `Promise<Point[]>` — **(a) first
+  reappearing** `async`, just proven; `Promise<Point[]>` — **(a) first
   appearance** of a **generic type applied to a built-in type**: `Promise`
   itself takes a type parameter describing what it eventually resolves
-- to — here, an array of `Point`.
+  to — here, an array of `Point`.
 - `const response = await fetch(...)` — **(b) reappearing** `fetch`
-- (Lesson 1) and its options object (`method`, `headers`, `body` —
+  (Lesson 1) and its options object (`method`, `headers`, `body` —
   Lesson 2's `POST`-with-JSON-body pattern), now awaited instead of
   chained with `.then`.
   *(Added retroactively, found missing while cross-referencing a real
@@ -674,7 +677,7 @@ function here — both styles interoperate freely.
   network call has zero timeout and zero retry logic — a genuinely
   honest, still-open gap, not yet closed anywhere in this project. Full
   standalone treatment: ../concepts/retry-timeout-and-backoff.md.)*
-- `{ program }` — **(a) first appearance** of
+  `{ program }` — **(a) first appearance** of
   **object shorthand property syntax**: equivalent to `{ program:
   program }`, using the variable's own name as the key when they match.
   *(Full standalone treatment: ../concepts/javascript-object-shorthand-property.md.)*
@@ -694,7 +697,7 @@ function here — both styles interoperate freely.
 - `fetchPath(program).then((points) => { ... })` — **(c) already
   established** `.then()` (Lesson 1), called on the `Promise<Point[]>`
   `fetchPath` returns; `points` inside the callback is correctly typed as
-- `Point[]`, inferred from `fetchPath`'s own declared return type — no
+  `Point[]`, inferred from `fetchPath`'s own declared return type — no
   annotation needed here, TypeScript already knows.
 
 ### CS Lens
@@ -810,12 +813,13 @@ project's real first use of JavaScript/TypeScript's ES module `import`/
 ../concepts/javascript-es-modules-import-export.md.)*
 
 ### Mechanical Walkthrough
+
 - `from flask_cors import CORS` / `CORS(app, origins=[...])` — **(a)
   first appearance.** `flask_cors` is a real, third-party Flask extension
   (installed via `pip`, same as `flask` itself); calling `CORS(app,
   ...)` wraps every route on `app` so its responses include the
   `Access-Control-Allow-Origin` header the browser was missing.
-- `origins=["http://localhost:5180"]` — **(a) a deliberate, named
+  `origins=["http://localhost:5180"]` — **(a) a deliberate, named
   choice**: allowing *only* this one, specific origin, rather than `"*"`
   (allow literally anyone) — the narrower, real-world-appropriate option,
   since this backend will eventually hold real data (Lesson 10 onward)

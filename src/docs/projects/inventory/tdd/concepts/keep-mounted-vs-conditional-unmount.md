@@ -93,6 +93,36 @@ Counter shows: 5
   the real difference is invisible until you look at *state*, not
   appearance.
 
+## Execution Trace
+
+The same 4-click sequence (click the counter 5 times, Toggle, Toggle),
+traced against the real output above:
+
+```
+Conditional-render version ({visible && <Counter />}):
+  visible=true:  <Counter /> renders, count=0
+  5 clicks:      count → 1 → 2 → 3 → 4 → 5 (Counter's own state, live)
+  Toggle click:  visible → false. {false && <Counter />} → false.
+                 React unmounts Counter. count=5 is destroyed with it.
+  Toggle click:  visible → true. {true && <Counter />} → <Counter />.
+                 React mounts a BRAND NEW Counter instance. count=0 (fresh useState).
+  → final displayed count: 0
+
+Keep-mounted version (<div style={{display: visible ? "block" : "none"}}>):
+  visible=true:  <Counter /> renders inside the div, count=0
+  5 clicks:      count → 1 → 2 → 3 → 4 → 5
+  Toggle click:  visible → false. div's style becomes display:"none".
+                 Counter is still in the React tree — NOT unmounted, count=5 untouched.
+  Toggle click:  visible → true. div's style becomes display:"block".
+                 The SAME Counter instance becomes visible again. count is still 5.
+  → final displayed count: 5
+```
+
+Both versions run the identical 5 clicks and the identical 2 toggles —
+the only difference in the entire trace is whether the *third* toggle
+step destroys `Counter`'s component instance or merely hides its DOM
+node, and that one difference is what separates `0` from `5` at the end.
+
 ## CS Lens
 
 This is the same underlying distinction as a paused process versus a

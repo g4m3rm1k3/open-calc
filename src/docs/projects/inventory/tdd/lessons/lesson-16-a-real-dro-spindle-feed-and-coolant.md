@@ -191,14 +191,15 @@ if "S" in words and self.spindle_dir:
 ```
 
 ### Mechanical Walkthrough
+
 - `words["M"] if isinstance(words["M"], list) else [words["M"]]` — **(a)
   first appearance** of normalizing a value that might be a single item
   or a list into always-a-list.
   *(Full standalone treatment: ../concepts/python-normalize-scalar-or-list.md.)*
   Lesson 2's `tokenize()` already turns a
   *repeated* letter on one line into a real Python `list` (its own
-- duplicate-word behavior) — a line like `"M3 M8"` produces `{"M": [3.0, 8.0]}` — so this one line is what lets a single line legitimately turn
-
+  duplicate-word behavior) — a line like `"M3 M8"` produces `{"M": [3.0,
+  8.0]}` — so this one line is what lets a single line legitimately turn
   on the spindle *and* coolant together, matching the real reference's
   own `for (const m of ms2)` loop over potentially-multiple M-codes per
   block.
@@ -209,10 +210,50 @@ if "S" in words and self.spindle_dir:
 - `if "S" in words and self.spindle_dir:` — **(a) first appearance** of
   this project's own port of the reference's *second* real S-handling
   site: `S` alone, on a line with no `M3`/`M4` at all, still updates
-- `spindle_rpm` — but **only** if the spindle is already running (`self.spindle_dir` is truthy) — verified directly this session: `S`
-
+  `spindle_rpm` — but **only** if the spindle is already running
+  (`self.spindle_dir` is truthy) — verified directly this session: `S`
   sent while the spindle is stopped (`M5` already applied) is correctly
   ignored, matching the real reference's own `&& ch.dir` guard exactly.
+
+### Execution Trace
+
+The `for m_value in m_values:` dispatch chain, against real line
+`"M3 S1000"` (single M-code) — the per-line real output is already
+shown below; this traces the internal `elif` chain that produces it:
+
+```
+words = {"M": 3.0, "S": 1000.0}
+"M" in words? → Yes
+m_values = words["M"] if isinstance(words["M"], list) else [words["M"]]
+  → words["M"] (3.0) is not a list → m_values = [3.0]
+
+for m_value in [3.0]:
+  m_value = 3.0 → m_int = 3
+  3 not in _SUPPORTED_M_CODES? → False (3 is _SPINDLE_CW) → continue
+  m_int == _SPINDLE_CW (3)?  → True → self.spindle_dir = "CW"
+  (elif branches for CCW/STOP/MIST/FLOOD/OFF never checked — the chain
+  stops at the first True branch)
+Loop ends (only 1 value in m_values).
+
+if "S" in words and self.spindle_dir:
+  "S" in words → True.  self.spindle_dir ("CW") → truthy → True
+  → self.spindle_rpm = words["S"] = 1000.0
+```
+
+A line with two M-codes, `"M3 M8"` (spindle CW and coolant flood
+together, the exact real case `python-normalize-scalar-or-list.md`
+names above), traces the same loop running **twice**:
+
+```
+words = {"M": [3.0, 8.0]}
+m_values = words["M"] (a list already) → m_values = [3.0, 8.0]
+
+for m_value in [3.0, 8.0]:
+  m_value=3.0 → m_int=3 → matches _SPINDLE_CW → self.spindle_dir = "CW"
+  m_value=8.0 → m_int=8 → matches _COOLANT_FLOOD → self.coolant_flood = True
+Loop ends (2 values, both applied) — both real state changes happened
+from one single line, one loop, two iterations.
+```
 
 ### Commands and Real Output
 
@@ -403,12 +444,13 @@ function MachineStatus({ program }: MachineStatusProps) {
 ```
 
 ### Mechanical Walkthrough
+
 - `const AXES = ["x", "y", "z"] as const;` — **(a) first appearance** of
   TypeScript's `as const` assertion.
   *(Full standalone treatment: ../concepts/typescript-as-const-assertion.md.)*
 - `AXES.map((axis) => ...)` structure, `.toFixed(4)` — **(a) a real,
   corrected detail**: the reference uses **4** decimal places
-- (`.toFixed(4)`), not 3 — my own first, unread-source draft used 3;
+  (`.toFixed(4)`), not 3 — my own first, unread-source draft used 3;
   fixed once the real line was actually read.
 - `AXIS_LABEL_COLOR` — **(b) reappearing** object-as-lookup-table
   pattern (Lesson 4's `_MOTION_CODES`), ported directly from the
@@ -419,11 +461,44 @@ function MachineStatus({ program }: MachineStatusProps) {
   coloring ternary), ported directly from the reference's own identical
   three-way `ms.dir === "CW" ? ... : ms.dir === "CCW" ? ... : ...` chain.
 - `.sec`/`.dro`/`.dro-ax`/`.dro-num`/`.dro-unit`/`.sgrid`/`.sbox`/
-- `.sbox-l`/`.sbox-v` class names — **(a) chosen deliberately to match
+  `.sbox-l`/`.sbox-v` class names — **(a) chosen deliberately to match
   the reference's own real class names exactly**, not renamed —
   because the real CSS (next unit) was ported verbatim under those exact
   selectors; matching names here is what makes the port a port, not an
   independent restyling that happens to look similar.
+
+### Execution Trace
+
+`AXES.map(...)` against this same lesson's own real state,
+`{position: {x:30.0, y:20.0, z:-5.0}, ...}` (shown below in "Commands
+and Real Output"):
+
+```
+axis="x": AXIS_LABEL_COLOR["x"] = "var(--color-axis-x)"
+  state.position["x"] (30.0).toFixed(4) → "30.0000"
+  → <div className="dro" key="x">
+      <span style={{color:"var(--color-axis-x)"}}>X</span>
+      <span style={{color:"var(--color-text)"}}>30.0000</span>  ← not z, so var(--color-text)
+      <span>mm</span>
+    </div>
+
+axis="y": AXIS_LABEL_COLOR["y"] = "var(--color-axis-y)"
+  state.position["y"] (20.0).toFixed(4) → "20.0000"
+  → <div className="dro" key="y"> ... "Y" ... "20.0000" ... </div>
+
+axis="z": AXIS_LABEL_COLOR["z"] = "var(--color-axis-z)"
+  state.position["z"] (-5.0).toFixed(4) → "-5.0000"
+  → <div className="dro" key="z">
+      <span style={{color:"var(--color-axis-z)"}}>Z</span>
+      <span style={{color:"var(--color-axis-z-value)"}}>-5.0000</span>  ← axis==="z", different color
+      <span>mm</span>
+    </div>
+```
+
+Three real DRO rows from one `.map()` call — `Z`'s own readout is the
+only one that gets `var(--color-axis-z-value)` instead of
+`var(--color-text)`, since the ternary inside the JSX checks
+`axis === "z"` fresh on every iteration, not just once.
 
 ### The New Code — Real CSS, Ported Verbatim
 
@@ -438,22 +513,43 @@ function MachineStatus({ program }: MachineStatusProps) {
 .dro{display:flex;align-items:center;background:var(--color-bg);
   border:1px solid var(--color-border);border-radius:4px;padding:5px 8px;
   margin-bottom:3px;gap:8px}
+.dro-ax{font-family:monospace;font-size:12px;font-weight:700;width:14px;
+  flex-shrink:0}
 .dro-num{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;
   flex:1;text-align:right;letter-spacing:-.5px}
+.dro-unit{font-size:9px;color:var(--color-muted);min-width:20px}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 .sbox{background:var(--color-bg);border:1px solid var(--color-border);
   border-radius:4px;padding:5px 7px}
+.sbox-l{font-size:8px;color:var(--color-muted);font-weight:700;
+  letter-spacing:1px;text-transform:uppercase}
+.sbox-v{font-size:13px;font-weight:700;margin-top:2px;font-family:monospace}
 ```
-(abridged to the most structurally important rules; `.dro-ax`/
-`.dro-unit`/`.sbox-l`/`.sbox-v` follow the identical real values, quoted
-in full in `theme.css`.)
+Every real rule from `getCSS()`'s DRO/spindle block, shown in full — none
+elided. `.dro-ax` sizes the `X`/`Y`/`Z` axis-letter label; `.dro-unit`
+sizes the small trailing unit text next to each DRO readout; `.sbox-l`/
+`.sbox-v` are the small spindle/feed/coolant status boxes' own label and
+value rows.
+
+The two new real tokens these rules (and the ones above) depend on,
+added to `theme.css`'s `:root` alongside `--color-axis-*`/
+`--color-status-*`/`--color-muted`:
+```css
+--color-border: #2b3a55;
+--color-text-dim: #90a4c2;
+```
+`--color-border` is used directly above (`.sec`/`.dro`/`.sbox`'s own
+borders); `--color-text-dim` isn't consumed by any of *this* lesson's
+own rules — added alongside its real siblings from the same
+`PALETTE_DARK` read, for a later consumer, not yet used here.
 
 ### Mechanical Walkthrough
+
 - Every rule above is the reference's own real, embedded stylesheet
   (`cnc-sim/cnc/CNCSim.tsx`'s `getCSS()`, lines 1688–1701), with only
   `${C.bg}`/`${C.bd}`/`${C.txt3}`-style template-literal color
   references replaced by this project's own `var(--color-bg)`/
-- `var(--color-border)`/`var(--color-muted)` design tokens (Lesson 12) —
+  `var(--color-border)`/`var(--color-muted)` design tokens (Lesson 12) —
   **structure, spacing, and typography values copied exactly**, not
   reinterpreted.
 - **(a) two new, real tokens added to `theme.css`**, cited from the same

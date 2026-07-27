@@ -6,8 +6,10 @@
 shell: the 3D viewport becomes a genuine, fixed, full-screen background
 layer — sized only by the real browser window, never by anything a
 panel does — and two independent, resizable, tabbed side panels float
-above it, left and right. Direct instruction, from a real, named prior
-failure: a view (DRO, Tools) lives in *at most one* panel at a time;
+above it, left and right. Direct instruction, from a design judgment
+made before any code existed here (not a coded prototype that failed —
+see this lesson's own correction, below, for why that distinction
+matters): a view (DRO, Tools) lives in *at most one* panel at a time;
 clicking its ribbon button opens or moves it into whichever panel is
 currently "selected," closes it if it's already the active tab there,
 and dragging either panel's edge resizes it live — all verified this
@@ -200,6 +202,7 @@ The end of `createViewport`, in full:
 as the app runs, not just at the exact moment it was first created.
 
 ### Mechanical Walkthrough
+
 - `new ResizeObserver(() => {...})` / `.observe(container)` — **(b)
   reappearing**, full treatment in the concept file, watching this
   project's own real viewport container instead of the lab's plain
@@ -208,19 +211,45 @@ as the app runs, not just at the exact moment it was first created.
   appearance** of a real, defensive guard this project's own container
   specifically needs: a `.canvas-layer` briefly at zero size during
   initial mount (before layout settles) would otherwise divide by zero
-- computing `camera.aspect`, producing `NaN` and a real, broken render —
+  computing `camera.aspect`, producing `NaN` and a real, broken render —
   never observed in the concept file's own simpler lab, genuinely new
   here.
 - `renderer.setSize(newWidth, newHeight)` — **(b) reappearing** the
   identical call already made once, at creation, in `createViewport`'s
   own earlier lines — now called again, live, instead of never again.
 - `camera.aspect = ...` / `camera.updateProjectionMatrix()` — **(a)
-- first appearance** — a `PerspectiveCamera`'s `aspect` ratio is read
+  first appearance** — a `PerspectiveCamera`'s `aspect` ratio is read
   once when its internal projection matrix is built and never
-- recomputed automatically after — `updateProjectionMatrix()` is the
+  recomputed automatically after — `updateProjectionMatrix()` is the
   real, required call telling Three.js to rebuild it from the new
   `aspect` value; skipping it would leave the camera's own math stale
   even though `aspect` itself changed.
+
+### Execution Trace
+
+The observer callback against the real resize below (window resized to
+900×700, the real `.canvas-layer` container ending up 900×638 once the
+ribbon bar's own height is subtracted):
+
+```
+Before resize: renderer size = (some earlier width, height), camera.aspect
+  = (earlier width / earlier height)
+
+Browser resizes to 900x700 → ResizeObserver fires the callback:
+  newWidth = container.clientWidth → 900
+  newHeight = container.clientHeight → 638  (700 minus the ribbon's own height)
+  newWidth === 0 || newHeight === 0?  → False, False → guard does not fire
+  renderer.setSize(900, 638)  → the real <canvas> now measures 900x638
+  camera.aspect = 900 / 638 → 1.4106...
+  camera.updateProjectionMatrix()  → the camera's internal projection
+    matrix is rebuilt using the new 1.4106 aspect ratio
+```
+
+The guard's own `newWidth === 0 || newHeight === 0` never fires in this
+real resize (both dimensions are genuinely nonzero) — it exists for the
+narrower, real case named above (a container measuring zero during
+initial mount, before layout settles), which this particular resize
+event doesn't happen to hit.
 
 ### CS Lens / SE Lens
 
@@ -372,6 +401,7 @@ export default SidePanel;
 ```
 
 ### Mechanical Walkthrough
+
 - `content: ReactNode` — **(b) reappearing**, full treatment in the
   concept file — a tab carries its already-built content, not raw data
   `SidePanel` would have to know how to render itself.
@@ -386,14 +416,45 @@ export default SidePanel;
   reappearing**, the identical call `ToolCardList.tsx` already used
   (Lesson 17) for the same reason: without it, closing a tab would also
   fire the tab's own `onClick` (selecting a tab about to be removed) and
-- the panel's `onMouseDown` (redundant, but not itself harmful here) —
+  the panel's `onMouseDown` (redundant, but not itself harmful here) —
   named because a reader seeing three nested click handlers on one
   element needs to know which ones are meant to fire together and which
   aren't.
 - `` `side-panel ${side}${isSelected ? " selected" : ""}` `` /
-- `` `side-panel-tab${tab.id === activeTabId ? " active" : ""}` `` —
+  `` `side-panel-tab${tab.id === activeTabId ? " active" : ""}` `` —
   **(b) reappearing**, the exact conditional-class shape established
   since Lesson 17.
+
+### Execution Trace
+
+`tabs.find(...)` and `tabs.map(...)` against 3 real tabs
+(`dro`/`tools`/`code`), with `activeTabId = "tools"`:
+
+```
+tabs.find((tab) => tab.id === activeTabId):
+  tab={id:"dro",...}:   "dro" === "tools"?   → False → keep searching
+  tab={id:"tools",...}: "tools" === "tools"? → True  → STOP, return this tab
+  (tab={id:"code",...} is never even checked — find() stops at the
+  first match)
+  activeTab = {id:"tools", label:"Tools", content:<MachineStatus/>}
+
+tabs.map((tab) => (...)):
+  tab={id:"dro"}:   "dro" === "tools"?   → False → className has no " active"
+    → <div key="dro" className="side-panel-tab">DRO<span>x</span></div>
+  tab={id:"tools"}: "tools" === "tools"? → True  → className has " active"
+    → <div key="tools" className="side-panel-tab active">Tools<span>x</span></div>
+  tab={id:"code"}:  "code" === "tools"?  → False → className has no " active"
+    → <div key="code" className="side-panel-tab">Code<span>x</span></div>
+  (all 3 tabs render, regardless of which one is active)
+
+activeTab ? activeTab.content : <empty message>
+  → activeTab is truthy → renders <MachineStatus/> in side-panel-body
+```
+
+`.find()` and `.map()` are evaluated completely independently here —
+`.find()` stops at the first match and never looks at `"code"` at all,
+while `.map()` still renders all 3 tabs regardless; only the *body*
+below the tab bar depends on which single tab `.find()` located.
 
 ### CS Lens
 
@@ -405,14 +466,25 @@ flat list of independent toggles).
 
 ### SE Lens
 
-Real prior failure, restated concretely here: a docking library that
-assumed its entire container was always tiled by real panels — no true
-empty space — is exactly why this component's own empty state
-(`tabs.length === 0` → "No panels open.") is real, first-class behavior,
-not an edge case skipped and hoped never to happen. A panel with zero
-tabs still renders, still has a real width, and is still a valid,
-selectable target — the actual requirement a tiling-only model could
-not satisfy.
+**Correction, this session:** the earlier wording here ("a real prior
+failure... a docking library that assumed its entire container was
+always tiled") implied a coded, tested prototype that produced a real,
+captured error — no such prototype, library name, code, or error exists
+anywhere in this project or session to back that claim, and stating it
+that way was dishonest by this curriculum's own standard (every other
+real correction gets exactly that evidence; this one didn't have it).
+What's real is narrower: a **design-review judgment**, not a coded
+failure — a tiling-only panel model (every panel always occupies real
+space, with no first-class "zero tabs" state) was considered and
+rejected before writing any code, on the reasoning below, not discovered
+by building it and watching it break. This component's own empty state
+(`tabs.length === 0` → "No panels open.") is real, first-class behavior
+specifically because a design that *couldn't* represent "zero tabs, but
+this panel still legitimately exists as a drop target" was ruled out at
+the design stage. A panel with zero tabs still renders, still has a real
+width, and is still a valid, selectable target — the actual requirement
+a tiling-only model can't satisfy, reasoned through rather than proven
+by a failed build.
 
 ---
 
@@ -587,8 +659,9 @@ bar, each tab's own active/inactive and hover-to-close states, and the
 empty-state message.
 
 ### Mechanical Walkthrough
+
 - `.side-panel.left .side-panel-resize-handle` / `.side-panel.right
-- .side-panel-resize-handle` — **(a) first appearance** of the descendant
+  .side-panel-resize-handle` — **(a) first appearance** of the descendant
   combinator in this project, per the isolated lab above: `right: -3px`
   only applies to a resize handle that's really nested inside a
   `.side-panel.left`, letting one shared class (`.side-panel-resize-handle`)
@@ -596,11 +669,11 @@ empty-state message.
   contains it — exactly the problem a single, unscoped rule couldn't
   solve.
 - `.side-panel`, `.side-panel-tabs`, `.side-panel-tab`, `.side-panel-tab-close`,
-- `.side-panel-body`, `.side-panel-empty`, `.side-panel-resize-handle` —
+  `.side-panel-body`, `.side-panel-empty`, `.side-panel-resize-handle` —
   **(c) already basic** — plain class selectors, the same syntax
   established since `css-rule-syntax-selectors-cascade.md`.
 - `.side-panel.left`, `.side-panel.right`, `.side-panel.selected`,
-- `.side-panel-tab.active` — **(b) reappearing** — compound class
+  `.side-panel-tab.active` — **(b) reappearing** — compound class
   selectors (two classes required on one element), the same shape
   Lesson 18's own `.btn.full`/`.btn-gr` combination already established,
   cited there back to `css-rule-syntax-selectors-cascade.md`.
@@ -675,15 +748,16 @@ Full standalone lab, run for real, in the concept file above. Not
 repeated here.
 
 ### Mechanical Walkthrough
+
 - `const dragState = useRef<{ startX: number; startWidth: number } | null>(null);`
-- — **(b) reappearing** `useRef`, but genuinely new *for this project's
+  — **(b) reappearing** `useRef`, but genuinely new *for this project's
   own code*: every earlier use (`Viewport.tsx`'s `containerRef`, Lesson
   8) held a real DOM node; this one holds a plain mutable value — the
   exact second half `react-useref-hook.md`'s own isolated lab already
   covers (its `RenderCounter` example), now actually used that way here
   for the first time.
 - `handlePointerDown` — **(b) reappearing**, full treatment in the drag
-- concept file — `dragState.current` (not a `useState` value) captures
+  concept file — `dragState.current` (not a `useState` value) captures
   the drag's starting point specifically *because* recording it should
   never itself trigger a re-render; only `onResize`'s own `setState`
   call, further down, should.
@@ -899,6 +973,7 @@ anywhere in this file anymore — it doesn't fit the panel model yet (a
 third toggle no one asked for. The component itself is untouched.
 
 ### Mechanical Walkthrough
+
 - `type PanelState = { tabs: ViewId[]; activeTab: ViewId | null }` —
   **(b) reappearing** TypeScript object/union types, applied to a new,
   real shape.
@@ -919,13 +994,61 @@ third toggle no one asked for. The component itself is untouched.
   `setState`, spread); **(a) first appearance** of this specific,
   real three-branch decision as a whole.
 - `(Object.keys(VIEW_LABELS) as ViewId[]).map(...)` — **(a) first
-- appearance** of `Object.keys()` in this project — returns a real
+  appearance** of `Object.keys()` in this project — returns a real
   array of an object's own keys, cast back to `ViewId[]` since
   `Object.keys` itself only ever returns `string[]`, with no way for
   TypeScript to know the specific literal keys `VIEW_LABELS` actually
-- has — this is what lets `RibbonToolbar`'s groups be built directly
+  has — this is what lets `RibbonToolbar`'s groups be built directly
   from `VIEW_LABELS` rather than a second, separately-maintained list of
   view ids that could drift out of sync with it.
+
+### Execution Trace
+
+Two real calls in sequence, starting from `leftPanel = {tabs:["dro",
+"tools"], activeTab:"dro"}`, `rightPanel = {tabs:["code"],
+activeTab:"code"}`, `selectedPanel = "left"`:
+
+```
+Call 1: toggleView("dro")  — closing the active tab in the selected panel
+  selected = leftPanel = {tabs:["dro","tools"], activeTab:"dro"}
+  otherSide = "right"
+  selected.tabs.includes("dro") (true) && selected.activeTab==="dro" (true)
+    → True → take the early-return branch
+  setPanel("left", panel => removeFromPanel(panel, "dro")):
+    removeFromPanel({tabs:["dro","tools"],activeTab:"dro"}, "dro"):
+      panel.tabs.includes("dro")? → True → continue
+      tabs = ["dro","tools"].filter(id => id !== "dro") = ["tools"]
+      activeTab: panel.activeTab==="dro"? → True → tabs[0] ?? null = "tools"
+      return {tabs:["tools"], activeTab:"tools"}
+  → leftPanel = {tabs:["tools"], activeTab:"tools"}
+  return  (function exits here — the two lines below never run for this call)
+
+Call 2: toggleView("code")  — moving a view from the other panel into
+  the selected one (starting from the state Call 1 just produced)
+  selected = leftPanel = {tabs:["tools"], activeTab:"tools"}
+  otherSide = "right"
+  selected.tabs.includes("code")? → False → skip the early return
+  setPanel("right", panel => removeFromPanel(panel, "code")):
+    removeFromPanel({tabs:["code"],activeTab:"code"}, "code"):
+      includes("code")? → True → tabs = [].filter(...) = []
+      activeTab: activeTab==="code"? → True → tabs[0] ?? null → undefined ?? null → null
+      return {tabs:[], activeTab:null}
+  → rightPanel = {tabs:[], activeTab:null}
+  setPanel("left", panel => ({
+    tabs: panel.tabs.includes("code") ? panel.tabs : [...panel.tabs, "code"],
+    activeTab: "code",
+  })):
+    panel = {tabs:["tools"], activeTab:"tools"}
+    panel.tabs.includes("code")? → False → tabs = [...["tools"], "code"] = ["tools","code"]
+  → leftPanel = {tabs:["tools","code"], activeTab:"code"}
+```
+
+Two calls, three of the function's real branches exercised: closing an
+active tab in place (Call 1), and removing-from-the-other-panel plus
+adding-to-the-selected-one in the same call (Call 2) — proof a view
+really can only ever end up in one panel's `tabs` array at a time,
+since `otherSide` is always cleared before the selected side ever gains
+the view.
 
 ### CS Lens
 

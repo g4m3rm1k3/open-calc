@@ -45,6 +45,40 @@ got a Match object: <re.Match object; span=(8, 11), match='333'> -> 333
 - `re.finditer(...)` returns an iterator object — calling it doesn't do any matching work yet. Each step of the `for` loop pulls the *next* match, doing just enough work to find it, not the whole text at once.
 - A `for` loop over any iterator repeatedly asks it "what's next," until it signals there's nothing left, at which point the loop ends automatically.
 
+## Execution Trace
+
+Against `text = "a1 b22 c333"`, traced against the real output above:
+
+```
+all_at_once = re.findall(r"\d+", text)
+  → scans the entire string immediately, finds all 3 matches
+  → builds and returns a complete list right away: ['1', '22', '333']
+  → type(all_at_once) → <class 'list'>
+
+one_at_a_time = re.finditer(r"\d+", text)
+  → returns an iterator immediately — no scanning has happened yet
+  → type(one_at_a_time) → <class 'callable_iterator'>
+
+for match in one_at_a_time:
+  Step 1: loop asks the iterator for the next match
+    → iterator scans from where it left off (start of string), finds "1"
+    → yields Match(span=(1,2), match='1')
+    → print("got a Match object:", ..., "->", "1")
+  Step 2: loop asks again
+    → iterator resumes scanning from after "1", finds "22"
+    → yields Match(span=(4,6), match='22')
+    → print(..., "->", "22")
+  Step 3: loop asks again
+    → iterator resumes from after "22", finds "333"
+    → yields Match(span=(8,11), match='333')
+    → print(..., "->", "333")
+  Step 4: loop asks again → iterator has nothing left → loop ends
+```
+
+`findall`'s single call does all 3 matches' worth of work before the
+`print` on the next line even runs; `finditer`'s iterator does none of
+that work until the `for` loop actually asks, one match at a time.
+
 ## CS Lens
 
 This is **lazy evaluation** — deferring work until its result is actually needed, one piece at a time, rather than computing everything eagerly up front. The **iterator protocol** is the general mechanism behind it: any object implementing "give me the next item, or tell me you're done" can be looped over with `for`, regardless of what it represents internally.

@@ -25,8 +25,17 @@ own format, adapted for teaching exactly one concept in isolation:
 - **The isolated example** — the smallest disposable host that demonstrates
   exactly this concept, run for real, real output shown, and a sentence
   stating what that output proves.
-- **Mechanical Walkthrough, CS Lens, SE Lens** — exactly as `LessonSchema.md`
-  defines them.
+- **Mechanical Walkthrough, Execution Trace, CS Lens, SE Lens** — exactly
+  as `LessonSchema.md` defines them. Execution Trace is not optional
+  decoration: `LessonSchema.md`'s own step 8 gives a mechanical trigger
+  (a loop or equivalent comprehension/generator, recursion, a
+  short-circuiting search, 2+ sequential same-kind constructions whose
+  results accumulate/compare, or a branch/dispatch depending on state
+  carried from an earlier step) — if the isolated example's own code
+  meets that trigger, real, concrete step-by-step values are required,
+  not a prose paraphrase of what the code "generally does." If none of
+  the trigger conditions are met, say so explicitly rather than silently
+  omitting the step.
 - **Connection** — what this builds on, what commonly builds on it.
 - **Try It Yourself** — closes every file: suggested modifications to the
   example and what result each should produce. This is what makes a concept

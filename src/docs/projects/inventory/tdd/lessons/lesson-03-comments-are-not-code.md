@@ -226,21 +226,22 @@ As a whole, `core/lexer.py` now has three functions instead of one:
 the project will actually call going forward.
 
 ### Mechanical Walkthrough
+
 - `_BLOCK_COMMENT_RE = re.compile(r"\(([^)]*)\)")` — **(b) `re.compile`
   reappearing** (Lesson 2); the pattern itself is **(a) first
-- appearance**: `\(` and `\)` — literal parenthesis characters, escaped
+  appearance**: `\(` and `\)` — literal parenthesis characters, escaped
   with `\` because bare `(`/`)` in a regex mean "start/end a capture
-- group," not "match a literal parenthesis." `([^)]*)` — a capture group
+  group," not "match a literal parenthesis." `([^)]*)` — a capture group
   matching zero-or-more characters that are *not* a closing paren:
   `[^)]` is a **negated character class** (the `^` immediately inside
-- `[...]` means "anything except what follows" — a different meaning
+  `[...]` means "anything except what follows" — a different meaning
   than `^` used outside brackets, which anchors to the start of a
   string, worth distinguishing explicitly since both use the same
   character). `*` (zero-or-more) rather than `+` (one-or-more, used for
   the number pattern in Lesson 2) because an empty comment, `()`, is
   valid and should match too.
 - `match = _BLOCK_COMMENT_RE.search(line)` — **(b) reappearing**
-- (`.search`, Lesson 2's disposable lab) — finds the *first* parenthetical
+  (`.search`, Lesson 2's disposable lab) — finds the *first* parenthetical
   comment only, matching the reference's own `rest.match(...)` (a
   non-global match, first-only) at line 1124.
 - `comment = match.group(1).strip()` — **(b) reappearing** `.group(1)`
@@ -248,7 +249,7 @@ the project will actually call going forward.
   trailing whitespace).
 - `clean = _BLOCK_COMMENT_RE.sub("", line).strip()` — **(a) first
   appearance** of `.sub(replacement, text)`: replaces *every* match of the
-- pattern in `text` with `replacement` — here, `""`, meaning "delete every
+  pattern in `text` with `replacement` — here, `""`, meaning "delete every
   parenthetical comment," matching the reference's `.replace(regex, "",
   "g")` (JavaScript's `g` flag for "replace all," which Python's `.sub`
   does *by default* with no flag needed — a real, small, worth-naming
@@ -279,6 +280,41 @@ the project will actually call going forward.
   from a function bundles them into a tuple automatically); the calling
   code (`clean, comment = strip_comment(line)`, in the next unit) is what
   actually unpacks it back into two separate names.
+
+### Execution Trace
+
+The escalating-input table above shows final results for 4 real lines,
+but never the internal `search`-vs-`sub` split — worth tracing directly
+for the one genuinely interesting case, `"(start) G0 (rapid) X10"`
+(two block comments on one line):
+
+```
+line = "(start) G0 (rapid) X10"
+
+match = _BLOCK_COMMENT_RE.search(line)
+  → finds the FIRST parenthetical only: "(start)", group(1) = "start"
+  comment = "start".strip() = "start"
+
+clean = _BLOCK_COMMENT_RE.sub("", line).strip()
+  → .sub() removes EVERY match, not just the first:
+    "(start)" removed, AND "(rapid)" removed
+  → "  G0  X10".strip() = "G0  X10"   (the double space between G0 and
+    X10 is real — it's where "(rapid)" used to be, .sub() doesn't
+    collapse the gap it leaves behind)
+
+semicolon_index = clean.find(";") on "G0  X10" → -1 (no semicolon)
+  if semicolon_index >= 0: → False, skipped entirely
+
+return ("G0  X10", "start")
+```
+
+`search()` and `sub()` run independently against the *same* original
+`line`, not one after another on shrinking text — `search()` only ever
+looks for the first match (which is why `"rapid"` never becomes
+`comment`), while `sub()` separately finds and removes every match
+regardless of what `search()` found. That's the real mechanism behind
+"only the first block comment's text is kept, but all of them are
+removed."
 
 ### CS Lens
 
@@ -345,18 +381,19 @@ Already shown whole in the previous unit's "Updated Project" — this unit's
 walkthrough covers this function specifically.
 
 ### Mechanical Walkthrough
+
 - `def parse_line(line):` — already-known basic Python.
 - `clean, comment = strip_comment(line)` — **(a) first appearance** of
   **tuple unpacking**: `strip_comment` returns one two-element tuple;
   writing two comma-separated names on the left assigns the tuple's first
   element to `clean` and second to `comment` in one line, rather than
-- indexing (`result[0]`, `result[1]`) — the same general Python feature
+  indexing (`result[0]`, `result[1]`) — the same general Python feature
   that lets `for match in ...:` implicitly unpack, though this is its
   first *explicit*, standalone appearance in this project.
 - `return {"words": tokenize(clean), "comment": comment}` — a dict
   literal, already-known basic Python, calling **(b) `tokenize`
   reappearing**, unchanged since Lesson 2, now given the *cleaned* text
-- instead of the raw line — this single word, `clean` instead of `line`,
+  instead of the raw line — this single word, `clean` instead of `line`,
   is the entire fix for the bug Lesson 2 demonstrated.
 
 ### CS Lens
@@ -413,11 +450,12 @@ def tokenize_line():
 ```
 
 ### Mechanical Walkthrough
+
 - `from core.lexer import parse_line` replaces Lesson 2's
-- `from core.lexer import tokenize` — **(c) already-established** import
+  `from core.lexer import tokenize` — **(c) already-established** import
   syntax, just naming a different function.
 - `return parse_line(body["line"])` replaces Lesson 2's
-- `return {"words": tokenize(body["line"])}` — the route no longer builds
+  `return {"words": tokenize(body["line"])}` — the route no longer builds
   the response dict itself; `parse_line` already returns the exact right
   shape (`{"words": ..., "comment": ...}`). The route's validation logic
   (the `if not isinstance(...)` check above it) is **completely

@@ -47,6 +47,23 @@ mysql://user:password@localhost:3306/mydb
 - SQLite's own URL form is a real, specific exception to the general pattern: `sqlite:///:memory:` (three slashes, then the special in-memory marker) or `sqlite:////absolute/path` (three slashes plus a leading `/` for an absolute path, four total) — because there's no real host to connect to, only a local file (or no file at all, for `:memory:`).
 - Credentials embedded directly in a connection URL (as shown for PostgreSQL/MySQL above) are a real, common but also a real, common security concern — production systems typically read the URL (or its individual pieces) from environment variables or a secrets manager, never hardcoded directly in source code.
 
+## Execution Trace
+
+The loop carries no state between iterations — each pass just prints one
+already-built string — so the trace is short, but real:
+
+```
+Iteration 1: url = "sqlite:///:memory:"                              → printed
+Iteration 2: url = "sqlite:////absolute/path/to/app.db"              → printed
+Iteration 3: url = "postgresql://user:password@localhost:5432/mydb"  → printed
+Iteration 4: url = "mysql://user:password@localhost:3306/mydb"       → printed
+```
+
+Four structurally different real databases, one loop, one `print(url)`
+— the loop itself has no idea which dialect it's currently printing;
+all the real distinguishing information already lives inside each
+string before the loop ever runs.
+
 ## CS Lens
 
 A connection URL is a **uniform resource identifier** applied specifically to database connections — the same broader idea `http-request-response.md`'s URLs already use for web resources, generalized to identify and configure a connection to any addressable resource, not just a web page. Encoding "which system, and how to reach it" in one standard, parseable string format is what makes database drivers, ORMs, and connection-pooling tools able to work generically across many different backing engines without engine-specific configuration code scattered everywhere.

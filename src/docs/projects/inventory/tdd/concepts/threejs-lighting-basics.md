@@ -53,6 +53,39 @@ scene.add(dirLight);
 - A material that ignores lighting entirely (like `LineBasicMaterial`, used for simple flat-colored lines) is unaffected by either kind of light — lighting only matters for materials specifically designed to react to it (`MeshStandardMaterial`, `MeshLambertMaterial`, and similar).
 - Combining both is additive: a surface's final rendered brightness is the ambient contribution plus whatever directional contribution that specific point's angle produces.
 
+## Execution Trace
+
+Three real stages, the same sphere and material throughout, only the
+scene's lights changing between them:
+
+```
+Stage 1: scene has 0 lights
+  MeshStandardMaterial computes: (nothing to reflect) → every point on
+  the sphere renders pure black, regardless of its surface angle
+
+Stage 2: scene.add(AmbientLight(0xffffff, 0.7))
+  MeshStandardMaterial computes: ambient contribution (0.7, uniform) +
+  no directional contribution → every point gets the SAME flat
+  brightness, regardless of angle → renders as one uniform gray-green
+  disc, no visible curvature
+
+Stage 3: scene.add(DirectionalLight(0xffffff, 0.8) at position (2,2,2))
+  MeshStandardMaterial computes, per point on the sphere's surface:
+    ambient contribution (0.7, still uniform, unchanged from Stage 2)
+    + directional contribution (0.8 × how directly this specific
+      point's surface normal faces the light at (2,2,2) — varies
+      continuously across the sphere's real curved surface)
+  → points facing the light: high total brightness (bright side)
+  → points facing away: only the ambient 0.7 contributes (darker side,
+    but not pure black, since ambient is still present)
+  → renders with real, visible curvature and form
+```
+
+The ambient contribution (`0.7`) never changes once added in Stage 2 —
+Stage 3's new visible shading comes entirely from the directional
+light's own per-point angle calculation, added on top of that same
+constant ambient base.
+
 ## CS Lens
 
 This is a simplified, real-time-friendly approximation of how light actually behaves physically — a full physical simulation (tracing how light bounces around an entire scene, accumulating indirect illumination realistically) is computationally far too expensive to run many times per second, so real-time graphics substitutes cheap, direct approximations (a flat ambient term standing in for all indirect light; a single directional term standing in for a dominant light source) that produce a visually convincing result at a fraction of the cost. This tradeoff — physical accuracy versus real-time performance — is a recurring theme across real-time graphics generally.

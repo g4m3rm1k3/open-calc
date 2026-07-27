@@ -297,22 +297,23 @@ def compute_path(commands):
 ```
 
 ### Mechanical Walkthrough
-- `_ARC_MODES = ("G2", "G3")` / `_ARC_WORDS = (...)` — **(a) first
-- appearance** — `_ARC_WORDS` exists because real arc motion needs *some* word present (an endpoint or a center specifier) — a bare `"G2"` with
 
+- `_ARC_MODES = ("G2", "G3")` / `_ARC_WORDS = (...)` — **(a) first
+  appearance** — `_ARC_WORDS` exists because real arc motion needs *some*
+  word present (an endpoint or a center specifier) — a bare `"G2"` with
   no other words on the line is a real no-op in the reference (`hasArcMotion`
   is `False`), and this project's own `is_arc` check mirrors that gate.
 - `old_x, old_y, old_z = state.x, state.y, state.z` (before
-- `state.apply()`) — **(b) reappearing** — Lesson 33's own
+  `state.apply()`) — **(b) reappearing** — Lesson 33's own
   capture-before-apply pattern, extended to `x`/`y` since arc geometry
   needs the *starting* point of the move, not just its depth.
 - `ocx = old_x + command.get("i", 0.0)` / `ocy = old_y + command.get("j",
-- 0.0)` — **(a) first appearance** — the real center-offset form: `I`/`J` are offsets *from the start point*, not absolute coordinates —
-
+  0.0)` — **(a) first appearance** — the real center-offset form:
+  `I`/`J` are offsets *from the start point*, not absolute coordinates —
   a real, easy-to-get-backwards detail, ported exactly as
   `ch.pos.X + I` reads.
 - The `if "r" in command:` block (half-chord check, `h`, `mx`/`my`,
-- `ux`/`uy`, `sign`) — **(a) first appearance** — the real `R`-word
+  `ux`/`uy`, `sign`) — **(a) first appearance** — the real `R`-word
   center derivation: given only a radius and the two endpoints, there are
   two possible circle centers producing that radius (one on each side of
   the chord connecting them); `sign` (`+1` for `G02`, `-1` for `G03`)
@@ -329,7 +330,7 @@ def compute_path(commands):
   Fanuc convention this port preserves: `G02 I-15. J0.` with no `X`/`Y`
   at all means "a complete circle back to the start," not "go nowhere."
 - `if mode == "G2": if da > 0: da -= 2 * math.pi` / `else: if da < 0: da
-- += 2 * math.pi` — **(a) first appearance** — real sweep-direction
+  += 2 * math.pi` — **(a) first appearance** — real sweep-direction
   normalization: `atan2`'s own range (`-π` to `π`) can produce a `da`
   that goes the *wrong way* around for the commanded direction; this
   forces `G02` (clockwise) to always be a negative sweep and `G03`
@@ -342,6 +343,66 @@ def compute_path(commands):
   real angle-based interpolation, `a0` advancing toward `a0 + da` in
   `steps` equal increments, each producing one real point on the circle
   via `ocx + r * cos(a)`, `ocy + r * sin(a)`.
+
+### Execution Trace
+
+No `R`-form arc appears anywhere else in this lesson (`O0003.nc`'s own
+example, traced in Connect the Pieces below, is I/J-form). Run directly
+against the real function this session for `G02 X0 Y10 R10` starting at
+`(10, 0)`:
+
+```
+$ python3 -c "
+from core.path import _add_arc_points
+points = []
+_add_arc_points({'motion': 'G2', 'r': 10.0, 'x': 0.0, 'y': 10.0},
+                 10.0, 0.0, 0.0, 10.0, 0.0, points)
+print(len(points), points[0], points[-1])
+"
+```
+
+Center resolution (the `if "r" in command:` block):
+```
+dx, dy = -10.0, 10.0; length = 14.1421 (the real chord length)
+abs(r_val) (10.0) + 1e-6 < length/2 (7.0711)?  → False, no degrade-to-line
+h = sqrt(10.0² - 7.0711²) = sqrt(100 - 50) = 7.0711
+mx, my = 5.0, 5.0 (real chord midpoint)
+ux, uy = -0.7071, -0.7071
+sign = 1 (mode is "G2")
+ocx = 5.0 + 1×7.0711×(-0.7071) = 0.0
+ocy = 5.0 + 1×7.0711×(-0.7071) = 0.0
+```
+The real center this run resolves to is the origin — not an assumption,
+the actual computed value.
+
+Angle/sweep resolution:
+```
+r = sqrt((10-0)² + (0-0)²) = 10.0
+a0 = atan2(0-0, 10-0)  = 0.0 rad
+a1 = atan2(10-0, 0-0)  = 1.5708 rad (90°)
+da = a1 - a0 = 1.5708 rad (90°) — the naive, un-normalized sweep
+
+Normalize for G2 (must be negative/clockwise):
+  da (1.5708) > 0 → da -= 2π → da = -4.7124 rad (-270°)
+
+steps = max(8, round(4.7124 × 10.0 / 2)) = max(8, 24) = 24
+```
+
+Interpolation, first/last of the 24 real points:
+```
+s=1:  a = 0.0 + (-4.7124×1)/24  = -0.1963 → (9.8079, -1.9509)
+s=24: a = 0.0 + (-4.7124×24)/24 = -4.7124 → (-0.0000, 10.0000)
+```
+
+The real result is a **270° arc**, not the naive 90° a reader might
+expect from two points 90° apart — verified against `cnc/engineMotion.ts`
+lines 210–231 directly: the reference's own `sign` is picked from `mode`
+alone (`G02` vs `G03`), never from `R`'s own sign, so this project's port
+is faithfully reproducing a real limitation already present in the
+reference — a positive `R` here doesn't select "the short way," the way
+some real Fanuc controls use `R`'s sign to distinguish a ≤180° arc from
+a >180° one. Neither this project nor the reference it's ported from
+implements that distinction.
 
 ### CS Lens
 

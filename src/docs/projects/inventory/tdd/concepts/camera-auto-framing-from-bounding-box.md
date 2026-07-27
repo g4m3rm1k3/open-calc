@@ -58,10 +58,12 @@ const centerHuge = frameCamera(camera, huge);
 console.log("huge object camera distance:", camera.position.distanceTo(centerHuge));
 ```
 
-**Real output:**
+**Real output — corrected, this session (re-run directly against the
+project's own `three` package; the previous values here were never
+actually produced by this code):**
 ```
-tiny object camera distance: ~0.14
-huge object camera distance: ~139.3
+tiny object camera distance: 0.307245834493064
+huge object camera distance: 307.2458299147443
 ```
 
 **What this proves:** the *same* function correctly frames both a
@@ -89,6 +91,41 @@ advance.
   left at whatever fixed values were fine for a different-sized scene —
   a `near` plane fixed at, say, `0.1` would clip straight through an
   object whose entire size is `0.05`.
+
+## Execution Trace
+
+`frameCamera` run against two objects 1000× apart in size, each call
+independent of the other except that both write into the same shared
+`camera` object:
+
+```
+frameCamera(camera, tiny):  tiny = Mesh(SphereGeometry(radius=0.05))
+  box.setFromObject(tiny) → size = (0.1, 0.1, 0.1), center = (0, 0, 0)
+  maxDimension = max(0.1, 0.1, 0.1, 0.001) = 0.1
+  distance = 0.1 * 2 = 0.2
+  camera.position = (0+0.2, 0-0.2, 0+0.12) = (0.2, -0.2, 0.12)
+  camera.near = 0.1/100 = 0.001; camera.far = 0.1*100 = 10
+  return center = (0, 0, 0)
+distance from camera.position to (0,0,0) = sqrt(0.2² + 0.2² + 0.12²) ≈ 0.3072
+
+frameCamera(camera, huge):  huge = Mesh(SphereGeometry(radius=50))
+  box.setFromObject(huge) → size = (100, 100, 100), center = (0, 0, 0)
+  maxDimension = max(100, 100, 100, 0.001) = 100
+  distance = 100 * 2 = 200
+  camera.position = (0+200, 0-200, 0+120) = (200, -200, 120)  ← overwrites the tiny-object values
+  camera.near = 100/100 = 1; camera.far = 100*100 = 10000
+  return center = (0, 0, 0)
+distance from camera.position to (0,0,0) = sqrt(200² + 200² + 120²) ≈ 307.25
+```
+
+The second call doesn't combine with or average against the first —
+`camera.position`, `.near`, and `.far` are simply overwritten wholesale,
+which is exactly why calling `frameCamera` again on a different object
+correctly re-frames the view instead of leaving stale values behind.
+The two real distances (`0.307...`, `307.245...`) differ by exactly
+1000×, the same ratio as the two spheres' own radii (`0.05` vs `50`) —
+confirming the formula scales linearly with object size, with no
+hidden size-specific branch anywhere in `frameCamera`.
 
 ## CS Lens
 

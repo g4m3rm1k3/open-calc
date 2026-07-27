@@ -304,7 +304,8 @@ Render loop, resize handling, and teardown, all directly mirroring
 ```
 
 ### Mechanical Walkthrough
-- No `EffectComposer`/`UnrealBloomPass`/`Line2` at all — a plain
+
+No `EffectComposer`/`UnrealBloomPass`/`Line2` at all — a plain
 `renderer.render(scene, camera)` call, since two solid, lit meshes need
 none of the toolpath viewport's own glow/thick-line machinery.
 Everything else (Z-up camera, damped `OrbitControls`, a `ResizeObserver`
@@ -386,15 +387,83 @@ function setAssembly(
 }
 ```
 
+`TOOL_COLOR`/`HOLDER_COLOR`, read above but not yet shown declared — the
+real module-level constants, with the real comment already on them:
+
+```ts
+// A real, deliberately simpler sibling to viewport.ts's own createViewport:
+// this modal only ever shows one small, static (non-animated) assembly, not
+// a live, glowing toolpath -- no post-processing composer/bloom, no Line2
+// geometry, just two solid, lit meshes. Real colors, not theme-driven yet
+// (a reasonable, named scope cut for a first pass, not an oversight): tool
+// = a light steel gray, holder = a darker gunmetal, distinct enough to read
+// clearly regardless of the app's own current theme.
+const TOOL_COLOR = 0xc8ccd4;
+const HOLDER_COLOR = 0x4a5568;
+```
+
+The comment's own "distinct enough to read clearly" was asserted, not
+measured — checked directly, this session, using WCAG's own real
+relative-luminance formula as a numeric proxy for "how distinguishable
+are these two colors" (WCAG's actual 4.5:1 threshold is defined for
+text against a background, not two solid meshes in a lit 3D scene, so
+this isn't a claim of accessibility compliance — just borrowing a real,
+standard formula instead of eyeballing it): `0xc8ccd4` (light steel
+gray) has a relative luminance of `0.602`; `0x4a5568` (dark gunmetal)
+has `0.090` — a real contrast ratio of **4.67:1**, comparable to what
+WCAG considers strongly distinguishable for text. A real, lucky-not-
+measured pass, not a verified one — and "regardless of the app's own
+current theme" is only ever checked against this modal's own fixed
+background, never against
+the app's 18-theme catalog (Lesson 24) this same tool/holder pair could
+theoretically be viewed against in a future, theme-aware pass.
+
 ### Mechanical Walkthrough
+
 Every call to `setAssembly` first disposes and removes every mesh the
-- *previous* call created — `mesh.geometry.dispose()` releases the real
+*previous* call created — `mesh.geometry.dispose()` releases the real
 GPU-side vertex buffer a `LatheGeometry` allocated (it can't be
 "re-profiled" in place; a changed profile means an entirely new
 geometry object), and `mesh.material.dispose()` releases its own GPU
 resources the same way. Skipping this would leak a full extra tool+
 holder mesh pair on every toggle click and every tool switch — small
 individually, real and compounding over a session.
+
+### Execution Trace
+
+Two real, sequential `setAssembly` calls, run for real against the
+actual `three` package (verified via direct Node execution, not a
+browser session, per this session's own cost constraint) — first with
+`showHolder=true`, then a toggle to `showHolder=false`:
+
+```
+Call 1: setAssembly(toolProfile, holderProfile, showHolder=true)
+  clearMeshes(): meshes=[] already → for loop over [] → no-op
+  toolGeometry = revolveProfile(toolProfile); toolMesh created;
+    assemblyGroup.add(toolMesh); meshes = [toolMesh]
+  showHolder true → holderGeometry/holderMesh created;
+    assemblyGroup.add(holderMesh); meshes = [toolMesh, holderMesh]
+  Real result: meshes.length = 2, assemblyGroup.children.length = 2
+
+Call 2: setAssembly(toolProfile, null, showHolder=false)
+  clearMeshes(): for mesh of [toolMesh, holderMesh]:
+    assemblyGroup.remove(toolMesh); toolMesh.geometry.dispose();
+      toolMesh.material.dispose()
+    assemblyGroup.remove(holderMesh); holderMesh.geometry.dispose();
+      holderMesh.material.dispose()
+  meshes = []  (both real THREE.Mesh objects from call 1 now
+    unreferenced by both `meshes` and the scene graph)
+  new toolGeometry/toolMaterial/toolMesh created (a fresh object, not
+    the disposed one — the concept file's own point: a disposed
+    BufferGeometry can't be revived)
+  showHolder false → holder branch skipped entirely
+  Real result: meshes.length = 1, assemblyGroup.children.length = 1
+```
+
+Confirmed directly, this session: `assemblyGroup.children.length` goes
+2 → 1, not 2 → 3 — proof `clearMeshes()`'s loop actually removed both
+of call 1's meshes from the scene graph before call 2 added its own
+single one, rather than the two calls' meshes silently accumulating.
 
 ### CS Lens / SE Lens
 
@@ -407,7 +476,8 @@ None new.
 
 ### Run It
 
-Confirmed by code review: `clearMeshes()` is the first line of
+Confirmed by code review and direct Node execution against the real
+`three` package (above): `clearMeshes()` is the first line of
 `setAssembly`, called unconditionally on every invocation.
 
 ---
@@ -462,10 +532,10 @@ controls.target.copy(center);
 
 ### Mechanical Walkthrough / CS Lens / SE Lens
 
-- Not repeated — fully covered by `camera-auto-framing-from-bounding-
+Not repeated — fully covered by `camera-auto-framing-from-bounding-
 box.md`. The one project-specific detail beyond that file's own generic
 example: `camera.near`/`camera.far` are also derived from
-- `maxDimension`, not left fixed — a `near` plane fixed at a value fine
+`maxDimension`, not left fixed — a `near` plane fixed at a value fine
 for an 8-unit assembly would clip straight through a 0.2-unit one.
 
 ### Commands
@@ -579,6 +649,29 @@ holder's body past that point). `showHolder=false` skips building the
 holder mesh at all, not just hiding an existing one — the real toggle
 this feature exists to provide.
 
+### Execution Trace
+
+The guard and the real positioning, using `TA5120`'s own confirmed
+values (Lesson 47's `get_tool_assembly` output: `stickout: 2.6`):
+
+```
+showHolder=true, holderProfile=[18 real points], holderProfile.length(18) > 0
+  → guard passes → holder branch runs
+  holderMesh.position.z = 2.6
+    → holder's own nose (its profile's y=0 point) now sits at world
+      z=2.6, 2.6 units above the tool tip (world z=0, unmoved)
+
+showHolder=false (any holderProfile) → first operand false →
+  && short-circuits before evaluating holderProfile at all → guard
+  fails → holder branch skipped entirely, no mesh created, no
+  position.z assignment happens
+```
+
+The tool mesh itself is never repositioned by this unit's own code —
+only the holder moves, by exactly the one real, confirmed distance
+(`CScalar`) that separates a real tool's tip from its holder's real
+gauge line.
+
 ### CS Lens
 
 Not a hard CS concept — placing two independently-shaped solids of
@@ -660,6 +753,9 @@ async function patchHolderConnections(
   return data.assembly!;
 }
 ```
+
+`ToolAssemblyModal` itself is the real caller of both — fetching on
+mount, then calling `patchHolderConnections` from `handleSave` below:
 
 ```tsx
 function ToolAssemblyModal({ tool, onClose }: ToolAssemblyModalProps) {
@@ -749,14 +845,15 @@ function ToolAssemblyModal({ tool, onClose }: ToolAssemblyModalProps) {
 ```
 
 ### Mechanical Walkthrough
+
 Two separate `useEffect`s, deliberately: one with an **empty dependency
 array** (`[]`) creates the real WebGL viewport exactly once, for this
-- modal's own lifetime — a second one, depending on `[tool, assembly,
+modal's own lifetime — a second one, depending on `[tool, assembly,
 showHolder]`, re-runs `setAssembly` whenever any of that real data
 changes, reading `viewportRef.current` (populated by the first effect).
 React runs effects in the order they're declared within the same
 commit, so by the time the second effect's own first run happens,
-- `viewportRef.current` is already set — no race, confirmed by direct
+`viewportRef.current` is already set — no race, confirmed by direct
 testing (the tool's own procedural profile renders immediately on open,
 before the real assembly fetch even resolves, then the holder appears
 once it does). `upperType`/`upperSize`/`lowerType`/`lowerSize` are
@@ -1025,16 +1122,49 @@ New CSS for the modal's own two-pane body (`.assembly-modal-body`,
 ```
 
 ### Mechanical Walkthrough
+
 `.tcard` already had `cursor: pointer` in `theme.css` (Lesson 17,
 originally for a click-to-select interaction the reference has but this
 project never wired up) — the click handler added here is the first
 real use of that existing affordance. `update_holder_connections`
 mutates the already-loaded `holder` ORM object's own attributes
-- directly and calls `session.commit()` — SQLAlchemy's own unit-of-work
+directly and calls `session.commit()` — SQLAlchemy's own unit-of-work
 tracks the change without needing an explicit `UPDATE` statement built
 by hand. The route's `allowed`/`unknown` check rejects any field name
 outside the four real, intended ones with a clear `400`, rather than
 silently accepting (and ignoring) a typo'd or unsupported field name.
+
+### Execution Trace
+
+`update_holder_connections`'s own four `if key in fields:` checks, run
+for real (the identical attribute-mutation logic, verified directly)
+against a **partial** body — only `upper_connection_size` sent, matching
+a real PATCH where the user edited one field and left the other three
+alone:
+
+```
+holder before: {UpperConnectionType: 3, UpperConnectionSize: "BT40",
+                LowerConnectionType: 1, LowerConnectionSize: "ER32"}
+fields = {"upper_connection_size": "BT50"}
+
+"upper_connection_type" in fields?  → False → holder.UpperConnectionType
+  untouched
+"upper_connection_size" in fields?  → True  → holder.UpperConnectionSize
+  = "BT50"
+"lower_connection_type" in fields?  → False → holder.LowerConnectionType
+  untouched
+"lower_connection_size" in fields?  → False → holder.LowerConnectionSize
+  untouched
+
+holder after: {UpperConnectionType: 3, UpperConnectionSize: "BT50",
+               LowerConnectionType: 1, LowerConnectionSize: "ER32"}
+```
+
+Four independent checks, not one combined "replace the whole holder"
+assignment — sending a partial body only ever touches the fields
+actually present in `fields`, exactly like Lesson 15's own
+`ALLOWED_TOOL_FIELDS` partial-update shape, applied here to a different
+table.
 
 ### CS Lens
 

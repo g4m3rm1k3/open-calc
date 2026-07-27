@@ -55,6 +55,33 @@ engine_b pets: ['Milo']
 - `Base.metadata.create_all(engine_a)` / `(engine_b)` — **(b) reappearing** (`orm-object-relational-mapping.md`) — run once per engine, since each is a separate, empty database needing its own real tables created.
 - `Session(engine_a)` vs. `Session(engine_b)` — **(a) the actual concept**: a `Session` is bound to *one specific engine* at construction — this is the only place "which database" is ever decided. `Pet`, `select(Pet)`, and every query-building line are completely unaware of it.
 
+## Execution Trace
+
+Four real `Session` blocks, traced against the real output above:
+
+```
+Session(engine_a): add Pet(name="Rex")   → commit → engine_a's own
+  real database now has one row: Rex
+
+Session(engine_b): add Pet(name="Milo")  → commit → engine_b's own,
+  completely separate real database now has one row: Milo
+  (engine_a is untouched by this — different file/connection entirely)
+
+Session(engine_a): select(Pet) → queries engine_a's own database only
+  → finds Rex (the only row engine_a has ever had)
+  → print "engine_a pets: ['Rex']"
+
+Session(engine_b): select(Pet) → queries engine_b's own database only
+  → finds Milo (the only row engine_b has ever had)
+  → print "engine_b pets: ['Milo']"
+```
+
+The exact same `Pet` class and the exact same `select(Pet)` expression
+run in all four blocks — nothing about `Pet` changes between them. The
+only thing that ever varies is which `Session` (and therefore which
+`engine`) each block is constructed with, which is the sole real
+decision point determining which database gets read or written.
+
 ## CS Lens
 
 This is **separation of schema from connection** — a real, general database-programming principle: the description of *what a table looks like* (columns, types, relationships) is independent information from *where a specific instance of that table's data lives* (which server, which file, which connection). Conflating the two — as informally assuming "a model IS a database" does — is what makes this pattern feel surprising the first time it's seen.

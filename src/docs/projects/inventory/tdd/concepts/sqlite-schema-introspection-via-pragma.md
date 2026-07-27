@@ -84,6 +84,36 @@ still completely empty.
   than one real table, or a table's true role can only become clear by
   checking which other tables' rows actually point at it.
 
+## Execution Trace
+
+Three real queries against an unfamiliar file, traced against the real
+output above:
+
+```
+Query 1: select name from sqlite_master where type='table'
+  → returns 4 real rows, each a (name,) tuple
+  tables = ['Orders', 'Customers', 'OrderItems', 'ShippingLabels']
+  → print(tables)
+
+Query 2: pragma table_info(Orders)
+  → returns one row per real column in Orders, e.g.:
+  row = (0, "CustomerID", "GUID", ...)   → print "CustomerID GUID"
+  row = (1, "OrderDate", "DATE", ...)    → print "OrderDate DATE"
+  row = (2, "Total", "DOUBLE", ...)      → print "Total DOUBLE"
+  (loop continues for every real column pragma table_info reports)
+
+Query 3: select count(*) from Orders
+  → one real row, one real value
+  → cur.fetchone()[0] → 1204
+  → print("count:", 1204)
+```
+
+Each query answers a genuinely different question — which tables exist,
+what one specific table's real columns are, and whether that table
+actually holds data — and none of the three required opening any
+documentation or guessing; each is a direct, real read of the file's
+own current state.
+
 ## CS Lens
 
 This is **black-box introspection** — learning a system's real

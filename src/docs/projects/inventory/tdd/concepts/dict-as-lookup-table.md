@@ -50,9 +50,37 @@ all match: ['Sunday', 'Monday', 'Tuesday', 'Unknown']
 - `.get(key, default)` looks up `key` in the dict, returning `default` if it isn't present — avoiding a `KeyError` that a bare `_DAY_NAMES[n]` would raise for an unmapped value.
 - Adding a new case to the lookup-table version means adding one new dict entry; adding one to the branching version means inserting a new `elif` in the right place among the existing ones.
 
+## Execution Trace
+
+Both functions run against the same 4 inputs, traced side by side:
+
+```
+n=0: day_name_branching(0) → n==0 branch → "Sunday"
+     day_name_lookup(0)    → _DAY_NAMES.get(0, "Unknown") → 0 is a key → "Sunday"
+     assert "Sunday" == "Sunday" ✓
+
+n=1: day_name_branching(1) → n==0? No → n==1 branch → "Monday"
+     day_name_lookup(1)    → _DAY_NAMES.get(1, "Unknown") → 1 is a key → "Monday"
+     assert "Monday" == "Monday" ✓
+
+n=2: day_name_branching(2) → n==0? No → n==1? No → n==2 branch → "Tuesday"
+     day_name_lookup(2)    → _DAY_NAMES.get(2, "Unknown") → 2 is a key → "Tuesday"
+     assert "Tuesday" == "Tuesday" ✓
+
+n=5: day_name_branching(5) → n==0? No → n==1? No → n==2? No → else → "Unknown"
+     day_name_lookup(5)    → _DAY_NAMES.get(5, "Unknown") → 5 not a key → "Unknown"
+     assert "Unknown" == "Unknown" ✓
+```
+
+Every real input takes a different number of comparisons in the
+branching version (`n=0` short-circuits immediately, `n=5` has to fail
+three checks before reaching `else`) but exactly one operation — a
+single hash lookup — in the lookup version, regardless of which entry
+it is or whether it exists at all.
+
 ## CS Lens
 
-This is the **dispatch table pattern**, applied to *values* rather than *behavior* — the same underlying idea as looking up a function to call by name (see `http-routing-dispatch-table.md`), just mapping to a plain result instead of a callable. Both are instances of replacing a decision expressed as *code* (a branch) with a decision expressed as *data* (a lookup).
+This is the **dispatch table pattern**, applied to *values* rather than *behavior* — the same underlying idea as looking up a function to call by name (see `http-routing-dispatch-table.md`), just mapping to a plain result instead of a callable. Both are instances of replacing a decision expressed as *code* (a branch) with a decision expressed as *data* (a lookup). It's also a plain-data instance of the **Strategy pattern** — selecting, at runtime, which one of a family of interchangeable options to use for a given input, instead of hardcoding one choice — usually seen with each "strategy" as a swappable object or function, here reduced to its simplest form: each strategy is just a fixed value, and "selecting" one is a dict lookup.
 
 Also recognized in: a real interpreter translating a numeric opcode into a specific operation (exactly the shape of porting a `switch` statement's cases into a dict, one case per entry), configuration systems mapping a string key to a setting, and any place a fixed correspondence table exists in a spec or a reference document — it usually translates directly into a literal dict rather than a chain of comparisons.
 

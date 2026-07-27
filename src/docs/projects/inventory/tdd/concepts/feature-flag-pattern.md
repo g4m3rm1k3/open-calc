@@ -45,6 +45,31 @@ print(process_lines(lines, verbose_mode_enabled=True))
 - Because recognition and activation are separate steps, either can change independently — a smarter way to detect debug lines wouldn't need to touch the activation logic at all, and a new condition for when verbose mode applies (say, only during business hours) wouldn't need to touch the recognition logic either.
 - The flag itself (`verbose_mode_enabled`) is ordinary data, passed in from outside — nothing about *how* it's decided (a config file, a request field, a command-line argument) is baked into this function; it only consumes the already-decided value.
 
+## Execution Trace
+
+The identical 3-line input, run through the loop twice — once per flag
+value — traced against the real output above:
+
+```
+process_lines(lines, verbose_mode_enabled=False):
+  "real output":          is_debug_line=False → not skipped → results=["real output"]
+  "#debug: internal state": is_debug_line=True → (True and False)=False → not skipped
+                            → results=["real output", "#debug: internal state"]
+  "more output":          is_debug_line=False → not skipped
+                            → results=["real output", "#debug: internal state", "more output"]
+
+process_lines(lines, verbose_mode_enabled=True):
+  "real output":          is_debug_line=False → not skipped → results=["real output"]
+  "#debug: internal state": is_debug_line=True → (True and True)=True → continue (skipped!)
+                            → results=["real output"]  (unchanged)
+  "more output":          is_debug_line=False → not skipped
+                            → results=["real output", "more output"]
+```
+
+`is_debug_line` is computed identically on every iteration in both
+runs — it's only the `and verbose_mode_enabled` half of the condition
+that ever differs, and it's the only thing that does.
+
 ## CS Lens
 
 This is a specific application of **separation of concerns**: two logically independent questions — "what is this" (a classification/recognition concern) and "does it matter right now" (a policy/activation concern) — are kept in genuinely separate pieces of code, rather than merged into one combined conditional evaluated in a single step. Keeping them separate means each can be tested, changed, and reasoned about on its own.

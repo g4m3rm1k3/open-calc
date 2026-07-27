@@ -59,6 +59,27 @@ const contents: string = fs.readFileSync("data.txt", "utf-8");
 - Once installed as a `devDependency` (never a regular dependency — see `npm-package-json.md`, since a browser or Node process never executes a `.d.ts` file, only `tsc` reads it), `tsc` matches it to the real library by package name automatically, with no import changes needed in the code that uses the library.
 - Some libraries instead ship their *own* built-in types (a `.d.ts` file included directly in their own package) — for those, no separate `@types/` package exists or is needed; whether a library needs one has to be checked per-library, not assumed.
 
+## Execution Trace
+
+`leftpad`'s own real `while` loop, run at actual runtime (unaffected by
+whether `tsc` can see its types) for `leftpad("5", 3, "0")`:
+
+```
+Start: str = "5" (length 1)
+Check: str.length (1) < len (3)? → True
+  str = "0" + "5" = "05" (length 2)
+Check: str.length (2) < len (3)? → True
+  str = "0" + "05" = "005" (length 3)
+Check: str.length (3) < len (3)? → False → loop ends
+Return: "005"
+```
+
+This loop runs identically whether `@types/leftpad-demo` is installed
+or not — the `TS7016` error (before installing) and the clean compile
+(after) both happen entirely at `tsc`-check time, before any of this
+code has actually run even once. The runtime trace above is completely
+unaffected by which of those two states `tsc` was in.
+
 ## CS Lens
 
 This is **type information decoupled from implementation** — a real demonstration that a type system's checking and a program's actual runtime behavior are two entirely separate concerns that merely happen to usually travel together. Nothing stops them from being packaged, versioned, and shipped independently, which is exactly what `@types/` packages do.

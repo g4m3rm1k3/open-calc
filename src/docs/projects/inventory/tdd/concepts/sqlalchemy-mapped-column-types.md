@@ -55,6 +55,30 @@ nickname VARCHAR nullable
 - `Mapped[T | None]` (a union with `None`, see `typescript-union-types.md` for the identical union idea in a different language) is specifically what marks a column **nullable** — its *absence* is what makes a column `NOT NULL` by default, inverting what might be the more intuitive default (most languages default parameters to required unless marked otherwise; here, the union with `None` is the explicit opt-in to nullability).
 - This is a real, direct application of the same "derive one thing from another, don't duplicate" instinct `typescript-typeof-returntype-utility.md` describes — a single Python type annotation is the one true source both a type checker and a real database schema draw from.
 
+## Execution Trace
+
+`inspect(engine).get_columns("pets")` returns one dict per real column,
+iterated in table order — traced against the real output above:
+
+```
+column = {"name": "id", ...}:       type: int → INTEGER; primary_key=True → not nullable
+  → print "id INTEGER required"
+column = {"name": "name", ...}:     type: str (no | None) → VARCHAR, not nullable
+  → print "name VARCHAR required"
+column = {"name": "age", ...}:      type: int (no | None) → INTEGER, not nullable
+  → print "age INTEGER required"
+column = {"name": "nickname", ...}: type: str | None → VARCHAR, nullable
+  → print "nickname VARCHAR nullable"
+```
+
+Every column in this loop was produced from the exact same real class
+body — `Mapped[str]` and `Mapped[str | None]` (on `name` and
+`nickname`) produce the identical SQL *type* (`VARCHAR`) but opposite
+nullability, which is the one real distinction this whole concept is
+about: the presence of `| None` in the annotation, not the base type
+itself, is what the loop's `"nullable"`/`"required"` branch is actually
+reading.
+
 ## CS Lens
 
 This is **type-driven schema generation** — the same annotation a type checker uses for static analysis is *also* consumed by SQLAlchemy at runtime to determine real database structure, collapsing what could have been two separate, independently-maintained descriptions (a type annotation for the type checker, a schema definition for the database) into exactly one. This reflects a broader pattern of deriving multiple real artifacts from one canonical source, rather than hand-synchronizing several parallel descriptions of the same underlying fact.

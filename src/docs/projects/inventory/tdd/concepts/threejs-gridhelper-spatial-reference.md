@@ -57,6 +57,37 @@ scene.add(gridRotated);
 - Three.js's built-in helper objects (including `GridHelper`) are constructed flat on the X/Z plane by default, matching the library's own default assumption that Y is the "up" axis — a scene using a different up-axis convention (see the coordinate convention this same lesson names for its camera) must explicitly rotate the grid to match, using ordinary rotation properties exactly as any other object would be rotated (see `radians-rotation-unit.md`).
 - A grid, once added to a scene, is an ordinary scene member like any other — it can be repositioned, hidden, or removed exactly like any mesh or line, despite being provided as a convenience rather than hand-built.
 
+## Execution Trace
+
+Two separately-constructed grids, same size/divisions, traced against
+their real, different orientations:
+
+```
+grid = new THREE.GridHelper(500, 50, 0x131c28, 0x131c28)
+  → internally builds 51 lines one direction + 51 the other = 102
+    real line segments, as real vertex geometry
+  → grid.geometry.attributes.position.count → 204 (2 vertices per
+    segment) → 204 / 2 = 102
+  → print(102)
+  → default orientation: flat on the X/Z plane (Y-up convention)
+
+gridDefault = new THREE.GridHelper(500, 50)  → same construction,
+  no rotation applied → stays flat on X/Z, identical to `grid` above
+
+gridRotated = new THREE.GridHelper(500, 50)  → identical construction
+gridRotated.rotation.x = Math.PI / 2
+  → this ONE property write reorients the whole object: what was
+    flat on X/Z now lies flat on X/Y instead — the underlying
+    geometry (which vertices, how many) is completely unchanged;
+    only the object's own transform changed
+```
+
+`gridDefault` and `gridRotated` are built from the identical
+constructor call — the only difference in this entire trace is the one
+line setting `.rotation.x`, which is why the vertex *count* (102) would
+be identical for both, even though where those vertices end up in the
+scene is not.
+
 ## CS Lens
 
 A grid is a **spatial reference frame** — a fixed, known structure against which everything else's position, scale, and orientation can be visually judged. This is the identical role a coordinate axis, a ruler, or graph paper plays in any 2D or 3D context, made concrete and visible rather than left implicit.

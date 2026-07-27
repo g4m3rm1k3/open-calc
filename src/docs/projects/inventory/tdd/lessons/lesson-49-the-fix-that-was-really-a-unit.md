@@ -53,12 +53,12 @@ dict, unused by anything downstream until now).
 ```
 
 ### Mechanical Walkthrough
+
 `command.get("active_t", 0)` reads a value the *parser* already put on
-- every command dict — `compute_steps` doesn't compute anything new here,
+every command dict — `compute_steps` doesn't compute anything new here,
 it just carries an already-real fact forward into its own per-step
 snapshot, the same way `command_index` already rides alongside each
-- point.
-- `{**state.state(), "active_t": ...}` — spreading `state.state()`'s
+point. `{**state.state(), "active_t": ...}` — spreading `state.state()`'s
 own dict and adding one more key, rather than teaching `MachineState`
 itself about tool numbers at all; `active_t` is real parser-tracked
 modal state, not physical machine state, and doesn't belong on that
@@ -144,8 +144,9 @@ def get_assembly_by_number(tool_number):
 ```
 
 ### Mechanical Walkthrough
+
 The session that looks up `tool` closes (`with get_session() as
-- session:` exits) *before* `get_tool_assembly(tool_id)` opens its own —
+session:` exits) *before* `get_tool_assembly(tool_id)` opens its own —
 `tool_id` is captured as a plain local variable first, so the second
 call doesn't depend on the first session still being open. `.scalars(
 ).first()` (not `.scalar_one_or_none()`, used everywhere a tool number
@@ -228,11 +229,12 @@ const HOLDER_COLOR = 0x4a5568;
 ```
 
 ### Mechanical Walkthrough
-- Not one line of `toolAssembly.ts` changed for this — `buildToolProfile`/
+
+Not one line of `toolAssembly.ts` changed for this — `buildToolProfile`/
 `revolveProfile` take plain data in, return plain geometry out, with no
 dependency on which viewport calls them. `clearToolMeshes` mirrors
 `assemblyViewport.ts`'s own identical dispose-then-rebuild shape
-- (`concepts/threejs-mutating-scene-after-creation.md`, reappearing) —
+(`concepts/threejs-mutating-scene-after-creation.md`, reappearing) —
 the same real reason applies here: a `LatheGeometry`'s vertex data is
 baked in at construction, not mutable in place.
 
@@ -327,19 +329,44 @@ buildToolProfile/revolveProfile calls.
 ```
 
 ### Mechanical Walkthrough
+
+`clearToolMeshes()`/the tool-then-holder mesh construction — **(b)
+reappearing**, the identical shape `assemblyViewport.ts`'s own
+`clearMeshes()`/`setAssembly` already established (Lesson 48), applied
+here to `toolGroup` instead of `assemblyGroup`. `toolMesh.rotation.x =
+Math.PI / 2` (positive, not Lesson 48's negative) is this unit's one
+genuinely new value — worked out below, not copied.
+
+### Execution Trace
+
 THREE's own X-axis rotation formula: `y' = y·cos(θ) − z·sin(θ)`, `z' =
-y·sin(θ) + z·cos(θ)`. For a local `(0, 1, 0)` point (pure `+y`) with
-- `θ = +90°`: `y' = 0`, `z' = 1` — local `+y` maps to world `+z`. With
-`θ = -90°` (`assemblyViewport.ts`'s own choice): local `+y` maps to
-- world `−z` instead. Both are internally consistent — a mesh's own tip
-still stays at the local origin either way, and the holder still sits
-the correct relative distance from it — but only one of them makes
-`+y` (extending from the tool's tip toward its own holder) line up with
-this *specific* scene's own real `+z` (away from the part, toward the
-spindle, matching the toolpath already drawn here in real machine
-coordinates). `assemblyViewport.ts`'s own modal preview never had a
-real external reference to get right — its camera orbits freely around
-whatever it's shown, so either sign looks equally correct there.
+y·sin(θ) + z·cos(θ)`. Applied to a local `(0, 1, 0)` point (pure `+y`,
+the direction from a tool's tip toward its own holder) at each of the
+two real `θ` values in play:
+
+```
+θ = +Math.PI/2 (this unit's own choice, viewport.ts):
+  cos(90°) = 0, sin(90°) = 1
+  y' = 1*0 - 0*1 = 0
+  z' = 1*1 + 0*0 = 1
+  → local (0,1,0) maps to world (0,0,1) — local +y lands on world +z
+
+θ = -Math.PI/2 (assemblyViewport.ts's own choice, Lesson 48):
+  cos(-90°) = 0, sin(-90°) = -1
+  y' = 1*0 - 0*(-1) = 0
+  z' = 1*(-1) + 0*0 = -1
+  → local (0,1,0) maps to world (0,0,-1) — local +y lands on world -z
+```
+
+Both are internally consistent — a mesh's own tip still stays at the
+local origin either way, and the holder still sits the correct relative
+distance from it — but only `+90°` makes `+y` (extending from the
+tool's tip toward its own holder) line up with this *specific* scene's
+own real `+z` (away from the part, toward the spindle, matching the
+toolpath already drawn here in real machine coordinates).
+`assemblyViewport.ts`'s own modal preview never had a real external
+reference to get right — its camera orbits freely around whatever it's
+shown, so either sign looks equally correct there.
 
 ### CS Lens
 
@@ -449,8 +476,9 @@ async function fetchAssemblyByNumber(
 ```
 
 ### Mechanical Walkthrough
+
 `activeToolNumber` (a plain number, derived from `currentState?.
-- active_t`) is the effect's own dependency — not `currentState` itself.
+active_t`) is the effect's own dependency — not `currentState` itself.
 This matters: `currentState` is a *new* object every step (a fresh
 `states[stepIndex]` entry), but `activeToolNumber` only actually
 *changes value* when a real tool change happens — depending on the
@@ -545,7 +573,8 @@ only wired to `ToolCardList`) through:
 ```
 
 ### Mechanical Walkthrough
-- No new mechanism — `toolsRefreshKey` (a plain number, bumped by
+
+No new mechanism — `toolsRefreshKey` (a plain number, bumped by
 `ToolImportPanel`'s own `onImported` callback) already existed
 specifically to solve exactly this class of problem for
 `ToolCardList.tsx`; `BlockList.tsx` simply hadn't been wired to it,
@@ -623,7 +652,8 @@ all.
 ```
 
 ### Mechanical Walkthrough
-- `setTools((prev) => prev.filter(...))` still runs first — `ToolCardList`
+
+`setTools((prev) => prev.filter(...))` still runs first — `ToolCardList`
 itself updates instantly, an optimistic local update, same as before.
 `onDeleted?.()` is the new, real addition: it tells whichever parent
 holds `toolsRefreshKey` (`App.tsx`) that *some* real, external state
@@ -754,14 +784,42 @@ holder:
 ```
 
 ### Mechanical Walkthrough
+
 Tool and holder are converted **independently**, each by its own real
-- `is_metric`/`holder_is_metric` flag, not by a single shared assumption —
+`is_metric`/`holder_is_metric` flag, not by a single shared assumption —
 a real assembly can (and in this project's own current data, does) pair
 an inch tool with an inch holder, but nothing in the schema guarantees
 they always match, so treating them as a single unit would have been a
 real, if currently invisible, second version of the exact same mistake.
+
+### Execution Trace
+
+`activeToolDisplay` run for real against tool 1's own real, seeded data
+(`"0.5 Bull endmill"`, `is_metric: false`; its real holder,
+`holder_is_metric: false`, `stickout: 2.6`):
+
+```
+mmTool:
+  diameter:       toMillimeters(0.5,  false) = 0.5  * 25.4 = 12.7
+  cutting_depth:  toMillimeters(1.25, false) = 1.25 * 25.4 = 31.75
+  total_length:   toMillimeters(4.0,  false) = 4.0  * 25.4 = 101.6
+  arbor_diameter: toMillimeters(0.5,  false) = 0.5  * 25.4 = 12.7
+
+holderProfile (first real point, of 18):
+  {x: 0.0,    y: 0} → toMillimeters(0.0,    false) = 0.0
+  {x: 0.6132, y: 0} → toMillimeters(0.6132, false) = 15.57528
+
+stickout: toMillimeters(2.6, false) = 2.6 * 25.4 = 66.04
+```
+
+Every one of these seven real values takes the identical `* 25.4` path
+— this specific tool/holder pair happens to agree on `is_metric`, so
+nothing here demonstrates the two flags actually diverging, but the
+code path that reads `assembly.holder_is_metric` independently of
+`tool.is_metric` on every single call is the same regardless of whether
+this particular assembly's two flags happen to match.
 `ToolDimensions` (`toolAssembly.ts`) deliberately does **not** carry
-- `is_metric` itself — `buildToolProfile` never needs it, only this
+`is_metric` itself — `buildToolProfile` never needs it, only this
 conversion step does, so a separate `FetchedTool = ToolDimensions & {
 is_metric: boolean }` type carries it instead, on the raw fetched shape
 only (a real design correction made while writing this exact code —

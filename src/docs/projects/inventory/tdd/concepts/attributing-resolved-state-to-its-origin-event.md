@@ -77,6 +77,37 @@ reading the current snapshot.
   — a caller has to decide what to do then (this concept doesn't
   prescribe that; see Connection).
 
+## Execution Trace
+
+The forward pass (resolving *what*), traced against the real `events`
+list above:
+
+```
+Start: resolved_bold = None
+e = {line: 1, sets_bold: True}  → sets_bold is not None → resolved_bold = True
+e = {line: 2, sets_bold: None}  → sets_bold is None     → resolved_bold unchanged (True)
+e = {line: 3, sets_bold: None}  → sets_bold is None     → resolved_bold unchanged (True)
+e = {line: 4, sets_bold: None}  → sets_bold is None     → resolved_bold unchanged (True)
+Final: resolved_bold = True
+```
+
+The backward search (resolving *where*), `find_origin(events, 4, ...)` —
+`events[:4]` is all four events, `reversed(...)` walks them line 4 → 1:
+
+```
+Check line 4: sets_bold is None → sets_it(e) is False → keep searching
+Check line 3: sets_bold is None → sets_it(e) is False → keep searching
+Check line 2: sets_bold is None → sets_it(e) is False → keep searching
+Check line 1: sets_bold is True → sets_it(e) is True  → return this event
+Result: origin = {line: 1, sets_bold: True}
+```
+
+The forward pass touches all 4 events and keeps overwriting the same
+variable; the backward search stops at the *first* match it finds
+walking in reverse — which is why it correctly lands on line 1 in one
+pass, without needing to compare timestamps or track "the last one that
+changed it" separately.
+
 ## CS Lens
 
 This is the same operation as `git blame`: given a file's current line

@@ -151,24 +151,57 @@ two new listeners and the new function:
 ```
 
 ### Mechanical Walkthrough
-- `((event.clientX - rect.left) / rect.width) * 2 - 1` converts a real
+
+`((event.clientX - rect.left) / rect.width) * 2 - 1` converts a real
 pixel position (relative to the canvas's own bounding rect, since the
 canvas itself may not start at the browser window's own origin) into
-- NDC `x` — `0` at the left edge maps to `-1`, `rect.width` at the right edge maps to `+1`. The `y` axis is negated (`-(... * 2 - 1)`, written
-
+NDC `x` — `0` at the left edge maps to `-1`, `rect.width` at the right
+edge maps to `+1`. The `y` axis is negated (`-(... * 2 - 1)`, written
 here as `-(... ) * 2 + 1`) because screen pixels count downward from
 the top while NDC counts upward from the bottom — the single most
 common real bug in this exact conversion, when it's gotten backwards.
 `raycaster`/`pointerNdc`/`intersection` are all created once, outside
-- `handlePointerMove`, and mutated in place on every real move event —
+`handlePointerMove`, and mutated in place on every real move event —
 a real, deliberate avoidance of allocating three new objects on
 every single mouse-move firing, which can easily happen dozens of
-- times per second.
-- `planeFor` is a real, pure function — same real
+times per second. `planeFor` is a real, pure function — same real
 input, same real plane, every time — called both once at setup
 (`G17`, depth `0`, matching `core/parser.py`'s own real default) and
 again from `setDrawPlane` whenever the user picks a different plane or
 depth.
+
+### Execution Trace
+
+Run for real against the actual `three` package (direct Node execution,
+not a browser session): a mouse at pixel `(600, 150)` on an 800×600
+canvas (`rect = {left:0, top:0, width:800, height:600}`), the default
+`G17`/depth-`0` plane:
+
+```
+pointerNdc.x = ((600-0)/800)*2 - 1 = 0.75*2 - 1 = 0.5
+pointerNdc.y = -((150-0)/600)*2 + 1 = -(0.25*2) + 1 = 0.5
+  → NDC = (0.5, 0.5)  (right-of-center, upper half — matches a pixel in
+    the canvas's own upper-right quadrant)
+
+planeFor("G17", 0) → THREE.Plane(normal={x:0,y:0,z:1}, constant:-0)
+  (the XY plane, unmoved)
+
+raycaster.setFromCamera((0.5, 0.5), camera) then
+raycaster.ray.intersectPlane(currentPlane, intersection):
+  → real hit: {x: 47.716..., y: 57.288..., z: 0}
+  (z is exactly 0 — the ray really does land on the G17 plane, whatever
+  its own x/y turn out to be, confirming intersectPlane is doing real
+  geometric work, not just echoing depth back)
+```
+
+The other two planes, same `planeFor`, different `drawPlane`/`depth`
+arguments — showing the branch actually selects a different real
+normal, not just a different depth on the same axis:
+
+```
+planeFor("G18", 3) → normal={x:0,y:1,z:0}, constant:-3   (XZ plane, Y=3)
+planeFor("G19", 2) → normal={x:1,y:0,z:0}, constant:-2   (YZ plane, X=2)
+```
 
 ### CS Lens / SE Lens
 
@@ -269,15 +302,16 @@ The new, matching `setDrawPlane` effect, alongside the existing
 ```
 
 ### Mechanical Walkthrough
+
 `onCursorMoveRef` is seeded from `onCursorMove` at first render
 (`useRef(onCursorMove)`), then kept current by a small, dedicated
-- effect depending on `[onCursorMove]` — the exact same shape `usePlayback.ts`
+effect depending on `[onCursorMove]` — the exact same shape `usePlayback.ts`
 (Lesson 46) already established for `sbkRef`/`speedModeRef`/
 `custSpeedRef`. The mount effect passes a small, stable arrow function
 (`(position) => onCursorMoveRef.current(position)`) to `createViewport`
 — *that* wrapper's own identity never changes across renders (it's
 created once, inside an effect with an empty dependency array), but
-- what it *calls* — `onCursorMoveRef.current` — is always whatever the
+what it *calls* — `onCursorMoveRef.current` — is always whatever the
 latest real `onCursorMove` prop actually is.
 
 ### CS Lens / SE Lens
@@ -440,18 +474,49 @@ The new CSS this real layout needs:
 ```
 
 ### Mechanical Walkthrough
+
 `PLANES` names, for each real plane, which two real world axes a
-- position *on* that plane actually varies in (`axes`) — `G17`'s own
+position *on* that plane actually varies in (`axes`) — `G17`'s own
 depth is `z`, so a cursor position there only ever varies in `x`/`y`;
 the bar shows exactly those two, by real axis name, not a fixed "X/Y"
 label that would be wrong for `G18`/`G19`. `valueA`/`valueB` read
 straight off `cursorPosition` using those axis names as real object
-- keys (`cursorPosition[axisA]`) — no separate per-plane display logic
+keys (`cursorPosition[axisA]`) — no separate per-plane display logic
 needed, since `cursorPosition` already has real `x`/`y`/`z` fields for
 every plane. `.status-bar-planes` reuses `.btn-group`/`.btn`/`.btn-sm`/
-- `.btn-bl` — the identical real classes `PlaybackControls.tsx`'s own
+`.btn-bl` — the identical real classes `PlaybackControls.tsx`'s own
 speed-mode row already established (Lesson 46) — for the same real
 "a row of mutually-exclusive toggle buttons" shape.
+
+### Execution Trace
+
+Two real, sequential draw planes, each with a real cursor position from
+the previous unit's own raycaster trace:
+
+```
+drawPlane = "G17", cursorPosition = {x: 47.716489, y: 57.287739, z: 0}
+  (the previous unit's own real G17/depth-0 hit)
+  active = PLANES.find(p => p.id === "G17") → {axes: ["x","y"]}
+  [axisA, axisB] = ["x", "y"]
+  valueA = cursorPosition["x"] = 47.716489 → "47.716"
+  valueB = cursorPosition["y"] = 57.287739 → "57.288"
+  status bar shows: X 47.716  Y 57.288
+
+drawPlane = "G18", cursorPosition = {x: 31.853922, y: 5, z: 26.594693}
+  (a real G18/depth-5 hit, same NDC (0.5, 0.5), same camera)
+  active = PLANES.find(p => p.id === "G18") → {axes: ["x","z"]}
+  [axisA, axisB] = ["x", "z"]
+  valueA = cursorPosition["x"] = 31.853922 → "31.854"
+  valueB = cursorPosition["z"] = 26.594693 → "26.595"
+  status bar shows: X 31.854  Z 26.595   (Y is never read at all here —
+    cursorPosition.y really is 5, exactly planeDepth, but the bar
+    doesn't show it, because G18's own "axes" names x/z, not y)
+```
+
+Same `cursorPosition` shape, same two-value display logic, two
+genuinely different pairs of object keys read from it — `PLANES`'
+`axes` field is what decides which two, not a separate branch per
+plane inside the component itself.
 
 ### CS Lens
 
@@ -533,9 +598,10 @@ cursor.
 ```
 
 ### Mechanical Walkthrough
+
 `<StatusBar>` sits as a real sibling of `.app-body` inside `.app-shell`
 (a real, always-visible bottom bar, not another toggleable side-panel
-- tab) — `.app-shell`'s own `flex-direction: column` plus `.status-bar`'s
+tab) — `.app-shell`'s own `flex-direction: column` plus `.status-bar`'s
 own `flex-shrink: 0` reserves its real space without needing any layout
 changes to the existing ribbon/canvas/side-panel structure.
 `onCursorMove={setCursorPosition}` passes React's own dispatch function

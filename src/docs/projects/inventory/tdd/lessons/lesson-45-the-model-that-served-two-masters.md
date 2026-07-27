@@ -136,7 +136,8 @@ conn.commit()
 ```
 
 ### Mechanical Walkthrough
-- `ALTER TABLE ... DROP COLUMN` — **reappearing**, per `concepts/
+
+`ALTER TABLE ... DROP COLUMN` — **reappearing**, per `concepts/
 database-migrations.md`'s own Try-It-Yourself exercise 3, which already
 named this exact statement as "the reverse of your `ADD COLUMN`
 migration" before it was ever actually needed for real in this project.
@@ -245,13 +246,14 @@ renders `EditableCptInfoBlock` in place of the removed, read-only CPT
 `InfoBlock`.
 
 ### Mechanical Walkthrough
+
 `feed = RPM × FluteCount × CPT`, solved for `CPT` (`feed / (rpm *
-- fluteCount)`) — the identical real formula `computeFeedFromChipLoad`
+fluteCount)`) — the identical real formula `computeFeedFromChipLoad`
 (Lesson 41, now removed) already used, just isolated for the opposite
 variable, exactly as `EditableSfmInfoBlock` (Lesson 44) already solved
 `SFM = π × diameter × RPM / 12` for `RPM` instead of `SFM`. Every
-- construct in `EditableCptInfoBlock` — local `text` state seeded once, `Number.isNaN` guard, `onEditWord` on change — is **reappearing**,
-
+construct in `EditableCptInfoBlock` — local `text` state seeded once,
+`Number.isNaN` guard, `onEditWord` on change — is **reappearing**,
 `EditableSfmInfoBlock`'s own shape, named directly there as "the
 identical shape... one formula over," now applied a second time.
 
@@ -327,6 +329,7 @@ Coolant, Tool, SFM, and now CPT) has its own editable replacement.
 ```
 
 ### Mechanical Walkthrough
+
 `npx tsc --noEmit` is what actually caught this: removing the CPT
 block's own call site (previous unit) left `InfoBlock` an unused
 declaration — TypeScript's own real, unused-declaration diagnostic
@@ -345,7 +348,7 @@ The comment directly above `.block-info-select`/`.block-info-input`
    .block-move-input's original bug (see below). */
 ```
 
-- A pure prose edit — `.block-move-input` (Lesson 43/44) is mentioned
+A pure prose edit — `.block-move-input` (Lesson 43/44) is mentioned
 only in passing, as a cross-reference, not a new rule.
 
 ### CS Lens

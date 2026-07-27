@@ -42,6 +42,30 @@ size: 500x220
 - `observer.observe(element)` — **(a) first appearance** — starts watching a specific real DOM element; the callback fires once immediately with the element's current size (confirmed above — the very first log line reflects the *starting* size, before any real change happened), then again every time it actually changes.
 - `entry.contentRect.width` / `.height` — **(a) first appearance** — the real, current size of the observed element's content box, read directly from the entry the browser provides — not something the calling code has to measure itself with `clientWidth`/`clientHeight` after the fact.
 
+## Execution Trace
+
+Two real callback firings, traced against the real output above:
+
+```
+observer.observe(box) called
+  → callback fires immediately (1st firing), entries = [one entry for #box]
+  → entry.contentRect = {width: 300, height: 100} (the element's starting size)
+  → for (const entry of entries): one iteration, logs "size: 300x100"
+
+#box's width/height changed to 500px/220px via JavaScript
+  → browser detects the real size change, schedules the callback again
+  → callback fires (2nd firing), entries = [one entry for #box]
+  → entry.contentRect = {width: 500, height: 220} (the new size)
+  → for (const entry of entries): one iteration, logs "size: 500x220"
+```
+
+The `for...of` loop inside the callback runs exactly once per firing here
+(one observed element), but its real job is handling *however many*
+entries one firing reports — a single `ResizeObserver` watching three
+elements, all resized in the same browser paint frame, would deliver all
+three in one `entries` array to one callback call, not three separate
+calls.
+
 ## CS Lens
 
 This is the **observer pattern**, the same general idea `event-driven-ui-callbacks.md` already names for click events, applied here to a continuously-monitored *property* (size) rather than a discrete user action — closer in kind to a file-system watcher (react to a file changing, whenever that happens, for whatever reason) than to a single click.

@@ -106,6 +106,7 @@ export function monacoThemeName(themeId: string): string {
 ```
 
 ### Mechanical Walkthrough
+
 - `themeId.replace(/[^a-zA-Z0-9-]/g, "-")` — **(a) first appearance** —
   a general character-class sanitizer, not a special case for
   underscores specifically: any character Monaco's own regex wouldn't
@@ -113,7 +114,7 @@ export function monacoThemeName(themeId: string): string {
   apostrophe would be handled by the same line, not require a second fix.
 - The sanitizing happens only at the two Monaco call sites, never
   touching `theme.id` itself anywhere else (`findTheme`, `localStorage`,
-- `applyTheme`) — **(a) first appearance of this specific boundary
+  `applyTheme`) — **(a) first appearance of this specific boundary
   discipline** in this project: the real, stored identity of a theme and
   the name Monaco is willing to accept are two different real
   constraints, kept separate rather than collapsing `themes.ts`'s own ids
@@ -128,6 +129,16 @@ boundary that actually needs it, rather than narrowing the shared data
 itself, is the same general shape as validating/escaping input only at
 the edge of a system that needs it, not upstream where the data is still
 generically useful.
+
+Also recognized in: Postel's Law ("be liberal in what you accept, strict
+in what you produce" — the same asymmetry, applied to output instead of
+input); parameterized SQL queries escaping a value only at the database
+boundary, not everywhere the string travels beforehand; and HTML
+auto-escaping a value only at render time (`textcontent-vs-innerhtml-
+xss.md`), not when it's first read from a form or stored — in every
+case, the data itself stays permissive and general-purpose, and the
+narrowing happens exactly once, at whichever specific boundary actually
+can't tolerate the raw form.
 
 ### SE Lens
 

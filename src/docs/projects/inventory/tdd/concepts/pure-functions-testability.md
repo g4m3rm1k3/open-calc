@@ -85,6 +85,36 @@ describe("groupBySign", () => {
 - Extracting `groupBySign` out of `drawGroupedBars` didn't change what either function does — it only changed *where* the grouping logic lives, separating "compute the groups" (pure) from "draw them" (impure, dependent on a real canvas).
 - The impure `drawGroupedBars` still exists and is still needed — extraction doesn't eliminate side effects from a program (a program that never draws anything is useless for a drawing tool); it isolates *which specific piece* carries them, shrinking the impure surface to exactly what genuinely needs it.
 
+## Execution Trace
+
+`groupBySign([1, 2, -3, -4, 5])`, the exact input the real test above
+checks:
+
+```
+Start: current = [values[0]] = [1], groups = []
+
+i=1: values[1]=2.  sign(2)=1,  sign(current[-1]=1)=1  → equal  → current.push(2)
+     current = [1, 2]
+i=2: values[2]=-3. sign(-3)=-1, sign(current[-1]=2)=1 → not equal
+     groups.push([1, 2]) → groups = [[1, 2]]
+     current = [-3]
+i=3: values[3]=-4. sign(-4)=-1, sign(current[-1]=-3)=-1 → equal → current.push(-4)
+     current = [-3, -4]
+i=4: values[4]=5.  sign(5)=1,  sign(current[-1]=-4)=-1 → not equal
+     groups.push([-3, -4]) → groups = [[1, 2], [-3, -4]]
+     current = [5]
+
+Loop ends (i=5, values.length=5). groups.push(current) → groups = [[1, 2], [-3, -4], [5]]
+Final: [[1, 2], [-3, -4], [5]]  — matches the real test's own expectation.
+```
+
+`drawGroupedBars`'s own loop is a second, separate pass over
+`groupBySign`'s output — `.forEach` calling `canvasContext.fillRect`
+once per group (3 real draw calls here) — but that pass is never
+exercised by the test above at all, which is the entire point: the
+grouping logic's correctness is fully checked without ever touching a
+canvas.
+
 ## CS Lens
 
 This is a direct, practical consequence of **referential transparency** — a pure function's call can conceptually be replaced by its return value with no change in program behavior, which is precisely what makes it trivial to reason about and test in total isolation: there's no hidden state to set up, and no observable effect to verify beyond the return value itself. Side-effecting code, by contrast, requires reasoning about *when* it runs and *what environment* it runs in, not just what value it produces.

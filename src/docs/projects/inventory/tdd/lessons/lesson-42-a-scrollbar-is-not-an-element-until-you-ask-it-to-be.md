@@ -81,22 +81,23 @@ props, the `block-info-${kind}` class, the value `<span>`) — only the
 label now renders an icon before its text, chosen by `kind`.
 
 ### Mechanical Walkthrough
+
 - `Record<string, React.ReactNode>` — **reappearing** `Record<>` (first
-- taught `App.tsx`'s `VIEW_LABELS: Record<ViewId, string>`, Lesson 27) —
+  taught `App.tsx`'s `VIEW_LABELS: Record<ViewId, string>`, Lesson 27) —
   the only new wrinkle is the *value* type: `React.ReactNode` (anything
-- React can render — an element, a string, `null`), not `string`, so
+  React can render — an element, a string, `null`), not `string`, so
   this lookup's values are real JSX elements, not labels.
 - `React.ReactNode` used with no `import React from "react"` anywhere
-- in this file — **first appearance of this specific detail**: `@types/
+  in this file — **first appearance of this specific detail**: `@types/
   react`'s own type declarations include `export as namespace React;`,
   which makes the `React` namespace available as an ambient, global
   type reference project-wide the moment *any* file imports anything
-- from `"react"` (this file already does, for `useEffect`/`useState`) —
+  from `"react"` (this file already does, for `useEffect`/`useState`) —
   no separate import of `React` itself is required to reference
   `React.ReactNode` as a type.
 - `{INFO_ICONS[kind] || <Settings size={12} />}` — **reappearing**
   bracket-lookup-with-`||`-fallback (the concept file's own isolated
-- example already demonstrates this exact idiom) — `kind` values this
+  example already demonstrates this exact idiom) — `kind` values this
   project doesn't have a mapped icon for (there are none today; every
   real kind has an entry) would fall back to a generic gear icon rather
   than rendering nothing.
@@ -347,13 +348,13 @@ First appearance in this project — full standalone treatment:
 ```
 
 ### Mechanical Walkthrough
+
 The three base pseudo-elements are fully covered in `concepts/custom-
 scrollbar-styling.md`. `:hover` chained onto `::-webkit-scrollbar-
 thumb` is **reappearing** (`:hover` itself, already used throughout
 this project's CSS) — the new detail is only that it's chained onto a
 vendor-prefixed pseudo-element, which works exactly like chaining it
-- onto any ordinary selector.
-- `color-mix(in srgb, ...)` — **reappearing**
+onto any ordinary selector. `color-mix(in srgb, ...)` — **reappearing**
 (Lesson 40).
 
 ### CS Lens / SE Lens
@@ -411,11 +412,94 @@ side panels) already has.
 </AnimatePresence>
 ```
 
+### The Updated Project
+
+`OperationBlock`'s full return statement, `block-row-detail`'s real
+contents included in full — every line inside that div (the four
+always-shown `InfoBlock`s, the conditional `Tool`/`SFM`/`CPT` blocks,
+and the `runs.map(...)` movement-table loop) is unchanged from Lesson
+41; only the `AnimatePresence`/`motion.div` wrapper around it is new to
+this lesson:
+
+```tsx
+  return (
+    <div className="block-operation">
+      <button type="button" className="block-row-header" onClick={() => setExpanded((e) => !e)}>
+        <span className="block-row-toggle">{expanded ? "▾" : "▸"}</span>
+        <span className="block-row-seq">N{displayNumber}</span>
+        <span className="block-row-label">{label}</span>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="block-row-detail">
+              {/* Modals declared once, at the top of the operation -- the
+                  real state as of this operation's own tool change, not
+                  repeated per line below. Each is its own real, distinct
+                  block, not a flat summary line. */}
+              <InfoBlock kind="plane" label="Plane" value={declared.plane} />
+              <InfoBlock kind="wcs" label="WCS" value={declared.active_wcs} />
+              <InfoBlock kind="rotation" label="Rotation" value={rotationLabel(declared.spindle_dir)} />
+              <InfoBlock kind="coolant" label="Coolant" value={coolantLabel(declared)} />
+              {tool && (
+                <InfoBlock
+                  kind="tool"
+                  label="Tool"
+                  value={`T${declared.active_t} H${declared.active_h} (${tool.diameter}${tool.is_metric ? "mm" : "in"} dia, ${tool.flute_count} flute)`}
+                />
+              )}
+              {sfm != null && <InfoBlock kind="sfm" label="SFM" value={sfm.toFixed(1)} />}
+              {tool && (
+                <InfoBlock
+                  kind="cpt"
+                  label="CPT"
+                  value={
+                    tool.chip_load_per_tooth != null
+                      ? `${tool.chip_load_per_tooth} (feed ${chipLoadFeed!.toFixed(1)})`
+                      : "no data for this tool"
+                  }
+                />
+              )}
+              {runs.map((run) =>
+                run.type === "block" ? (
+                  <InfoBlock key={run.key} kind={run.kind} label={run.label} value={run.value} />
+                ) : (
+                  <table className="block-move-table block-move-table-run" key={`t-${run.commands[0].seq_n}`}>
+                    <MoveTableHead />
+                    <tbody>
+                      {run.commands.map((c) => (
+                        <MoveTableRow key={c.seq_n} command={c} />
+                      ))}
+                    </tbody>
+                  </table>
+                ),
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+```
+
+Note that `InfoBlock`'s own icon lookup (this lesson's first unit,
+above) changes nothing inside `block-row-detail` itself — every call
+site here still passes the same `kind`/`label`/`value` props Lesson 41
+already established; the icon is resolved *inside* `InfoBlock`, not at
+any of these call sites.
+
 ### Mechanical Walkthrough
+
 `AnimatePresence`, `motion.div`, and its `initial`/`animate`/`exit`/
-- `transition` props are all **reappearing** — the exact mechanism
+`transition` props are all **reappearing** — the exact mechanism
 Lesson 39 gave full first-time treatment (there, animating `x` for a
-- slide; here, animating `height`/`opacity` for a collapse) — no new
+slide; here, animating `height`/`opacity` for a collapse) — no new
 construct, a different property being animated. Two real, small
 wrinkles worth naming directly, per the Repetition Rule, rather than
 silently treating the whole block as identical to Lesson 39's:
@@ -522,12 +606,23 @@ Lesson 16's own, unchanged. `background`/`backdrop-filter`/`-webkit-
 backdrop-filter`/`box-shadow` replace Lesson 16's flat `background:
 var(--color-bg)` with Lesson 40's exact glassmorphism technique.
 `.dro-num`'s font swaps from Lesson 41's `"JetBrains Mono"` to this
-lesson's own newly-loaded `"Share Tech Mono"`; `text-shadow: 0 0 12px
-currentColor` is **first appearance of `currentColor`** as a
-`text-shadow` value — a real, small CSS keyword meaning "whatever this
-element's own resolved `color` is," so the glow always matches the
-number's own axis-specific color (Lesson 16's `AXIS_LABEL_COLOR`)
-without needing a second, separately-maintained color value.
+lesson's own newly-loaded `"Share Tech Mono"` — worth stating the real
+reason a live numeric readout specifically needs a monospace face, not
+just that a distinct one was picked: `.dro-num` updates continuously
+during simulation (Lesson 46's own step-through), and every character in
+a monospace font occupies identical horizontal width — a digit changing
+from `1` to `8`, or a value gaining a new leading digit, never shifts
+any of the surrounding text sideways. A proportional font (Inter, this
+project's own body face) sizes each digit differently, so the exact same
+update would visibly jitter the whole DRO row left and right on every
+tick — a real, load-bearing legibility reason for a live-updating
+readout, not just a stylistic pairing with the app's own retro-terminal
+look. `text-shadow: 0 0 12px currentColor` is **first appearance of
+`currentColor`** as a `text-shadow` value — a real, small CSS keyword
+meaning "whatever this element's own resolved `color` is," so the glow
+always matches the number's own axis-specific color (Lesson 16's
+`AXIS_LABEL_COLOR`) without needing a second, separately-maintained
+color value.
 
 ```css
 .block-operation {
@@ -584,7 +679,8 @@ directly editable text, which it isn't (yet — see Lesson 41's own
 "Known Incomplete").
 
 ### Mechanical Walkthrough
-- Every property in this unit is **reappearing** — `linear-gradient()`,
+
+Every property in this unit is **reappearing** — `linear-gradient()`,
 `color-mix()`, `backdrop-filter`/`-webkit-backdrop-filter`, and
 `box-shadow` (including the `inset` variant) were all given full,
 first-time treatment in Lesson 40; `currentColor` (named above) and

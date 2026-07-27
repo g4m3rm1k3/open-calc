@@ -56,6 +56,35 @@ attempt 2 failed, retrying in 481ms
 - **Exponential backoff** (`2 ** attempt * 100`) grows the delay between successive retries — 200ms, then 400ms, then 800ms, and so on — so a struggling remote system is given increasingly more room to recover, rather than being hit at a constant, possibly-overwhelming rate.
 - **Jitter** (`Math.random() * 100`, added on top of the backoff delay) deliberately randomizes the exact delay — this matters specifically when *many* clients might all fail and start retrying at the same moment (a server briefly going down affects everyone connected to it simultaneously); without jitter, every client's retries would arrive in lockstep, creating repeated waves of load exactly when the server can least handle them.
 
+## Execution Trace
+
+`fetchWithRetry(url, maxAttempts)`, against an endpoint that fails
+twice then succeeds — traced against the real output above:
+
+```
+attempt=1: fetchWithTimeout(url, 2000) → throws (real failure)
+  attempt (1) === maxAttempts? No → keep going
+  delayMs = 2**1 * 100 + random(0..100) = 200 + ~87 ≈ 287
+  logs "attempt 1 failed, retrying in 287ms"
+  await the delay (287ms real wait)
+
+attempt=2: fetchWithTimeout(url, 2000) → throws again (real failure)
+  attempt (2) === maxAttempts? No (assuming maxAttempts ≥ 3) → keep going
+  delayMs = 2**2 * 100 + random(0..100) = 400 + ~81 ≈ 481
+  logs "attempt 2 failed, retrying in 481ms"
+  await the delay (481ms real wait)
+
+attempt=3: fetchWithTimeout(url, 2000) → succeeds this time
+  → return await fetchWithTimeout(...) returns immediately with the
+    real Response — the for loop exits via this return, never reaching
+    a 4th iteration
+```
+
+The delay actually grows between attempts (`287ms` → `481ms`, roughly
+doubling per the `2 ** attempt` term) rather than staying constant — and
+the loop exits the instant an attempt succeeds, so `maxAttempts` is a
+real ceiling, not a fixed number of attempts always made.
+
 ## CS Lens
 
 This is **fault-tolerant design for an unreliable channel** — accepting that a network call can and will occasionally fail for reasons outside either endpoint's own correctness, and building a real, bounded strategy for recovering from that class of failure automatically, rather than either ignoring the possibility or failing immediately on the first hiccup. Exponential backoff with jitter specifically is a well-studied, real solution to a real, classic distributed-systems problem: uncoordinated clients retrying in a way that avoids synchronizing into damaging, repeated load spikes.

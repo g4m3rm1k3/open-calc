@@ -47,6 +47,31 @@ true
 - The callback receives up to three arguments — the element, its index, and the whole array being mapped — though most uses (as here) only need the element itself.
 - Because `.map()` always produces one output per input, it's the wrong tool when the desired output has a *different* number of elements than the input (filtering some out, or expanding one into several) — those are different, related array methods (`.filter()`, `.flatMap()`) built on the same general idea.
 
+## Execution Trace
+
+Both versions run against `points = [{x:1,y:2}, {x:3,y:4}, {x:5,y:6}]`:
+
+```
+Hand-written loop:
+  Start: labelsLoop = []
+  p={x:1,y:2}: labelsLoop.push("(1, 2)") → labelsLoop = ["(1, 2)"]
+  p={x:3,y:4}: labelsLoop.push("(3, 4)") → labelsLoop = ["(1, 2)", "(3, 4)"]
+  p={x:5,y:6}: labelsLoop.push("(5, 6)") → labelsLoop = ["(1, 2)", "(3, 4)", "(5, 6)"]
+
+.map() version:
+  p={x:1,y:2}: callback returns "(1, 2)" → collected
+  p={x:3,y:4}: callback returns "(3, 4)" → collected
+  p={x:5,y:6}: callback returns "(5, 6)" → collected
+  labelsMap = ["(1, 2)", "(3, 4)", "(5, 6)"]
+
+JSON.stringify(labelsLoop) === JSON.stringify(labelsMap) → true
+```
+
+Both traces visit the same 3 elements in the same order and produce the
+identical string at each step — `.map()` isn't computing anything
+different, it's just not making the caller write `labelsLoop = []` and
+`.push(...)` by hand.
+
 ## CS Lens
 
 `.map()` is the direct JavaScript instance of the general **map** higher-order function found across functional programming — applying one function to every element of a collection, independently, producing a new collection of results. It is deliberately distinct from **fold/reduce** (see `fold-reduce-pattern.md`), which combines a collection down into a single accumulated value rather than producing one output per input — `.map()` preserves the collection's shape (same length, transformed contents); `.reduce()` collapses it.

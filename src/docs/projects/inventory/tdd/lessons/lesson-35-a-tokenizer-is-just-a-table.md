@@ -360,6 +360,7 @@ give it a correctly-sized container):
 ```
 
 ### Mechanical Walkthrough
+
 - `hexWithAlpha` — **(a) first appearance** — Monaco's `colors` bag
   needs real `#RRGGBBAA` hex, not the `rgba(...)` string form this
   project's own `hexToRgba` (themes.ts) already produces for plain CSS
@@ -371,12 +372,12 @@ give it a correctly-sized container):
   `DO1`/`END1` line highlights consistently with how the backend actually
   treats it, not a second, independently-maintained list that could drift.
 - `GCODE_LANGUAGE`'s `tokenizer.root` array — **(a) first appearance**,
-- per `declarative-tokenizer-rules.md` — order matters identically to
+  per `declarative-tokenizer-rules.md` — order matters identically to
   `core/lexer.py`'s own keyword-before-word-extraction fix: the flow-keyword
   rule runs before the generic `[XYZIJKRFSTHQD]...` rule, so `END1` is
   never misread as a data word here either.
 - `registered` / the early-return guard in `registerGcodeLanguage` — **(a)
-- first appearance** — Monaco throws on a duplicate `monaco.languages.
+  first appearance** — Monaco throws on a duplicate `monaco.languages.
   register({ id })` call; guarding against it is what makes this survive
   React's development-mode double-invoke.
 - `gcodeMonacoTheme(theme)` — **(a) first appearance** — one function

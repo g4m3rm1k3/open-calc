@@ -51,6 +51,31 @@ True
 - The `if` clause is fully optional — a dict comprehension without one (`{field: body[field] for field in allowed_fields}`) would instead raise a real `KeyError` the moment `field` isn't actually present in `body`, since there's no filter protecting against that case.
 - A dict comprehension always produces a **new** dict — the original `body` is never modified by building `comprehension` from it, exactly like list comprehensions never modify their source iterable.
 
+## Execution Trace
+
+Both versions iterate the same `allowed_fields = ("name", "type", "diameter_mm")` against the same `body`:
+
+```
+By hand:
+  Start: by_hand = {}
+  field="name":         "name" in body?         → True  → by_hand["name"] = "face_mill_50"
+  field="type":         "type" in body?         → True  → by_hand["type"] = "Face Mill"
+  field="diameter_mm":  "diameter_mm" in body?  → True  → by_hand["diameter_mm"] = 50
+  Final: by_hand = {'name': 'face_mill_50', 'type': 'Face Mill', 'diameter_mm': 50}
+
+Comprehension — identical 3 checks, same order:
+  field="name":         in body → include ("name", "face_mill_50")
+  field="type":         in body → include ("type", "Face Mill")
+  field="diameter_mm":  in body → include ("diameter_mm", 50)
+  Final: comprehension = {'name': 'face_mill_50', 'type': 'Face Mill', 'diameter_mm': 50}
+```
+
+`"unexpected_field"` never appears in either trace at all — both loops
+only ever iterate `allowed_fields` (3 items), never `body`'s own keys
+(4 items), which is *why* the unlisted field is excluded: it's never a
+candidate `field` value in the first place, not filtered out after the
+fact.
+
 ## CS Lens
 
 This is the identical **comprehension** concept `python-tuple-unpacking.md`'s neighboring list-comprehension idiom applies, extended to build key-value pairs instead of single values — Python's list, set, and dict comprehensions all share the same underlying "iterate, optionally filter, transform" grammar, differing only in the literal syntax (`[]`, `{}` with one expression, `{}` with a `key: value` pair) surrounding the result.

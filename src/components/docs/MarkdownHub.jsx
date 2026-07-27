@@ -876,11 +876,28 @@ function MdCodeBlock({ language, code }) {
   );
 }
 
+// Lesson tracks that get inline concept-embed panels (`../concepts/x.md`
+// rendered as an expandable panel instead of a plain link/code span).
+// Hardcoded per-track for now, on purpose — not derived from DOCS_MODULES
+// or folder structure — until concepts become a global, non-tdd-specific
+// feature (a deliberately deferred bigger refactor).
+const CONCEPT_EMBED_LESSON_PATHS = [
+  "/projects/inventory/tdd/lessons/",
+  "/projects/inventory/tdd/wpf-lessons/",
+];
+
+function isConceptEmbedLessonFile(activeFile) {
+  return (
+    !!activeFile &&
+    CONCEPT_EMBED_LESSON_PATHS.some((p) => activeFile.includes(p))
+  );
+}
+
 function MdInlineCode({ children }) {
   const { activeFile } = useContext(DocsCtx);
   const text = String(children);
 
-  const isTddLesson = activeFile?.includes("/projects/inventory/tdd/lessons/");
+  const isTddLesson = isConceptEmbedLessonFile(activeFile);
   if (isTddLesson && text.endsWith(".md")) {
     const filename = text.split("/").pop();
     const forcedHref = `../concepts/${filename}`;
@@ -991,6 +1008,7 @@ function resolveDocPath(currentFilePath, href) {
 }
 
 function ConceptEmbed({ docPath, title }) {
+  const { themeStyles } = useGlobalTheme();
   const [content, setContent] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -1073,9 +1091,7 @@ function MdLink({ href, children }) {
   if (isRelativeMd) {
     const docPath = resolveDocPath(activeFile, href);
 
-    const isTddLesson = activeFile?.includes(
-      "/projects/inventory/tdd/lessons/",
-    );
+    const isTddLesson = isConceptEmbedLessonFile(activeFile);
     const isConcept = hrefBase.startsWith("../concepts/");
     if (isTddLesson && isConcept && docPath) {
       return <ConceptEmbed docPath={docPath} title={extractText(children)} />;
@@ -1546,6 +1562,15 @@ const SectionedMarkdown = memo(function SectionedMarkdown({
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           margin-bottom: 1.5rem;
+        }
+        /* The gradient text-fill above is inherited by every descendant,
+           including an inline \`code\` span — its own background pill still
+           paints (background-clip isn't inherited), but its text goes
+           transparent along with the heading's, leaving an empty box. Reset
+           the fill back to the code span's own themed color so it's visible
+           again on its own background. */
+        .intro-page-content h1 code {
+          -webkit-text-fill-color: initial;
         }
         @media (min-width: 640px) {
           .intro-page-content h1 {

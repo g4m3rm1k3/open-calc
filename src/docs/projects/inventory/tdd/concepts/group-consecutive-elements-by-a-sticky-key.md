@@ -99,6 +99,46 @@ groups the data actually has, not five.
   `else` only covers the very first element, before any group exists
   yet.
 
+## Execution Trace
+
+The naive version, against `items` (5 elements, keys
+`100, 101, 102, 200, 201`, no two consecutive raw keys ever equal):
+
+```
+groups = []
+item(key=100): groups empty → groups.append([item]) → groups = [[100]]
+item(key=101): groups[-1][-1]["key"] (100) == 101? No → groups.append([item]) → [[100],[101]]
+item(key=102): groups[-1][-1]["key"] (101) == 102? No → groups.append([item]) → [[100],[101],[102]]
+item(key=200): groups[-1][-1]["key"] (102) == 200? No → groups.append([item]) → [...,[200]]
+item(key=201): groups[-1][-1]["key"] (200) == 201? No → groups.append([item]) → [...,[201]]
+Final: 5 groups — every item alone, since raw keys are never equal.
+```
+
+The fixed version, tracking `current_key` (the last *real* boundary),
+against the same 5 items:
+
+```
+Start: current_key = None, groups = []
+
+item(real=True,  key=100): real and 100 != None → True
+  → current_key = 100; groups.append([item]) → groups = [[100]]
+item(real=False, key=101): real is False → condition False
+  → groups is non-empty → groups[-1].append(item) → groups = [[100,101]]
+item(real=False, key=102): real is False → condition False
+  → groups[-1].append(item) → groups = [[100,101,102]]
+item(real=True,  key=200): real and 200 != 100 (current_key) → True
+  → current_key = 200; groups.append([item]) → groups = [[100,101,102],[200]]
+item(real=False, key=201): real is False → condition False
+  → groups[-1].append(item) → groups = [[100,101,102],[200,201]]
+
+Final: [[100,101,102],[200,201]] — 2 groups, matching the real data's
+actual boundaries.
+```
+
+`current_key` only changes on the two `real=True` elements — every
+`real=False` filler element leaves it untouched and just joins whatever
+group is already open, regardless of its own, irrelevant key.
+
 ## CS Lens
 
 This is the same idea as SQL's `LAG()` window function, or a classic

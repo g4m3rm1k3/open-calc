@@ -264,10 +264,11 @@ real signal — words, a comment, or a real N-number — is enough to keep
 it.
 
 ### Mechanical Walkthrough
+
 - `enumerate(text.split("\n"), start=1)` — **first appearance** in this
   file (though `enumerate` itself is ordinary Python): pairs each
   element of the split-on-newline list with a running count starting at
-- 1, not 0 — chosen deliberately so `line_number` matches a real
+  1, not 0 — chosen deliberately so `line_number` matches a real
   editor's own 1-indexed line display.
 - `not words and not comment and real_seq_n is None` — **first
   appearance of this exact three-way condition**: a boolean `and` chain
@@ -311,14 +312,14 @@ None new.
 ...     program = f.read()
 >>> commands = Parser().parse(program)
 >>> [(c["line_number"], c["seq_n"], c["has_real_seq_n"]) for c in commands if c["has_real_seq_n"]]
-[(2, 1101, True), (15, 2101, True)]
+[(2, 1101, True), (17, 2101, True)]
 >>> len(commands)
-26
+30
 ```
 
 Real output, against the real fixture: both previously-dropped lines
-(2 and 15) now survive, correctly flagged `has_real_seq_n: True`, and
-the total command count went from 24 (broken) to 26.
+(2 and 17) now survive, correctly flagged `has_real_seq_n: True`, and
+the total command count went from 27 (broken) to 30.
 
 ---
 
@@ -328,7 +329,7 @@ the total command count went from 24 (broken) to 26.
 
 Every command needs *some* `seq_n` to group under — the Operations view
 can't have gaps. But real files are sparse: `O0003.nc` has exactly two
-real N-words in 26 real lines. Something has to fill in the rest
+real N-words in 30 real lines. Something has to fill in the rest
 without colliding with a real, authored value that shows up later in
 the same file.
 
@@ -372,7 +373,7 @@ iterations gets a real execution trace, not just a code listing).
 Line 1 "O0003 (CIRCULAR POCKET)": real_seq_n=None → seq_n=1,    _next_seq_n: 1 → 2
 Line 2 "N1101":                   real_seq_n=1101 → seq_n=1101, _next_seq_n: 2 → 1102
 Line 3 "G21 G90 G17":             real_seq_n=None → seq_n=1102, _next_seq_n: 1102 → 1103
-Line 4 "T1 M06 G43 H1":           real_seq_n=None → seq_n=1103, _next_seq_n: 1103 → 1104
+Line 4 "T1 M06":                  real_seq_n=None → seq_n=1103, _next_seq_n: 1103 → 1104
 ```
 
 Line 2's real `N1101` doesn't just get used for that line — it
@@ -433,7 +434,7 @@ operation groups. Given real N-numbers exist, the obvious-looking
 approach — group consecutive commands that share the same `seq_n` — is
 wrong, and it produced a real, visible bug: a dozen fragmented
 "operations," one per line, instead of two. The reason: only 2 of the
-26 commands have a *real* `seq_n`; the other 24 each got a unique,
+30 commands have a *real* `seq_n`; the other 28 each got a unique,
 auto-generated value from the previous unit's counter, so no two of
 them are ever equal to each other. Comparing raw `seq_n` values treats
 every synthetic filler line as its own distinct group.
@@ -514,28 +515,44 @@ across every non-real line in between; if it doesn't, the fallback
 (unchanged) groups by tool change or a standalone comment instead.
 
 ### Mechanical Walkthrough
-**Execution trace**, first 6 commands of `O0003.nc` (`hasRealSeqNumbers
-= true`), `currentKey` starting `null`:
+
+- `let currentKey: number | null = null;` — plain, typed-nullable
+  variable declaration — already-established syntax.
+- `for (const command of commands)` — **reappearing** `for...of` loop
+  (already used elsewhere in this codebase).
+- `command.has_real_seq_n && command.seq_n !== currentKey` — a boolean
+  `&&` short-circuit combined with strict inequality, both
+  already-established — the `&&` matters here specifically: a synthetic
+  command's own `seq_n` is never compared against `currentKey` at all,
+  because `has_real_seq_n` is `false` and the right side never runs.
+- `groups[groups.length - 1].push(command)` — array-last-element access
+  plus in-place mutation via `.push()` — **reappearing** (the same shape
+  already used in this function's own fallback branch below).
+
+### Execution Trace
+
+`buildOperations` run for real against `O0003.nc`'s own 30 commands
+(`hasRealSeqNumbers = true`), `currentKey` starting `null`:
 
 ```
-c1 (line 1, comment, has_real=false, seq_n=1):
+c1 (line 1, comment-only, has_real=false, seq_n=1):
   has_real false → skip first branch; groups.length===0 → new group [c1]
 c2 (line 2, "N1101", has_real=true, seq_n=1101):
   has_real true, 1101 !== null → currentKey=1101, new group [c2]
-c3 (line 3, "G21 G90 G17", has_real=false, seq_n=1102):
-  has_real false → not first branch; groups.length>0 → push onto last group
-  groups: [[c1], [c2, c3]]
-c4 (line 4, "T1 M06...", has_real=false): → pushed onto same group
-c5..: → pushed onto same group, until...
-c_at_line_15 ("N2101", has_real=true, seq_n=2101):
+c3..c16 (lines 3-16, has_real=false, seq_n=1102..1115):
+  has_real false, every time → not first branch; groups.length>0 →
+  each pushed onto the last group in turn
+  groups so far: [[c1], [c2, c3, ..., c16]]
+c17 (line 17, "N2101", has_real=true, seq_n=2101):
   has_real true, 2101 !== 1101 → currentKey=2101, new group started
 ```
 
-The key insight the trace makes visible: `c1` through the line right
-before `N2101` all land in exactly **one** group, even though 23 of
-- them carry 23 different, mutually-unequal `seq_n` values — because the
-condition that starts a new group only fires on a *real* N-word whose
-value differs from the current key, never on a synthetic one.
+The key insight the trace makes visible: `c2` through `c16` — 15
+commands, lines 2 through 16 — all land in exactly **one** group, even
+though 14 of them (`c3`–`c16`) carry 14 different, mutually-unequal
+`seq_n` values — because the condition that starts a new group only
+fires on a *real* N-word whose value differs from the current key,
+never on a synthetic one.
 
 ### CS Lens
 
@@ -588,7 +605,7 @@ own cost constraint.
 ```pycon
 # Backend confirms the real data this algorithm consumes:
 >>> len(commands); [c["has_real_seq_n"] for c in commands].count(True)
-26
+30
 2
 ```
 
@@ -691,11 +708,12 @@ every real movement line, merging consecutive movement lines into one
 table instead of starting a new one per line.
 
 ### Mechanical Walkthrough
+
 - `let lastCoolant: string = coolantLabel(declared);` — **first
   appearance of this exact seeding pattern**: initializing the "last
   shown" tracker from the *declared* baseline, not from the first
   element of `rest`. This is the specific bug this function fixed
-- earlier this session — without seeding from `declared`, the first
+  earlier this session — without seeding from `declared`, the first
   real coolant word in `rest` that happened to match what was already
   declared up top would still fire (comparing against `undefined`/
   nothing), producing a redundant duplicate block.
@@ -708,12 +726,67 @@ table instead of starting a new one per line.
   the reappearing idea from the previous unit, applied here to decide
   what to *render* rather than how to *group*.
 - `const last = runs[runs.length - 1];` then `if (last && last.type ===
-- "table")` — **reappearing** array-last-element access (already used
+  "table")` — **reappearing** array-last-element access (already used
   in `buildOperations`); `last.type === "table"` is a TypeScript
-- discriminated-union narrowing check — reading `last.type` first is
+  discriminated-union narrowing check — reading `last.type` first is
   what lets `last.commands.push(...)` type-check on the next line
   without a cast, since TypeScript narrows the union based on that
   comparison.
+
+### Execution Trace
+
+`buildOperationRuns` run for real against `O0003.nc`'s first (`N1101`)
+operation group. `commands` for this group is lines 2–16; `firstMoveIndex
+= commands.findIndex(hasMovementWord)` lands on line 6 (`G43 H1 Z1.0`,
+the first line with an axis letter), so `declared = commands[firstMoveIndex
+- 1]` is line 5 (`S1800 M03`, `spindle_dir: "CW"`, `plane: "G17"`,
+`active_wcs: "G54"`, `coolant_flood: false`). `rest = commands.slice(1)`
+is lines 3–16 (line 5 itself is included in `rest`, since `slice(1)` only
+drops line 2, not "whichever line `declared` happened to be"):
+
+```
+lastCoolant="off", lastRotation="CW", lastPlane="G17", lastWcs="G54"
+  (all seeded from declared, line 5)
+
+i=0  line 3  "G21 G90 G17"  → hasPlaneWord true, command.plane="G17"
+              === lastPlane → no block. hasMovementWord false → no row.
+i=1  line 4  "T1 M06"       → hasToolChange true (ms includes 6) and
+              hasMovementWord false → early return, nothing checked.
+i=2  line 5  "S1800 M03"    → (declared, walked again) hasRotationWord
+              true, label="CW" === lastRotation → no block.
+i=3  line 6  "G43 H1 Z1.0"  → hasMovementWord true (Z present); runs is
+              still empty → runs = [{type:"table", commands:[line6]}]
+i=4  line 7  "T2 M08"       → hasToolChange true (T present, no M06 —
+              the pre-call case) AND hasMovementWord false → early
+              return. hasCoolantWord is NEVER reached this iteration,
+              even though this line's own M08 is a real coolant word
+              (the backend's own coolant_flood flips true starting
+              exactly here) — lastCoolant stays "off".
+i=5..11  lines 8-14  → each has an axis letter → hasMovementWord true →
+              appended to the same table run (8 rows total: 6,8,9,10,
+              11,12,13,14)
+i=12  line 15 "M09 M05"     → hasCoolantWord true, label=coolantLabel
+              (line15)="off" (M09 turns flood back off) === lastCoolant
+              ("off", unchanged since i=4 never updated it) → no block
+i=13  line 16 "G21 G90 G17" → plane "G17" === lastPlane → no block
+
+Final: runs = [{type:"table", commands:[6,8,9,10,11,12,13,14]}] — one
+continuous movement table, zero block runs.
+```
+
+The trace surfaces a real, verified gap, not a hypothetical one: this
+operation's coolant genuinely turns on (`M08`, line 7) and back off
+(`M09`, line 15) — the backend's own `coolant_flood` field confirms it
+(`False` through line 6, `True` from line 7 through line 14, `False`
+again at line 15) — but the Operations view never shows a coolant block
+for either transition. The reason is the interaction traced above:
+`hasToolChange(words) && !hasMovementWord(words)` returns early on line
+7 *before* `hasCoolantWord` ever runs on that same line, so `lastCoolant`
+never updates away from `"off"` — which means line 15's own coolant-off
+word later compares equal to a tracker that was never actually
+current, and also produces no block. Named honestly in this lesson's
+own Known Incomplete section below, since it wasn't caught until this
+trace was run for real.
 
 ### CS Lens
 
@@ -825,7 +898,11 @@ function computeFeedFromChipLoad(tool: Tool, rpm: number): number | null {
 
 ```python
 class TlToolMill(Base):
-    # ...existing columns above (Id, ToolId, Diameter, FluteCount, CuttingDepth, ArborDiameter)...
+    __tablename__ = "TlToolMill"
+
+    ID: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("TlTool.ID"), primary_key=True)
+    OverallDiameter: Mapped[float]
+    OverallLength: Mapped[float]
     FluteCount: Mapped[int]
     CuttingDepth: Mapped[float]
     ArborDiameter: Mapped[float]
@@ -833,6 +910,7 @@ class TlToolMill(Base):
 
     tool: Mapped[TlTool] = relationship(back_populates="mill")
     endmill: Mapped["TlToolEndmill | None"] = relationship(back_populates="mill", uselist=False)
+    drill: Mapped["TlToolDrill | None"] = relationship(back_populates="mill", uselist=False)
 ```
 
 `TlToolMill` gains one new, nullable column alongside its existing real
@@ -1232,6 +1310,7 @@ function OperationBlock({
 ```
 
 ### Mechanical Walkthrough
+
 - `useState(true)` — **reappearing** (established React hook, first
   taught Lesson 11, reused for a collapse toggle the same way `App.tsx`
   already uses it for `isConfigOpen`): `expanded` starts `true` (an
@@ -1250,13 +1329,13 @@ function OperationBlock({
   idiom (already used throughout this codebase, e.g. `SidePanel`'s
   conditional tab content).
 - `runs.map((run) => run.type === "block" ? <InfoBlock .../> : <table>...)`
-- — **reappearing** `Array.prototype.map` returning JSX per element
+  — **reappearing** `Array.prototype.map` returning JSX per element
   (already established since the earliest React lessons); the ternary
   branches on `run.type`, the same discriminated-union narrowing already
   named in `buildOperationRuns`'s own Mechanical Walkthrough earlier in
   this lesson.
 - `<InfoBlock kind="plane" label="Plane" value={declared.plane} />` and
-- its siblings — `InfoBlock` itself is this lesson's own component,
+  its siblings — `InfoBlock` itself is this lesson's own component,
   **already shown in full** earlier (the "Declared Once, Re-Emitted
   Only on Change" unit's own surrounding code) — these lines are new
   *call sites* passing new props, not a new component definition.
@@ -1335,6 +1414,7 @@ function BlockList({ program }: BlockListProps) {
 ```
 
 ### Mechanical Walkthrough
+
 - `useEffect(() => { fetchBlocks(program)... }, [program])` —
   **reappearing** (Lesson 27's own debounced-reparse effect shape, and
   Lesson 26's `.catch()` + `logger.error` convention): re-runs
@@ -1343,12 +1423,12 @@ function BlockList({ program }: BlockListProps) {
   exactly once, on mount — **reappearing**, the same "empty deps = mount
   only" idiom already used for `App.tsx`'s theme initializer.
   `fetchTools` here is a **new, separate function of the same name**
-- as `ToolCardList.tsx`'s own `fetchTools` (Lesson 17) — a real name
+  as `ToolCardList.tsx`'s own `fetchTools` (Lesson 17) — a real name
   collision across two different files, not the same function reused;
   worth naming directly since a mechanical, name-only check can't tell
   the two apart.
 - `const toolsByNumber = new Map<number, Tool>();` / the `for...of` loop
-- — **reappearing** (`Map`, already used in this codebase); building a
+  — **reappearing** (`Map`, already used in this codebase); building a
   lookup that keeps only the first tool seen per `tool_number`, per this
   schema's own real, named, non-unique-number allowance (`core/tools.
   py`).
@@ -1568,6 +1648,7 @@ none of them have any visual layout yet without the CSS backing them.
 ```
 
 ### Mechanical Walkthrough
+
 - `.block-program-header, .block-row-header { display: flex; ... }` —
   **reappearing** flexbox layout (`concepts/css-flexbox-layout.md`,
   already established) — a comma-separated selector list applying one
@@ -1580,7 +1661,7 @@ none of them have any visual layout yet without the CSS backing them.
   new CSS mechanism, a new *use* of one already taught): a block's
   `kind` prop (`InfoBlock`, shown earlier) selects a modifier class
   (`block-info-${kind}`), and each modifier only overrides one property,
-- `border-left-color` — the base `.block-info` rule supplies everything
+  `border-left-color` — the base `.block-info` rule supplies everything
   else identically. This is `concepts/design-tokens-theming-pattern.md`'s
   own "swappable catalog of named values" idea, applied to *block kind*
   instead of *app theme*: seven kinds, one shared shape, one color each.
@@ -1607,7 +1688,7 @@ none of them have any visual layout yet without the CSS backing them.
   movement tables sit inside a collapsed operation (indented, to align
   under that operation's own declared-info blocks), but the one table
   belonging to the *currently-running* block (`.block-move-table-run`)
-- is shown flush, unindented, at the top level — `:not()` expresses
+  is shown flush, unindented, at the top level — `:not()` expresses
   "every other case" directly, rather than needing a second, positive
   class naming every table that *isn't* the running one.
 
@@ -1701,12 +1782,13 @@ if (id === "blocks") return <BlockList program={debouncedCode} />;
 ```
 
 ### Mechanical Walkthrough
+
 All three lines **reappear** the exact mechanism Lesson 27 established
 for adding a tab at all (and Lesson 35 already reused once for `code`):
 a new member on the `ViewId` union, a matching new key in
 `VIEW_LABELS` (which is what `RibbonToolbar`'s own toggle buttons are
 generated from, for free), and one new `if` branch in
-- `renderViewContent`. No new construct in any of these three lines —
+`renderViewContent`. No new construct in any of these three lines —
 `RibbonToolbar` needed zero changes to pick up a fourth toggle button
 automatically, exactly as designed back in Lesson 27.
 
@@ -1749,7 +1831,7 @@ own line 2.
 5. **`buildOperations`** — sees `has_real_seq_n: True`, `seq_n: 1101 !==
    currentKey (null)` → starts a new operation group here; every
    following command, real or synthetic, stays in this same group until
-   `N2101` (line 15) starts the next one.
+   `N2101` (line 17) starts the next one.
 6. **`OperationBlock`** — `hasRealSeqNumbers` is true for this program,
    so `displayNumber = first.seq_n` → the operation header reads
    `N1101`, the real, authored value — not a synthetic ordinal.
@@ -1766,7 +1848,7 @@ Reverting just the parser's skip-condition fix (Concept Unit 2) back to
 ```pycon
 >>> commands = Parser().parse(program)  # with the old, one-field check restored
 >>> len(commands)
-24
+27
 >>> any(c["has_real_seq_n"] for c in commands)
 False
 ```
@@ -1799,6 +1881,19 @@ This entire feature is committed in a deliberately unfinished state,
 by direct instruction: it's real, working scope for the ideas this
 lesson teaches, not a finished product.
 
+- **A coolant word on the same line as a tool pre-call is silently
+  never shown.** Found via this lesson's own Execution Trace on
+  `buildOperationRuns` (`O0003.nc`'s `N1101` operation, line 7 `T2
+  M08`): `hasToolChange(words) && !hasMovementWord(words)` returns
+  early before `hasCoolantWord` ever runs on that line, so
+  `lastCoolant` never updates — meaning neither that coolant-on nor the
+  later coolant-off (line 15, `M09`) ever renders a block, even though
+  the backend's own `coolant_flood` field correctly tracks both
+  transitions. Not fixed this session (naming it honestly, not
+  quietly patching it mid-trace) — the real fix is either checking
+  `hasCoolantWord` before the early return, or not early-returning at
+  all and instead skipping only the *table* row for a
+  tool-change-only line.
 - **Read-only.** No field in the Operations view writes back into the
   source text yet — editing is real, distinct, later scope.
 - **Single-program only.** No subprogram nesting; a real switch and
@@ -1826,7 +1921,7 @@ lesson teaches, not a finished product.
 - [x] `extract_seq_n`/`parse_line` return a real `seq_n` for any line
       with a real N-word, `None` otherwise — verified directly.
 - [x] `Parser.parse` no longer drops a comment-only or N-only line —
-      verified directly against `O0003.nc` (24 → 26 commands).
+      verified directly against `O0003.nc` (27 → 30 commands).
 - [x] `Parser._parse_block` exposes every real modal field, `raw`,
       `comment`, `seq_n`, `has_real_seq_n`, `line_number`, `words` on
       every command.

@@ -80,18 +80,83 @@ def _add_cycle_points(command, x, y, z, r, points):
 _SUPPORTED_WORDS = ("G", "X", "Y", "Z", "F", "M", "S", "H", "T", "R", "Q")
 ```
 
-Its command-building tail, the two new words read into the command dict:
+`_parse_block` in full, with the two new `R`/`Q` reads and the command
+dict's updated comment marked — everything else is unchanged from Lesson
+32:
 
 ```python
+    def _parse_block(self, words):
+        for letter in words:
+            if letter not in _SUPPORTED_WORDS:
+                raise UnsupportedCodeError(f"{letter}-word is not supported yet")
+
+        went_home = False
+        if "G" in words:
+            g_values = words["G"] if isinstance(words["G"], list) else [words["G"]]
+            for g_value in g_values:
+                if self._apply_g_code(g_value, words):
+                    went_home = True
+
+        program_ended = False
+        if "M" in words:
+            m_values = words["M"] if isinstance(words["M"], list) else [words["M"]]
+            for m_value in m_values:
+                if self._apply_m_code(m_value, words):
+                    program_ended = True
+                    break
+
+        # Real dispatch order (cnc/CNCEngine.ts's _executeBlock, per
+        # COMPONENT_MAP.md's own citation): G-codes, then M-codes, then
+        # T/D/F/S/H words, then motion -- an M-code that returns truthy
+        # (program end) short-circuits everything after it in the same
+        # block, exactly like the real engine.
+        if not program_ended:
+            if "S" in words and self.spindle_dir:
+                self.spindle_rpm = words["S"]
+
+            if "F" in words:
+                self.current_feed = words["F"]
+
+        command = {
+            "motion": self.current_motion,
+            "feed": self.current_feed,
+            "spindle_rpm": self.spindle_rpm,
+            "spindle_dir": self.spindle_dir,
+            "coolant_flood": self.coolant_flood,
+            "coolant_mist": self.coolant_mist,
+            # Real fields path.py's own motion resolution needs, ported     # ← changed (comment)
+            # from cnc/engineMotion.ts's applyMotion/addCyclePoints:        # ← changed (comment)
+            # pos_mode decides absolute vs incremental (the "av()"          # ← changed (comment)
+            # helper); r/q are the canned-cycle retract-plane and           # ← changed (comment)
+            # peck-depth words.                                             # ← changed (comment)
+            "pos_mode": self.pos_mode,
+        }
         if not program_ended:
             for axis in ("X", "Y", "Z"):
                 if axis in words:
                     command[axis.lower()] = words[axis]
-            if "R" in words:
-                command["r"] = words["R"]
-            if "Q" in words:
-                command["q"] = words["Q"]
+            if "R" in words:                                                # ← new
+                command["r"] = words["R"]                                   # ← new
+            if "Q" in words:                                                # ← new
+                command["q"] = words["Q"]                                   # ← new
+        if went_home:
+            # Real, unconditional G28 behavior (cnc/engineGCodeApply.ts):
+            # ch.pos.X = ch.home.X, etc. -- applied by MachineState.apply()
+            # *before* any X/Y/Z word on this same line, so a combined
+            # "G28 X0 Y0" resolves those words relative to the just-homed
+            # position, matching the real engine's own documented
+            # double-apply behavior, rather than one or the other winning
+            # outright (previously, this pre-resolved home right here and
+            # let any X/Y/Z word on the same line simply overwrite it below,
+            # instead of building on top of it).
+            command["went_home"] = True
+        return command
 ```
+
+`R` and `Q` land inside the same `if not program_ended:` gate the axis
+loop already uses, for the same reason: a canned cycle's retract-plane or
+peck-depth word on a line whose M-code just ended the program has nothing
+left to apply to, exactly like `X`/`Y`/`Z` on that same line.
 
 `core/path.py` in full:
 
@@ -158,6 +223,7 @@ def compute_path(commands):
 ```
 
 ### Mechanical Walkthrough
+
 - `_CYCLE_MODES = (...)` — **(a) first appearance** — direct port of the
   reference's own `hasCyc` array (Lesson 4's own `_MOTION_CODES` is a
   dict keyed by number; this is a tuple checked by membership, since
@@ -168,14 +234,14 @@ def compute_path(commands):
   *before* this move, exactly like `ch.pos.Z` is read before
   `applyMotion` overwrites it in the reference.
 - `is_absolute = command.get("pos_mode", "G90") == "G90"` /
-- `r = command["r"] if is_absolute else old_z + command["r"]` — **(a)
+  `r = command["r"] if is_absolute else old_z + command["r"]` — **(a)
   first appearance** — direct port of the real ternary
   (`w.R != null ? (ch.posMode === "G90" ? w.R : ch.pos.Z + w.R) : ch.pos.Z + 3`),
   reusing Lesson 31's own `pos_mode` field for the first time outside
   `MachineState`.
 - `_add_cycle_points(command, x, y, z, r, points)` — **(a) first
   appearance** — the shared 3-point pattern, called once regardless of
-- which of the 9 real cycle codes triggered it — `command["motion"]`
+  which of the 9 real cycle codes triggered it — `command["motion"]`
   itself (already correctly set per-code by `_apply_g_code`, Lesson 29)
   is only consulted again inside this function for the two codes
   (`G83`, `G76`) whose real behavior actually differs from the shared
@@ -185,11 +251,66 @@ def compute_path(commands):
   exactly like the reference's own `w.Q != null` check; `abs(command["q"])`
   matches `Math.abs(w.Q)`.
 - `if command["motion"] == "G76": for _ in range(3): ...` — **(a) first
-- appearance** — the reference's own literal `for (let p = 0; p < 3;
+  appearance** — the reference's own literal `for (let p = 0; p < 3;
   p++)`, tagging points `"G32"` (a motion mode this project has never
   emitted before, and doesn't otherwise interpret — it's the real
   reference's own tag for a thread-cutting pass, carried through
   unmodified).
+
+### Execution Trace
+
+Neither the `G83` peck loop nor the `G76` spring-pass loop has a real
+example anywhere else in this lesson — `O0002.nc`'s own `G81` line
+(traced in Connect the Pieces, below) never exercises either. Run
+directly against the real function this session, not the reference or a
+hand trace, to get real values:
+
+```
+$ python3 -c "
+from core.path import _add_cycle_points
+points = []
+_add_cycle_points({'motion': 'G83', 'q': 3.0}, 10.0, 5.0, -10.0, 3.0, points)
+for pt in points: print(pt)
+"
+```
+
+For `G83 X10 Y5 Z-10 R3 Q3` (`x=10.0, y=5.0, z=-10.0, r=3.0, q=3.0`):
+
+```
+Shared 3-point pattern first (identical for every cycle code):
+  {G0, z: 3.0}, {G1, z: -10.0}, {G0, z: 3.0}
+
+Peck loop: current_z starts at r (3.0); loop while current_z > z (-10.0)
+Iteration 1: current_z 3.0  → peck_z = max(-10.0, 3.0 - 3.0) = 0.0
+             append {G1, z: 0.0}, {G0, z: 3.0} → current_z = 0.0
+Iteration 2: current_z 0.0  → peck_z = max(-10.0, 0.0 - 3.0) = -3.0
+             append {G1, z: -3.0}, {G0, z: 3.0} → current_z = -3.0
+Iteration 3: current_z -3.0 → peck_z = max(-10.0, -3.0 - 3.0) = -6.0
+             append {G1, z: -6.0}, {G0, z: 3.0} → current_z = -6.0
+Iteration 4: current_z -6.0 → peck_z = max(-10.0, -6.0 - 3.0) = -9.0
+             append {G1, z: -9.0}, {G0, z: 3.0} → current_z = -9.0
+Iteration 5: current_z -9.0 → peck_z = max(-10.0, -9.0 - 3.0) = -10.0
+             append {G1, z: -10.0}, {G0, z: 3.0} → current_z = -10.0
+Loop check: current_z (-10.0) > z (-10.0)? False → loop ends.
+
+Total: 3 (shared pattern) + 5×2 (peck iterations) = 13 points.
+```
+
+Real, run this same session, for `G76` (`x=20.0, y=0.0, z=-5.0, r=2.0`,
+no `q`):
+
+```
+Shared 3-point pattern: {G0, z: 2.0}, {G1, z: -5.0}, {G0, z: 2.0}
+Pass 1: append {G32, z: -5.0}, {G0, z: 2.0}
+Pass 2: append {G32, z: -5.0}, {G0, z: 2.0}
+Pass 3: append {G32, z: -5.0}, {G0, z: 2.0}
+Total: 3 + 3×2 = 9 points.
+```
+
+`G76`'s own real, honest limit is visible directly in this trace, not
+just stated: all 3 passes cut to the identical `z: -5.0` — the loop
+carries no notion of a shrinking pitch or depth per pass, exactly the
+"3 hardcoded spring passes" the function's own docstring already names.
 
 ### CS Lens
 
@@ -200,6 +321,15 @@ input to a behavior — except the "behavior" nine different inputs map to
 is the exact same function call, which is why a membership check against
 a shared function call is the right shape here, not nine separate
 branches that happen to call identical code.
+
+Also recognized in: an HTTP framework treating every `2xx` status code
+as "success" with one shared handler rather than a branch per exact
+code; a tax system applying the identical bracket calculation to every
+income value that falls within its range; and a keybinding system
+mapping a dozen different key combinations to the same one "save"
+command — in each case, the real complexity is the membership test
+("is this one of the group"), not the behavior, which is shared and
+single once membership is established.
 
 ### SE Lens
 

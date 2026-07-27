@@ -56,6 +56,37 @@ None
 <re.Match object; span=(0, 5), match='while'>
 ```
 
+### Execution Trace
+
+Four calls against the same compiled `pattern`, traced against the real
+output above — the `.search()` call is the one worth tracing carefully,
+since its result is not what a first read of "search scans the whole
+string" would predict:
+
+```
+Call 1: pattern.match("END1")
+  Try position 0 only: "END1" matches (WHILE|END\d+|DO\d*) → Match, span(0,4)
+
+Call 2: pattern.match("  END1")
+  Try position 0 only: "  END1"[0:] starts with two spaces, no alternative
+  matches at position 0 → None
+
+Call 3: pattern.search("  END1")
+  search() is willing to try every position 0..5 — but the pattern itself
+  starts with `^`, which only ever succeeds at true position 0 (no
+  MULTILINE). So every position search() tries after 0 is rejected by `^`
+  before the alternation even runs → None, same as Call 2.
+
+Call 4: pattern.match("while [#1 lt 8] do1")
+  Try position 0 only, re.IGNORECASE active: "while" matches WHILE
+  case-insensitively → Match, span(0,5)
+```
+
+Call 3 is the one that overturns the naive expectation: `.search()` does
+try more positions than `.match()` in general, but a leading `^` in the
+pattern itself cancels that advantage out — the anchor, not the method,
+is what actually decides whether leading whitespace defeats the match.
+
 ### Discard
 
 This lab is not part of the project — the real pattern below recognizes
@@ -64,8 +95,14 @@ This lab is not part of the project — the real pattern below recognizes
 ### CS Lens
 
 Per `python-regex-match-vs-search.md`: `.match()` only ever tries
-position `0`; the two leading spaces are enough to defeat it even though
-the identical pattern clearly matches a few characters further in.
+position `0`. `.search()` normally tries every position until one
+succeeds — but not here: this pattern's own leading `^` constrains
+`.search()` right back down to position `0` too, which is exactly why
+Call 3 above still returns `None` on the padded string rather than
+finding `"END1"` a few characters in. The real fix downstream isn't a
+different method — it's `.strip()`ing the line before matching at all
+(confirmed in the SE Lens below), removing the leading whitespace instead
+of trying to out-clever it with `.search()`.
 
 ### SE Lens
 
@@ -95,13 +132,29 @@ G-code data at all.
 
 ### Reference Source, Read for Real This Session
 
-`cnc/gcodeParser.ts`'s own `_parseLine`, whose keyword regex is checked
-*before* its own word-extraction regex runs — the identical real
-word-extraction collision exists in the reference's own `_extractWords`
-(it excludes only `N`/`O`, the same two letters this project's own
-`tokenize()` already excluded since Lessons 2–3), tolerated there for the
-same reason this fix relies on: keyword detection wins first, so the
-spurious word is never looked at.
+**Correction, this session — the mechanism is real but was mischaracterized
+in an earlier draft:** `_parseLine` (`cnc/gcodeParser.ts` lines 45–135)
+does **not** check its keyword regex before word extraction — read in
+order, it calls `_extractWords` first (line 108), *then* runs the keyword
+regex afterward (lines 110–117). The identical real word-extraction
+collision does exist in `_extractWords` (`cnc/gcodeParser.ts` lines
+137–180, standard word regex at line 158; it excludes only `N`/`O`, line
+163 — the same two letters this project's own `tokenize()` already
+excluded since Lessons 2–3), so `_parseLine("END1")` really does return a
+spurious `words: {D: 1}` in the reference too, same as this project's own
+bug.
+
+What actually protects the reference isn't parse order — it's
+**consumption** order, one layer up: `cnc/CNCEngine.ts`'s `_executeBlock`
+checks `if (b.keyword) { execKeyword(...); return; }` (lines 366–369)
+*before* it ever reads `b.words` for G/M-code dispatch (line 371
+onward) — the polluted `words` field is computed, just never consumed,
+for a keyword line. This project's own fix is a genuinely different, and
+arguably better, mechanism: `tokenize()` (`core/lexer.py` line 60) checks
+`_KEYWORD_RE` *before* running its own word regex at all, so the spurious
+word is never created in the first place, rather than created and later
+ignored by a downstream consumer. Both close the same real bug; only one
+of them prevents the bad data from existing at all.
 
 ### Files Affected
 
@@ -211,6 +264,14 @@ disambiguation — two patterns that can both match overlapping input
 specific one first and stopping there, the same general shape as
 "maximal munch"/longest-match tokenizing rules in real lexers, without
 needing to formalize it that heavily for 21 fixed keywords.
+
+Also recognized in: a real compiler's lexer choosing `>=` over `>`
+followed by `=` (longest match wins), a URL router matching
+`/users/new` against a more specific route before falling back to
+`/users/:id`, and a spam filter checking a sender against an allowlist
+before running the expensive full content-scan — in every case, a
+cheaper or more specific check runs first, precisely so the more general
+mechanism never gets a chance to misfire on input it wasn't meant for.
 
 ### SE Lens
 

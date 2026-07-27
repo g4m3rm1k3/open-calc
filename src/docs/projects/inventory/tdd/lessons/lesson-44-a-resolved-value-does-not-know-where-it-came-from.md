@@ -96,6 +96,63 @@ before this operation began).
   `hasPlaneWord`/`hasWcsWord`/etc. predicates (Lesson 41) against each
   earlier command in turn.
 
+### Execution Trace
+
+All five searches run for real against `O0003.nc`'s first (`N1101`)
+operation. `commands` here is Lesson 41's own group (lines 2–16);
+`declared` is line 5 (`S1800 M03`), so `declaredIndex = commands.indexOf(declared)
+= 3` (`commands[0]`=line 2, `[1]`=line 3, `[2]`=line 4, `[3]`=line 5):
+
+```
+findSourceCommand(commands, 3, hasPlaneWord, declared):
+  i=3 (line 5, "S1800 M03"): gValues=[] → hasPlaneWord false
+  i=2 (line 4, "T1 M06"):    gValues=[] → false
+  i=1 (line 3, "G21 G90 G17"): gValues=[21,90,17], 17 present → true
+    → return commands[1] = line 3
+  planeSource = line 3  (found by walking past 2 lines that don't set it)
+
+findSourceCommand(commands, 3, hasWcsWord, declared):
+  i=3: gValues=[] → false
+  i=2: gValues=[] → false
+  i=1: gValues=[21,90,17], none in 54..59 → false
+  i=0 (line 2, "N1101"): words={} → false
+  loop exhausted (i now -1) → return fallback = declared (line 5)
+  wcsSource = declared  (no G54 word anywhere in this operation to find —
+    G54 is inherited from before it started; the fallback is the honest
+    answer, not a bug)
+
+findSourceCommand(commands, 3, hasRotationWord, declared):
+  i=3 (line 5): mValues=[3], 3 present → hasRotationWord true
+    → return commands[3] = declared itself
+  rotationSource = declared  (found on declared's own first try — M03
+    lives right there)
+
+findSourceCommand(commands, 3, hasCoolantWord, declared):
+  i=3: mValues=[3], no 7/8/9 → false
+  i=2: mValues=[6], no 7/8/9 → false
+  i=1: no M word → false
+  i=0: no M word → false
+  loop exhausted → return fallback = declared
+  coolantSource = declared  (the real M08 that turns coolant on lives on
+    line 7 — *after* declared — but this search only ever walks
+    backward from declared, so it can never find a source that comes
+    later; the fallback silently stands in for "no backward source,"
+    not "no source at all")
+
+findSourceCommand(commands, 3, (w) => "S" in w, declared):
+  i=3 (line 5): "S" in words → true → return commands[3] = declared
+  sfmSource = declared
+```
+
+Three of the five land on `declared` itself — two because the word
+really is on `declared`'s own line (`rotationSource`, `sfmSource`), one
+because nothing earlier in the operation ever set it at all
+(`wcsSource`) — and the trace can't tell those two reasons apart from
+its return value alone; only `planeSource`, found two lines back, shows
+the search actually walking. `coolantSource`'s fallback is the sharper
+case: the real origin line exists, just not in the direction this
+function looks.
+
 ### CS Lens / SE Lens
 
 Not repeated here — both given full treatment in `concepts/attributing-
@@ -205,8 +262,9 @@ that same callback's shape once, as its own type, so
 signature inline.
 
 ### Mechanical Walkthrough
+
 - `existing == null ? [] : Array.isArray(existing) ? existing :
-- [existing]` — **reappearing** normalize-to-array idiom (Lesson 41's
+  [existing]` — **reappearing** normalize-to-array idiom (Lesson 41's
   own `mValues`/`gValues`).
 - `values.filter((v) => !inGroup(v))` — the actual fix, per `concepts/
   partition-and-replace-within-a-combined-field.md`: keeps every value
@@ -215,8 +273,34 @@ signature inline.
   appends the real replacement value(s) onto whatever survived
   filtering.
 - The rest — `delete`, conditional single-vs-array assignment, line
-- splicing — is **reappearing**, identical to `applyWordEdit`'s own
+  splicing — is **reappearing**, identical to `applyWordEdit`'s own
   shape (Lesson 43).
+
+### Execution Trace
+
+`applyGroupEdit` run for real against this unit's own "Run It" line
+(`"S1800 M03 M08"`, `words: {S: 1800, M: [3, 8]}`), editing Rotation
+from `M3` to `M4` (`inGroup` is the rotation-code test `[3,4,5].includes`,
+`newValues = [4]`):
+
+```
+existing = command.words.M = [3, 8]
+values = [3, 8]  (already an array)
+kept = values.filter(v => ![3,4,5].includes(v))
+  v=3: in group → dropped
+  v=8: not in group → kept
+  kept = [8]
+next = [...kept, ...newValues] = [8, 4]
+newWords = {...command.words}
+next.length === 2 (not 0, not 1) → newWords.M = [8, 4]
+lines[2] = serializeLine(command, newWords) = "S1800 M8 M4"
+```
+
+`M8` — the coolant word, nothing to do with this edit — survives in the
+rebuilt line exactly because `filter` only removed the value that
+matched `inGroup`; `applyWordEdit`'s own unconditional-replace shape
+(Lesson 43) would have overwritten the whole `M` word with just `[4]`,
+silently turning coolant off as a side effect of changing rotation.
 
 ### CS Lens / SE Lens
 
@@ -436,20 +520,21 @@ where the browser's default `outline` would draw a plain rectangle
 regardless of how rounded the element underneath it is.
 
 ### Mechanical Walkthrough
+
 - `"7,8".split(",").map(Number)` — **reappearing** (Lesson 43's own
-- `parseWordInput` does the identical split/convert) — the *reason*
+  `parseWordInput` does the identical split/convert) — the *reason*
   it's needed here is new: "Flood + Mist" is the one option whose
   `value` string encodes *two* real numbers at once (`M7` and `M8`
-- together), not one — `applyGroupEdit`'s own `newValues: number[]`
+  together), not one — `applyGroupEdit`'s own `newValues: number[]`
   parameter is what makes writing both in one edit possible.
 - `value={currentValue}` / `onChange={...}` on a `<select>` — **first
   appearance of `<select>` itself** (see the concept file), but the
   *controlled-element* mechanism (React owns the displayed value,
-- `onChange` is the only path to change it) is **reappearing** — the
+  `onChange` is the only path to change it) is **reappearing** — the
   same idea Lesson 18's checkbox and Lesson 43's `EditableCell` already
   established, a third HTML element using the identical pattern.
 - Unlike `EditableCell` (Lesson 43), `EditableInfoBlock` has **no local
-- state** — `value={currentValue}` reads directly from the prop, every
+  state** — `value={currentValue}` reads directly from the prop, every
   render, exactly like Lesson 18's checkbox. This is a deliberate,
   correct difference, not an inconsistency: a `<select>` only changes on
   a discrete, deliberate choice, never mid-keystroke, so there's no
@@ -541,16 +626,51 @@ function handleEditTool(command: Command, toolNumber: number) {
 ```
 
 ### Mechanical Walkthrough
+
 The bug this replaced, named directly rather than silently absorbed:
 calling `applyWordEdit(ref, command, "T", ...)` then `applyWordEdit(ref,
-- command, "H", ...)` — each call reads `command.words` **fresh, from the
+command, "H", ...)` — each call reads `command.words` **fresh, from the
 original, un-edited command object** — so the second call rebuilds its
 `newWords` from the *pre-T-edit* words, silently reverting the `T` the
 first call just wrote the moment the second call's own serialization
 ran. The fix builds **one combined `newWords`** with both `T` and `H`
 set at once, serializing the line exactly once. `{ ...command.words, T:
-- toolNumber, H: toolNumber }` — **reappearing** object spread (Lesson
+toolNumber, H: toolNumber }` — **reappearing** object spread (Lesson
 43) with two keys overridden at once, rather than one.
+
+### Execution Trace
+
+Both versions run for real against a representative command (`words:
+{T: 1, H: 1}`), changing tool 1 to tool 2:
+
+```
+Broken -- two sequential applyWordEdit calls against the same `command`:
+  applyWordEdit(program, command, "T", "2"):
+    value=2, newWords={...command.words}={T:1,H:1} -> newWords.T=2
+      -> {T:2, H:1}
+    lines[0] = serializeLine(...) = "H1 T2"   (T correctly written)
+
+  applyWordEdit("H1 T2", command, "H", "2"):
+    command.words is STILL {T:1, H:1} -- the original object, never
+      mutated by the first call
+    newWords = {...command.words} = {T:1, H:1} -> newWords.H=2
+      -> {T:1, H:2}
+    lines[0] = serializeLine(...) = "H2 T1"   <- T reverted to 1!
+      (this call rebuilt newWords from the stale command.words, so
+      its own splice overwrites the line the first call had just
+      correctly written)
+
+Fixed -- handleEditTool, one combined write:
+  newWords = {...command.words, T:2, H:2} = {T:2, H:2}   (built once,
+    both keys set together, no intermediate stale read)
+  lines[0] = serializeLine(...) = "H2 T2"
+```
+
+The trace makes the bug concrete rather than describable-only: the
+second `applyWordEdit` call doesn't fail to *see* the first edit -- it
+never asks. Its own `newWords` starts fresh from `command.words` every
+time, and `command` itself was never reassigned, so nothing about the
+first call's success or failure was ever visible to the second.
 
 ### CS Lens
 
@@ -659,14 +779,14 @@ and a narrower width than a `<select>`'s own dropdown affordance needs:
 ```
 
 ### Mechanical Walkthrough
+
 `(typedSfm * 12) / (Math.PI * diameterInches)` is `computeSfm`'s own
 formula (`sfm = π × diameter × rpm / 12`) solved for `rpm` instead of
-- `sfm` — ordinary algebra, not a new construct.
-- `Number.isNaN(typedSfm)` gate — **reappearing** (Lesson 43's own `parseWordInput` uses the
-
+`sfm` — ordinary algebra, not a new construct. `Number.isNaN(typedSfm)`
+gate — **reappearing** (Lesson 43's own `parseWordInput` uses the
 identical guard) — a not-yet-finished number while typing doesn't write
 a bogus `S` word. The local `text` state, seeded once and not resynced
-- — **reappearing**, the exact same tradeoff `EditableCell` (Lesson 43)
+— **reappearing**, the exact same tradeoff `EditableCell` (Lesson 43)
 already accepts, for the identical reason (a debounce-lagged `sfm` prop
 shouldn't fight the user's typing).
 
@@ -796,11 +916,12 @@ All already-established selector syntax — plain classes and one
 hover" shape, one level deeper in the tree.
 
 ### Mechanical Walkthrough
-- Every construct here is **reappearing** — `useState` toggle, conditional `{expanded && (...)}` rendering, a `▾`/`▸` button — the identical shape
 
+Every construct here is **reappearing** — `useState` toggle, conditional
+`{expanded && (...)}` rendering, a `▾`/`▸` button — the identical shape
 `OperationBlock`'s own collapse (Lesson 41) and `BlockList`'s program
 collapse already use. The only real new content: `{commands.length}
-- move{commands.length === 1 ? "" : "s"}` — a plain, correct singular/
+move{commands.length === 1 ? "" : "s"}` — a plain, correct singular/
 plural label, ordinary conditional string building, no new construct.
 
 ### CS Lens / SE Lens
@@ -849,7 +970,8 @@ column, so they were never visible or directly editable.
 (`J`/`K` are the identical shape, repeated twice more.)
 
 ### Mechanical Walkthrough
-- Every line is **reappearing** — `EditableCell`/`fmtWord`/`onEditWord`
+
+Every line is **reappearing** — `EditableCell`/`fmtWord`/`onEditWord`
 are exactly Lesson 43's own machinery, applied to three more letters.
 No new construct; the only real content is that these three columns
 existed as real, round-tripped data (Lesson 43's own `WORD_ORDER`

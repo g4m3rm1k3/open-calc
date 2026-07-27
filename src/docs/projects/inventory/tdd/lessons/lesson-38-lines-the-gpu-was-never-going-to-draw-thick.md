@@ -222,16 +222,17 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
 ```
 
 ### Mechanical Walkthrough
+
 - `EffectComposer`/`RenderPass`/`UnrealBloomPass`/`OutputPass` — **(a)
   first appearance** — a real, chained post-processing pipeline: render
   the scene normally (`RenderPass`), then run a real bloom filter over
   the result (`UnrealBloomPass`), then map the (HDR, internally
   higher-range) result back to the screen's real display range
-- (`OutputPass`) — each pass consuming the previous one's output.
+  (`OutputPass`) — each pass consuming the previous one's output.
 - `UnrealBloomPass(..., 0.6, 0.5, 1.2)` — **(a) first appearance** —
   strength `0.6` (how strong the glow is), radius `0.5` (how far it
   spreads), threshold `1.2` (only pixels *brighter* than this bloom at
-- all) — the threshold being above `1.0` is what keeps a plain white
+  all) — the threshold being above `1.0` is what keeps a plain white
   background from blooming, since normal, non-HDR color values never
   exceed `1.0` on any channel.
 - `new THREE.Color(baseColor).multiplyScalar(1.5)` — **(a) first
@@ -241,7 +242,7 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
   even though it doesn't correspond to any real, displayable 0–255 value
   until tone-mapped back down by `OutputPass`.
 - `Line2`/`LineGeometry`/`LineMaterial`, `resolution`, `linewidth: 3` —
-- **(a) first appearance**, per `webgl-linewidth-limitation.md` — real
+  **(a) first appearance**, per `webgl-linewidth-limitation.md` — real
   triangle-based fat lines; `resolution` is required because the
   triangle-widening math happens in screen pixels, not world units, so
   the material needs to know the real, current pixel size of the canvas
@@ -251,16 +252,100 @@ And `cleanup()` (Lesson 37) now also disposes the composer:
   depth relative to) everything else in the scene, so the glow is never
   hidden behind the grid.
 - `child.geometry.dispose(); child.material.dispose();` before
-- `pathGroup.remove(child)` — **(a) first appearance of real disposal
+  `pathGroup.remove(child)` — **(a) first appearance of real disposal
   here** — a genuinely separate, real, pre-existing leak this change
   happens to close: `pathGroup.remove(pathGroup.children[0])` alone
   (Lessons 8–37) removed old lines from the scene graph but never
   released their GPU geometry/material buffers, on every single redraw
   (every theme switch, every new program parsed) since Lesson 8.
 - `composer.setSize`/`mat.resolution.set(...)` in the resize handler,
-- `composer.dispose()` in `cleanup()` — **(b) reappearing** shape (extend
+  `composer.dispose()` in `cleanup()` — **(b) reappearing** shape (extend
   the existing resize/cleanup functions) applied to the two new,
   real resources this lesson introduces.
+
+### Execution Trace
+
+No point/segment data is shown anywhere else in this lesson. `App.tsx`'s
+own real `DEFAULT_PROGRAM` (Lesson 27) is what actually loads on first
+render, so its real, already-computed 6 points (confirmed live, this
+session, against the current backend) are what `drawPath` really runs
+against the first time the app renders anything:
+
+```
+$ python3 -c "
+from core.parser import Parser
+from core.path import compute_steps
+commands = Parser().parse('M3 S1000\nG0 X10 Y20\nX30\nG1 Z-5 F100\nM8')
+for pt in compute_steps(commands)['points']: print(pt)
+"
+```
+```
+{motion: G0, x: 0,  y: 0,  z: 0}
+{motion: G0, x: 0,  y: 0,  z: 0}
+{motion: G0, x: 10, y: 20, z: 0}
+{motion: G0, x: 30, y: 20, z: 0}
+{motion: G1, x: 30, y: 20, z: -5}
+{motion: G1, x: 30, y: 20, z: -5}
+```
+
+**First call** to `drawPath(points)` — `pathGroup.children.length` is
+`0` (nothing has ever been drawn yet), so the dispose loop's condition is
+immediately false and it never executes:
+
+```
+while (pathGroup.children.length) { ... }   ← 0, skipped entirely
+lineMaterials = []
+points.length (6) < 2?  → False, continue
+
+groupSegments(points):
+  current = {motion: "G0", points: [pt0]}
+  i=1: pt1.motion "G0" === current.motion → push → points now [pt0, pt1]
+  i=2: pt2.motion "G0" === current.motion → push → points now [pt0,pt1,pt2]
+  i=3: pt3.motion "G0" === current.motion → push → points now [pt0..pt3]
+  i=4: pt4.motion "G1" !== current.motion ("G0")
+       → segments.push(current)  (segment 1: G0, 4 points)
+       → current = {motion: "G1", points: [pt3 (bridge), pt4]}
+  i=5: pt5.motion "G1" === current.motion → push → points now [pt3,pt4,pt5]
+  end of loop → segments.push(current)  (segment 2: G1, 3 points)
+  → 2 real segments
+
+segments.forEach (2 iterations):
+  Segment 1 (G0, 4 points): positions = 12 real numbers (0,0,0, 0,0,0,
+    10,20,0, 30,20,0); baseColor = colors.rapid; one LineGeometry/
+    LineMaterial/Line2 built; pathGroup.add() → pathGroup now has 1 child;
+    lineMaterials = [mat1]
+  Segment 2 (G1, 3 points): positions = 9 real numbers (30,20,0, 30,20,-5,
+    30,20,-5) — note pt3 is real, shared data: it's both segment 1's last
+    point and segment 2's first, the bridge groupSegments built above;
+    baseColor = colors.feed; second Line2 built; pathGroup.add() →
+    pathGroup now has 2 children; lineMaterials = [mat1, mat2]
+```
+
+**A second call** (any later redraw — a new program parsed, a theme
+switch changing `colors`) starts from `pathGroup.children.length === 2`
+this time, so the dispose loop actually runs:
+
+```
+Iteration 1: child = children[0] (segment 1's Line2)
+  child.geometry.dispose(); child.material.dispose(); pathGroup.remove(child)
+  → pathGroup.children.length now 1
+Iteration 2: child = children[0] (now segment 2's Line2, shifted into
+  position 0 after the first removal)
+  child.geometry.dispose(); child.material.dispose(); pathGroup.remove(child)
+  → pathGroup.children.length now 0 → loop condition false, ends
+lineMaterials = []  (reset, about to be rebuilt from scratch below)
+```
+
+Every redraw is a full dispose-then-rebuild, never a partial update — the
+same 2-line sequence above runs again from a clean `pathGroup`.
+
+The composer chain itself needs no data-dependent trace — it's a fixed,
+3-step sequence run once per `render()` call, each pass consuming the
+prior pass's framebuffer output regardless of what's in the scene:
+`RenderPass` renders the real scene graph normally; `UnrealBloomPass`
+reads that result and adds bloom around anything brighter than its own
+`1.2` threshold; `OutputPass` reads the (still-HDR-range) bloomed result
+and tone-maps it back down to real, displayable 0–255 color.
 
 ### CS Lens
 
@@ -281,6 +366,31 @@ multiplier values (`0.6`/`0.5`/`1.2`/`1.5`) are real, tuned constants
 with no formula deriving them from anything else in this project; they
 were chosen to look right, and changing them is a legitimate future
 adjustment, not a "wrong value" waiting to be corrected.
+
+**Why thick and glowing, not just correct:** the underlying usability
+problem, never stated directly until now — a 1px line, even rendered
+perfectly, is genuinely hard to track against a busy 3D scene (a grid,
+a machine model, multiple overlapping toolpath segments at typical
+zoom levels), and harder still to reliably tell rapid from feed moves
+by color alone at that width. Thickness and bloom both exist to solve
+the same real problem — making the toolpath the most visually
+insistent thing in the scene, since it's the primary content of this
+view, not decoration. The real alternative rejected implicitly by not
+being considered: dashed lines or distinct geometry (e.g. tube-shaped
+rapids vs. flat-ribbon feed moves) as a *second*, non-color-dependent
+way to distinguish rapid from feed — thickness alone still leaves the
+rapid/feed distinction resting on color only, an accessibility gap this
+lesson doesn't raise or address.
+
+`depthTest: false`/`renderOrder = 999` (Mechanical Walkthrough, above)
+is described there purely as an implementation fact ("so the glow is
+never hidden behind the grid") — worth stating as the actual design
+decision it is: the toolpath is deliberately given priority over every
+other visual element in the scene, on the reasoning that a CNC operator
+checking the machine's programmed path needs it visible *regardless* of
+camera angle or what else is being rendered, even at the cost of
+occasionally looking geometrically wrong (drawing through solid
+geometry that should occlude it).
 
 ### Commands
 

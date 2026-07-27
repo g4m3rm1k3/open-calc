@@ -166,6 +166,7 @@ strips the tag before anything else sees it, and only *acts* on the tag
 if the instance was created with the switch on.
 
 ### Mechanical Walkthrough
+
 - `def __init__(self, optional_skip_enabled=False):` — **(a) first
   appearance** of a **default parameter value** on this project's own
   classes.
@@ -194,7 +195,7 @@ if the instance was created with the switch on.
   regardless of the switch.
 - `if skip: stripped = stripped[1:].strip()` — a slice removing exactly
   the first character (the `/` itself), then trimming any space that
-- followed it — so `parse_line`, called next, never sees the `/` at all.
+  followed it — so `parse_line`, called next, never sees the `/` at all.
 - `if skip and self.optional_skip_enabled: continue` — **(a) the actual
   decision**, made only here, after tokenizing already happened (`words`
   already computed) — a real, deliberate choice: even a skipped line's
@@ -202,13 +203,66 @@ if the instance was created with the switch on.
   skipped line containing genuinely unsupported syntax would still be
   worth flagging in a future, stricter lesson) — only building a
   *command* from it, and updating modal state from it, is what skipping
-- actually prevents.
-- `continue` — **(c) already established** — moves to
+  actually prevents. `continue` — **(c) already established** — moves to
   the next line without appending anything or calling `_parse_block`,
   which means `self.current_motion` is **not** touched by a skipped line
-- either — matching the reference's identical behavior (`_applyMotion`,
+  either — matching the reference's identical behavior (`_applyMotion`,
   the function that would update `motionMode`, is never reached for a
   truly skipped block, since `_executeBlock` returns before calling it).
+
+### Execution Trace
+
+`"G0 X10\n/G1 X20\nX30"`, run for real this session against two
+`Parser` instances — one with the switch off, one on:
+
+```
+Parser(optional_skip_enabled=False).parse(program):
+
+Line 1: "G0 X10" → stripped="G0 X10", skip=False
+  words={"G":0.0,"X":10.0} → not empty → skip and enabled? False (skip
+  itself is False) → commands.append(_parse_block(...))
+  → current_motion becomes "G0"; commands = [{"motion":"G0","x":10.0}]
+
+Line 2: "/G1 X20" → stripped starts with "/" → skip=True,
+  stripped becomes "G1 X20"
+  words={"G":1.0,"X":20.0} → not empty
+  skip (True) and self.optional_skip_enabled (False)? → False → runs anyway
+  → commands.append(_parse_block(...)) → current_motion becomes "G1"
+  → commands = [..., {"motion":"G1","x":20.0}]
+
+Line 3: "X30" → skip=False, words={"X":30.0}
+  → commands.append(...) → command carries current_motion ("G1")
+  → commands = [..., {"motion":"G1","x":30.0}]
+
+Final (3 commands): motions are G0, G1, G1 — the skip tag never
+mattered, since the switch was off.
+```
+
+```
+Parser(optional_skip_enabled=True).parse(program):
+
+Line 1: "G0 X10" → skip=False → runs → current_motion="G0"
+  commands = [{"motion":"G0","x":10.0}]
+
+Line 2: "/G1 X20" → skip=True, stripped="G1 X20", words={"G":1.0,"X":20.0}
+  skip (True) and self.optional_skip_enabled (True)? → True
+  → continue — _parse_block is never called for this line
+  → current_motion is NOT touched, still "G0"
+  → commands unchanged
+
+Line 3: "X30" → skip=False, words={"X":30.0}
+  → commands.append(_parse_block(...)) → command carries current_motion,
+  which is still "G0" (Line 2 never ran, so it never became "G1")
+  → commands = [{"motion":"G0","x":10.0}, {"motion":"G0","x":30.0}]
+
+Final (2 commands): the skipped line contributes nothing at all — not
+a command, and not even a mode change for the line after it.
+```
+
+The real, easy-to-miss fact this trace makes visible: Line 3's motion
+is `"G1"` in the first run and `"G0"` in the second — the *same
+line*, same text, producing a different result depending entirely on
+whether Line 2 ever got to update `self.current_motion`.
 
 ### CS Lens
 
@@ -290,6 +344,7 @@ commands = Parser(
 ```
 
 ### Mechanical Walkthrough
+
 - `body.get("optional_skip_enabled", False)` — **(b) reappearing**
   `dict.get` with a default (Lesson 2's own error-message pattern used
   `dict` literals directly; this is the first *read*, with a fallback,
@@ -299,9 +354,9 @@ commands = Parser(
   debt**: this coerces whatever was sent — a real JSON boolean (correct),
   but also a non-empty string, a non-zero number, or any other truthy
   value (silently accepted as `True`, possibly wrongly). A stricter,
-- real fix — reject anything that isn't literally `True`/`False` with a
+  real fix — reject anything that isn't literally `True`/`False` with a
   `400`, the same rigor Lesson 2's request validation already applies to
-- `"line"` — is real, deliberately deferred work: this project doesn't
+  `"line"` — is real, deliberately deferred work: this project doesn't
   have a shared, reusable validation module yet (a named, later
   build-order item, matching `CURRICULUM.md`'s own deferred "real API
   audit" step), and adding one-off checks per field, per route, right

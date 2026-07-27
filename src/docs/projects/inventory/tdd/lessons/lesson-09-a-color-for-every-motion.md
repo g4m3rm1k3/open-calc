@@ -133,18 +133,19 @@ defaults to `"G0"` (matching `MachineState`'s own default motion, Lesson
 prior context, is conventionally a rapid positioning move.
 
 ### Mechanical Walkthrough
+
 - `DEFAULT_MOTION = "G0"` — **(a) first appearance** of a **module-level
   constant** in this file, named rather than inlined, specifically so the
   one place this default is decided is unambiguous and grep-able.
 - `{"motion": DEFAULT_MOTION, **state.position()}` — **(a) first
   appearance** of `**` used in a **dict literal** (distinct from Lesson
-- 4's `**` inside f-string math — unrelated meanings sharing one
+  4's `**` inside f-string math — unrelated meanings sharing one
   character).
   *(Full standalone treatment: ../concepts/python-dict-unpacking.md.)*
   `**state.position()` **unpacks** every key-value pair from
   the dict `state.position()` returns (`x`, `y`, `z`) directly into this
   new, larger dict literal, alongside the explicitly-written `"motion"`
-- key — equivalent to writing `{"motion": ..., "x": ..., "y": ...,
+  key — equivalent to writing `{"motion": ..., "x": ..., "y": ...,
   "z": ...}` by hand, without needing to know or repeat `position()`'s
   exact fields here.
 - `{"motion": command["motion"], **state.position()}` — same unpacking,
@@ -152,6 +153,39 @@ prior context, is conventionally a rapid positioning move.
   applied, rather than the constant — **(b) reappearing** dict indexing
   (`command["motion"]`, guaranteed present by every command `Parser`
   produces, Lesson 4).
+
+### Execution Trace
+
+`compute_path` against a real 2-command program mixing both motion
+modes, `"G0 X10\nG1 X20 Y5"`, run this session:
+
+```
+state = MachineState()
+points = [{"motion": "G0", **state.position()}]
+  → {"motion": "G0", "x": 0.0, "y": 0.0, "z": 0.0}   ← DEFAULT_MOTION, not
+    from any command yet
+
+command 1 ("G0 X10", motion="G0"): state.apply(...)
+  state.position() = {"x": 10.0, "y": 0.0, "z": 0.0}
+  points.append({"motion": "G0", **that})
+  → {"motion": "G0", "x": 10.0, "y": 0.0, "z": 0.0}
+
+command 2 ("G1 X20 Y5", motion="G1"): state.apply(...)
+  state.position() = {"x": 20.0, "y": 5.0, "z": 0.0}
+  points.append({"motion": "G1", **that})
+  → {"motion": "G1", "x": 20.0, "y": 5.0, "z": 0.0}
+
+Final points (3 entries):
+  {"motion": "G0", "x": 0.0,  "y": 0.0, "z": 0.0}
+  {"motion": "G0", "x": 10.0, "y": 0.0, "z": 0.0}
+  {"motion": "G1", "x": 20.0, "y": 5.0, "z": 0.0}
+```
+
+The origin point (index 0) is tagged `"G0"` from `DEFAULT_MOTION`, not
+from any real command — it exists before the loop even starts. Every
+point after that is tagged from `command["motion"]`, the mode active
+*when that specific command ran*, which is exactly the real per-point
+data the next unit needs to color a path segment-by-segment.
 
 ### CS Lens
 
@@ -233,6 +267,7 @@ export function groupSegments(points: PathPoint[]): Segment[] {
 ```
 
 ### Mechanical Walkthrough
+
 - `export interface PathPoint { motion: string; x: number; ... }` — **(b)
   reappearing** interface syntax (Lesson 7) and `export` (Lesson 7's
   `vite.config.ts`; *../concepts/javascript-es-modules-import-export.md*),
@@ -245,14 +280,14 @@ export function groupSegments(points: PathPoint[]): Segment[] {
   case** — an empty path produces an empty segment list, not an error or
   a segment with no points.
 - `let current: Segment = { motion: points[0].motion, points:
-- [points[0]] };` — the first segment starts as just the first point,
+  [points[0]] };` — the first segment starts as just the first point,
   tagged with its own motion mode.
 - `if (point.motion !== current.motion)` — **(a) first appearance of the
   actual grouping decision**, ported directly from the reference's
   identical comparison (`mode !== currentSegment.mode`): a change in
   motion mode ends the current run.
 - `current = { motion: point.motion, points: [current.points[current.
-- points.length - 1], point] };` — **(a) the one real, easy-to-miss
+  points.length - 1], point] };` — **(a) the one real, easy-to-miss
   detail, ported faithfully rather than simplified away**: the *new*
   segment starts with **two** points — the *last* point of the segment
   that just ended, plus this new one — not just the new point alone.
@@ -266,6 +301,42 @@ export function groupSegments(points: PathPoint[]): Segment[] {
   the end), so it's pushed once, explicitly, after the loop — a real,
   common off-by-one shape worth naming, not just writing correctly by
   luck.
+
+### Execution Trace
+
+`groupSegments(points)` against this lesson's own carried pipeline
+example, `"G0 X10 Y20\nG1 X30\nG0 Z-5"`, whose real `compute_path`
+output (traced above) is:
+`[{G0,(0,0,0)}, {G0,(10,20,0)}, {G1,(30,20,0)}, {G0,(30,20,-5)}]`
+(labeled p0–p3 below):
+
+```
+Before the loop: current = {motion:"G0", points:[p0]}, segments = []
+
+i=1: point=p1 (motion "G0")
+  p1.motion ("G0") !== current.motion ("G0")? No → same run
+  current.points.push(p1) → current = {motion:"G0", points:[p0,p1]}
+
+i=2: point=p2 (motion "G1")
+  p2.motion ("G1") !== current.motion ("G0")? Yes → mode changed
+  segments.push(current) → segments = [{G0,[p0,p1]}]
+  current = {motion:"G1", points:[current.points[-1]=p1, p2]} = {G1,[p1,p2]}
+  (the new segment starts with p1 again — the bridge point — plus p2)
+
+i=3: point=p3 (motion "G0")
+  p3.motion ("G0") !== current.motion ("G1")? Yes → mode changed again
+  segments.push(current) → segments = [{G0,[p0,p1]}, {G1,[p1,p2]}]
+  current = {motion:"G0", points:[current.points[-1]=p2, p3]} = {G0,[p2,p3]}
+
+Loop ends (i=4, points.length=4). segments.push(current):
+  segments = [{G0,[p0,p1]}, {G1,[p1,p2]}, {G0,[p2,p3]}]
+```
+
+3 segments from 4 points, real motion changes at every boundary — `p1`
+appears in both the first and second segments, `p2` in both the second
+and third, which is exactly the deliberate two-point-bridge behavior
+named above: without it, the line drawn for segment 1 would visibly stop
+short of where segment 2's own line begins.
 
 ### Discard — Not This Time
 
@@ -466,6 +537,7 @@ function drawPath(points: PathPoint[]) {
 ```
 
 ### Mechanical Walkthrough
+
 - `import { groupSegments, type PathPoint } from "./segments.ts";` —
   **(a) first appearance** of an **inline type-only import specifier**.
   *(Full standalone treatment: ../concepts/typescript-type-only-import.md.)*
@@ -495,15 +567,48 @@ function drawPath(points: PathPoint[]) {
   (`condition ? ifTrue : ifFalse`) in this project.
   *(Full standalone treatment: ../concepts/ternary-conditional-operator.md.)*
   A compact
-- `if`/`else` that produces a *value* rather than executing a block —
+  `if`/`else` that produces a *value* rather than executing a block —
   read as "if this segment's motion is `G0`, the color is rapid red;
   otherwise, it's feed green" — a direct, one-line port of the
   reference's own identical ternary (`seg.mode === "G00" ? colors.rapid :
   channelColor`), simplified since this project has no channel-based
   color variation yet.
 - The rest of the loop body (`BufferGeometry`, `LineBasicMaterial`,
-- `THREE.Line`, `pathGroup.add`) — **(c) already established** (Lesson
+  `THREE.Line`, `pathGroup.add`) — **(c) already established** (Lesson
   8), now run once *per segment* instead of once for the whole path.
+
+### Execution Trace
+
+`segments.forEach(...)` against the 3 real segments the previous unit's
+own trace computed for `[{G0,[p0,p1]}, {G1,[p1,p2]}, {G0,[p2,p3]}]`:
+
+```
+Segment 1 ({motion:"G0", points:[p0,p1]}):
+  vectors = [Vector3(p0.x,p0.y,p0.z), Vector3(p1.x,p1.y,p1.z)] (2 points)
+  geometry built from those 2 vectors
+  color: segment.motion ("G0") === "G0"? Yes → RAPID_COLOR (0xff8b8b)
+  material = LineBasicMaterial({ color: RAPID_COLOR })
+  line = new Line(geometry, material) → pathGroup.add(line)
+  → pathGroup now has 1 child
+
+Segment 2 ({motion:"G1", points:[p1,p2]}):
+  vectors = [Vector3(p1...), Vector3(p2...)] (2 points)
+  color: "G1" === "G0"? No → FEED_COLOR (0x46d89f)
+  new Line(...) → pathGroup.add(line)
+  → pathGroup now has 2 children
+
+Segment 3 ({motion:"G0", points:[p2,p3]}):
+  vectors = [Vector3(p2...), Vector3(p3...)] (2 points)
+  color: "G0" === "G0"? Yes → RAPID_COLOR (0xff8b8b)
+  new Line(...) → pathGroup.add(line)
+  → pathGroup now has 3 children
+```
+
+Each segment becomes exactly one `Line` object with its own color —
+the ternary is re-evaluated fresh for every segment in the loop, which
+is why segments 1 and 3 (both `"G0"`) end up the same red even though
+they're two entirely separate `Line` objects, not one shared color
+applied after the fact.
 
 ### CS Lens
 

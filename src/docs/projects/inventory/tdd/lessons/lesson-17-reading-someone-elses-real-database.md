@@ -247,15 +247,16 @@ every field a tool request body may contain — the actual schema this
 lesson's next unit validates against.
 
 ### Mechanical Walkthrough
+
 - `@dataclass(frozen=True)` — **(a) first appearance**, full treatment
   in the concept file. `frozen=True` specifically, here, because
-- `ToolField` describes a fixed fact about the API's own shape — it
+  `ToolField` describes a fixed fact about the API's own shape — it
   should never be mutated once defined, and `frozen=True` makes that a
   real, enforced guarantee, not just a convention.
 - `allowed_types: tuple[type, ...]` — **(a) first appearance** of
   `tuple[type, ...]` as a type annotation: a tuple of an unspecified
   number of `type` objects (`int`, `str`, `bool` are themselves values
-- of type `type` in Python) — this is what lets one field accept
+  of type `type` in Python) — this is what lets one field accept
   `(int, float)` and another accept just `(str,)`.
 - `TOOL_FIELDS: tuple[ToolField, ...] = (...)` — **(c) already
   established** tuple-literal syntax, applied to a tuple of the
@@ -365,6 +366,7 @@ passes through — one generic loop over `TOOL_FIELDS`, plus two rules
 directly instead.
 
 ### Mechanical Walkthrough
+
 - `for field in TOOL_FIELDS:` — **(c) already established** iteration
   over a tuple.
 - `if field.name not in body:` — **(b) reappearing**, the same
@@ -372,7 +374,7 @@ directly instead.
   now run once per declared field instead of once for a whole object.
 - `isinstance(value, bool) and bool not in field.allowed_types` — **(a)
   first real, enforced use** of the `bool`-subclass-of-`int` gotcha
-- `python-isinstance.md`'s own exercises already named as a fact —
+  `python-isinstance.md`'s own exercises already named as a fact —
   here it's an actual guard, not just an observation: without it,
   `{"tool_number": true}` would silently pass a bare `isinstance(value,
   (int,))` check, since `True` really is an `int` as far as Python's
@@ -383,12 +385,69 @@ directly instead.
   by data instead of a literal tuple typed inline.
 - `" or ".join(t.__name__ for t in field.allowed_types)` — **(a) first
   appearance** of `.join` on a **generator expression** (`t.__name__
-- for t in ...`, no square brackets — lazily produced, not a full list built first) — produces `"int or float"` from `(int, float)`.
-
+  for t in ...`, no square brackets — lazily produced, not a full list
+  built first) — produces `"int or float"` from `(int, float)`.
 - The two `if` blocks after the loop — **(c) already established**
   membership checks (`in body`), composed into two new, real business
   rules specific to this project's tool shape (a tool is either an
   endmill or a drill, never both, never neither).
+
+### Execution Trace
+
+The loop against the real second test case below —
+`{"tool_number": 7, "name": "x", "is_metric": True, "diameter": True,
+"total_length": 50, "flute_count": 2, "cutting_depth": 20,
+"arbor_diameter": 5, "corner_radius": 0}` — traced field by field, in
+`TOOL_FIELDS`' own declared order:
+
+```
+errors = []
+
+field=ToolField("tool_number",(int,),required=True):
+  "tool_number" in body? Yes. value=7.
+  isinstance(7, bool)? No → is_bool_where_unwanted=False
+  isinstance(7, (int,))? Yes → not True = False → no error
+
+field=ToolField("name",(str,),required=True):
+  "name" in body? Yes. value="x". isinstance("x",(str,))? Yes → no error
+
+field=ToolField("is_metric",(bool,),required=True):
+  "is_metric" in body? Yes. value=True.
+  isinstance(True, bool)? Yes. bool not in (bool,)? False → is_bool_where_unwanted=False
+  isinstance(True, (bool,))? Yes → no error   (bool IS the allowed type here)
+
+field=ToolField("diameter", NUMBER=(int,float), required=True):
+  "diameter" in body? Yes. value=True.
+  isinstance(True, bool)? Yes. bool not in (int,float)? True
+    → is_bool_where_unwanted = True and True = True
+  is_bool_where_unwanted or not isinstance(...)? → True → ERROR:
+    type_names = "int or float"
+    errors.append("diameter must be int or float, got bool")
+
+field=ToolField("total_length", NUMBER, required=True):
+  value=50. isinstance(50,bool)? No. isinstance(50,(int,float))? Yes → no error
+
+field=ToolField("flute_count",(int,),required=True): value=2 → no error
+field=ToolField("cutting_depth",NUMBER,required=True): value=20 → no error
+field=ToolField("arbor_diameter",NUMBER,required=True): value=5 → no error
+field=ToolField("corner_radius",NUMBER,required=False): value=0 → no error
+field=ToolField("tip_angle",NUMBER,required=False): not in body, required=False → skipped, no error
+field=ToolField("material",(str,),required=False): not in body → skipped
+field=ToolField("manufacturer",(str,),required=False): not in body → skipped
+
+Loop ends (all 12 fields checked). errors = ["diameter must be int or float, got bool"]
+
+if "corner_radius" in body and "tip_angle" in body:  → True and False → False, skip
+if "corner_radius" not in body and "tip_angle" not in body: → False and True → False, skip
+
+return ["diameter must be int or float, got bool"]
+```
+
+The loop never stops early at `"diameter"` — it checks all 12 declared
+fields regardless of how many already failed, which is why a body with
+*multiple* type errors would come back with multiple messages at once,
+the same "report everything wrong, not just the first thing" choice
+Lesson 14's comprehension already made.
 
 ### Verified, Run for Real
 
@@ -567,11 +626,12 @@ by every model in the next two units, alongside the same `get_engine`/
 `get_session`/`init_db` Lesson 15 already built.
 
 ### Mechanical Walkthrough
+
 Full first-appearance treatment in the concept file — this project's
 real `GUID` class *is* that file's isolated example, verbatim, so
 nothing here is new to re-enumerate. The one addition specific to this
-- project: `if isinstance(value, str): value = uuid.UUID(value)` — **(b) reappearing** `isinstance` — lets a `GUID` column also accept a
-
+project: `if isinstance(value, str): value = uuid.UUID(value)` —
+**(b) reappearing** `isinstance` — lets a `GUID` column also accept a
 plain UUID string, not only a `uuid.UUID` object, convenient for the
 seed data and manual testing done this session.
 
@@ -651,7 +711,37 @@ Real output (excerpt) named exactly which tables reference which —
 keys *without* a diagram, before finding out (from actually reading
 row data, not just column names) that `TlTool`, `TlToolMill`, and
 `TlToolEndmill` share the **same** primary key rather than referencing
-each other by a separate foreign key column at all:
+each other by a separate foreign key column at all.
+
+### Execution Trace
+
+The comprehension against `TlToolMill`'s own real columns (cross-
+referenced from `pragma table_info` and this same unit's own final ORM
+model below: `ID`, `OverallDiameter`, `OverallLength`, `FluteCount`,
+`CuttingDepth`, `ArborDiameter`, plus the two real, unmapped columns the
+investigation found, `TlGradeID`/`TlOpParamsID`):
+
+```
+cols = ["ID", "OverallDiameter", "OverallLength", "FluteCount",
+        "CuttingDepth", "ArborDiameter", "TlGradeID", "TlOpParamsID"]
+
+c="ID":              ends with "ID"? Yes. c != "ID"? No  → excluded
+c="OverallDiameter":  ends with "ID"? No                 → excluded
+c="OverallLength":    ends with "ID"? No                 → excluded
+c="FluteCount":       ends with "ID"? No                 → excluded
+c="CuttingDepth":     ends with "ID"? No                 → excluded
+c="ArborDiameter":    ends with "ID"? No                 → excluded
+c="TlGradeID":        ends with "ID"? Yes. != "ID"? Yes   → included
+c="TlOpParamsID":     ends with "ID"? Yes. != "ID"? Yes   → included
+
+fk_like = ["TlGradeID", "TlOpParamsID"]
+```
+
+This matches the real, cited output exactly — the comprehension's own
+`c != "ID"` check is specifically why the table's own primary key,
+`ID`, never shows up as a false "foreign key" of itself, even though it
+technically ends in the same two letters every real candidate is
+filtered by.
 
 ```python
 >>> [row["ID"].hex() for row in tl_tool_rows]
@@ -737,11 +827,12 @@ None` — the same existence-based typing the real file itself uses,
 with no invented discriminator column standing in for it.
 
 ### Mechanical Walkthrough
+
 Full first-appearance treatment of the pattern itself is in the
 concept file. What's specific to this project's real code: **(a) a
 four-level-deep real chain** (`TlTool` → `TlToolMill` →
 `TlToolEndmill`/`TlToolDrill`), one level deeper than the concept
-- file's own two-level `Vehicle`/`Car` example — and **(b) a genuinely
+file's own two-level `Vehicle`/`Car` example — and **(b) a genuinely
 sibling pair** (`endmill`/`drill`) at the deepest level, both optional,
 at most one ever populated for a given tool — this exact shape is what
 the next unit's real bug turned out to depend on.
@@ -966,6 +1057,7 @@ SEED_TOOL_MATERIALS = [{"ID": _CARBIDE_ID}, {"ID": _HSS_ID}]
 ```
 
 ### Mechanical Walkthrough
+
 - `TlManufacturer`/`TlMaterial` — **(b) reappearing** the exact same
   shape as `TlTool` one unit ago: a GUID primary key plus plain columns,
   no shared-key inheritance needed here since neither has a
@@ -975,14 +1067,14 @@ SEED_TOOL_MATERIALS = [{"ID": _CARBIDE_ID}, {"ID": _HSS_ID}]
   its own table sharing `TlMaterial`'s key, rather than a plain foreign
   key column on `TlAssemblyItem` pointing straight at `TlMaterial`. This
   project's own `TlToolMaterial` rows (below) always shadow a
-- `TlMaterial` row 1:1 — the extra table exists in the real schema
+  `TlMaterial` row 1:1 — the extra table exists in the real schema
   (confirmed against the actual file), even though nothing about this
   project's own data yet needs the distinction that separate table
   would allow in Mastercam itself (per-material tool-specific
   properties, not modeled here).
 - `_GENERIC_MFG_ID = uuid.uuid4()` — **(b) reappearing** `uuid.uuid4()`
   (`uuid-byte-order.md`), called at **import time**, not inside a
-- function — these three module-level constants exist so `SEED_TOOLS`
+  function — these three module-level constants exist so `SEED_TOOLS`
   (already in this file, below) can reference the *same* generated ID
   it needs to link a seed tool's catalog row to the correct seed
   material/manufacturer row, without either side needing to query the
@@ -1051,8 +1143,9 @@ def _tool_to_dict(tool: TlTool) -> dict:
 ```
 
 ### Mechanical Walkthrough
+
 - `tool.mill`, `tool.catalog_item` — **(b) reappearing** the
-- `back_populates` relationships already built two units ago —
+  `back_populates` relationships already built two units ago —
   reading `tool.mill` triggers SQLAlchemy to load the matching
   `TlToolMill` row (same shared ID) with no join written by hand here.
 - `mill.endmill.CornerRadius if mill.endmill else None` — **(b)
@@ -1062,7 +1155,7 @@ def _tool_to_dict(tool: TlTool) -> dict:
   the same expression, not two separate steps.
 - `catalog.tool_material.material.Name` — **(a) first appearance** of
   chaining *three* relationship hops in one expression
-- (`TlAssemblyItem` → `TlToolMaterial` → `TlMaterial`) — each `.` is a
+  (`TlAssemblyItem` → `TlToolMaterial` → `TlMaterial`) — each `.` is a
   separate real relationship traversal, only possible because every
   link in the chain was declared with `relationship()` two units ago;
   guarded by `catalog and catalog.tool_material` first since either
@@ -1274,6 +1367,7 @@ def remove_tool(tool_number):
 ```
 
 ### Mechanical Walkthrough
+
 - `<int:tool_number>` — **(b) reappearing** Flask's URL converter
   syntax (`flask-url-path-parameters.md`), previously `<name>` (a bare
   string converter) — the converter itself enforces the type at the
@@ -1283,14 +1377,14 @@ def remove_tool(tool_number):
 - `if "material" in body: material_id = get_material_id_by_name(...)` —
   **(a) first appearance** of a request field that's optional at the
   API boundary but, once present, must resolve to something real
-- server-side, checked with its own dedicated `400` — distinct from
+  server-side, checked with its own dedicated `400` — distinct from
   `validate_tool_body`'s type/presence checks (which run first): a
   syntactically valid string can still name a material that doesn't
   exist, a different kind of invalid input than a wrong type.
 - `insert_tool(body["tool_number"], mill_fields, catalog_fields, ...)`
   — **(a) first appearance** of assembling several small dicts
   (grouped by which table each maps to) from one flat validated body,
-- immediately before the real insert — the shape `insert_tool` expects
+  immediately before the real insert — the shape `insert_tool` expects
   mirrors the schema's own real table boundaries, not the flat request
   body's.
 - `return {"tool": get_tool_by_number(body["tool_number"])}, 201` —
@@ -1298,6 +1392,42 @@ def remove_tool(tool_number):
   return it" pattern Lesson 14 already established, now reading
   through the full five-table chain via `_tool_to_dict` instead of one
   row.
+
+### Execution Trace
+
+`list_tools()`'s own dict comprehension, against 2 real rows (tool 1,
+the real end-mill data cited throughout this lesson; tool 4, the real
+drill):
+
+```
+rows = [TlTool(ToolNumber=1, ...), TlTool(ToolNumber=4, ...)]
+  (ordered by ToolNumber, per the query)
+
+row=TlTool(ToolNumber=1):
+  str(1) → "1"
+  _tool_to_dict(row) → {"tool_number":1, "name":"end_mill_4fl",
+    "diameter":10.0, "flute_count":4, "corner_radius":0.0,
+    "tip_angle":None, ...}   (tip_angle is None — this row has no
+    mill.drill, only mill.endmill)
+  → entry: "1" → {that dict}
+
+row=TlTool(ToolNumber=4):
+  str(4) → "4"
+  _tool_to_dict(row) → {"tool_number":4, "name":"drill_hss",
+    "diameter":6.0, "flute_count":2, "corner_radius":None,
+    "tip_angle":118.0, ...}   (corner_radius is None here instead —
+    this row has mill.drill, not mill.endmill)
+  → entry: "4" → {that dict}
+
+Final: {"1": {tool 1's dict}, "4": {tool 4's dict}}
+```
+
+`_tool_to_dict` is called once per row inside the comprehension — the
+same function the previous unit already traces in detail — and the
+dict's own keys are `str(row.ToolNumber)`, not the row's own database
+`ID` (the real GUID), which is why `/api/tools`'s response is keyed
+`"1"`/`"4"`, matching `ToolCardList.tsx`'s own real, human-facing tool
+numbers, not an opaque UUID a frontend would have no use for.
 
 ### Verified, Run for Real
 
@@ -1491,6 +1621,7 @@ import ToolCardList from "./ToolCardList.tsx"; // was ToolTable
 ```
 
 ### Mechanical Walkthrough
+
 - `Record<string, Tool>` — **(a) first appearance**, full standalone
   treatment: `../concepts/typescript-record-utility-type.md`. Matches
   `list_tools()`'s real return shape (a dict keyed by `str(row.ToolNumber)`)
@@ -1506,12 +1637,12 @@ import ToolCardList from "./ToolCardList.tsx"; // was ToolTable
   stable identity per card, matching the reference's own `key={n}`.
 - `t.corner_radius != null ? "Endmill" : "Drill"` — **(b) reappearing**
   the same existence-based typing already used server-side in
-- `_tool_to_dict`, applied again here purely for *display* — the
+  `_tool_to_dict`, applied again here purely for *display* — the
   frontend never re-derives "is this an endmill" from anything the
   backend didn't already decide; it just reads which of the two
   optional fields came back non-`null`.
 - `handleDelete` calling `deleteToolByNumber` then updating local state
-- with `delete next[String(toolNumber)]` — **(b) reappearing** the
+  with `delete next[String(toolNumber)]` — **(b) reappearing** the
   copy-then-mutate-the-copy immutability discipline already established
   for objects/arrays, applied to a `Record` treated as a plain object
   (which, at runtime, it is one).
@@ -1522,6 +1653,38 @@ import ToolCardList from "./ToolCardList.tsx"; // was ToolTable
   outer card (a future lesson, not yet ported here), a click on the
   inner ✕ button would otherwise also fire the card's own click
   handler.
+
+### Execution Trace
+
+`visibleTools.map(...)` against the same 2 real tools traced above
+(`Object.entries({"1": {...end_mill_4fl...}, "4": {...drill_hss...}})`):
+
+```
+visibleTools = [["1", {tool_number:1, name:"end_mill_4fl", diameter:10,
+                       is_metric:true, corner_radius:0, tip_angle:null, ...}],
+                ["4", {tool_number:4, name:"drill_hss", diameter:6,
+                       is_metric:true, corner_radius:null, tip_angle:118, ...}]]
+
+Entry 1: toolNumber="1", t={...end_mill_4fl...}
+  kind: t.corner_radius (0) != null? → True → kind = "Endmill"
+  card header: "T01 -- Endmill"   (String("1").padStart(2,"0") = "01")
+  meta line: "end_mill_4fl (diameter 10mm) R0mm -- (unnamed material/manufacturer)"
+    (corner_radius branch taken: R0mm)
+
+Entry 2: toolNumber="4", t={...drill_hss...}
+  kind: t.corner_radius (null) != null? → False → kind = "Drill"
+  card header: "T04 -- Drill"
+  meta line: "drill_hss (diameter 6mm) 118deg -- (unnamed material/manufacturer)"
+    (corner_radius is null, so the tip_angle branch runs instead: 118deg)
+
+Result: 2 real card elements, keyed "1" and "4".
+```
+
+`kind`'s own ternary and the meta line's own nested ternary both key
+off the exact same `corner_radius != null` fact — Entry 1 and Entry 2
+take opposite branches of *both* ternaries together, never
+independently, because they're deciding the same real question
+("is this an endmill or a drill") twice in two different places.
 
 ### CS Lens
 
@@ -1625,6 +1788,7 @@ And the real rules:
 ```
 
 ### Mechanical Walkthrough
+
 - `.tcard`, `.tcard-h`, `.tcard-name`, `.tcard-meta` — **(a) first
   appearance** of this project's card-list styling — every property
   used was already declared by Lesson 12 except the two new ones above.
@@ -1632,7 +1796,7 @@ And the real rules:
   compound-class selector syntax (`css-rule-syntax-selectors-cascade.md`),
   `.tcard.on` specifically requiring *both* classes on the same element
   (`cursor: pointer` alone from `.tcard`, plus the amber override from
-- `.on`) — the same compositional-class idea Lesson 18 names again for
+  `.on`) — the same compositional-class idea Lesson 18 names again for
   `.btn.btn-gr.full`.
 - `--color-border-strong`/`--color-amber`/`--color-amber-bg` — **(b)
   reappearing** `css-custom-properties.md`'s mechanism, three more real

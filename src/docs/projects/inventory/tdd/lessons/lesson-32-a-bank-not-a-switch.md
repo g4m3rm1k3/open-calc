@@ -150,43 +150,84 @@ def _m_code_matches(bank_key, m_int):
     return False
 ```
 
-The constructor's new real fields (ported from `ChannelState`'s own real
-defaults):
+`Parser.__init__` in full, with the four new fields marked — everything
+above them is unchanged from Lesson 31:
 
 ```python
-        self.active_t = 0
-        self.pending_t = 0
-        self.done = False
-        self.waiting = None
+    def __init__(self, optional_skip_enabled=False):
+        self.current_motion = "G0"
+        self.optional_skip_enabled = optional_skip_enabled
+        self.current_feed = 0
+        self.spindle_rpm = 0
+        self.spindle_dir = ""
+        self.coolant_flood = False
+        self.coolant_mist = False
+        # Real fields and real defaults, ported from ChannelState
+        # (cnc/channelState.ts's constructor) -- every one of these is set
+        # by cnc/engineGCodeApply.ts's real applyGCode, below, faithfully
+        # ported case-by-case.
+        self.plane = "G17"
+        self.units = "mm"
+        self.cutter_comp = "G40"
+        self.tool_length_comp = "G49"
+        self.active_h = 0
+        self.css_speed_max = None
+        self.active_wcs = "G54"
+        self.cycle = "G80"
+        self.pos_mode = "G90"
+        self.css_mode = False
+        self.css_speed = 0
+        self.feed_mode = "G94"
+        self.retract_plane = "G98"
+        self.home = {"x": 0.0, "y": 0.0, "z": 0.0}
+        # Real fields, ported from ChannelState's own real defaults        # ← new
+        # (cnc/channelState.ts: activeT=0, activeH=0, pendingT=0) and set  # ← new
+        # by cnc/engineMCodeApply.ts's real applyMCode, below, for this    # ← new
+        # project's one real machine definition (fanuc_mill's own mCodes  # ← new
+        # bank, cnc/machineDefinitions.ts).                                # ← new
+        self.active_t = 0                                                  # ← new
+        self.pending_t = 0                                                 # ← new
+        self.done = False                                                  # ← new
+        self.waiting = None                                                # ← new
 ```
 
-`_parse_block`'s M-word handling and dispatch-order gating:
+`_parse_block` in full, with every piece this lesson adds or changes
+marked in place — the letter-support check and the G-word loop above the
+M-word block are unchanged from Lesson 31:
 
 ```python
-        program_ended = False
+    def _parse_block(self, words):
+        for letter in words:
+            if letter not in _SUPPORTED_WORDS:
+                raise UnsupportedCodeError(f"{letter}-word is not supported yet")
+
+        went_home = False
+        if "G" in words:
+            g_values = words["G"] if isinstance(words["G"], list) else [words["G"]]
+            for g_value in g_values:
+                if self._apply_g_code(g_value, words):
+                    went_home = True
+
+        program_ended = False                                              # ← new
         if "M" in words:
             m_values = words["M"] if isinstance(words["M"], list) else [words["M"]]
             for m_value in m_values:
-                if self._apply_m_code(m_value, words):
-                    program_ended = True
-                    break
+                if self._apply_m_code(m_value, words):                     # ← changed (was an inline elif chain on m_int)
+                    program_ended = True                                   # ← new
+                    break                                                  # ← new
 
-        # Real dispatch order (cnc/CNCEngine.ts's _executeBlock, per
-        # COMPONENT_MAP.md's own citation): G-codes, then M-codes, then
-        # T/D/F/S/H words, then motion -- an M-code that returns truthy
-        # (program end) short-circuits everything after it in the same
-        # block, exactly like the real engine.
-        if not program_ended:
+        # Real dispatch order (cnc/CNCEngine.ts's _executeBlock, per       # ← new
+        # COMPONENT_MAP.md's own citation): G-codes, then M-codes, then    # ← new
+        # T/D/F/S/H words, then motion -- an M-code that returns truthy    # ← new
+        # (program end) short-circuits everything after it in the same    # ← new
+        # block, exactly like the real engine.                            # ← new
+        if not program_ended:                                              # ← new
             if "S" in words and self.spindle_dir:
                 self.spindle_rpm = words["S"]
 
             if "F" in words:
                 self.current_feed = words["F"]
-```
 
-and the command dict / axis loop, now also gated:
-
-```python
         command = {
             "motion": self.current_motion,
             "feed": self.current_feed,
@@ -196,7 +237,7 @@ and the command dict / axis loop, now also gated:
             "coolant_mist": self.coolant_mist,
             "pos_mode": self.pos_mode,
         }
-        if not program_ended:
+        if not program_ended:                                              # ← new
             for axis in ("X", "Y", "Z"):
                 if axis in words:
                     command[axis.lower()] = words[axis]
@@ -204,6 +245,15 @@ and the command dict / axis loop, now also gated:
             command["went_home"] = True
         return command
 ```
+
+Before this lesson, `words["M"]` was resolved by an inline `elif` chain
+on a fixed `_SUPPORTED_M_CODES` tuple, right here inside `_parse_block`,
+with no way to signal "program ended" back out. Now every M-value is
+handed to `_apply_m_code` (below), and its real, data-driven return value
+is what `program_ended` tracks — which is also what the new dispatch-order
+gate on the `S`/`F` capture and the axis loop actually has to consult for
+the first time; before this lesson that comment cited a dispatch order
+with nothing yet able to violate it.
 
 `_apply_m_code` itself, in full:
 
@@ -266,9 +316,10 @@ and the command dict / axis loop, now also gated:
 ```
 
 ### Mechanical Walkthrough
+
 - `_FANUC_MILL_M_CODES` — **(a) first appearance** — a real data bank,
   keyed by category, each value a tuple of real code strings, directly
-- mirroring `fanuc_mill.mCodes`'s own shape; `(b) reappearing` — dict
+  mirroring `fanuc_mill.mCodes`'s own shape; `(b) reappearing` — dict
   literal syntax itself, unchanged since Lesson 4's `_MOTION_CODES`.
 - `_m_code_matches(bank_key, m_int)` — **(a) first appearance** — a real
   port of the reference's own `match()` closure, including its exact
@@ -277,21 +328,62 @@ and the command dict / axis loop, now also gated:
   a simpler `code[1:]` slice, since the real function is written to
   tolerate code strings that aren't just `"M"` plus digits.
 - `if _m_code_matches(...): ...` (repeated, unindented from each other) —
-- **(a) first appearance** — independent checks, not `elif`, a real,
+  **(a) first appearance** — independent checks, not `elif`, a real,
   deliberate structural choice ported from the reference's own sequence
-- of separate `if (match(...))` statements — genuinely different from
+  of separate `if (match(...))` statements — genuinely different from
   `_apply_g_code`'s `elif` chain one method above it.
 - `program_ended` / `if not program_ended: ...` (twice — the
-- `S`/`F` capture, then the axis loop) — **(a) first appearance** of the
+  `S`/`F` capture, then the axis loop) — **(a) first appearance** of the
   mechanism being real and load-bearing; the comment citing
   `_executeBlock`'s dispatch order was already present since Lesson 29,
   but had nothing to actually gate until this lesson gave `_apply_m_code`
   a real way to signal program end.
 - `self.active_t`/`self.pending_t`/`self.done`/`self.waiting` — **(a)
-- first appearance** — real `ChannelState` fields, previously entirely
+  first appearance** — real `ChannelState` fields, previously entirely
   absent from this project.
 - `"T"` added to `_SUPPORTED_WORDS` — **(a) first appearance** — the
   actual fix for the crash this lesson opened with.
+
+### Execution Trace
+
+`_apply_m_code`'s own body is 11 independent `if _m_code_matches(...)`
+checks run in a fixed order every single call, with `program_ended`
+carried into how the *next* call's caller behaves — traced against the
+real program `T2 M06 / M03 S2000 / X10 F50 S9999 / M02`, the same one
+already run live above:
+
+```
+Call 1 (line "T2 M06"): m_int = 6
+  spindle_cw  ("M03"→3.0):  6 != 3.0  → False
+  spindle_ccw ("M04"→4.0):  6 != 4.0  → False
+  spindle_stop("M05"→5.0):  6 != 5.0  → False
+  coolant_mist("M07"→7.0):  6 != 7.0  → False
+  coolant_flood("M08"→8.0): 6 != 8.0  → False
+  tool_change ("M06"→6.0):  6 == 6.0  → True
+    "T" in words → active_t = active_h = pending_t = 2.0
+  spindle_orient/program_stop/optional_stop/program_end: none match 6
+  return False (program not ended)
+
+Call 2 (line "M03 S2000"): m_int = 3
+  spindle_cw ("M03"→3.0): 3 == 3.0 → True
+    spindle_dir = "CW"; "S" in words → spindle_rpm = 2000.0
+  every other check: no match
+  return False
+
+Call 3 (line "M02"): m_int = 2
+  spindle_cw..optional_stop: no match
+  program_end ("M30"→30.0): 2 != 30.0 → False
+  program_end ("M02"→2.0):  2 == 2.0  → True
+    self.done = True
+  return True  ← program_ended
+```
+
+`program_ended` is reset to `False` at the top of every `_parse_block`
+call (one call per line) — Call 3's own `True` only ever gates *that same
+line's* own `S`/`F`/axis-word capture, not a later line's. That's exactly
+what the real output above already shows: the `M02` line carries no new
+`x`/`s`/`f` of its own, because `program_ended` had already flipped `True`
+earlier in that same call, before that line's own axis-word gate ran.
 
 ### CS Lens
 
@@ -302,6 +394,15 @@ at the moment `_apply_m_code` runs, not by a branch baked into the
 function's own source the way `_apply_g_code`'s `elif g_int == ...`
 chain is. Swapping in a different bank (a `haas_mill` dict, say) would
 change the answer with zero edits to `_apply_m_code` itself.
+
+**REAPPEARING** (Lesson 3's `open-closed-principle.md`): this is that
+same principle, now with a real, working second axis to prove it —
+`_apply_m_code`'s own logic is *closed* for modification (Exercise 1 has
+you add a whole new machine's M-code bank without touching it at all) but
+*open* for extension (a new bank is just a new dict, `_FANUC_MILL_M_CODES`
+alongside it). Lesson 3's own version of OCP was about tolerating one new
+letter; this one is the fuller shape — an entire new machine's worth of
+behavior, added as pure data.
 
 ### SE Lens
 

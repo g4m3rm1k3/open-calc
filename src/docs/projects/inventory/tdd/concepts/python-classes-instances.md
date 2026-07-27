@@ -48,6 +48,28 @@ print(b.increment())
 - `a = Counter()` **calls** the class, which Python recognizes as "create a new instance," automatically invoking `__init__(self)` with `self` bound to the brand-new instance being built — a programmer never passes `self` explicitly; Python supplies it.
 - `a.increment()` looks up `increment` on `a`'s class (`Counter`), and calls it with `self` automatically bound to `a`. Inside, `self.count += 1` reads and rewrites `a`'s own `count`.
 
+## Execution Trace
+
+Two instances, three calls total, traced against the real output above:
+
+```
+a = Counter()  → a new instance; a.count = 0 (own, independent storage)
+b = Counter()  → a second, separate instance; b.count = 0 (own, independent storage)
+
+a.increment():  self = a.  self.count (0) += 1 → a.count = 1.  return 1.
+  → printed: 1
+
+a.increment():  self = a.  self.count (1) += 1 → a.count = 2.  return 2.
+  → printed: 2
+
+b.increment():  self = b.  self.count (0) += 1 → b.count = 1.  return 1.
+  → printed: 1
+```
+
+`b.increment()` returns `1`, not `3` — proof `a.count` and `b.count`
+are two separate storage locations, not one shared value: nothing that
+happened to `a` across its two calls is visible from `b` at all.
+
 ## CS Lens
 
 A class instance's attributes are **object state** — memory that outlives any single method call and belongs to that specific instance, not the class as a whole. This is the general mechanism behind any "object that remembers something."

@@ -46,6 +46,38 @@ console.log(drained);
 - Removing index `0` specifically (rather than any other index) means every remaining element shifts down by exactly one position each time, but the *next* element to remove is always, again, whatever is now at index `0` — the loop never needs to track or compute an index itself, sidestepping the shifting-index bug entirely.
 - This pattern terminates because the collection strictly shrinks by one every iteration, and the loop condition depends on that same shrinking value — a loop invariant simple enough to verify by inspection.
 
+## Execution Trace
+
+The broken version, run for real against `[1, 2, 3, 4, 5]` — the array
+shrinks *underneath* the index `i` as the loop runs:
+
+```
+i=0: array=[1,2,3,4,5], i < length(5) → true. splice(0,1) removes value 1
+     → array=[2,3,4,5], length now 4
+i=1: array=[2,3,4,5], i < length(4) → true. splice(1,1) removes value 3
+     → array=[2,4,5], length now 3
+i=2: array=[2,4,5], i < length(3) → true. splice(2,1) removes value 5
+     → array=[2,4], length now 2
+i=3: array=[2,4], i < length(2) → 3 < 2 is false → loop ends
+Final: broken = [2, 4]
+```
+
+Values `1`, `3`, and `5` were removed; `2` and `4` were never visited by
+a matching `i`, because each `splice` shifted them one position to the
+*left*, into an index the loop had already passed. The while-loop
+version, removing whatever is currently at index `0` every time instead
+of tracking a separate counter, never has this problem:
+
+```
+Start: drained=[1,2,3,4,5], length=5 → truthy, loop runs
+splice(0,1) removes 1 → drained=[2,3,4,5], length=4 → truthy
+splice(0,1) removes 2 → drained=[3,4,5],   length=3 → truthy
+splice(0,1) removes 3 → drained=[4,5],     length=2 → truthy
+splice(0,1) removes 4 → drained=[5],       length=1 → truthy
+splice(0,1) removes 5 → drained=[],        length=0 → falsy, loop ends
+Final: drained = []
+```
+
 ## CS Lens
 
 This is a small, real instance of a broader principle: **iterating over a mutable collection while also mutating it is unsafe unless the iteration strategy specifically accounts for the mutation.** Different data structures and languages solve this differently — some collection types raise a runtime error the instant they detect concurrent modification during iteration (a deliberate safety check, precisely because this bug class is common and easy to introduce silently); the drain-by-always-removing-index-0 idiom instead sidesteps the problem structurally, by never holding onto a stale index across iterations at all.

@@ -52,11 +52,39 @@ again
 - Commands that aren't mode-changers (`"hello"`, `"world"`, etc.) never touch `self.bold` — they only *read* whatever it currently holds.
 - The entire "stickiness" is just: nothing resets `self.bold` between calls to `apply`. An instance attribute (see `python-classes-instances.md`) naturally persists this way — sticky state doesn't require any special mechanism beyond ordinary object state.
 
+## Execution Trace
+
+`f.apply(cmd)` called once per command, `self.bold` carried across every
+call — traced against the real output above:
+
+```
+Start: f.bold = False
+
+cmd="hello":    not "BOLD_ON"/"BOLD_OFF" → style = "" (bold is False)
+                → return "hello" → printed "hello"
+cmd="BOLD_ON":  → f.bold = True → returns None → nothing printed
+cmd="world":    not a mode command → style = "**" (bold is now True)
+                → return "**world**" → printed "**world**"
+cmd="there":    not a mode command → style = "**" (bold still True)
+                → return "**there**" → printed "**there**"
+cmd="BOLD_OFF": → f.bold = False → returns None → nothing printed
+cmd="again":    not a mode command → style = "" (bold is False again)
+                → return "again" → printed "again"
+```
+
+`"BOLD_ON"` is stated exactly once, yet the *next two* commands
+(`"world"`, `"there"`) both read `bold=True` — `self.bold` was never
+reset between those calls, which is the entire mechanism; there's no
+separate "remember this" step beyond the attribute simply still holding
+its last-set value the next time `apply` runs.
+
 ## CS Lens
 
 This is **sticky state** (in some domains called "modal" state) — a specific shape of state distinguished by what changes it: only explicit mode-setting operations change it, while other operations merely read the currently active mode, and it never silently reverts on its own between operations.
 
 Also recognized in: a text editor's current font/bold setting (stays on until turned off), a terminal's current working directory (`cd` changes it for every subsequent command, not just one), CSS's cascade and inheritance (a set property applies to all descendants until overridden), and a video game's currently equipped weapon (stays equipped across many turns until switched).
+
+Two more formal names for the same shape, worth having both: an object like `TextFormatter` (or, in this project, `Parser`) that changes *how it responds* to later input based on its own current internal mode is the GoF **State pattern** — usually described with a separate class per state and explicit transitions between them, but the same idea in its plainest form, one flag and one `if`. And resolving *what to do* by reading a value out of the object's own current state — rather than the caller having to pass every relevant setting in explicitly on every call — is **data-directed dispatch**: the dispatch target isn't hardcoded at the call site, it's computed from data the object is already carrying.
 
 ## SE Lens
 

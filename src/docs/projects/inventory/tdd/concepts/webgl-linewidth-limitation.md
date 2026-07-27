@@ -70,6 +70,16 @@ will actually provide — checking the real, reported range
 (`ALIASED_LINE_WIDTH_RANGE`) is the only way to know for certain, for
 this specific driver, right now.
 
+Also recognized in: CSS properties a browser parses without error but
+silently ignores rendering (an unsupported `gap` value on an old engine,
+accepted syntactically, with zero visual effect); HTTP content
+negotiation, where a client can request a representation the server
+lists as theoretically supported but doesn't actually have cached or
+built; and any hardware API in general — audio sample rates, camera
+resolutions, GPU texture sizes — where the type system happily accepts a
+number, but only a runtime capability query reveals which numbers the
+actual device will honor.
+
 ## SE Lens
 
 The real, standard workaround (what this project's own `viewport.ts`

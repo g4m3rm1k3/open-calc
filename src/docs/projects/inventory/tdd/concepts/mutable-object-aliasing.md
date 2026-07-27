@@ -68,6 +68,61 @@ print([p.x for p in history_correct])
 - Because all three list entries are references to the *one* `shared` object, reading `.x` off any of them reads whatever `shared.x` currently is — at the moment of reading, not at the moment each reference was appended.
 - The fixed version creates a genuinely new, independent `Point()` for each entry, so each one's `.x` is set once and never touched again by any later code.
 
+## Execution Trace
+
+The broken version — one object, three appended references:
+
+```
+shared = Point()  → one real object, id X, shared.x = 0
+history_broken = []
+
+shared.x = 1
+history_broken.append(shared)  → history_broken = [ref→X]  (X.x is currently 1)
+
+shared.x = 2  → the SAME object X now has x=2 — this changes what the
+                already-appended reference above "shows" too
+history_broken.append(shared)  → history_broken = [ref→X, ref→X]  (X.x is currently 2)
+
+shared.x = 3  → X.x=3, changing BOTH already-appended references again
+history_broken.append(shared)  → history_broken = [ref→X, ref→X, ref→X]  (X.x is 3)
+
+Read [p.x for p in history_broken]:
+  ref→X: reads X.x → 3
+  ref→X: reads X.x → 3  (same object, read again)
+  ref→X: reads X.x → 3  (same object, read again)
+Final: [3, 3, 3]
+```
+
+The fixed version — three separate objects, one real reference each:
+
+```
+shared2 = Point()  → object Y, shared2.x = 0
+history_correct = []
+
+shared2.x = 1
+history_correct.append(Point())  → a brand-new object Z1, history_correct = [ref→Z1]
+history_correct[-1].x = shared2.x  → Z1.x = 1  (Z1 is untouched by anything after this)
+
+shared2.x = 2
+history_correct.append(Point())  → a brand-new object Z2, history_correct = [ref→Z1, ref→Z2]
+history_correct[-1].x = shared2.x  → Z2.x = 2
+
+shared2.x = 3
+history_correct.append(Point())  → a brand-new object Z3
+history_correct[-1].x = shared2.x  → Z3.x = 3
+
+Read [p.x for p in history_correct]:
+  ref→Z1: reads Z1.x → 1  (never touched since being set)
+  ref→Z2: reads Z2.x → 2
+  ref→Z3: reads Z3.x → 3
+Final: [1, 2, 3]
+```
+
+Every `.append()` call in the broken version stores a reference to the
+exact same memory; every later mutation of `shared` is visible through
+all three references at once, because there was only ever one real
+object to read from.
+
 ## CS Lens
 
 This is **aliasing** — two or more names (or, here, list slots) referring to the *same* underlying object in memory, rather than independent copies of it. A mutation through any one alias is visible through every other alias, because there was only ever one real object being looked at multiple ways.

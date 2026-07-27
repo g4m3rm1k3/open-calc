@@ -48,6 +48,29 @@ ok
 - `raise TooColdError(f"{t} is below freezing")` constructs an instance of the custom exception (passing a message, exactly like calling any class) and immediately stops normal execution, propagating upward until something catches it.
 - `except TooColdError as e:` only catches this specific exception type (and any subclass of it, were one to exist) — a `ValueError` raised elsewhere would not be caught here; it would propagate further up, uncaught by this block.
 
+## Execution Trace
+
+Two calls to `check_temp`, tracing both the raising and non-raising paths:
+
+```
+try: check_temp(-5)
+  t = -5.  t < 0? → True → raise TooColdError("-5 is below freezing")
+  → normal execution inside check_temp stops immediately; the
+    exception propagates up to the try block
+except TooColdError as e:
+  → e is the TooColdError instance just raised
+  → print("caught:", e) → "caught: -5 is below freezing"
+
+print(check_temp(10))
+  t = 10.  t < 0? → False → skip the raise entirely
+  → return "ok"
+  → print("ok")
+```
+
+The first call never reaches its own `return "ok"` line at all — the
+`raise` inside the `if` block is a real, immediate exit from the
+function, not a value that happens to get returned.
+
 ## CS Lens
 
 This is using **inheritance** to create a new, named category within an existing hierarchy — `TooColdError` *is a* `Exception` (in the same sense `python-isinstance.md` describes), so all the general machinery for handling exceptions works on it unmodified, while its distinct name lets code single it out specifically from every other kind of failure.

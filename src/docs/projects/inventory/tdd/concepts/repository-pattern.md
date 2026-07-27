@@ -57,6 +57,36 @@ print(repo.find_by_name("drill_hss"))
 - Swapping the storage mechanism underneath a repository (moving from an in-memory list to a real database, or from one database to another) requires changing only the repository's own internals — every consumer, having depended only on the method names and their meanings, needs zero changes.
 - A repository is commonly backed by a real ORM's own query API internally (see `orm-query-builder-select-where.md`) — the repository pattern and an ORM aren't competitors; the repository is a thin, purpose-named layer *on top of* whatever the actual data-access mechanism is, hiding even the ORM's own API from the rest of the application if desired.
 
+## Execution Trace
+
+Two real adds, then two real reads, traced against the real output above:
+
+```
+repo = ToolRepository()  → self._tools = [] (the `or []` default applies)
+
+repo.add({"name": "end_mill_4fl", "diameter_mm": 10})
+  → self._tools.append(...) → _tools = [end_mill_4fl]
+
+repo.add({"name": "drill_hss", "diameter_mm": 6})
+  → self._tools.append(...) → _tools = [end_mill_4fl, drill_hss]
+
+describe_inventory(repo):
+  tools = repo.all() → list(self._tools) → a real copy, [end_mill_4fl, drill_hss]
+  return f"{len(tools)} tool(s) on hand" → "2 tool(s) on hand"
+
+repo.find_by_name("drill_hss"):
+  next((t for t in self._tools if t["name"] == "drill_hss"), None)
+    check end_mill_4fl: name == "drill_hss"? No
+    check drill_hss:    name == "drill_hss"? Yes → return this dict immediately
+  → {"name": "drill_hss", "diameter_mm": 6}
+```
+
+`describe_inventory` never once reaches into `_tools` itself — every
+value it works with came back through `repo.all()`, a named method. If
+`ToolRepository` were rewritten tomorrow to query a real database
+instead of a list, `describe_inventory`'s own code, and this exact
+trace's shape, would be unchanged.
+
 ## CS Lens
 
 This is a specific, named application of the same **adapter** idea (`adapter-pattern.md`) — translating a general, richer interface (however data actually gets stored and queried) into a small, purpose-fit one (the specific operations an application's own logic actually needs) — with the repository pattern specifically scoped to data access, using domain vocabulary (`find_by_name`, not `execute_query`) rather than storage vocabulary.

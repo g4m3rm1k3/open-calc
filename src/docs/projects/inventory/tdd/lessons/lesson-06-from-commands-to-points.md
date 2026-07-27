@@ -107,11 +107,12 @@ longer — the starting position, plus one recorded position after each
 command is applied.
 
 ### Mechanical Walkthrough
+
 - `from core.machine import MachineState` — **(b) reappearing** import
   syntax, reaching into a sibling module inside `core/` for the first
-- time from *another* `core/` module rather than from `app.py` —
+  time from *another* `core/` module rather than from `app.py` —
   **(a) worth naming**: `core/path.py` importing `core/machine.py`
-- directly is still entirely within the `core` boundary (Lesson 2) —
+  directly is still entirely within the `core` boundary (Lesson 2) —
   that boundary is about `core` never depending on `flask`, not about
   modules inside `core` staying isolated from each other.
 - `state = MachineState()` — **(b) reappearing** instantiation.
@@ -122,13 +123,39 @@ command is applied.
   command's "start" is the origin itself, which no command ever
   explicitly states.
 - `for command in commands: state.apply(command); points.append(state.position())`
-- — already-known basic Python (`for`, `list.append`); `state.apply` is
+  — already-known basic Python (`for`, `list.append`); `state.apply` is
   **(b) reappearing** (Lesson 5); the **(a) genuinely new decision** is
   calling `state.position()` **again**, immediately after each `apply`,
   and keeping *every* one of those results instead of only the loop's
   final value — the one-line difference between this lesson's scan and
   Lesson 5's fold.
 - `return points` — already-known basic Python.
+
+### Execution Trace
+
+`compute_path` against a real 2-command program, `"G0 X10\nX20 Y5"`,
+run this session:
+
+```
+state = MachineState() → state.position() = {'x':0.0,'y':0.0,'z':0.0}
+points = [{'x':0.0,'y':0.0,'z':0.0}]   ← the starting point, before any command
+
+command 1 ("G0 X10"): state.apply({'x':10.0, ...})
+  state.position() = {'x':10.0,'y':0.0,'z':0.0}
+  points.append(...) → points = [{'x':0.0,...}, {'x':10.0,'y':0.0,'z':0.0}]
+
+command 2 ("X20 Y5"): state.apply({'x':20.0,'y':5.0, ...})
+  state.position() = {'x':20.0,'y':5.0,'z':0.0}
+  points.append(...) → points = [{'x':0.0,...}, {'x':10.0,...}, {'x':20.0,'y':5.0,'z':0.0}]
+
+Loop ends (2 commands) → return points (3 entries)
+```
+
+2 real commands produced 3 real points — `n + 1`, exactly as the
+Project Change step above states: the starting point (before anything
+runs) plus one point per command. Compare against Lesson 5's own fold
+over this same kind of loop: a fold would only ever keep the *last* of
+these three entries; this scan keeps all of them.
 
 ### CS Lens
 
@@ -290,8 +317,9 @@ def path_program():
 ```
 
 ### Mechanical Walkthrough
+
 Identical validation/`try`/`except` shape to `/api/parse` and
-- `/api/simulate` — **(c) already established**, no new explanation owed.
+`/api/simulate` — **(c) already established**, no new explanation owed.
 The **only** difference from `/api/simulate` is the last two lines:
 `compute_path(commands)` (returning every point) instead of manually
 folding with a loop and returning one `position()` call. This is itself

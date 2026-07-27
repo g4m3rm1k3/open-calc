@@ -245,10 +245,11 @@ def init_db():
 ```
 
 ### Mechanical Walkthrough
+
 - `DB_PATH` / `mkdir` — **(c) already established** (Lesson 14),
   unchanged.
 - `class Base(DeclarativeBase): pass` — **(b) reappearing** (this
-- lesson's own `Pet` lab) — this project's **one real, shared**
+  lesson's own `Pet` lab) — this project's **one real, shared**
   declarative base; every real model (`Tool`, and any future table)
   will inherit from this exact class, so `Base.metadata` collects every
   one of them in a single place.
@@ -270,8 +271,8 @@ def init_db():
   runs (Python only registers a class with `Base.metadata` when the
   class *definition itself* executes, which requires the module
   defining it to have been imported). This project's real, correct
-- order — `app.py` imports `core.tools` (which defines `Tool`) *before* calling `init_db()` — is what makes this work; calling `init_db()`
-
+  order — `app.py` imports `core.tools` (which defines `Tool`) *before*
+  calling `init_db()` — is what makes this work; calling `init_db()`
   before that import would silently create an empty database with no
   `tools` table at all. Verified, not assumed: this exact ordering was
   tested this session and produces the real, correct table.
@@ -330,13 +331,14 @@ class Tool(Base):
 ```
 
 ### Mechanical Walkthrough
+
 - `class Tool(Base): __tablename__ = "tools"` — **(b) reappearing**
   (this lesson's own `Pet`), applied to the real table Lesson 14 built
   by hand — same real table name, same real column set, now declared
   once as a Python class instead of a `CREATE TABLE` string plus a
   separate mental model of "what fields a tool dict has."
 - `subtype: Mapped[str | None]` / `point_angle_deg: Mapped[float |
-- None]` — **(a) first appearance** of `Mapped[T | None]`: the **union
+  None]` — **(a) first appearance** of `Mapped[T | None]`: the **union
   with `None`** in the type annotation itself is what tells SQLAlchemy
   a column is **nullable** — the real, direct equivalent of Lesson 14's
   explicit SQL (columns *without* `NOT NULL` were nullable; here,
@@ -346,7 +348,7 @@ class Tool(Base):
 - `def to_dict(self): return {...}` — **(a) first appearance** of a
   **real method on a model class**, something Lesson 14's raw
   `sqlite3.Row` objects had no equivalent of at all (`dict(row)` worked
-- generically, with no method belonging to the row itself) — `Tool`
+  generically, with no method belonging to the row itself) — `Tool`
   instances are real Python objects, so they can carry real behavior,
   not just data; this one method is what lets every route keep
   returning the exact same plain-dict shape as before, unchanged.
@@ -396,6 +398,7 @@ def seed_tools_if_empty():
 ```
 
 ### Mechanical Walkthrough
+
 - `with get_session() as session:` — **(a) first appearance** of
   `Session` used as a **context manager**: guarantees the session is
   properly closed when the block ends, even if an error occurs inside
@@ -407,7 +410,7 @@ def seed_tools_if_empty():
   class constructor instead of building a dict). **A real, verified
   fact, worth naming as a genuine improvement over Lesson 14's raw
   version**: if `tool` contains any key that isn't a real column on
-- `Tool`, this line raises a real `TypeError` — *"'unexpected_field' is
+  `Tool`, this line raises a real `TypeError` — *"'unexpected_field' is
   an invalid keyword argument for Tool"*, confirmed this session —
   whereas Lesson 14's hand-written `INSERT INTO tools (name, type,
   ...)` silently **ignored** any extra dict key not in its explicit
@@ -415,7 +418,7 @@ def seed_tools_if_empty():
   extra validation code this project had to write.
 - `select(Tool).where(Tool.name == name)` — **(b) reappearing** (this
   lesson's own `Pet` lab), now the real lookup Lesson 14 wrote as
-- `"SELECT * FROM tools WHERE name = ?"` — identical real behavior,
+  `"SELECT * FROM tools WHERE name = ?"` — identical real behavior,
   including safety: `Tool.name == name` **always** compiles to a real
   parameterized query, confirmed this session with the exact same
   malicious input Lesson 14 used
@@ -426,16 +429,47 @@ def seed_tools_if_empty():
   or one** matching row; returns the real object, or `None` if none
   matched (would raise a real error if *more than one* matched,
   correctly treating that as a genuine data problem rather than
-- silently picking one — not reachable here since `name` isn't
+  silently picking one — not reachable here since `name` isn't
   declared unique yet, a real, honest, small gap worth naming: a future
   lesson should add a real `UNIQUE` constraint on `Tool.name`).
 - `seed_tools_if_empty` — **(c) already established** shape (Lesson
   14), `session.execute(select(Tool)).scalars().first()` replacing the
-- raw `SELECT COUNT(*)` — a real, deliberate simplification: fetching
+  raw `SELECT COUNT(*)` — a real, deliberate simplification: fetching
   one row and checking for `None` is simpler to read than a separate
   count query, at the honest cost of a marginally less efficient query
   if the table were ever huge (not a real concern at this project's
   current, real scale).
+
+### Execution Trace
+
+`seed_tools_if_empty()` against a fresh, empty table, then a second
+call against the now-populated one:
+
+```
+First call:
+  with get_session() as session:
+    existing = session.execute(select(Tool)).scalars().first()
+    → no rows in the table yet → existing = None
+  existing is None?  → True
+  for tool in SEED_TOOLS:  (4 real tools, same data as Lesson 14)
+    tool={name:"end_mill_4fl", ...}: insert_tool(tool)
+      → with get_session() as session: session.add(Tool(**tool)); session.commit()
+      → 1 real row written
+    tool={name:"end_mill_2fl", ...}: insert_tool(tool) → 2nd row written
+    tool={name:"ball_mill_4fl", ...}: insert_tool(tool) → 3rd row written
+    tool={name:"drill_hss", ...}: insert_tool(tool) → 4th row written
+  → table now has 4 real rows
+
+Second call (e.g. a server restart):
+  existing = session.execute(select(Tool)).scalars().first()
+    → the table now has rows → existing = <Tool id=1, name="end_mill_4fl">
+  existing is None?  → False → the for loop never runs
+  → still exactly 4 rows, nothing re-inserted
+```
+
+`.first()` only ever needs to find *one* row to prove the table isn't
+empty — it doesn't matter which one, which is why the check works
+identically whether the table has 1 row or 10,000.
 
 ### Commands and Real Output — Full Regression, Verified Live
 
@@ -475,12 +509,13 @@ ALLOWED_TOOL_FIELDS = REQUIRED_TOOL_FIELDS + OPTIONAL_TOOL_FIELDS
 ```
 
 ### Mechanical Walkthrough
+
 - `ALLOWED_TOOL_FIELDS = REQUIRED_TOOL_FIELDS + OPTIONAL_TOOL_FIELDS` —
   **(b) reappearing** tuple concatenation (already-known basic Python);
   a real, explicit **allow-list** — the same instinct as Lesson 4's
   `_SUPPORTED_WORDS`, applied here to request-body fields.
 - `{field: body[field] for field in ALLOWED_TOOL_FIELDS if field in
-- body}` — **(a) first appearance** of a **dict comprehension**.
+  body}` — **(a) first appearance** of a **dict comprehension**.
   *(Full standalone treatment: ../concepts/python-dict-comprehension.md.)*
   Builds
   a brand-new dict containing only the real, known-safe fields present
@@ -491,6 +526,43 @@ ALLOWED_TOOL_FIELDS = REQUIRED_TOOL_FIELDS + OPTIONAL_TOOL_FIELDS
   use — the crash is real and correctly possible when calling
   `insert_tool` directly (proven), but never reachable through this
   route, because the route's own filtering makes it unreachable.
+
+### Execution Trace
+
+The comprehension against a real request body with one genuinely
+unexpected field (`"unexpected_field"`, the exact case that raises a
+real `TypeError` when it reaches `Tool(**tool)` unfiltered):
+
+```
+body = {"name": "face_mill_50", "type": "Face Mill", "diameter_mm": 50,
+        "corner_radius_mm": 0, "flute_length_mm": 20, "total_length_mm": 60,
+        "shank_diameter_mm": 12, "flute_count": 4, "material": "Carbide",
+        "description": "test", "unexpected_field": "danger"}
+
+ALLOWED_TOOL_FIELDS has 12 entries (10 required + 2 optional); for each:
+  "name" in body?              → Yes → tool["name"] = "face_mill_50"
+  "type" in body?               → Yes → tool["type"] = "Face Mill"
+  "diameter_mm" in body?        → Yes → tool["diameter_mm"] = 50
+  ... (the other 6 required fields, all present) → all included
+  "subtype" in body?            → No  → not included
+  "point_angle_deg" in body?    → No  → not included
+
+"unexpected_field" is never checked at all — it isn't in
+ALLOWED_TOOL_FIELDS, so the comprehension never even asks whether it's
+in body.
+
+tool = {"name": "face_mill_50", "type": "Face Mill", "diameter_mm": 50,
+        "corner_radius_mm": 0, "flute_length_mm": 20, "total_length_mm": 60,
+        "shank_diameter_mm": 12, "flute_count": 4, "material": "Carbide",
+        "description": "test"}
+  → "unexpected_field" and "danger" are gone — never copied into `tool`
+  → insert_tool(tool) → Tool(**tool) succeeds, no TypeError
+```
+
+The comprehension iterates the *allow-list*, not the incoming body —
+that's the entire mechanism: a field the client sends is only ever
+copied over if its name appears in `ALLOWED_TOOL_FIELDS`, regardless of
+what else is present in `body`.
 
 ### SE Lens
 

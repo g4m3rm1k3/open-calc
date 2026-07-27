@@ -58,6 +58,30 @@ server: got 'what time is it?', answering
 - `mailbox.put(...)`, called from the main thread, is the "client" side — the thing initiating contact.
 - `server_thread.join()` makes the main program wait for the server thread to actually finish before the script exits, so the printed output is deterministic.
 
+## Execution Trace
+
+The `while True` loop runs across two threads at once — traced as the
+real sequence of events, not just what each thread does in isolation:
+
+```
+Main thread: starts server_thread
+Server thread: enters while True, calls mailbox.get() → blocks (queue empty)
+Main thread: prints "client: sending a request"
+Main thread: mailbox.put("what time is it?")
+Server thread: mailbox.get() unblocks, returns "what time is it?"
+Server thread: request != "STOP" → prints "server: got 'what time is it?', answering"
+Server thread: loop repeats, calls mailbox.get() again → blocks (queue empty again)
+Main thread: mailbox.put("STOP")
+Server thread: mailbox.get() unblocks, returns "STOP"
+Server thread: request == "STOP" → break, loop ends, thread finishes
+Main thread: server_thread.join() returns (server thread already finished)
+```
+
+The loop iterates exactly twice — once per real `put()` call — and
+spends nearly all of its time *blocked inside* `mailbox.get()`, not
+spinning or polling; the "loop" is really "wait, react, wait again,"
+which is the entire point this concept exists to make concrete.
+
 ## CS Lens
 
 This is the general shape every real client-server system reduces to: one side blocks waiting for input, the other side initiates. Swap the `Queue` for a real network socket and you have the shape underneath HTTP, database connections, and message queues alike.

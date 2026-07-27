@@ -54,6 +54,37 @@ false
 - A **material** (here, `THREE.LineBasicMaterial`) describes *how* a shape's surface (or, for a line, its stroke) should be rendered — color, whether it responds to scene lighting, transparency, and other appearance properties, and nothing about the actual vertex positions.
 - `new THREE.Line(geometry, material)` (or `THREE.Mesh(geometry, material)` for solid shapes) combines exactly one geometry and exactly one material into a single object that can be added to a scene — the same geometry/material pairing pattern applies to every drawable Three.js object type, only the specific combining class (`Line`, `Mesh`, `Points`) differs by what kind of shape is being drawn.
 
+## Execution Trace
+
+One `geometry`, built once, reused by two separately-constructed `Line`
+objects — traced against the real output above:
+
+```
+vectors = points.map(...) → 3 real THREE.Vector3 objects
+geometry = new THREE.BufferGeometry().setFromPoints(vectors)
+  → one real geometry object, built once, holding 3 vertex positions
+
+greenMaterial = new THREE.LineBasicMaterial({ color: 0x46d89f })
+redMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 })
+  → two separate, independent material objects
+
+greenLine = new THREE.Line(geometry, greenMaterial)
+  → combines the ONE geometry object with greenMaterial
+redLine = new THREE.Line(geometry, redMaterial)
+  → combines the SAME geometry object (not a copy) with redMaterial
+
+greenLine.geometry === redLine.geometry
+  → both reference the identical object created once above → true
+
+greenLine.material === redLine.material
+  → greenMaterial and redMaterial are two different objects → false
+```
+
+`geometry` is only ever constructed once in this whole trace — both
+`Line` objects hold a reference to that same object, not a copy of it,
+which is exactly why `===` reports `true` for geometry but `false` for
+material.
+
 ## CS Lens
 
 This is another concrete instance of **separation of concerns** (see `threejs-renderer-scene-camera.md`'s renderer/scene/camera split for the same principle at a different level) — shape data and appearance data are independent axes of variation, and keeping them as separate objects lets either vary without touching the other, and lets identical shape data be reused across multiple different-looking objects with zero duplication of the actual vertex data.

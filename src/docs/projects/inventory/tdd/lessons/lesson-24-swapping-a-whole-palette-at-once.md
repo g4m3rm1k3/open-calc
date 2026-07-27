@@ -77,14 +77,15 @@ first of five small functions `themes.ts` defines below its `THEMES`
 catalog, all building toward one exported `applyTheme`.
 
 ### Mechanical Walkthrough
+
 - `function hexToRgb(hex: string): [number, number, number]` — **(a)
   first appearance** the tuple return type, per
-- `typescript-tuple-types.md` — **(c) already basic** the `string`
+  `typescript-tuple-types.md` — **(c) already basic** the `string`
   parameter annotation.
 - `hex.replace("#", "")` — **(c) already basic** — a plain, non-regex
   string replace.
 - `clean.slice(0, 2)`, `.slice(2, 4)`, `.slice(4, 6)` — **(a) first
-- appearance** — `String.prototype.slice(start, end)`, splitting the
+  appearance** — `String.prototype.slice(start, end)`, splitting the
   6-character cleaned string into its three 2-character channel
   substrings by position.
 - `parseInt(str, 16)` — **(a) first appearance** — parses a string as a
@@ -369,6 +370,30 @@ remember whatever gets chosen this time.
 - `localStorage.setItem(STORAGE_KEY, theme.id)` — **(a) first
   appearance**, per `browser-local-storage.md`.
 
+### Execution Trace
+
+`getStoredThemeId()` against the two real cases `browser-local-
+storage.md`'s own lab already proved: a key that was previously set,
+and one that was never set at all:
+
+```
+Case 1 — a real prior visit already ran applyTheme(nordTheme), so
+localStorage's own "cnc-theme" key holds "nord":
+  localStorage.getItem("cnc-theme") → "nord"  (a real, non-null string)
+  "nord" || "slate" → "nord" is truthy → "nord"
+  return "nord"
+
+Case 2 — a brand-new browser profile, "cnc-theme" was never set:
+  localStorage.getItem("cnc-theme") → null
+  null || "slate" → null is falsy → "slate"
+  return "slate"
+```
+
+`|| "slate"` only ever matters in Case 2 — `getItem`'s real return value
+is what decides which branch runs, the same fallback pattern already
+established for other missing-value cases, just applied here to
+`localStorage`'s own real `null`-for-missing-key behavior.
+
 ### CS Lens
 
 Per `browser-local-storage.md`: a real, minimal key-value store, the same
@@ -534,6 +559,7 @@ directly, and push all thirteen resulting values onto the one element
 every rule in `theme.css` already reads its colors from.
 
 ### Mechanical Walkthrough
+
 - `emphasize(hex, amount, isLight)` — **(c) already basic** — a plain
   function; its own ternary body is **(b) reappearing**
   (`ternary-conditional-operator.md`).
@@ -543,10 +569,10 @@ every rule in `theme.css` already reads its colors from.
   `javascript-css-custom-property-write.md`.
 - `root.setProperty("--color-bg", theme.bg0)` and the twelve calls like it
   — **(a) first appearance** of the real project usage, per
-- `javascript-css-custom-property-write.md`'s isolated lab — each call
+  `javascript-css-custom-property-write.md`'s isolated lab — each call
   independent, one custom property at a time.
 - `theme.txt2` used for **both** `--color-grid` and `--color-muted`/
-- `--color-text-dim` — **(c) already basic** property access, but worth
+  `--color-text-dim` — **(c) already basic** property access, but worth
   naming directly: this is not three unrelated tokens that happen to
   match, it's the same real value reused for three different roles that
   all need a legible-secondary-foreground color, decided in this
@@ -663,7 +689,11 @@ export const GROUP_ORDER = ["System", "Developer", "Pastel", "Framework", "Color
 
 `THEMES` and `GROUP_ORDER` sit at the very top of `themes.ts`, above
 every function this lesson's other units add — everything below reads
-from this catalog, nothing writes to it at runtime:
+from this catalog, nothing writes to it at runtime. This is the file in
+full, end to end, with only this unit's own two additions marked —
+`hexToRgb` through `applyTheme` are unchanged, already shown in full in
+this lesson's earlier units, and repeated here (not elided) so the whole
+file is visible in one place:
 
 ```typescript
 export interface ThemeDefinition {                          // ← new
@@ -682,25 +712,139 @@ export interface ThemeDefinition {                          // ← new
   h3: string;                                                // ← new
 }                                                             // ← new
 
-export const THEMES: ThemeDefinition[] = [                  // ← new
-  { id: "slate", /* ...13 fields... */ },                   // ← new
-  { id: "light", /* ...13 fields... */ },                   // ← new
-  { id: "default", /* ...13 fields... */ },                 // ← new
-  // ...15 more entries...                                  // ← new
-];                                                            // ← new
+export const THEMES: ThemeDefinition[] = [                                                              // ← new
+  { id: "slate", name: "Slate", emoji: "🌑", group: "System", type: "dark",                              // ← new
+    accentHex: "#63b8ff", bg0: "#07111e", bg1: "#1e293b", border: "#2b3a55",                             // ← new
+    txt1: "#e6eefb", txt2: "#90a4c2", h2: "#63b8ff", h3: "#46d89f" },                                     // ← new
+  { id: "light", name: "Light", emoji: "☀️", group: "System", type: "light",                             // ← new
+    accentHex: "#f59e0b", bg0: "#ffffff", bg1: "#f8fafc", border: "#e2e8f0",                              // ← new
+    txt1: "#0f172a", txt2: "#64748b", h2: "#2563eb", h3: "#059669" },                                     // ← new
+  { id: "default", name: "Default", emoji: "🌑", group: "Developer", type: "dynamic",                    // ← new
+    accentHex: "#0ea5e9", bg0: "#0b1322", bg1: "#07111e", border: "#1e293b",                              // ← new
+    txt1: "#f1f5f9", txt2: "#94a3b8", h2: "#60a5fa", h3: "#34d399" },                                     // ← new
+  { id: "github", name: "GitHub", emoji: "🐙", group: "Developer", type: "dynamic",                      // ← new
+    accentHex: "#0969da", bg0: "#0d1117", bg1: "#161b22", border: "#30363d",                              // ← new
+    txt1: "#c9d1d9", txt2: "#8b949e", h2: "#c9d1d9", h3: "#c9d1d9" },                                     // ← new
+  { id: "dracula", name: "Dracula", emoji: "🧛", group: "Developer", type: "dark",                       // ← new
+    accentHex: "#bd93f9", bg0: "#282a36", bg1: "#21222c", border: "#44475a",                              // ← new
+    txt1: "#f8f8f2", txt2: "#6272a4", h2: "#ff79c6", h3: "#50fa7b" },                                     // ← new
+  { id: "nord", name: "Nord", emoji: "🏔️", group: "Developer", type: "dark",                            // ← new
+    accentHex: "#88c0d0", bg0: "#2e3440", bg1: "#3b4252", border: "#434c5e",                              // ← new
+    txt1: "#d8dee9", txt2: "#4c566a", h2: "#81a1c1", h3: "#5e81ac" },                                     // ← new
+  { id: "monokai", name: "Monokai", emoji: "🎨", group: "Developer", type: "dark",                       // ← new
+    accentHex: "#a6e22e", bg0: "#272822", bg1: "#1e1f1c", border: "#49483e",                              // ← new
+    txt1: "#f8f8f2", txt2: "#75715e", h2: "#a6e22e", h3: "#66d9ef" },                                     // ← new
+  { id: "tokyo_night", name: "Tokyo Night", emoji: "🌃", group: "Developer", type: "dark",                // ← new
+    accentHex: "#7aa2f7", bg0: "#1a1b26", bg1: "#16161e", border: "#292e42",                              // ← new
+    txt1: "#c0caf5", txt2: "#565f89", h2: "#7aa2f7", h3: "#bb9af7" },                                     // ← new
+  { id: "one_dark", name: "One Dark", emoji: "⚛️", group: "Developer", type: "dark",                     // ← new
+    accentHex: "#61afef", bg0: "#282c34", bg1: "#21252b", border: "#3e4451",                              // ← new
+    txt1: "#abb2bf", txt2: "#5c6370", h2: "#61afef", h3: "#c678dd" },                                     // ← new
+  { id: "catppuccin", name: "Catppuccin", emoji: "🌸", group: "Pastel", type: "dark",                    // ← new
+    accentHex: "#cba6f7", bg0: "#24273a", bg1: "#1e2030", border: "#363a4f",                              // ← new
+    txt1: "#cad3f5", txt2: "#8087a2", h2: "#cba6f7", h3: "#8aadf4" },                                     // ← new
+  { id: "catppuccin-latte", name: "Catppuccin Latte", emoji: "☕", group: "Pastel", type: "light",        // ← new
+    accentHex: "#8839ef", bg0: "#eff1f5", bg1: "#e6e9ef", border: "#ccd0da",                              // ← new
+    txt1: "#4c4f69", txt2: "#6c6f85", h2: "#8839ef", h3: "#1e66f5" },                                     // ← new
+  { id: "vue-dark", name: "Vue Dark", emoji: "💚", group: "Framework", type: "dark",                     // ← new
+    accentHex: "#41b883", bg0: "#0b1a12", bg1: "#081410", border: "#064e3b",                              // ← new
+    txt1: "#f1f5f9", txt2: "#94a3b8", h2: "#34d399", h3: "#10b981" },                                     // ← new
+  { id: "vue-light", name: "Vue Light", emoji: "🌿", group: "Framework", type: "light",                  // ← new
+    accentHex: "#41b883", bg0: "#ffffff", bg1: "#ecfdf5", border: "#a7f3d0",                              // ← new
+    txt1: "#0f172a", txt2: "#475569", h2: "#047857", h3: "#059669" },                                     // ← new
+  { id: "synthwave", name: "SynthWave '84", emoji: "🕹️", group: "Colorful", type: "dark",                // ← new
+    accentHex: "#ff7edb", bg0: "#262335", bg1: "#1e1c29", border: "#3f3c4c",                              // ← new
+    txt1: "#f8f8f2", txt2: "#848bbd", h2: "#36f9f6", h3: "#f92aad" },                                     // ← new
+  { id: "cyberFuchsia", name: "Cyber Fuchsia", emoji: "💜", group: "Colorful", type: "dynamic",           // ← new
+    accentHex: "#d946ef", bg0: "#180024", bg1: "#240036", border: "#4c0070",                              // ← new
+    txt1: "#fdf4ff", txt2: "#e8b5ff", h2: "#d946ef", h3: "#a855f7" },                                     // ← new
+  { id: "electricBlue", name: "Electric Blue", emoji: "⚡", group: "Colorful", type: "dynamic",           // ← new
+    accentHex: "#3b82f6", bg0: "#030b22", bg1: "#061536", border: "#133772",                              // ← new
+    txt1: "#eff6ff", txt2: "#bfdbfe", h2: "#3b82f6", h3: "#60a5fa" },                                     // ← new
+  { id: "cyberCyan", name: "Cyber Cyan", emoji: "🌊", group: "Colorful", type: "dynamic",                 // ← new
+    accentHex: "#06b6d4", bg0: "#001924", bg1: "#002636", border: "#00577a",                              // ← new
+    txt1: "#ecfeff", txt2: "#a5f3fc", h2: "#06b6d4", h3: "#22d3ee" },                                     // ← new
+  { id: "paperTextbook", name: "Paper Textbook", emoji: "📄", group: "Focus", type: "light",              // ← new
+    accentHex: "#475569", bg0: "#f9f9f6", bg1: "#f0f0eb", border: "#d4d4cd",                              // ← new
+    txt1: "#2b2b29", txt2: "#52524e", h2: "#334155", h3: "#475569" },                                     // ← new
+  { id: "sepiaTextbook", name: "Sepia Textbook", emoji: "📚", group: "Focus", type: "dark",               // ← new
+    accentHex: "#f97316", bg0: "#2a2723", bg1: "#36322d", border: "#5c554d",                              // ← new
+    txt1: "#e3dfd7", txt2: "#a8a195", h2: "#fb923c", h3: "#fdba74" },                                     // ← new
+];                                                                                                          // ← new
 
 export const GROUP_ORDER = ["System", "Developer", "Pastel", "Framework", "Colorful", "Focus"]; // ← new
 
-// hexToRgb, rgbToHex, lightenHex, darkenHex, hexToRgba, emphasize,
-// getStoredThemeId, findTheme, applyTheme all follow below — each one
-// covered in its own Concept Unit above/below this one.
+function hexToRgb(hex: string): [number, number, number] {
+  const clean = hex.replace("#", "");
+  return [
+    parseInt(clean.slice(0, 2), 16),
+    parseInt(clean.slice(2, 4), 16),
+    parseInt(clean.slice(4, 6), 16),
+  ];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  const clamp = (n: number) => Math.round(Math.max(0, Math.min(255, n)));
+  const toHex = (n: number) => clamp(n).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+export function lightenHex(hex: string, amount: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
+}
+
+export function darkenHex(hex: string, amount: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
+}
+
+export function hexToRgba(hex: string, alpha: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function emphasize(hex: string, amount: number, isLight: boolean): string {
+  return isLight ? darkenHex(hex, amount) : lightenHex(hex, amount);
+}
+
+const STORAGE_KEY = "cnc-theme";
+
+export function getStoredThemeId(): string {
+  return localStorage.getItem(STORAGE_KEY) || "slate";
+}
+
+export function findTheme(id: string): ThemeDefinition {
+  return THEMES.find((t) => t.id === id) ?? THEMES.find((t) => t.id === "slate")!;
+}
+
+export function applyTheme(theme: ThemeDefinition) {
+  const isLight = theme.type === "light";
+  const root = document.documentElement.style;
+  root.setProperty("--color-bg", theme.bg0);
+  root.setProperty("--color-panel", theme.bg1);
+  root.setProperty("--color-grid", theme.txt2);
+  root.setProperty("--color-border", theme.border);
+  root.setProperty("--color-border-strong", emphasize(theme.border, 0.25, isLight));
+  root.setProperty("--color-text", theme.txt1);
+  root.setProperty("--color-text-dim", theme.txt2);
+  root.setProperty("--color-muted", theme.txt2);
+  root.setProperty("--color-accent-blue", theme.accentHex);
+  root.setProperty("--color-accent-blue-bright", emphasize(theme.accentHex, 0.3, isLight));
+  root.setProperty("--color-accent-green", theme.h3);
+  root.setProperty("--color-accent-green-bright", emphasize(theme.h3, 0.3, isLight));
+  root.setProperty("--color-accent-green-bg", hexToRgba(theme.h3, 0.1));
+  localStorage.setItem(STORAGE_KEY, theme.id);
+}
 ```
 
 The whole file now reads, top to bottom, as: the shape one theme takes
 → eighteen real theme values in that shape → the small set of pure
-functions that turn any one of them into thirteen real CSS values.
+functions (all already built in this lesson's earlier units, unchanged
+here) that turn any one of them into thirteen real CSS values.
 
 ### Mechanical Walkthrough
+
 - `interface ThemeDefinition { ... }` — **(b) reappearing** — a plain TS
   interface (`typescript-interfaces.md`); `type: "light" | "dark" | "dynamic"`
   is **(b) reappearing** a union type (`typescript-union-types.md`),
@@ -708,7 +852,7 @@ functions that turn any one of them into thirteen real CSS values.
 - `const THEMES: ThemeDefinition[] = [ {...}, {...}, ... ]` — **(a) first
   appearance, at the whole-unit level** — the catalog itself, per
   `design-tokens-theming-pattern.md`: eighteen complete, self-contained
-- value-sets, addressable by `id`. Each individual entry — **(c) already
+  value-sets, addressable by `id`. Each individual entry — **(c) already
   basic** — is just an object literal matching the interface above it;
   the concept being taught is the *array-of-complete-sets* shape, not any
   one entry's own syntax.
@@ -827,7 +971,9 @@ export default ThemeCard;
 This is a new, freestanding file, so there is no larger enclosing
 structure to return to.
 
-**What's reused, not new:** `Record<ThemeDefinition["type"], string>` —
+### Reused, Not New
+
+`Record<ThemeDefinition["type"], string>` —
 `typescript-record-utility-type.md`, Lesson 23, this project's first use
 already covered that ground; `` `theme-card${isActive ? " active" : ""}` ``
 — the exact conditional-className template-literal shape
@@ -840,7 +986,9 @@ unlike `hexToRgba`'s function-call approach above); the `isActive &&`
 conditional render — `event-driven-ui-callbacks.md`/JSX conditional
 rendering, established since early lessons.
 
-**SE Lens:** the real, deliberate choice here is the same one Lesson 12
+### SE Lens
+
+The real, deliberate choice here is the same one Lesson 12
 already made and named: port the *value* (a rich, at-a-glance visual
 comparison of every option), never the *mechanism* (a specific animation
 or icon library) that happened to produce it in someone else's app.
@@ -1404,6 +1552,36 @@ explicit width calculation.
   `javascript-array-map.md`, rendering one button per action, the same
   pattern already used one line above for `group.toggles.map`.
 
+### Execution Trace
+
+Two real call sites — `App.tsx`'s pre-lesson call (no `actions` prop at
+all) and this lesson's own new one (a real Settings action):
+
+```
+<RibbonToolbar groups={...} />
+  Destructuring { groups, actions = [] } against { groups: [...] }
+  → actions property is undefined (never passed) → default applies
+  → actions = []
+  actions.length > 0?  → 0 > 0 → False → the whole {actions.length > 0 && (...)}
+    expression evaluates to false → nothing rendered for actions at all
+    (no <div className="ribbon-actions">, no wasted empty <div>)
+
+<RibbonToolbar groups={...} actions={[{id:"settings", label:"⚙", onClick:openSettingsModal}]} />
+  Destructuring against { groups: [...], actions: [{...}] }
+  → actions property IS present → default does NOT apply
+  → actions = [{id:"settings", label:"⚙", onClick:openSettingsModal}]
+  actions.length > 0?  → 1 > 0 → True → renders <div className="ribbon-actions">
+    actions.map(...):
+      action={id:"settings", label:"⚙", ...}:
+        → <button key="settings" className="btn ribbon-btn" onClick={openSettingsModal}>⚙</button>
+    → 1 real button rendered
+```
+
+Every pre-existing `<RibbonToolbar groups={...} />` call site in the
+app keeps working with no changes at all — the default's whole point is
+that `actions.length > 0` evaluates to `false` for them without any of
+those call sites needing to know `actions` exists.
+
 ### CS Lens
 
 Per `javascript-default-parameter-values.md`: an optional parameter with
@@ -1508,8 +1686,9 @@ guaranteed to happen exactly once no matter how many times `App` itself
 re-renders afterward.
 
 ### Mechanical Walkthrough
+
 - `useState(() => { ... })` — **(a) first appearance**, per
-- `react-usestate-lazy-initializer.md` — a function passed directly,
+  `react-usestate-lazy-initializer.md` — a function passed directly,
   not called.
 - `const id = getStoredThemeId()` — **(b) reappearing**, per
   `browser-local-storage.md`'s own unit above.
@@ -1769,9 +1948,10 @@ mutated (the two lights) and rebuilding what can't (the grid) — then
 replays the last-drawn toolpath so its rapid/feed colors catch up too.
 
 ### Mechanical Walkthrough
+
 - `let colors = themeColors()` — **(b) reappearing** `themeColors()`
   itself (Lesson 8); **(a) first appearance** of `let` instead of `const`
-- here specifically — needed because `updateColors` below reassigns this
+  here specifically — needed because `updateColors` below reassigns this
   same variable, and a `const` binding cannot be reassigned.
 - `const ambientLight = new THREE.AmbientLight(...); scene.add(ambientLight)`
   — **(b) reappearing** the constructor call itself
@@ -1791,16 +1971,16 @@ replays the last-drawn toolpath so its rapid/feed colors catch up too.
   - `colors = themeColors()` — **(c) already basic** reassignment, now
     legal because of the `let` change above.
   - `renderer.setClearColor(colors.background, 1)` — **(b) reappearing**
-- — the exact same call `createViewport` already made once, at setup.
+    — the exact same call `createViewport` already made once, at setup.
   - `ambientLight.color.set(colors.lightAmbient)` /
-- `directionalLight.color.set(colors.lightDirectional)` — **(a) first appearance**, per `threejs-mutating-scene-after-creation.md` — the
-
+    `directionalLight.color.set(colors.lightDirectional)` — **(a) first
+    appearance**, per `threejs-mutating-scene-after-creation.md` — the
     mutate-in-place technique.
   - `scene.remove(grid)` — **(a) first appearance** — removes an object
     from the scene graph; necessary before adding its replacement, or both
     would render at once.
   - `grid = new THREE.GridHelper(...)` — **(a) first appearance**, per
-- `threejs-mutating-scene-after-creation.md` — the rebuild-in-place
+    `threejs-mutating-scene-after-creation.md` — the rebuild-in-place
     technique, for the one property that genuinely can't be mutated.
   - `drawPath(lastPoints)` — **(b) reappearing** — the existing function,
     called again with the value `lastPoints` was set to save specifically
@@ -1808,6 +1988,61 @@ replays the last-drawn toolpath so its rapid/feed colors catch up too.
 - `return { drawPath, updateColors }` — **(b) reappearing** — object
   shorthand property syntax (`javascript-object-shorthand-property.md`),
   now returning two functions instead of one.
+
+### Execution Trace
+
+`updateColors()` called for real, switching from `"slate"` to
+`"nord"` (real token values, from this lesson's own `THEMES` catalog):
+
+```
+Before: colors = {background:"#07111e", grid:"#90a4c2", ...,
+  lightAmbient:"#ffffff", lightDirectional:"#ffffff"}  (slate's values —
+  background from slate.bg0, grid from slate.txt2, per applyTheme's own
+  root.setProperty("--color-grid", theme.txt2) — read from the CSS custom
+  properties applyTheme just wrote)
+ambientLight.color is currently white; directionalLight.color is
+  currently white; grid is the original GridHelper instance, call it G1
+
+updateColors() runs:
+  colors = themeColors()
+    → reads the CURRENT custom-property values (nord's, since
+      applyTheme(nordTheme) already ran and wrote them to :root)
+    → colors = {background:"#2e3440", grid:"#4c566a", ...,
+      lightAmbient:"#ffffff", lightDirectional:"#ffffff"}
+      (background from nord.bg0, grid from nord.txt2 — nord doesn't
+      change the light tokens themselves in this lesson's own catalog —
+      both remain white — but background/grid do change)
+
+  renderer.setClearColor("#2e3440", 1)
+    → the canvas's own background is now nord's dark blue-gray, not slate's
+
+  ambientLight.color.set("#ffffff")
+    → mutates the SAME AmbientLight object in place — no new object,
+      no scene.remove/add needed for this one (a Light's own color IS
+      mutable, per the concept file's own isolated proof)
+
+  directionalLight.color.set("#ffffff")
+    → same in-place mutation on the same DirectionalLight object
+
+  scene.remove(grid)  → removes G1 from the scene graph
+  grid = new THREE.GridHelper(500, 50, "#4c566a", "#4c566a")
+    → a genuinely NEW GridHelper instance, call it G2 — G1's own color
+      is baked into its geometry at construction and can't be mutated,
+      per the concept file's own proof
+  grid.rotation.x = Math.PI / 2  → G2 re-oriented, matching G1's own setup
+  scene.add(grid)  → G2 (nord-colored) now in the scene; G1 is gone
+
+  drawPath(lastPoints)
+    → redraws the existing toolpath data using the CURRENT rapid/feed
+      colors from the just-updated `colors` — same points, refreshed colors
+```
+
+Lights and grid take genuinely different paths through the identical
+function: lights are mutated (`.color.set()`, same object, same
+reference); the grid is discarded and rebuilt (`remove`/`new`/`add`,
+a different object entirely) — exactly the real Three.js limitation
+`threejs-mutating-scene-after-creation.md` proves in isolation, now
+applied to two real, different object types in the same real function.
 
 ### CS Lens
 

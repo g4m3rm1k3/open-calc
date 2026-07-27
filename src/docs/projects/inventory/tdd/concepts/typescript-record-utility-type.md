@@ -51,6 +51,27 @@ bob: 95 (silver)
 - The commented-out lines show the actual boundary of what's checked: assigning the wrong *value* type is a real, caught error (`Score.points` is `number`, not `string`); reading a key that was never actually set is **not** caught — `Record`'s promise is about value shape, not about which specific keys exist at runtime. That's a real, worth-knowing limit, not a bug in the type.
 - `Object.entries(scoresByPlayer)` returns `[string, Score][]` — TypeScript infers the tuple's second element as `Score` directly from the `Record`'s own value type, with no cast needed.
 
+## Execution Trace
+
+`Object.entries(scoresByPlayer)` returns 2 real `[key, Score]` pairs,
+iterated in insertion order:
+
+```
+Object.entries(scoresByPlayer) → [["alice", {points:120,level:"gold"}],
+                                   ["bob", {points:95,level:"silver"}]]
+
+Iteration 1: [player, score] = ["alice", {points:120, level:"gold"}]
+  → console.log("alice: 120 (gold)")
+Iteration 2: [player, score] = ["bob", {points:95, level:"silver"}]
+  → console.log("bob: 95 (silver)")
+```
+
+Every `score` value destructured in this loop is statically known to be
+a `Score` — `score.points`/`score.level` are checked against that
+shape on both iterations, even though `scoresByPlayer`'s own keys
+(`"alice"`, `"bob"`) were never individually declared anywhere in the
+`Record<string, Score>` type itself.
+
 ## CS Lens
 
 This is the same **associative array / hash map** abstract data type every language has some form of (Python's `dict`, a plain JS object used as a map, Java's `HashMap<K, V>`) — `Record<K, V>` is specifically TypeScript's way of giving that structure a real, generic, checked *type*, on top of a plain JavaScript object at runtime (there is no special `Record` value — it compiles away entirely; only the type-checking is real).
