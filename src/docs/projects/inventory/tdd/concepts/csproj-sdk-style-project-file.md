@@ -6,7 +6,12 @@
 
 ## Setup
 
-.NET SDK installed. No project needed beyond one `dotnet new wpf` scaffold to inspect.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+```
+Nothing to edit yet — the generated `.csproj` itself is the example.
 
 ## The Problem
 

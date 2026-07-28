@@ -6,7 +6,15 @@
 
 ## Setup
 
-.NET SDK with the `wpf` template, a `Grid` with `RowDefinitions` already declared.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+cd ConceptDemo
+```
+Open `MainWindow.xaml`, add the `RowDefinitions` from
+`wpf-grid-rows-and-columns.md` first if they're not already there, then
+add the two `TextBlock`s below.
 
 ## The Problem
 

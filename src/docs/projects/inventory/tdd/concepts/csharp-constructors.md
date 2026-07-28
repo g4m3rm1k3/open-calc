@@ -2,11 +2,17 @@
 
 **What you'll understand by the end:** what actually runs when `new ClassName()` is called, and when.
 
-**Prerequisites:** none.
+**Prerequisites:** `csharp-classes-objects-and-fields.md`.
 
 ## Setup
 
-.NET SDK installed, one console project.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new console -n CtorDemo -o CtorDemo
+cd CtorDemo
+```
+Replace the generated `Program.cs`'s contents with the example below.
 
 ## The Problem
 

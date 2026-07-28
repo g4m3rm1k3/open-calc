@@ -6,7 +6,15 @@
 
 ## Setup
 
-.NET SDK installed. Two files in one console project.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new console -n NamespaceDemo -o NamespaceDemo
+cd NamespaceDemo
+```
+Two files, both directly in this folder: create a **new** file named
+`Greeter.cs`, and replace the generated `Program.cs`'s own contents.
+Both examples below.
 
 ## The Problem
 

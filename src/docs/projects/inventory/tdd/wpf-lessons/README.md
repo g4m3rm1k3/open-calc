@@ -1,5 +1,11 @@
 # wpf-lessons
 
+**Running an isolated example yourself and not sure what to actually
+type/run/create?** `HOW-TO-RUN-EXAMPLES.md` — read it once, covers every
+concept file's mechanics (which `dotnet new` template, where files go,
+what a dot in a filename does and doesn't mean) so no individual concept
+file has to re-explain it.
+
 ## Purpose
 
 This track exists to learn C# and WPF themselves, as first-class subjects
@@ -44,13 +50,18 @@ inline. Lesson 1 has both, retroactively, as of this pass.
 
 ## What's assumed known
 
-General programming fundamentals — what a variable, loop, function, data
-type, or class *is* in the abstract — are not re-taught here; that ground
-was covered learning Python/JS in `../lessons/`. Nothing about C# or WPF
-specifically is assumed, even where it resembles something already known.
-C#'s own syntax, keywords, type system, and WPF's markup and mechanisms
-get taught from first principles every time — resemblance to something
-Python/JS-shaped is not the same as identity, and gets no shortcut.
+Exactly three things, stated precisely because getting this wrong once
+already caused real damage: **basic functions, basic data types, and
+basic loops.** Nothing else. Not Python, not JavaScript, not `../lessons/`
+(never completed — do not assume it, cite it, or lean on a comparison to
+it as if it were shared context) — and not general OOP either: "class,"
+"object," "instance," "constructor," "inheritance" are **not** assumed as
+concepts, in any language, not just not-in-C#. Where earlier material in
+this track treated one of those as "the same idea, just new syntax," that
+was wrong and is being corrected as found, not left standing. C#'s own
+syntax, keywords, type system, and WPF's markup and mechanisms get taught
+from first principles — and so does the general CS idea underneath one,
+the first time it's needed, before the C#-specific spelling of it.
 
 ## Cadence: just-in-time, not planned ahead
 

@@ -6,7 +6,14 @@
 
 ## Setup
 
-.NET SDK with the `wpf` template.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+cd ConceptDemo
+```
+This continues directly from `wpf-data-binding-and-datacontext.md`'s own
+`ConceptDemo` — same project, `Message`'s setter is the only change.
 
 ## The Problem
 

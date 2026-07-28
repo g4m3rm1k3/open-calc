@@ -1,7 +1,9 @@
 # WPF Lesson 2: A Property That Belongs to Someone Else
 
 *(Track purpose, scope, concept-reuse rule, and cadence: `README.md` —
-not restated per-lesson.)*
+not restated per-lesson. Unsure what to actually type/run/create for one
+of the linked concept files' own isolated examples:
+`HOW-TO-RUN-EXAMPLES.md`.)*
 
 ## What you will build
 
@@ -52,6 +54,10 @@ it doesn't start fresh. Reused from Lesson 1 without re-explanation:
 
 > **`sender`** — the required first parameter of an event handler; the
 > exact object that raised the event.
+
+> **Interpolated string (`$"..."`)** — a string literal prefixed with
+> `$`; any `{expr}` inside it is replaced with that expression's real
+> value when the string is built, instead of being kept as literal text.
 
 > **Access modifier (`private`)** — restricts a member to code inside its
 > own containing class only; the default for a class member with no
@@ -487,12 +493,14 @@ change needed to keep the two in sync — because the handler updates
 - `StatusText.Text = $"Clicked {_clickCount} times";` — **(b) hard
   concept reappearing**: `StatusText` is the `x:Name`-generated field
   from the previous unit, `Text` is the same settable property already
-  used since Lesson 1, `$"..."` is a C# interpolated string — **(a)
-  first appearance** as a specific syntax, though the underlying idea
-  (building a string from a value) is already familiar from Python's own
-  f-strings, already covered generally by
-  `../concepts/python-f-strings.md`; C#'s `$"{expr}"` is the same idea,
-  different syntax, not a new concept to learn from scratch.
+  used since Lesson 1. `$"..."` is **(a) first appearance** of C#'s
+  **interpolated string**: the leading `$` before the opening quote
+  means any `{expr}` inside the string is replaced with that
+  expression's real value, converted to text, when the string is built
+  — `$"Clicked {_clickCount} times"` with `_clickCount` equal to `3`
+  produces the actual string `"Clicked 3 times"`, not the literal text
+  `"Clicked {_clickCount} times"`. Without the leading `$`, `{` and `}`
+  would just be ordinary characters in the string, not a substitution.
 
 ### Execution Trace
 
