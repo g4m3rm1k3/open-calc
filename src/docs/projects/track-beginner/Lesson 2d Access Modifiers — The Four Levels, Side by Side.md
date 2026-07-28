@@ -267,7 +267,7 @@ access, everywhere, all the time.
 Delete the whole `accessdemo` folder (`vaultpkg/` and `otherpkg/`
 together) — the real project's own access
 levels (private fields with getters starting Lesson 7, package-private
-fields starting Lesson 6) are the ones that matter from here on, now
+fields starting Lesson 6c) are the ones that matter from here on, now
 with a real reference point for what each level actually guarantees.
 
 ### Mechanical Walkthrough

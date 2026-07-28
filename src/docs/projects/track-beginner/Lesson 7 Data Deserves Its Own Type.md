@@ -11,7 +11,7 @@ class system is actually *for* — not "an OOP requirement," but a tool
 for making an invalid state (a name with no matching quantity)
 unrepresentable instead of just unlikely.
 
-**What you need to know first:** Lesson 6 — specifically,
+**What you need to know first:** Lesson 6e — specifically,
 `InventoryAdapter` and `onBindViewHolder`'s dependency on
 `List<String>`, which this lesson changes to `List<Item>`. Lesson 2a's
 class/object/`new`/field/constructor syntax, reused here for two new,

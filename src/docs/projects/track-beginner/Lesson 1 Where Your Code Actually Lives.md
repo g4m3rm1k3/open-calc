@@ -27,6 +27,9 @@ idea is explained from scratch, at the exact point it first shows up,
 including things that might otherwise feel too basic to explain.
 
 **Terms introduced in this lesson:**
+- **Class declaration (`public class HelloWorld`)** — an access
+  modifier, the `class` keyword, and a name combined into one
+  statement; the name must exactly match the `.java` file's own name.
 - **`class`** — the required container every line of Java code must
   live inside; nothing can run at a file's top level the way it can in
   Python or JavaScript.
@@ -248,7 +251,7 @@ Enumerating every distinct piece of that file, in order:
   equivalent to Python's `print(...)` or JavaScript's `console.log(...)`).
   What an object actually *is*, and how to build your own with your
   own methods, is the entire subject of a dedicated lesson coming very
-  soon (Lesson 2 starts pulling this thread). For now: this exact line
+  soon (Lesson 2a starts pulling this thread). For now: this exact line
   is Java's print statement.
 - `;` at the end of the `println` line — **first appearance.** Java
   requires a semicolon at the end of every statement. Python uses line
@@ -455,7 +458,7 @@ will not appear in the real project again.
 Android Studio's New Project wizard is doing, automatically, exactly
 what you just did by hand: creating a folder structure that matches a
 package name, plus a large amount of supporting configuration
-(explained in Lesson 2) that a bare `javac` project doesn't need.
+(explained in Lessons 2b–2e) that a bare `javac` project doesn't need.
 Knowing what you just learned, the wizard's fields should now read as
 instructions rather than mysteries.
 
@@ -518,7 +521,7 @@ public class MainActivity extends AppCompatActivity {
 
 The `package` line and `public class MainActivity` are both patterns
 you already know from this lesson. `extends AppCompatActivity` and
-everything inside the class body are genuinely new — that's Lesson 2's
+everything inside the class body are genuinely new — that's Lesson 2c's
 subject, not this one. For now, just confirm the `package` line
 matches the folder path, which is the entire point of this lesson.
 
@@ -530,7 +533,7 @@ matches the folder path, which is the entire point of this lesson.
 - `public class MainActivity` — **reappearing**, same shape as
   `HelloWorld` and `Greeter` above; only the name changed.
 - `extends AppCompatActivity` and everything inside the class body —
-  intentionally not explained yet, flagged and picked up in Lesson 2.
+  intentionally not explained yet, flagged and picked up in Lesson 2c.
 
 ### Run It
 

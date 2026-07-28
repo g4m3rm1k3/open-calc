@@ -13,7 +13,7 @@ carry an `Item` object across that same OS-mediated `Intent` boundary.
 **What you need to know first:** Lesson 4 (`Intent`, `startActivity`,
 declaring a new Activity in the Manifest, lambdas implementing
 single-method interfaces, via `Doorbell`/`Chime` and `OnTapListener`).
-Lesson 6 (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
+Lessons 6c and 6e (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
 7 (`Item`, its fields and `equals()`/`hashCode()`).
 
 **Terms introduced in this lesson:**

@@ -744,6 +744,6 @@ Restore the override afterward.
       onSaveInstanceState, since fields were observed not to survive
       rotation on their own").
 
-Lesson 6 is next: the inventory list itself — `RecyclerView`, the
+Lessons 6a–6e are next: the inventory list itself — `RecyclerView`, the
 Adapter pattern, and why Android refuses to let you just loop over a
 `List` and add a `TextView` per item by hand.

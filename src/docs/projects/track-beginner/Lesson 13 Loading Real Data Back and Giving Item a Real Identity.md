@@ -499,6 +499,6 @@ original column order afterward.
 This closes Pocket Inventory's core persistence story — every item
 added, viewed, and removed now genuinely survives the process itself
 ending, not just a screen rotation, built from the ground up: `Item`
-(Lesson 7), `RecyclerView`/`Adapter` (Lesson 6), `SharedPreferences` for
+(Lesson 7), `RecyclerView`/`Adapter` (Lessons 6a–6e), `SharedPreferences` for
 one setting (Lesson 10), and now a real relational table for the
 growing list itself (Lessons 12–13).

@@ -59,7 +59,8 @@ these labs, and both are worth understanding before you type anything:
 **Terms introduced in this lesson:**
 - **Field** — a named piece of data, declared inside a class body with
   no method around it, that every object built from that class has its
-  own independent copy of.
+  own independent copy of; `LightSwitch`'s `boolean isOn` is the first
+  one this lesson declares.
 - **Object / instance** — an actual, individual thing built from a
   class (the blueprint), holding its own copy of the class's fields.
 - **`new`** — the keyword that constructs a brand-new object in memory
@@ -80,7 +81,8 @@ these labs, and both are worth understanding before you type anything:
   and vice versa.
 - **Constructor** — code with no return type at all, whose name must
   exactly match the class name, that runs automatically every time
-  `new` builds an object, to set up its starting state.
+  `new` builds an object, to set up its starting state; `LightSwitch`'s
+  `LightSwitch(boolean startsOn)` is this lesson's first one.
 - **Default constructor** — the free, no-argument constructor Java
   automatically supplies for any class that doesn't declare one
   itself; it disappears the instant the class defines its own.

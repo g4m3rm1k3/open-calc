@@ -525,13 +525,13 @@ after the threshold changes.
 
 ### Mechanical Walkthrough
 
-- `private InventoryAdapter adapter;` as a field, `adapter = new InventoryAdapter(...)`
-  inside `onCreate` — **first appearance of promoting a local variable
-  to a field for this specific reason.** `onResume`, a separate method,
-  needs to call `adapter.setLowStockThreshold(...)` — a local variable
-  scoped to `onCreate` would already be gone by the time `onResume` runs;
-  only a field survives across separate method calls on the same
-  object.
+- Promoting a local variable to a field (`private InventoryAdapter
+  adapter;` as a field, `adapter = new InventoryAdapter(...)` inside
+  `onCreate`, reappearing) — **first appearance** of doing this for
+  this specific reason. `onResume`, a separate method, needs to call
+  `adapter.setLowStockThreshold(...)` — a local variable scoped to
+  `onCreate` would already be gone by the time `onResume` runs; only a
+  field survives across separate method calls on the same object.
 - `onResume()` override — reappearing (the lifecycle method itself,
   Lesson 5's logging lab), now doing genuine work for the first time:
   the concrete payoff of having labbed the full lifecycle order back
