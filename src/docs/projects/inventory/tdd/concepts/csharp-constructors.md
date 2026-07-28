@@ -20,6 +20,7 @@ Some setup work genuinely needs to happen every single time a new object is crea
 
 ## The Isolated Example
 
+In `Program.cs` (replacing the generated `Console.WriteLine("Hello, World!");`):
 ```csharp
 Lamp a = new Lamp();
 Console.WriteLine("Program: about to make a second Lamp");

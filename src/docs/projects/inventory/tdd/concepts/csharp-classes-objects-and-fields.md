@@ -20,6 +20,7 @@ A function can group *behavior* (a sequence of steps) under one name, but it has
 
 ## The Isolated Example
 
+In `Program.cs` (replacing the generated `Console.WriteLine("Hello, World!");`):
 ```csharp
 class Dog
 {

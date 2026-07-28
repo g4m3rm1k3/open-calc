@@ -21,10 +21,18 @@ the example below.
 
 ## The Isolated Example
 
+In `MainWindow.xaml`, replace the generated `<Grid></Grid>` with:
 ```xml
-<TextBlock x:Name="BoundText" Text="{Binding Message}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+<Grid>
+    <TextBlock x:Name="BoundText" Text="{Binding Message}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+</Grid>
 ```
 
+In `MainWindow.xaml.cs`, inside the `public partial class MainWindow :
+Window { ... }` body: add `Message` as a new member, **replace** the
+generated constructor (it currently only has `InitializeComponent();`)
+with the version below, and add `MainWindow_Loaded` as a new method
+alongside it:
 ```csharp
 public string Message { get; set; } = "Hello";
 

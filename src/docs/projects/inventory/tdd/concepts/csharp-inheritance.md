@@ -20,6 +20,7 @@ Two classes are sometimes genuinely related — every `Dog` really is a kind of 
 
 ## The Isolated Example
 
+In `Program.cs` (replacing the generated `Console.WriteLine("Hello, World!");`):
 ```csharp
 class Animal
 {

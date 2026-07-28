@@ -21,14 +21,16 @@ XAML declares a whole tree of objects, but code-behind (`MainWindow.xaml.cs`) ne
 
 ## The Isolated Example
 
-`MainWindow.xaml`:
+`MainWindow.xaml` — replace the generated `<Grid></Grid>` with:
 ```xml
 <Grid>
     <TextBlock x:Name="TopText" Text="Top row" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
 </Grid>
 ```
 
-`MainWindow.xaml.cs`:
+`MainWindow.xaml.cs` — **replace** the generated constructor (currently
+just `InitializeComponent();`) with this, inside the existing `public
+partial class MainWindow : Window { ... }` body:
 ```csharp
 public MainWindow()
 {

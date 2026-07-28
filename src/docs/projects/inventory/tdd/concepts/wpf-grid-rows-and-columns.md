@@ -21,6 +21,8 @@ A `Grid` with no structure is one single cell — every child placed inside it, 
 
 ## The Isolated Example
 
+In `MainWindow.xaml`, replace the generated `<Grid></Grid>` (the whole
+element, opening and closing tags) with:
 ```xml
 <Grid>
     <Grid.RowDefinitions>

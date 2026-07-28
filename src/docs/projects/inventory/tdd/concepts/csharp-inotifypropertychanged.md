@@ -21,7 +21,13 @@ This continues directly from `wpf-data-binding-and-datacontext.md`'s own
 
 ## The Isolated Example
 
-The exact same window as `wpf-data-binding-and-datacontext.md`, with one real change — `Message` becomes a full property that raises a notification on every set, and the class declares it supports this:
+`MainWindow.xaml` is unchanged from `wpf-data-binding-and-datacontext.md`
+— this concept only touches `MainWindow.xaml.cs`. Replace that whole
+file's `public partial class MainWindow : Window { ... }` — the entire
+class, including its opening line — with this (note the added `,
+INotifyPropertyChanged` after `Window`): `Message` becomes a full
+property that raises a notification on every set, and the class
+declares it supports this:
 
 ```csharp
 public partial class MainWindow : Window, INotifyPropertyChanged

@@ -525,12 +525,13 @@ Build succeeded.
    `"Clicked 3 times"`), with its own backing field and its own
    `PropertyChanged` raise. Bind a new `TextBlock` to it and update it
    alongside `StatusMessage` inside the handler.
-3. Temporarily change `nameof(StatusMessage)` to `nameof(StatusMessage)`
-   for one property but deliberately mistype a *second* property's own
-   `nameof` (once Exercise 2's second property exists) as a raw string
-   with a typo, e.g. `"ClikCountMessage"`. Rebuild, run, and click —
+3. Leave `StatusMessage`'s own `PropertyChanged?.Invoke(...)` call using
+   `nameof(StatusMessage)` untouched, but change `ClickCountMessage`'s
+   own raise (from Exercise 2) to use a raw string with a typo instead
+   of `nameof`, e.g. `"ClikCountMessage"`. Rebuild, run, and click —
    confirm that specific property's binding silently stops updating
-   while every correctly-`nameof`'d one keeps working, then fix it.
+   while `StatusMessage`'s correctly-`nameof`'d one keeps working, then
+   fix it.
 
 ## Definition of Done
 

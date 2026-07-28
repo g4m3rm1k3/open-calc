@@ -12,9 +12,10 @@
 dotnet new wpf -n ConceptDemo -o ConceptDemo
 cd ConceptDemo
 ```
-Open `MainWindow.xaml`, add the `RowDefinitions` from
-`wpf-grid-rows-and-columns.md` first if they're not already there, then
-add the two `TextBlock`s below.
+Open `MainWindow.xaml` and replace the generated empty `<Grid></Grid>`
+with the example below — a complete, standalone `Grid`, not a
+continuation of any other file (even though the row structure matches
+`wpf-grid-rows-and-columns.md`'s own).
 
 ## The Problem
 
@@ -22,9 +23,17 @@ A `Grid`'s rows exist, but nothing yet says *which* row each child actually belo
 
 ## The Isolated Example
 
+In `MainWindow.xaml`, replace the generated `<Grid></Grid>` with:
 ```xml
-<TextBlock Grid.Row="0" Text="Top row" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
-<TextBlock Grid.Row="1" Text="Bottom row" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" Text="Top row" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <TextBlock Grid.Row="1" Text="Bottom row" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+</Grid>
 ```
 
 ```

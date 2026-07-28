@@ -19,11 +19,7 @@ Before any window can exist, something has to record, in one canonical place, wh
 
 ## The Isolated Example
 
-```
-dotnet new wpf -n ConceptDemo
-```
-
-The generated `ConceptDemo.csproj`, in full:
+The generated `ConceptDemo.csproj` (from the `dotnet new wpf` in Setup, above), in full:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -40,7 +36,8 @@ The generated `ConceptDemo.csproj`, in full:
 
 **What this proves:** nothing here is hand-maintained boilerplate — every line is a real, individually meaningful setting read by the build system; changing or removing any one of them changes what the project actually is (proven directly below by removing `UseWPF`).
 
-Removing `<UseWPF>true</UseWPF>` and adding a `TextBlock` to the window's markup, then building:
+Removing `<UseWPF>true</UseWPF>` from `ConceptDemo.csproj`, and adding a
+`TextBlock` inside `MainWindow.xaml`'s generated `<Grid></Grid>`, then building:
 ```
 dotnet build
 ```

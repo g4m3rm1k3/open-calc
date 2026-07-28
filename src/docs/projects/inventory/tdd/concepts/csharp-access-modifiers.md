@@ -26,7 +26,8 @@ Not every type in a project is meant to be used by code outside that project —
 
 ## The Isolated Example
 
-A class library, `AccessLib`, with two classes:
+`dotnet new classlib` generated `AccessLib/Class1.cs`. Open it and
+**replace its entire contents** with:
 ```csharp
 namespace AccessLib;
 
@@ -40,8 +41,12 @@ class InternalTool
     public string Name() => "InternalTool";
 }
 ```
+(The filename `Class1.cs` doesn't matter and isn't renamed — per
+`../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`, a `.cs` file's name is never
+meaningful to the compiler.)
 
-A separate console project, `AccessConsumer`, referencing `AccessLib` (`dotnet add AccessConsumer reference AccessLib`):
+`dotnet new console` generated `AccessConsumer/Program.cs`. Open it and
+**replace its entire contents** with:
 ```csharp
 using AccessLib;
 

@@ -17,7 +17,7 @@ Before any C# code can be organized into something the compiler recognizes as "a
 ## The Isolated Example
 
 ```
-dotnet new console -n Demo
+dotnet new console -n Demo -o Demo
 ```
 
 **Real output:**

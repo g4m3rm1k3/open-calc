@@ -21,7 +21,7 @@ A window needs somewhere to put visible content, and that content needs a way to
 
 ## The Isolated Example
 
-Adding one child element inside a previously-empty `<Grid>`:
+In `MainWindow.xaml`, replace the generated `<Grid></Grid>` with:
 ```xml
 <Grid>
     <TextBlock Text="Concept demo" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />

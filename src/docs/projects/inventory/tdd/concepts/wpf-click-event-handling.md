@@ -2,7 +2,7 @@
 
 **What you'll understand by the end:** how `Click="Handler"` in XAML actually wires a real method as a callback, what the required `(object sender, RoutedEventArgs e)` signature means, and when that method really runs.
 
-**Prerequisites:** `xaml-x-name-and-generated-fields.md`, `wpf-attached-properties.md` (this example places a `Button` using `Grid.Row`).
+**Prerequisites:** `xaml-x-name-and-generated-fields.md`.
 
 ## Setup
 
@@ -21,10 +21,17 @@ A window that only ever displays static content isn't interactive — something 
 
 ## The Isolated Example
 
+In `MainWindow.xaml`, replace the generated `<Grid></Grid>` with:
 ```xml
-<Button x:Name="DemoButton" Content="Press me" Click="DemoButton_Click" Width="120" Height="40" />
+<Grid>
+    <Button x:Name="DemoButton" Content="Press me" Click="DemoButton_Click" Width="120" Height="40" />
+</Grid>
 ```
 
+In `MainWindow.xaml.cs`: **replace** the generated constructor (currently
+just `InitializeComponent();`) with the version below, and add
+`DemoButton_Click` as a new method alongside it, both inside the
+existing `public partial class MainWindow : Window { ... }` body:
 ```csharp
 public MainWindow()
 {
