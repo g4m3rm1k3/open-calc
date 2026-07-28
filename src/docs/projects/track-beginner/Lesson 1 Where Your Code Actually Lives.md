@@ -26,6 +26,55 @@ Java and **zero** object-oriented programming. Nothing here is
 idea is explained from scratch, at the exact point it first shows up,
 including things that might otherwise feel too basic to explain.
 
+**Terms introduced in this lesson:**
+- **`class`** — the required container every line of Java code must
+  live inside; nothing can run at a file's top level the way it can in
+  Python or JavaScript.
+- **Access modifier / `public`** — a keyword controlling which other
+  code is allowed to see and use a class or method; `public` means
+  "anything, anywhere, can see this."
+- **Block (`{ }`)** — curly braces marking the start and end of a
+  section of code, the same job Python does with indentation.
+- **Method** — Java's word for a function that belongs to a class or
+  an object.
+- **`main` method / entry point** — the one exact method shape,
+  `public static void main(String[] args)`, the JVM looks for inside a
+  named class to begin running a program.
+- **`static`** — means a method belongs to the class itself rather than
+  to an object made from the class; this is what lets the JVM call
+  `main` before any object exists.
+- **Return type / `void`** — the type of value a method declares it
+  hands back; `void` means "returns nothing," checked by the compiler.
+- **Parameter list / array (`String[]`)** — an array is a fixed-size,
+  ordered list of values; `String[] args` is an array of `String`
+  values passed in from the command line.
+- **`System.out.println` / method call syntax** — Java's built-in print
+  statement, and the general `.methodName(...)` shape for calling a
+  method that belongs to an object.
+- **Statement / semicolon** — Java requires a semicolon at the end of
+  every statement, where Python uses line breaks and JavaScript makes
+  it optional.
+- **Compiler (`javac`) / bytecode / JVM (`java`)** — Java's two
+  separate steps, translate-then-run, replacing the one step Python and
+  JavaScript hide from you.
+- **Package declaration** — a compiler-checked claim, at the top of a
+  `.java` file, that the file lives at the end of a matching folder
+  path.
+- **`-d` compiler flag** — tells `javac` to place compiled output into
+  a proper package-based folder structure, instead of next to the
+  source file.
+- **Classpath (`-cp`)** — tells the `java` command where to look for
+  already-compiled classes when running one.
+- **Namespace / addressing scheme** — giving every unit in a large
+  system a globally unique, hierarchical name so two unrelated pieces
+  of code can reuse the same short name without colliding.
+- **Emulator** — a full software-simulated Android phone running on
+  your computer, letting you test an app without a physical device.
+- **SDK / Minimum SDK** — SDK (Software Development Kit) is the
+  collection of tools and pre-built code Android gives you to build
+  apps; "minimum SDK" is the oldest Android version your app agrees to
+  run on.
+
 ---
 
 ## Concept Unit: The Shape of a Java Program

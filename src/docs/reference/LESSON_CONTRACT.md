@@ -436,6 +436,33 @@ When JavaScript says `x is not defined`, it means the symbol table lookup failed
 Students who can name concepts can look them up, extend them, and transfer them to
 new contexts. Students who only recognise patterns cannot.
 
+### Explain, don't just describe
+
+"Explain" and "describe" are not the same verb, and this contract means the stronger
+one for every piece of code, not only the parts that feel conceptually hard. To
+**describe** something is to give an account of its appearance or characteristics —
+what it's called, what it looks like, what it does, stated flatly. To **explain**
+something is to give the reasoning behind it — why it works, why it's shaped this
+way, what would go wrong without it, what it lets the reader do that they couldn't
+before.
+
+**Description:** `onCreateViewHolder` inflates the row layout and returns a new
+`ViewHolder`.
+
+**Explanation:** `onCreateViewHolder` inflates the row layout and wraps it in a new
+`ViewHolder` — new, because this is the one method the list widget calls only when it
+needs a row it doesn't already have lying around to reuse; every other visible row
+reuses an existing `ViewHolder` instead of coming back through here, which is the
+entire performance idea this class exists for.
+
+Both sentences are factually correct. Only the second one is teaching. A lesson —
+or even a single walkthrough bullet — that is accurate but purely descriptive fails
+this contract exactly as a wrong statement would, just less visibly. See
+`LESSON SCHEMA.md`'s Mechanical Walkthrough step for how this is checked bullet by
+bullet, and its explicit permission to take more room (a longer paragraph, an extra
+Concept Unit, even an extra lesson) whenever a concept needs more than a clause to
+actually explain, rather than compressing real difficulty to fit a line.
+
 ### Nothing is assumed
 
 Every concept a lesson needs is either taught in that lesson or recapped briefly

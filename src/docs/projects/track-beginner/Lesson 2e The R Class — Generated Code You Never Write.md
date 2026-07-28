@@ -12,6 +12,19 @@ is a real class, just one nobody typed by hand). Lesson 2c
 (`setContentView(R.layout.activity_main)` is where you first saw `R`
 used, left unexplained on purpose until now).
 
+**Terms introduced in this lesson:**
+- **`final` (on a class)** — the class cannot be subclassed; no
+  `extends` of it is allowed anywhere.
+- **Nested class (`static final class layout`)** — a class declared
+  inside another class, used here to group resources by type under one
+  outer `R`.
+- **Hexadecimal integer literal (`0x7f0b001c`)** — a number written in
+  base 16, marked by the `0x` prefix; `R`'s generated resource IDs are
+  just unique numbers in this format.
+- **Code generation** — a build tool producing real source code from
+  another artifact (here, the `res/` folder's file and folder names)
+  instead of a human typing it by hand.
+
 ---
 
 ## Concept Unit: The `R` Class — Generated Code You Never Write
@@ -52,9 +65,9 @@ public final class R {
 
 ### Mechanical Walkthrough
 
-- `public final class R` — **`final` on a class, first appearance.**
-  You already know `public class` (Lesson 1). `final` here is a new
-  keyword with a specific, narrow meaning in this position: this class
+- `final` — **first appearance.** You already know `public class`
+  (Lesson 1). `final` here is a new keyword with a specific, narrow
+  meaning in this position: applied to a class, it means the class
   cannot be subclassed — no `class MyR extends R` anywhere, ever.
   That's a deliberate restriction, reasonable since `R` is pure
   generated data, never meant to be extended the way `MainActivity`
@@ -62,21 +75,20 @@ public final class R {
   depending on where you put it — on a variable, on a method — each
   gets explained the first time it appears in one of those other
   positions, in a later lesson.)
-- Nested `static final class layout`, `class string`, etc. — **first
-  appearance of a nested class.** A class declared *inside* another
-  class. Each nested class here groups one *type* of resource. This is
+- `static final class layout` — **first appearance of a nested class.**
+  A class declared *inside* another class. Each nested class here
+  groups one *type* of resource (`layout`, `string`, and so on). This is
   why you write `R.layout.activity_main` and `R.string.app_name` — the
   outer `R`, plus the resource-type name (itself a class), plus the
   specific resource's name: three-part addressing, one level of
   nesting deep.
-- The integer values (`0x7f0b001c`) — **first appearance**, worth one
-  clause: these are just unique numeric IDs, written in hexadecimal
-  (base 16 — the `0x` prefix marks it; not needed in more depth right
-  now). You never write or read them directly; you always go through
-  the generated constant names. The numbers exist because, ultimately,
-  Android's resource system is numeric under the hood for performance —
-  the human-readable names are purely a compile-time convenience
-  layered on top.
+- `0x7f0b001c` — **first appearance.** These integer values are just
+  unique numeric IDs, written in hexadecimal (base 16 — the `0x` prefix
+  marks it; not needed in more depth right now). You never write or
+  read them directly; you always go through the generated constant
+  names. The numbers exist because, ultimately, Android's resource
+  system is numeric under the hood for performance — the human-readable
+  names are purely a compile-time convenience layered on top.
 
 ### CS Lens
 

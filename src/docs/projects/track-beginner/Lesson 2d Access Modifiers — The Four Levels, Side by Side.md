@@ -17,6 +17,24 @@ packages to show the difference between "same package" and "a
 subclass in a different package"). Lesson 2c (`extends`, and that
 `protected` matters — this lesson explains exactly how much).
 
+**Terms introduced in this lesson:**
+- **`import`** — tells the compiler "when I write this class name in
+  this file, I mean the one at this package path," needed whenever code
+  references a class from a different package than its own.
+- **Package-private (default access)** — Java's fourth access level,
+  written by simply omitting a modifier: visible only within the same
+  package, regardless of inheritance.
+- **Field initializer (`public int publicField = 1;`)** — setting a
+  field's starting value directly at its declaration, shorthand for
+  setting it inside a constructor that runs before anything else
+  touches the object.
+- **Least-privilege access control** — the SE Lens principle behind
+  having four access levels instead of two: grant exactly the access a
+  legitimate caller needs, and no more.
+- **Encapsulation boundaries with more than one visibility scale** — the
+  CS Lens idea that "hidden vs. exposed" is too coarse; real systems
+  need graded levels of visibility between fully closed and fully open.
+
 ---
 
 ## Concept Unit: Access Modifiers — The Four Levels, Side by Side

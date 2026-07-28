@@ -385,6 +385,8 @@ itemTouchHelper.attachToRecyclerView(recyclerView);
 
 ```java
 public class InventoryActivity extends AppCompatActivity {
+    private InventoryAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -399,7 +401,7 @@ public class InventoryActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.inventoryRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        final InventoryAdapter adapter = new InventoryAdapter(items, item -> {
+        adapter = new InventoryAdapter(items, item -> {
             Intent intent = new Intent(InventoryActivity.this, ItemDetailActivity.class);
             intent.putExtra("EXTRA_ITEM", item);
             startActivity(intent);
@@ -448,6 +450,18 @@ public class InventoryActivity extends AppCompatActivity {
             quantityInput.setText("");
             locationInput.setText("");
         });
+
+        Button settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(v ->
+                startActivity(new Intent(InventoryActivity.this, SettingsActivity.class)));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("pocket_inventory_prefs", MODE_PRIVATE);
+        int threshold = prefs.getInt("low_stock_threshold", 5);
+        adapter.setLowStockThreshold(threshold);
     }
 }
 ```

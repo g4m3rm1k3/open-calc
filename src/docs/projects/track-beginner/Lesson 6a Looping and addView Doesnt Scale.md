@@ -17,6 +17,34 @@ happens at 500 items?" instead.
 near-empty), Lesson 5 (instance fields, lifecycle — not directly used
 here but assumed solid).
 
+**Terms introduced in this lesson:**
+- **`LinearLayout`** — a layout container that stacks its children one
+  after another, vertically or horizontally, with no constraint-solving
+  involved, unlike `ConstraintLayout`.
+- **Building a View entirely in Java (`new TextView(this)`)** — the same
+  `new` + constructor pattern as any object, on a framework class, with
+  no XML at all; `this` supplies the `Context` every View needs to
+  exist.
+- **`addView`** — mutates the already-built view tree at runtime, adding
+  a new child after the screen was already inflated (as opposed to XML,
+  which only describes the *initial* tree).
+- **`android:padding`** — space added *inside* a view's own edges, as
+  opposed to `layout_margin`, which adds space *outside* a view.
+- **`RecyclerView`** — the AndroidX widget that keeps only a small
+  number of row View objects alive and reuses them as the user scrolls,
+  instead of building one object per data item.
+- **A view as its own layout root** — a layout file whose root element
+  is the view itself (a bare `<TextView>`), rather than a container with
+  views nested inside, used when the file's only job is describing one
+  row's appearance.
+- **Eager vs. lazy (on-demand) evaluation** — the CS Lens idea behind
+  why the `addView` loop doesn't scale: doing all the work upfront
+  regardless of whether it's needed, versus doing only the work a
+  specific moment actually requires.
+- **Template/instance separation** — the CS Lens idea behind splitting
+  a row layout from a screen layout: one small structural description
+  gets instantiated many times against different data.
+
 ---
 
 ## Concept Unit: Looping and `addView()` Doesn't Scale
@@ -72,12 +100,14 @@ describes the *initial* tree; `addView` mutates it afterward.
 
 Five iterations, concrete values, not "it loops five times":
 
+#### Execution Trace
+
 ```
-Iteration 1: i = 0, row = new TextView, row.text = "Item 0", container now has 1 child
-Iteration 2: i = 1, row = new TextView, row.text = "Item 1", container now has 2 children
-Iteration 3: i = 2, row = new TextView, row.text = "Item 2", container now has 3 children
-Iteration 4: i = 3, row = new TextView, row.text = "Item 3", container now has 4 children
-Iteration 5: i = 4, row = new TextView, row.text = "Item 4", container now has 5 children
+Iteration 1: i = 0, row = new TextView, row.text = "Item 0", container now has 1 child, because the loop condition i < 5 held and addView appended this new object
+Iteration 2: i = 1, row = new TextView, row.text = "Item 1", container now has 2 children, because a second, separate new TextView was built and appended, not the first one reused
+Iteration 3: i = 2, row = new TextView, row.text = "Item 2", container now has 3 children, because each pass builds one more distinct object and addView keeps growing the same container
+Iteration 4: i = 3, row = new TextView, row.text = "Item 3", container now has 4 children, because i < 5 still held so the loop body ran again
+Iteration 5: i = 4, row = new TextView, row.text = "Item 4", container now has 5 children, because this is the last pass satisfying i < 5 — i becomes 5 next and the loop stops
 ```
 
 Each iteration builds a genuinely new `TextView` object — five separate

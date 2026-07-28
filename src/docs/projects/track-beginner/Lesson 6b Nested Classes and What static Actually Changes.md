@@ -150,8 +150,14 @@ can genuinely differ:
 javap -p Outer$Inner
 ```
 
-(`-p` — show `private` members too; without it, `javap` hides anything
-not `public`, and this hidden field is not `public`.)
+(`-p` — show every member regardless of access level, including
+genuinely `private` ones; `javap`'s default already shows `public`,
+`protected`, and package-private members — it hides only `private` —
+and it turns out `this$0` is package-private, not `private`, so it
+would actually appear either way here. `-p` is used anyway as a safe
+habit: a synthetic field's exact access level is a javac implementation
+detail, not something the language guarantees, so don't assume you know
+it without asking `javap` to show everything.)
 
 Real output, this session:
 
@@ -167,10 +173,13 @@ class Outer$Inner {
 `final Outer this$0;` — a real field, sitting in the compiled class,
 that appears nowhere in `Outer.java`'s source. This is the hidden
 reference from step 2, made visible: the compiler added it during
-compilation, named it `this$0` itself (a name you are not allowed to
-write by hand — `$` in an identifier is legal Java syntax, but this
-exact name is reserved for compiler-generated code), and wired
-`Inner`'s constructor to accept and store an `Outer` the moment you
+compilation and named it `this$0` itself. `$` is a legal character in a
+Java identifier — nothing in the compiler actually stops you from
+declaring your own field with this literal name — but the Java Language
+Specification (§3.8) states plainly that `$` "should be used only in
+mechanically generated source code," precisely so a human-written name
+never collides with a compiler-generated one like this. `Inner`'s
+constructor was wired to accept and store an `Outer` the moment you
 write `outer.new Inner()`. Compare against the class with no hidden
 reference:
 

@@ -18,6 +18,38 @@ savedInstanceState` — present since Lesson 1 but unused until now),
 and Lesson 4 (`InventoryActivity`, `Intent`, navigating from
 `MainActivity`).
 
+**Terms introduced in this lesson:**
+- **`onStart` / `onResume` / `onPause` / `onStop` / `onDestroy`** — the
+  Activity lifecycle methods beyond `onCreate`, each called by the OS
+  at a specific transition: becoming visible, becoming interactive,
+  losing the foreground, becoming fully hidden, and being permanently
+  torn down.
+- **Back stack / stack data structure (LIFO)** — `startActivity` pushes
+  an Activity onto a Last-In-First-Out stack; pressing Back pops the
+  top one off and destroys it, revealing whatever's beneath.
+- **Configuration change** — an event (rotation, language, dark-mode
+  change) Android treats as "the resources this Activity was built with
+  may no longer be correct," answered by destroying and rebuilding the
+  Activity from scratch rather than patching it in place.
+- **Increment operator (`tapCount++`)** — shorthand for
+  `tapCount = tapCount + 1;`.
+- **`setText` (dynamic content)** — changes a view's displayed text
+  after the layout is already on screen, as opposed to the
+  XML-hardcoded `android:text` value used until now.
+- **`onSaveInstanceState(Bundle outState)`** — called by the OS before
+  destroying an Activity it expects to recreate (rotation, memory
+  reclaim), giving you one last chance to save small values.
+- **`Bundle`** — a String-keyed container (conceptually close to the
+  `Map<String, String>` from Lesson 4's `RequestDemo` lab) with
+  type-specific methods per value, like `putInt`/`getInt`, rather than
+  one generic `put`.
+- **Fresh-start-vs-recreated check (`savedInstanceState != null`)** —
+  distinguishes a truly first launch (nothing saved yet) from an
+  `onCreate` run that's recreating a destroyed Activity.
+- **Checkpointing** — the CS Lens pattern of saving just enough state
+  before a destructive event to reconstruct correctness afterward,
+  without persisting everything.
+
 ---
 
 ## Concept Unit: The Back Stack — Screens Are Stacked, Not Replaced

@@ -27,6 +27,41 @@ polymorphism, and the Observer pattern, all proved by hand with
 `Doorbell`/`Chime`), Lesson 2b (Manifest declarations), and Lesson 3
 (the button now sitting unwired in your layout).
 
+**Terms introduced in this lesson:**
+- **`Map<String, String>` / `HashMap`** — Java's typed key/value lookup
+  table, the same idea as a Python dict or a JavaScript plain object
+  used as a lookup, with the compiler enforcing key and value types.
+- **`android:exported="false"`** — explicitly states an Activity cannot
+  be launched by another app on the device, only from inside this app.
+- **No `<intent-filter>` (by omission)** — the absence of a
+  launcher intent filter is itself meaningful: it's what makes an
+  Activity reachable only from inside the app's own code.
+- **Anonymous class (`new OnTapListener() { ... }`)** — a class with no
+  name, declared and instantiated in one expression; the long-hand
+  version of what a lambda writes concisely.
+- **Functional interface** — any interface with exactly one abstract
+  method; that specific shape is what makes lambda syntax legal for it.
+- **Lambda expression (`() -> ...`)** — compact syntax that builds a
+  real object implementing a functional interface, with no separate
+  named class.
+- **`Intent`** — an object describing a desired action (here, "start
+  this Activity"), handed to the OS's own dispatcher instead of calling
+  the target directly.
+- **`Class` object / `.class` literal (`InventoryActivity.class`)** —
+  Java's built-in mechanism for referring to a class itself as a value,
+  without creating an instance of it.
+- **`Context`** — represents "who is making this request"; an Activity
+  is one kind of `Context`, and Android APIs that need to know the
+  calling app's environment require one.
+- **`setOnClickListener`** — registers a callback to run later, when a
+  tap event actually occurs, rather than immediately.
+- **`startActivity`** — hands an `Intent` off to the OS, which confirms
+  the target is declared in the Manifest before building it and calling
+  its `onCreate()`.
+- **Capability scoping** — the CS Lens pattern of explicitly declaring
+  what a component is and isn't allowed to be used for, rather than
+  everything being globally reachable by default.
+
 ---
 
 ## Concept Unit: You Can't Just `new` Another Activity

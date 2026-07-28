@@ -22,6 +22,49 @@ not strictly required for this specific lesson, since the Manifest
 isn't Java at all, but the next lesson immediately after this one needs
 it).
 
+**Terms introduced in this lesson:**
+- **XML declaration / prolog (`<?xml version="1.0" encoding="utf-8"?>`)**
+  — the required header line at the very top of a standards-compliant
+  XML file, naming the XML version and the file's text encoding.
+- **XML (Extensible Markup Language) / `<manifest>`** — a text format
+  built from nested `<tag>...</tag>` pairs carrying `attribute="value"`
+  pairs, used to describe structured data or configuration rather than
+  executable code; `<manifest>` is this file's root element.
+- **XML namespace declaration (`xmlns:android`, `xmlns:tools`)** — the
+  same collision-avoidance idea as a Java package, applied to XML
+  attribute names instead of class names.
+- **`<application>`** — the element describing properties of the app as
+  a whole (icon, display name, theme), as opposed to any one screen.
+- **Resource-pointing attributes (`android:icon`, `android:label`,
+  `android:theme`, `android:allowBackup`)** — XML attributes whose value
+  is a reference into a separate resource file rather than a literal,
+  hardcoded value.
+- **Backup/data-extraction attributes
+  (`android:dataExtractionRules`, `android:fullBackupContent`)** — point
+  at generated rule files controlling which app data cloud backup and
+  device-transfer are allowed to include.
+- **`android:roundIcon`** — a second, pre-cropped-to-a-circle version of
+  the app icon, for launchers that display round icons.
+- **`android:supportsRtl` / RTL layout mirroring** — opts the app into
+  automatically mirroring its layout horizontally for right-to-left
+  languages.
+- **`<activity android:name=...>`** — the manifest entry that connects
+  a compiled `Activity` class to the running app; without it, the class
+  compiles fine but the OS has no idea it's launchable.
+- **`android:windowSoftInputMode`** — controls whether an Activity's
+  layout resizes (`adjustResize`) or the whole screen pans when the
+  on-screen keyboard opens.
+- **Intent filter (`<intent-filter>`, `<action ... MAIN />`,
+  `<category ... LAUNCHER />`)** — the declaration of which Activity is
+  a valid entry point (`MAIN`) and which one specifically appears on the
+  home screen/app drawer (`LAUNCHER`).
+- **Resource reference syntax (`@type/name`, e.g.
+  `@style/Theme.PocketInventory`)** — points at a named resource defined
+  elsewhere instead of hardcoding a value inline.
+- **Declarative configuration vs. imperative code** — describing facts
+  about a system for something else to read and act on, rather than
+  writing step-by-step instructions.
+
 ---
 
 ## Concept Unit: The Manifest — How Android Even Knows You Exist

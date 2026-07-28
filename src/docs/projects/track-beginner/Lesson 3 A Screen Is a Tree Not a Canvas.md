@@ -23,6 +23,49 @@ that's this lesson. No new Java concepts appear in this lesson at
 all — it's an entirely different file format (XML, first explained in
 Lesson 2b) describing a screen as data instead of code.
 
+**Terms introduced in this lesson:**
+- **`ConstraintLayout`** — the root view group used here; an XML tag
+  that instantiates a real Java class, same as the Manifest's
+  `.MainActivity`, positioning its children by solved relationships
+  instead of coordinates.
+- **`match_parent` / `wrap_content`** — the two sizing values every
+  view's width/height must use instead of a pixel number: "be exactly
+  as large as whatever contains me" versus "be exactly as large as my
+  own content needs, no larger."
+- **`TextView`** — a view that displays text, the XML-declared
+  equivalent of a label.
+- **`@+id/...` (the `+`)** — means "this id doesn't exist in `R` yet —
+  generate it," the mechanism by which new constants appear in the
+  generated `R.java` file.
+- **`android:text`** — an attribute that directly sets a view's
+  displayed string.
+- **Layout constraint (`app:layout_constraintBottom_toBottomOf="parent"`,
+  etc.)** — declares a relationship between one view's edge and
+  another element's edge; a solver, not you, computes the position that
+  satisfies every declared constraint at once.
+- **`dp` (density-independent pixels)** — a unit Android automatically
+  scales per-device so the same value produces roughly the same
+  physical size regardless of screen pixel density.
+- **`sp` (scale-independent pixels)** — the same per-device scaling as
+  `dp`, plus respecting the user's OS-level text-size accessibility
+  setting; used only for text size.
+- **`Button`** — a tappable view, declared the same way as `TextView`
+  but with built-in tap-feedback behavior.
+- **Margin (`android:layout_marginTop`)** — pushes a view away from
+  whatever it's constrained to, by a `dp` amount.
+- **`Start`/`End` vs. `Left`/`Right`** — direction-aware constraint
+  sides that automatically flip for right-to-left languages, preferred
+  over the literal `Left`/`Right` for that reason.
+- **Over-constraining** — the SE Lens principle that more constraints
+  aren't automatically safer: constrain only the edges a view's
+  position actually depends on, and let `wrap_content` own the rest.
+- **Constraint satisfaction system** — the CS Lens pattern name for
+  declaring relationships and letting a solver compute values that
+  satisfy them, rather than computing values yourself.
+- **Resolution independence via a virtual unit layer** — the CS Lens
+  pattern name behind `dp`/`sp`, the same idea as vector graphics
+  scaling cleanly or print "points" being resolution-independent.
+
 ---
 
 ## Concept Unit: XML Layouts Are Declarative View Trees

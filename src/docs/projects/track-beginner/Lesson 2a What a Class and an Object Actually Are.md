@@ -56,6 +56,40 @@ these labs, and both are worth understanding before you type anything:
   from multiple files needs exactly one `main` in total, in whichever
   file you name on the `java` command line, not one per file.
 
+**Terms introduced in this lesson:**
+- **Field** — a named piece of data, declared inside a class body with
+  no method around it, that every object built from that class has its
+  own independent copy of.
+- **Object / instance** — an actual, individual thing built from a
+  class (the blueprint), holding its own copy of the class's fields.
+- **`new`** — the keyword that constructs a brand-new object in memory
+  and hands back a reference to it.
+- **Reference** — practically, "a way to find this specific object
+  again"; a variable of a class type stores a reference to an object,
+  not the object itself.
+- **Dot notation for setting a field** — reaching into a specific
+  object and changing one of its fields, e.g. `kitchen.isOn = true;`
+  (the sibling operation to dot notation for calling a method).
+- **Instance method** — a method with no `static` keyword; it belongs
+  to a specific object and can only be called through one
+  (`kitchen.toggle()`), never through the class name directly.
+- **`this`** — inside an instance method or constructor, a special,
+  automatically-available reference meaning "the exact object this
+  code is running for."
+- **Logical NOT (`!`)** — flips a `boolean` value: `!true` is `false`
+  and vice versa.
+- **Constructor** — code with no return type at all, whose name must
+  exactly match the class name, that runs automatically every time
+  `new` builds an object, to set up its starting state.
+- **Default constructor** — the free, no-argument constructor Java
+  automatically supplies for any class that doesn't declare one
+  itself; it disappears the instant the class defines its own.
+- **Encapsulation of state** — bundling data into a named, typed unit
+  instead of tracking related values as separate loose variables.
+- **Message passing** — the object-oriented idea of sending an object a
+  request (a method call) and letting it decide, internally, how to
+  respond, rather than reaching in and changing its data directly.
+
 ---
 
 ## Concept Unit: A Class Is a Blueprint, an Object Is a Thing Built From It
@@ -120,10 +154,12 @@ Bedroom: false
 
 Three statements, two separate objects, one value at a time:
 
+#### Execution Trace
+
 ```
-Iteration 1: new LightSwitch() → kitchen built, kitchen.isOn = false (default)
-Iteration 2: new LightSwitch() → bedroom built, bedroom.isOn = false (default)
-Iteration 3: kitchen.isOn = true → kitchen.isOn = true, bedroom.isOn still false
+Iteration 1: new LightSwitch() → kitchen built, kitchen.isOn = false, because a boolean field never explicitly set gets Java's default value
+Iteration 2: new LightSwitch() → bedroom built, bedroom.isOn = false, because this is a second, separate call to new — a completely different object with its own default
+Iteration 3: kitchen.isOn = true → only kitchen changes, because kitchen.isOn and bedroom.isOn are different memory, not linked just for sharing a field name
 ```
 
 What this proves: `LightSwitch` itself is not a light switch — it's a
@@ -398,9 +434,11 @@ Bedroom starts: false
 
 The constructor argument sets each object's starting state directly:
 
+#### Execution Trace
+
 ```
-Iteration 1: new LightSwitch(true) → kitchen built, kitchen.isOn = true
-Iteration 2: new LightSwitch(false) → bedroom built, bedroom.isOn = false
+Iteration 1: new LightSwitch(true) → kitchen built, kitchen.isOn = true, because the constructor runs immediately and sets isOn from the startsOn argument passed in
+Iteration 2: new LightSwitch(false) → bedroom built, bedroom.isOn = false, because the same constructor ran again with a different argument value
 ```
 
 Now prove the important side effect: try the *old* no-argument call

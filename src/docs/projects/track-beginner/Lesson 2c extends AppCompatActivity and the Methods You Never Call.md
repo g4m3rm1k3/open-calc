@@ -31,6 +31,57 @@ lesson is that vocabulary applied to a class you didn't write. Lesson
 2b (the Manifest already told the OS `MainActivity` is the entry
 point; this lesson explains what the OS does once it gets there).
 
+**Terms introduced in this lesson:**
+- **`extends`** — declares that a class inherits another class's fields
+  and methods, plus whatever it adds or overrides itself.
+- **`@Override` / Annotation** — `@` marks an annotation, metadata
+  attached to code that tools and the compiler can read rather than
+  logic that runs; `@Override` specifically checks that a method really
+  does replace one from the parent class, turning a typo'd method name
+  into a compile error instead of a silent bug.
+- **`protected`** — an access modifier meaning callable by the class
+  itself, its subclasses, and framework code in the same package.
+- **`super`** — refers to "the parent class's own version of this,"
+  used to explicitly call a parent's implementation of a method you've
+  overridden.
+- **`R` class / resource ID reference (`R.layout.activity_main`)** — a
+  generated, compile-time constant pointing at a resource; the
+  generated `R` class itself is the next lesson's full subject.
+- **`interface`** — declares a set of method signatures with no bodies
+  at all: a pure contract that anything implementing it must fulfill.
+- **Field typed as an interface (`private TapCallback callback;`) /
+  Polymorphism** — a field declared with an interface type can hold any
+  object from any class that fulfills that interface's contract,
+  decided at the point it's actually called, not when the field was
+  declared.
+- **`implements`** — declares a class fulfills an interface's contract
+  (as opposed to `extends`, which inherits a class's actual code).
+- **Lambda expression (`(v, insets) -> { ... }`)** — compact syntax
+  building an implementation of a single-method interface inline, with
+  no separate named class needed.
+- **`ViewCompat` / `setOnApplyWindowInsetsListener`** — an AndroidX
+  class providing one consistent API across Android versions;
+  `setOnApplyWindowInsetsListener` registers a callback that runs when
+  the system reports how much space system UI currently occupies.
+- **`findViewById` / view inflation** — inflation is the step where
+  Android builds real `View` objects from an XML layout file;
+  `findViewById` walks that already-built tree looking for one view by
+  its id.
+- **`Insets` / `WindowInsetsCompat.Type.systemBars()`** — `Insets` holds
+  four numbers (`left`, `top`, `right`, `bottom`) describing how much
+  system UI overlaps each edge of a view; `systemBars()` asks
+  specifically for the status bar and navigation bar together.
+- **`setPadding`** — pushes a view's content inward from its own edges
+  by a given amount, independently on each of the four sides.
+- **Template Method pattern** — a base class defines a fixed algorithm
+  and calls out to specific points a subclass overrides to fill in.
+- **Observer pattern** — an object holds onto a standalone callback and
+  decides, on its own, when to call it — no subclassing involved.
+- **Inversion of Control (Hollywood Principle)** — the broader idea
+  behind both patterns above: you hand control to a framework instead
+  of writing a top-down script yourself ("don't call us, we'll call
+  you").
+
 ---
 
 ## Concept Unit: `extends AppCompatActivity` and the Methods You Never Call
@@ -135,6 +186,8 @@ methods* too, plus its own, because `extends` declares "a `Child` is a
 the three lines of output land in exactly this order, with `Child`'s
 message sandwiched inside `Base`'s two — walking `c.run()` one call at
 a time answers it:
+
+#### Execution Trace
 
 1. `c.run()` — `Child` never wrote its own `run()`, so this calls
    `Base`'s inherited `run()` method.

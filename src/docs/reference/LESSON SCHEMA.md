@@ -267,6 +267,42 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    enumeration step exists specifically so that sorting is checked
    against the actual code, item by item, rather than trusted to memory.
 
+   > **Explain, don't just describe — for every item, not only hard
+   > concepts:** "explain" and "describe" are not interchangeable, and
+   > this schema means the stronger one. To *describe* something is to
+   > give an account of its appearance or characteristics — what it
+   > looks like, what it's called, what it does, stated flatly. To
+   > *explain* something is to give the reasoning behind it — why it
+   > works, why it's shaped this way, what would go wrong without it, what
+   > it lets the reader do that they couldn't before. A walkthrough bullet
+   > can be factually accurate and still fail this schema if it only
+   > describes: *"`onCreateViewHolder` inflates the row layout and returns
+   > a new `InventoryViewHolder`."* That sentence is true and says nothing
+   > a reader couldn't get from reading the method signature. Explained:
+   > *"`onCreateViewHolder` inflates the row layout and wraps it in a new
+   > `InventoryViewHolder` — new, because this is the one method
+   > `RecyclerView` calls only when it needs a row it doesn't already have
+   > lying around to reuse; every other visible row reuses an existing
+   > `ViewHolder` instead of coming back through here, which is the entire
+   > performance idea this class exists for."* Same fact, plus the reason
+   > it's true and why it matters. This applies to every item sorted into
+   > (a) or (b) above — not just the ones that feel conceptually hard.
+   > A whole walkthrough of accurate, well-written descriptions, with
+   > zero reasoning anywhere in it, fails this schema completely, even
+   > with nothing factually wrong in it.
+   >
+   > **When a concept genuinely needs more room than a clause to explain,
+   > take the room — do not compress a hard concept down to fit a
+   > one-line bullet.** A longer paragraph inside the same Concept Unit,
+   > an extra Concept Unit inserted before the one that needs it, or, for
+   > a concept that's genuinely load-bearing for everything after it, a
+   > whole extra lesson — all of these are correct tools, and reaching
+   > for one is not a sign the lesson plan failed. Compressing real
+   > difficulty into a single under-explained bullet so the lesson "stays
+   > the right size" is the actual failure: a reader who is quietly lost
+   > on bullet four of fourteen has not been taught, no matter how
+   > correct bullets one through three were.
+   >
    > **Cite the concept, not the lesson, for lessons written from this
    > point forward:** when (b) applies, name the concept or pattern and
    > restate briefly what it does — "the same Observer pattern
@@ -548,3 +584,12 @@ Read the draft top to bottom and answer honestly:
       input, was it exercised against a short escalating sequence of tiny
       inputs first, each changing one thing? Jumping straight from a
       minimal lab to full complexity skips the practiced-skill step.
+- [ ] Read every Mechanical Walkthrough bullet and ask, per bullet: does
+      this only describe (what it's called, what it looks like, what it
+      does, stated flatly), or does it explain (why it's shaped this way,
+      what would break without it, what it enables)? A bullet that is
+      factually correct but purely descriptive fails this check — add the
+      reasoning, don't just verify the fact. If a concept needed more than
+      a clause to actually explain, was it given that room (a longer
+      paragraph, an extra Concept Unit, or an extra lesson), rather than
+      compressed to fit?
