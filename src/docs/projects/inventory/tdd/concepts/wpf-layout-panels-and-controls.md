@@ -6,7 +6,14 @@
 
 ## Setup
 
-.NET SDK with the `wpf` template, one scaffolded WPF project.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+cd ConceptDemo
+```
+Open `MainWindow.xaml` and edit the empty `<Grid>` it generates — the
+example below shows exactly what to add inside it.
 
 ## The Problem
 
@@ -46,7 +53,7 @@ ConceptDemo.exe              37584 Console                    1    104,736 K
 ## Mechanical Walkthrough
 
 - `<Grid>` — WPF's most common **layout panel**: a container whose whole job is arranging the elements placed inside it. Used here with no rows/columns defined, so it behaves as one single cell.
-- `<TextBlock ... />` — a real WPF **control**, the standard element for displaying non-editable text (WPF's rough equivalent of HTML's `<span>`/`<p>`). The trailing `/>` is XML's self-closing tag form, used because this element has no children.
+- `<TextBlock ... />` — a real WPF **control**, the standard element for displaying non-editable text. The trailing `/>` is XML's self-closing tag form, used because this element has no children.
 - `Text="Concept demo"` — the actual string content displayed; same attribute mechanism as `Title` on `Window`, applied to a different, nested object.
 - `FontSize="24"` — same attribute mechanism, a different property.
 - `HorizontalAlignment="Center"` / `VerticalAlignment="Center"` — how this element positions itself *within* the space its parent (`Grid`) gives it, independent of the window's actual current size — `Center` on both means the text sits in the middle regardless of how the window is resized.

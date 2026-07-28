@@ -2,11 +2,18 @@
 
 **What you'll understand by the end:** what XAML actually is, how `x:Class` links a markup file to a real C# class, and what `InitializeComponent()` — a method with no visible body — actually comes from.
 
-**Prerequisites:** `csharp-partial-classes.md` (XAML's own generated code depends directly on `partial`); basic XML/HTML tag syntax (elements, attributes, nesting, self-closing tags).
+**Prerequisites:** `csharp-partial-classes.md` (XAML's own generated code depends directly on `partial`).
 
 ## Setup
 
-.NET SDK with the `wpf` template available (`dotnet new list` shows it) — Windows only, WPF has no cross-platform build.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+cd ConceptDemo
+```
+Windows only — WPF has no cross-platform build. The generated
+`MainWindow.xaml`/`MainWindow.xaml.cs` are the example; nothing to add.
 
 ## The Problem
 
@@ -72,7 +79,7 @@ The error points at `MainWindow.xaml.cs`, not the `.xaml` file where the actual 
 
 ## Mechanical Walkthrough
 
-- `<Window ...>` — XAML (**eXtensible Application Markup Language**) is XML; the root element's name is a real WPF class (`Window`, from `System.Windows`) — writing `<Window>...</Window>` declaratively constructs a `Window` object, the same real operation as `new Window()` in C#.
+- `<Window ...>` — XAML (**eXtensible Application Markup Language**) is **XML**: text structured as nested **elements**, each a start tag (`<Window ...>`) paired with a matching end tag (`</Window>`), everything between them counted as "inside" it; a tag can carry **attributes** (`name="value"` pairs, like `Title="MainWindow"` below) written inside the start tag itself. The root element's name here is a real WPF class (`Window`, from `System.Windows`) — writing `<Window>...</Window>` declaratively constructs a `Window` object, the same real operation as `new Window()` in C#.
 - `x:Class="ConceptDemo.MainWindow"` — the single load-bearing attribute: tells the build system which real `partial class` this markup's generated half belongs to.
 - `xmlns="..."` / `xmlns:x="..."` — **XML namespace** declarations; not URLs that are fetched, just unique strings identifying which vocabulary of element names (`Window`, `Grid`, ...) this file uses, and (the `x:`-prefixed one) which attributes are XAML's own language-level ones (like `x:Class`) rather than an ordinary WPF property.
 - `Title="MainWindow" Height="450" Width="800"` — ordinary XML attributes setting real properties on the constructed `Window` object; identical in effect to writing `this.Title = "MainWindow";` in C#.

@@ -2,11 +2,20 @@
 
 **What you'll understand by the end:** how two separate files can define pieces of the exact same class, merged by the compiler before anything runs.
 
-**Prerequisites:** none.
+**Prerequisites:** `csharp-classes-objects-and-fields.md` (this file assumes "class," "field," and "constructor" are already real, not just familiar-sounding).
 
 ## Setup
 
-.NET SDK installed. Two files in one console project.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new console -n PartialDemo -o PartialDemo
+cd PartialDemo
+```
+Two files, both directly in this folder, next to the generated
+`Program.cs`: create a **new** file named `Robot.Body.cs` (the exact dot
+in that name is cosmetic — see the linked guide if that's not obvious),
+and replace `Program.cs`'s own contents. Both examples below.
 
 ## The Problem
 

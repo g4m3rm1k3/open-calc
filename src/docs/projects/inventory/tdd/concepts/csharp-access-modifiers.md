@@ -2,11 +2,23 @@
 
 **What you'll understand by the end:** what `public` and `internal` actually restrict, and why a top-level C# type can't be scoped to "just this file."
 
-**Prerequisites:** `dotnet-cli-and-project-scaffolding.md` (this example uses a project reference between two scaffolded projects).
+**Prerequisites:** `csharp-classes-objects-and-fields.md`; `dotnet-cli-and-project-scaffolding.md` (this example uses a project reference between two scaffolded projects).
 
 ## Setup
 
-.NET SDK installed. Two projects: a class library and a console app referencing it.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+Two **separate** projects, side by side in your scratch folder (not one
+inside the other):
+```
+dotnet new classlib -n AccessLib -o AccessLib
+dotnet new console -n AccessConsumer -o AccessConsumer
+dotnet add AccessConsumer reference AccessLib
+```
+The third command is what makes `AccessConsumer` able to see
+`AccessLib`'s `public` types at all — without it, this example's real
+compile errors would be a *different* error (a missing reference), not
+the access-modifier one this file is actually about.
 
 ## The Problem
 

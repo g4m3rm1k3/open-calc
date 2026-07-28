@@ -6,7 +6,9 @@
 
 ## Setup
 
-The .NET SDK installed (`dotnet --version` prints a version number, e.g. `10.0.301`). No existing project needed — this creates one.
+*(Full walkthrough of these mechanics, including where to put throwaway projects like this one: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+The .NET SDK installed (`dotnet --version` prints a version number, e.g. `10.0.301`). No existing project needed — the isolated example below is the setup step itself.
 
 ## The Problem
 

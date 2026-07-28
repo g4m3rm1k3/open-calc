@@ -1,7 +1,9 @@
 # WPF Lesson 3: A Value That Announces Its Own Changes
 
 *(Track purpose, scope, concept-reuse rule, and cadence: `README.md` —
-not restated per-lesson.)*
+not restated per-lesson. Unsure what to actually type/run/create for one
+of the linked concept files' own isolated examples:
+`HOW-TO-RUN-EXAMPLES.md`.)*
 
 ## What you will build
 

@@ -6,7 +6,14 @@
 
 ## Setup
 
-.NET SDK with the `wpf` template.
+*(Full walkthrough of these mechanics: `../wpf-lessons/HOW-TO-RUN-EXAMPLES.md`.)*
+
+```
+dotnet new wpf -n ConceptDemo -o ConceptDemo
+cd ConceptDemo
+```
+Open `MainWindow.xaml` and replace the generated empty `<Grid></Grid>`
+with the example below.
 
 ## The Problem
 

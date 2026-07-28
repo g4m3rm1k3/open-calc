@@ -1,19 +1,24 @@
 # WPF Lesson 1: A Window Is a Class Split in Two
 
 *(Track purpose, scope, concept-reuse rule, and cadence: `README.md` —
-not restated per-lesson.)*
+not restated per-lesson. Unsure what to actually type/run/create for one
+of the linked concept files' own isolated examples:
+`HOW-TO-RUN-EXAMPLES.md`.)*
 
 ## What C# and WPF are
 
 **WPF** (Windows Presentation Foundation) is Microsoft's framework, built
-on .NET, for building Windows desktop GUI applications — the
-desktop-app counterpart to the browser-based frontend `../lessons/`
-builds with HTML/React. **C#** ("C sharp") is the statically-typed,
-compiled language WPF apps are written in — .NET's flagship language,
-playing the same role Python/JavaScript played in `../lessons/`. (Static
-typing itself isn't new — `../concepts/static-vs-dynamic-typing.md`
-already covers the general idea against Python; what's new here is C#'s
-own specific rules and syntax for it, covered as they come up.)
+on .NET, for building Windows desktop GUI applications — programs with
+real windows, buttons, and text on screen, as opposed to a command-line
+program that only prints text. **C#** ("C sharp") is the language WPF
+apps are written in. It is **statically typed** and **compiled** —
+"statically typed" means every variable's type is fixed and checked
+*before* the program ever runs (get a type wrong, and the program refuses
+to build at all, rather than failing partway through running); "compiled"
+means the source code you write is translated into a different, runnable
+form (machine code, here by way of .NET) by a separate step (`dotnet
+build`, covered below) before it executes — both ideas are explained
+properly, in the concept files below, the moment real code needs them.
 
 ## What you will build
 
@@ -29,12 +34,15 @@ arbitrary convention instead of a mechanism with a real reason.
 
 ## What you need to know first
 
-Nothing about C# or WPF — that's this track's whole point. From the main
-`lessons/` track: what a `class` is and does (Lesson 4's own Python
-classes), what compiling/running a program means in general, and basic
-HTML/XML tag syntax (elements, attributes, nesting, self-closing tags —
-used throughout `lessons/`'s own frontend work), since XAML (below) turns
-out to lean on that same shape directly. Nothing else assumed.
+Exactly three things, per this track's own stated floor (see
+`README.md`): basic functions, basic data types, basic loops. Nothing
+about C# or WPF. **Nothing about classes, objects, or inheritance
+either** — those are general CS ideas, not C#-specific ones, but they are
+still first appearances here, not assumed background, and get real,
+from-scratch treatment the moment this lesson's first real code needs
+them (`../concepts/csharp-classes-objects-and-fields.md`). No HTML/XML
+familiarity is assumed either — XAML (below) is explained as its own
+thing, not "the same shape as something you've already seen."
 
 ## Terms introduced in this lesson
 
@@ -77,8 +85,8 @@ out to lean on that same shape directly. Nothing else assumed.
 > files, merged into one class by the compiler before anything else is
 > compiled.
 
-> **using directive** — C#'s equivalent of Python's `import`; brings a
-> namespace's names into scope so they can be written unqualified.
+> **using directive** — brings a namespace's names into scope so they
+> can be written unqualified, without the full `Namespace.TypeName` path.
 
 > **namespace** — a named grouping of related types; `System.Windows` is
 > WPF's own core namespace.
@@ -120,14 +128,20 @@ out to lean on that same shape directly. Nothing else assumed.
 ## Concepts cataloged from this lesson
 
 Every concept this lesson introduces has its own isolated, runnable entry
-in `../concepts/` (same rule `../lessons/` uses, and the same one stated
-in `../concepts/README.md`) — a later lesson only skips re-teaching one
-of these on a **100% match**, never on resemblance:
+in `../concepts/` (per the rule stated in `../concepts/README.md`) — a
+later lesson only skips re-teaching one of these on a **100% match**,
+never on resemblance:
 
-`dotnet-cli-and-project-scaffolding` · `csproj-sdk-style-project-file` ·
-`csharp-partial-classes` · `csharp-namespaces-and-using-directives` ·
-`csharp-access-modifiers` · `csharp-constructors` ·
-`xaml-declarative-ui-markup` · `wpf-layout-panels-and-controls`
+`csharp-classes-objects-and-fields` · `dotnet-cli-and-project-scaffolding` ·
+`csproj-sdk-style-project-file` · `csharp-partial-classes` ·
+`csharp-namespaces-and-using-directives` · `csharp-access-modifiers` ·
+`csharp-constructors` · `csharp-inheritance` · `xaml-declarative-ui-markup` ·
+`wpf-layout-panels-and-controls`
+
+`csharp-classes-objects-and-fields` in particular is worth reading first
+if it's genuinely new — everything else in this lesson that mentions a
+`class`, a field, `new SomeType()`, or a method assumes that file's own
+vocabulary, not general familiarity with the idea.
 
 ---
 
@@ -144,18 +158,17 @@ and record which version of .NET it targets.
 
 ### The Concept, Commands Run for Real
 
-There's no smaller disposable example to isolate here — same reasoning
-`lessons/` Lesson 1 used for `python -m venv`: the command itself *is*
-the smallest real demonstration, run for real rather than described:
+There's no smaller disposable example to isolate here — the command
+itself *is* the smallest real demonstration, run for real rather than
+described:
 
 ```
 dotnet new wpf -n CncWpf
 ```
 
 **.NET** (say "dot net") is Microsoft's platform for building and running
-C# programs — a **runtime** (the program that actually executes compiled
-code, the same role CPython plays for a `.py` file, or Node's V8 for a
-`.js` file) bundled with a large standard library and a family of
+C# programs — a **runtime** (a program that takes compiled code and
+actually executes it) bundled with a large standard library and a family of
 command-line/build tools. `dotnet` is the .NET command-line tool (C#'s
 rough equivalent of the `python`/`node` commands — one CLI that can
 create projects, build them, and run them). `new` is the subcommand for scaffolding a new project from a
@@ -215,8 +228,9 @@ has none yet) — it runs automatically after `new`, without being asked.
 - `<Project Sdk="Microsoft.NET.Sdk">` — **(a) first appearance.** A
   `.csproj` file is XML (a markup format — angle-bracket-delimited
   elements, covered properly in the next unit's own concept) describing
-  *how to build this project*, C#'s equivalent of `requirements.txt` plus
-  a build config combined. `Sdk="Microsoft.NET.Sdk"` says "build this
+  *how to build this project*: what kind of program it is, which
+  dependencies it needs, and which build settings apply.
+  `Sdk="Microsoft.NET.Sdk"` says "build this
   using .NET's own standard build logic" — the modern, minimal
   "SDK-style" project format (older, pre-.NET-Core project files listed
   every single source file explicitly; this style discovers `.cs` files
@@ -237,10 +251,11 @@ has none yet) — it runs automatically after `new`, without being asked.
   Not exercised yet (no code exists), named now since it'll matter the
   moment real fields are added.
 - `<ImplicitUsings>enable</ImplicitUsings>` — **(a) first appearance.**
-  C#'s `using X;` (covered next unit) is its equivalent of Python's
-  `import X`. This setting auto-adds a handful of extremely common
-  `using` statements (`System`, `System.Linq`, etc.) to every file without
-  writing them by hand — a convenience default, not something we'll rely
+  `using X;` (covered next unit — it brings a group of related types into
+  scope so they can be referred to by short name) auto-adds a handful of
+  extremely common `using` statements (`System`, `System.Linq`, etc.) to
+  every file without writing them by hand — a convenience default, not
+  something we'll rely
   on understanding yet.
 - `<UseWPF>true</UseWPF>` — **(a) first appearance.** The one flag that
   actually makes this a WPF project instead of a plain console app: it
@@ -288,10 +303,14 @@ a small `.exe` stub loads and runs it — not explored further now).
 
 ## Concept Unit: A Class Split in Two
 
-*(Full standalone treatment: `../concepts/csharp-partial-classes.md`,
+*(Full standalone treatment: `../concepts/csharp-classes-objects-and-fields.md`
+(read this one first if "class"/"object"/"field" aren't already solid —
+everything below assumes it, not general familiarity),
+`../concepts/csharp-partial-classes.md`,
 `../concepts/csharp-namespaces-and-using-directives.md`,
-`../concepts/csharp-access-modifiers.md`, and
-`../concepts/csharp-constructors.md`.)*
+`../concepts/csharp-access-modifiers.md`,
+`../concepts/csharp-constructors.md`, and
+`../concepts/csharp-inheritance.md`.)*
 
 ### The Problem
 
@@ -409,8 +428,8 @@ public partial class MainWindow : Window
 
 ### Mechanical Walkthrough
 
-- `using System.Windows;` — **(a) first appearance.** C#'s `import`
-  equivalent: pulls a **namespace** (a named group of related classes —
+- `using System.Windows;` — **(a) first appearance.** A **using
+  directive**: pulls a **namespace** (a named group of related classes —
   `System.Windows` is WPF's own core namespace, containing `Window`,
   `Application`, and everything else this lesson uses) into scope, so
   code below can write `Window` instead of the fully-qualified
@@ -430,11 +449,11 @@ public partial class MainWindow : Window
   class can't be scoped down to just "this file"; that's a common
   first-guess, but not how C# actually works). `partial` — **(b) hard concept reappearing**,
   just proven above with `Robot`. `: Application` — **(a) first
-  appearance** — **inheritance**: `App` *is an* `Application` (a real
-  WPF class from `System.Windows`), gaining every capability that class
-  already has, the identical idea to Python's `class Foo(Bar):` already
-  known from the main track, different syntax (`:` instead of
-  parentheses).
+  appearance** — **inheritance**, full standalone treatment in
+  `../concepts/csharp-inheritance.md`: `App` *is an* `Application` (a
+  real WPF class from `System.Windows`), gaining every capability that
+  class already has — every field and method `Application` defines is
+  now usable on `App` too, with nothing re-declared here.
 - `public partial class MainWindow : Window` — same three ideas,
   reapplied: **(c) already basic**, no new explanation owed for the
   *shape* — `MainWindow` inherits from `Window` instead of `Application`.
@@ -549,15 +568,18 @@ file or explaining what generates code from it.
 
 ### Mechanical Walkthrough
 
-- `<Window ...>` / `<Application ...>` — **(a) first appearance.** XAML
-  (pronounced "zammel," *eXtensible Application Markup Language*) is
-  XML — angle-bracket elements, exactly the shape `client-server-
-  architecture.md`'s own HTML already used in `lessons/`, but here it
-  describes a real object tree instead of a web page: the root
-  element's *name* (`Window`, `Application`) is a real WPF class, and
-  writing `<Window>...</Window>` is a declarative way of saying
-  "construct a `Window` object" without writing `new Window()` in C#
-  directly.
+- `<Window ...>` / `<Application ...>` — **(a) first appearance,** of
+  both XAML and the XML tag syntax it's built on. **XAML** (pronounced
+  "zammel," *eXtensible Application Markup Language*) is **XML**: text
+  structured as nested **elements**, each written as a start tag
+  (`<Window ...>`) and matching end tag (`</Window>`), with everything
+  between them considered "inside" that element — the same nested,
+  tagged-text shape a `<Grid>...</Grid>` a few lines down uses one level
+  deeper. Here, XAML describes a real object tree rather than arbitrary
+  text: the root element's *name* (`Window`, `Application`) is a real
+  WPF class, and writing `<Window>...</Window>` is a declarative way of
+  saying "construct a `Window` object" without writing `new Window()` in
+  C# directly.
 - `x:Class="CncWpf.MainWindow"` — **(a) first appearance**, the single
   most load-bearing line in the file: this is what tells the build
   system *which* `partial class` (previous unit) this markup's generated
@@ -675,12 +697,12 @@ centered both ways.
 ### Mechanical Walkthrough
 
 - `<TextBlock ... />` — **(a) first appearance.** A real WPF element —
-  the standard control for displaying a run of non-editable text (WPF's
-  rough equivalent of HTML's `<span>`/`<p>`). The trailing `/>` (instead
-  of a separate closing `</TextBlock>`) is a **self-closing tag** —
-  already-established XML syntax from the previous unit's `<Window ...>`,
-  used here because `TextBlock` has no children in this case, purely a
-  shorter way to write `<TextBlock ...></TextBlock>`.
+  the standard control for displaying a run of non-editable text. The
+  trailing `/>` (instead of a separate closing `</TextBlock>`) is a
+  **self-closing tag** — **(a) first appearance** of this specific XML
+  shape: legal only when an element has no children, purely a shorter
+  way to write `<TextBlock ...></TextBlock>` with nothing between the
+  tags.
 - `Text="Hello, WPF"` — **(a) first appearance** of this specific
   property, **(c) already basic** as an attribute in general (same
   mechanism as `Title`/`Height`/`Width`, previous unit): the actual
