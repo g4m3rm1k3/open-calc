@@ -1,5 +1,20 @@
 # Lesson 6e: `Adapter` — Bridging a List of Data to a Finite Number of Rows
 
+> **Revised 2026-07-28** — added real proof for three claims that were
+> previously only described, not explained: a logging exercise proving
+> `RecyclerView` actually recycles `ViewHolder`s (in the "Verify
+> Recycling Is Real" step), a full Concept Unit proving the real
+> mechanism behind `LayoutInflater`/"inflate" with a reflection lab
+> (verified against real AndroidX `Fragment` source conventions this
+> session), and a full Concept Unit proving what `ArrayList`'s
+> "resizable" actually means with a hand-built growable array (verified
+> against a real `ArrayList`'s own backing array via reflection this
+> session). Also fixed the Adapter unit's own `### Mechanical Walkthrough`
+> to stop overclaiming that naming `LayoutInflater` was the same as
+> explaining its mechanism — heading marked `(revised 07/28)`. The three
+> new sections aren't marked since they're self-evidently new. Full
+> detail in `CHANGELOG.md` in this folder.
+
 **What you will build:** The real `InventoryAdapter` class, and the
 inventory screen finally showing a real, scrolling list of five items
 through `RecyclerView` — the payoff of the whole 6a–6e sequence. You'll
@@ -17,19 +32,12 @@ finally becomes a real, saved file), Lesson 6d (generics, `List<String>`).
 **Terms introduced in this lesson:**
 - **`final` (on a field)** — restricts a field's reference to being
   assigned exactly once, never reassigned afterward.
-- **Annotation** (e.g. `@NonNull`, `@Override`) — a piece of metadata
-  attached to code (`@Name` syntax) that doesn't change what the code
-  does at runtime by itself; instead it's read by the compiler, an
-  IDE's static analysis, or a framework, to enable a check or a
-  behavior.
-- **`@NonNull`** — an annotation asserting a parameter or return value
-  must never be `null`; checked by Android Studio's static analysis,
-  not by the compiler itself.
-- **`@Override`** — an annotation asserting this method is replacing
-  (overriding) a method already defined on the class or interface being
-  extended/implemented; the compiler rejects it if no such method
-  actually exists, catching typos in the method name/signature that
-  would otherwise silently create an unrelated new method instead.
+- **`@NonNull`** — an annotation (the general mechanism proven in Lesson
+  2c's `Reminder`/`Task` lab) asserting a parameter or return value must
+  never be `null`; checked by Android Studio's static analysis, not by
+  the compiler — unlike `@Override`, which really is compiler-checked,
+  `@NonNull` is only as effective as the tool voluntarily looking for
+  it, the exact distinction that lab proved.
 - **Strategy pattern** — packaging an algorithm (here, row arrangement)
   as its own swappable, independent object, rather than baking that
   logic directly into the class that uses it.
@@ -195,7 +203,7 @@ outer `InventoryAdapter` class supplies the three methods
 `RecyclerView.Adapter` requires plus a constructor and the data it
 wraps.
 
-### Mechanical Walkthrough
+### Mechanical Walkthrough (revised 07/28)
 
 - `class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder>`
   — split into two ideas: extending `RecyclerView.Adapter` is the
@@ -222,11 +230,14 @@ wraps.
   a clause: `this.itemNames` disambiguates the field from the parameter
   of the same name — `this.` explicitly means "the field on this
   object," not the parameter that's shadowing it.
-- `@NonNull` — **first appearance.** An annotation (same category as
-  `@Override`, different purpose): a documentation-and-
+- `@NonNull` — **first appearance of this specific annotation**, though
+  annotations themselves are reappearing (Lesson 2c's `Reminder`/`Task`
+  lab and the real `BadChild` compile error): a documentation-and-
   tooling hint that this parameter or return value must never be
-  `null`, checked by Android Studio's static analysis, not by the
-  compiler itself.
+  `null`, checked by Android Studio's static analysis — like `@Reminder`
+  in that lab, not like `@Override`, `@NonNull` gets no special
+  treatment from `javac` itself; passing `null` here would still compile
+  fine and only fail if Android Studio's lint happens to catch it.
 - `onCreateViewHolder(@NonNull ViewGroup parent, int viewType)` —
   **first appearance.** Called by `RecyclerView` only when it actually
   needs a *new* holder object — not once per data item, but only enough

@@ -25,6 +25,106 @@ near its own top pointing back to both.
 
 ---
 
+## 2026-07-28
+
+- **Lesson 8** — The user asked directly whether overloaded methods and
+  constructors, already in use since `println` in Lesson 1 and named in
+  this lesson, had ever actually been taught rather than just used. They
+  hadn't: "Java picks which one runs based on the arguments supplied at
+  the call site" had been asserted three times (`putExtra` here,
+  `Item(Parcel in)` here, `this(...)` delegation in Lesson 13) with no
+  isolated proof anywhere. Fixed with a new Concept Unit, `Overloading —
+  Same Method Name, Chosen at Compile Time`, positioned before this
+  lesson's first real use of it: a `Printer`/`OverloadDemo` lab (real
+  output verified this session) proving three overloads get selected
+  correctly, then a sharper second lab, `StaticTypeDemo`, proving the
+  more important and non-obvious fact — overload resolution uses a
+  variable's *declared* type, not what it actually holds at runtime.
+  Real compile error, this session: a variable declared `Object` but
+  holding a real `String` at runtime still gets rejected by `show(...)`,
+  because no overload accepts `Object` and the runtime value is never
+  consulted. This gave a clean opportunity to name the underlying CS
+  distinction directly — overload resolution is **static dispatch**
+  (compile-time, from declared types), while `Base`/`Child`'s overridden
+  `setup()` (Lesson 2c) is **dynamic dispatch** (runtime, from the
+  object's real type) — two different mechanisms this course had used
+  side by side without ever naming what separated them. The `putExtra`
+  and `Item(Parcel in)` walkthrough bullets now point back to this proof
+  instead of re-describing overloading from scratch.
+- **Lesson 2c** — The user pointed out that "Annotation" had been
+  described identically, shallowly, in three separate lessons
+  (2c's own `@Override` bullet, 6e's `@NonNull`, 18's `@LayoutRes`/
+  `@MainThread`) — always "metadata attached to code... read by the
+  compiler, an IDE's static analysis, or a framework" — without the
+  underlying mechanism ever once being proven: what actually makes an
+  annotation inert by default, and why `@Override` specifically gets
+  real compiler enforcement while the others don't. Fixed with a new
+  Concept Unit at true first appearance (before the existing `extends`
+  unit, since `@Override` is in this lesson's very first code block):
+  a `Reminder`/`Task` lab proving, with identical real output before
+  and after deleting the annotation, that a custom annotation changes
+  nothing about execution by itself — then a real compile error,
+  reusing the `Base`/`Child` files from the lesson's next unit
+  (`BadChild.java`, `@Override protected void setupp()`, a
+  deliberate typo), proving `@Override` specifically *is* a hardcoded
+  javac special case, not evidence of a general "annotations are
+  compiler-checked" rule. The three later, now-redundant "Annotation"
+  glossary entries in Lessons 6e and 18 were trimmed to point back
+  here per the Glossary Rule (a reappearing term doesn't get a second
+  full entry), rather than left as silent duplicates.
+- **Lesson 6e** — The user pointed out (correctly) that the `LayoutInflater`
+  walkthrough bullet named the class responsible for inflation without
+  ever explaining the actual mechanism — "the real class that does it"
+  described a responsibility, not a how, the same category of failure
+  as saying "microwaving heats food" and calling that an explanation of
+  microwaves. Fixed with a new Concept Unit, `LayoutInflater — What
+  "Inflate" Actually Does`, proving the real mechanism (runtime class
+  resolution by name via `Class.forName`, a required constructor shape
+  located via `getConstructor`, invoked via `newInstance`) with a
+  reflection lab, real output verified this session, then connected
+  explicitly to `LayoutInflater`'s own real, documented behavior
+  (verified against real AndroidX `Fragment` source this session via
+  `android.googlesource.com`, for the adjacent Parent Contract fact that
+  `Fragment` itself is not `abstract`). The same audit, widened at the
+  user's request to include core Java, not just Android framework,
+  found the identical failure shape in `ArrayList` — "a concrete,
+  resizable implementation of `List`" named its role, never its
+  mechanism. Fixed with a second new Concept Unit, `ArrayList — What
+  "Resizable" Actually Means`, proving the backing-array-and-copy
+  mechanism with a hand-built `GrowableIntArray`, real output verified
+  this session, cross-checked against a real `java.util.ArrayList`'s
+  actual backing array via reflection (`--add-opens java.base/java.util=ALL-UNNAMED`)
+  to confirm the `0 → 10 → 15` capacity curve matches the real class
+  exactly. Separately, added a real logging exercise proving
+  `RecyclerView` genuinely recycles `ViewHolder`s instead of just
+  asserting it (a 30-item list, `Log.d` in both `onCreateViewHolder`
+  and `onBindViewHolder`, real Logcat output showing creation calls stop
+  while bind calls continue) — the same class of gap, caught first,
+  before the wider LayoutInflater/ArrayList audit.
+- **Lesson 18 (new)** — Built following the same rubric this session
+  just finished stress-testing on Lesson 6e: every framework claim
+  either proven with real output or honestly flagged as unrunnable
+  outside a real Android emulator (matching the precedent already set
+  by Lessons 8, 12, 15, and 16 for `Parcelable`/`SQLiteOpenHelper`/
+  `ViewModel`/`LiveData`). Migrates the inventory screen's entire UI
+  into `InventoryListFragment`, hosted by a thin `InventoryActivity` —
+  adapted from `track/`'s own Lesson 18 to this course's actual
+  architecture (inline Add form from Lesson 9, no separate
+  `AddItemActivity`; the granular `notifyItemInserted`/`notifyItemRemoved`
+  Adapter from Lessons 9/11, not `track/`'s `setItems(...)` full-replace
+  version), not ported wholesale. The `Fragment` Parent Contract block
+  (not `abstract`, `onCreateView`'s real default body, the two real
+  constructors) is verified against real AndroidX source fetched this
+  session from `android.googlesource.com`, not written from memory.
+- **Structural pass across Lessons 1–17** — deleted a duplicate,
+  stale `Lesson 7 ... (Added).md` file left over from an unmerged
+  draft; fixed six cross-references still pointing at the pre-split
+  "Lesson 2"/"Lesson 6" (both later split into 2a–2e and 6a–6e) instead
+  of the specific sub-lesson that actually owns the concept; added five
+  missing glossary entries the project's own linter
+  (`scripts/check-narrative-lessons.mjs`) flagged as first-appearance
+  terms with no matching "Terms introduced in this lesson" entry.
+
 ## 2026-07-25
 
 - **Lesson 2c, Lesson 4** — The two "Observer pattern" fixes below (both

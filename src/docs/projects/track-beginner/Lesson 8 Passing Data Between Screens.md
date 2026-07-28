@@ -1,5 +1,16 @@
 # Lesson 8: Passing Data Between Screens — Intent Extras and Parcelable
 
+> **Revised 2026-07-28** — added a new "Overloading" Concept Unit
+> before the Intent-extras unit, proving method/constructor overload
+> resolution with a real lab and a real compile error (verified this
+> session), where it had previously only ever been named and described
+> ("Java picks which one runs based on the arguments"), never proven —
+> the same gap already fixed for Annotations (Lesson 2c), `LayoutInflater`
+> and `ArrayList` (Lesson 6e). The existing `putExtra` and
+> `Item(Parcel in)` walkthrough bullets now point back to this proof
+> instead of re-describing it. Full detail in `CHANGELOG.md` in this
+> folder.
+
 **What you will build:** Tapping a row in the inventory list opens a
 new `ItemDetailActivity` showing that specific item's full details.
 The transferable problem: you already know `Intent` as a way to ask the
@@ -9,6 +20,9 @@ doesn't even have easy access to a `Context` meant for navigation).
 Two separate problems, solved with two separate tools: a callback
 interface to report *which* item was tapped, and a way to actually
 carry an `Item` object across that same OS-mediated `Intent` boundary.
+Along the way, you'll also prove — with a real compile error — the
+exact mechanism `println` has silently used since Lesson 1: how Java
+picks which same-named method actually runs.
 
 **What you need to know first:** Lesson 4 (`Intent`, `startActivity`,
 declaring a new Activity in the Manifest, lambdas implementing
@@ -30,9 +44,20 @@ Lessons 6c and 6e (`InventoryAdapter`, `onBindViewHolder`, `ViewHolder`). Lesson
   — here, a newline.
 - **`implements`** — fulfills an interface's method contract, as
   opposed to `extends`, which inherits a base class's implementation.
+- **Method overloading** — multiple methods sharing one name on the
+  same class, distinguished only by their parameter types.
+- **Overload resolution** — the compiler's own process of picking which
+  overload a specific call actually means, decided once, at compile
+  time, from the types written in the source — never by inspecting
+  what a variable actually holds while the program runs.
+- **Static dispatch vs. dynamic dispatch** — overload resolution is
+  static dispatch (decided at compile time, from declared types);
+  `Base`/`Child`'s overridden `setup()` (Lesson 2c) is dynamic dispatch
+  (decided at runtime, from the object's real type) — two different
+  mechanisms that can both make "the right code runs here" true.
 - **Constructor overloading** — declaring more than one constructor for
-  the same class, distinguished by parameter list; Java picks which one
-  runs based on the arguments supplied at the call site.
+  the same class; the exact same overload-resolution mechanism as any
+  other method, applied to constructors.
 - **Single Responsibility Principle** — a class should have one job;
   giving `InventoryAdapter` navigation logic on top of its actual job
   (turning data into rows) would make it harder to reuse for a
@@ -288,6 +313,199 @@ behavior per screen later without touching this file again.
 
 ---
 
+## Concept Unit: Overloading — Same Method Name, Chosen at Compile Time
+
+### The Problem
+
+`System.out.println(...)` has been called in this project since
+Lesson 1 — with a `String`, with numbers built from `+` concatenation,
+with all sorts of different values — and it has always simply worked,
+with no explanation of *how* Java knew what to do with each different
+kind of value handed to the exact same method name. The next unit is
+about to lean on that same unexplained behavior directly, through a
+method called `putExtra`. Before trusting it further, prove what's
+actually happening.
+
+### Introduce the Concept in Isolation
+
+Create a folder for this lab (same convention as every lab so far).
+Inside it, create `Printer.java`:
+
+```java
+class Printer {
+    void show(int value) {
+        System.out.println("int version ran: " + value);
+    }
+
+    void show(String value) {
+        System.out.println("String version ran: " + value);
+    }
+
+    void show(double value) {
+        System.out.println("double version ran: " + value);
+    }
+}
+```
+
+Three methods, all named `show`, all on the same class — this compiles,
+which already proves something: Java does not treat this as three
+attempts to redefine the same method. Create `OverloadDemo.java`:
+
+```java
+public class OverloadDemo {
+    public static void main(String[] args) {
+        Printer printer = new Printer();
+        printer.show(5);
+        printer.show("hello");
+        printer.show(5.0);
+    }
+}
+```
+
+Compile and run:
+
+```
+javac Printer.java OverloadDemo.java
+java OverloadDemo
+```
+
+Real output, this session:
+
+```
+int version ran: 5
+String version ran: hello
+double version ran: 5.0
+```
+
+#### Execution Trace
+
+1. `printer.show(5)` — `5` is an `int` literal. At the point this line
+   is *compiled*, before the program ever runs, the compiler looks at
+   `5`'s type and picks the one `show` overload whose parameter type
+   matches — `show(int)` — and bakes that specific choice into the
+   compiled code. This is why the output says "int version ran."
+2. `printer.show("hello")` — `"hello"` is a `String` literal; the
+   compiler picks `show(String)` for the same reason, at the same
+   point, before the program runs.
+3. `printer.show(5.0)` — `5.0` is a `double` literal; the compiler
+   picks `show(double)`.
+
+Nothing about this trace involves the program actually *running* yet —
+every decision happened while `javac` was compiling `OverloadDemo.java`,
+which is the entire point about to be proven directly.
+
+### Discard This Version — Prove *When* the Choice Is Made
+
+Delete neither file yet. In the same folder, create one more file,
+`StaticTypeDemo.java`, that looks like it should obviously work:
+
+```java
+public class StaticTypeDemo {
+    public static void main(String[] args) {
+        Printer printer = new Printer();
+        Object mystery = "hello";
+        printer.show(mystery);
+    }
+}
+```
+
+`mystery` genuinely holds a `String` — `"hello"` — at the moment this
+runs. Try to compile it:
+
+```
+javac Printer.java StaticTypeDemo.java
+```
+
+Real compiler output, this session — this genuinely fails to compile:
+
+```
+StaticTypeDemo.java:5: error: no suitable method found for show(Object)
+        printer.show(mystery);
+               ^
+    method Printer.show(int) is not applicable
+      (argument mismatch; Object cannot be converted to int)
+    method Printer.show(String) is not applicable
+      (argument mismatch; Object cannot be converted to String)
+    method Printer.show(double) is not applicable
+      (argument mismatch; Object cannot be converted to double)
+1 error
+```
+
+This is the actual proof, not the execution trace alone: `mystery`
+holds a real `String` at runtime — if overload resolution looked at
+what's actually inside the variable when the program runs, `show(String)`
+would be the obvious match, the same way it was one paragraph ago.
+Instead, the compiler only ever looks at `mystery`'s **declared** type,
+`Object` — and rejects the call, at compile time, because no `show`
+overload accepts an `Object`, even though the value that variable
+happens to hold right now would fit one perfectly. Overload resolution
+is decided once, permanently, when the code is compiled, using only the
+types visible in the source — never by inspecting what a variable
+actually contains while the program runs.
+
+### Discard the Throwaway Example
+
+Delete `Printer.java`, `OverloadDemo.java`, and `StaticTypeDemo.java` —
+none of it appears in the project again. The real project uses this
+exact mechanism through `Intent.putExtra`, next, and later through
+`Item`'s own second constructor.
+
+### Mechanical Walkthrough
+
+- `void show(int value)`, `void show(String value)`, `void show(double value)`
+  — **first appearance of method overloading**: multiple methods
+  sharing one name on the same class, distinguished only by their
+  parameter types.
+- The three calls in `OverloadDemo.main` — **first appearance** of
+  overload resolution happening successfully, proven by the execution
+  trace above to be a compile-time decision, not a runtime one.
+- `printer.show(mystery)` failing to compile — **first appearance of a
+  failed overload resolution**, and the actual proof of *when* the
+  decision is made: rejected because of `mystery`'s declared type,
+  `Object`, with the real value it holds at runtime never even
+  consulted.
+
+### CS Lens
+
+**This is a hard concept — static dispatch versus dynamic dispatch —
+and it is worth contrasting directly with something this course has
+already proven, not just described in isolation.** Overload resolution
+(this unit) is **static dispatch**: which method body runs is decided
+once, at compile time, purely from the types written in the source.
+`Base`/`Child`'s own `run()` calling `setup()` (Lesson 2c) is **dynamic
+dispatch**: which override actually runs is decided at *runtime*, based
+on the real object's actual type, which is exactly why `Child`'s
+`setup()` ran even though `Base.run()`'s own source only ever mentions
+`setup()` once, with no way to read from that source alone which
+version would execute. Two genuinely different mechanisms, both
+producing "the right code runs for this specific case" — one decided
+by the compiler before the program exists as a running thing, the other
+decided by the object itself, live, while the program runs. Also
+recognized in: C++'s explicit split between function overloading
+(compile-time) and `virtual` methods (runtime) — the same two
+mechanisms, in a language that makes you opt into the second one by
+name — and Python/JavaScript having no real overloading at all (a
+later `def`/`function` with the same name simply replaces the earlier
+one, since neither language chooses between candidates by parameter
+type the way Java's compiler does here).
+
+### SE Lens
+
+**Why does Java offer overloading at all, instead of just requiring a
+different method name for each parameter type** (`showInt`, `showString`,
+`showDouble`)? Different names would work and would remove any need for
+this unit's own proof — but it pushes a naming burden onto every
+caller, who now has to remember which exact name matches which exact
+type, for something that's conceptually one operation ("show this
+value") repeated across a few different kinds of value. Overloading
+costs the reader a small amount of "which version actually runs here"
+uncertainty — exactly what this unit exists to remove — in exchange for
+one name to remember and call correctly regardless of which type is on
+hand, which is precisely why `System.out.println` itself has offered
+this same shape since the very first line of Java this course ever ran.
+
+---
+
 ## Concept Unit: Passing Primitive Extras — the Straightforward (but Fragile) Way
 
 ### The Problem
@@ -481,12 +699,12 @@ generic, and this Activity owns the specifics.
   lesson's next unit) a lambda doesn't have in the same way;
   qualifying which `this` is meant removes the ambiguity.
 - `intent.putExtra("EXTRA_NAME", item.getName())` and its two siblings
-  — **first appearance.** `putExtra` is overloaded (multiple versions
-  of the same method name, differing by parameter type — already
-  implicitly used any time you called `println` with different argument
-  types) — one version accepts a `String` value, another an `int`,
-  matched automatically based on what you pass. Each call attaches one
-  key-value pair to the `Intent`'s extras bundle.
+  — **first appearance of `putExtra` specifically**, though overloading
+  itself is reappearing — proven directly, this lesson's own
+  `Printer`/`OverloadDemo` lab: one version accepts a `String` value,
+  another an `int`, chosen at compile time from each call's own
+  argument types, the exact mechanism just proved, not merely asserted.
+  Each call attaches one key-value pair to the `Intent`'s extras bundle.
 - `startActivity(intent)` — reappearing.
 
 ### Run It
@@ -834,13 +1052,15 @@ here is reused.
   this lesson, just framework-defined), requiring specific methods this
   class must supply.
 - `protected Item(android.os.Parcel in)` — **first appearance of
-  constructor overloading**: a *second* constructor, same class name,
-  different parameter list (`Parcel` instead of the three original
-  fields) — Java picks which one runs based on the arguments supplied
-  at the call site, the same way `putExtra` earlier this lesson picks
-  between its `String`/`int` versions based on argument type. `Parcel`
-  is the framework's serialized-bytes container that actually crosses
-  the Intent boundary.
+  constructor overloading specifically**, applying this lesson's own
+  proven overload-resolution mechanism to constructors instead of
+  ordinary methods: a *second* constructor, same class name, different
+  parameter list (`Parcel` instead of the three original fields) —
+  chosen at compile time from the arguments at each `new Item(...)`
+  call site, the exact static-dispatch mechanism the
+  `Printer`/`OverloadDemo` lab proved, not a new rule for constructors.
+  `Parcel` is the framework's serialized-bytes container that actually
+  crosses the Intent boundary.
 - `in.readString()` / `in.readInt()` — **first appearance.** Reads
   values back out of the `Parcel`, in a fixed order.
 - `writeToParcel(Parcel dest, int flags)` — **first appearance,** the
@@ -1020,6 +1240,10 @@ Walkthrough. Restore the correct order afterward.
 
 - [ ] Tapping any inventory row opens `ItemDetailActivity` showing that
       row's real name, quantity, and location.
+- [ ] You ran the `Printer`/`OverloadDemo` lab and the `StaticTypeDemo`
+      compile error yourself, and can explain, in your own words, why
+      overload resolution uses a variable's declared type rather than
+      what it actually holds at runtime.
 - [ ] You ran the `InterfaceDemo` lab and can explain, in your own
       words, why `InventoryAdapter` needed a listener interface instead
       of calling `startActivity` itself.

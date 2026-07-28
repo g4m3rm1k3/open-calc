@@ -1,5 +1,15 @@
 # Lesson 2c: `extends AppCompatActivity` and the Methods You Never Call
 
+> **Revised 2026-07-28** — added a new "Annotations" Concept Unit
+> before the `extends`/Template Method one, with a real isolated lab
+> (`Reminder`/`Task`) proving annotations are inert metadata by default,
+> plus a real compile error proving `@Override` specifically is a
+> hardcoded exception `javac` itself checks. This closes a gap where
+> `@Override` had been described ("metadata attached to code") without
+> ever being mechanistically explained. The existing `@Override`
+> walkthrough bullet, below, now points back to this proof instead of
+> re-describing it — heading marked `(revised 07/28)`.
+>
 > **Revised 2026-07-25** — added the edge-to-edge insets Concept Unit,
 > including a real isolated lab (`TapCallback`/`Doorbell`/`Chime`) that
 > proves the Observer pattern by hand before it's ever named in real
@@ -34,11 +44,17 @@ point; this lesson explains what the OS does once it gets there).
 **Terms introduced in this lesson:**
 - **`extends`** — declares that a class inherits another class's fields
   and methods, plus whatever it adds or overrides itself.
-- **`@Override` / Annotation** — `@` marks an annotation, metadata
-  attached to code that tools and the compiler can read rather than
-  logic that runs; `@Override` specifically checks that a method really
-  does replace one from the parent class, turning a typo'd method name
-  into a compile error instead of a silent bug.
+- **Annotation** — `@`-prefixed metadata attached to a code declaration,
+  not executable code itself; inert by default, only meaningful if some
+  separate tool specifically looks for it.
+- **`@interface`** — the keyword pair that declares a brand-new
+  annotation type, as opposed to plain `interface`, which declares
+  method signatures to implement.
+- **`@Override`** — one of the small handful of annotations `javac`
+  itself has real, specific logic for: checks that a method really does
+  replace one from the parent class, turning a typo'd method name into
+  a compile error instead of a silent bug — a genuine exception to
+  "annotations do nothing on their own," not the general rule.
 - **`protected`** — an access modifier meaning callable by the class
   itself, its subclasses, and framework code in the same package.
 - **`super`** — refers to "the parent class's own version of this,"
@@ -81,6 +97,204 @@ point; this lesson explains what the OS does once it gets there).
   behind both patterns above: you hand control to a framework instead
   of writing a top-down script yourself ("don't call us, we'll call
   you").
+
+---
+
+## Concept Unit: Annotations — Metadata a Tool Reads, Not Code That Runs
+
+### The Problem
+
+`@Override` sits directly above `protected void onCreate(...)` in the
+very first real code this lesson is about to show. The `@` syntax has
+never appeared anywhere in this course before this line. It looks like
+it might be part of the method itself — is it? What actually happens
+when this code runs, because of that one line?
+
+### Introduce the Concept in Isolation
+
+Prove it with the smallest possible custom annotation, entirely outside
+Android — no framework needed to show what an annotation fundamentally
+is. Create a folder for this lab (same convention as every lab so far).
+Inside it, create `Reminder.java`:
+
+```java
+@interface Reminder {
+    String value();
+}
+```
+
+`@interface` — not plain `interface` — is the keyword pair that
+declares a brand-new **annotation type**, rather than a normal
+interface with methods to implement. `value()` declares one piece of
+text this annotation can carry, supplied in parentheses wherever the
+annotation is actually used.
+
+In the same folder, create `Task.java`:
+
+```java
+class Task {
+    @Reminder("double check totals before shipping")
+    void calculateTotal() {
+        System.out.println("Calculating total...");
+    }
+
+    void logStart() {
+        System.out.println("Starting...");
+    }
+}
+```
+
+`@Reminder("...")`, sitting directly above `calculateTotal()` with no
+semicolon of its own, is not a statement — it's metadata attached to
+the declaration immediately below it.
+
+Create `AnnotationDemo.java`:
+
+```java
+public class AnnotationDemo {
+    public static void main(String[] args) {
+        Task task = new Task();
+        task.calculateTotal();
+        task.logStart();
+    }
+}
+```
+
+Compile and run:
+
+```
+javac Reminder.java Task.java AnnotationDemo.java
+java AnnotationDemo
+```
+
+Real output, this session:
+
+```
+Calculating total...
+Starting...
+```
+
+Now delete `@Reminder("double check totals before shipping")` from
+`Task.java` entirely, leaving `calculateTotal()` with no annotation at
+all, and recompile and rerun:
+
+```
+javac Reminder.java Task.java AnnotationDemo.java
+java AnnotationDemo
+```
+
+Real output, this session:
+
+```
+Calculating total...
+Starting...
+```
+
+**Identical.** What this proves: `@Reminder` was never read by anything
+at runtime — the JVM ran both methods exactly the same way whether the
+annotation was there or not. An annotation, by itself, does absolutely
+nothing. It's a label sitting next to code, not code.
+
+### `@Override` Is a Real Exception, Not the Rule
+
+`@Reminder` was silently ignored by the compiler too — `javac` compiled
+`Task.java` without complaint whether the annotation was present or
+not. `@Override` behaves completely differently, and the difference is
+worth proving directly, reusing the `Base`/`Child` files this lesson's
+next unit is about to build anyway. Once you've created `Base.java` and
+`Child.java` in `pkgdemo2` (next unit), come back and add a third file
+in that same folder, `BadChild.java`:
+
+```java
+public class BadChild extends Base {
+    @Override
+    protected void setupp() {
+        System.out.println("Typo'd override");
+    }
+    public static void main(String[] args) {
+        BadChild c = new BadChild();
+        c.run();
+    }
+}
+```
+
+Compile it alone:
+
+```
+javac BadChild.java
+```
+
+Real compiler output, this session:
+
+```
+BadChild.java:2: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+1 error
+```
+
+`setupp()` (a typo of `setup()`) matches nothing declared on `Base` —
+and unlike `@Reminder`, which the compiler happily ignored, this fails
+to *compile at all*, with the error pointing at the `@Override` line
+itself. What this proves: `@Override` is not evidence that "the
+compiler checks annotations" as a general rule — it's evidence that
+`javac` has real, specific, hardcoded logic built in for this one exact
+annotation, by name, and nothing else. Delete `BadChild.java` once
+you've seen this — it won't appear in the project again.
+
+### Discard the Throwaway Example
+
+Delete `Reminder.java`, `Task.java`, and `AnnotationDemo.java` — none of
+it appears in the project again. (`BadChild.java`, above, gets deleted
+in place, right after you've seen its error.)
+
+### Mechanical Walkthrough
+
+- `@interface Reminder { String value(); }` — **first appearance of
+  declaring a custom annotation type.**
+- `@Reminder("double check totals before shipping")`, attached above
+  the `calculateTotal` method — **first appearance** of applying an
+  annotation to a real method declaration.
+- Removing `@Reminder(...)` and seeing identical output — **first
+  appearance of proving an annotation's default behavior**: inert unless
+  something specifically goes looking for it.
+- `@Override` inside `BadChild`, failing to compile — **reappearing**
+  (the exact syntax from this lesson's own first code block, seen here
+  isolated and deliberately broken) — proof that this one specific
+  annotation gets real, structural enforcement from `javac` itself, a
+  fundamentally different treatment than `@Reminder` just received.
+
+### CS Lens
+
+This is the general idea of **declarative metadata** — attaching
+descriptive information to code that some separate process *may* act
+on, without that information being executable itself. Also recognized
+in: Python decorators (though worth a precise contrast, not a loose
+one — a Python decorator is itself executable code that wraps and can
+replace the function beneath it, running every time that function is
+defined; a Java annotation like `@Reminder` never runs anything, ever,
+by itself), database column constraints like `NOT NULL` (metadata the
+database engine checks, not the stored data itself), and HTML
+`data-*` attributes (read by JavaScript that specifically looks for
+them, inert to the browser's own rendering otherwise).
+
+### SE Lens
+
+**If most annotations do nothing on their own, why does this project
+keep using them** (`@NonNull`, later in this course; `@LayoutRes` and
+`@MainThread`, later still)? Because "does nothing on its own" is
+exactly the source of their value, not a flaw: an annotation's real
+effect comes entirely from voluntary agreement between whoever writes
+it and whoever chooses to go looking for it. Android Studio's own
+static-analysis engine specifically knows to search for `@NonNull` and
+warn about a code path where a null value could reach it — the same
+voluntary, external-tool relationship `@Reminder` could have had, if
+this lab had bothered to write a reader for it. `@Override` is the rare
+exception precisely because the Java language itself, not just a
+convention, requires `javac` to check it specifically — which is why it
+alone produces a compile error instead of a tool's warning. Every other
+annotation this project ever writes is only ever as useful as whichever
+tool has actually been told to look for it.
 
 ---
 
@@ -258,20 +472,20 @@ setup work, inflate your screen's layout, and — if your template
 generated it — react to system bar insets) *plus* one visible proof
 that it ran: a log line you can watch appear in real time.
 
-### Mechanical Walkthrough (revised 07/25 — one bullet added)
+### Mechanical Walkthrough (revised 07/28 — `@Override` bullet updated)
 
 - `extends AppCompatActivity` — **reappearing**, same `extends` keyword
   from the `pkgdemo2` lab, now the framework version: `MainActivity` is
   an `AppCompatActivity`, plus whatever's different here, exactly like
   `Child` was a `Base`, plus whatever was different there.
-- `@Override` — **first appearance.** A compiler-checked annotation
-  (`@` marks it as an annotation — metadata attached to code that tools
-  and the compiler can read, rather than logic that runs; you'll meet
-  more annotations later): "I intend this method to replace a method of
-  the same name/signature in the parent class." Without it, a typo in
-  the method name (say, `onCreat`) would silently compile as a
-  brand-new unrelated method that the OS never calls — `@Override`
-  turns that mistake into a compile error instead of a silent bug.
+- `@Override` — **reappearing**, proven directly in this lesson's own
+  `Reminder`/`Task` lab and `BadChild` compile error, above: "I intend
+  this method to replace a method of the same name/signature in the
+  parent class," and unlike most annotations, `javac` itself has real,
+  specific logic checking that claim. Without it, a typo in the method
+  name (say, `onCreat`) would silently compile as a brand-new unrelated
+  method that the OS never calls — `@Override` turns that mistake into
+  a compile error instead of a silent bug.
 - `protected void onCreate(Bundle savedInstanceState)` — **`protected`
   reappearing** from the `pkgdemo2` lab's `setup()`, now explained
   concretely: `protected` means callable by the class itself, by
@@ -724,6 +938,12 @@ it turns this exact silent failure into an immediate compile error.
 
 ## Definition of Done
 
+- [ ] You ran the `Reminder`/`Task` annotation lab yourself, saw
+      identical output with the annotation present and removed, and can
+      explain why in your own words.
+- [ ] You triggered the real `BadChild` compile error on purpose and can
+      explain why `@Override` gets that treatment when `@Reminder`
+      didn't.
 - [ ] You saw your own `Log.d` line appear in Logcat, proving
       `onCreate` is called by the OS, not by you.
 - [ ] You ran the `pkgdemo2` Template Method lab and it matched your
