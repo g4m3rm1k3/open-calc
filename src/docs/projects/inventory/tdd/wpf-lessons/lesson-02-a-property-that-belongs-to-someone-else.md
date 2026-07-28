@@ -147,10 +147,15 @@ renders exactly as it did at the end of Lesson 1.
 No loop, recursion, or carried state in this unit — two static row
 declarations, nothing computed. Not applicable.
 
-### CS Lens / SE Lens
+### CS Lens
 
-Both covered in full in the linked concept file — this unit is the
-concept's first real application, not a new angle on it.
+Covered in full in the linked concept file — this unit is the concept's
+first real application, not a new angle on it.
+
+### SE Lens
+
+Covered in full in the linked concept file — this unit is the concept's
+first real application, not a new angle on it.
 
 ### Commands and Real Output
 
@@ -248,7 +253,11 @@ top, a plain, not-yet-wired button beneath it.
 
 No loop, recursion, or carried state — static placement. Not applicable.
 
-### CS Lens / SE Lens
+### CS Lens
+
+Covered in full in `../concepts/wpf-attached-properties.md`.
+
+### SE Lens
 
 Covered in full in `../concepts/wpf-attached-properties.md`.
 
@@ -346,7 +355,11 @@ depends on.
 
 Not applicable — no runtime behavior changes in this unit at all.
 
-### CS Lens / SE Lens
+### CS Lens
+
+Covered in full in the linked concept file.
+
+### SE Lens
 
 Covered in full in the linked concept file.
 

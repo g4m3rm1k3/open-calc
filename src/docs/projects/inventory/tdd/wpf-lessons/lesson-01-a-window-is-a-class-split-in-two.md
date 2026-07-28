@@ -125,6 +125,14 @@ thing, not "the same shape as something you've already seen."
 > **HorizontalAlignment / VerticalAlignment** — properties controlling
 > how an element positions itself within the space its parent gives it.
 
+> **XML attribute** — a `name="value"` pair written inside an element's
+> start tag (e.g. `Title="MainWindow"`), setting a real property on the
+> object that element constructs.
+
+> **Self-closing tag** — an XML element with no children, written as a
+> single tag ending in `/>` (e.g. `<TextBlock ... />`) instead of a
+> separate start and end tag with nothing between them.
+
 ## Concepts cataloged from this lesson
 
 Every concept this lesson introduces has its own isolated, runnable entry
@@ -189,9 +197,10 @@ Restoring C:\...\wpf-app\CncWpf\CncWpf.csproj:
   Restored C:\...\wpf-app\CncWpf\CncWpf.csproj (in 59 ms).
 Restore succeeded.
 ```
-"Restoring" is .NET's equivalent of `pip install`-ing a project's
-dependencies (covered properly once a real one is added — this template
-has none yet) — it runs automatically after `new`, without being asked.
+"Restoring" is .NET's step for downloading and preparing every package
+this project depends on (covered properly once a real one is added —
+this template has none yet) — it runs automatically after `new`,
+without being asked.
 
 ### Project Change
 
@@ -323,10 +332,21 @@ provable fact, not an assumption.
 ### Introduce the Concept in Isolation
 
 A tiny, disposable console app — not WPF, no XAML — proving the one
-mechanism this all rests on: `partial`.
+mechanism this all rests on: `partial`. Set it up for real, in a scratch
+folder outside `wpf-app/` entirely (full mechanics of doing this:
+`HOW-TO-RUN-EXAMPLES.md`):
+```
+dotnet new console -n Robot -o Robot
+cd Robot
+```
+Two files, both directly in this new `Robot` folder, next to the
+generated `Program.cs`: create a **new** file named `Robot.Body.cs` (the
+dot in that name is cosmetic, not a folder requirement — see the linked
+guide if that's not obvious), and **replace** `Program.cs`'s own
+generated contents with the second block below.
 
+`Robot.Body.cs` (new file):
 ```csharp
-// Robot.Body.cs
 partial class Robot
 {
     public string Name = "Rex";
@@ -338,8 +358,8 @@ partial class Robot
 }
 ```
 
+`Program.cs` (replacing the generated `Console.WriteLine("Hello, World!");`):
 ```csharp
-// Robot.Brain.cs
 partial class Robot
 {
     public void Think()
@@ -367,7 +387,7 @@ Rex says hi from Brain.cs
 
 **What this proves:** two separate `.cs` files, each declaring `partial
 class Robot`, are really the *same* class — `Think()` (defined in
-`Robot.Brain.cs`) reads `Name` (defined in `Robot.Body.cs`) with no
+`Program.cs`) reads `Name` (defined in `Robot.Body.cs`) with no
 error, no import, no reference between the two files at all. Without
 `partial` on both, this would be a compile error ("Robot" defined twice).
 `partial` is a real keyword telling the compiler "don't complain that
@@ -379,8 +399,9 @@ magic.
 
 ### Discard
 
-`Robot`/`Body.cs`/`Brain.cs` are deleted now. They exist only to prove
-`partial` — they will not appear in the real project.
+Delete the whole `Robot` folder created above — `Robot.Body.cs` and this
+version of `Program.cs` exist only to prove `partial`; they will not
+appear in the real `wpf-app/CncWpf` project.
 
 ### Project Change
 
@@ -626,9 +647,7 @@ file or explaining what generates code from it.
 
 ### CS Lens
 
-This is the same **declarative vs. imperative** distinction the main
-track's own `declarative-vs-imperative-queries.md` already names for SQL
-vs. hand-rolled loops, reapplied to UI construction: XAML states *what*
+This is a **declarative vs. imperative** distinction: XAML states *what*
 the object tree should look like; the generated code it compiles into
 is the *how* (a real sequence of `new Grid(); this.Content = grid; ...`
 calls), same as a SQL query states *what* rows to return while a query
@@ -784,8 +803,8 @@ One concrete trip through everything built in this lesson:
 2. That generated partial merges with the hand-read
    `public partial class MainWindow : Window { public MainWindow() {
    InitializeComponent(); } }` from `MainWindow.xaml.cs` — the exact
-   `partial` mechanism proven with `Robot`/`Body.cs`/`Brain.cs` at the
-   start of this lesson, now doing real work: one class, two files,
+   `partial` mechanism proven with `Robot`/`Robot.Body.cs`/`Program.cs`
+   at the start of this lesson, now doing real work: one class, two files,
    merged by the compiler before either half is treated as complete.
 3. `dotnet run` starts the compiled `CncWpf.exe`. `App.xaml`'s own
    `StartupUri="MainWindow.xaml"` fires automatically, constructing a

@@ -78,6 +78,26 @@ what breaks actually broken and captured. This is not a draft-then-revise
 process — get each lesson right on the first pass where possible; time
 spent rewriting a lesson is time not spent learning the next thing.
 
+## Run the checkers before considering a lesson/concept file done
+
+Two scripts, same spirit as `track-beginner/CURRICULUM_NOTES.md`'s own
+rule ("run it before considering a lesson-schema compliance question
+closed; don't hand-audit from memory") — every category below was found
+by hand, more than once, before the check for it existed:
+
+```
+node scripts/check-narrative-lessons.mjs src/docs/projects/inventory/tdd/wpf-lessons
+node scripts/check-wpf-concepts.mjs
+```
+The first checks lesson-file structure (Concept Unit steps, glossary
+coverage, execution traces) — shared with `track-beginner`/
+`pocket-inventory-wpf`. The second is specific to this track: concept
+file structure (`../concepts/*.md`'s own required sections), whether
+every code fence in a concept's "Isolated Example" states which file it
+goes in, and a banned-phrase check for the exact "assumes `../lessons/`
+or Python" violations this README's own "What's assumed known" section
+exists because of.
+
 ## Format: `src/docs/reference/LESSON SCHEMA.md`
 
 Lessons in this track follow that schema (the mechanical, step-by-step

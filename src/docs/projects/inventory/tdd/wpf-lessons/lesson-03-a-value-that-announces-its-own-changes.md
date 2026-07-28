@@ -211,9 +211,13 @@ verification harness.)
    fluke; a real, plain property change *never* reaches a binding on its
    own, no matter how many times it happens.
 
-### CS Lens / SE Lens
+### CS Lens
 
-Both covered in full in `../concepts/wpf-data-binding-and-datacontext.md`.
+Covered in full in `../concepts/wpf-data-binding-and-datacontext.md`.
+
+### SE Lens
+
+Covered in full in `../concepts/wpf-data-binding-and-datacontext.md`.
 
 ### Commands and Real Output
 
@@ -410,9 +414,13 @@ neither exists in the file shown above.)
    this trace actually proves: one write, two listeners, zero code
    naming either listener.
 
-### CS Lens / SE Lens
+### CS Lens
 
-Both covered in full in `../concepts/csharp-inotifypropertychanged.md`.
+Covered in full in `../concepts/csharp-inotifypropertychanged.md`.
+
+### SE Lens
+
+Covered in full in `../concepts/csharp-inotifypropertychanged.md`.
 
 ### Commands and Real Output
 

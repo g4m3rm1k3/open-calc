@@ -123,8 +123,15 @@ const REQUIRED_CLOSING_HEADINGS = [
   'Definition of Done',
 ]
 
+const NON_LESSON_FILENAMES = new Set([
+  'CHANGELOG.MD',
+  'README.MD',
+  'CURRICULUM_NOTES.MD',
+  'HOW-TO-RUN-EXAMPLES.MD',
+])
+
 function isMarkdownFile(name) {
-  return name.toLowerCase().endsWith('.md') && name.toUpperCase() !== 'CHANGELOG.MD' && name.toUpperCase() !== 'README.MD' && name.toUpperCase() !== 'CURRICULUM_NOTES.MD'
+  return name.toLowerCase().endsWith('.md') && !NON_LESSON_FILENAMES.has(name.toUpperCase())
 }
 
 function findLessonFiles(folder) {
@@ -554,7 +561,20 @@ function checkHeadingCaseDrift(fileLabel, text, issues) {
 // the safe direction for a heuristic like this — it won't false-flag a
 // term that was never claimed in the checked shape to begin with.
 const FIRST_APPEARANCE_RE = /`([^`\n]{1,60})`\s*—\s*\*\*first appearance/gi
-const GLOSSARY_LABEL_RE = /^\*\*Terms introduced in this lesson[:.]?\*\*/im
+// Also catches a term named in **bold** rather than backticks, immediately
+// followed by its own first-appearance marker — e.g. "is a **self-closing
+// tag** — **(a) first appearance**". Found missing entirely: two terms in
+// wpf-lessons Lesson 1 used exactly this shape and were invisible to the
+// backtick-only regex above, so both silently shipped with no glossary
+// entry until caught by hand.
+const BOLD_FIRST_APPEARANCE_RE = /\*\*([A-Za-z][A-Za-z0-9 /()'-]{1,50}?)\*\*\s*—\s*\*\*\(?a?\)?\s*first appearance/gi
+// Two valid label conventions coexist in this corpus: track-beginner /
+// pocket-inventory-wpf use a bold run-in phrase; wpf-lessons uses a real
+// `##` heading with blockquote (`>`) entries — the exact shape
+// LESSON_CONTRACT.md's own worked example shows. Neither is "the" correct
+// one; match both rather than false-flagging whichever wasn't the original
+// template.
+const GLOSSARY_LABEL_RE = /^(?:\*\*Terms introduced in this lesson[:.]?\*\*|#{1,3}\s+Terms introduced in this lesson\b)/im
 
 function extractGlossarySection(text) {
   const labelMatch = GLOSSARY_LABEL_RE.exec(text)
@@ -571,8 +591,11 @@ function extractGlossarySection(text) {
 // — the placeholder name, e.g. `T` in `class Box<T>`" contains "Box<T>",
 // but the bolded name "Type parameter" alone does not). Matching only
 // against bolded names would miss most real coverage that already exists.
+// Entries are either `- **Term** — def` (list bullet) or `> **Term** — def`
+// (blockquote) — same "match both conventions" reasoning as the label regex
+// above.
 function extractGlossaryEntryBlobs(glossaryText) {
-  const items = glossaryText.split(/\n(?=\s*[-*]\s)/).filter((s) => /^\s*[-*]\s/.test(s))
+  const items = glossaryText.split(/\n(?=\s*[-*>]\s)/).filter((s) => /^\s*[-*>]\s/.test(s))
   return items.map((item) => normalizeTerm(item))
 }
 
@@ -652,6 +675,10 @@ function checkGlossary(fileLabel, text, issues) {
   let m
   const re = new RegExp(FIRST_APPEARANCE_RE.source, FIRST_APPEARANCE_RE.flags)
   while ((m = re.exec(text))) {
+    firstAppearanceTerms.add(m[1].trim())
+  }
+  const boldRe = new RegExp(BOLD_FIRST_APPEARANCE_RE.source, BOLD_FIRST_APPEARANCE_RE.flags)
+  while ((m = boldRe.exec(text))) {
     firstAppearanceTerms.add(m[1].trim())
   }
   const unbolded = text.match(UNBOLDED_FIRST_APPEARANCE_RE) || []
