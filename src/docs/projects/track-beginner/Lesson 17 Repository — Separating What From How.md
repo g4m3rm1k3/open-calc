@@ -214,7 +214,11 @@ class is shown above.
   limitation named there, now the caller's job to handle one layer up.
 - `loadItemsFromDatabase()`'s entire body, `addItem`'s `ContentValues`
   construction, and `deleteItem`'s clause — all reappearing (Lessons
-  12–14), unchanged in substance, only in which file they live in.
+  12–14), unchanged in substance, only in which file they live in. Both
+  methods' own `item` parameter is also reappearing (effectively final
+  lambda capture, Lesson 9): each method's own `dbExecutor.execute(() -> ...)`
+  lambda reads `item` without ever reassigning it, the same rule that
+  let Lesson 14's insert/delete lambdas read `values`/`removedItem`.
 - `public void shutdown()` — **first appearance.** A plain method, not
   an override of anything — `InventoryRepository` is not a `ViewModel`
   and has no `onCleared()` of its own to override; whoever owns an

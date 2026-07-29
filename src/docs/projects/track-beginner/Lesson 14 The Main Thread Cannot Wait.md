@@ -812,7 +812,11 @@ it runs, and *when* its result reaches the screen, are different.
   `runOnUiThread`, unlike the load above — because neither `insert` nor
   `delete` touches a `View` or an adapter method at all; they only write
   to the database file itself. The next unit proves exactly why the
-  load needed that extra wrapping and these two do not.
+  load needed that extra wrapping and these two do not. Both lambdas
+  also reappear (Lesson 9's own effectively final lambda capture): the
+  insert lambda reads `values`, and the delete lambda reads
+  `removedItem`, neither ever reassigned after being built, which is
+  exactly what makes both legal to read from inside a lambda body.
 
 ---
 

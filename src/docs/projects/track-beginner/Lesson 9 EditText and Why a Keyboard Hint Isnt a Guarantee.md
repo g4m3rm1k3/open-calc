@@ -51,6 +51,10 @@ five hardcoded seed items, the click-lambda that opens
   in-place-editable character sequence, not a `String` directly.
 - **`String.isEmpty()`** — returns whether a string has zero
   characters.
+- **`final` on a local variable / effectively final lambda capture** —
+  a lambda can only read a local variable from its enclosing method if
+  that variable is `final` or effectively final (never reassigned after
+  its first value); otherwise it fails to compile.
 
 ---
 
@@ -706,13 +710,15 @@ the form.
 ### Mechanical Walkthrough
 
 - `final InventoryAdapter adapter = new InventoryAdapter(...)` — **first
-  appearance of `final` on a local variable in this project.** Needed
-  here for a real reason, not just habit: `addItemButton`'s lambda,
-  defined later in the same method, reads `adapter` — a lambda can only
-  capture a local variable that's `final` or effectively final (never
-  reassigned after its first value), and without holding a reference at
-  all there'd be no way to call `addItem` on this specific adapter
-  later.
+  appearance of `final` on a local variable, and of effectively final
+  lambda capture.** Needed here for a real reason, not just habit:
+  `addItemButton`'s lambda, defined later in the same method, reads
+  `adapter` — a lambda can only capture a local variable that's `final`
+  or **effectively final** (a variable never reassigned after its first
+  value — legal to capture even without the `final` keyword written
+  explicitly, as long as no code path ever assigns it a second time),
+  and without holding a reference at all there'd be no way to call
+  `addItem` on this specific adapter later.
 - `nameInput.getText().toString().trim()` — **first appearance of
   `EditText.getText()`.** Returns an `Editable`, not a `String` directly
   — a mutable, in-place-editable character sequence Android uses
