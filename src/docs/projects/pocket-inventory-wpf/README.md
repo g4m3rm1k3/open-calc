@@ -73,18 +73,32 @@ this specific project:
   reason: you can't understand what an ORM is hiding from you until you've
   done the thing it hides by hand at least once.
 
-## Before Lesson 1: What You Already Know
+## Before Lesson 0a: What You Already Know
 
-You know Python. That gives you real, transferable understanding of what a
-variable, a function, a loop, and a conditional *are for* — that transfers.
-It does **not** give you C#'s syntax, C#'s type system, or WPF's execution
-model, and this curriculum never assumes it does. Every lesson that touches a
-construct with a "Python cousin" (`var` vs. Python's untyped assignment, a C#
-`class` vs. a Python class, `foreach` vs. `for x in y`) says so explicitly and
-still gives it a full concept lab — per `LESSON_CONTRACT.md`'s own rule:
-*"familiar-sounding is a trap, not a reason to skip the lab."*
+> **Revised 2026-07-29** — see `CURRICULUM_NOTES.md`. The floor below
+> used to read "you know Python well," which in practice meant OOP
+> vocabulary (`class`, `object`, `constructor`, `: BaseClass`
+> inheritance) got used starting in Lesson 0 without ever being taught
+> — nobody had actually verified the reader knew it. The corrected floor
+> is deliberately narrower.
 
-Lesson 0 assumes nothing else. No prior C#. No prior WPF. No prior XAML.
+Basic Python only: functions, data types, loops, `list`, `dict`. That
+gives you real, transferable understanding of what these *are for* —
+that transfers. It does **not** give you C#'s syntax, C#'s type system,
+or WPF's execution model, and this curriculum never assumes it does.
+**It also does not include OOP** — `class`, `object`, `constructor`,
+inheritance are first appearances here, the same as if you'd never
+written a class in any language, and get real, from-scratch treatment
+in [Lesson 0a](Lesson-00-a-classes-objects-and-inheritance.md), read
+*before* Lesson 0 for exactly this reason. Every lesson that touches a
+construct with a "Python cousin" (`var` vs. Python's untyped assignment,
+`foreach` vs. `for x in y`, `Dictionary<K,V>` vs. `dict`) says so
+explicitly and still gives it a full concept lab — per
+`LESSON_CONTRACT.md`'s own rule: *"familiar-sounding is a trap, not a
+reason to skip the lab."*
+
+Lesson 0a assumes nothing else. No prior C#. No prior WPF. No prior
+XAML. No prior OOP, in any language.
 
 ## How the Lessons Are Ordered
 
@@ -123,6 +137,22 @@ each fixing a real problem:
    project could teach foreign keys, `JOIN`, and one-to-many relationships —
    the single most transferable relational-database idea there is. Epic 6
    builds a real `Suppliers` table instead.
+
+## Prepended Concept Lessons (`Lesson-NN-a-...`)
+
+Added 2026-07-29, ongoing: wherever a lesson uses a C#/.NET construct
+without ever teaching it — found by auditing the whole course against
+the corrected "no OOP, no C#, no WPF" floor above — the fix is a short,
+standalone lesson **inserted before** the lesson that first needs it,
+not a rewrite of the lesson itself. Existing lessons stay as committed;
+a prepended lesson closes the gap in front of them. Three exist so far:
+
+- [Lesson 0a — Classes, Objects, Constructors, and Inheritance](Lesson-00-a-classes-objects-and-inheritance.md) — before Lesson 0, which uses `class`/`instance`/`constructor` on its very first page.
+- [Lesson 1a — `static`, `readonly`, `Dictionary<K,V>`, and Safe Lookups](Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md) — before Lesson 2, whose attached-property lab bundles five unlabeled constructs into one line.
+- [Lesson 5a — `enum`](Lesson-05-a-enum-a-closed-set-of-named-values.md) — before Lesson 6, which uses an enum-backed property six lessons before `enum` otherwise gets its own lab (Lesson 12, which now points back here instead of re-teaching it).
+
+More get added as they're found reading forward — this list grows, not
+all at once.
 
 ## Lesson 0 — Developer Environment
 
@@ -325,10 +355,20 @@ written before all fifty lessons are, the same way every other project in
 this curriculum (`cam/`, `PDM/`, `track/`) was built a handful of lessons at
 a time rather than all at once. Written so far:
 
+- [x] [Lesson 0a — Classes, Objects, Constructors, and Inheritance](Lesson-00-a-classes-objects-and-inheritance.md) *(prepended 2026-07-29)*
 - [x] [Lesson 0 — Developer Environment](Lesson-00-developer-environment.md)
 - [x] [Lesson 1 — Your First WPF Window](Lesson-01-your-first-wpf-window.md)
+- [x] [Lesson 1a — `static`, `readonly`, `Dictionary<K,V>`, and Safe Lookups](Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md) *(prepended 2026-07-29)*
 - [x] [Lesson 2 — Grid and the Visual Tree](Lesson-02-grid-and-the-visual-tree.md)
 - [x] [Lesson 3 — Frame/Page Navigation](Lesson-03-frame-page-navigation.md)
 - [x] [Lesson 4 — The Navigation Stack](Lesson-04-the-navigation-stack.md)
 - [x] [Lesson 5 — Styles and Resource Dictionaries](Lesson-05-styles-and-resource-dictionaries.md)
-- [ ] Lessons 6–50 — write on request, in order
+- [x] [Lesson 5a — `enum`](Lesson-05-a-enum-a-closed-set-of-named-values.md) *(prepended 2026-07-29)*
+- [x] [Lesson 6 — Fields, Classes, and List](Lesson-06-fields-classes-and-list.md)
+- [x] [Lesson 7 — `INotifyPropertyChanged` and `ObservableCollection`](Lesson-07-inotifypropertychanged-observablecollection.md)
+- [x] [Lesson 8 — `SelectedItem` and Two-Way Binding](Lesson-08-selecteditem-and-two-way-binding.md)
+- [x] [Lesson 9 — SQLite and `Microsoft.Data.Sqlite`](Lesson-09-sqlite-and-microsoft-data-sqlite.md)
+- [x] [Lesson 10 — Reading Rows Back Into Objects](Lesson-10-reading-rows-back-into-objects.md)
+- [x] [Lesson 11 — Validation at a Boundary](Lesson-11-validation-at-a-boundary.md)
+- [x] [Lesson 12 — Enums and `ComboBox`](Lesson-12-enums-and-combobox.md)
+- [ ] Lessons 13–50 — write on request, in order

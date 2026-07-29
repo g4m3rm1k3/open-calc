@@ -281,14 +281,27 @@ ordinary C# object memory is normally reclaimed.
 
 Why does `Microsoft.Data.Sqlite` require you to build and manage a raw
 connection string, open it explicitly, and dispose of it explicitly,
-instead of hiding all of that behind something friendlier? Because this
-project's stated approach (see `CURRICULUM_NOTES.md`) is raw ADO.NET
-before any ORM, deliberately: an ORM like Entity Framework would hide
-every one of these steps behind method calls that look almost like
-working with plain C# objects — genuinely convenient, and genuinely
-hiding real mechanics (a real connection, opened and closed, against a
-real file) worth understanding at least once before trusting a tool to
-manage them invisibly.
+instead of hiding all of that behind something friendlier? Because
+`Microsoft.Data.Sqlite` is an **ADO.NET** provider — ADO.NET (**A**ctive**X**
+**D**ata **O**bjects .NET; the name is a legacy carryover from ActiveX
+Data Objects, an older, pre-.NET Microsoft data-access technology, with
+`.NET` appended for its .NET-era successor) is .NET's own standard,
+low-level API for talking to a
+database directly: real connections, real commands, real result rows,
+with nothing translating them into C# objects automatically. Every
+database library this project could have chosen — SQL Server's, MySQL's,
+PostgreSQL's — implements this same ADO.NET shape
+(`*Connection`/`*Command`/`*Reader`, `Open()`/`ExecuteNonQuery()`/
+`ExecuteReader()`), which is *why* the specific steps in this lesson
+transfer directly to any other ADO.NET provider, not just SQLite's own.
+This project's stated approach (see `CURRICULUM_NOTES.md`) is raw
+ADO.NET before any ORM, deliberately: an ORM like Entity Framework is
+built *on top of* ADO.NET, and would hide every one of these steps
+behind method calls that look almost like working with plain C#
+objects — genuinely convenient, and genuinely hiding real mechanics (a
+real connection, opened and closed, against a real file) worth
+understanding at least once before trusting a tool to manage them
+invisibly.
 
 ### Connection
 

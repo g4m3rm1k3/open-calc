@@ -316,11 +316,14 @@ invalid, with no custom drawing code written for it.
 
 ### The Contract You're Implementing
 
-`IDataErrorInfo` means fitting `InventoryItem` into a shape .NET itself
-already declared — worth reading that real shape before writing
-`InventoryItem`'s implementation of it. From `System.ComponentModel`
-itself, not this project's code (verified against the real interface,
-this session):
+`IDataErrorInfo` is another **interface** — the same contract-with-no-
+implementation-of-its-own idea `INotifyPropertyChanged` already proved
+in Lesson 7 (a class implementing it makes a narrow promise about
+specific required members, without *becoming a kind of* anything the
+way `: Window`/`: Page` inheritance does). This one's real shape is
+different, and worth reading before writing `InventoryItem`'s
+implementation of it. From `System.ComponentModel` itself, not this
+project's code (verified against the real interface, this session):
 
 ```csharp
 public interface IDataErrorInfo

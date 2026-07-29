@@ -36,15 +36,8 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
   column, here), with an explicit, matching rule for converting it
   back — every persistence boundary needs this pair of operations for
   any type that isn't already a native column type.
-- **`enum`** (e.g. `enum Season { Spring, Summer, Fall, Winter }`) —
-  declares a brand-new type whose only legal values are a fixed, named
-  set of members (`Season.Fall`, qualified by the enum's name),
-  enforced by the compiler everywhere it's used.
-- **`Enum.GetValues(typeof(T))`** — a `static` method returning every
-  member of a given enum type, in declared order.
-- **Casting an enum to `int`** (e.g. `(int)current`) — every enum
-  member is secretly an integer underneath, assigned in declared order
-  starting at `0`.
+- **`enum`, `Enum.GetValues`, casting an enum to `int`** — reappearing;
+  full treatment in `Lesson-05-a-enum-a-closed-set-of-named-values.md`.
 - **`Array`** — the general, non-generic collection type
   `Enum.GetValues` returns (predates generics in .NET's history).
 - **`ComboBox`** — a dropdown control restricted to choosing one item
@@ -61,7 +54,12 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
 
 ---
 
-## Concept Unit: `enum` — Declaring a Closed Set of Named Values
+## Concept Unit: `enum` — Applying What Lesson 05a Already Proved
+
+*(Hard concept reappearing — full isolated lab, execution trace, and
+both lenses: `Lesson-05-a-enum-a-closed-set-of-named-values.md`. Not
+re-derived here; this unit goes straight to the real, project-specific
+application.)*
 
 ### The Problem
 
@@ -70,150 +68,34 @@ almost anything. A category is different: this project only ever wants
 to recognize a handful of specific categories, decided ahead of time —
 storing that as a `string` would let the exact same real-world
 category get spelled a dozen different, incompatible ways across a
-growing inventory, with nothing in the type system stopping it.
-
-### Introduce the Concept in Isolation
-
-```bash
-dotnet new console -o lab-enum
-cd lab-enum
-```
-
-Replace `Program.cs`:
-
-```csharp
-Season current = Season.Fall;
-Console.WriteLine(current);
-Console.WriteLine((int)current);
-Console.WriteLine(current == Season.Fall);
-
-Console.WriteLine("---");
-
-foreach (Season season in Enum.GetValues(typeof(Season)))
-{
-    Console.WriteLine(season);
-}
-
-enum Season
-{
-    Spring,
-    Summer,
-    Fall,
-    Winter
-}
-```
-
-(The `enum` declaration has to come *after* the executable statements
-in this file, not before — the top-level-statements rule:
-executable code always comes first, type declarations after, in a
-top-level-statements `Program.cs`.)
-
-Run it:
-
-```bash
-dotnet run
-```
-
-Real output:
-
-```text
-Fall
-2
-True
----
-Spring
-Summer
-Fall
-Winter
-```
-
-#### Execution Trace
-
-`Enum.GetValues` returns every member in declared order — the `foreach`
-below `"---"` just walks that list, one member at a time:
-
-1. `season = Spring` — the first element `Enum.GetValues` returns,
-   because `Spring` is declared first in the enum definition and this
-   method walks members in declared order — prints `Spring`.
-2. `season = Summer` — the `foreach` advances to the next member in
-   declared order, since `Summer` was declared immediately after
-   `Spring` — prints `Summer`.
-3. `season = Fall` — advances to the third declared member, because
-   `Fall` was declared immediately after `Summer` — prints `Fall`.
-4. `season = Winter` — reaches the last declared member, and the loop
-   ends afterward because `Enum.GetValues` returned exactly four
-   elements — prints `Winter`.
-
-*What this proves:* `enum Season { Spring, Summer, Fall, Winter }`
-declares a brand-new **type**, `Season`, whose only legal values are
-exactly those four named members — nothing else is a `Season`, ever,
-and the compiler enforces this at every point a `Season` is used, the
-identical static-typing guarantee already established, now applied to "one of
-a fixed list" instead of "a number" or "a string." `Season.Fall` refers
-to one specific member, qualified by its enum's name, the same
-`Type.Member` shape as `Math.PI` or any `static` member access already
-familiar from earlier lessons. `Console.WriteLine(current)` printed
-`Fall` — the literal member name — not a number, even though
-`(int)current` proves every member secretly *is* an integer underneath
-(`Spring`=0, `Summer`=1, `Fall`=2, `Winter`=3, assigned in declared
-order, starting at 0, unless overridden — not needed in this project).
-`current == Season.Fall` compares two enum values the same way any
-value is compared, returning `True`. `Enum.GetValues(typeof(Season))`
-is a `static` method that returns every member of a given enum type, in
-declared order, as a collection you can loop over with `foreach` —
-this exact call is what feeds a WPF dropdown every valid
-choice automatically, in this lesson's next unit, instead of
-hand-typing each option twice.
-
-### Discard the Throwaway Example
-
-Delete the `lab-enum` folder. `Season` never appears again — the real
-project's enum, `Category`, is built next, in the exact same shape.
+growing inventory, with nothing in the type system stopping it. Lesson
+05a already proved `enum` is the fix, using a throwaway `Season`; here
+it's applied for real, as `InventoryItem.Category`.
 
 ### Mechanical Walkthrough
 
-- `enum Season { Spring, Summer, Fall, Winter }` — **first appearance.**
-  Declares a brand-new type whose only legal values are exactly those
-  four named members — enforced by the compiler everywhere `Season` is
-  used.
-- `Season.Fall` — **first appearance.** One specific member, qualified
-  by its enum's name — the same `Type.Member` shape as `Math.PI`.
-- `(int)current` — **first appearance of casting an enum.** Every
-  member secretly *is* an integer underneath, assigned in declared
-  order starting at `0`.
-- `current == Season.Fall` — **reappearing** (`==`, already-basic),
-  now comparing two enum values.
-- `Enum.GetValues(typeof(Season))` — **first appearance.** A `static`
-  method returning every member of a given enum type, in declared
-  order, as a collection `foreach` can walk.
+The real `Category` enum this project builds, next unit, uses the exact
+same shape Lesson 05a's `Season` already proved — a fixed member list,
+`Type.Member` access, an implicit `int` underneath each member, and
+`Enum.GetValues` returning every member in declared order (the
+mechanism that feeds a `ComboBox` every valid choice automatically,
+next unit, instead of hand-typing each option twice). Nothing about
+applying it to `Category` instead of `Season` changes any of that
+mechanism — only the member names and what they represent.
 
 ### CS Lens
 
-An `enum` is a concrete instance of a **finite, named set** — the type
-system expressing "exactly these values, nothing else" instead of
-relying on a comment or a naming convention to say so. Also recognized
-in: Python's `enum.Enum` class (the direct equivalent, though Python's
-version is opt-in — nothing stops a Python programmer from using a
-bare string instead, where C#'s `enum` is a real, separate type the
-compiler checks); TypeScript's `enum` keyword; HTML's `<select>`
-options, which are exactly this idea expressed as markup instead of
-code; and this project's own sibling Android curriculum, which reaches
-the identical "closed set enforced by the compiler" idea one lesson
-later, there.
+Covered in full in `Lesson-05-a-enum-a-closed-set-of-named-values.md`.
 
 ### SE Lens
 
-Why not just validate a `string` category against an allowed list at
-the point it's saved, the same way `Name` was validated earlier? Because
-that validation would have to be repeated, correctly, at every single
-place a category is written — the Add form today, an Edit form later,
-a CSV import in Lesson 35 — and any one of those call sites forgetting
-the check reintroduces exactly the typo problem this lesson exists to
-prevent. An `enum` moves the guarantee into the type itself: there is
-no code path anywhere in this program, now or in any future lesson,
-capable of producing an `InventoryItem` whose category isn't one of
-the five real values — not because every call site remembered to
-check, but because an invalid one literally cannot compile.
+Covered in full in `Lesson-05-a-enum-a-closed-set-of-named-values.md` —
+this project's own reason for choosing `enum` over a validated `string`
+for `Category` specifically: that validation would have to be repeated,
+correctly, at every single place a category is written — the Add form
+today, an Edit form later, a CSV import in Lesson 35 — and any one call
+site forgetting the check reintroduces exactly the typo problem `enum`
+exists to prevent.
 
 ---
 

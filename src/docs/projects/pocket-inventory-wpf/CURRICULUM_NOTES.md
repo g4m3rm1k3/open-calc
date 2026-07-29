@@ -22,8 +22,28 @@ C#/WPF concept gets taught exactly once, at the lesson that first needs it —
 and the lesson sequence itself becomes the reference afterward, instead of
 five unrelated homework folders that each shallowly repeat the basics.
 
-The student knows Python well. They have done nothing in C#/.NET before this
-project. Dev machine is Windows, mouse-shared with a Mac — WPF only
+> **Revised — the floor below was wrong and caused real damage.**
+> "Knows Python well" was read as license to explain C#/WPF concepts
+> primarily by Python comparison, and to treat OOP vocabulary (class,
+> object, instance, constructor, method, inheritance) as already known
+> because "the student knows programming." Neither is true. The real,
+> corrected floor, stated precisely because getting this wrong once
+> already cost real time: **basic Python only — functions, data types,
+> loops, `list`, `dict` — and nothing else.** No OOP, in Python or any
+> language: `class`/`object`/`instance`/`constructor`/`method`/
+> `inheritance` are first appearances here, not assumed background, the
+> same as someone who has never written a class in any language. No C#.
+> No WPF. A CS Lens "Also recognized in: Python's `__init__`..." aside is
+> still fine — that's comparison after the fact, not the explanation
+> itself — but nothing may be taught *only* via a Python comparison, and
+> no from-scratch OOP grounding may be skipped because "the student
+> already knows what a class is." Found by an audit that traced `class`/
+> `object`/`constructor`/inheritance through Lessons 0–12: all four are
+> used as settled vocabulary starting in Lesson 0, never once given a
+> real, isolated, from-first-principles treatment anywhere in the
+> course — the single largest gap in this project as of this pass.
+
+Dev machine is Windows, mouse-shared with a Mac — WPF only
 builds/runs on Windows; the plain `dotnet` CLI works fine on macOS for
 verifying console-only C# snippets (this is how Lesson 0/1's C# examples
 were actually run and verified — the WPF window itself could not be).
@@ -104,13 +124,68 @@ project.
 ## Status
 
 - [x] `README.md` — full 50-lesson roadmap, 12 epics
+- [x] `Lesson-00-a-classes-objects-and-inheritance.md` — prepended, 2026-07-29
 - [x] `Lesson-00-developer-environment.md`
 - [x] `Lesson-01-your-first-wpf-window.md`
+- [x] `Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md` — prepended, 2026-07-29
 - [x] `Lesson-02-grid-and-the-visual-tree.md`
 - [x] `Lesson-03-frame-page-navigation.md`
 - [x] `Lesson-04-the-navigation-stack.md`
 - [x] `Lesson-05-styles-and-resource-dictionaries.md`
-- [ ] Lessons 6–50 — write on request, in order
+- [x] `Lesson-05-a-enum-a-closed-set-of-named-values.md` — prepended, 2026-07-29
+- [x] `Lesson-06-fields-classes-and-list.md`
+- [x] `Lesson-07-inotifypropertychanged-observablecollection.md`
+- [x] `Lesson-08-selecteditem-and-two-way-binding.md`
+- [x] `Lesson-09-sqlite-and-microsoft-data-sqlite.md`
+- [x] `Lesson-10-reading-rows-back-into-objects.md`
+- [x] `Lesson-11-validation-at-a-boundary.md`
+- [x] `Lesson-12-enums-and-combobox.md`
+- [ ] Lessons 13–50 — write on request, in order
+
+## Prepended concept lessons — an ongoing strategy, not a one-time fix
+
+A full-course audit (2026-07-29) against the corrected floor above found
+`class`/`object`/`constructor`/inheritance used unexplained from Lesson
+0 onward, plus three narrower gaps (`static`/`readonly`/`Dictionary`/
+target-typed `new()`/`TryGetValue` bundled unlabeled into one Lesson 2
+lab; `enum` used six lessons before its own lab; `ADO.NET` used but
+never positively defined). The fix pattern going forward: **a short,
+standalone `Lesson-NN-a-...` lesson inserted before the lesson that
+first needs a concept, not a rewrite of the lesson itself.** Existing
+lessons stay as committed; a prepended lesson closes the gap in front of
+them. Don't rewrite Lessons 6–12 in place to fix a gap found in them —
+prepend instead, the same way Lessons 0a/1a/5a were just added. Numbers
+above 9 need two digits for correct sort (`Lesson-10-a-...`, not
+`Lesson-9-a-...`), matching the existing `Lesson-NN-` convention.
+
+**Real gaps found and fixed this pass**, for reference — don't
+re-discover these from scratch in a future audit:
+- Lesson 0's very first page uses `class`/`instance`/`constructor`
+  unexplained → Lesson 0a.
+- Lesson 2's attached-property lab bundles `static`, `readonly`,
+  `Dictionary<object,int>`, target-typed `new()`, and a `TryGetValue`/
+  ternary pattern into one line with zero individual walkthrough →
+  Lesson 1a.
+- Lesson 6 uses an enum-backed `Orientation` property calling it "first
+  appearance," but `enum` doesn't get a real lab until Lesson 12 → moved
+  the lab to Lesson 5a; Lesson 12 now points back to it instead of
+  re-teaching it (its own glossary trimmed to match).
+- `ADO.NET` (Lessons 9, 10) was defined only negatively ("not an ORM")
+  → real definition added in place at its first use, Lesson 9 (no
+  prepended lesson needed — the surrounding mechanism already had real
+  labs; only the term itself was undefined).
+- Lesson 11's `IDataErrorInfo` unit presented "interface" as if needing
+  fresh grounding, when Lesson 7 already taught it properly (a real,
+  correct, from-scratch treatment — confirmed, not a gap) → fixed to
+  cite Lesson 7 by name instead of silently re-implying it's new.
+
+**Known, smaller gaps not yet fixed** (found same audit, lower priority
+— didn't block the audit's own read, unlike the OOP gap):
+- `IDataErrorInfo` (Lesson 11) and `ComboBox` (Lesson 12) both skip
+  "Introduce the Concept in Isolation" and go straight from "The
+  Problem" to real project code — inconsistent with this course's own
+  pattern for hard/new constructs elsewhere. Worth a throwaway lab each
+  when next touched, not urgent enough to block reading forward.
 
 ## Filename convention
 
