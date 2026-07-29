@@ -3,10 +3,11 @@
  * Structural linter for the narrative markdown lesson series governed by
  * src/docs/reference/LESSON_CONTRACT.md and LESSON SCHEMA.md — the
  * Concept-Unit-per-section format used by src/docs/projects/track-beginner/,
- * src/docs/projects/pocket-inventory-wpf/, and any future series in that
- * same shape. This is NOT the same system as validate-lesson-schema.mjs,
- * which checks the unrelated JS-object interactive lesson engine under
- * src/courses/ — a lesson here is a plain .md file, not a JS export.
+ * src/docs/projects/pocket-inventory-wpf/, src/docs/projects/ai-rl-track/,
+ * and any future series in that same shape. This is NOT the same system as
+ * validate-lesson-schema.mjs, which checks the unrelated JS-object
+ * interactive lesson engine under src/courses/ — a lesson here is a plain
+ * .md file, not a JS export.
  *
  * What this catches (structural / mechanical, no code understanding
  * required):
@@ -51,6 +52,32 @@
  *      backticks separating them — code and its own explanation crammed
  *      onto one unwrapped line inside a fence, distinct from #3's
  *      multi-line wrapped-paragraph shape of the same underlying bug.
+ *  12. (Soft note, LOW PRECISION in practice) A Concept Unit marking 4+
+ *      distinct terms **first appearance** — per the Recursive Concept
+ *      Extraction Rule a unit's own isolated lab can only actually prove
+ *      one new concept at a time, so a dense unit is a candidate for a
+ *      bundled term riding along on someone else's proof, unnoticed.
+ *      Empirically (first full-course run, 2026-07-28/29): most flags here
+ *      are several method calls that are all necessarily-cohesive facets of
+ *      ONE mechanism (every method `Parcelable` requires you to implement,
+ *      every field `SharedPreferences.Editor` chains) rather than truly
+ *      unrelated concepts riding along unlabeled — still worth a glance,
+ *      but expect a high false-positive rate unless the listed terms
+ *      clearly belong to different subjects.
+ *  13. A Concept Unit marking a **first appearance** term with zero real-
+ *      output marker anywhere in the unit *or* in the lesson's own "What
+ *      Breaks Without This"/"Connect the Pieces"/"Exercises" sections —
+ *      catches a unit asserting behavior with no backing proof of any kind
+ *      anywhere in the file. Empirically HIGH PRECISION after the 2026-07-29
+ *      fixes below (a CRLF line-ending bug and a closing-section heading-
+ *      depth mismatch were both silently erasing real "What Breaks Without
+ *      This" proof before this check ever saw it — fixed; see PROOF_MARKER_RE
+ *      and extractSectionText's own comments) — of 30 initial flags across
+ *      the whole course, 29 were real proof written in phrasing the marker
+ *      regex didn't yet recognize (now added), and exactly 1 was a real gap,
+ *      fixed same session: pocket-inventory-wpf Lesson 3's `Page` unit
+ *      asserted "`Page` has no `Show()`" without the reader ever actually
+ *      trying it and seeing the real `CS1061` compiler error.
  *
  * What this CANNOT catch, on purpose — don't extend it to pretend it can:
  *   - Whether an explanation is actually *correct* (the Observer vs.
@@ -60,9 +87,13 @@
  *     generates — that only ever surfaces against the reader's real
  *     machine, which is exactly why the reactive fix-as-you-go loop with
  *     the user still matters even with this script running clean.
+ *   - Whether #12/#13 are real gaps or false positives — both are
+ *     deliberately loose heuristics (see their own comments above their
+ *     function definitions below); every flag they raise still needs a
+ *     human to actually read the unit before treating it as a real bug.
  *
  * Usage:
- *   node scripts/check-narrative-lessons.mjs                    # both known series
+ *   node scripts/check-narrative-lessons.mjs                    # all known series
  *   node scripts/check-narrative-lessons.mjs <folder>            # one folder
  *   node scripts/check-narrative-lessons.mjs <folder> <folder>   # several
  */
@@ -77,6 +108,7 @@ const root = resolve(__dirname, '..')
 const DEFAULT_FOLDERS = [
   'src/docs/projects/track-beginner',
   'src/docs/projects/pocket-inventory-wpf',
+  'src/docs/projects/ai-rl-track',
 ]
 
 // CS Lens is genuinely conditional in the schema itself ("Name the
@@ -712,6 +744,132 @@ function checkGlossary(fileLabel, text, issues) {
   }
 }
 
+// Both checks below exist because of five real, confirmed bugs found in
+// this course in one session — LayoutInflater, ArrayList, Annotation
+// (across three separate lessons), method/constructor overloading, and
+// RecyclerView's own recycling claim — none of them structural (every
+// required heading was present, every glossary entry matched) and none of
+// them caught by any check above. Each one shared the same shape: a term
+// genuinely marked **first appearance**, given a role/category
+// description ("X is the class responsible for...", "Java picks which one
+// runs based on the arguments"), with NO isolated lab and NO real output
+// anywhere backing that specific claim — asserted, never proven, per this
+// course's own explain-don't-describe standard. This can't be verified by
+// a script (whether an explanation is actually deep enough is a judgment
+// call, same limitation this file's own header already states) — but the
+// ROOT CAUSE is mechanical and checkable: per the Recursive Concept
+// Extraction Rule, a Concept Unit's own isolated lab can only actually
+// prove ONE new concept. A Walkthrough claiming several unrelated "first
+// appearance" terms at once means the unit is bundling concepts the lab
+// never isolated individually — exactly the shape every one of the five
+// real bugs had. Flagging that density narrows "read every lesson end to
+// end" down to "read N flagged units," the same value this script's other
+// soft checks already provide.
+const DENSE_UNIT_THRESHOLD = 4
+
+function checkConceptUnitDensity(fileLabel, text, issues) {
+  const units = splitByHeading(text, 2).filter((u) => /^Concept Unit:/i.test(u.heading))
+  const re = /`([^`\n]{1,60})`\s*—\s*\*\*first appearance/gi
+  for (const unit of units) {
+    const terms = new Set()
+    let m
+    const unitRe = new RegExp(re.source, re.flags)
+    while ((m = unitRe.exec(unit.text))) {
+      terms.add(m[1].trim())
+    }
+    if (terms.size >= DENSE_UNIT_THRESHOLD) {
+      issues.push({
+        file: fileLabel,
+        line: unit.startLine,
+        kind: 'dense-concept-unit',
+        message: `Concept Unit "${unit.heading}" marks ${terms.size} distinct terms **first appearance** in one unit (${[...terms].join(', ')}) — per the Recursive Concept Extraction Rule, verify this unit's own isolated lab actually proves each one individually, not just its primary concept; a bundled term riding along on someone else's proof is exactly how LayoutInflater/ArrayList/Annotation/overloading/RecyclerView-recycling went unnoticed`,
+      })
+    }
+  }
+}
+
+// Real proof, per this course's own established shapes: fenced "Real
+// output"/"Real compiler output"/"Real error" blocks verified live, an
+// `Iteration N:` execution trace, the honest, explicit "reproduce it
+// yourself" acknowledgment this course uses instead of fabricating output,
+// or — this course's dominant shape for on-device-only mechanisms
+// (SharedPreferences, LiveData, rotation, process death) that cannot run
+// under plain `javac`/`java` — a concrete, stated before/after device test
+// in the lesson's own "What Breaks Without This" section (required by the
+// Contract's own Agile checklist to be "concrete and specific, not
+// hypothetical"): break the mechanism, predict, run on the real
+// emulator/device, observe, restore. That section is a sibling `##`
+// heading *after* the Concept Unit it backs, not nested inside it, so it's
+// pulled in separately below rather than missed. Deliberately broad: this
+// can't confirm the proof actually backs any SPECIFIC first-appearance
+// term (that's still a human/close-reading judgment, same as the density
+// check above) — it only confirms a unit claiming first-appearance terms
+// has *some* real backing somewhere in the lesson, catching the narrower,
+// worse failure of a unit with literally zero proof of any kind anywhere.
+const PROOF_MARKER_RE =
+  /real[\w\s,]{0,20}(output|error|failure|crash)|compiler output|verified (this session|against)|Iteration \d+:|reproduce (it|this) yourself|on your own (emulator|device|browser)|swipe[- ]away|rotate the (phone|device|screen)|close and reopen the app|on the emulator|logcat|predict, then verify|read the (actual|exact) (error|crash|failure|exception)|throws?[\w\s]{0,15}Exception\b/i
+
+// "### Run It" is this course family's own established heading for a
+// concrete on-device verification step (confirmed present in 100+ lesson
+// files across track-beginner, track, pocket-inventory-wpf, file editor,
+// mydb, and others) — a structural marker, not a phrase, so it's checked
+// separately from PROOF_MARKER_RE rather than folded into that regex.
+const RUN_IT_HEADING_RE = /^### Run It\b/im
+
+// Closing-section heading depth varies by series (see checkClosingSections'
+// own comment above: track-beginner uses '## ', pocket-inventory-wpf nests
+// under a literal '## Closing' wrapper at '### ') — extracted heading-
+// name-first, independent of level, rather than assuming one series'
+// nesting is the only valid one, the same fix checkClosingSections already
+// made for the same reason.
+function extractSectionText(text, nameRe) {
+  // Split on \r?\n, not just '\n' — several lesson files in this repo use
+  // CRLF line endings, and a bare '\n' split leaves a trailing '\r' on
+  // every line that silently breaks any '$'-anchored per-line regex (the
+  // heading text still "matches" via startsWith, but a `.*$` capture does
+  // not, and fails completely silently — no error, just an empty result).
+  const lines = text.split(/\r?\n/)
+  let capturing = false
+  let captureLevel = 0
+  const out = []
+  for (const line of lines) {
+    const hashMatch = line.match(/^(#{2,3})\s+(.*)$/)
+    if (hashMatch) {
+      const level = hashMatch[1].length
+      if (capturing && level <= captureLevel) capturing = false
+      if (!capturing && nameRe.test(hashMatch[2].trim())) {
+        capturing = true
+        captureLevel = level
+        continue
+      }
+    }
+    if (capturing) out.push(line)
+  }
+  return out.join('\n')
+}
+
+function checkFirstAppearanceUnitHasProof(fileLabel, text, issues) {
+  const units = splitByHeading(text, 2).filter((u) => /^Concept Unit:/i.test(u.heading))
+  const closingText = extractSectionText(
+    text,
+    /^(what breaks without this|connect the pieces|exercises)$/i,
+  )
+  const hasClosingProof = PROOF_MARKER_RE.test(closingText) || RUN_IT_HEADING_RE.test(closingText)
+  const claimRe = /`[^`\n]{1,60}`\s*—\s*\*\*first appearance/i
+  for (const unit of units) {
+    if (!claimRe.test(unit.text)) continue
+    const hasUnitProof = PROOF_MARKER_RE.test(unit.text) || RUN_IT_HEADING_RE.test(unit.text)
+    if (!hasUnitProof && !hasClosingProof) {
+      issues.push({
+        file: fileLabel,
+        line: unit.startLine,
+        kind: 'no-proof-in-unit',
+        message: `Concept Unit "${unit.heading}" marks one or more terms **first appearance** but contains no real-output marker anywhere in the unit, and the lesson's own "What Breaks Without This"/"Connect the Pieces"/"Exercises" sections have none either — read this unit directly; it may be asserting behavior instead of proving it`,
+      })
+    }
+  }
+}
+
 // Cross-file check: the same backticked term marked "first appearance"
 // in more than one lesson means an earlier lesson (in filename order) grew
 // a dependency on something a later lesson still claims to own first.
@@ -768,6 +926,8 @@ function main() {
       checkHiddenBehaviorClaims(fileLabel, text, allIssues)
       checkGlossary(fileLabel, text, allIssues)
       checkHeadingCaseDrift(fileLabel, text, allIssues)
+      checkConceptUnitDensity(fileLabel, text, allIssues)
+      checkFirstAppearanceUnitHasProof(fileLabel, text, allIssues)
     }
   }
 

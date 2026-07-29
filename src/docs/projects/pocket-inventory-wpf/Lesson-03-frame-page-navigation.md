@@ -99,12 +99,31 @@ create the file directly) and add a new file, `SamplePage.xaml`:
 </Page>
 ```
 
-Try running this project's `Program`-equivalent entry point directly against
-`SamplePage` the way you would a `Window` — there is no way to do this;
-`Page` has no `Show()` method and no `.NET` project template ever generates
-one as a startup target. This is the point to notice, not a mistake to
-fix: a `Page`, unlike a `Window`, has genuinely no way to appear on screen
-by itself. It requires a **host** — something else, with an actual window
+Don't just take it on faith that `Page` has no `Show()` — try it. In
+`MainWindow.xaml.cs`'s constructor, right after `InitializeComponent();`,
+temporarily add:
+
+```csharp
+SamplePage page = new SamplePage();
+page.Show();
+```
+
+Build it. Real compiler output — verified on the machine this lesson was
+written on:
+
+```text
+MainWindow.xaml.cs(23,14): error CS1061: 'SamplePage' does not contain a
+definition for 'Show' and no accessible extension method 'Show' accepting
+a first argument of type 'SamplePage' could be found (are you missing a
+using directive or an assembly reference?)
+```
+
+That's not a hypothetical — it's the real C# compiler refusing to compile
+this specific line, because `Show()` genuinely does not exist anywhere on
+`Page` or anything it inherits from. Remove those two lines before moving
+on; they don't belong in the project. This is the point to notice: a
+`Page`, unlike a `Window`, has genuinely no way to appear on screen by
+itself. It requires a **host** — something else, with an actual window
 and an actual `Show()`, willing to display it. `Frame`, the next unit,
 is that host.
 
@@ -730,6 +749,9 @@ enabled.
       `TextBlock`; `HomePage.xaml` holds the relocated welcome message.
 - [ ] Clicking "Add Item" swaps in a real `AddItemPage`, in the same
       window, with the header and footer unchanged.
+- [ ] You triggered the real `CS1061` error yourself by trying
+      `page.Show()` on a `Page`, not just read about it, and removed the
+      two lines afterward.
 - [ ] You can explain, in your own words, why `Page` cannot be shown
       without a host, and what specifically `Frame` provides.
 - [ ] You observed the default navigation toolbar's Back arrow working

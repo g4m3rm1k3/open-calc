@@ -379,7 +379,7 @@ function getMdCss(md) {
 .md-body h2 { font-size: 1.4em; font-weight: 700; margin: 1.8em 0 0.5em; color: ${md.h2}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.2em; }
 .md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: ${md.h3}; }
 .md-body h4 { font-size: 1em; font-weight: 600; margin: 1.2em 0 0.3em; color: ${md.h4}; }
-.md-body p { margin: 0 0 1em; }
+.md-body p, .md-body .md-p-block { margin: 0 0 1em; }
 .md-body strong, .md-body b { color: ${md.strong}; font-weight: 700; }
 .md-body em, .md-body i { color: ${md.em}; }
 .md-body li::marker { color: ${md.listMarker}; font-weight: 700; }
@@ -1007,8 +1007,56 @@ function resolveDocPath(currentFilePath, href) {
   return resolvedPath in DOCS_MODULES ? resolvedPath : null;
 }
 
+// Whether this hast paragraph node contains an inline trigger that
+// MdInlineCode/MdLink will turn into a <ConceptEmbed>. A ConceptEmbed's
+// expanded content is a full markdown document, including real block-level
+// elements (h1, p, ul, ...) — and those are invalid inside a <p> per the
+// HTML content model. Unlike parsing an HTML string, React's DOM renderer
+// does NOT auto-correct this: it silently constructs the broken tree
+// exactly as instructed (a real <h1> nested inside a real <p>), and
+// browsers then lay that out unpredictably rather than rejecting it —
+// this is what caused nested concept embeds to render at a fraction of
+// their real width with the wrong font. The fix is to never let a
+// paragraph containing one of these triggers become a real <p> at all —
+// walk the same trigger conditions MdInlineCode/MdLink use (recursing
+// through wrapper elements like `em`/`strong`, since the trigger is often
+// wrapped in emphasis) and report if any are found.
+function paragraphContainsConceptEmbed(node, activeFile) {
+  if (!node || !isConceptEmbedLessonFile(activeFile)) return false;
+
+  function walk(n) {
+    if (!n) return false;
+    if (n.type === "element" && n.tagName === "code") {
+      const text = (n.children || [])
+        .filter((c) => c.type === "text")
+        .map((c) => c.value)
+        .join("");
+      if (text.endsWith(".md")) {
+        const filename = text.split("/").pop();
+        const forcedHref = `../concepts/${filename}`;
+        if (resolveDocPath(activeFile, forcedHref)) return true;
+      }
+    }
+    if (n.type === "element" && n.tagName === "a") {
+      const href = n.properties?.href || "";
+      const hrefBase = href.split("#")[0];
+      const isRelativeMd =
+        hrefBase.endsWith(".md") &&
+        !href.startsWith("http") &&
+        !href.startsWith("//");
+      const isConcept = hrefBase.startsWith("../concepts/");
+      if (isRelativeMd && isConcept && resolveDocPath(activeFile, href)) {
+        return true;
+      }
+    }
+    return (n.children || []).some(walk);
+  }
+
+  return (node.children || []).some(walk);
+}
+
 function ConceptEmbed({ docPath, title }) {
-  const { themeStyles } = useGlobalTheme();
+  const { themeStyles, typography } = useGlobalTheme();
   const [content, setContent] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -1055,6 +1103,12 @@ function ConceptEmbed({ docPath, title }) {
                 ui={themeStyles?.ui}
                 accentColor={themeStyles?.accentHex || "#0ea5e9"}
                 isDark={themeStyles?.isDark}
+                font={typography?.font}
+                width={typography?.width}
+                lineHeight={typography?.lineHeight}
+                fontSize={typography?.fontSize}
+                textAlign={typography?.textAlign}
+                embedded
               />
             </span>
           )}
@@ -1192,6 +1246,19 @@ const MD_COMPONENTS = {
   h2: ({ children }) => <h2 id={useHeadingId(children)}>{children}</h2>,
   h3: ({ children }) => <h3 id={useHeadingId(children)}>{children}</h3>,
   h4: ({ children }) => <h4 id={useHeadingId(children)}>{children}</h4>,
+  p({ node, children }) {
+    const { activeFile } = useContext(DocsCtx);
+    if (paragraphContainsConceptEmbed(node, activeFile)) {
+      // See paragraphContainsConceptEmbed's own comment: this paragraph
+      // will render a ConceptEmbed whose expanded content can include
+      // real block-level elements, invalid inside a real <p>. A <div>
+      // carries the identical `.md-body` paragraph margin (the
+      // `.md-p-block` selector alongside `p` in getMdCss, below) without
+      // that restriction.
+      return <div className="md-p-block">{children}</div>;
+    }
+    return <p>{children}</p>;
+  },
   pre({ node }) {
     // react-markdown re-renders `pre` in place at the same tree position when
     // the surrounding doc changes — with no key, React treats it as an update
@@ -1507,6 +1574,16 @@ const SectionedMarkdown = memo(function SectionedMarkdown({
   lineHeight,
   fontSize,
   textAlign,
+  // True when this render is nested inside another chrome-providing box
+  // (currently: ConceptEmbed's own bordered/padded card). The card already
+  // supplies border/shadow/background/padding, so re-adding this component's
+  // own "page" box on top of it just compounds padding on every level of
+  // nesting (a concept embedding another concept stacks both boxes' padding
+  // each time). When embedded, skip the page chrome entirely and let the
+  // parent's box be the only chrome — only typography (font/size/line-height/
+  // alignment) still applies, so embedded content still matches the reader's
+  // chosen settings.
+  embedded = false,
 }) {
   const { speak, stop } = useSpeech();
   const [playingIdx, setPlayingIdx] = useState(null);
@@ -1581,13 +1658,23 @@ const SectionedMarkdown = memo(function SectionedMarkdown({
 
       {pages.map((sections, pageIdx) => {
         const isIntro = pageIdx === 0;
-        const widthClass =
-          width === "narrow"
+        // Embedded content keeps no width constraint of its own — it already
+        // lives inside the parent card's content area, and re-centering it
+        // to a narrower max-width here would shrink it again inside that
+        // already-narrower box.
+        const widthClass = embedded
+          ? "w-full"
+          : width === "narrow"
             ? "max-w-3xl mx-auto"
             : width === "normal"
               ? "max-w-5xl mx-auto"
               : "max-w-[1400px] mx-auto";
-        const pageClasses = `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || "border-slate-200 dark:border-slate-800"} w-full ${widthClass}`;
+        // Embedded content skips the page card's own border/shadow/background/
+        // padding entirely — the parent box (ConceptEmbed's card) already
+        // provides all of that, so this is bare content, not a second card.
+        const pageClasses = embedded
+          ? "w-full"
+          : `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || "border-slate-200 dark:border-slate-800"} w-full ${widthClass}`;
 
         const getFontFamily = (f) => {
           switch (f) {
