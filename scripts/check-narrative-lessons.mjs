@@ -160,6 +160,7 @@ const NON_LESSON_FILENAMES = new Set([
   'README.MD',
   'CURRICULUM_NOTES.MD',
   'HOW-TO-RUN-EXAMPLES.MD',
+  'CONCEPT-GRAPH.MD',
 ])
 
 function isMarkdownFile(name) {
