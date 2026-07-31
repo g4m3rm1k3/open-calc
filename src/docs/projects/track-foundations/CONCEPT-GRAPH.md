@@ -65,14 +65,21 @@ worked chunk (Lessons 0–4):
   re-tagged wholesale — only touched if a specific node is revisited
   anyway.
 
-**Status: Lessons 0–34 of 34 extracted (complete). 190 nodes,
+**Status: Lessons 0–34 of 34 extracted (complete). 189 nodes,
 `scripts/concept-graph-report.mjs` passes with 0 validation issues. Schema
 frozen since Lesson 10 — no new node fields added since, only new
 nodes/edges within the existing format. Extraction (build-order stage 1)
-is done; the Graph Health Report has been generated and reviewed. Next:
-user review of the full graph (stage 4), then global topological sort,
-partition by category, and lesson grouping (stages 5–7) — no lesson prose
-has been written yet.**
+is done; the Graph Health Report has been generated, and a full manual
+concept audit (stage 4) is complete — every node checked against
+"independent mental model / concept-vs-API / cross-language-or-framework
+equivalent." Two changes came out of that audit: `viewmodel-provider` was
+folded into `android-viewmodel` (the retrieval mechanism, not a separate
+idea), and `logcat` was replaced by a portable `logging` node (Category 00)
+with Android's `Log.d`/Logcat as a `Syntax by language` mapping, not a node
+of its own — Logcat is a tool, not a concept. No other node changed.
+The graph is now considered conceptually complete. Next: global topological
+sort, partition by category, and lesson grouping (stages 5–7) — no lesson
+prose has been written yet.**
 
 ## Learner Baseline
 
@@ -314,6 +321,22 @@ Required prerequisites: []
 Builds toward: [view-recycling]
 Related concepts: []
 Used by (track/): Lesson 6
+Recognition taught in (track-foundations):
+Fully taught in (track-foundations):
+
+### logging
+
+Preferred Name: Logging
+Aliases: []
+Definition: Instrumenting running code by emitting diagnostic events to an observable sink, so what a program is actually doing can be inspected without stopping it or attaching a debugger.
+First needed because: The primary way to prove, concretely, that framework lifecycle methods really are being called when the course claims they are — a concept every later "watch this run" moment in this course quietly relies on.
+Category: 00 Programming Fundamentals
+Depth required: Working
+Required prerequisites: []
+Builds toward: []
+Related concepts: []
+Syntax by language: Java/Android — `Log.d(...)`/`Log.i(...)`/`Log.e(...)`, viewed via Logcat (Android Studio's log viewer, a tool, not a concept of its own). Python — the `logging` module, viewed in a terminal or a file. C#/.NET — `ILogger`, viewed via the console or a configured provider. Universal beyond any one language — also `console.log`/`printf`/stdout more generally; the specific sink and viewer differ, the underlying idea doesn't.
+Used by (track/): Lesson 2
 Recognition taught in (track-foundations):
 Fully taught in (track-foundations):
 
@@ -2341,26 +2364,11 @@ Fully taught in (track-foundations):
 
 Preferred Name: `ViewModel`
 Aliases: []
-Definition: A class Jetpack manages specially, retained across Activity recreation via a framework-owned store tied to the logical screen rather than the physical Activity object.
-First needed because: Rotation (Lesson 5) destroys and rebuilds `InventoryActivity` on every configuration change, re-querying the database every single time — `ViewModel` is Jetpack's purpose-built answer, structural rather than a hand-written rescue per field.
+Definition: A class Jetpack manages specially, retained across Activity recreation via a framework-owned store tied to the logical screen rather than the physical Activity object. Retrieved (never constructed directly with `new`) through `ViewModelProvider`, a framework-managed lookup returning the existing instance for that screen if one already exists, constructing a new one only the first time.
+First needed because: Rotation (Lesson 5) destroys and rebuilds `InventoryActivity` on every configuration change, re-querying the database every single time — `ViewModel` is Jetpack's purpose-built answer, structural rather than a hand-written rescue per field. Constructing one directly with `new` would produce a brand-new object on every `onCreate`, exactly the problem it exists to fix — the retrieval mechanism is part of the same idea, not a separate one.
 Category: 07 Android Framework
 Depth required: Mastery
 Required prerequisites: [activity-lifecycle, configuration-change, lifecycle-scoped-cache]
-Builds toward: [viewmodel-provider]
-Related concepts: []
-Used by (track/): Lesson 15
-Recognition taught in (track-foundations):
-Fully taught in (track-foundations):
-
-### viewmodel-provider
-
-Preferred Name: `ViewModelProvider`
-Aliases: []
-Definition: The framework-managed lookup that returns an existing `ViewModel` instance for a screen if one already exists, constructing a new one only the first time.
-First needed because: Constructing a `ViewModel` directly with `new` would produce a brand-new object on every `onCreate`, exactly the problem `ViewModel` itself exists to fix — something has to hold the real, retained instance.
-Category: 07 Android Framework
-Depth required: Mastery
-Required prerequisites: [android-viewmodel]
 Builds toward: []
 Related concepts: []
 Used by (track/): Lesson 15
@@ -2893,21 +2901,6 @@ Required prerequisites: [android-resources]
 Builds toward: [findviewbyid]
 Related concepts: []
 Used by (track/): Lesson 2, Lesson 3
-Recognition taught in (track-foundations):
-Fully taught in (track-foundations):
-
-### logcat
-
-Preferred Name: Logcat
-Aliases: []
-Definition: Android's system-wide logging output stream, viewable inside Android Studio, used to observe what a running app is actually doing as it runs.
-First needed because: The primary way to prove, concretely, that framework lifecycle methods really are being called when the course claims they are.
-Category: 08 Android Project Concepts
-Depth required: Working
-Required prerequisites: []
-Builds toward: []
-Related concepts: []
-Used by (track/): Lesson 2
 Recognition taught in (track-foundations):
 Fully taught in (track-foundations):
 
