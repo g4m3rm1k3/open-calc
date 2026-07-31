@@ -86,7 +86,7 @@ const GENERATED_NOTICE =
 // 1. Canonical topological order
 // ---------------------------------------------------------------------------
 
-function computeCanonicalOrder(byId) {
+export function computeCanonicalOrder(byId) {
   const remaining = new Map([...byId.entries()].map(([id, n]) => [id, n.requiredPrereqs.length]))
   const readySet = new Set([...remaining.entries()].filter(([, deg]) => deg === 0).map(([id]) => id))
   const order = []
