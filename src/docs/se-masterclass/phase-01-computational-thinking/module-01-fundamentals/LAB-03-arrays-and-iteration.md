@@ -1203,6 +1203,4 @@ Calling the function does NOT execute its body. It returns a generator object im
 
 ---
 
-*Next: [LAB-04 — Objects and Hash Maps](LAB-04-objects-and-hash-maps.md)*
-
 *Next: [LAB-04 — Objects and Hash Maps](LAB-04-objects-and-hash-maps.md) — Java*

@@ -1,0 +1,1390 @@
+{
+  "_meta": {
+    "series": "FOUNDATIONS",
+    "description": "A complete concept-first curriculum. Every concept taught in isolation with a runnable example — no build step, no framework, no application context required. Prerequisite for the GEOMETRY series.",
+    "audience": "Students who know what a variable is and what an if statement is. Nothing else assumed.",
+    "goal": "After completing FOUNDATIONS, the student can read any TypeScript or Python codebase, recognize all 23 GoF design patterns, explain every SOLID principle, describe architectural tradeoffs, write SQL, and build mental models for unfamiliar systems. They are ready to build GEOMETRY.",
+    "exampleEnvironments": "browser DevTools console, Python REPL, standalone HTML file (no server), Node.js one-liner (node -e). No example requires npm install or a running server.",
+    "governingDocuments": "CURRICULUM.json (this file) and FOUNDATIONS-LESSON-CONTRACT.md. Read both before writing any lesson.",
+    "labCount": 136,
+    "parts": {
+      "I":   "LAB-000 to LAB-005 — How Computers Work",
+      "II":  "LAB-006 to LAB-011 — Programming Fundamentals",
+      "III": "LAB-012 to LAB-018 — Object-Oriented Programming",
+      "IV":  "LAB-019 to LAB-023 — Functional Programming",
+      "V":   "LAB-024 to LAB-030 — Data Structures",
+      "VI":  "LAB-031 to LAB-033 — Algorithms",
+      "VII": "LAB-034 to LAB-040 — TypeScript Type System",
+      "VIII":"LAB-041 to LAB-047 — Python Features",
+      "IX":  "LAB-048 to LAB-059 — Software Engineering Principles",
+      "X":   "LAB-060 to LAB-064 — Testing",
+      "XI":  "LAB-065 to LAB-069 — Design Patterns: Creational",
+      "XII": "LAB-070 to LAB-076 — Design Patterns: Structural",
+      "XIII":"LAB-077 to LAB-086 — Design Patterns: Behavioral",
+      "XIV": "LAB-087 to LAB-101 — Software Architecture",
+      "XV":  "LAB-102 to LAB-112 — Web and React",
+      "XVI": "LAB-113 to LAB-125 — Backend and Database",
+      "XVII":"LAB-126 to LAB-135 — Math for Software"
+    }
+  },
+
+  "LAB-000": {
+    "title": "Binary, Bytes, and Character Encoding",
+    "concept": "All data in a computer is stored as binary digits (bits); eight bits form a byte; character encoding systems like UTF-8 define which byte sequences represent which characters",
+    "tags": ["cs:binary", "cs:bits-and-bytes", "cs:character-encoding", "cs:UTF-8", "cs:base-conversion"],
+    "visibleAtEnd": "Student can convert a small decimal number to binary by hand, explain why a text file is larger in UTF-8 than ASCII, and predict the byte length of a given string",
+    "buildsOn": [],
+    "file": "LAB-000-Binary-Bytes-Encoding-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-001": {
+    "title": "The Stack and the Heap",
+    "concept": "A program's memory is divided into two regions: the call stack (fixed-size frames pushed and popped automatically as functions are called and return) and the heap (dynamic allocation that persists until explicitly freed or garbage collected)",
+    "tags": ["cs:call-stack", "cs:heap-memory", "cs:stack-frame", "cs:memory-allocation", "cs:garbage-collection"],
+    "visibleAtEnd": "Student can draw the call stack at any point during a recursive function call, explain why stack overflow happens, and describe what garbage collection does",
+    "buildsOn": ["LAB-000"],
+    "file": "LAB-001-Stack-Heap-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-002": {
+    "title": "Processes, Threads, and the Event Loop",
+    "concept": "A process is an isolated running program with its own memory; a thread is a unit of execution within a process; JavaScript and Python run on a single thread and use an event loop to handle concurrency without blocking",
+    "tags": ["cs:process", "cs:thread", "cs:event-loop", "cs:concurrency", "cs:single-threaded", "cs:non-blocking"],
+    "visibleAtEnd": "Student can explain why setTimeout(fn, 0) runs after synchronous code, describe what the call stack and task queue are, and explain why JavaScript cannot block the main thread",
+    "buildsOn": ["LAB-001"],
+    "file": "LAB-002-Processes-Threads-EventLoop-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-003": {
+    "title": "How the Internet Works — TCP/IP, DNS, HTTP",
+    "concept": "Data travels across the internet in packets routed by IP addresses; TCP guarantees delivery and order; DNS translates domain names to IP addresses; HTTP is a request-response protocol layered on top of TCP",
+    "tags": ["cs:TCP-IP", "cs:DNS", "cs:HTTP", "cs:request-response", "cs:IP-address", "cs:packet"],
+    "visibleAtEnd": "Student can trace what happens between typing a URL and the browser displaying a page, explain what a DNS lookup is, and describe what an HTTP request and response contain",
+    "buildsOn": ["LAB-002"],
+    "file": "LAB-003-Internet-TCP-DNS-HTTP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-004": {
+    "title": "How Browsers Work — Parsing, Rendering, and the JS Engine",
+    "concept": "A browser parses HTML into a DOM tree, parses CSS into a CSSOM, combines them into a render tree, and paints pixels; the JavaScript engine compiles and executes JS on the same thread, which is why long JS tasks block rendering",
+    "tags": ["cs:DOM", "cs:rendering-pipeline", "cs:JavaScript-engine", "cs:HTML-parsing", "cs:CSSOM", "cs:reflow"],
+    "visibleAtEnd": "Student can explain why a script tag at the top of a page blocks rendering, describe what the DOM is, and explain what happens when JavaScript modifies a DOM node",
+    "buildsOn": ["LAB-003"],
+    "file": "LAB-004-How-Browsers-Work-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-005": {
+    "title": "Big-O Notation and Algorithm Complexity",
+    "concept": "Big-O notation describes how the runtime or memory usage of an algorithm grows relative to input size; O(1) is constant, O(n) is linear, O(n²) is quadratic — the notation hides constants and lower-order terms because they become irrelevant at scale",
+    "tags": ["cs:big-O", "cs:time-complexity", "cs:space-complexity", "cs:algorithm-analysis", "cs:asymptotic-notation"],
+    "visibleAtEnd": "Student can classify array lookup, array search, and nested loop algorithms by their Big-O complexity, and explain why O(n log n) beats O(n²) for large inputs",
+    "buildsOn": ["LAB-000"],
+    "file": "LAB-005-Big-O-Complexity-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-006": {
+    "title": "Functions as First-Class Values",
+    "concept": "In JavaScript and Python, functions are values — they can be assigned to variables, passed as arguments, returned from other functions, and stored in data structures; this is the foundation of callbacks, higher-order functions, and functional programming",
+    "tags": ["cs:first-class-functions", "cs:higher-order-functions", "lang:function-expression", "lang:callback", "cs:function-as-value"],
+    "visibleAtEnd": "Student can pass a function as an argument, return a function from a function, and store functions in an array — all in the browser console",
+    "buildsOn": ["LAB-005"],
+    "file": "LAB-006-First-Class-Functions-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-007": {
+    "title": "Closures and Lexical Scope",
+    "concept": "A closure is a function that retains access to variables from its enclosing scope after that scope has exited; lexical scope means a function's accessible variables are determined by where the function is written in the source code, not where it is called",
+    "tags": ["cs:closure", "cs:lexical-scope", "cs:scope-chain", "cs:variable-capture", "cs:enclosing-scope"],
+    "visibleAtEnd": "Student can explain what a closure captures, predict the value of a captured variable when the inner function is called, and use a closure to create a private counter",
+    "buildsOn": ["LAB-006"],
+    "file": "LAB-007-Closures-Lexical-Scope-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-008": {
+    "title": "Recursion",
+    "concept": "Recursion is a technique where a function calls itself with a smaller version of the problem until it reaches a base case that stops the calls; every recursive solution has an equivalent iterative solution, but some problems are more naturally expressed recursively",
+    "tags": ["cs:recursion", "cs:base-case", "cs:recursive-case", "cs:call-stack-depth", "cs:tail-recursion"],
+    "visibleAtEnd": "Student can write a recursive function for factorial and Fibonacci, identify the base case and recursive case, and explain what happens when the base case is missing",
+    "buildsOn": ["LAB-006", "LAB-001"],
+    "file": "LAB-008-Recursion-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-009": {
+    "title": "Error Handling and Exceptions",
+    "concept": "An exception is an object that represents an abnormal condition; throwing an exception unwinds the call stack until a catch block intercepts it; unhandled exceptions crash the program or reject a promise",
+    "tags": ["cs:exception", "cs:try-catch-finally", "cs:error-propagation", "cs:custom-error", "se:fail-fast"],
+    "visibleAtEnd": "Student can throw a custom error class, catch it at the right level of the call stack, distinguish recoverable from unrecoverable errors, and explain what finally guarantees",
+    "buildsOn": ["LAB-008"],
+    "file": "LAB-009-Error-Handling-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-010": {
+    "title": "Modules and Imports",
+    "concept": "A module is a file whose exports are explicitly declared; imports give one module access to another module's exports; modules prevent name collisions, enforce encapsulation at the file level, and make dependencies explicit",
+    "tags": ["cs:module-system", "lang:ESM", "lang:CommonJS", "cs:namespace", "cs:dependency-graph"],
+    "visibleAtEnd": "Student can write an ESM module with named and default exports, import from it in another file, and explain why modules prevent the global scope pollution that script tags cause",
+    "buildsOn": ["LAB-009"],
+    "file": "LAB-010-Modules-Imports-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-011": {
+    "title": "Async Programming — Callbacks, Promises, and async/await",
+    "concept": "Asynchronous operations (network requests, timers, file reads) complete in the future; callbacks pass a function to be called when the operation completes; Promises represent a future value and can be chained; async/await is syntax sugar over Promises that makes async code read like synchronous code",
+    "tags": ["cs:async-programming", "lang:callback", "lang:Promise", "lang:async-await", "cs:event-loop-async"],
+    "visibleAtEnd": "Student can convert callback-style code to Promises and then to async/await, explain what Promise chaining does, and correctly use try/catch with async functions",
+    "buildsOn": ["LAB-002", "LAB-009"],
+    "file": "LAB-011-Async-Callbacks-Promises-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-012": {
+    "title": "Classes and Objects",
+    "concept": "A class is a blueprint that describes the properties (data) and methods (behavior) that its instances (objects) will have; the constructor initializes a new instance; instance methods access the instance's data via 'this' (JavaScript) or 'self' (Python)",
+    "tags": ["oop:class", "oop:object", "oop:instance", "oop:constructor", "oop:instance-method", "oop:this"],
+    "visibleAtEnd": "Student can define a class with a constructor and two instance methods, create multiple instances from it, and demonstrate that each instance has its own copy of the data",
+    "buildsOn": ["LAB-010"],
+    "file": "LAB-012-Classes-Objects-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-013": {
+    "title": "Encapsulation",
+    "concept": "Encapsulation bundles data and the methods that operate on it into one unit (a class), and restricts direct access to internal data — forcing all interaction through defined methods that enforce the object's invariants",
+    "tags": ["oop:encapsulation", "oop:information-hiding", "oop:access-modifier", "oop:invariant", "oop:getter-setter"],
+    "visibleAtEnd": "Student can make a class property private, expose it through a getter that enforces an invariant, and demonstrate that code outside the class cannot violate that invariant",
+    "buildsOn": ["LAB-012"],
+    "file": "LAB-013-Encapsulation-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-014": {
+    "title": "Inheritance",
+    "concept": "Inheritance lets a subclass extend a superclass, inheriting all its properties and methods and optionally overriding them; the subclass is-a superclass — it can be used anywhere the superclass is expected",
+    "tags": ["oop:inheritance", "oop:superclass", "oop:subclass", "oop:method-override", "oop:super-call"],
+    "visibleAtEnd": "Student can create a subclass that overrides one method, call the parent method with super, and verify that the subclass instance passes an instanceof check for both the subclass and the superclass",
+    "buildsOn": ["LAB-013"],
+    "file": "LAB-014-Inheritance-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-015": {
+    "title": "Polymorphism",
+    "concept": "Polymorphism means the same method call produces different behavior depending on the runtime type of the object — code that calls shape.area() works correctly whether the object is a Circle, Rectangle, or Triangle without knowing which type it is",
+    "tags": ["oop:polymorphism", "oop:method-overriding", "oop:runtime-type", "oop:duck-typing", "oop:virtual-dispatch"],
+    "visibleAtEnd": "Student can write a function that accepts an array of mixed shapes and calls .area() on each, with each shape computing the correct result, and explain why the calling code does not need to know the concrete type",
+    "buildsOn": ["LAB-014"],
+    "file": "LAB-015-Polymorphism-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-016": {
+    "title": "Abstraction",
+    "concept": "Abstraction hides implementation details behind a simplified interface — the user of an abstraction needs to know what it does, not how it does it; abstract classes define the interface but leave implementation to subclasses",
+    "tags": ["oop:abstraction", "oop:abstract-class", "oop:interface-contract", "oop:hiding-complexity", "oop:what-not-how"],
+    "visibleAtEnd": "Student can define an abstract class with an abstract method, create two concrete subclasses with different implementations, and use both through the abstract type",
+    "buildsOn": ["LAB-015"],
+    "file": "LAB-016-Abstraction-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-017": {
+    "title": "Interfaces as a Contract",
+    "concept": "An interface declares a set of method signatures that any implementing class must provide — it is a contract between the implementer and the caller; programming to an interface means callers depend on the contract, not the concrete class, so the implementation can be swapped without changing the callers",
+    "tags": ["oop:interface", "oop:contract", "oop:programming-to-interface", "cs:structural-typing", "se:dependency-on-abstraction"],
+    "visibleAtEnd": "Student can define an interface with two method signatures, write two classes that implement it differently, write a function that accepts the interface type, and pass either implementation to that function",
+    "buildsOn": ["LAB-016"],
+    "file": "LAB-017-Interfaces-Contract-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-018": {
+    "title": "Object Composition",
+    "concept": "Composition builds complex objects by combining simpler ones as components (has-a relationships); in contrast to inheritance (is-a), composition lets you mix and match behaviors independently, avoids deep class hierarchies, and makes behavior changes at runtime possible",
+    "tags": ["oop:composition", "oop:has-a", "oop:delegation", "se:composition-over-inheritance", "oop:mixin"],
+    "visibleAtEnd": "Student can build an object whose behavior comes entirely from composed components, swap one component for another without changing the outer object's interface, and explain one scenario where composition is better than inheritance",
+    "buildsOn": ["LAB-017"],
+    "file": "LAB-018-Object-Composition-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-019": {
+    "title": "Pure Functions and Side Effects",
+    "concept": "A pure function always returns the same output for the same input and has no side effects (does not modify external state, does not perform I/O); pure functions are trivially testable, safe to memoize, and safe to run in parallel",
+    "tags": ["fp:pure-function", "fp:side-effect", "fp:referential-transparency", "fp:determinism", "se:testability"],
+    "visibleAtEnd": "Student can identify whether a function is pure or impure, explain what side effect makes an impure function impure, and rewrite an impure function as a pure one",
+    "buildsOn": ["LAB-011"],
+    "file": "LAB-019-Pure-Functions-Side-Effects-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-020": {
+    "title": "Immutability",
+    "concept": "An immutable value cannot be changed after creation — operations that appear to modify it return a new value instead; immutability eliminates an entire class of bugs caused by shared mutable state and makes programs easier to reason about",
+    "tags": ["fp:immutability", "fp:immutable-data", "cs:value-semantics", "cs:reference-semantics", "fp:structural-sharing"],
+    "visibleAtEnd": "Student can demonstrate the difference between mutating an array and returning a new array, explain why immutability matters in multi-threaded contexts, and use Object.freeze() or spread syntax to enforce immutability",
+    "buildsOn": ["LAB-019"],
+    "file": "LAB-020-Immutability-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-021": {
+    "title": "Higher-Order Functions — map, filter, reduce",
+    "concept": "A higher-order function takes a function as an argument or returns one; map transforms each element of a collection, filter selects elements matching a predicate, reduce combines all elements into a single accumulated value — these three operations replace most explicit loops",
+    "tags": ["fp:higher-order-functions", "fp:map", "fp:filter", "fp:reduce", "fp:declarative-over-imperative"],
+    "visibleAtEnd": "Student can replace a for loop that transforms an array with map, replace one that filters with filter, replace one that accumulates with reduce, and chain all three in a single expression",
+    "buildsOn": ["LAB-020"],
+    "file": "LAB-021-Higher-Order-Functions-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-022": {
+    "title": "Function Composition",
+    "concept": "Function composition combines two or more functions so that the output of one becomes the input of the next; compose(f, g)(x) means f(g(x)); pipe is compose with the order reversed; composition lets you build complex transformations from simple, reusable pieces",
+    "tags": ["fp:function-composition", "fp:pipe", "fp:compose", "fp:data-transformation-pipeline", "fp:point-free"],
+    "visibleAtEnd": "Student can implement a pipe function, compose three single-argument functions using it, and explain why each function in a composition must have exactly one input",
+    "buildsOn": ["LAB-021"],
+    "file": "LAB-022-Function-Composition-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-023": {
+    "title": "Currying and Partial Application",
+    "concept": "Currying transforms a multi-argument function into a chain of single-argument functions; partial application fixes some arguments of a function, returning a new function that takes the rest; both techniques produce reusable, specialized functions from general ones",
+    "tags": ["fp:currying", "fp:partial-application", "fp:arity", "fp:function-factory", "fp:closure-applied"],
+    "visibleAtEnd": "Student can curry a two-argument function by hand, use partial application to create a specialized version of a general function, and name one real use case for each technique",
+    "buildsOn": ["LAB-022"],
+    "file": "LAB-023-Currying-Partial-Application-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-024": {
+    "title": "Arrays — Linear Data Structure and O(n) Operations",
+    "concept": "An array stores elements in contiguous memory, giving O(1) access by index; searching for a value requires O(n) because every element may need to be examined; inserting at the start or middle shifts all following elements — also O(n); these costs determine when arrays are the right choice",
+    "tags": ["cs:array", "cs:dynamic-array", "cs:index", "cs:O-1-access", "cs:O-n-search", "cs:amortized-complexity"],
+    "visibleAtEnd": "Student can explain why arr[5] is O(1) but finding an element by value is O(n), describe what happens to memory when a dynamic array runs out of capacity, and choose array vs hash table based on access pattern",
+    "buildsOn": ["LAB-005"],
+    "file": "LAB-024-Arrays-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-025": {
+    "title": "Hash Tables — O(1) Lookup",
+    "concept": "A hash table stores key-value pairs; a hash function maps the key to a bucket index, giving O(1) average-case lookup, insert, and delete; collisions (two keys hashing to the same bucket) are resolved by chaining or open addressing",
+    "tags": ["cs:hash-table", "cs:hash-function", "cs:collision", "cs:O-1-lookup", "cs:load-factor", "cs:chaining"],
+    "visibleAtEnd": "Student can explain why object property lookup in JavaScript is O(1), describe what a collision is and how chaining resolves it, and explain why worst-case hash table lookup is O(n)",
+    "buildsOn": ["LAB-024"],
+    "file": "LAB-025-Hash-Tables-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-026": {
+    "title": "Sets",
+    "concept": "A set stores unique values with O(1) membership testing; it supports union, intersection, and difference operations; sets are the right data structure when you need to answer 'have I seen this before?' or 'what do these two collections have in common?'",
+    "tags": ["cs:set", "cs:membership-test", "cs:union", "cs:intersection", "cs:difference", "cs:O-1-membership"],
+    "visibleAtEnd": "Student can use a Set to deduplicate an array, compute the intersection of two sets, and explain why Set membership is O(1) while Array.includes() is O(n)",
+    "buildsOn": ["LAB-025"],
+    "file": "LAB-026-Sets-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-027": {
+    "title": "Stacks and Queues",
+    "concept": "A stack is a LIFO (last-in, first-out) structure — push adds to the top, pop removes from the top; a queue is FIFO (first-in, first-out) — enqueue adds to the back, dequeue removes from the front; both have O(1) push/pop when implemented correctly",
+    "tags": ["cs:stack", "cs:queue", "cs:LIFO", "cs:FIFO", "cs:O-1-push-pop", "cs:call-stack-application"],
+    "visibleAtEnd": "Student can implement a stack using an array, implement a queue using two stacks, and identify which data structure models undo history (stack) versus a print queue (queue)",
+    "buildsOn": ["LAB-024"],
+    "file": "LAB-027-Stacks-Queues-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-028": {
+    "title": "Linked Lists",
+    "concept": "A linked list stores elements as nodes where each node holds a value and a pointer to the next node; inserting at the head is O(1) because no shifting is required; accessing by index is O(n) because traversal starts from the head",
+    "tags": ["cs:linked-list", "cs:node", "cs:pointer", "cs:O-n-access", "cs:O-1-head-insert", "cs:doubly-linked-list"],
+    "visibleAtEnd": "Student can implement a singly linked list with insert-at-head and print-all, explain why insertion is O(1) while access by index is O(n), and describe the memory difference between a linked list and an array",
+    "buildsOn": ["LAB-027"],
+    "file": "LAB-028-Linked-Lists-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-029": {
+    "title": "Trees and Binary Search Trees",
+    "concept": "A tree is a hierarchical data structure where each node has zero or more children; a binary search tree (BST) keeps all left-subtree values less than the node and all right-subtree values greater, giving O(log n) search in a balanced tree",
+    "tags": ["cs:tree", "cs:binary-tree", "cs:BST", "cs:O-log-n-search", "cs:tree-height", "cs:balanced-tree"],
+    "visibleAtEnd": "Student can insert values into a BST by hand, search for a value by traversing left/right, and explain why a degenerate BST (sorted insertion) degrades to O(n) search",
+    "buildsOn": ["LAB-028"],
+    "file": "LAB-029-Trees-BST-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-030": {
+    "title": "Graphs",
+    "concept": "A graph is a set of vertices connected by edges; edges can be directed or undirected, weighted or unweighted; graphs model any pairwise relationship — networks, dependencies, maps, social connections; adjacency lists represent sparse graphs efficiently",
+    "tags": ["cs:graph", "cs:vertex", "cs:edge", "cs:directed-graph", "cs:adjacency-list", "cs:DFS", "cs:BFS"],
+    "visibleAtEnd": "Student can represent a graph as an adjacency list, perform depth-first search to find a path between two nodes, and identify which real-world problems are graph problems",
+    "buildsOn": ["LAB-029"],
+    "file": "LAB-030-Graphs-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-031": {
+    "title": "Sorting Algorithms",
+    "concept": "Sorting algorithms reorder a collection; bubble sort is O(n²) and demonstrates the problem; merge sort is O(n log n) by dividing the array in half recursively and merging sorted halves; the comparison lower bound for sorting is O(n log n) — no comparison sort can do better",
+    "tags": ["cs:sorting", "cs:bubble-sort", "cs:merge-sort", "cs:O-n-log-n", "cs:stable-sort", "cs:divide-and-conquer"],
+    "visibleAtEnd": "Student can implement merge sort, explain why it is O(n log n), and describe what 'stable sort' means and why it matters",
+    "buildsOn": ["LAB-008", "LAB-005"],
+    "file": "LAB-031-Sorting-Algorithms-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-032": {
+    "title": "Searching — Linear and Binary Search",
+    "concept": "Linear search checks every element in O(n); binary search on a sorted array repeatedly halves the search space, giving O(log n) — but requires the array to already be sorted; this tradeoff (sort cost vs search cost) is a recurring engineering decision",
+    "tags": ["cs:linear-search", "cs:binary-search", "cs:O-log-n", "cs:sorted-precondition", "cs:search-space-halving"],
+    "visibleAtEnd": "Student can implement binary search, explain why it requires sorted input, and calculate how many steps binary search needs for a million-element array",
+    "buildsOn": ["LAB-031"],
+    "file": "LAB-032-Searching-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-033": {
+    "title": "Dynamic Programming and Memoization",
+    "concept": "Dynamic programming solves problems by breaking them into overlapping subproblems and storing results so each subproblem is solved once; memoization stores results of expensive function calls keyed by input; tabulation builds a results table bottom-up",
+    "tags": ["cs:dynamic-programming", "cs:memoization", "cs:tabulation", "cs:overlapping-subproblems", "cs:optimal-substructure"],
+    "visibleAtEnd": "Student can convert a naive recursive Fibonacci (exponential) to memoized Fibonacci (linear) and explain why the speedup occurs",
+    "buildsOn": ["LAB-032", "LAB-025"],
+    "file": "LAB-033-Dynamic-Programming-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-034": {
+    "title": "TypeScript — Interfaces and Type Aliases",
+    "concept": "A TypeScript interface declares the shape an object must have; a type alias names any type expression; both enable type checking at compile time, but interfaces can be extended and merged while type aliases can express unions, intersections, and mapped types",
+    "tags": ["lang:typescript-interface", "lang:typescript-type-alias", "lang:structural-typing", "lang:excess-property-checking", "cs:static-type-system"],
+    "visibleAtEnd": "Student can define an interface with required and optional properties, write a function that accepts the interface type, and explain why TypeScript uses structural typing (shape matters, not name)",
+    "buildsOn": ["LAB-017"],
+    "file": "LAB-034-TypeScript-Interfaces-Type-Aliases-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-035": {
+    "title": "TypeScript — Union Types and Discriminated Unions",
+    "concept": "A union type allows a value to be one of several types; a discriminated union adds a literal 'kind' field to each member so TypeScript can narrow the type in a switch — this models data that is exactly one of a fixed set of shapes",
+    "tags": ["lang:union-type", "lang:discriminated-union", "lang:literal-type", "lang:tagged-union", "cs:algebraic-data-type"],
+    "visibleAtEnd": "Student can define a discriminated union for a shape type (circle, rectangle, triangle), write a switch that narrows to each variant, and explain why TypeScript reports an error on an unhandled variant",
+    "buildsOn": ["LAB-034"],
+    "file": "LAB-035-Union-Discriminated-Unions-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-036": {
+    "title": "TypeScript — Generics",
+    "concept": "Generics parameterize a type so the same function or class works correctly with any type while still being type-checked; a generic function defers the decision of which type to use until the call site, without losing type safety",
+    "tags": ["lang:typescript-generics", "cs:parametric-polymorphism", "lang:generic-constraint", "lang:generic-function", "lang:generic-class"],
+    "visibleAtEnd": "Student can write a generic identity function, a generic stack class, and a generic function constrained to objects with a specific property — and explain why generics prevent the loss of type information that any causes",
+    "buildsOn": ["LAB-035"],
+    "file": "LAB-036-Generics-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-037": {
+    "title": "TypeScript — Type Narrowing and Type Guards",
+    "concept": "Type narrowing is TypeScript's ability to refine a broad type to a specific type inside a conditional block; type guards are expressions that perform a runtime check TypeScript can track at compile time (typeof, instanceof, in, custom predicates with 'is')",
+    "tags": ["lang:type-narrowing", "lang:type-guard", "lang:typeof", "lang:instanceof", "lang:never-type", "lang:exhaustive-check"],
+    "visibleAtEnd": "Student can write a custom type guard function, use it to narrow a union type, and trigger a TypeScript never-type error by adding a new union member without handling it in a switch",
+    "buildsOn": ["LAB-036"],
+    "file": "LAB-037-Type-Narrowing-Guards-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-038": {
+    "title": "TypeScript — Mapped Types and Utility Types",
+    "concept": "Mapped types transform every property of an existing type according to a rule; built-in utility types — Partial, Required, Readonly, Pick, Omit, Record — are all implemented as mapped types; they let you derive new types from existing ones without duplication",
+    "tags": ["lang:mapped-types", "lang:conditional-types", "lang:Partial", "lang:Required", "lang:Pick", "lang:Omit", "lang:Record"],
+    "visibleAtEnd": "Student can implement Partial<T> and Readonly<T> from scratch as mapped types, use Pick and Omit to derive view-model types from a domain type, and explain what keyof T produces",
+    "buildsOn": ["LAB-037"],
+    "file": "LAB-038-Mapped-Types-Utility-Types-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-039": {
+    "title": "TypeScript — Async and Promises",
+    "concept": "TypeScript types Promises as Promise<T> where T is the resolved value type; an async function always returns Promise<T>; await unwraps the Promise inside an async function; TypeScript enforces that you handle the async nature of values — you cannot use a Promise<number> where a number is expected",
+    "tags": ["lang:typescript-Promise", "lang:async-await-typescript", "cs:async-typing", "lang:return-type-inference", "cs:promise-chain-typing"],
+    "visibleAtEnd": "Student can write a typed async function, correctly type a function that returns a Promise of an array, and explain what Promise<void> means versus Promise<never>",
+    "buildsOn": ["LAB-038", "LAB-011"],
+    "file": "LAB-039-TypeScript-Async-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-040": {
+    "title": "TypeScript — Decorators",
+    "concept": "A decorator is a function that modifies the behavior of a class, method, property, or parameter at declaration time; decorators are TypeScript's metaprogramming mechanism for cross-cutting concerns like logging, validation, and dependency injection",
+    "tags": ["lang:typescript-decorator", "cs:metaprogramming", "se:cross-cutting-concerns", "lang:decorator-factory", "se:aspect-oriented-programming"],
+    "visibleAtEnd": "Student can write a method decorator that logs entry and exit, apply it to a class method, and explain why decorators are evaluated at class definition time, not at call time",
+    "buildsOn": ["LAB-039"],
+    "file": "LAB-040-Decorators-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-041": {
+    "title": "Python — Type Hints",
+    "concept": "Python type hints annotate variables and function signatures with types; they are not enforced at runtime — they are documentation checked by the mypy static analyzer; gradual typing lets you add hints incrementally to existing code",
+    "tags": ["lang:python-type-hints", "lang:mypy", "lang:Optional", "lang:Union-python", "lang:TypeVar", "cs:gradual-typing"],
+    "visibleAtEnd": "Student can annotate a Python function with parameter and return type hints, run mypy and read its error output, and explain why Python does not raise an error at runtime if a type hint is violated",
+    "buildsOn": ["LAB-034"],
+    "file": "LAB-041-Python-Type-Hints-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-042": {
+    "title": "Python — List Comprehensions and Generator Expressions",
+    "concept": "A list comprehension is a compact syntax for building a list by transforming or filtering another iterable; a generator expression is the same syntax with parentheses instead of brackets and produces values lazily one at a time instead of building the whole list in memory",
+    "tags": ["lang:list-comprehension", "lang:generator-expression", "lang:dict-comprehension", "lang:set-comprehension", "fp:declarative-collection-building"],
+    "visibleAtEnd": "Student can rewrite a for-loop that builds a list as a list comprehension, convert it to a generator expression, and explain the memory difference between the two",
+    "buildsOn": ["LAB-021", "LAB-041"],
+    "file": "LAB-042-List-Comprehensions-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-043": {
+    "title": "Python — Generators and Iterators",
+    "concept": "An iterator is any object with a __next__ method that returns the next value or raises StopIteration; a generator function uses yield to produce values one at a time, suspending execution between yields; generators model infinite sequences and large datasets that should not be fully loaded into memory",
+    "tags": ["lang:generator", "lang:iterator-protocol", "lang:yield", "cs:lazy-evaluation", "cs:infinite-sequence"],
+    "visibleAtEnd": "Student can write a generator function that produces an infinite sequence, consume it with next() and a for loop, and explain what 'lazy evaluation' means in this context",
+    "buildsOn": ["LAB-042"],
+    "file": "LAB-043-Generators-Iterators-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-044": {
+    "title": "Python — Context Managers",
+    "concept": "A context manager wraps a block of code with setup and teardown logic using the 'with' statement; it guarantees the teardown runs even if the block raises an exception — used for file handles, database connections, locks, and any resource that must be released",
+    "tags": ["lang:context-manager", "lang:with-statement", "lang:__enter__", "lang:__exit__", "se:resource-management", "se:RAII"],
+    "visibleAtEnd": "Student can implement a context manager using __enter__ and __exit__, use it in a with block, and verify the teardown runs when an exception is raised inside the block",
+    "buildsOn": ["LAB-043", "LAB-009"],
+    "file": "LAB-044-Context-Managers-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-045": {
+    "title": "Python — Dataclasses and Pydantic",
+    "concept": "A Python dataclass automatically generates __init__, __repr__, and __eq__ from field annotations, eliminating boilerplate; Pydantic is a validation library that enforces types and constraints at runtime when data enters a Python program from an external source (HTTP request, config file, database)",
+    "tags": ["lang:python-dataclass", "lang:pydantic", "cs:data-validation", "se:schema", "lang:field-validator"],
+    "visibleAtEnd": "Student can define a Pydantic model, instantiate it with valid data, observe the ValidationError raised with invalid data, and explain why Pydantic validation belongs at system boundaries but not inside business logic",
+    "buildsOn": ["LAB-044", "LAB-041"],
+    "file": "LAB-045-Dataclasses-Pydantic-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-046": {
+    "title": "Python — Async with asyncio",
+    "concept": "Python's asyncio runs coroutines on a single-threaded event loop; a coroutine declared with async def suspends at each await, yielding control to the event loop so other coroutines can run; this enables concurrent I/O without threads or processes",
+    "tags": ["lang:python-asyncio", "lang:async-def", "lang:await-python", "cs:coroutine", "cs:cooperative-multitasking"],
+    "visibleAtEnd": "Student can run two async functions concurrently with asyncio.gather, compare the execution time against running them sequentially, and explain why asyncio does not help with CPU-bound work",
+    "buildsOn": ["LAB-043", "LAB-011"],
+    "file": "LAB-046-Python-Async-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-047": {
+    "title": "Python — Dunder Methods and the Data Model",
+    "concept": "Python dunder (double-underscore) methods define how objects respond to built-in operations; __len__ makes len() work, __getitem__ makes indexing work, __eq__ makes == work, __iter__ makes for-loops work — implementing these makes custom classes behave like built-in types",
+    "tags": ["lang:dunder-methods", "lang:python-data-model", "lang:__str__", "lang:__repr__", "lang:__eq__", "lang:operator-overloading"],
+    "visibleAtEnd": "Student can implement a custom collection class that supports len(), indexing, iteration, and the in operator by implementing the appropriate dunder methods",
+    "buildsOn": ["LAB-046"],
+    "file": "LAB-047-Dunder-Methods-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-048": {
+    "title": "SOLID — Single Responsibility Principle",
+    "concept": "A class should have one reason to change — meaning it should be responsible to exactly one actor or concern; a class with multiple responsibilities becomes a liability: changing behavior for one consumer risks breaking behavior for another",
+    "tags": ["se:SRP", "se:single-responsibility", "se:cohesion", "se:reason-to-change", "se:SOLID"],
+    "visibleAtEnd": "Student can identify which responsibilities in a given class violate SRP, extract each into its own class, and demonstrate that a change to one extracted class does not affect the others",
+    "buildsOn": ["LAB-018"],
+    "file": "LAB-048-SRP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-049": {
+    "title": "SOLID — Open/Closed Principle",
+    "concept": "A module should be open for extension but closed for modification — new behavior is added by writing new code, not by editing existing code; the mechanism is abstraction: depend on an interface, add new implementations without touching the callers",
+    "tags": ["se:OCP", "se:open-closed", "se:extension-without-modification", "se:abstraction-point", "se:SOLID"],
+    "visibleAtEnd": "Student can demonstrate the OCP violation (a switch on type that must be modified for each new type), refactor it to use polymorphism, and add a new type without touching existing code",
+    "buildsOn": ["LAB-048", "LAB-017"],
+    "file": "LAB-049-OCP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-050": {
+    "title": "SOLID — Liskov Substitution Principle",
+    "concept": "If S is a subtype of T, then objects of type T in a program may be replaced with objects of type S without changing the correctness of the program; an LSP violation means a subclass breaks the contract its superclass established — typically by weakening preconditions, strengthening postconditions, or throwing exceptions the superclass does not throw",
+    "tags": ["se:LSP", "se:liskov-substitution", "se:behavioral-subtyping", "se:contract", "se:SOLID"],
+    "visibleAtEnd": "Student can identify an LSP violation (the classic Rectangle/Square example), explain exactly which contract is broken, and rewrite the hierarchy to satisfy LSP",
+    "buildsOn": ["LAB-049", "LAB-015"],
+    "file": "LAB-050-LSP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-051": {
+    "title": "SOLID — Interface Segregation Principle",
+    "concept": "Clients should not be forced to depend on interfaces they do not use; a fat interface that bundles many unrelated methods forces implementing classes to provide no-op or throwing stubs — split fat interfaces into role-specific interfaces so each client depends on exactly what it needs",
+    "tags": ["se:ISP", "se:interface-segregation", "se:fat-interface", "se:role-interface", "se:SOLID"],
+    "visibleAtEnd": "Student can identify a fat interface causing ISP violation, split it into two focused interfaces, and demonstrate that the original implementers only implement what they need",
+    "buildsOn": ["LAB-050"],
+    "file": "LAB-051-ISP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-052": {
+    "title": "SOLID — Dependency Inversion Principle",
+    "concept": "High-level modules should not depend on low-level modules — both should depend on abstractions; abstractions should not depend on details; the mechanism is injection: the high-level module declares what it needs via an interface, and something else supplies the concrete implementation",
+    "tags": ["se:DIP", "se:dependency-inversion", "se:depend-on-abstractions", "se:inversion-of-control", "se:dependency-injection", "se:SOLID"],
+    "visibleAtEnd": "Student can refactor a class that directly instantiates its dependencies into one that receives them via constructor injection, then substitute a test implementation without changing the class under test",
+    "buildsOn": ["LAB-051"],
+    "file": "LAB-052-DIP-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-053": {
+    "title": "DRY, YAGNI, and KISS",
+    "concept": "DRY (Don't Repeat Yourself) says every piece of knowledge should have one authoritative representation; YAGNI (You Ain't Gonna Need It) says do not build features before they are required; KISS (Keep It Simple, Stupid) says the simplest solution that works is the right one — complexity is a cost, not a feature",
+    "tags": ["se:DRY", "se:YAGNI", "se:KISS", "se:code-reuse", "se:simplicity", "se:premature-generalization"],
+    "visibleAtEnd": "Student can identify a DRY violation (copied logic in two places), extract it, identify a YAGNI violation (unused abstraction layer), remove it, and explain why three similar lines is sometimes better than a premature abstraction",
+    "buildsOn": ["LAB-052"],
+    "file": "LAB-053-DRY-YAGNI-KISS-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-054": {
+    "title": "Composition over Inheritance",
+    "concept": "Favor composing objects from smaller, independent behavior components over extending a class hierarchy; inheritance creates tight coupling between parent and child and forces a rigid is-a taxonomy; composition gives flexibility — behavior can be mixed, swapped at runtime, and changed without modifying the consumer",
+    "tags": ["se:composition-over-inheritance", "oop:has-a-vs-is-a", "se:flexibility", "se:fragile-base-class", "se:inheritance-problems"],
+    "visibleAtEnd": "Student can demonstrate the fragile base class problem with a concrete example, refactor it using composition, and add a new behavior combination that would have required a new subclass in the inheritance version but requires no new class in the composition version",
+    "buildsOn": ["LAB-053", "LAB-018"],
+    "file": "LAB-054-Composition-Over-Inheritance-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-055": {
+    "title": "Tell Don't Ask and Command-Query Separation",
+    "concept": "Tell Don't Ask says you should tell an object to do something rather than asking for its state and making decisions externally — the object knows its own state best; Command-Query Separation says a method should either change state (command) or return a value (query), never both",
+    "tags": ["se:tell-dont-ask", "se:command-query-separation", "se:encapsulation-enforcement", "se:information-expert", "se:side-effect-clarity"],
+    "visibleAtEnd": "Student can identify a Tell Don't Ask violation, refactor it by moving the decision into the object, identify a CQS violation (a method that both returns a value and modifies state), and split it into a command and a query",
+    "buildsOn": ["LAB-054"],
+    "file": "LAB-055-Tell-Dont-Ask-CQS-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-056": {
+    "title": "Law of Demeter",
+    "concept": "A method should only call methods on: itself, its parameters, objects it creates, and its direct components — not on objects returned by other objects; train-wreck code (a.b().c().d()) violates this law because the caller knows too much about the internal structure of unrelated objects",
+    "tags": ["se:law-of-demeter", "se:train-wreck", "se:coupling", "se:principle-of-least-knowledge", "se:message-chain"],
+    "visibleAtEnd": "Student can identify a train-wreck call chain, explain which objects the caller is wrongly coupled to, and refactor it so each object only talks to its immediate neighbors",
+    "buildsOn": ["LAB-055"],
+    "file": "LAB-056-Law-Of-Demeter-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-057": {
+    "title": "Fail Fast and Defensive Programming",
+    "concept": "Fail fast means detect invalid state as early as possible and stop immediately rather than continuing with corrupted data; guard clauses check preconditions at the start of a function and return or throw immediately — this keeps the main path unindented and the error handling explicit",
+    "tags": ["se:fail-fast", "se:defensive-programming", "se:guard-clause", "se:precondition", "se:assertion"],
+    "visibleAtEnd": "Student can refactor a deeply nested if-else function into a flat function using guard clauses, add precondition checks at the entry point, and explain why failing fast at a boundary is safer than propagating invalid state deep into the system",
+    "buildsOn": ["LAB-056"],
+    "file": "LAB-057-Fail-Fast-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-058": {
+    "title": "Code Smells",
+    "concept": "A code smell is a surface indicator of a deeper problem in the design; smells do not break the program but signal that the code will be hard to change; God Object (one class that does everything), Primitive Obsession (using raw strings/numbers where a type should exist), Feature Envy (a method that uses another class's data more than its own), Shotgun Surgery (one change requires edits in many files)",
+    "tags": ["se:code-smell", "se:god-object", "se:primitive-obsession", "se:feature-envy", "se:shotgun-surgery", "se:divergent-change"],
+    "visibleAtEnd": "Student can identify each named smell in a code sample, name the design principle it violates, and propose a specific refactoring that removes it",
+    "buildsOn": ["LAB-057"],
+    "file": "LAB-058-Code-Smells-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-059": {
+    "title": "Refactoring",
+    "concept": "Refactoring is changing the internal structure of code without changing its observable behavior; Extract Method pulls a code block into a named function; Rename Variable makes intent explicit; Move Method relocates behavior to the class that owns the relevant data; the test suite is the safety net that proves behavior was not changed",
+    "tags": ["se:refactoring", "se:extract-method", "se:rename", "se:move-method", "se:behavior-preservation", "se:boy-scout-rule"],
+    "visibleAtEnd": "Student can apply Extract Method, Rename Variable, and Introduce Parameter Object to a messy function, run the same tests before and after, and verify the observable behavior is identical",
+    "buildsOn": ["LAB-058"],
+    "file": "LAB-059-Refactoring-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-060": {
+    "title": "Unit Testing Fundamentals",
+    "concept": "A unit test verifies one unit of behavior in isolation — given this input, expect this output; the Arrange-Act-Assert pattern structures every test; a failing test before the fix and a passing test after it proves the fix worked; tests are documentation that cannot go stale",
+    "tags": ["se:unit-testing", "se:AAA-pattern", "se:test-case", "se:test-suite", "se:test-isolation", "se:regression-prevention"],
+    "visibleAtEnd": "Student can write three unit tests for a pure function using AAA structure, make one test fail intentionally, fix the function, and see all tests pass",
+    "buildsOn": ["LAB-019"],
+    "file": "LAB-060-Unit-Testing-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-061": {
+    "title": "Test-Driven Development",
+    "concept": "TDD is a discipline where you write a failing test before writing the production code that makes it pass; the cycle is red (write failing test) → green (write minimum code to pass) → refactor (clean up without breaking tests); TDD produces tests that verify intent and production code that has no unnecessary complexity",
+    "tags": ["se:TDD", "se:red-green-refactor", "se:test-first", "se:design-from-tests", "se:YAGNI-enforced"],
+    "visibleAtEnd": "Student can implement a small feature (a shopping cart total calculator) using strict TDD — writing each test before the code, committing after each green, and refactoring after the feature is complete",
+    "buildsOn": ["LAB-060"],
+    "file": "LAB-061-TDD-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-062": {
+    "title": "Test Doubles — Mocks, Stubs, Fakes, and Spies",
+    "concept": "A test double replaces a real dependency in a test; a stub returns canned responses; a fake is a working implementation with simplified behavior (in-memory database); a mock is a stub that also verifies the correct calls were made; a spy wraps a real object and records calls without replacing behavior",
+    "tags": ["se:test-double", "se:mock", "se:stub", "se:fake", "se:spy", "se:interaction-testing"],
+    "visibleAtEnd": "Student can write a test using a stub to control a dependency's response, write a test using a mock to verify a side effect occurred, and explain when to use each type of double",
+    "buildsOn": ["LAB-061", "LAB-052"],
+    "file": "LAB-062-Test-Doubles-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-063": {
+    "title": "Integration Testing",
+    "concept": "An integration test verifies that two or more components work correctly together with their real dependencies — real database, real file system, real HTTP client; integration tests catch the bugs that unit tests cannot: mismatched schemas, wrong SQL, misconfigured routes",
+    "tags": ["se:integration-testing", "se:test-boundary", "se:real-dependencies", "se:database-testing", "se:contract-testing"],
+    "visibleAtEnd": "Student can write an integration test that inserts a record into a real SQLite database, reads it back through the production query, and asserts the values match — and explain why this test would not catch a bug that a unit test with a stub database would miss",
+    "buildsOn": ["LAB-062"],
+    "file": "LAB-063-Integration-Testing-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-064": {
+    "title": "End-to-End Testing and the Test Pyramid",
+    "concept": "An end-to-end test drives the entire system through its real interface (a browser, an API client) and verifies complete user journeys; the test pyramid says: many unit tests (fast, isolated), fewer integration tests (slower, real dependencies), fewest E2E tests (slowest, most realistic); inverting the pyramid produces a slow, brittle test suite",
+    "tags": ["se:e2e-testing", "se:user-journey", "se:browser-automation", "se:test-pyramid", "se:test-cost"],
+    "visibleAtEnd": "Student can explain where each type of test belongs in the test pyramid, describe what an E2E test for a login form would verify, and explain why a 100% E2E test suite is worse than a mixed pyramid",
+    "buildsOn": ["LAB-063"],
+    "file": "LAB-064-E2E-Testing-Test-Pyramid-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-065": {
+    "title": "Design Pattern: Factory Method",
+    "concept": "Factory Method defines an interface for creating an object but lets subclasses decide which class to instantiate; it replaces direct constructor calls with a factory method call, so adding a new product type means adding a new subclass rather than editing existing code",
+    "tags": ["dp:factory-method", "dp:creational", "oop:subclass-decides-instantiation", "se:open-closed", "dp:creator-product"],
+    "visibleAtEnd": "Student can implement Factory Method for a notification system (EmailNotification, SMSNotification) where the creator subclass determines which concrete product is created, and add a PushNotification without touching existing creator code",
+    "buildsOn": ["LAB-049", "LAB-016"],
+    "file": "LAB-065-Factory-Method-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-066": {
+    "title": "Design Pattern: Abstract Factory",
+    "concept": "Abstract Factory provides an interface for creating families of related objects without specifying their concrete classes; where Factory Method produces one product, Abstract Factory produces a suite of related products that are designed to work together",
+    "tags": ["dp:abstract-factory", "dp:creational", "dp:product-family", "dp:platform-independence", "dp:factory-of-factories"],
+    "visibleAtEnd": "Student can implement an Abstract Factory for UI components (DarkThemeFactory, LightThemeFactory) where each factory produces a matching Button, Checkbox, and Input, and switch themes without changing the code that uses them",
+    "buildsOn": ["LAB-065"],
+    "file": "LAB-066-Abstract-Factory-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-067": {
+    "title": "Design Pattern: Builder",
+    "concept": "Builder separates the construction of a complex object from its representation; a fluent Builder accumulates configuration through chained method calls and produces the object in a final build() call; this replaces telescoping constructors (functions with 8 optional parameters) with readable, explicit construction",
+    "tags": ["dp:builder", "dp:creational", "dp:fluent-interface", "dp:step-by-step-construction", "se:telescoping-constructor-problem"],
+    "visibleAtEnd": "Student can implement a QueryBuilder that accumulates SELECT, WHERE, ORDER BY, and LIMIT clauses and produces a SQL string from build(), and demonstrate that incompletely constructed queries fail at build() not at runtime",
+    "buildsOn": ["LAB-066"],
+    "file": "LAB-067-Builder-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-068": {
+    "title": "Design Pattern: Singleton — and When to Avoid It",
+    "concept": "Singleton ensures a class has only one instance and provides a global access point to it; it solves the legitimate problem of shared resources (a configuration object, a connection pool) but introduces global state, makes testing difficult by preventing dependency injection, and creates hidden coupling between classes",
+    "tags": ["dp:singleton", "dp:creational", "dp:single-instance", "se:global-state-problem", "se:singleton-antipattern"],
+    "visibleAtEnd": "Student can implement Singleton with lazy initialization, demonstrate the testing problem it creates, and refactor the code to use dependency injection so the same effect is achieved without the global state",
+    "buildsOn": ["LAB-067", "LAB-052"],
+    "file": "LAB-068-Singleton-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-069": {
+    "title": "Design Pattern: Prototype",
+    "concept": "Prototype creates new objects by cloning an existing instance (the prototype); this is useful when object creation is expensive, when the exact type is unknown at creation time, or when you need many similar objects that differ only in configuration; shallow vs deep copy is the critical implementation detail",
+    "tags": ["dp:prototype", "dp:creational", "dp:clone", "cs:shallow-copy", "cs:deep-copy"],
+    "visibleAtEnd": "Student can implement a clone() method, demonstrate the bug that shallow copy causes when the object contains a nested object, fix it with deep copy, and name one real use case where Prototype beats direct construction",
+    "buildsOn": ["LAB-068"],
+    "file": "LAB-069-Prototype-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-070": {
+    "title": "Design Pattern: Adapter",
+    "concept": "Adapter converts the interface of one class into the interface that a client expects; it is a wrapper that translates calls — the client calls the adapter's interface, the adapter translates and delegates to the adaptee; Adapter is how you integrate code you cannot change (a library, a legacy system) with code that expects a different interface",
+    "tags": ["dp:adapter", "dp:structural", "dp:interface-translation", "se:legacy-integration", "dp:wrapper"],
+    "visibleAtEnd": "Student can write an Adapter that makes a third-party payment library (with its own interface) work through the PaymentProcessor interface the rest of the system expects — without modifying the library or the callers",
+    "buildsOn": ["LAB-069", "LAB-017"],
+    "file": "LAB-070-Adapter-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-071": {
+    "title": "Design Pattern: Bridge",
+    "concept": "Bridge decouples an abstraction from its implementation so the two can vary independently; instead of subclassing for every combination of abstraction and implementation (a 2D class hierarchy), Bridge uses composition — the abstraction holds a reference to an implementation interface",
+    "tags": ["dp:bridge", "dp:structural", "dp:abstraction-implementation-split", "dp:composition-over-inheritance", "dp:decoupling"],
+    "visibleAtEnd": "Student can demonstrate the class-explosion problem (Shape × Color requiring N×M subclasses) and refactor it using Bridge so adding a new Shape and a new Color each require one class, not N+M",
+    "buildsOn": ["LAB-070", "LAB-054"],
+    "file": "LAB-071-Bridge-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-072": {
+    "title": "Design Pattern: Composite",
+    "concept": "Composite composes objects into tree structures to represent part-whole hierarchies; it lets clients treat individual objects and compositions of objects uniformly through a common interface — a file system where files and directories both have size(), a UI where a Panel and a Button both have render()",
+    "tags": ["dp:composite", "dp:structural", "dp:tree-structure", "dp:uniform-interface", "dp:part-whole-hierarchy"],
+    "visibleAtEnd": "Student can implement a file system tree where File and Directory both implement a Component interface with size(), and demonstrate that calling size() on a Directory recursively sums the sizes of all nested files",
+    "buildsOn": ["LAB-071"],
+    "file": "LAB-072-Composite-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-073": {
+    "title": "Design Pattern: Decorator",
+    "concept": "Decorator wraps an object in another object that implements the same interface, adding behavior before or after delegating to the wrapped object; decorators can be stacked; this is how you add responsibilities to objects at runtime without subclassing",
+    "tags": ["dp:decorator", "dp:structural", "dp:dynamic-behavior", "dp:wrapping", "dp:open-closed-structural"],
+    "visibleAtEnd": "Student can implement a Logger decorator and a Caching decorator for a DataSource interface, stack them (LoggingDataSource wrapping CachingDataSource wrapping the real source), and show that adding TimingDecorator requires no changes to existing decorators",
+    "buildsOn": ["LAB-072"],
+    "file": "LAB-073-Decorator-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-074": {
+    "title": "Design Pattern: Facade",
+    "concept": "Facade provides a simplified interface to a complex subsystem; it reduces the learning curve for using the subsystem and decouples clients from the internal complexity — the client only sees the facade's interface and is unaffected by changes to the subsystem internals",
+    "tags": ["dp:facade", "dp:structural", "dp:simplified-interface", "dp:subsystem", "se:abstraction-layer"],
+    "visibleAtEnd": "Student can implement a VideoConverter facade that hides four subsystem classes (CodecFactory, AudioMixer, BitrateReader, OggCompressionCodec) behind a single convertVideo(filename, format) method",
+    "buildsOn": ["LAB-073"],
+    "file": "LAB-074-Facade-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-075": {
+    "title": "Design Pattern: Flyweight",
+    "concept": "Flyweight minimizes memory by sharing the common immutable state (intrinsic state) of many similar objects, while each object maintains its own unique mutable state (extrinsic state) externally; useful when a program needs a huge number of objects that would consume too much memory if each stored all its own data",
+    "tags": ["dp:flyweight", "dp:structural", "dp:shared-state", "dp:intrinsic-extrinsic-state", "cs:memory-optimization"],
+    "visibleAtEnd": "Student can implement a TreeFlyweight where a forest of 100,000 trees shares species data (texture, color) while each tree stores only its coordinates, and demonstrate the memory reduction compared to each tree storing all its own data",
+    "buildsOn": ["LAB-074"],
+    "file": "LAB-075-Flyweight-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-076": {
+    "title": "Design Pattern: Proxy",
+    "concept": "Proxy provides a surrogate for another object and controls access to it; a Virtual Proxy delays expensive object creation until first use (lazy loading); a Protection Proxy adds access control; a Remote Proxy represents an object in a different address space",
+    "tags": ["dp:proxy", "dp:structural", "dp:surrogate", "dp:lazy-loading", "dp:access-control", "dp:virtual-proxy"],
+    "visibleAtEnd": "Student can implement a Virtual Proxy that delays loading a large image until the first call to display(), and a Protection Proxy that checks user role before allowing calls to an AdminService",
+    "buildsOn": ["LAB-075"],
+    "file": "LAB-076-Proxy-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-077": {
+    "title": "Design Pattern: Chain of Responsibility",
+    "concept": "Chain of Responsibility passes a request along a chain of handlers; each handler decides whether to handle the request or pass it to the next handler; this decouples the sender from the receiver and allows the chain to be assembled at runtime — HTTP middleware is the most common modern form",
+    "tags": ["dp:chain-of-responsibility", "dp:behavioral", "dp:handler-chain", "dp:decoupled-handling", "dp:middleware-application"],
+    "visibleAtEnd": "Student can build a request validation chain (AuthHandler → RateLimitHandler → LoggingHandler → HandlerHandler) where each link processes or rejects the request, and add a new handler without changing any existing handler",
+    "buildsOn": ["LAB-076"],
+    "file": "LAB-077-Chain-Of-Responsibility-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-078": {
+    "title": "Design Pattern: Command",
+    "concept": "Command encapsulates a request as an object with an execute() method; this lets you parameterize operations, queue them, log them, and implement undo by storing the inverse operation; the invoker does not know what the command does — it only calls execute()",
+    "tags": ["dp:command", "dp:behavioral", "dp:encapsulate-request", "dp:undo-redo", "dp:queue-requests"],
+    "visibleAtEnd": "Student can implement a text editor with InsertTextCommand and DeleteTextCommand, execute a sequence of commands, undo them in reverse order, and explain why the Command pattern is what makes undo/redo possible",
+    "buildsOn": ["LAB-077"],
+    "file": "LAB-078-Command-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-079": {
+    "title": "Design Pattern: Iterator",
+    "concept": "Iterator provides a standard way to access elements of a collection sequentially without exposing the collection's underlying structure; it decouples traversal logic from the collection so the same traversal code works on arrays, trees, graphs, or database result sets",
+    "tags": ["dp:iterator", "dp:behavioral", "dp:sequential-access", "dp:collection-traversal", "lang:iterator-protocol"],
+    "visibleAtEnd": "Student can implement a custom Iterator for a binary tree that traverses in-order, use it with a for-of loop by implementing the iterator protocol, and explain why the caller does not need to know the tree's internal structure",
+    "buildsOn": ["LAB-078", "LAB-043"],
+    "file": "LAB-079-Iterator-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-080": {
+    "title": "Design Pattern: Mediator",
+    "concept": "Mediator reduces chaotic dependencies between many objects by making them communicate only through a central mediator object; instead of each component knowing about every other component (O(n²) connections), all components know only the mediator (O(n) connections) — an air traffic controller is the canonical example",
+    "tags": ["dp:mediator", "dp:behavioral", "dp:central-coordinator", "dp:reduced-coupling", "dp:event-hub"],
+    "visibleAtEnd": "Student can refactor a chat room where each User directly references every other User into one where each User only talks to the ChatRoom mediator, and demonstrate that adding a new User requires no changes to existing Users",
+    "buildsOn": ["LAB-079"],
+    "file": "LAB-080-Mediator-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-081": {
+    "title": "Design Pattern: Memento",
+    "concept": "Memento captures and externalizes an object's internal state so that it can be restored later — without violating encapsulation; the Originator creates the Memento and restores from it, the Caretaker stores Mementos without inspecting them; this is the structural basis for undo history and save-game systems",
+    "tags": ["dp:memento", "dp:behavioral", "dp:state-snapshot", "dp:undo-mechanism", "dp:originator-caretaker"],
+    "visibleAtEnd": "Student can implement a text editor with a history stack of Mementos, undo and redo operations that restore state from the stack, and explain why the Caretaker cannot read the Memento's contents",
+    "buildsOn": ["LAB-080", "LAB-078"],
+    "file": "LAB-081-Memento-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-082": {
+    "title": "Design Pattern: Observer",
+    "concept": "Observer defines a one-to-many dependency: when a subject changes state, all subscribed observers are notified and updated automatically; the subject maintains a list of observers and calls update() on each; this is the structural basis of event systems, reactive frameworks, and pub/sub messaging",
+    "tags": ["dp:observer", "dp:behavioral", "dp:event-subscription", "dp:publisher-subscriber", "dp:loose-coupling"],
+    "visibleAtEnd": "Student can implement a Subject with subscribe/unsubscribe/notify, attach multiple Observer objects to it, change the subject's state, and see all observers update; then remove one observer and confirm it no longer receives updates",
+    "buildsOn": ["LAB-081"],
+    "file": "LAB-082-Observer-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-083": {
+    "title": "Design Pattern: State",
+    "concept": "State allows an object to alter its behavior when its internal state changes — it appears to change its class; instead of large if-else or switch blocks on a state enum, each state is a separate class that handles the transitions and behaviors for that state",
+    "tags": ["dp:state", "dp:behavioral", "dp:finite-state-machine", "dp:context-state", "dp:behavior-by-state"],
+    "visibleAtEnd": "Student can implement a TrafficLight with Red, Yellow, Green state classes where each state handles the next() call differently, and demonstrate that adding a new state (BlinkingRed) requires only a new class — not modifying existing states",
+    "buildsOn": ["LAB-082"],
+    "file": "LAB-083-State-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-084": {
+    "title": "Design Pattern: Strategy",
+    "concept": "Strategy defines a family of algorithms, encapsulates each one, and makes them interchangeable; the context delegates to a strategy object, and the strategy can be swapped at runtime; this is the pattern to use when you have multiple ways to do the same thing and want to choose at runtime",
+    "tags": ["dp:strategy", "dp:behavioral", "dp:interchangeable-algorithms", "dp:runtime-selection", "se:open-closed-behavioral"],
+    "visibleAtEnd": "Student can implement a Sorter that accepts a SortStrategy interface and works correctly with BubbleSortStrategy, MergeSortStrategy, and QuickSortStrategy — and swap strategies at runtime without changing the Sorter",
+    "buildsOn": ["LAB-083"],
+    "file": "LAB-084-Strategy-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-085": {
+    "title": "Design Pattern: Template Method",
+    "concept": "Template Method defines the skeleton of an algorithm in a base class, leaving some steps to subclasses; the base class calls abstract methods in a fixed order (the template); subclasses override the steps but cannot change the order; this is the GoF pattern most directly based on inheritance",
+    "tags": ["dp:template-method", "dp:behavioral", "dp:algorithm-skeleton", "dp:hook-method", "oop:inheritance-controlled"],
+    "visibleAtEnd": "Student can implement a DataMiner base class with a mine() template method that calls extractData(), parseData(), analyzeData() in order; create two subclasses for CSV and PDF that override each step; and show the order is guaranteed regardless of subclass",
+    "buildsOn": ["LAB-084", "LAB-014"],
+    "file": "LAB-085-Template-Method-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-086": {
+    "title": "Design Pattern: Visitor",
+    "concept": "Visitor lets you add operations to a class hierarchy without modifying the classes; each class accepts a Visitor and calls the visitor's visit method for its own type; double dispatch routes the call to the right visitor method; this is the pattern for when you have a stable class hierarchy but frequently add new operations",
+    "tags": ["dp:visitor", "dp:behavioral", "dp:double-dispatch", "dp:operations-on-structure", "dp:open-closed-operations"],
+    "visibleAtEnd": "Student can implement an AST node hierarchy (NumberNode, AddNode, MultiplyNode) with accept(visitor), and write two Visitors — a PrintVisitor and an EvaluateVisitor — without touching the node classes",
+    "buildsOn": ["LAB-085"],
+    "file": "LAB-086-Visitor-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-087": {
+    "title": "Software Architecture: Layered Architecture",
+    "concept": "Layered architecture organizes code into horizontal layers — Presentation, Application, Domain, and Infrastructure — where each layer only communicates with the layer directly below it; this separation means UI changes do not break business logic, and database changes do not break UI",
+    "tags": ["sa:layered-architecture", "sa:presentation-layer", "sa:domain-layer", "sa:infrastructure-layer", "sa:layer-isolation"],
+    "visibleAtEnd": "Student can draw the four layers of a web application, assign a list of code artifacts to the correct layer, explain what rule is violated when a domain object imports from an HTTP framework, and name the benefit that violation loses",
+    "buildsOn": ["LAB-086"],
+    "file": "LAB-087-Layered-Architecture-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-088": {
+    "title": "Software Architecture: MVC — Model-View-Controller",
+    "concept": "MVC separates an application into three roles: Model (data and business rules), View (presentation), Controller (handles input, updates Model, selects View); the Model knows nothing about the View; the View renders whatever Model state it is given; the Controller is the only component that knows about both",
+    "tags": ["sa:MVC", "sa:model", "sa:view", "sa:controller", "sa:separation-of-concerns", "dp:observer-in-mvc"],
+    "visibleAtEnd": "Student can implement a minimal MVC todo list where adding an item updates only the Model, the View re-renders only from Model state, and the Controller is the only code that calls both",
+    "buildsOn": ["LAB-087", "LAB-082"],
+    "file": "LAB-088-MVC-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-089": {
+    "title": "Software Architecture: Hexagonal Architecture",
+    "concept": "Hexagonal architecture (Ports and Adapters) places the domain at the center, surrounded by ports (interfaces) and adapters (implementations); the domain depends on nothing external — it defines the ports it needs, and adapters plug in from outside; this makes the domain testable with no infrastructure",
+    "tags": ["sa:hexagonal", "sa:ports-and-adapters", "sa:domain-isolation", "sa:adapter-in-architecture", "se:dependency-inversion-applied"],
+    "visibleAtEnd": "Student can restructure a simple application so the domain defines a port interface, the test uses an in-memory adapter, and the production code uses a real database adapter — swapping between them by changing only the wiring",
+    "buildsOn": ["LAB-088", "LAB-052"],
+    "file": "LAB-089-Hexagonal-Architecture-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-090": {
+    "title": "Software Architecture: Repository Pattern",
+    "concept": "The Repository pattern abstracts data access behind a collection-like interface — the caller adds, removes, and finds entities without knowing whether they are stored in a database, a file, or memory; this decouples domain logic from persistence and makes domain code testable without a database",
+    "tags": ["sa:repository", "sa:data-access-abstraction", "se:persistence-ignorance", "sa:collection-interface", "sa:domain-layer"],
+    "visibleAtEnd": "Student can define a Repository interface with find, save, and delete, write an InMemoryRepository for tests and a SQLiteRepository for production, and run the same domain logic against both without changing the domain code",
+    "buildsOn": ["LAB-089"],
+    "file": "LAB-090-Repository-Pattern-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-091": {
+    "title": "Software Architecture: Service Layer",
+    "concept": "The Service Layer sits between the Presentation layer and the Domain — it orchestrates domain objects and repositories to implement use cases; a service method corresponds to one user action (createOrder, cancelShipment); services enforce transaction boundaries and coordinate multiple domain objects",
+    "tags": ["sa:service-layer", "sa:application-logic", "sa:use-case-orchestration", "sa:transaction-boundary", "sa:application-service"],
+    "visibleAtEnd": "Student can implement an OrderService.placeOrder() method that: validates input, checks inventory via a Repository, creates an Order entity, saves it, and sends a confirmation event — and write a test that verifies the orchestration without hitting a real database",
+    "buildsOn": ["LAB-090"],
+    "file": "LAB-091-Service-Layer-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-092": {
+    "title": "Software Architecture: Unit of Work",
+    "concept": "Unit of Work tracks changes made to objects during a business transaction and flushes them all to the database in a single atomic operation at the end; it prevents partial writes, reduces round-trips, and ensures that either all changes are committed or none are",
+    "tags": ["sa:unit-of-work", "sa:transaction-management", "sa:change-tracking", "sa:atomicity", "dp:unit-of-work-pattern"],
+    "visibleAtEnd": "Student can implement a UnitOfWork that tracks new, dirty, and deleted entities, commit them all in one flush(), and demonstrate that if an error occurs mid-flush, no changes persist",
+    "buildsOn": ["LAB-091"],
+    "file": "LAB-092-Unit-Of-Work-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-093": {
+    "title": "Software Architecture: CQRS",
+    "concept": "CQRS (Command Query Responsibility Segregation) separates the model used to write data (commands that change state) from the model used to read data (queries that return state); reads and writes have different performance and consistency requirements — separating them lets each be optimized independently",
+    "tags": ["sa:CQRS", "sa:command-side", "sa:query-side", "sa:read-write-separation", "sa:eventual-consistency"],
+    "visibleAtEnd": "Student can implement a simple CQRS system where PlaceOrderCommand goes through the write model (with full validation) and GetOrderSummaryQuery goes through a flattened read model (a denormalized view) — and explain why these use different data shapes",
+    "buildsOn": ["LAB-092"],
+    "file": "LAB-093-CQRS-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-094": {
+    "title": "Software Architecture: Event Sourcing",
+    "concept": "Event sourcing stores state as a sequence of immutable events rather than the current state; the current state is derived by replaying events from the beginning; the event log is the source of truth, giving a complete audit trail and the ability to reconstruct any past state",
+    "tags": ["sa:event-sourcing", "sa:event-store", "sa:projection", "sa:append-only", "sa:audit-trail"],
+    "visibleAtEnd": "Student can implement a BankAccount using event sourcing where AccountOpened, MoneyDeposited, and MoneyWithdrawn events are appended to a list, and the current balance is derived by replaying them — then demonstrate that rewinding to any past state is possible",
+    "buildsOn": ["LAB-093"],
+    "file": "LAB-094-Event-Sourcing-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-095": {
+    "title": "Software Architecture: Event-Driven Architecture and Pub/Sub",
+    "concept": "Event-driven architecture decouples components by having them communicate through events: producers emit events without knowing who consumes them; consumers subscribe to event types without knowing who produced them; this removes direct dependencies between services but introduces eventual consistency",
+    "tags": ["sa:event-driven", "sa:pub-sub", "sa:message-broker", "sa:loose-coupling", "sa:asynchronous-communication"],
+    "visibleAtEnd": "Student can implement an in-process event bus where OrderService emits OrderPlaced, and EmailService and InventoryService each subscribe and react — neither knowing the other exists — and explain the tradeoff vs direct method calls",
+    "buildsOn": ["LAB-094", "LAB-082"],
+    "file": "LAB-095-Event-Driven-PubSub-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-096": {
+    "title": "Software Architecture: Saga Pattern",
+    "concept": "A saga manages a distributed transaction across multiple services where a traditional ACID transaction is impossible; each service executes a local transaction and publishes an event; if a step fails, compensating transactions roll back the already-completed steps; choreography (services react to events) vs orchestration (a coordinator directs) are the two implementations",
+    "tags": ["sa:saga", "sa:distributed-transaction", "sa:compensating-transaction", "sa:choreography", "sa:orchestration"],
+    "visibleAtEnd": "Student can implement a three-step booking saga (reserve seat, charge card, send ticket) with compensating transactions for each step, trigger a failure at step 2, and verify step 1 is compensated by releasing the reserved seat",
+    "buildsOn": ["LAB-095"],
+    "file": "LAB-096-Saga-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-097": {
+    "title": "Software Architecture: Circuit Breaker",
+    "concept": "A circuit breaker wraps calls to an external service; when failures exceed a threshold, it opens (stops making calls and returns an error immediately); after a timeout, it half-opens (allows one probe call); if the probe succeeds, it closes; this prevents a failing dependency from exhausting all threads and cascading the failure",
+    "tags": ["sa:circuit-breaker", "sa:fault-tolerance", "sa:fail-fast-distributed", "sa:half-open-state", "sa:resilience"],
+    "visibleAtEnd": "Student can implement a CircuitBreaker with closed/open/half-open states, simulate a failing dependency, watch the breaker open after 5 failures, and verify it half-opens after a timeout",
+    "buildsOn": ["LAB-096"],
+    "file": "LAB-097-Circuit-Breaker-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-098": {
+    "title": "Software Architecture: REST API Design",
+    "concept": "REST is an architectural style for APIs where resources are identified by URLs, state is transferred as representations (JSON), and HTTP methods express intent (GET reads, POST creates, PUT replaces, PATCH modifies, DELETE removes); stateless requests mean each request contains all information needed to process it",
+    "tags": ["sa:REST", "sa:resource", "cs:HTTP-methods", "sa:stateless", "sa:uniform-interface", "sa:idempotency"],
+    "visibleAtEnd": "Student can design the URL structure and HTTP methods for a complete CRUD API, explain why GET must be idempotent, explain the difference between PUT and PATCH, and identify a non-RESTful design and fix it",
+    "buildsOn": ["LAB-097", "LAB-003"],
+    "file": "LAB-098-REST-API-Design-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-099": {
+    "title": "Software Architecture: Authentication — JWT, Sessions, OAuth 2.0",
+    "concept": "Session-based auth stores a session ID in a cookie and state on the server; JWT (JSON Web Token) encodes claims in a signed token the client stores and sends with every request — stateless; OAuth 2.0 is an authorization framework that lets a user grant a third party access to their resources without sharing their password",
+    "tags": ["sa:authentication", "sa:JWT", "sa:session-auth", "sa:OAuth2", "cs:cryptographic-signing", "sa:stateless-auth"],
+    "visibleAtEnd": "Student can decode a JWT by hand (base64 header + payload + signature), explain what the signature prevents, describe the difference between authentication and authorization, and draw the OAuth 2.0 authorization code flow",
+    "buildsOn": ["LAB-098"],
+    "file": "LAB-099-Authentication-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-100": {
+    "title": "Software Architecture: The 12-Factor App",
+    "concept": "The 12-Factor App is a methodology for building software-as-a-service: store config in environment variables (not code), treat backing services as attached resources, export services via port binding, keep development and production as similar as possible, treat logs as event streams",
+    "tags": ["sa:12-factor", "sa:configuration", "sa:backing-services", "sa:stateless-processes", "sa:environment-parity"],
+    "visibleAtEnd": "Student can identify which of the 12 factors a given application violates, explain why hardcoding a database URL in source code is a 12-factor violation, and rewrite it to read from an environment variable",
+    "buildsOn": ["LAB-099"],
+    "file": "LAB-100-12-Factor-App-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-101": {
+    "title": "Software Architecture: Microservices vs Monolith",
+    "concept": "A monolith deploys all functionality as one unit — simple to develop, test, and deploy but hard to scale independently; microservices split functionality into independently deployable services — each can scale and be deployed independently but at the cost of distributed systems complexity (network latency, partial failure, distributed transactions)",
+    "tags": ["sa:microservices", "sa:monolith", "sa:service-boundaries", "sa:distributed-complexity", "sa:deployment-independence"],
+    "visibleAtEnd": "Student can list three concrete problems a monolith solves better than microservices, three concrete problems microservices solve better, and explain why starting with a monolith and extracting services later is generally the right sequence",
+    "buildsOn": ["LAB-100"],
+    "file": "LAB-101-Microservices-Monolith-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-102": {
+    "title": "The DOM and Browser Rendering Pipeline",
+    "concept": "The DOM (Document Object Model) is a tree of objects representing an HTML document that JavaScript can read and modify; the browser builds the DOM from HTML, builds the CSSOM from CSS, combines them into a render tree, and paints pixels — modifying the DOM triggers recalculation of the affected parts of this pipeline",
+    "tags": ["cs:DOM", "cs:document-tree", "lang:querySelector", "cs:reflow", "cs:repaint", "cs:virtual-DOM"],
+    "visibleAtEnd": "Student can use querySelector to find an element, modify its textContent and style, create a new element and append it, and explain why reading offsetHeight after writing to the DOM forces a synchronous reflow",
+    "buildsOn": ["LAB-004"],
+    "file": "LAB-102-DOM-Rendering-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-103": {
+    "title": "CSS Box Model",
+    "concept": "Every HTML element is a box with four layers: content (the text or image), padding (space inside the border), border (the edge), and margin (space outside the border); box-sizing: border-box makes width include padding and border, which is almost always what you want",
+    "tags": ["lang:css-box-model", "lang:margin", "lang:padding", "lang:border", "lang:box-sizing-border-box"],
+    "visibleAtEnd": "Student can predict the rendered size of an element given its width, padding, and border, explain why two adjacent margins collapse into one, and use box-sizing: border-box to make layout math predictable",
+    "buildsOn": ["LAB-102"],
+    "file": "LAB-103-CSS-Box-Model-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-104": {
+    "title": "CSS Flexbox",
+    "concept": "Flexbox lays out items along a single axis (row or column), distributing space according to flex-grow, flex-shrink, and flex-basis; the container controls direction and alignment; flex: 1 on a child makes it grow to fill all remaining space",
+    "tags": ["lang:flexbox", "lang:flex-container", "lang:flex-item", "lang:main-axis", "lang:cross-axis", "lang:flex-1"],
+    "visibleAtEnd": "Student can center an element horizontally and vertically using flexbox in under 3 lines of CSS, build a sidebar + main content layout using flex: 1, and explain the difference between justify-content (main axis) and align-items (cross axis)",
+    "buildsOn": ["LAB-103"],
+    "file": "LAB-104-CSS-Flexbox-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-105": {
+    "title": "CSS Grid",
+    "concept": "CSS Grid lays out items in a two-dimensional grid of rows and columns defined by the container; items can span multiple rows and columns; grid-template-areas lets you name regions; Grid excels at page-level layouts while Flexbox excels at component-level one-dimensional layouts",
+    "tags": ["lang:css-grid", "lang:grid-template-columns", "lang:grid-template-areas", "lang:fr-unit", "lang:grid-area"],
+    "visibleAtEnd": "Student can implement a complete page layout (header, sidebar, main, footer) using grid-template-areas, explain when to use Grid vs Flexbox, and use the fr unit to distribute space proportionally",
+    "buildsOn": ["LAB-104"],
+    "file": "LAB-105-CSS-Grid-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-106": {
+    "title": "JavaScript Events and the Event Loop (in the Browser)",
+    "concept": "Browser events (click, keydown, load, resize) are dispatched by the browser and handled by listener functions registered with addEventListener; event propagation moves up the DOM tree (bubbling); the event loop processes one task at a time from the task queue — a long event handler blocks all other events",
+    "tags": ["cs:browser-event", "lang:addEventListener", "cs:event-bubbling", "cs:event-delegation", "cs:task-queue-browser"],
+    "visibleAtEnd": "Student can register a click handler, stop propagation to prevent bubbling, use event delegation on a list parent instead of individual items, and explain why a 5-second loop in a click handler freezes the browser",
+    "buildsOn": ["LAB-105", "LAB-002"],
+    "file": "LAB-106-JavaScript-Events-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-107": {
+    "title": "Fetch API and HTTP in the Browser",
+    "concept": "The Fetch API sends HTTP requests from the browser; fetch() returns a Promise that resolves to a Response; CORS (Cross-Origin Resource Sharing) is a browser security mechanism that blocks requests to a different origin unless the server explicitly allows it",
+    "tags": ["lang:fetch-API", "cs:HTTP-request-browser", "cs:JSON-parse", "cs:CORS", "lang:async-fetch"],
+    "visibleAtEnd": "Student can fetch JSON from a public API in the browser console, parse the response, handle errors by checking response.ok, and explain what CORS is and why it exists",
+    "buildsOn": ["LAB-106", "LAB-011"],
+    "file": "LAB-107-Fetch-API-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-108": {
+    "title": "WebSockets",
+    "concept": "A WebSocket is a persistent, full-duplex communication channel between client and server — unlike HTTP, either side can send a message at any time without the other side polling; WebSockets are used when the server needs to push data to the client (live feeds, chat, real-time collaboration)",
+    "tags": ["cs:WebSocket", "cs:full-duplex", "cs:persistent-connection", "cs:real-time", "lang:WebSocket-API"],
+    "visibleAtEnd": "Student can open a WebSocket connection to a public echo server from the browser console, send a message, and receive the echo — then explain why long-polling is the alternative and what it costs",
+    "buildsOn": ["LAB-107"],
+    "file": "LAB-108-WebSockets-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-109": {
+    "title": "React — Components and JSX",
+    "concept": "A React component is a function that takes props and returns a description of UI as JSX; JSX is syntax that looks like HTML but compiles to React.createElement() calls; the component tree is a tree of function calls, not DOM nodes — React reconciles this virtual tree against the real DOM",
+    "tags": ["lang:react-component", "lang:JSX", "lang:props", "cs:virtual-DOM", "lang:component-tree", "cs:reconciliation"],
+    "visibleAtEnd": "Student can write a functional component that accepts props, compose two components in a parent, and explain what React.createElement() produces and how it relates to the real DOM",
+    "buildsOn": ["LAB-108", "LAB-036"],
+    "file": "LAB-109-React-Components-JSX-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-110": {
+    "title": "React — State with useState and Effects with useEffect",
+    "concept": "useState holds component-local state and re-renders the component when it changes; useEffect runs side effects after render — fetching data, subscribing to events, updating the DOM; the dependency array controls when the effect re-runs: empty array means once on mount, values in array mean when those values change",
+    "tags": ["lang:useState", "lang:useEffect", "cs:reactive-state", "cs:side-effect-management", "lang:dependency-array"],
+    "visibleAtEnd": "Student can build a counter with useState, fetch data on mount with useEffect, and explain why an effect with no dependency array runs on every render while one with [] runs only once",
+    "buildsOn": ["LAB-109"],
+    "file": "LAB-110-React-State-Effects-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-111": {
+    "title": "React — Custom Hooks",
+    "concept": "A custom hook is a function whose name starts with 'use' that calls other hooks; it extracts stateful logic from components so the logic can be reused across multiple components without changing the component hierarchy",
+    "tags": ["lang:custom-hook", "lang:useRef", "lang:useMemo", "lang:useCallback", "se:hook-composition"],
+    "visibleAtEnd": "Student can extract a useWindowSize hook from a component that listens to the resize event, use it in two different components, and explain why custom hooks do not share state between component instances",
+    "buildsOn": ["LAB-110"],
+    "file": "LAB-111-React-Custom-Hooks-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-112": {
+    "title": "React — Context and Performance",
+    "concept": "React Context passes data through the component tree without prop-drilling; any component inside the Provider can read the context value; when the context value changes, all consumers re-render — useCallback and useMemo prevent unnecessary re-renders of pure components",
+    "tags": ["lang:useContext", "lang:createContext", "cs:prop-drilling", "lang:React-memo", "lang:useMemo-performance"],
+    "visibleAtEnd": "Student can create a theme context, provide it at the root, consume it deep in the tree, and demonstrate that a component wrapped in React.memo does not re-render when an unrelated part of state changes",
+    "buildsOn": ["LAB-111"],
+    "file": "LAB-112-React-Context-Performance-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-113": {
+    "title": "Relational Database Model and Normalization",
+    "concept": "A relational database stores data in tables (rows and columns); tables are related by foreign keys; normalization removes redundancy by ensuring each fact is stored in exactly one place — first normal form eliminates repeating groups, second eliminates partial dependencies, third eliminates transitive dependencies",
+    "tags": ["cs:relational-model", "cs:table", "cs:primary-key", "cs:foreign-key", "cs:normalization", "cs:referential-integrity"],
+    "visibleAtEnd": "Student can identify a denormalized table with update anomalies, normalize it to 3NF, draw the resulting schema with foreign keys, and explain what a referential integrity violation is",
+    "buildsOn": ["LAB-025"],
+    "file": "LAB-113-Relational-Model-Normalization-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-114": {
+    "title": "SQL — Queries, Joins, and Aggregation",
+    "concept": "SQL is a declarative language for querying relational databases; SELECT retrieves data, WHERE filters rows, JOIN combines rows from multiple tables on a matching column, GROUP BY aggregates rows by a column, HAVING filters groups",
+    "tags": ["lang:SQL-SELECT", "lang:SQL-JOIN", "lang:SQL-GROUP-BY", "lang:SQL-WHERE", "lang:SQL-aggregate"],
+    "visibleAtEnd": "Student can write a query that joins two tables, filters by a condition, and returns an aggregate (count, sum, average) per group — all running directly in an SQLite console",
+    "buildsOn": ["LAB-113"],
+    "file": "LAB-114-SQL-Queries-Joins-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-115": {
+    "title": "SQL — Indexes and Query Plans",
+    "concept": "A database index is a data structure (usually a B-tree) that allows the database to find rows by a column value in O(log n) without scanning every row; EXPLAIN QUERY PLAN shows whether a query uses an index or a full table scan; indexes speed up reads at the cost of write overhead and storage",
+    "tags": ["cs:database-index", "cs:B-tree-index", "cs:query-plan", "cs:index-scan", "cs:full-table-scan"],
+    "visibleAtEnd": "Student can run EXPLAIN QUERY PLAN on a query without an index, add the index, run it again, observe the plan change from table scan to index scan, and explain the write-speed tradeoff",
+    "buildsOn": ["LAB-114"],
+    "file": "LAB-115-SQL-Indexes-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-116": {
+    "title": "Transactions and ACID",
+    "concept": "A database transaction is a unit of work that either fully succeeds or fully fails; ACID: Atomicity (all or nothing), Consistency (valid state before and after), Isolation (concurrent transactions do not interfere), Durability (committed transactions survive crashes)",
+    "tags": ["cs:transaction", "cs:atomicity", "cs:consistency", "cs:isolation", "cs:durability", "cs:ACID"],
+    "visibleAtEnd": "Student can demonstrate that two operations in a transaction both succeed or both fail (by introducing an error between them), explain why isolation prevents dirty reads, and describe what Durability means when the power fails",
+    "buildsOn": ["LAB-115"],
+    "file": "LAB-116-Transactions-ACID-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-117": {
+    "title": "ORMs — Object-Relational Mapping",
+    "concept": "An ORM maps database rows to objects and generates SQL from method calls; it eliminates SQL boilerplate and works well for simple queries, but introduces the N+1 problem (one query to load a list + N queries to load each item's relations) and can generate inefficient SQL that hides performance problems",
+    "tags": ["sa:ORM", "cs:object-relational-mapping", "cs:N-plus-1-problem", "sa:active-record", "sa:data-mapper"],
+    "visibleAtEnd": "Student can define two related ORM models, query them, trigger an N+1 problem intentionally (showing N+1 SQL statements in logs), and fix it with an eager-load join query",
+    "buildsOn": ["LAB-116"],
+    "file": "LAB-117-ORMs-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-118": {
+    "title": "Database Migrations",
+    "concept": "A database migration is a versioned, reversible script that modifies the database schema; migrations are checked into source control alongside application code so the schema evolves with the code; running migrations in order brings any database to the current schema",
+    "tags": ["cs:schema-migration", "cs:migration-script", "cs:forward-migration", "cs:rollback-migration", "se:schema-versioning"],
+    "visibleAtEnd": "Student can write a migration that adds a column, run it, verify the column exists, write a down migration that removes it, run the rollback, and verify the column is gone",
+    "buildsOn": ["LAB-117"],
+    "file": "LAB-118-Database-Migrations-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-119": {
+    "title": "HTTP In Depth — Methods, Status Codes, Headers",
+    "concept": "HTTP defines methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS), status codes (1xx informational, 2xx success, 3xx redirect, 4xx client error, 5xx server error), and headers (Content-Type, Authorization, Cache-Control, CORS headers); idempotency means calling the same request multiple times has the same effect as calling it once",
+    "tags": ["cs:HTTP-methods", "cs:HTTP-status-codes", "cs:HTTP-headers", "cs:idempotency", "cs:content-negotiation"],
+    "visibleAtEnd": "Student can classify any HTTP method as safe/idempotent or not, interpret any 3-digit status code by its category, and use curl in the terminal to send a request with a custom header and read the response headers",
+    "buildsOn": ["LAB-107"],
+    "file": "LAB-119-HTTP-In-Depth-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-120": {
+    "title": "Middleware Pattern in Web Frameworks",
+    "concept": "In web frameworks, middleware is a function that sits in the request-response pipeline: it receives the request, does something (logging, auth check, parsing), then calls next() to pass to the next middleware or the final handler; middleware chains compose cross-cutting concerns without touching route handlers",
+    "tags": ["sa:middleware", "dp:chain-of-responsibility-applied", "sa:pipeline", "cs:request-response-pipeline", "sa:cross-cutting-concerns"],
+    "visibleAtEnd": "Student can implement three middleware functions (request logger, auth checker, JSON parser) as a composable chain, wire them in front of a route handler, and demonstrate that removing one middleware requires zero changes to the others",
+    "buildsOn": ["LAB-119", "LAB-077"],
+    "file": "LAB-120-Middleware-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-121": {
+    "title": "Task Queues and Background Jobs",
+    "concept": "A task queue decouples task submission from task execution — the web process puts a job on the queue (fast) and a worker process picks it up and runs it (in background); this prevents slow operations (email sending, PDF generation, ML inference) from blocking HTTP responses",
+    "tags": ["cs:task-queue", "cs:message-broker", "cs:worker-process", "cs:async-job", "cs:background-processing"],
+    "visibleAtEnd": "Student can implement a simple in-process task queue with a producer and a consumer running on a timer, explain why the queue decouples the two, and describe what Redis adds when this moves to a real multi-process system",
+    "buildsOn": ["LAB-120"],
+    "file": "LAB-121-Task-Queues-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-122": {
+    "title": "Caching — Strategies and Trade-offs",
+    "concept": "A cache stores the result of an expensive operation so subsequent requests return the stored result immediately; cache-aside (application checks cache before querying), write-through (writes go to cache and database together), and write-behind (writes go to cache and database asynchronously) are the three main strategies; cache invalidation is the hard problem",
+    "tags": ["cs:cache", "cs:cache-hit", "cs:cache-miss", "cs:TTL", "cs:cache-invalidation", "cs:cache-aside"],
+    "visibleAtEnd": "Student can implement a cache-aside cache with TTL expiry in under 20 lines, demonstrate cache hit vs miss timing, and explain what stale data means and when it is acceptable",
+    "buildsOn": ["LAB-121", "LAB-025"],
+    "file": "LAB-122-Caching-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-123": {
+    "title": "Docker — Containers and Images",
+    "concept": "A Docker container is an isolated process with its own filesystem, network, and process space — it uses the host OS kernel but cannot see the host's other processes or files; a Docker image is a layered, immutable filesystem snapshot that a container runs from; a Dockerfile is the script that builds an image",
+    "tags": ["cs:container", "cs:Docker-image", "cs:Dockerfile", "cs:layer", "cs:port-mapping", "cs:isolation"],
+    "visibleAtEnd": "Student can write a minimal Dockerfile for a Node.js app, build the image, run a container from it, map a port, and explain why the container can run the same on any machine with Docker installed",
+    "buildsOn": ["LAB-001", "LAB-002"],
+    "file": "LAB-123-Docker-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-124": {
+    "title": "Docker Compose — Multi-Container Development Environments",
+    "concept": "Docker Compose defines and runs multi-container applications from a YAML file; services (app, database, cache) are defined with their images, ports, volumes, and dependencies; a single 'docker compose up' starts the entire environment",
+    "tags": ["cs:Docker-Compose", "cs:service", "cs:network", "cs:volume", "cs:development-environment", "cs:dependency-ordering"],
+    "visibleAtEnd": "Student can write a docker-compose.yml that starts a web server and a PostgreSQL database, connects them on a shared network, and persists database data in a volume that survives container restarts",
+    "buildsOn": ["LAB-123"],
+    "file": "LAB-124-Docker-Compose-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-125": {
+    "title": "Git Branching Strategies and CI/CD",
+    "concept": "Git branching strategies define how teams use branches to coordinate parallel work; trunk-based development keeps branches short-lived (hours, not weeks) and merges to main frequently; CI (Continuous Integration) runs tests on every push; CD (Continuous Deployment) automatically deploys every passing build",
+    "tags": ["cs:git-branching", "cs:feature-branch", "cs:merge", "cs:rebase", "cs:CI-CD", "cs:trunk-based-development"],
+    "visibleAtEnd": "Student can create a feature branch, rebase it onto main, resolve a merge conflict, and describe what a CI pipeline does on every pull request",
+    "buildsOn": ["LAB-124"],
+    "file": "LAB-125-Git-Branching-CICD-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-126": {
+    "title": "Floating-Point Arithmetic and Numerical Precision",
+    "concept": "Floating-point numbers are stored in binary as sign + exponent + mantissa per IEEE 754; most decimal fractions (0.1, 0.3) cannot be represented exactly in binary, so arithmetic produces small errors; these errors accumulate and cause bugs when comparing floats with == or when performing many sequential operations",
+    "tags": ["math:floating-point", "math:IEEE-754", "math:epsilon", "math:rounding-error", "math:numerical-stability"],
+    "visibleAtEnd": "Student can reproduce 0.1 + 0.2 !== 0.3 in the browser console, explain why it happens, write a safe float comparison using epsilon, and explain when to use integers (money in cents) instead of floats",
+    "buildsOn": ["LAB-000"],
+    "file": "LAB-126-Floating-Point-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-127": {
+    "title": "Vectors and Vector Operations",
+    "concept": "A vector is a quantity with magnitude and direction, represented as an ordered list of numbers (x, y) in 2D or (x, y, z) in 3D; vector addition, scalar multiplication, dot product (projection, angle), and cross product (perpendicular vector, area) are the fundamental operations used throughout graphics and geometry",
+    "tags": ["math:vector", "math:dot-product", "math:cross-product", "math:magnitude", "math:vector-normalization"],
+    "visibleAtEnd": "Student can implement 2D vector add, subtract, scale, magnitude, normalize, and dot product in 20 lines, use dot product to determine if two vectors point the same direction, and use magnitude to compute distance between two points",
+    "buildsOn": ["LAB-126"],
+    "file": "LAB-127-Vectors-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-128": {
+    "title": "Matrices and Transformations",
+    "concept": "A matrix is a 2D array of numbers; matrix multiplication composes transformations — multiplying a point by a transformation matrix applies the transformation; rotation, scaling, and translation in 2D are all matrix multiplications; composing them into one matrix applies all transformations in one operation",
+    "tags": ["math:matrix", "math:matrix-multiplication", "math:rotation-matrix", "math:translation", "math:scale", "math:transformation-composition"],
+    "visibleAtEnd": "Student can implement 2D matrix multiplication, construct a rotation matrix for an arbitrary angle, apply it to a point, and compose rotation with scale into a single matrix",
+    "buildsOn": ["LAB-127"],
+    "file": "LAB-128-Matrices-Transformations-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-129": {
+    "title": "Trigonometry for Programmers",
+    "concept": "Sine and cosine map an angle to the y and x coordinates of a point on the unit circle; atan2(y, x) recovers the angle from a (y, x) pair and handles all four quadrants correctly; these three functions underlie all rotation, oscillation, and angular positioning in graphics and games",
+    "tags": ["math:sine", "math:cosine", "math:atan2", "math:unit-circle", "math:radians-vs-degrees"],
+    "visibleAtEnd": "Student can draw a circle of points using sin and cos in a canvas, animate a point moving along the circle by incrementing the angle, and use atan2 to compute the angle from the center to the mouse cursor",
+    "buildsOn": ["LAB-128"],
+    "file": "LAB-129-Trigonometry-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-130": {
+    "title": "Coordinate Systems and Transformations",
+    "concept": "A coordinate system defines how points are located in space; world space places objects in the scene, screen space maps to pixels (Y-down in browsers), and local space is relative to an object's own origin; transforming between them requires translation, scaling, and axis flipping",
+    "tags": ["math:coordinate-system", "math:world-space", "math:screen-space", "math:world-to-screen", "math:screen-to-world"],
+    "visibleAtEnd": "Student can implement worldToScreen and screenToWorld functions that correctly handle a zoom factor and pan offset, verify they are inverses of each other, and explain why the Y-axis is flipped between world space (Y-up) and screen space (Y-down)",
+    "buildsOn": ["LAB-129"],
+    "file": "LAB-130-Coordinate-Systems-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-131": {
+    "title": "Computational Geometry — Intersection and Containment",
+    "concept": "Computational geometry algorithms determine spatial relationships; line segment intersection finds whether and where two segments cross; point-in-polygon determines if a point is inside a polygon using ray casting (count how many edges the ray crosses); these are the primitive operations every geometry engine uses",
+    "tags": ["math:line-intersection", "math:point-in-polygon", "math:ray-casting", "math:winding-number", "cs:geometric-primitives"],
+    "visibleAtEnd": "Student can implement line segment intersection that returns the intersection point or null, implement point-in-polygon using ray casting, and test both with cases that include edge conditions (collinear segments, point exactly on an edge)",
+    "buildsOn": ["LAB-130"],
+    "file": "LAB-131-Computational-Geometry-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-132": {
+    "title": "Bézier Curves",
+    "concept": "A Bézier curve is a parametric curve defined by control points; a cubic Bézier has four: two endpoints and two that pull the curve without being on it; the de Casteljau algorithm evaluates the curve at parameter t (0 to 1) by successive linear interpolation; Bézier curves are how every vector graphics tool and CNC toolpath system represents smooth curves",
+    "tags": ["math:bezier-curve", "math:control-point", "math:de-Casteljau", "math:parametric-curve", "math:linear-interpolation"],
+    "visibleAtEnd": "Student can implement cubic Bézier evaluation using de Casteljau, sample 100 points along the curve, draw it in a canvas, and move a control point and observe how the curve changes",
+    "buildsOn": ["LAB-131"],
+    "file": "LAB-132-Bezier-Curves-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-133": {
+    "title": "State Machines and Finite Automata",
+    "concept": "A finite state machine is a model of computation with a finite set of states, transitions triggered by inputs, and one current state at a time; it is used to model UI interactions, network protocols, game logic, and parsers — anything that has distinct modes of behavior that transition on events",
+    "tags": ["cs:state-machine", "cs:finite-automaton", "cs:state", "cs:transition", "cs:accepting-state", "dp:state-pattern-applied"],
+    "visibleAtEnd": "Student can implement a state machine for a traffic light using a table of transitions, simulate it advancing through states on timer events, and explain how a state machine prevents impossible state combinations",
+    "buildsOn": ["LAB-083"],
+    "file": "LAB-133-State-Machines-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-134": {
+    "title": "Regular Expressions",
+    "concept": "A regular expression is a pattern that matches strings; it is evaluated by a finite automaton; character classes (\\d, \\w, \\s), quantifiers (*, +, ?, {n,m}), anchors (^, $), groups ((abc)), and alternation (a|b) are the building blocks; regular expressions are the right tool for pattern matching but the wrong tool for parsing nested structures",
+    "tags": ["cs:regular-expression", "cs:pattern-matching", "cs:capture-group", "cs:quantifier", "cs:character-class", "cs:greedy-vs-lazy"],
+    "visibleAtEnd": "Student can write a regex that validates an email format, extracts all numbers from a string, and matches a date in YYYY-MM-DD format — all testable in the browser console",
+    "buildsOn": ["LAB-133"],
+    "file": "LAB-134-Regular-Expressions-LESSON.md",
+    "status": "planned"
+  },
+
+  "LAB-135": {
+    "title": "Graph Theory — Formal",
+    "concept": "Graph theory is the mathematical study of graphs (vertices and edges); a path is a sequence of vertices connected by edges; a cycle is a path that starts and ends at the same vertex; connectivity, spanning trees, shortest paths (Dijkstra, Bellman-Ford), and topological sort are the core algorithms with direct software applications",
+    "tags": ["math:graph-theory", "math:path", "math:cycle", "math:spanning-tree", "cs:Dijkstra", "cs:topological-sort"],
+    "visibleAtEnd": "Student can implement Dijkstra's algorithm to find the shortest path in a weighted graph, implement topological sort for a dependency graph, and explain why topological sort fails on a graph with a cycle",
+    "buildsOn": ["LAB-134", "LAB-030"],
+    "file": "LAB-135-Graph-Theory-LESSON.md",
+    "status": "planned"
+  }
+}
