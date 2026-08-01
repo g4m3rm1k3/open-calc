@@ -167,6 +167,28 @@ import csharpLevel0 from './content/csharp-fundamentals/level-0.md?raw'
 import csharpLevel1 from './content/csharp-fundamentals/level-1.md?raw'
 import csharpLevel2 from './content/csharp-fundamentals/level-2.md?raw'
 import csharpLevel3 from './content/csharp-fundamentals/level-3.md?raw'
+import csharpLevel4 from './content/csharp-fundamentals/level-4.md?raw'
+import csharpLevel5 from './content/csharp-fundamentals/level-5.md?raw'
+import csharpLevel6 from './content/csharp-fundamentals/level-6.md?raw'
+import csharpLevel7 from './content/csharp-fundamentals/level-7.md?raw'
+import csharpLevel8 from './content/csharp-fundamentals/level-8.md?raw'
+import csharpLevel9 from './content/csharp-fundamentals/level-9.md?raw'
+import csharpLevel10 from './content/csharp-fundamentals/level-10.md?raw'
+import csharpLevel11 from './content/csharp-fundamentals/level-11.md?raw'
+import csharpLevel12 from './content/csharp-fundamentals/level-12.md?raw'
+import csharpLevel13 from './content/csharp-fundamentals/level-13.md?raw'
+import csharpLevel14 from './content/csharp-fundamentals/level-14.md?raw'
+import csharpLevel15 from './content/csharp-fundamentals/level-15.md?raw'
+import csharpLevel16 from './content/csharp-fundamentals/level-16.md?raw'
+import csharpLevel17 from './content/csharp-fundamentals/level-17.md?raw'
+import csharpLevel18 from './content/csharp-fundamentals/level-18.md?raw'
+import csharpLevel19 from './content/csharp-fundamentals/level-19.md?raw'
+import csharpLevel20 from './content/csharp-fundamentals/level-20.md?raw'
+import csharpLevel21 from './content/csharp-fundamentals/level-21.md?raw'
+import csharpLevel22 from './content/csharp-fundamentals/level-22.md?raw'
+import csharpLevel23 from './content/csharp-fundamentals/level-23.md?raw'
+import csharpLevel24 from './content/csharp-fundamentals/level-24.md?raw'
+import csharpLevel25 from './content/csharp-fundamentals/level-25.md?raw'
 
 import javaLevel0 from './content/java-fundamentals/level-0.md?raw'
 import javaLevel1 from './content/java-fundamentals/level-1.md?raw'
@@ -545,6 +567,28 @@ const LESSON_FILES: Record<string, string> = {
   'csharp-fundamentals/level-1.md': csharpLevel1,
   'csharp-fundamentals/level-2.md': csharpLevel2,
   'csharp-fundamentals/level-3.md': csharpLevel3,
+  'csharp-fundamentals/level-4.md': csharpLevel4,
+  'csharp-fundamentals/level-5.md': csharpLevel5,
+  'csharp-fundamentals/level-6.md': csharpLevel6,
+  'csharp-fundamentals/level-7.md': csharpLevel7,
+  'csharp-fundamentals/level-8.md': csharpLevel8,
+  'csharp-fundamentals/level-9.md': csharpLevel9,
+  'csharp-fundamentals/level-10.md': csharpLevel10,
+  'csharp-fundamentals/level-11.md': csharpLevel11,
+  'csharp-fundamentals/level-12.md': csharpLevel12,
+  'csharp-fundamentals/level-13.md': csharpLevel13,
+  'csharp-fundamentals/level-14.md': csharpLevel14,
+  'csharp-fundamentals/level-15.md': csharpLevel15,
+  'csharp-fundamentals/level-16.md': csharpLevel16,
+  'csharp-fundamentals/level-17.md': csharpLevel17,
+  'csharp-fundamentals/level-18.md': csharpLevel18,
+  'csharp-fundamentals/level-19.md': csharpLevel19,
+  'csharp-fundamentals/level-20.md': csharpLevel20,
+  'csharp-fundamentals/level-21.md': csharpLevel21,
+  'csharp-fundamentals/level-22.md': csharpLevel22,
+  'csharp-fundamentals/level-23.md': csharpLevel23,
+  'csharp-fundamentals/level-24.md': csharpLevel24,
+  'csharp-fundamentals/level-25.md': csharpLevel25,
   'java-fundamentals/level-0.md': javaLevel0,
   'java-fundamentals/level-1.md': javaLevel1,
   'java-fundamentals/level-2.md': javaLevel2,

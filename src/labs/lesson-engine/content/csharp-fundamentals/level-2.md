@@ -1,209 +1,195 @@
 ---
 series: csharp-fundamentals
 level: 2
-title: Interfaces & Generics
+title: Arrays
 lang: csharp
 ---
 
-# Interfaces & Generics
+# Arrays
 
-An interface in C# is a contract: a list of method and property signatures that a class promises to implement. Any class that implements an interface can be used wherever that interface type is expected — regardless of what other methods the class has. Generics let you write one class or method that works for any type, with type safety checked at compile time.
+Every variable so far has held exactly one value. An **array** holds a fixed number of values of the same type, stored contiguously and accessed by position. Arrays are the foundation every other C# collection — `List<T>`, `Dictionary<TKey, TValue>` — is eventually built on top of.
 
-## Interfaces
-
-```csharp
-using System;
-
-interface IShape
-{
-    double Area();
-    double Perimeter();
-    string Describe();
-}
-
-class Circle : IShape
-{
-    private double _radius;
-
-    public Circle(double radius) { _radius = radius; }
-
-    public double Area() => Math.PI * _radius * _radius;
-    public double Perimeter() => 2 * Math.PI * _radius;
-    public string Describe() => $"Circle with radius {_radius}";
-}
-
-class Rectangle : IShape
-{
-    private double _width, _height;
-
-    public Rectangle(double width, double height)
-    {
-        _width = width;
-        _height = height;
-    }
-
-    public double Area() => _width * _height;
-    public double Perimeter() => 2 * (_width + _height);
-    public string Describe() => $"Rectangle {_width}×{_height}";
-}
-
-class Program
-{
-    static void PrintShape(IShape shape)
-    {
-        Console.WriteLine(shape.Describe());
-        Console.WriteLine($"  Area: {shape.Area():F2}");
-        Console.WriteLine($"  Perimeter: {shape.Perimeter():F2}");
-    }
-
-    static void Main()
-    {
-        IShape circle = new Circle(5.0);
-        IShape rect   = new Rectangle(4.0, 6.0);
-
-        PrintShape(circle);
-        PrintShape(rect);
-    }
-}
-```
-
-```text
-Circle with radius 5
-  Area: 78.54
-  Perimeter: 31.42
-Rectangle 4×6
-  Area: 24.00
-  Perimeter: 20.00
-```
-
-`interface IShape { ... }` — declares an interface. By convention, interface names start with `I`. All members are implicitly `public` and have no body.
-
-`class Circle : IShape` — `Circle` implements the `IShape` interface. The compiler enforces that `Circle` provides all three methods. A class can implement multiple interfaces: `class Foo : IShape, IComparable<Foo>`.
-
-`static void PrintShape(IShape shape)` — accepts any object that implements `IShape`. The specific type (`Circle`, `Rectangle`) does not matter at the call site.
-
-`{shape.Area():F2}` — format specifier inside string interpolation. `:F2` means "fixed-point, 2 decimal places."
-
-**CS lens:** This is **polymorphism** through interfaces — the same method call (`PrintShape`) behaves differently depending on the runtime type of the argument. The .NET runtime dispatches `shape.Area()` to the correct implementation by looking up the method in a virtual method table (v-table) at runtime. This is O(1) dispatch, not a search.
-
-## Generics — One Definition for Any Type
+## Declaring and Indexing
 
 ```csharp
 using System;
-
-class Stack<T>
-{
-    private T[] _items;
-    private int _count;
-
-    public Stack(int capacity)
-    {
-        _items = new T[capacity];
-        _count = 0;
-    }
-
-    public void Push(T item)
-    {
-        _items[_count++] = item;
-    }
-
-    public T Pop()
-    {
-        return _items[--_count];
-    }
-
-    public T Peek() => _items[_count - 1];
-    public int Count => _count;
-}
 
 class Program
 {
     static void Main()
     {
-        var intStack = new Stack<int>(10);
-        intStack.Push(1);
-        intStack.Push(2);
-        intStack.Push(3);
-        Console.WriteLine(intStack.Pop());
-        Console.WriteLine(intStack.Count);
+        int[] scores = { 88, 92, 75, 95 };
 
-        var strStack = new Stack<string>(10);
-        strStack.Push("hello");
-        strStack.Push("world");
-        Console.WriteLine(strStack.Pop());
+        Console.WriteLine(scores.Length);
+        Console.WriteLine(scores[0]);
+        Console.WriteLine(scores[3]);
+
+        scores[1] = 100;
+        Console.WriteLine(scores[1]);
+
+        foreach (int s in scores)
+        {
+            Console.Write(s + " ");
+        }
+        Console.WriteLine();
     }
 }
 ```
 
 ```text
-3
+4
+88
+95
+100
+88 100 75 95 
+```
+
+`int[] scores = { 88, 92, 75, 95 };` — `int[]` is the type "array of `int`". The `{ }` initialiser fixes both the contents and the length at creation — an array's length can never change after this line.
+
+`scores.Length` — the number of elements. A property, not a method — no parentheses.
+
+`scores[0]` — indexing starts at `0`. `scores[0]` is the first element; `scores[3]` is the fourth and last, since the array holds four elements total.
+
+`scores[1] = 100;` — arrays are mutable through their indices, even though their length is fixed. Assigning to `scores[1]` overwrites the second element in place.
+
+`foreach (int s in scores)` — visits every element in order, from the first to the last.
+
+**CS lens:** An array is stored as one contiguous block of memory. `scores[2]` is computed directly as "the base address, plus `2` times the size of one `int`" — an O(1) operation regardless of the array's length, the same reason array indexing is always fast, in any language.
+
+## Every Slot Starts at a Default Value
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] nums = new int[5];
+        Console.WriteLine(nums[0]);
+        Console.WriteLine(nums.Length);
+    }
+}
+```
+
+```text
+0
+5
+```
+
+`new int[5]` — creates an array of length `5` with no initial values listed. Every slot is filled with that type's **default value** — `0` for numeric types, `false` for `bool`, `null` for reference types like `string`. C# never leaves array memory uninitialised the way some lower-level languages do.
+
+## Out-of-Bounds Access Is a Real, Caught Error
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] nums = { 1, 2, 3 };
+        try
+        {
+            Console.WriteLine(nums[5]);
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            Console.WriteLine("Caught: " + ex.GetType().Name);
+        }
+    }
+}
+```
+
+```text
+Caught: IndexOutOfRangeException
+```
+
+`nums[5]` — `nums` only has indices `0` through `2`; `5` is out of bounds. C# does not silently return garbage memory the way C does — it throws a real, catchable `IndexOutOfRangeException` (a full lesson on `try`/`catch` comes later; this example previews the shape because the failure itself is the point here).
+
+**SE lens:** This is a real, deliberate safety guarantee: every array access is bounds-checked at runtime. It costs a small amount of performance compared to C's unchecked access, in exchange for turning "silently corrupt some unrelated memory" into "a real exception, at the exact line that caused it" — a trade C# (and Java, and most modern managed languages) makes on purpose.
+
+## Sorting and Reversing
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] nums = { 5, 2, 8, 1, 9 };
+
+        Array.Sort(nums);
+        foreach (int n in nums) Console.Write(n + " ");
+        Console.WriteLine();
+
+        Array.Reverse(nums);
+        foreach (int n in nums) Console.Write(n + " ");
+        Console.WriteLine();
+    }
+}
+```
+
+```text
+1 2 5 8 9 
+9 8 5 2 1 
+```
+
+`Array.Sort(nums)` — sorts `nums` **in place**, ascending. Nothing is returned; `nums` itself is mutated.
+`Array.Reverse(nums)` — reverses `nums` in place, also mutating rather than returning a new array.
+
+**SE lens:** Both methods mutate their argument directly instead of returning a new, sorted array. This is efficient — no second array is ever allocated — but it means calling `Array.Sort(nums)` and then continuing to use an *earlier* reference to the original order is a real bug: there is no earlier order left to read, because `nums` was changed in place.
+
+## Two-Dimensional Arrays
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[,] grid = new int[2, 3];
+        grid[0, 0] = 1;
+        grid[1, 2] = 9;
+
+        Console.WriteLine(grid[0, 0]);
+        Console.WriteLine(grid[1, 2]);
+        Console.WriteLine(grid.GetLength(0));
+        Console.WriteLine(grid.GetLength(1));
+    }
+}
+```
+
+```text
+1
+9
 2
-world
+3
 ```
 
-`class Stack<T>` — `T` is a **type parameter**. When you write `new Stack<int>(10)`, `T` becomes `int` everywhere in the class. When you write `new Stack<string>(10)`, `T` becomes `string`.
+`int[,]` — a **rectangular** two-dimensional array: two dimensions, comma-separated inside the brackets, one single underlying block of memory. `new int[2, 3]` creates 2 rows of 3 columns each — 6 slots total, all starting at `0`.
 
-`T[] _items` — an array of type `T`. The .NET runtime creates a specialised version of the class for each concrete type — `Stack<int>` and `Stack<string>` are separate compiled types, each fully type-safe.
+`grid[0, 0]` / `grid[1, 2]` — indexed with both coordinates inside one pair of brackets, row then column.
 
-`new T[capacity]` — allocates a managed array of `capacity` elements of type `T`.
+`grid.GetLength(0)` — the size of dimension `0` (rows): `2`. `grid.GetLength(1)` — the size of dimension `1` (columns): `3`. `Length` alone would give the total element count (`6`); `GetLength` asks about one specific dimension.
 
-**SE lens:** Generics eliminate code duplication while maintaining type safety. Without generics, you would write `IntStack`, `StringStack`, etc. — or use `object` as the element type and lose all type checking. Generic collections from `System.Collections.Generic` (`List<T>`, `Dictionary<K,V>`, `Queue<T>`) use exactly this mechanism.
+## Challenge: sum_array
 
-## Generic Methods
-
-A method can be generic independently of its class:
-
-```csharp
-using System;
-
-class Utility
-{
-    public static T Max<T>(T a, T b) where T : IComparable<T>
-    {
-        return a.CompareTo(b) >= 0 ? a : b;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(Utility.Max(3, 7));
-        Console.WriteLine(Utility.Max("apple", "banana"));
-        Console.WriteLine(Utility.Max(2.5, 1.8));
-    }
-}
-```
-
-```text
-7
-banana
-2.5
-```
-
-`where T : IComparable<T>` — a **generic constraint**: `T` must implement `IComparable<T>`, which provides a `CompareTo` method. Without the constraint, the compiler does not know that `T` has `CompareTo`.
-
-`a.CompareTo(b) >= 0` — returns `true` if `a >= b`.
-
-## Challenge: generic_pair
-
-Write a generic class `Pair<T, U>` that holds two values of possibly different types:
-- Fields `First` and `Second` (auto-properties with private set)
-- A constructor `Pair(T first, U second)`
-- A method `string Describe()` that returns `"(first, second)"` using string interpolation
+Write a `static int SumArray(int[] numbers)` method that returns the sum of every element in `numbers`. An empty array should return `0`.
 
 ```challenge
-class Pair<T, U>
+static int SumArray(int[] numbers)
 {
     // TODO
 }
 ```
 
 ```test
-var p1 = new Pair<string, int>("Alice", 30);
-assert p1.First == "Alice"
-assert p1.Second == 30
-assert p1.Describe() == "(Alice, 30)"
-var p2 = new Pair<double, bool>(3.14, true);
-assert p2.Describe() == "(3.14, True)"
+assert SumArray(new int[] { 1, 2, 3, 4 }) == 10
+assert SumArray(new int[] { 5 }) == 5
+assert SumArray(new int[] { }) == 0
+assert SumArray(new int[] { -3, 3 }) == 0
+assert SumArray(new int[] { 10, -20, 30 }) == 20
 ```
