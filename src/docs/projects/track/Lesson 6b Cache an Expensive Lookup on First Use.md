@@ -84,7 +84,9 @@ This version is deleted now. It will not appear again.
 ### Mechanical Walkthrough
 
 1. `private String cachedResult;` — **(b) reappearing** field
-   declaration, starting `null`.
+   declaration, starting `null` — the field's own lifetime outlives any
+   one method call, which is exactly what lets it remember, across
+   separate calls, whether the expensive work has already run.
 2. `if (cachedResult == null) { ... cachedResult = "Found Value"; }` —
    **(a) first appearance** of this exact caching shape: the
    expensive work runs only when no cached result exists yet.

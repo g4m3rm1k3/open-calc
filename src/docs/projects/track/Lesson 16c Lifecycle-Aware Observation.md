@@ -79,11 +79,16 @@ of an object with its own destroy/teardown lifecycle.
 
 ### SE Lens
 
-The alternative — a plain observer, manually unregistered at exactly the
-right lifecycle callback every single time — was not chosen going
-forward because it doesn't scale: every single observer registration
-site becomes a place a developer could forget the matching unregister
-call, with each miss producing a real, hard-to-reproduce bug.
+The alternative — treating "lifecycle-aware" as just one more detail
+baked into `LiveData`'s own class, rather than naming it as a separate,
+general pattern — was not chosen because `LiveData` isn't the only
+Android API that needs this exact shape: any component observing
+something over time (a location listener, a sensor, a network
+connection monitor) faces the identical "callback fired after my screen
+was already gone" risk. Naming the pattern independently of `LiveData`
+is what lets a different class implement the same `LifecycleOwner`-aware
+registration shape, rather than every new API reinventing its own
+answer to the same problem.
 
 ---
 

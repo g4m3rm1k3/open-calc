@@ -58,10 +58,14 @@ Android code.
 
 ### CS Lens
 
-`Room.databaseBuilder(...).build()` is the first appearance, in this
-course, of a shape that recurs across other Android APIs going forward:
-a fluent builder object, configured step by step, ending in one explicit
-call that produces the real, finished object.
+`Room.databaseBuilder(...).build()` separates *configuration* from
+*construction* as two genuinely distinct phases: nothing about calling
+`.databaseBuilder(...)` itself produces a working database — the
+builder object is inert until `.build()` runs, meaning partially-
+configured state can never leak into a real, usable object by accident.
+This exact shape recurs across other Android APIs going forward,
+wherever an object needs several pieces of configuration before it's
+safe to use at all.
 
 Also recognized in: builder patterns across virtually every mainstream
 language and framework (`StringBuilder` in Java itself, fluent builder

@@ -67,11 +67,15 @@ container's own scope object).
 
 ### SE Lens
 
-This unit deliberately stops at recognition — `Context`'s full type
-hierarchy and different flavors (Activity Context versus Application
-Context) are a later lesson's own subject; the goal here is only naming
-what `this` has represented, unexplained, since it first appeared
-passed to `Intent`'s constructor.
+The alternative — a single, globally-reachable app instance every API
+call implicitly looks up on its own, rather than requiring an explicit
+`Context` argument at every call site — was not chosen because Android
+processes can genuinely hold more than one meaningfully different
+environment at once (a specific Activity's own theme and lifecycle
+versus the whole application's). Requiring `Context` explicitly, as a
+real parameter, makes each call state exactly which environment it's
+acting on behalf of, rather than silently assuming there's only ever
+one.
 
 ---
 

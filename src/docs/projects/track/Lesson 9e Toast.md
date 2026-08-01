@@ -47,7 +47,10 @@ Android code.
 
 1. `Toast.makeText(this, "Item saved.", Toast.LENGTH_SHORT)` — **(a)
    first appearance**: constructs the message, taking a `Context`
-   (Lesson 4h), the message text, and a duration constant.
+   (Lesson 4h) because a `Toast` must attach its overlay to the app's
+   own window system rather than to any one specific screen — the
+   message text, and a duration constant, round out what it needs to
+   display and when to disappear.
 2. `.show();` — **(a) first appearance**: displays the message overlay
    immediately; it dismisses itself automatically once its duration
    elapses, with no further code required.

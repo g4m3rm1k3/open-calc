@@ -70,10 +70,14 @@ input frame by frame.
 
 ### SE Lens
 
-This concept itself names a paradigm rather than introducing a new
-design tradeoff of its own — the tradeoffs (giving up control of timing
-and sequence) were already covered under inversion of control, its
-underlying mechanism.
+The alternative — writing the program as one top-to-bottom script that
+polls for each possible event in a tight loop ("has the button been
+clicked yet? check again.") — was not chosen because it wastes CPU
+cycles busy-checking events that may not happen for minutes, and forces
+every event's handling logic into one linear sequence that has to check
+every possibility on every pass. Event-driven programming instead lets
+each handler stay independent, running only when its own specific event
+actually occurs, with no busy-waiting in between.
 
 ---
 

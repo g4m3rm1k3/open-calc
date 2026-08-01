@@ -96,8 +96,10 @@ This version is deleted now. It will not appear again.
    declared by `List`'s contract: appends one element to the end,
    growing the underlying storage automatically if needed. Called
    three times, adding three elements in order.
-4. `names.size()` — **(a) first appearance**: returns the current
-   number of elements, `3` after three `add` calls.
+4. `names.size()` — **(a) first appearance**: returns the current,
+   live element count — `3` after three `add` calls — never a fixed
+   capacity set up front, unlike an array's own `.length`, which stays
+   constant regardless of how many slots actually hold real data.
 5. `names.get(0)` — **(a) first appearance**: returns the element at a
    given position, counting from `0` — position `0` is the *first*
    element added, `"Rex"`, not a special or arbitrary one.

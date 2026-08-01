@@ -107,11 +107,14 @@ built from its schema, every object in Python or C#.
 
 ### SE Lens
 
-Distinguishing "the blueprint" from "the real thing built from it" is
-what makes it possible to build as many independent dogs as a program
-needs from one single `class Dog` declaration — a distinction with no
-equivalent for a plain `int`, which has no separate "blueprint" step at
-all.
+The alternative — collapsing "the blueprint" and "the real thing" into
+one concept, so declaring `Dog` and having a usable dog were the same
+act — was not chosen because it would make it impossible to describe a
+shape once and then build many independent copies of it: every `Dog`
+would have to be its own separate declaration, with no shared behavior
+or field layout to reuse, the same problem this curriculum would face if
+every `int` needed its own from-scratch type definition instead of one
+shared `int` type producing as many independent values as needed.
 
 ---
 

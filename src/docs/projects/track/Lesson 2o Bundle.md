@@ -76,11 +76,14 @@ same way for loosely-structured data passing).
 
 ### SE Lens
 
-This lesson deliberately stops at recognition, not full mastery —
-`Bundle` appears constantly, and needs a name now, but its full role
-(particularly around configuration changes and process death) is
-genuinely a later lesson's own subject, not something to compress into
-a single lesson here.
+The alternative — one generic `put(String key, Object value)` method,
+rather than a typed method per type (`putString`, `putInt`) — was not
+chosen because a generic version would push every type check to
+runtime: reading a key back would require an unchecked cast, and
+storing an `int` under a key later read with `getString` would fail
+only when that specific line actually runs, not at compile time.
+Typed methods make the type of every stored value part of the call
+site itself, checked by the compiler at the moment it's written.
 
 ---
 

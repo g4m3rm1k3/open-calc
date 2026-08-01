@@ -80,9 +80,13 @@ one-method restriction.
 
 ### SE Lens
 
-This concept itself carries no new design tradeoff beyond what
-interfaces already established — its entire value is enabling the next
-lesson's shorthand, which does carry a real one.
+The alternative — requiring every functional interface to be explicitly
+marked, by name, before a lambda could target it — was not chosen
+because it would force interfaces written years before lambdas existed
+(`Runnable`, `Comparator`) to be retrofitted with a marker just to
+qualify. Defining "functional interface" structurally, purely by method
+count, means any interface that happens to fit the shape automatically
+qualifies, with nothing to add or change on the interface itself.
 
 ---
 

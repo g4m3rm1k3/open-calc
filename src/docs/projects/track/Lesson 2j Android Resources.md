@@ -51,8 +51,10 @@ a real, verified project artifact.
 ### Mechanical Walkthrough
 
 1. `<resources> ... </resources>` — **(a) first appearance** of the
-   resource file's own root tag, holding any number of individual
-   resources.
+   resource file's own root tag: XML requires exactly one root element
+   per file, which is why every individual resource nests inside this
+   one shared wrapper rather than each having its own top-level file
+   structure.
 2. `<string name="app_name">My App</string>` — **(a) first appearance**
    of this specific resource shape: `name` is the symbolic identifier
    code will refer to; `app_name` never appears as literal text

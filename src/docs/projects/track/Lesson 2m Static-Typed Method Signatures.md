@@ -80,7 +80,9 @@ This version is deleted now. It will not appear again.
 1. `static int add(int first, int second)` — **(a) first appearance**
    of this signature shape examined explicitly: return type (`int`),
    method name (`add`), parameter list with each parameter's own
-   declared type (`int first`, `int second`).
+   declared type (`int first`, `int second`) — every one of these
+   declared types is what the compiler checks against at every call
+   site, the exact contract item 3 below relies on.
 2. `static void printSum(int first, int second)` — the same shape,
    with `void` in the return-type position specifically declaring "no
    value returned," rather than that position simply being left empty.

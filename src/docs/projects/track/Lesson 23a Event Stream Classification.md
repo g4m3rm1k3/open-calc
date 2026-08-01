@@ -84,7 +84,11 @@ This version is deleted now. It will not appear in the project again.
 ### Mechanical Walkthrough
 
 1. `int deltaX = endX - startX; int deltaY = endY - startY;` — computes
-   how far the raw movement traveled in each direction.
+   how far the raw movement traveled in each direction, relative to its
+   own starting point rather than absolute screen position — every
+   classification below depends only on this relative distance, which
+   is what makes the same gesture classify identically no matter where
+   on the screen it happens.
 2. `if (Math.abs(deltaX) < 5 && Math.abs(deltaY) < 5) { return "TAP"; }`
    — **(a) first appearance** of this classification shape: a small,
    near-zero movement is classified as a tap, not a swipe or scroll.

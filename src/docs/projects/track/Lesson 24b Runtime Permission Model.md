@@ -66,7 +66,10 @@ Android code.
 2. `== PackageManager.PERMISSION_GRANTED` — compares the result against
    a constant representing "yes, already granted." Genuinely basic
    comparison syntax, sorted **(c)**, applied to a real permission-state
-   check.
+   check — `checkSelfPermission` returns an `int` rather than a plain
+   `boolean` specifically so it can also be compared against
+   `PERMISSION_DENIED`, distinguishing "denied" from other states a
+   bare true/false couldn't represent.
 3. `requestPermissionLauncher.launch(Manifest.permission.CAMERA)` —
    **(b) reappearing** result-launcher shape from Lesson 10b, here
    requesting a permission specifically rather than launching a new
