@@ -484,6 +484,22 @@ export const WANDBOX_COMPILER = {
   'c#':       'mono-6.12.0.199',
 }
 
+// Wandbox occasionally fails at the infrastructure level — its own container
+// runtime (crun/OCI) refusing to spawn a sandbox, typically because its host
+// is out of spare processes/resources — rather than the submitted code being
+// wrong. That failure lands in the same `compiler_error` field a genuine
+// compile error would, with status 126 (couldn't even exec, let alone
+// compile). Confirmed live 2026-08-01: every Wandbox language tested (C#,
+// C++, Java) failed identically with "OCI runtime error: crun: clone:
+// Resource temporarily unavailable", consistently across 5 retries — this is
+// Wandbox's own backend being down, not a real compile error. Matching on
+// these known infra-failure signatures and throwing (instead of returning a
+// string) is what lets runCode's existing Wandbox→Piston fallback actually
+// engage — previously this class of failure was returned as a normal
+// result, so the fallback below never ran, and the raw infra error text was
+// shown to the learner as if their own code had failed to compile.
+const WANDBOX_INFRA_ERROR_PATTERN = /OCI runtime error|crun:|runc:|Resource temporarily unavailable|cannot allocate memory|Cannot allocate memory/i
+
 async function runWandbox(compiler, code, stdin = '') {
   let res
   const body = { code, compiler }
@@ -502,6 +518,9 @@ async function runWandbox(compiler, code, stdin = '') {
   const compileErr = (data.compiler_error || '').trimEnd()
   const out = (data.program_output || '').trimEnd()
   const err = (data.program_error || '').trimEnd()
+  if (compileErr && !out && !err && WANDBOX_INFRA_ERROR_PATTERN.test(compileErr)) {
+    throw new Error('Wandbox execution backend unavailable: ' + compileErr)
+  }
   // Wandbox puts compiler *warnings* in compiler_error too, not just hard
   // errors — a program that compiled fine (just with an unused-variable
   // warning, say) still runs and produces real output. Treating any non-empty
@@ -511,7 +530,10 @@ async function runWandbox(compiler, code, stdin = '') {
   // so that combination, plus the message actually containing "error" and
   // not just warning noise, is what actually distinguishes the two.
   if (compileErr && !out && !err && /error/i.test(compileErr)) {
-    return 'Error: Compile error:\n' + compileErr
+    // Must start with exactly 'Compile error:' — executor.ts's
+    // output.startsWith('Compile error:') check is what routes this to the
+    // error channel instead of being displayed as if it were program output.
+    return 'Compile error:\n' + compileErr
   }
   if (out && err) return out + '\n⚠ stderr:\n' + err
   return out || err || (compileErr ? compileErr : '(no output)')
@@ -556,9 +578,94 @@ async function runPiston(lang, wrappedCode, stdin = '') {
   }
   if (!res.ok) throw new Error(`Piston returned ${res.status}`)
   const data = await res.json()
+  // An API-level rejection (bad request, rate limit, or — since 2/15/2026 —
+  // "Public Piston API is now whitelist only") comes back as HTTP 200 with a
+  // top-level `message` field and no `run` result at all. Falling through to
+  // the no-output path below would silently tell the learner their program
+  // produced nothing, hiding a real "execution never happened" failure.
+  if (data.message && !data.run) throw new Error('Piston: ' + data.message)
   const run = data.run || {}
   const stdout = (run.stdout || '').trimEnd()
   const stderr = (run.stderr || '').trimEnd()
+  if (stdout && stderr) return stdout + '\n⚠ stderr:\n' + stderr
+  return stdout || stderr || '(no output)'
+}
+
+// ── Judge0 CE — second fallback (added 2026-08-01) ───────────────────────────
+// ce.judge0.com is Judge0's own free, keyless, CORS-open public demo instance
+// — verified live: real end-to-end C# execution succeeds, and a genuine
+// compile error correctly comes back as status.id 6 with real
+// `compile_output`, a cleaner contract than Wandbox's own
+// warning-vs-error string heuristic. Added specifically because Piston's
+// public API went whitelist-only on 2/15/2026 (confirmed dead — every
+// request now returns HTTP 401) and stopped actually catching anything
+// Wandbox failed to run. No PowerShell or Julia support here — neither
+// Judge0 nor any other free/keyless backend found for those two.
+const JUDGE0_LANG = {
+  c: 103,             // C (GCC 14.1.0)
+  cpp: 105, 'c++': 105, // C++ (GCC 14.1.0)
+  java: 91,            // Java (JDK 17.0.6)
+  rust: 108,           // Rust (1.85.0)
+  go: 107,             // Go (1.23.5)
+  ruby: 72,            // Ruby (2.7.0)
+  php: 98,             // PHP (8.3.11)
+  haskell: 61,         // Haskell (GHC 8.8.1)
+  scala: 112,          // Scala (3.4.2)
+  swift: 83,           // Swift (5.2.3)
+  lua: 64,             // Lua (5.3.5)
+  perl: 85,            // Perl (5.28.1)
+  bash: 46, sh: 46, shell: 46, // Bash (5.0.0)
+  r: 99,               // R (4.4.1)
+  csharp: 51, 'c#': 51, // C# (Mono 6.6.0.161)
+  kotlin: 111,         // Kotlin (2.1.10)
+}
+
+// Safe UTF-8 <-> base64 (plain btoa/atob throw on multi-byte characters,
+// which real lesson code can contain — comments, string literals, etc.)
+function utf8ToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+}
+function base64ToUtf8(str) {
+  return str ? decodeURIComponent(escape(atob(str))) : ''
+}
+
+async function runJudge0(lang, wrappedCode, stdin = '') {
+  const languageId = JUDGE0_LANG[lang]
+  if (!languageId) throw new Error('No Judge0 runner for: ' + lang)
+  let res
+  const body = {
+    language_id: languageId,
+    source_code: utf8ToBase64(wrappedCode),
+  }
+  if (stdin) body.stdin = utf8ToBase64(stdin)
+  try {
+    res = await fetch('https://ce.judge0.com/submissions?base64_encoded=true&wait=true', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  } catch {
+    throw new Error('Judge0 unreachable')
+  }
+  if (!res.ok) throw new Error(`Judge0 returned ${res.status}`)
+  const data = await res.json()
+  const stdout = base64ToUtf8(data.stdout).trimEnd()
+  const stderr = base64ToUtf8(data.stderr).trimEnd()
+  const compileOutput = base64ToUtf8(data.compile_output).trimEnd()
+  const statusId = data.status?.id
+  // status.id: 1/2 = queued/processing (shouldn't happen with wait=true),
+  // 3 = Accepted, 4 = Wrong Answer (N/A without an expected_output), 5 = Time
+  // Limit Exceeded, 6 = Compilation Error, 7-12 = various runtime signals,
+  // 13 = Internal Error, 14 = Exec Format Error. A real status enum instead
+  // of Wandbox's own string-sniffing-for-"error" heuristic.
+  if (statusId === 6) {
+    // Matches executor.ts's output.startsWith('Compile error:') check.
+    return 'Compile error:\n' + compileOutput
+  }
+  if (statusId !== 3 && statusId !== 4) {
+    const detail = stderr || compileOutput || data.status?.description || 'unknown failure'
+    throw new Error(`Judge0: ${data.status?.description || 'failed'} — ${detail}`)
+  }
   if (stdout && stderr) return stdout + '\n⚠ stderr:\n' + stderr
   return stdout || stderr || '(no output)'
 }
@@ -574,22 +681,49 @@ export async function runCode(language, code, priorCode = '', stdin = '') {
 
   const wrapped = autoWrap(lang, code)
 
-  // Kotlin and PowerShell go straight to Piston (Wandbox doesn't support them)
-  if (lang === 'kotlin' || lang === 'powershell' || lang === 'ps1')
-    return runPiston(lang, wrapped, stdin)
+  // Kotlin and PowerShell skip Wandbox (it doesn't support either) and go
+  // straight to Piston, falling back to Judge0 for Kotlin specifically —
+  // Judge0 has no PowerShell runtime, so PowerShell has only Piston, which
+  // is why it's still broken while Piston's public API stays whitelist-only.
+  if (lang === 'kotlin' || lang === 'powershell' || lang === 'ps1') {
+    try {
+      return await runPiston(lang, wrapped, stdin)
+    } catch (pistonErr) {
+      if (!JUDGE0_LANG[lang]) throw pistonErr
+      try {
+        return await runJudge0(lang, wrapped, stdin)
+      } catch (judge0Err) {
+        throw new Error(`Piston: ${pistonErr.message} · Judge0: ${judge0Err.message}`)
+      }
+    }
+  }
 
-  // Everything else: try Wandbox first, fall back to Piston on any failure
+  // Everything else: try Wandbox first, then Piston, then Judge0 — each
+  // only attempted if a runner for that language actually exists, so a
+  // language only Wandbox supports still fails fast instead of trying two
+  // pointless extra requests.
   const wandboxCompiler = WANDBOX_COMPILER[lang]
   if (wandboxCompiler) {
     try {
       return await runWandbox(wandboxCompiler, wrapped, stdin)
     } catch (wandboxErr) {
-      if (!PISTON_LANG[lang]) throw wandboxErr
-      try {
-        return await runPiston(lang, wrapped, stdin)
-      } catch (pistonErr) {
-        throw new Error(`Wandbox: ${wandboxErr.message} · Piston: ${pistonErr.message}`)
+      const attempts = [`Wandbox: ${wandboxErr.message}`]
+      if (PISTON_LANG[lang]) {
+        try {
+          return await runPiston(lang, wrapped, stdin)
+        } catch (pistonErr) {
+          attempts.push(`Piston: ${pistonErr.message}`)
+        }
       }
+      if (JUDGE0_LANG[lang]) {
+        try {
+          return await runJudge0(lang, wrapped, stdin)
+        } catch (judge0Err) {
+          attempts.push(`Judge0: ${judge0Err.message}`)
+        }
+      }
+      if (attempts.length === 1) throw wandboxErr
+      throw new Error(attempts.join(' · '))
     }
   }
 
@@ -601,4 +735,5 @@ export const RUNNABLE_LANGS = new Set([
   'python', 'py', 'javascript', 'js', 'typescript', 'ts', 'matlab', 'm',
   ...Object.keys(WANDBOX_COMPILER),
   ...Object.keys(PISTON_LANG),
+  ...Object.keys(JUDGE0_LANG),
 ])
