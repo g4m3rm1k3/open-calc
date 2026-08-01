@@ -125,22 +125,420 @@ project.
 
 - [x] `README.md` — full 50-lesson roadmap, 12 epics
 - [x] `Lesson-00-a-classes-objects-and-inheritance.md` — prepended, 2026-07-29
+- [x] `Lesson-00-b-polymorphism-virtual-and-override.md` — prepended,
+      2026-08-01 (real, captured `CS0108` warning proving method hiding
+      silently fails through a `List<Lightbulb>`-typed reference, then
+      real, corrected output proving `virtual`/`override` fixes it)
+- [x] `Lesson-00-c-abstract-classes-and-interfaces.md` — prepended,
+      2026-08-01 (real `CS0144`/`CS0534`/`CS1721` compiler errors,
+      captured live: can't instantiate an `abstract` class, can't skip
+      an `abstract` member, can't inherit two base classes — contrasted
+      against a real, working multi-interface implementation)
 - [x] `Lesson-00-developer-environment.md`
 - [x] `Lesson-01-your-first-wpf-window.md`
 - [x] `Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md` — prepended, 2026-07-29
+- [x] `Lesson-01-b-structs-and-extension-methods.md` — prepended,
+      2026-08-01 (real, contrasting output: a `struct` copy stays
+      independent, a `class` "copy" shares the same object; real
+      `CS0509` proving `string` is sealed, then a real, working
+      `IsBlank()` extension method)
 - [x] `Lesson-02-grid-and-the-visual-tree.md`
 - [x] `Lesson-03-frame-page-navigation.md`
 - [x] `Lesson-04-the-navigation-stack.md`
 - [x] `Lesson-05-styles-and-resource-dictionaries.md`
 - [x] `Lesson-05-a-enum-a-closed-set-of-named-values.md` — prepended, 2026-07-29
 - [x] `Lesson-06-fields-classes-and-list.md`
+- [x] `Lesson-06-a-generics-writing-your-own.md` — prepended,
+      2026-08-01 (real `InvalidCastException` at runtime for an
+      `object`-based container, converted to a real, compile-time
+      `CS0029` with a generic `Container<T>`; real `CS1061` proving an
+      unconstrained `T` has no members, fixed with `where T : Animal` —
+      directly explains Lesson 48's own, previously-unexplained
+      `where T : DependencyObject`)
+- [x] `Lesson-06-b-custom-delegates-and-events.md` — prepended,
+      2026-08-01 (real multicast proof — one delegate variable, `+=`,
+      one call running two methods; real, silent subscriber loss from a
+      plain public delegate field reassigned from outside, then real
+      `CS0070` errors proving `event` blocks both outside reassignment
+      *and* outside direct invocation — explains `PropertyChanged`,
+      Lesson 7)
 - [x] `Lesson-07-inotifypropertychanged-observablecollection.md`
 - [x] `Lesson-08-selecteditem-and-two-way-binding.md`
 - [x] `Lesson-09-sqlite-and-microsoft-data-sqlite.md`
 - [x] `Lesson-10-reading-rows-back-into-objects.md`
 - [x] `Lesson-11-validation-at-a-boundary.md`
 - [x] `Lesson-12-enums-and-combobox.md`
-- [ ] Lessons 13–50 — write on request, in order
+- [x] `Lesson-13-decimal-and-culture-aware-formatting.md` — written and
+      verified 2026-07-31 (real `dotnet run` output for the
+      `double`-vs-`decimal` representation-error lab, the `ToString("C")`/
+      `CultureInfo` lab, and a real `dotnet new wpf` build proving the
+      `TextBox`-to-`decimal` implicit binding conversion, including its
+      silent-failure-on-bad-input behavior)
+- [x] `Lesson-14-nullable-purchase-info.md` — written and verified
+      2026-07-31 (real `CS0037` compiler error proving `DateTime` can't
+      hold `null`; a real `dotnet new wpf` run proving `DatePicker.SelectedDate`
+      is genuinely `DateTime?` in both directions, including clearing it
+      back to `null`; a real SQLite round-trip proving `DBNull.Value`/
+      `IsDBNull` correctly persist and reload the null case)
+- [x] `Lesson-15-notes-and-favorites.md` — written and verified
+      2026-07-31, closes Epic 3 (real measured `DesiredSize.Height`
+      proving `TextWrapping="Wrap"` actually wraps text across multiple
+      lines vs. one; a real `dotnet new wpf` run proving `CheckBox.IsChecked`
+      binds a `bool` two-way and a `DataTrigger` really does change a
+      `TextBlock`'s `Foreground` from gray to gold with zero code-behind
+      `if` statements)
+- [x] `Lesson-16-the-datagrid-control.md` — written and verified
+      2026-07-31, opens Epic 4 (real `dotnet run` output proving
+      `AutoGenerateColumns="True"` reflects over a type's public
+      properties for real column count/headers, vs. `False` showing
+      exactly the explicit `DataGridTextColumn`s declared; real proof
+      `DataGrid.IsReadOnly` defaults to `False`, unlike `ListBox`)
+- [x] `Lesson-17-collectionviewsource-and-grouping.md` — written and
+      verified 2026-07-31 (real `dotnet run` output proving
+      `CollectionViewSource.GetDefaultView` + `PropertyGroupDescription`
+      genuinely partitions 5 items into 3 real groups summing back to 5,
+      with zero duplication of the source collection)
+- [x] `Lesson-18-sortdescription.md` — verified 2026-07-31 (real
+      ascending/descending `SortDescription` reordering on a live
+      `ICollectionView`, same three objects each pass)
+- [x] `Lesson-19-predicates-and-live-search.md` — verified 2026-07-31
+      (real `Predicate<object>`/`ICollectionView.Filter` narrowing proven
+      live against 4 objects, underlying `Cats.Count` unchanged)
+- [x] `Lesson-20-combining-predicates.md` — verified 2026-07-31, closes
+      Epic 4 (real output proving `&&`-composed search+category+favorites
+      narrows 4 items to 2 to 1 as each condition activates)
+- [x] `Lesson-21-reusing-a-view-for-create-and-update.md` — verified
+      2026-07-31 (real independent-copy proof; real `UPDATE ... WHERE
+      Id = @id` against SQLite with rows-affected + read-back proof).
+      Deliberately avoided introducing LINQ (`FirstOrDefault`) in real
+      project code — used a plain indexed loop instead, since LINQ has
+      never been taught in this course; keep doing this going forward,
+      don't reach for LINQ shortcuts in real project code without first
+      giving it its own concept lab.
+- [x] `Lesson-22-modal-dialogs-and-messageboxresult.md` — verified
+      2026-07-31 (real `DELETE ... WHERE Id/Name` against SQLite with
+      rows-affected + read-back proof; `MessageBox.Show`'s actual click
+      behavior documented per established API contract, not
+      automatable headlessly — same honest "run it yourself" pattern
+      already used for other pure-UI-interaction proofs, e.g. Lesson 8)
+- [x] `Lesson-23-icommand-relaycommand-and-mvvm.md` — verified 2026-07-31,
+      closes Epic 5. Full `RelayCommand.cs`/`InventoryViewModel.cs`/
+      `InventoryItem.cs` actually compiled together as a real WPF project
+      (0 errors) — not just inspected. Found and fixed a **real latent
+      bug** while testing, not a deliberate teaching device: `RemoveItem`
+      didn't reset `editingItemId`, so select-item-to-edit → delete that
+      same item → add a new item silently did nothing (confirmed via
+      real output: `Items.Count` stayed `0` instead of `1`). Fixed by
+      clearing `editingItemId`/`NewItemDraft` in `RemoveItem` when the
+      deleted item is the one currently loaded for editing; documented
+      directly in the lesson's own Mechanical Walkthrough. Also
+      deliberately kept `MessageBox.Show` in code-behind, not the
+      ViewModel — honest exception, discussed in the lesson's SE Lens.
+- [x] `Lesson-23-a-custom-exceptions.md` — prepended, 2026-08-01 (real
+      proof `catch (Exception ex)` can't distinguish two different
+      validation failures; a real custom `InvalidCategoryException`,
+      carrying its own `AttemptedCategory` property, correctly routed
+      by a second, more specific `catch` block — explains the real
+      `catch (SqliteException ex)` the very next lesson uses)
+- [x] `Lesson-24-foreign-keys-and-join.md` — verified 2026-07-31, opens
+      Epic 6 (real `SqliteException`/error 19 for a FK violation; real
+      `INNER JOIN` output; confirmed `Microsoft.Data.Sqlite` defaults
+      `PRAGMA foreign_keys` to ON, unlike raw SQLite — a real,
+      provider-specific fact worth having verified rather than assumed;
+      real `SelectedValue`/`SelectedValuePath` two-way proof; real
+      `INSERT OR IGNORE` multi-row idempotency + column `DEFAULT` proof)
+- [x] `Lesson-25-storing-photos-by-path.md` — verified 2026-07-31 (real
+      `File.Copy` + `BitmapImage` round-trip against a real 3840x2400
+      Windows wallpaper file; genuinely important real finding — a plain
+      XAML string binding leaves the image file locked, `File.Delete`
+      throws a real `IOException`, while explicit `BitmapImage` with
+      `CacheOption.OnLoad` releases the handle and deletion succeeds.
+      This directly motivates Lesson 26 rather than being an arbitrary
+      style choice — confirmed with real, contrasting output, not
+      assumed from general documentation)
+- [x] `Lesson-26-deleting-orphaned-files.md` — verified 2026-07-31,
+      closes Epic 6 (real proof `File.Delete` on a missing path throws
+      nothing, real proof it removes an existing file)
+- [x] `Lesson-27-deep-copy-vs-reference-copy.md` — verified 2026-07-31,
+      opens Epic 7 (real `ReferenceEquals` proof of shared-mutable-state
+      shallow-copy bug via `List<string>`, and its real fix via
+      `new List<string>(original)`)
+- [x] `Lesson-28-the-soft-delete-pattern.md` — verified 2026-07-31 (real
+      proof two `ICollectionView`s — `GetDefaultView` and a directly
+      constructed `ListCollectionView` — are genuinely independent
+      objects over the same source collection, `ReferenceEquals` false,
+      each filtering correctly and reacting to `.Refresh()`). Caught and
+      fixed one issue before it shipped: the first draft referenced an
+      unexplained `BoolToVisibilityConverter` for the Restore button —
+      value converters have never been taught in this course — replaced
+      with the already-established `RelayCommand`/`CanExecute` pattern
+      instead. Watch for this class of mistake going forward: reaching
+      for a common WPF idiom without checking whether this course has
+      actually earned it yet.
+- [x] `Lesson-29-a-tiny-state-machine.md` — verified 2026-07-31, closes
+      Epic 7 (real proof `TryBorrow`/`TryReturn`-style guards correctly
+      allow valid transitions and reject invalid ones, state left
+      unchanged on rejection; real proof `CommandParameter` bound via
+      `ElementName` correctly carries a live `TextBox.Text` value through
+      to a command's `Execute`)
+- [x] `Lesson-30-sum-and-aggregate-queries.md` — verified 2026-07-31,
+      opens Epic 8. **Real, important, non-obvious finding**: SQLite's
+      `SUM()` over the `Value` column (stored as exact `TEXT` per Lesson
+      13) still computes internally in floating point — `SUM('0.1'+'0.2')`
+      returns `0.30000000000000004`, the *exact* same representation
+      error Lesson 13 built a whole lesson to avoid, now reintroduced at
+      the aggregate level despite exact storage. This was not assumed
+      — it was tested and confirmed real. Handled honestly in the lesson
+      (rounding via `ToString("C")` safely absorbs an error ~15 orders
+      of magnitude smaller than a cent) rather than silently ignored.
+      Also confirmed `SUM()` on an empty table returns real `DBNull`,
+      not `0` — handled explicitly, with a real reproduced crash
+      (`Convert.ToDecimal(DBNull.Value)` throws) proving why it matters.
+- [x] `Lesson-31-group-by.md` — verified 2026-07-31 (real `GROUP BY` +
+      `SUM`/`COUNT` output, 3 correct per-category groups from 4 rows)
+- [x] `Lesson-32-order-by-and-limit.md` — verified 2026-07-31. **Real,
+      significant bug caught before writing anything else**: `ORDER BY
+      Value DESC` on the `TEXT`-stored `Value` column sorts
+      lexicographically, not numerically — real, wrong output confirmed
+      (`"9.99"` outranks `"100.00"`; `"100.00"` outranks `"10.00"`).
+      Fixed with `ORDER BY CAST(Value AS REAL) DESC`, verified correct.
+      A "Top 5 Most Valuable" feature built on the naive query would
+      have silently shown wrong results forever with zero errors. Also:
+      substituted `PurchaseDate IS NULL` for the roadmap's generic
+      "missing category" idea, since this project's `Category` has been
+      `NOT NULL` since Lesson 12 — checked the actual schema rather than
+      copying the roadmap's generic description uncritically.
+- [x] `Lesson-33-composing-a-dashboard.md` — verified 2026-07-31, closes
+      Epic 8 (real proof `Frame.GoBack()` returns to the *same cached
+      page instance*, not a fresh one — `ReferenceEquals` true, state
+      intact — the load-bearing fact this lesson's whole design depends
+      on, checked rather than assumed by analogy to browser back
+      buttons)
+- [x] `Lesson-34-csv-streamwriter-and-escaping.md` — verified 2026-07-31,
+      opens Epic 9 (real proof naive comma-joining breaks a
+      comma-containing field; real proof the quote-and-double escaping
+      fix produces a correctly-structured row; real `StreamWriter` file
+      write/read-back)
+- [x] `Lesson-35-defensive-csv-parsing.md` — verified 2026-07-31 (real
+      quote-aware parser correctly reverses Lesson 34's escaping; real
+      per-row `try`/`catch` proof — 2 of 4 rows succeed, 2 fail with
+      real, different exception types, neither failure stopping the
+      loop). **While writing this lesson, caught a real, severe
+      retroactive bug in Lesson 24**: `SaveItemToDatabase`/
+      `UpdateItemInDatabase` were never actually updated to include
+      `SupplierId`/`SerialNumber` — only `CREATE TABLE` and the `JOIN`
+      load were. Verified for real: every "Add" from Lesson 24 onward
+      would have thrown `SQLite Error 19: NOT NULL constraint failed:
+      Items.SerialNumber` and crashed. Fixed directly in Lesson 24 (new
+      "The New Code — Saving and Updating" section + Mechanical
+      Walkthrough note), re-verified against a real SQLite round-trip,
+      checker re-run clean. This is exactly the kind of gap that only
+      surfaces when a *later* lesson's own code forces you to reason
+      about what an earlier lesson actually left in place — worth
+      periodically re-reading earlier "New Code" sections against later
+      ones for this same class of drift.
+- [x] `Lesson-36-system-text-json.md` — verified 2026-07-31 (real nested
+      JSON serialization proof — `Supplier` as a genuine nested object;
+      `decimal` preserved exactly, no `SUM()`-style float artifact;
+      `DateTime?` → real `null`; `JsonStringEnumConverter` proof).
+      Caught and fixed my own draft using `Items.Select(...)` (LINQ) in
+      real project code with zero explanation — replaced with a plain
+      `foreach`, same mistake class as the Lesson 21 `FirstOrDefault`
+      catch. This is now the second time; worth treating as a standing
+      habit to check for on every remaining lesson, not a one-off.
+- [x] `Lesson-37-flowdocument-and-printdialog.md` — verified 2026-07-31,
+      closes Epic 9 (real, unusually thorough proof: an actual
+      `FlowDocument`/`Table` was written through the exact same
+      `XpsDocument`/`XpsDocumentWriter`/`DocumentPaginator` pipeline
+      `PrintDialog` uses internally, producing a real 63,658-byte file
+      with a correctly-reported page count — not just constructed and
+      trusted)
+- [x] `Lesson-38-appdata-and-settings-persistence.md` — verified
+      2026-07-31, opens Epic 10 (real `%AppData%` resolution + real
+      JSON settings file write/read-back, confirmed separate from
+      `pocketinventory.db`)
+- [x] `Lesson-39-dynamicresource-and-dark-mode.md` — verified 2026-07-31
+      (real, side-by-side proof: after swapping a resource dictionary
+      entry at runtime, a `StaticResource`-bound element stayed
+      unchanged while a `DynamicResource`-bound element correctly
+      updated — the exact mechanical reason this lesson exists, not
+      just asserted from the attribute names)
+- [x] `Lesson-40-inputbindings-and-keygesture.md` — verified 2026-07-31
+      (real proof a `KeyBinding.Command` resolves to the exact same
+      object as the button's own command — `ReferenceEquals` true —
+      and invoking it runs identical logic)
+- [x] `Lesson-41-contextmenu-and-status-bar.md` — verified 2026-07-31,
+      closes Epic 10. **Real, important WPF gotcha caught and proven**:
+      a `ContextMenu`'s `MenuItem` does not inherit `DataContext` the
+      normal way — `Command="{Binding ...}"` resolved to a real `null`
+      (confirmed) — because `ContextMenu` is a separate popup root, not
+      part of the visual tree. Fixed and verified with the real
+      `PlacementTarget.DataContext`/`RelativeSource AncestorType=ContextMenu`
+      pattern (`ReferenceEquals` true). Also confirmed
+      `{Binding Items.Count}` updates live via `ObservableCollection<T>`'s
+      own `Count` change notification.
+- [x] `Lesson-42-selectionmode-and-selecteditems.md` — verified
+      2026-07-31, opens Epic 11 (real proof `DataGrid.SelectionMode`
+      already defaults to `Extended`; real, correctly-typed
+      `SelectedItems` `IList` proof with 2 of 3 items selected)
+- [x] `Lesson-43-bulk-edit-and-bulk-delete.md` — verified 2026-07-31.
+      **Dramatic, real, measured proof**: 200 individual auto-committing
+      `UPDATE`s took 1753ms; the same 200 wrapped in one real
+      `SqliteTransaction` took 12ms — ~146x faster, real numbers from
+      this machine, not an estimate. Real rollback proof included too.
+- [x] `Lesson-44-the-drag-and-drop-api.md` — verified 2026-07-31 (real
+      `IDataObject`/`GetDataPresent`/`GetData` round-trip
+      proof, `ReferenceEquals` confirming the real object travels, not
+      a copy). Caught and fixed a real gap while writing it — referenced
+      `viewModel.UpdateSingleItem(item)` before it existed;
+      `UpdateItemInDatabase` has been `private` since Lesson 21, so
+      code-behind (outside the ViewModel) couldn't reach it. Added the
+      thin public wrapper with a real explanation, not just silently
+      patched. This is the third time a real gap surfaced only because
+      a later lesson's code forced the question — same class of issue
+      as the Lesson 24 and Lesson 36 catches.
+- [x] `Lesson-45-command-and-memento-patterns.md` — verified 2026-07-31,
+      closes Epic 11 (real LIFO undo-stack proof: 3 deletes then 3
+      undos restore items in exact reverse-deletion order at their
+      exact original positions; real proof re-inserting a deleted row
+      gets a genuinely new `Id`, never the original — named honestly,
+      not glossed over)
+- [x] `Lesson-46-file-copy-and-dispatchertimer.md` — verified
+      2026-07-31, opens Epic 12 (real, measured `DispatcherTimer` ticks
+      ~300ms apart, 3 real timestamped backup files confirmed on disk)
+- [x] `Lesson-47-restoring-a-backup.md` — verified 2026-07-31 (real,
+      significant finding: a plain `File.Copy` restore over a live
+      SQLite file silently fails to take effect, and cleanup throws a
+      real `IOException`, because `Microsoft.Data.Sqlite` pools native
+      connections even after `using` disposes the wrapper —
+      `SqliteConnection.ClearAllPools()` before the copy is genuinely
+      required and was proven both ways with real output)
+- [x] `Lesson-48-virtualization-and-big-o.md` — verified 2026-07-31 (real,
+      dramatic proof: 10,000-item `DataGrid`, virtualization on = 32 rows
+      realized/91ms vs. off = 10,000 rows/34324ms; grouping a 10,000-item
+      view still only realizes 32 rows/51ms, and explicitly disabling
+      `IsVirtualizingWhenGrouping` — older WPF advice's "required" fix —
+      measurably changed nothing, a real, dated-advice correction; a
+      20-jump scroll session realized 692 distinct row containers under
+      `VirtualizationMode="Standard"` vs. 33 under `"Recycling"`, and
+      leaving it unset matched `Recycling` exactly, proving that's
+      `DataGrid`'s real default)
+- [x] `Lesson-49-dotnet-publish-and-an-about-screen.md` — verified
+      2026-07-31 (real, measured `dotnet publish` size/file-count gap:
+      framework-dependent = 5 files/190K vs. self-contained = 257
+      files/141M; `PublishSingleFile=true` shrinks that to 7 files, with
+      5 real native `_cor3.dll` interop files proven to survive outside
+      the bundle — single-file publish isn't actually single-file for
+      WPF; the published framework-dependent `.exe` was run directly,
+      outside `dotnet run`, and proven to execute real code via a
+      written proof file; `Window.GetWindow(this)`, called from a real
+      `Page` hosted in a `Frame`, proven to return the exact
+      `Application.Current.MainWindow` instance; `ShowDialog()` proven
+      to genuinely block via real console-output ordering, and
+      `Owner.IsEnabled` proven to stay `True` throughout — a real,
+      checked-not-assumed correction)
+- [x] `Lesson-50-refactor-architecture-review-and-a-retrospective.md`
+      (Capstone) — verified 2026-07-31. Real, grepped evidence, not
+      assertion: 29 raw `SqliteConnection(ConnectionString)` call sites
+      across 13 real lesson files (9 through 43); a real before/after
+      `ItemRepository` extraction lab producing byte-identical output
+      pre- and post-refactor; a real, corrected audit of every
+      `MessageBox.Show` call site across all 49 files, finding Lesson
+      23's own "confirmations stay in code-behind" rule first broken by
+      Lesson 35's `ImportCsv` (soft, info-only) and then fully broken by
+      Lessons 43/47 (`BulkDelete`/`RestoreBackup`, both Yes/No-gated) —
+      genuine architectural drift, caught and named, not fixed by
+      retroactively rewriting three working lessons. The retrospective
+      itself is the lesson's stated deliverable. **All 50 core lessons
+      plus the capstone were, at this point, written and verified** —
+      see the 2026-08-01 entries directly below for what was added
+      after this point, following the coverage audit described in the
+      next note.
+- [x] `Lesson-51-async-and-await.md` — added 2026-08-01 (real, measured
+      `DispatcherTimer` proof: a synchronous `Thread.Sleep(3000)` on the
+      UI thread produces exactly `0` timer ticks during a real `3003ms`
+      span; the identical `3000ms` wait via `await Task.Delay` produces
+      `28` ticks, matching the expected ~30 — real proof `await` yields
+      the UI thread instead of blocking it. `ItemRepository.GetAllAsync`
+      added using real, verified `OpenAsync`/`ExecuteReaderAsync`/
+      `ReadAsync` calls.)
+- [x] `Lesson-52-unit-testing-with-xunit.md` — added 2026-08-01 (a real
+      `dotnet new xunit` project; real pass/fail proof with a
+      deliberately-wrong `Assert.Equal`; real `ItemRepositoryTests`
+      against a real, temp SQLite database, including a deliberate
+      regression — breaking `Add` to insert `"BROKEN"` instead of the
+      real category — caught automatically by `dotnet test` with a
+      real, structured diff)
+- [x] `Lesson-53-logging.md` — added 2026-08-01 (real proof: the same
+      `Console.WriteLine` output from three separate process runs is
+      gone after each one exits, while a real log file accumulated all
+      three real, timestamped entries; a real `FileLogger` with
+      `Information`/`Warning`/`Error` levels; a real, working
+      `Application.DispatcherUnhandledException` handler proven both
+      ways — with it, a real thrown exception is logged in full and the
+      app survives; without it, the app crashes for real and zero log
+      file is left behind)
+- [x] `Lesson-54-linq-the-professional-shorthand.md` — added 2026-08-01
+      (real `SequenceEqual` proof that hand-rolled `foreach`/`if` and
+      `Where().Select()` produce byte-identical output; real, genuinely
+      surprising deferred-execution proof — the same un-materialized
+      query variable, enumerated twice with no reassignment in between,
+      returns two different real results because the source list
+      changed; a small, real refactor closing the `PrintButton_Click`
+      duplication Lesson 50's own retrospective named but didn't fix)
+- [x] Lesson 50's own `InventoryViewModel(ItemRepository repository)`
+      Mechanical Walkthrough updated, 2026-08-01, to name **dependency
+      injection** explicitly — the pattern was already correct when
+      written, just never labeled.
+- [x] Lesson 48's Mechanical Walkthrough updated, 2026-08-01, to credit
+      Lesson 6a for `CountDescendants<T> where T : DependencyObject`,
+      which previously used generics with zero explanation anywhere in
+      the lesson — a real gap the 2026-08-01 audit found and closed.
+- [x] Lesson 20's own throwaway lab fixed, 2026-08-01: it used
+      `items.Where(...)` (real LINQ) before LINQ is ever taught anywhere
+      in this project — the same class of mistake as the Lesson 21/36
+      LINQ catches, just in a discarded lab rather than real project
+      code. Replaced with a plain `foreach`/`if`, re-verified for
+      identical real output.
+
+**2026-07-31 continuation note:** user confirmed (mid-session) they want
+every remaining lesson (17–50) written and verified now, in this pass,
+not paced to their own reading — "usage resets tomorrow... let's build
+them all." Continue the same per-lesson rigor (real `dotnet run`/`dotnet
+build` output for every new mechanic, checker script clean, status files
+updated) for every lesson from here through 50. Do not silently drop the
+verification bar to move faster — that was explicitly rejected earlier
+this same session ("there can't be gaps").
+
+**2026-07-31 post-completion audit:** after all 50 lessons + capstone
+were done, user asked directly whether logging, NuGet, OOP, and design
+patterns were actually covered. A real, grepped audit (not from memory)
+found: NuGet ✅ (Lesson 9), design patterns ✅ (Observer reinforced
+4×, Command/Memento Lesson 45, Repository Lesson 50) minus DI being used
+but never named, and two real, unaddressed gaps — **polymorphism**
+(inheritance is taught in Lesson 0a but `virtual`/`override` never
+appears anywhere) and **logging** (zero coverage; `Console.WriteLine` is
+used everywhere but only as lab-verification output, never framed as
+production logging discipline). The same audit, extended further per
+the user's "search for more, make sure we teach everything" follow-up,
+found six more real gaps (unit testing/xUnit, async/await, abstract
+classes, structs, custom delegates, generics-writing-your-own,
+extension methods, custom exceptions — see the Status list below for
+each as it's added) and one real bug: Lesson 20's throwaway lab used
+`.Where(...)` (real LINQ) before LINQ is ever taught anywhere in this
+project — the same class of mistake as the Lesson 21/36 LINQ catches
+earlier this session, just in a discarded lab instead of real project
+code. Fixed by replacing it with a plain `foreach`/`if`, re-verified for
+identical real output. **All of these gaps are now closed** (2026-08-01):
+six new prepended concept lessons (`00b`/`00c`/`01b`/`06a`/`06b`/`23a`,
+matching the existing `00a`/`01a`/`05a` convention, for foundational
+OOP/language gaps) and four new appended lessons (`51`–`54`, for
+professional-practice layers — async, testing, logging, a LINQ payoff —
+built on the finished app) — see the Status list above for each, plus
+small, real edits to Lessons 20 (the LINQ bug), 48 (crediting Lesson 6a
+for its own previously-unexplained generics), and 50 (naming dependency
+injection explicitly). Every new/edited file was re-run through
+`scripts/check-narrative-lessons.mjs` and came back clean.
 
 ## Prepended concept lessons — an ongoing strategy, not a one-time fix
 
@@ -179,13 +577,27 @@ re-discover these from scratch in a future audit:
   correct, from-scratch treatment — confirmed, not a gap) → fixed to
   cite Lesson 7 by name instead of silently re-implying it's new.
 
-**Known, smaller gaps not yet fixed** (found same audit, lower priority
-— didn't block the audit's own read, unlike the OOP gap):
-- `IDataErrorInfo` (Lesson 11) and `ComboBox` (Lesson 12) both skip
-  "Introduce the Concept in Isolation" and go straight from "The
-  Problem" to real project code — inconsistent with this course's own
-  pattern for hard/new constructs elsewhere. Worth a throwaway lab each
-  when next touched, not urgent enough to block reading forward.
+**Smaller gaps found same audit, fixed 2026-07-31**:
+- `IDataErrorInfo` (Lesson 11) skipped "Introduce the Concept in
+  Isolation" → added a throwaway console lab (`IDataErrorInfo` is a
+  plain `System.ComponentModel` interface, no WPF window needed to
+  prove it) with real, verified output showing the indexer returning
+  the validation message when empty and an empty string once set.
+- `ComboBox` (Lesson 12) skipped it too → added a throwaway
+  `dotnet new wpf` lab binding `ItemsSource` to `Enum.GetValues`,
+  verified to build clean (0 errors/warnings) with the exact XAML/C#
+  the lesson now shows; proves the real teaching point (the dropdown's
+  contents come live from the enum, never hand-typed as
+  `<ComboBoxItem>`s) before the real project does the same thing.
+
+Also ran a fresh pass of `scripts/check-narrative-lessons.mjs`'s
+`dense-concept-unit` flags against this project specifically (2026-07-31):
+all 4 (Lesson 0's Anatomy of a WPF Project, Lesson 6's `List<T>`,
+Lesson 9's `SqliteConnection` and `CREATE TABLE`/`ExecuteNonQuery`)
+checked out as real false positives — each bundles several terms that
+are all proven together by one execution trace or one real run, not
+gaps. Don't re-investigate these from scratch next time the checker
+flags them; this note is the record that they were checked.
 
 ## Filename convention
 

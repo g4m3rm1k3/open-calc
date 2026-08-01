@@ -145,11 +145,25 @@ without ever teaching it — found by auditing the whole course against
 the corrected "no OOP, no C#, no WPF" floor above — the fix is a short,
 standalone lesson **inserted before** the lesson that first needs it,
 not a rewrite of the lesson itself. Existing lessons stay as committed;
-a prepended lesson closes the gap in front of them. Three exist so far:
+a prepended lesson closes the gap in front of them.
+
+A second wave, added 2026-08-01, closes a different kind of gap: real
+C#/OOP fundamentals (`virtual`/`override`, `abstract` classes, structs,
+writing your own generics, custom `delegate`/`event` types, custom
+exceptions) that this project's own real code never happened to force —
+found via a direct audit against the stated goal of learning C# and OOP
+deeply, not just whatever this one project's narrative required. Nine
+exist so far:
 
 - [Lesson 0a — Classes, Objects, Constructors, and Inheritance](Lesson-00-a-classes-objects-and-inheritance.md) — before Lesson 0, which uses `class`/`instance`/`constructor` on its very first page.
+- [Lesson 0b — Polymorphism, `virtual`, and `override`](Lesson-00-b-polymorphism-virtual-and-override.md) — directly after 0a; inheritance without overriding is half the picture.
+- [Lesson 0c — Abstract Classes and Interfaces as Abstraction](Lesson-00-c-abstract-classes-and-interfaces.md) — directly after 0b; contrasts `abstract` classes against the interfaces (`INotifyPropertyChanged`, `ICommand`) this project already implements without ever explaining why an interface, not a base class.
 - [Lesson 1a — `static`, `readonly`, `Dictionary<K,V>`, and Safe Lookups](Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md) — before Lesson 2, whose attached-property lab bundles five unlabeled constructs into one line.
+- [Lesson 1b — Structs and Extension Methods](Lesson-01-b-structs-and-extension-methods.md) — directly after 1a; `SortDescription` (Lesson 18) is a real `struct`, used without ever explaining value-type semantics.
 - [Lesson 5a — `enum`](Lesson-05-a-enum-a-closed-set-of-named-values.md) — before Lesson 6, which uses an enum-backed property six lessons before `enum` otherwise gets its own lab (Lesson 12, which now points back here instead of re-teaching it).
+- [Lesson 6a — Generics, Writing Your Own](Lesson-06-a-generics-writing-your-own.md) — directly after Lesson 6's own `List<T>`; Lesson 48's `CountDescendants<T> where T : DependencyObject` uses this silently, 42 lessons later, with no prior explanation.
+- [Lesson 6b — Custom Delegates and Events](Lesson-06-b-custom-delegates-and-events.md) — directly after 6a; explains the `delegate`/`event` mechanism behind `PropertyChangedEventHandler`/`PropertyChanged` (Lesson 7), used correctly but never explained.
+- [Lesson 23a — Custom Exceptions](Lesson-23-a-custom-exceptions.md) — directly after Lesson 23, before Lesson 24's real `catch (SqliteException ex)` — explains how a `catch` block can distinguish exception types at all.
 
 More get added as they're found reading forward — this list grows, not
 all at once.
@@ -328,7 +342,35 @@ your own words, what you'd design differently starting a v2 today. The
 retrospective is itself the deliverable — a professional engineer revisiting
 old decisions with better judgment than they had when they made them.
 
-→ *(lessons are written incrementally — see [Status](#status) below)*
+→ *(all 50 lessons are written — see [Status](#status) below)*
+
+## After the Capstone
+
+Lessons 51–54, added 2026-08-01, came from the same kind of audit that
+produced the second wave of prepended concept lessons — real,
+professional-practice gaps (`async`/`await`, real unit tests, real
+logging, LINQ) this project's own narrative never forced, but that a
+developer aiming for genuine C# depth needs regardless. Each is a real,
+appended lesson, not a rewrite of the capstone itself — the capstone's
+own retrospective stands as originally written.
+
+- **Lesson 51 — Async/Await.** Converts `ItemRepository.GetAll()` to a
+  real `GetAllAsync()`, with real, measured proof (a `DispatcherTimer`
+  heartbeat) that a synchronous SQLite call genuinely freezes the UI
+  thread, and an async one doesn't.
+- **Lesson 52 — Unit Testing with xUnit.** A real, permanent
+  `PocketInventory.Tests` project, replacing this course's own
+  throwaway-lab verification method with real, rerunnable `[Fact]`
+  tests against `ItemRepository` — the concrete payoff of Lesson 50's
+  own Repository extraction.
+- **Lesson 53 — Logging.** A real `FileLogger`, wired into
+  `Application.DispatcherUnhandledException`, so a real crash in the
+  published `.exe` (Lesson 49) leaves a real, persistent record instead
+  of vanishing with no console attached to see it.
+- **Lesson 54 — LINQ, the Professional Shorthand.** Proves
+  `Where`/`Select` reproduce this project's own hand-rolled filter loops
+  exactly, names deferred execution, and closes a small, real finding
+  Lesson 50's own retrospective named but left for later.
 
 ## Definition of Done
 
@@ -350,25 +392,73 @@ old decisions with better judgment than they had when they made them.
 
 ## Status
 
-Only the lessons that exist as files are done — this roadmap is deliberately
-written before all fifty lessons are, the same way every other project in
-this curriculum (`cam/`, `PDM/`, `track/`) was built a handful of lessons at
-a time rather than all at once. Written so far:
+All 50 core lessons and the capstone are written and verified, plus
+nine prepended concept lessons and four lessons appended after the
+capstone (Lessons 51–54) closing real C#/professional-practice gaps
+found by direct audit — see [After the Capstone](#after-the-capstone)
+above:
 
 - [x] [Lesson 0a — Classes, Objects, Constructors, and Inheritance](Lesson-00-a-classes-objects-and-inheritance.md) *(prepended 2026-07-29)*
+- [x] [Lesson 0b — Polymorphism, `virtual`, and `override`](Lesson-00-b-polymorphism-virtual-and-override.md) *(prepended 2026-08-01)*
+- [x] [Lesson 0c — Abstract Classes and Interfaces as Abstraction](Lesson-00-c-abstract-classes-and-interfaces.md) *(prepended 2026-08-01)*
 - [x] [Lesson 0 — Developer Environment](Lesson-00-developer-environment.md)
 - [x] [Lesson 1 — Your First WPF Window](Lesson-01-your-first-wpf-window.md)
 - [x] [Lesson 1a — `static`, `readonly`, `Dictionary<K,V>`, and Safe Lookups](Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md) *(prepended 2026-07-29)*
+- [x] [Lesson 1b — Structs and Extension Methods](Lesson-01-b-structs-and-extension-methods.md) *(prepended 2026-08-01)*
 - [x] [Lesson 2 — Grid and the Visual Tree](Lesson-02-grid-and-the-visual-tree.md)
 - [x] [Lesson 3 — Frame/Page Navigation](Lesson-03-frame-page-navigation.md)
 - [x] [Lesson 4 — The Navigation Stack](Lesson-04-the-navigation-stack.md)
 - [x] [Lesson 5 — Styles and Resource Dictionaries](Lesson-05-styles-and-resource-dictionaries.md)
 - [x] [Lesson 5a — `enum`](Lesson-05-a-enum-a-closed-set-of-named-values.md) *(prepended 2026-07-29)*
 - [x] [Lesson 6 — Fields, Classes, and List](Lesson-06-fields-classes-and-list.md)
+- [x] [Lesson 6a — Generics, Writing Your Own](Lesson-06-a-generics-writing-your-own.md) *(prepended 2026-08-01)*
+- [x] [Lesson 6b — Custom Delegates and Events](Lesson-06-b-custom-delegates-and-events.md) *(prepended 2026-08-01)*
 - [x] [Lesson 7 — `INotifyPropertyChanged` and `ObservableCollection`](Lesson-07-inotifypropertychanged-observablecollection.md)
 - [x] [Lesson 8 — `SelectedItem` and Two-Way Binding](Lesson-08-selecteditem-and-two-way-binding.md)
 - [x] [Lesson 9 — SQLite and `Microsoft.Data.Sqlite`](Lesson-09-sqlite-and-microsoft-data-sqlite.md)
 - [x] [Lesson 10 — Reading Rows Back Into Objects](Lesson-10-reading-rows-back-into-objects.md)
 - [x] [Lesson 11 — Validation at a Boundary](Lesson-11-validation-at-a-boundary.md)
 - [x] [Lesson 12 — Enums and `ComboBox`](Lesson-12-enums-and-combobox.md)
-- [ ] Lessons 13–50 — write on request, in order
+- [x] [Lesson 13 — `decimal` and Culture-Aware Formatting](Lesson-13-decimal-and-culture-aware-formatting.md)
+- [x] [Lesson 14 — Nullable Purchase Info](Lesson-14-nullable-purchase-info.md)
+- [x] [Lesson 15 — Notes and Favorites](Lesson-15-notes-and-favorites.md) *(closes Epic 3)*
+- [x] [Lesson 16 — The DataGrid Control](Lesson-16-the-datagrid-control.md)
+- [x] [Lesson 17 — CollectionViewSource and Grouping](Lesson-17-collectionviewsource-and-grouping.md)
+- [x] [Lesson 18 — SortDescription](Lesson-18-sortdescription.md)
+- [x] [Lesson 19 — Predicates and Live Search](Lesson-19-predicates-and-live-search.md)
+- [x] [Lesson 20 — Combining Predicates](Lesson-20-combining-predicates.md) *(closes Epic 4)*
+- [x] [Lesson 21 — Reusing a View for Create and Update](Lesson-21-reusing-a-view-for-create-and-update.md)
+- [x] [Lesson 22 — Modal Dialogs and MessageBoxResult](Lesson-22-modal-dialogs-and-messageboxresult.md)
+- [x] [Lesson 23 — ICommand, RelayCommand, and MVVM](Lesson-23-icommand-relaycommand-and-mvvm.md) *(closes Epic 5)*
+- [x] [Lesson 23a — Custom Exceptions](Lesson-23-a-custom-exceptions.md) *(prepended 2026-08-01)*
+- [x] [Lesson 24 — Foreign Keys and JOIN](Lesson-24-foreign-keys-and-join.md) *(opens Epic 6)*
+- [x] [Lesson 25 — Storing Photos by Path](Lesson-25-storing-photos-by-path.md)
+- [x] [Lesson 26 — Deleting Orphaned Files](Lesson-26-deleting-orphaned-files.md) *(closes Epic 6)*
+- [x] [Lesson 27 — Deep Copy vs. Reference Copy](Lesson-27-deep-copy-vs-reference-copy.md) *(opens Epic 7)*
+- [x] [Lesson 28 — The Soft-Delete Pattern](Lesson-28-the-soft-delete-pattern.md)
+- [x] [Lesson 29 — A Tiny State Machine](Lesson-29-a-tiny-state-machine.md) *(closes Epic 7)*
+- [x] [Lesson 30 — SUM() and Aggregate Queries](Lesson-30-sum-and-aggregate-queries.md) *(opens Epic 8)*
+- [x] [Lesson 31 — GROUP BY](Lesson-31-group-by.md)
+- [x] [Lesson 32 — ORDER BY and LIMIT](Lesson-32-order-by-and-limit.md)
+- [x] [Lesson 33 — Composing a Dashboard](Lesson-33-composing-a-dashboard.md) *(closes Epic 8)*
+- [x] [Lesson 34 — CSV, StreamWriter, and Escaping](Lesson-34-csv-streamwriter-and-escaping.md) *(opens Epic 9)*
+- [x] [Lesson 35 — Defensive CSV Parsing](Lesson-35-defensive-csv-parsing.md)
+- [x] [Lesson 36 — System.Text.Json](Lesson-36-system-text-json.md)
+- [x] [Lesson 37 — FlowDocument and PrintDialog](Lesson-37-flowdocument-and-printdialog.md) *(closes Epic 9)*
+- [x] [Lesson 38 — %AppData% and Settings Persistence](Lesson-38-appdata-and-settings-persistence.md) *(opens Epic 10)*
+- [x] [Lesson 39 — DynamicResource and Dark Mode](Lesson-39-dynamicresource-and-dark-mode.md)
+- [x] [Lesson 40 — InputBindings and KeyGesture](Lesson-40-inputbindings-and-keygesture.md)
+- [x] [Lesson 41 — ContextMenu and a Status Bar](Lesson-41-contextmenu-and-status-bar.md) *(closes Epic 10)*
+- [x] [Lesson 42 — SelectionMode and SelectedItems](Lesson-42-selectionmode-and-selecteditems.md) *(opens Epic 11)*
+- [x] [Lesson 43 — Bulk Edit and Bulk Delete](Lesson-43-bulk-edit-and-bulk-delete.md)
+- [x] [Lesson 44 — The Drag-and-Drop API](Lesson-44-the-drag-and-drop-api.md)
+- [x] [Lesson 45 — The Command and Memento Patterns](Lesson-45-command-and-memento-patterns.md) *(closes Epic 11)*
+- [x] [Lesson 46 — File.Copy and DispatcherTimer](Lesson-46-file-copy-and-dispatchertimer.md) *(opens Epic 12)*
+- [x] [Lesson 47 — Restoring a Backup](Lesson-47-restoring-a-backup.md)
+- [x] [Lesson 48 — Virtualization and Big-O](Lesson-48-virtualization-and-big-o.md)
+- [x] [Lesson 49 — dotnet publish and an About Screen](Lesson-49-dotnet-publish-and-an-about-screen.md)
+- [x] [Lesson 50 (Capstone) — Refactor, Architecture Review, and a Retrospective](Lesson-50-refactor-architecture-review-and-a-retrospective.md)
+- [x] [Lesson 51 — Async/Await](Lesson-51-async-and-await.md) *(added 2026-08-01)*
+- [x] [Lesson 52 — Unit Testing with xUnit](Lesson-52-unit-testing-with-xunit.md) *(added 2026-08-01)*
+- [x] [Lesson 53 — Logging](Lesson-53-logging.md) *(added 2026-08-01)*
+- [x] [Lesson 54 — LINQ, the Professional Shorthand](Lesson-54-linq-the-professional-shorthand.md) *(added 2026-08-01)*

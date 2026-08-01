@@ -341,6 +341,72 @@ parameter to be named `propertyName` specifically (this project's own
 choice, for clarity) — the interface only cares about the `string`
 type, not the parameter's name.
 
+### Introduce the Concept in Isolation
+```bash
+dotnet new console -o lab-idataerrorinfo
+cd lab-idataerrorinfo
+```
+
+Replace `Program.cs`:
+
+```csharp
+using System.ComponentModel;
+
+Cat cat = new Cat();
+Console.WriteLine($"[\"Name\"] when empty: '{cat["Name"]}'");
+
+cat.Name = "Whiskers";
+Console.WriteLine($"[\"Name\"] when set: '{cat["Name"]}'");
+
+class Cat : IDataErrorInfo
+{
+    public string Name { get; set; } = string.Empty;
+
+    public string Error => string.Empty;
+
+    public string this[string propertyName]
+    {
+        get
+        {
+            if (propertyName == nameof(Name) && string.IsNullOrWhiteSpace(Name))
+            {
+                return "Name is required.";
+            }
+            return string.Empty;
+        }
+    }
+}
+```
+
+Run it:
+
+```bash
+dotnet run
+```
+
+Real output:
+
+```text
+["Name"] when empty: 'Name is required.'
+["Name"] when set: ''
+```
+
+*What this proves:* `cat["Name"]` — indexer syntax, reappearing from the
+previous unit — calls straight into `IDataErrorInfo`'s own indexer, the
+exact same call WPF's binding engine makes internally every time a bound
+property changes; nothing WPF-specific is happening here, no window, no
+binding, no XAML. When `Name` is still its default empty string, the
+indexer returns the real message; the moment `Name` holds something
+non-blank, the same call returns an empty string instead — the
+empty-versus-non-empty convention that's this interface's entire
+contract, proven with real output before `InventoryItem` ever implements
+it for real.
+
+### Discard the Throwaway Example
+Delete the `lab-idataerrorinfo` folder. The indexer shape and the
+empty-versus-non-empty convention are not discarded — `InventoryItem`
+implements exactly this next.
+
 ### The New Code
 
 ```csharp

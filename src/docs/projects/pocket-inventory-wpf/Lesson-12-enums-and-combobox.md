@@ -277,6 +277,70 @@ would just reopen the free-text problem this lesson's first unit
 exists to close). WPF has a dedicated control for choosing one value
 from a fixed list.
 
+### Introduce the Concept in Isolation
+```bash
+dotnet new wpf -o lab-combobox
+```
+
+Replace `MainWindow.xaml`'s `Grid` contents:
+
+```xml
+<StackPanel>
+    <ComboBox x:Name="ColorComboBox"
+              ItemsSource="{Binding ColorValues}"
+              SelectionChanged="ColorComboBox_SelectionChanged" />
+    <TextBlock x:Name="SelectionLabel" Margin="0,12,0,0" />
+</StackPanel>
+```
+
+Replace `MainWindow.xaml.cs`'s contents:
+
+```csharp
+using System.Windows;
+using System.Windows.Controls;
+
+namespace lab_combobox
+{
+    public partial class MainWindow : Window
+    {
+        public Array ColorValues => Enum.GetValues(typeof(Color));
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectionLabel.Text = $"You selected: {ColorComboBox.SelectedItem}";
+        }
+    }
+
+    enum Color { Red, Green, Blue }
+}
+```
+
+Run it on your Windows machine. Expected result, to verify yourself: the
+dropdown opens showing exactly `Red`, `Green`, `Blue`, in declaration
+order — never typed anywhere in `MainWindow.xaml` — and clicking any one
+of them updates `SelectionLabel` immediately, the same
+`SelectionChanged`/`SelectedItem` mechanism Lesson 8's `ListBox` already
+proved, now on a different control.
+
+*What this proves:* `ItemsSource="{Binding ColorValues}"` populates the
+dropdown's entire list of choices, live, from whatever `ColorValues`
+returns — here, `Enum.GetValues(typeof(Color))` — with zero
+`<ComboBoxItem>` elements hand-typed into the XAML. Rename or add a
+member to `Color` and rerun: the dropdown's contents change with it,
+automatically, because the list was never a fixed, separately-maintained
+copy in the first place.
+
+### Discard the Throwaway Example
+Delete the `lab-combobox` folder. `ComboBox`, `ItemsSource` bound to
+`Enum.GetValues`, and `SelectionChanged` are not discarded — the real
+project wires exactly this next.
+
 ### Project Change
 
 - **Reference Source:** No reference counterpart.
