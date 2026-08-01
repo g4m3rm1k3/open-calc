@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 const DRAW_TOOLS = [
@@ -24,6 +24,27 @@ const SHAPE_TOOLS = [
 const BG_STYLES = ['blank', 'ruled', 'grid']
 const BG_ICONS  = { blank: '⬜', ruled: '≡', grid: '⊞' }
 const BG_LABELS = { blank: 'Blank', ruled: 'Ruled lines', grid: 'Grid' }
+
+const Btn = ({ onClick, disabled, title, active, children, className = '' }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={title}
+    className={`h-7 flex items-center justify-center rounded text-sm transition-colors shrink-0 ${
+      active
+        ? 'bg-brand-500 text-white shadow-sm'
+        : disabled
+          ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+    } ${className}`}
+  >
+    {children}
+  </button>
+)
+
+const Divider = () => (
+  <div className="w-px self-stretch bg-slate-200 dark:bg-slate-700 shrink-0 mx-0.5" />
+)
 
 export default function DrawToolbar({
   tool,
@@ -62,26 +83,35 @@ export default function DrawToolbar({
     '#7f77dd',
   ]
 
-  const Btn = ({ onClick, disabled, title, active, children, className = '' }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`h-7 flex items-center justify-center rounded text-sm transition-colors shrink-0 ${
-        active
-          ? 'bg-brand-500 text-white shadow-sm'
-          : disabled
-            ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
-            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
-      } ${className}`}
-    >
-      {children}
-    </button>
-  )
+  // Keyboard shortcuts advertised on tool icons (V, P, T, R, etc.)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
 
-  const Divider = () => (
-    <div className="w-px self-stretch bg-slate-200 dark:bg-slate-700 shrink-0 mx-0.5" />
-  )
+      const key = e.key.toLowerCase()
+      const toolMap = {
+        v: 'select',
+        h: 'pan',
+        p: 'pen',
+        m: 'marker',
+        e: 'eraser',
+        t: 'text',
+        n: 'note',
+        r: 'rect',
+        o: 'ellipse',
+        l: 'line',
+        a: 'arrow',
+      }
+      if (toolMap[key]) {
+        e.preventDefault()
+        onSelectTool(toolMap[key])
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onSelectTool])
 
   return (
     <div className="flex items-center gap-1 px-3 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-x-auto">

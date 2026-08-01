@@ -548,6 +548,7 @@ export default function PageCanvas({
       : tool === 'select' ? 'default'
       : tool === 'text' || tool === 'note' ? 'cell'
       : 'crosshair'
+    canvas.requestRenderAll()
 
     // ── Shape drag-to-draw ──────────────────────────────────────────────────
     if (isShape) {

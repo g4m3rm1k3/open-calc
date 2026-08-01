@@ -1,168 +1,111 @@
 ---
 series: java-fundamentals
 level: 3
-title: Collections & Streams
+title: Loops
 lang: java
 ---
 
-# Collections & Streams
+# Loops
 
-`java.util` provides the Java Collections Framework: `ArrayList`, `HashMap`, `HashSet`, and more — all generic, resizable, and type-safe. Java 8 added the **Streams API**, which lets you express data transformations (filter, map, sort, collect) as a declarative pipeline rather than manual loops. Together they cover 90% of real Java data processing.
+Level 2's own `for (int i = 0; i < literal.length; i++)` already used a loop without naming it directly. This lesson names every loop shape Java has, and the two statements — `break` and `continue` — that change a loop's normal path through its own body.
 
-## ArrayList&lt;E&gt;
+## while and do-while
 
 ```java
-import java.util.ArrayList;
-import java.util.Collections;
-
 public class Main {
     public static void main(String[] args) {
-        ArrayList<String> names = new ArrayList<>();
-        names.add("Alice");
-        names.add("Bob");
-        names.add("Charlie");
-        names.add("Dave");
+        int i = 0;
+        while (i < 3) {
+            System.out.println(i);
+            i++;
+        }
 
-        System.out.println("Size: " + names.size());
-        System.out.println("First: " + names.get(0));
+        int j = 0;
+        do {
+            System.out.println("j=" + j);
+            j++;
+        } while (j < 3);
+    }
+}
+```
 
-        names.remove("Bob");
-        Collections.sort(names);
+```text
+0
+1
+2
+j=0
+j=1
+j=2
+```
 
-        for (String name : names) {
-            System.out.println(name);
+`while (i < 3) { ... }` — checks `i < 3` **before** every iteration, including the first; if the condition starts out `false`, the body never runs at all.
+
+`do { ... } while (j < 3);` — checks `j < 3` **after** every iteration instead. The body always runs at least once, even if `j < 3` were `false` from the start — the one real, structural difference between the two.
+
+`i++` — post-increment: adds `1` to `i`. Without it here, `i < 3` would never become `false`, and the loop would run forever — an **infinite loop**, one of the most common real bugs a loop can have.
+
+## for and Nested Loops
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        for (int i = 0; i < 5; i++) {
+            if (i == 3) continue;
+            if (i == 4) break;
+            System.out.println(i);
+        }
+
+        for (int r = 0; r < 2; r++) {
+            for (int c = 0; c < 2; c++) {
+                System.out.println(r + "," + c);
+            }
         }
     }
 }
 ```
 
 ```text
-Size: 4
-First: Alice
-Alice
-Charlie
-Dave
+0
+1
+2
+0,0
+0,1
+1,0
+1,1
 ```
 
-`ArrayList<String>` — a resizable array. The `<String>` is the type parameter: the list only accepts `String` values. The `<>` on the right is the **diamond operator** — the compiler infers the type.
+`for (int i = 0; i < 5; i++) { ... }` — a `for` loop packages initialization (`int i = 0`), condition (`i < 5`), and increment (`i++`) into one line, run in that order: initialize once, then repeat check-body-increment until the condition is `false`.
 
-`names.get(0)` — O(1) random access (unlike arrays, there is no `names[0]` syntax).
-`names.remove("Bob")` — O(n) linear scan to find and remove the first matching element.
-`Collections.sort(names)` — sorts alphabetically (uses `String.compareTo` which is lexicographic).
+`continue;` — skips the rest of *this* iteration's body and jumps straight to the increment step, without exiting the loop. `i == 3` — `3` is printed nowhere in the output because `continue` skipped `System.out.println(i)` for that one iteration only; the loop kept going afterward.
 
-`for (String name : names)` — enhanced for loop. Works with any `Iterable<T>`.
+`break;` — exits the loop entirely, right now, skipping every remaining iteration. `i == 4` — the loop stops here permanently; `4` never gets checked against `continue`, and no higher value is ever reached.
 
-## HashMap&lt;K, V&gt;
+Execution trace for the first loop:
 
-```java
-import java.util.HashMap;
+1. `i=0` — neither `if` matches, `0` prints, `i` becomes `1`.
+2. `i=1` — neither `if` matches, `1` prints, `i` becomes `2`.
+3. `i=2` — neither `if` matches, `2` prints, `i` becomes `3`.
+4. `i=3` — `i == 3` is `true`, `continue` skips the print, `i` becomes `4`.
+5. `i=4` — `i == 4` is `true`, `break` exits the loop immediately; nothing after this line in the loop body runs.
 
-public class Main {
-    public static void main(String[] args) {
-        HashMap<String, Integer> scores = new HashMap<>();
-        scores.put("Alice", 92);
-        scores.put("Bob", 78);
-        scores.put("Charlie", 85);
+`for (int r = 0; r < 2; r++) { for (int c = 0; c < 2; c++) { ... } }` — a **nested loop**: the entire inner `for` runs to completion for every single iteration of the outer one. Outer `r=0` runs the whole inner loop (`c=0`, then `c=1`), *then* outer advances to `r=1` and the inner loop runs again from `c=0`. `4` total inner-body executions for `2` outer iterations × `2` inner iterations each.
 
-        System.out.println(scores.get("Alice"));
-        System.out.println(scores.containsKey("Dave"));
-        scores.put("Bob", 80);
+**SE lens:** `while` reads best when the number of iterations genuinely isn't known ahead of time (waiting for real user input, reading a file until it runs out of lines). `for` reads best when the iteration count *is* known or computable up front (looping exactly `array.length` times). Choosing the shape that matches the real situation, rather than defaulting to one everywhere, is itself part of writing readable code — a `for` loop with no real counter, or a `while` loop manually re-deriving what a `for` loop states in one line, both signal to a reader that something doesn't quite fit.
 
-        for (var entry : scores.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-    }
-}
-```
+## Challenge: count_vowels
 
-```text
-92
-false
-Alice: 92
-Bob: 80
-Charlie: 85
-```
-
-`scores.put(key, value)` — inserts or overwrites (calling `put("Bob", 80)` replaces the old value 78).
-`scores.get(key)` — O(1) average lookup. Returns `null` if the key does not exist.
-`scores.containsKey(key)` — O(1) existence check.
-`scores.entrySet()` — returns a `Set<Map.Entry<K,V>>`. Each entry has `getKey()` and `getValue()`.
-
-**CS lens:** `HashMap` is a hash table: keys are hashed to bucket indices, values stored in the bucket. Average O(1) put/get; worst case O(n) with hash collisions. Iteration order is not guaranteed — use `LinkedHashMap` to preserve insertion order or `TreeMap` for sorted order.
-
-## Streams API
-
-```java
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class Main {
-    public static void main(String[] args) {
-        List<Integer> scores = Arrays.asList(88, 92, 75, 95, 83, 62, 91);
-
-        List<Integer> passing = scores.stream()
-            .filter(s -> s >= 70)
-            .sorted()
-            .collect(Collectors.toList());
-
-        double avg = scores.stream()
-            .mapToInt(Integer::intValue)
-            .average()
-            .orElse(0);
-
-        List<String> labels = scores.stream()
-            .map(s -> s >= 70 ? "pass" : "fail")
-            .collect(Collectors.toList());
-
-        System.out.println(passing);
-        System.out.printf("Average: %.1f%n", avg);
-        System.out.println(labels);
-    }
-}
-```
-
-```text
-[75, 83, 88, 91, 92, 95]
-Average: 83.7
-[pass, pass, pass, pass, pass, fail, pass]
-```
-
-`scores.stream()` — creates a `Stream<Integer>` from the list. Streams are lazy — no computation happens yet.
-
-`filter(predicate)` — keeps elements where the lambda returns `true`. Returns a `Stream<Integer>`.
-`sorted()` — sorts in natural order. Returns a `Stream<Integer>`.
-`collect(Collectors.toList())` — terminal operation that materialises the stream into a `List`.
-
-`mapToInt(Integer::intValue)` — converts `Stream<Integer>` to an `IntStream` for numeric operations. `Integer::intValue` is a **method reference** — shorthand for `i -> i.intValue()`.
-`.average()` — returns `OptionalDouble` (because an empty stream has no average).
-`.orElse(0)` — unwraps the `OptionalDouble`, returning 0 if absent.
-
-`map(s -> s >= 70 ? "pass" : "fail")` — transforms each `Integer` to a `String`. Returns `Stream<String>`.
-
-**SE lens:** The Streams API follows the same lazy-pipeline model as LINQ in C# and generators in Python. Building the pipeline is cheap; computation happens only at the terminal operation (`collect`, `average`, `forEach`). This allows the JVM to fuse operations — a `filter` + `map` + `collect` can be executed in a single pass over the data.
-
-## Challenge: word_frequency
-
-Given a `List<String>` of words, write a method `HashMap<String, Integer> wordFrequency(List<String> words)` that returns a map from each word to the number of times it appears. Use a loop and `getOrDefault`.
-
-`getOrDefault(key, defaultValue)` — returns the value for the key, or `defaultValue` if the key is absent.
+Write a `static int countVowels(String s)` method that returns how many characters in `s` are vowels (`a`, `e`, `i`, `o`, `u`), counting both uppercase and lowercase. Use `s.length()` and `s.charAt(i)` to examine each character.
 
 ```challenge
-static HashMap<String, Integer> wordFrequency(List<String> words) {
+static int countVowels(String s) {
     // TODO
 }
 ```
 
 ```test
-List<String> words = new ArrayList<>();
-words.add("the"); words.add("quick"); words.add("brown");
-words.add("fox"); words.add("the"); words.add("quick");
-words.add("the");
-HashMap<String, Integer> freq = wordFrequency(words);
-assert freq.get("the") == 3
-assert freq.get("quick") == 2
-assert freq.get("fox") == 1
-assert freq.get("brown") == 1
-assert freq.getOrDefault("missing", 0) == 0
+assert countVowels("hello") == 2
+assert countVowels("HELLO") == 2
+assert countVowels("xyz") == 0
+assert countVowels("") == 0
+assert countVowels("AEIOU") == 5
 ```

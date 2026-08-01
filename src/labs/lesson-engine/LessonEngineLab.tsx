@@ -194,6 +194,28 @@ import javaLevel0 from './content/java-fundamentals/level-0.md?raw'
 import javaLevel1 from './content/java-fundamentals/level-1.md?raw'
 import javaLevel2 from './content/java-fundamentals/level-2.md?raw'
 import javaLevel3 from './content/java-fundamentals/level-3.md?raw'
+import javaLevel4 from './content/java-fundamentals/level-4.md?raw'
+import javaLevel5 from './content/java-fundamentals/level-5.md?raw'
+import javaLevel6 from './content/java-fundamentals/level-6.md?raw'
+import javaLevel7 from './content/java-fundamentals/level-7.md?raw'
+import javaLevel8 from './content/java-fundamentals/level-8.md?raw'
+import javaLevel9 from './content/java-fundamentals/level-9.md?raw'
+import javaLevel10 from './content/java-fundamentals/level-10.md?raw'
+import javaLevel11 from './content/java-fundamentals/level-11.md?raw'
+import javaLevel12 from './content/java-fundamentals/level-12.md?raw'
+import javaLevel13 from './content/java-fundamentals/level-13.md?raw'
+import javaLevel14 from './content/java-fundamentals/level-14.md?raw'
+import javaLevel15 from './content/java-fundamentals/level-15.md?raw'
+import javaLevel16 from './content/java-fundamentals/level-16.md?raw'
+import javaLevel17 from './content/java-fundamentals/level-17.md?raw'
+import javaLevel18 from './content/java-fundamentals/level-18.md?raw'
+import javaLevel19 from './content/java-fundamentals/level-19.md?raw'
+import javaLevel20 from './content/java-fundamentals/level-20.md?raw'
+import javaLevel21 from './content/java-fundamentals/level-21.md?raw'
+import javaLevel22 from './content/java-fundamentals/level-22.md?raw'
+import javaLevel23 from './content/java-fundamentals/level-23.md?raw'
+import javaLevel24 from './content/java-fundamentals/level-24.md?raw'
+import javaLevel25 from './content/java-fundamentals/level-25.md?raw'
 
 import htmlDomLevel0  from './content/html-dom/level-0.md?raw'
 import htmlDomLevel1  from './content/html-dom/level-1.md?raw'
@@ -593,6 +615,28 @@ const LESSON_FILES: Record<string, string> = {
   'java-fundamentals/level-1.md': javaLevel1,
   'java-fundamentals/level-2.md': javaLevel2,
   'java-fundamentals/level-3.md': javaLevel3,
+  'java-fundamentals/level-4.md': javaLevel4,
+  'java-fundamentals/level-5.md': javaLevel5,
+  'java-fundamentals/level-6.md': javaLevel6,
+  'java-fundamentals/level-7.md': javaLevel7,
+  'java-fundamentals/level-8.md': javaLevel8,
+  'java-fundamentals/level-9.md': javaLevel9,
+  'java-fundamentals/level-10.md': javaLevel10,
+  'java-fundamentals/level-11.md': javaLevel11,
+  'java-fundamentals/level-12.md': javaLevel12,
+  'java-fundamentals/level-13.md': javaLevel13,
+  'java-fundamentals/level-14.md': javaLevel14,
+  'java-fundamentals/level-15.md': javaLevel15,
+  'java-fundamentals/level-16.md': javaLevel16,
+  'java-fundamentals/level-17.md': javaLevel17,
+  'java-fundamentals/level-18.md': javaLevel18,
+  'java-fundamentals/level-19.md': javaLevel19,
+  'java-fundamentals/level-20.md': javaLevel20,
+  'java-fundamentals/level-21.md': javaLevel21,
+  'java-fundamentals/level-22.md': javaLevel22,
+  'java-fundamentals/level-23.md': javaLevel23,
+  'java-fundamentals/level-24.md': javaLevel24,
+  'java-fundamentals/level-25.md': javaLevel25,
   'html-dom/level-0.md':  htmlDomLevel0,
   'html-dom/level-1.md':  htmlDomLevel1,
   'html-dom/level-2.md':  htmlDomLevel2,
