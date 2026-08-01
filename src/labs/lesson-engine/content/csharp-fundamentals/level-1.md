@@ -1,215 +1,217 @@
 ---
 series: csharp-fundamentals
 level: 1
-title: Classes & Properties
+title: Control Flow
 lang: csharp
 ---
 
-# Classes & Properties
+# Control Flow
 
-A class in C# bundles data and behaviour together and controls access through **access modifiers**. C# adds **properties** — a cleaner alternative to manual getters and setters that look like fields but execute code on access. This lesson covers class creation, constructors, fields, properties, and the `new` keyword.
+Every program so far has run every line, in order, exactly once. Real programs need to make decisions — run this block only if a condition holds, choose between several branches, skip everything if nothing matches. C# offers two ways to express a decision: `if`/`else` for open-ended conditions, and `switch` for choosing among a fixed set of known values.
 
-## Defining a Class
+## Comparison and Logical Operators
+
+Before a decision can be made, a condition needs to evaluate to `true` or `false`.
 
 ```csharp
 using System;
-
-class Rectangle
-{
-    public double Width;
-    public double Height;
-
-    public double Area()
-    {
-        return Width * Height;
-    }
-
-    public double Perimeter()
-    {
-        return 2 * (Width + Height);
-    }
-}
 
 class Program
 {
     static void Main()
     {
-        Rectangle r = new Rectangle();
-        r.Width = 5.0;
-        r.Height = 3.0;
+        int age = 20;
+        int minAge = 18;
 
-        Console.WriteLine(r.Area());
-        Console.WriteLine(r.Perimeter());
+        Console.WriteLine(age == minAge);
+        Console.WriteLine(age != minAge);
+        Console.WriteLine(age > minAge);
+        Console.WriteLine(age >= minAge);
+        Console.WriteLine(age < minAge);
+
+        bool hasLicense = true;
+        Console.WriteLine(age >= minAge && hasLicense);
+        Console.WriteLine(age < minAge || hasLicense);
+        Console.WriteLine(!hasLicense);
     }
 }
 ```
 
 ```text
-15
-16
+False
+True
+True
+True
+False
+True
+True
+False
 ```
 
-`public` — accessible from anywhere. `private` (default when no modifier is written) — accessible only within the class.
+`==` — equality comparison. Not to be confused with `=`, which is assignment. `age == minAge` asks a question; `age = minAge` gives an order.
+`!=` — not-equal.
+`>`, `>=`, `<`, `<=` — ordering comparisons, same meaning as in mathematics.
 
-`new Rectangle()` — creates a new instance of `Rectangle` on the heap and calls its constructor. The `new` keyword always allocates on the managed heap (C# handles memory with a garbage collector — you do not free objects manually).
+Every comparison operator produces a `bool` — `true` or `false` — never anything else.
 
-`r.Area()` — calls the `Area` method on the `r` instance. Inside the method, `Width` and `Height` refer to `r.Width` and `r.Height`.
+`&&` — logical AND. `a && b` is `true` only when both `a` and `b` are `true`.
+`||` — logical OR. `a || b` is `true` when at least one of `a` or `b` is `true`.
+`!` — logical NOT. Flips `true` to `false` and back.
 
-## Constructors
+**CS lens:** `&&` and `||` **short-circuit** — the right-hand side is only evaluated if the left-hand side doesn't already determine the answer. `age >= minAge && hasLicense` never even looks at `hasLicense` if `age >= minAge` is already `false`, because the whole expression can't be `true` either way. This matters when the right-hand side has a side effect, or could fail — `array.Length > 0 && array[0] == target` never touches `array[0]` on an empty array, because the length check already failed.
 
-A constructor initialises an object when it is created with `new`:
+## if / else
 
 ```csharp
 using System;
-
-class Rectangle
-{
-    public double Width;
-    public double Height;
-
-    public Rectangle(double width, double height)
-    {
-        Width = width;
-        Height = height;
-    }
-
-    public double Area() => Width * Height;
-}
 
 class Program
 {
     static void Main()
     {
-        Rectangle r = new Rectangle(5.0, 3.0);
-        Console.WriteLine(r.Area());
+        int score = 72;
 
-        var unit = new Rectangle(1.0, 1.0);
-        Console.WriteLine(unit.Area());
-    }
-}
-```
-
-```text
-15
-1
-```
-
-`public Rectangle(double width, double height)` — a constructor. Same name as the class, no return type.
-
-`public double Area() => Width * Height;` — an **expression-bodied method**: shorthand for a method with a single `return` statement. `=>` replaces `{ return ...; }`.
-
-`var unit = new Rectangle(1.0, 1.0)` — `var` infers the type as `Rectangle`. Equivalent to `Rectangle unit = new Rectangle(1.0, 1.0)`.
-
-## Properties — Smarter Fields
-
-Properties expose data with optional logic on read and write:
-
-```csharp
-using System;
-
-class BankAccount
-{
-    private double _balance;
-
-    public double Balance
-    {
-        get { return _balance; }
-        private set
+        if (score >= 90)
         {
-            if (value < 0) throw new ArgumentException("Balance cannot be negative");
-            _balance = value;
+            Console.WriteLine("A");
+        }
+        else if (score >= 80)
+        {
+            Console.WriteLine("B");
+        }
+        else if (score >= 70)
+        {
+            Console.WriteLine("C");
+        }
+        else
+        {
+            Console.WriteLine("F");
         }
     }
-
-    public BankAccount(double initialBalance)
-    {
-        Balance = initialBalance;
-    }
-
-    public void Deposit(double amount)
-    {
-        if (amount > 0) Balance += amount;
-    }
-
-    public bool Withdraw(double amount)
-    {
-        if (amount <= 0 || amount > Balance) return false;
-        Balance -= amount;
-        return true;
-    }
 }
+```
+
+```text
+C
+```
+
+`if (condition) { ... }` — the block runs only when `condition` is `true`. The parentheses around the condition are required; the braces are optional for a single statement but conventionally always written.
+
+`else if (condition) { ... }` — checked only if every condition above it was `false`. C# evaluates top to bottom and stops at the first branch whose condition is `true` — `score >= 70` is `true` for `score = 72`, but `score >= 90` and `score >= 80` were checked and rejected first.
+
+`else { ... }` — runs only if every condition above was `false`. Optional — an `if` needs no `else` at all.
+
+**SE lens:** Order matters when ranges overlap. Writing `score >= 70` before `score >= 90` would be a real bug — a score of `95` would match the first (`>= 70`) branch and print `C`, never reaching the correct `A` branch. Broadest-last, narrowest-first is not a style preference here; it's the only order that produces correct results.
+
+## switch — Choosing Among Known Values
+
+```csharp
+using System;
 
 class Program
 {
     static void Main()
     {
-        var account = new BankAccount(100.0);
-        account.Deposit(50.0);
-        Console.WriteLine(account.Balance);
-        Console.WriteLine(account.Withdraw(30.0));
-        Console.WriteLine(account.Balance);
+        int dayNumber = 3;
+        string dayName;
+
+        switch (dayNumber)
+        {
+            case 1:
+                dayName = "Monday";
+                break;
+            case 2:
+                dayName = "Tuesday";
+                break;
+            case 3:
+                dayName = "Wednesday";
+                break;
+            default:
+                dayName = "Unknown";
+                break;
+        }
+
+        Console.WriteLine(dayName);
     }
 }
 ```
 
 ```text
-150
-True
-120
+Wednesday
 ```
 
-`private double _balance` — the backing field. By convention, private fields in C# use a leading underscore.
+`switch (dayNumber)` — evaluates `dayNumber` once, then compares it against each `case` value in turn.
+`case 3:` — matches when `dayNumber == 3`. Runs the statements below it.
+`break;` — exits the `switch` immediately. **Required** at the end of every `case` in this classic form — without it, C# raises a compile error rather than silently falling through to the next case (a real, deliberate difference from C and C++, which fall through by default).
+`default:` — runs when no `case` matched. Like `else` for `if`, always optional but conventionally present.
 
-`public double Balance { get { ... } private set { ... } }` — a property. The `get` accessor runs when you read `account.Balance`. The `private set` accessor runs when code inside the class writes `Balance = value`.
+## Sharing One Body Across Several Cases
 
-`value` inside `set` — a special keyword that holds whatever was assigned to the property.
-
-`private set` — the property can be read from anywhere (`public`) but only written from within the class (`private set`).
-
-## Auto-Properties
-
-When no logic is needed in get/set, C# provides **auto-properties**:
+Two or more `case` labels can share a single body by stacking the labels — useful when several distinct values should be treated identically:
 
 ```csharp
-class Person
-{
-    public string Name { get; set; }
-    public int Age { get; private set; }
+using System;
 
-    public Person(string name, int age)
+class Program
+{
+    static void Main()
     {
-        Name = name;
-        Age = age;
+        int dayNumber = 6;
+        string kind;
+
+        switch (dayNumber)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                kind = "Weekday";
+                break;
+            case 6:
+            case 7:
+                kind = "Weekend";
+                break;
+            default:
+                kind = "Invalid";
+                break;
+        }
+
+        Console.WriteLine(kind);
     }
 }
 ```
 
-`public string Name { get; set; }` — the compiler generates a hidden backing field. No logic, just store and retrieve.
+```text
+Weekend
+```
 
-`public int Age { get; private set; }` — can be read publicly but only set inside the class.
+`case 1: case 2: case 3: case 4: case 5:` — five labels stacked with no body between them. C# matches `dayNumber` against every label in the stack; whichever one matches, execution falls into the single shared body written after the last label. This is not the same as C's fallthrough — an empty `case` label falling into the next is always allowed and never needs its own `break`; a `case` with a real body still requires one, exactly as before.
 
-**SE lens:** Properties are preferred over public fields in C# because they maintain encapsulation: you can later add validation or computed logic to a property without changing any code that reads it, because the calling syntax does not change.
+**SE lens:** Stacking labels is the honest way to express "these values mean the same thing" — five separate `case 1: kind = "Weekday"; break;` blocks would repeat the same line five times, and a future edit to the weekday logic would have to be made in five places instead of one.
 
-## Challenge: temperature_converter
+## Challenge: grade_letter
 
-Write a `Temperature` class with:
-- A private `double _celsius` field
-- A `Celsius` property (get/set) that stores the temperature
-- A `Fahrenheit` property (get only) that returns `Celsius * 9.0 / 5.0 + 32.0`
-- A constructor that takes a `double celsius` parameter
+Write a `static string GradeLetter(int score)` method that returns the letter grade for a numeric score:
+- `90` and above → `"A"`
+- `80` to `89` → `"B"`
+- `70` to `79` → `"C"`
+- below `70` → `"F"`
+
+Check from the highest threshold down, so a single score never matches more than one intended range.
 
 ```challenge
-class Temperature
+static string GradeLetter(int score)
 {
     // TODO
 }
 ```
 
 ```test
-var t = new Temperature(100.0);
-assert t.Celsius == 100.0
-assert Math.Abs(t.Fahrenheit - 212.0) < 0.01
-t.Celsius = 0.0;
-assert t.Celsius == 0.0
-assert Math.Abs(t.Fahrenheit - 32.0) < 0.01
+assert GradeLetter(95) == "A"
+assert GradeLetter(80) == "B"
+assert GradeLetter(89) == "B"
+assert GradeLetter(72) == "C"
+assert GradeLetter(69) == "F"
+assert GradeLetter(0) == "F"
 ```

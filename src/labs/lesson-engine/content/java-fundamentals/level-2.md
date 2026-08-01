@@ -1,212 +1,126 @@
 ---
 series: java-fundamentals
 level: 2
-title: Inheritance & Interfaces
+title: Arrays
 lang: java
 ---
 
-# Inheritance & Interfaces
+# Arrays
 
-Inheritance lets a class extend another class, inheriting its fields and methods. An interface defines a contract — a set of methods a class promises to implement. Together they are the two core tools of object-oriented design in Java. Use inheritance to share concrete behaviour; use interfaces to define shared capability across unrelated classes.
+Every variable so far has held exactly one value. An **array** holds a fixed number of values of the same type, all accessible by a numeric position — the first real Java data structure in this course, and the foundation every other collection (Level 16's `ArrayList`, in particular) is ultimately built on top of.
 
-## Inheritance with extends
+## Declaring, Indexing, and Default Values
 
 ```java
-class Animal {
-    String name;
-
-    Animal(String name) {
-        this.name = name;
-    }
-
-    String speak() {
-        return name + " makes a sound";
-    }
-
-    void describe() {
-        System.out.println(speak());
-    }
-}
-
-class Dog extends Animal {
-    String breed;
-
-    Dog(String name, String breed) {
-        super(name);
-        this.breed = breed;
-    }
-
-    @Override
-    String speak() {
-        return name + " barks";
-    }
-}
-
-class Cat extends Animal {
-    Cat(String name) { super(name); }
-
-    @Override
-    String speak() { return name + " meows"; }
-}
-
 public class Main {
     public static void main(String[] args) {
-        Animal a = new Animal("Generic");
-        Dog d = new Dog("Rex", "Labrador");
-        Cat c = new Cat("Whiskers");
+        int[] scores = new int[5];
+        scores[0] = 90;
+        scores[1] = 85;
+        System.out.println(scores[0]);
+        System.out.println(scores[4]);
+        System.out.println(scores.length);
 
-        a.describe();
-        d.describe();
-        c.describe();
+        int[] literal = {10, 20, 30};
+        for (int i = 0; i < literal.length; i++) {
+            System.out.println(literal[i]);
+        }
     }
 }
 ```
 
 ```text
-Generic makes a sound
-Rex barks
-Whiskers meows
+90
+85
+5
+0
+10
+20
+30
 ```
 
-`class Dog extends Animal` — `Dog` inherits all fields and methods of `Animal`. The relationship is "is-a": every `Dog` is an `Animal`.
+`new int[5]` — allocates an array of exactly `5` `int` slots, all starting at `0` (`int`'s own default value — every unassigned slot in a numeric array starts this way, never `null`). `scores[0] = 90;` — assigns into position `0`; array indices always start counting at `0`, not `1`.
 
-`super(name)` — calls the parent class constructor. Must be the first statement in the subclass constructor.
+`scores[4]` — printed before ever being explicitly assigned, and prints `0` — direct proof of that default-value initialization.
 
-`@Override` — an annotation that tells the compiler "this method is meant to override a parent method." If you misspell the method name, the compiler reports an error instead of silently creating a new method.
+`scores.length` — `.length` is a field, not a method (no parentheses, unlike `String`'s own `.length()` from Level... this course hasn't covered strings yet, but it's worth noting now: arrays and `String` spell "how many elements" two different ways, a real, common source of typos).
 
-`void describe()` is inherited by `Dog` and `Cat`. When `d.describe()` calls `speak()`, Java dispatches to `Dog.speak()` at runtime — this is **dynamic dispatch** (also called virtual dispatch).
+`int[] literal = {10, 20, 30};` — an **array literal**: creates and fills a `3`-element array in one expression, sized automatically to match the number of values given.
 
-**CS lens:** When `d.describe()` calls `speak()`, the JVM does not call `Animal.speak()` even though `describe` is defined in `Animal`. It looks up the actual type of the object (`Dog`) and finds `Dog.speak()` in the virtual method table. This O(1) lookup is the mechanism behind polymorphism.
-
-## Interfaces
+## Index Out of Bounds
 
 ```java
-interface Drawable {
-    void draw();
-    default String label() { return "Shape"; }
-}
-
-interface Resizable {
-    void resize(double factor);
-}
-
-class Circle implements Drawable, Resizable {
-    private double radius;
-
-    Circle(double radius) { this.radius = radius; }
-
-    @Override
-    public void draw() {
-        System.out.println("Circle with radius " + radius);
-    }
-
-    @Override
-    public void resize(double factor) {
-        radius *= factor;
-    }
-}
-
 public class Main {
-    static void render(Drawable d) {
-        System.out.print(d.label() + ": ");
-        d.draw();
-    }
-
     public static void main(String[] args) {
-        Circle c = new Circle(5.0);
-        render(c);
-        c.resize(2.0);
-        render(c);
+        int[] nums = {5, 3, 8, 1};
+        try {
+            System.out.println(nums[10]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Caught: " + e.getMessage());
+        }
     }
 }
 ```
 
 ```text
-Shape: Circle with radius 5.0
-Shape: Circle with radius 10.0
+Caught: Index 10 out of bounds for length 4
 ```
 
-`interface Drawable { void draw(); }` — an interface. Methods have no body (unless `default`). All methods are implicitly `public abstract`.
+`nums[10]` — `nums` only has `4` valid indices (`0`-`3`); asking for index `10` throws a real, catchable `ArrayIndexOutOfBoundsException`, rather than silently returning garbage the way raw memory access in a language like C would. `try`/`catch` — this course's later Exceptions lesson (Level 10) covers the full mechanism; for now, the shape to recognize is: risky code inside `try`, the specific failure handled inside `catch`.
 
-`default String label()` — a **default method**: provides a body so implementing classes don't have to override it. Introduced in Java 8.
+**CS lens:** This bounds check is not free — every single array access in Java pays a small, real runtime cost to verify the index is legal before reading memory. Languages without it (C, raw pointer arithmetic) are faster per-access but trade away this exact safety: an out-of-bounds C array access doesn't throw anything catchable — it reads or corrupts whatever memory happens to be at that address, a real, historical source of security vulnerabilities.
 
-`class Circle implements Drawable, Resizable` — a class can implement multiple interfaces (unlike `extends`, which is single-parent only). The compiler checks that all interface methods are implemented.
-
-`static void render(Drawable d)` — accepts any object that implements `Drawable`. The specific type does not matter at the call site.
-
-## Abstract Classes
-
-An abstract class is between a regular class and an interface — it can have both concrete methods and abstract (unimplemented) ones:
+## Sorting and 2D Arrays
 
 ```java
-abstract class Shape {
-    abstract double area();
-
-    void printArea() {
-        System.out.printf("Area: %.2f%n", area());
-    }
-}
-
-class Square extends Shape {
-    private double side;
-    Square(double side) { this.side = side; }
-
-    @Override
-    double area() { return side * side; }
-}
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        Shape s = new Square(4.0);
-        s.printArea();
+        int[] nums = {5, 3, 8, 1};
+        Arrays.sort(nums);
+        System.out.println(Arrays.toString(nums));
+
+        int[][] grid = new int[2][3];
+        grid[0][0] = 1;
+        grid[1][2] = 9;
+        System.out.println(grid[0][0]);
+        System.out.println(grid[1][2]);
+        System.out.println(grid.length);
+        System.out.println(grid[0].length);
     }
 }
 ```
 
 ```text
-Area: 16.00
+[1, 3, 5, 8]
+1
+9
+2
+3
 ```
 
-`abstract class Shape` — cannot be instantiated directly. `new Shape()` is a compile error.
-`abstract double area()` — must be implemented by every concrete subclass.
-`printArea()` — a concrete method that can call the abstract `area()` polymorphically.
+`import java.util.Arrays;` — `Arrays` is a utility class living outside `java.lang` (unlike `String` or `Math`), so it needs an explicit `import` before its name can be used unqualified.
 
-**SE lens:** Choose abstract class when subclasses share concrete code. Choose interface when you want to define capability that any unrelated class can implement (e.g., `Comparable`, `Iterable`).
+`Arrays.sort(nums)` — sorts `nums` **in place**: `nums` itself is reordered; nothing is returned (`sort`'s return type is `void`).
 
-## Challenge: payment_system
+`Arrays.toString(nums)` — arrays don't override `toString()` the useful way `ArrayList` (Level 16) does; printing `nums` directly would print something like `[I@1b6d3586` (a memory-address-flavored default). `Arrays.toString` is the real, standard way to get a readable `[1, 3, 5, 8]` instead.
 
-Define an interface `Payment` with a single method `void process(double amount)`. Write two classes that implement it:
-- `CreditCard` with a `String cardNumber` field — `process` prints `"Charged $<amount> to card ending in <last4digits>"`
-- `PayPal` with a `String email` field — `process` prints `"Sent $<amount> to <email> via PayPal"`
+`new int[2][3]` — a 2D array: `2` rows, each holding `3` `int`s. `grid[0][0]` — row `0`, column `0`. `grid.length` — the number of rows (`2`); `grid[0].length` — the number of columns in row `0` (`3`) — a genuinely separate `.length`, since in Java a 2D array is really an array of arrays, and each inner array carries its own length.
 
-In `main`, create one of each and call `process(99.99)` on both.
+## Challenge: sum_array
 
-```challenge java-program
-interface Payment {
+Write a `static int sumArray(int[] arr)` method that returns the sum of every element in `arr`. An empty array should return `0`.
+
+```challenge
+static int sumArray(int[] arr) {
     // TODO
-}
-
-class CreditCard implements Payment {
-    // TODO
-}
-
-class PayPal implements Payment {
-    // TODO
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Payment card = new CreditCard("1234567890123456");
-        Payment paypal = new PayPal("user@example.com");
-        card.process(99.99);
-        paypal.process(99.99);
-    }
 }
 ```
 
 ```test
-assert output.includes('Charged $99.99')
-assert output.includes('3456')
-assert output.includes('Sent $99.99')
-assert output.includes('user@example.com')
+assert sumArray(new int[]{1, 2, 3}) == 6
+assert sumArray(new int[]{}) == 0
+assert sumArray(new int[]{-5, 5}) == 0
+assert sumArray(new int[]{10}) == 10
 ```

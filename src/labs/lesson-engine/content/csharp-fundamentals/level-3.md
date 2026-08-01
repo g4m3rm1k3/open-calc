@@ -1,35 +1,28 @@
 ---
 series: csharp-fundamentals
 level: 3
-title: LINQ & Collections
+title: Loops
 lang: csharp
 ---
 
-# LINQ & Collections
+# Loops
 
-`System.Collections.Generic` provides strongly-typed collection classes — `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>` — that replace the need for raw arrays in most situations. **LINQ** (Language Integrated Query) adds query operators directly to the language, letting you filter, transform, group, and sort any collection with concise, readable syntax.
+`foreach` already visited every element of an array, one at a time, without saying how many times to repeat or when to stop — C# decided that automatically from the array's own length. A **loop** in the more general sense repeats a block of code based on a condition you control directly: while something is true, a fixed number of times, or until a specific point is reached. C# has four loop forms, each suited to a different shape of repetition.
 
-## List&lt;T&gt; — The Workhorse Collection
+## while — Repeat While a Condition Holds
 
 ```csharp
 using System;
-using System.Collections.Generic;
 
 class Program
 {
     static void Main()
     {
-        var scores = new List<int> { 88, 92, 75, 95, 83, 91 };
-
-        scores.Add(77);
-        scores.Remove(75);
-
-        Console.WriteLine($"Count: {scores.Count}");
-        Console.WriteLine($"First: {scores[0]}");
-
-        foreach (int score in scores)
+        int i = 0;
+        while (i < 5)
         {
-            Console.Write(score + " ");
+            Console.Write(i + " ");
+            i++;
         }
         Console.WriteLine();
     }
@@ -37,134 +30,158 @@ class Program
 ```
 
 ```text
-Count: 6
-First: 88
-88 92 95 83 91 77 
+0 1 2 3 4 
 ```
 
-`new List<int> { 88, 92, ... }` — creates a `List<int>` with an **initialiser list**. No fixed size — it grows automatically.
+`while (i < 5) { ... }` — checks `i < 5` **before** every iteration, including the first. The body runs, over and over, for as long as the condition stays `true`.
 
-`scores.Add(value)` — appends to the end. Amortized O(1).
-`scores.Remove(value)` — removes the first occurrence of `value`. O(n) — scans from the front.
-`scores.Count` — the number of elements (property, not a method).
-`scores[0]` — O(1) random access, same as an array.
+`i++` — increments `i` by `1`. Without this line, `i < 5` would never become `false`, and the loop would run forever — an **infinite loop**, a real and common mistake, not a hypothetical one.
 
-`foreach (int score in scores)` — iterates over all elements. C#'s `foreach` works with any type that implements `IEnumerable<T>`.
+**CS lens:** A `while` loop is the most general loop form — every other loop in this lesson could be rewritten as a `while` loop, but each of the other three exists because it makes one specific, common shape of repetition harder to get wrong.
 
-## Dictionary&lt;TKey, TValue&gt;
+## do-while — Guaranteed at Least Once
 
 ```csharp
 using System;
-using System.Collections.Generic;
 
 class Program
 {
     static void Main()
     {
-        var wordCount = new Dictionary<string, int>();
-        string[] words = { "the", "quick", "brown", "fox", "the", "quick", "the" };
-
-        foreach (string word in words)
+        int i = 0;
+        do
         {
-            if (wordCount.ContainsKey(word))
-                wordCount[word]++;
-            else
-                wordCount[word] = 1;
-        }
+            Console.Write(i + " ");
+            i++;
+        } while (i < 3);
+        Console.WriteLine();
 
-        foreach (var pair in wordCount)
+        int j = 10;
+        do
         {
-            Console.WriteLine($"{pair.Key}: {pair.Value}");
-        }
+            Console.Write(j + " ");
+            j++;
+        } while (j < 3);
+        Console.WriteLine();
     }
 }
 ```
 
 ```text
-the: 3
-quick: 2
-brown: 1
-fox: 1
+0 1 2 
+10 
 ```
 
-`wordCount[word]++` — indexer access on `Dictionary`. Reads or writes the value for `word`. If the key does not exist, reading throws a `KeyNotFoundException`.
+`do { ... } while (condition);` — checks the condition **after** the body runs, not before. The body always executes at least once, even when the condition is already `false` the very first time it's checked — proven by the second loop: `j` starts at `10`, already failing `j < 3`, and the body still runs exactly once before the loop exits.
 
-`wordCount.ContainsKey(word)` — O(1) lookup (hash map under the hood). Returns `true` if the key exists.
+**SE lens:** `do-while` is the right choice specifically when "run this at least once, then decide whether to repeat" is the real shape of the problem — reading user input and validating it is the classic example: you must ask at least once before there is anything to validate.
 
-`var pair in wordCount` — iterating a dictionary yields `KeyValuePair<TKey, TValue>` objects with `.Key` and `.Value`.
-
-**CS lens:** `Dictionary<TKey, TValue>` is C#'s hash map. Under the hood it uses open addressing with chaining. Average O(1) insert/lookup; worst-case O(n) on pathological hash collisions.
-
-## LINQ — Querying Collections
-
-LINQ provides extension methods on any `IEnumerable<T>`. Import `System.Linq`:
+## for — A Fixed, Counted Repetition
 
 ```csharp
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 class Program
 {
     static void Main()
     {
-        var scores = new List<int> { 88, 92, 75, 95, 83, 62, 91 };
-
-        var passing = scores.Where(s => s >= 70).ToList();
-        var sorted  = scores.OrderByDescending(s => s).ToList();
-        double avg  = scores.Average();
-        int max     = scores.Max();
-
-        Console.WriteLine($"Passing: {string.Join(", ", passing)}");
-        Console.WriteLine($"Sorted:  {string.Join(", ", sorted)}");
-        Console.WriteLine($"Average: {avg:F1}");
-        Console.WriteLine($"Max:     {max}");
-
-        var doubled = scores.Select(s => s * 2).ToList();
-        Console.WriteLine($"Doubled: {string.Join(", ", doubled)}");
+        for (int i = 0; i < 5; i++)
+        {
+            Console.Write(i + " ");
+        }
+        Console.WriteLine();
     }
 }
 ```
 
 ```text
-Passing: 88, 92, 75, 95, 83, 91
-Sorted:  95, 92, 91, 88, 83, 75, 62
-Average: 83.7
-Max:     95
-Doubled: 176, 184, 150, 190, 166, 124, 182
+0 1 2 3 4 
 ```
 
-`Where(predicate)` — filters: keeps only elements where the lambda returns `true`. Returns `IEnumerable<T>`.
-`OrderByDescending(keySelector)` — sorts descending by the key the lambda returns.
-`Average()`, `Max()`, `Min()`, `Sum()` — aggregate methods. Return a single value.
-`Select(transform)` — maps: applies the lambda to every element. Returns `IEnumerable<T>` of the results.
-`ToList()` — materialises the lazy query into a `List<T>`. LINQ queries are **lazy** — they execute only when iterated or converted.
-`string.Join(separator, collection)` — joins collection elements into a single string with the separator between them.
+`for (int i = 0; i < 5; i++) { ... }` — three parts, separated by `;`, all in one place instead of scattered around a `while` loop:
+- `int i = 0` — runs once, before the loop starts.
+- `i < 5` — checked before every iteration, exactly like a `while` condition.
+- `i++` — runs after every iteration's body finishes, before the condition is checked again.
 
-**SE lens:** LINQ uses the same deferred-execution model as Python generators. `scores.Where(s => s >= 70)` returns an iterator that hasn't executed yet. Chaining `Where(...).Select(...)` builds a pipeline; calling `ToList()` pulls all elements through at once. This is why you can chain many LINQ operators without creating intermediate lists.
+`i` is scoped to the `for` loop itself — it does not exist before the `for` line and cannot be read after the closing `}`.
 
-## Challenge: top_students
+**SE lens:** A `for` loop puts a loop's entire lifecycle — start, stop condition, and step — in one line, at the top, where a reader sees all three at once. The equivalent `while` version (`int i = 0; while (i < 5) { ...; i++; }`) says the same thing with the initialization and increment separated by the whole loop body, an easy place to lose track of one of them.
 
-Given a list of `(name, score)` tuples, write a method `List<string> TopStudents(List<(string Name, int Score)> students, int threshold)` that returns the names of students whose score is at or above the threshold, sorted alphabetically.
+## break and continue
 
-Use LINQ: `Where`, `OrderBy`, `Select`, and `ToList`.
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (i == 5) break;
+            if (i % 2 == 0) continue;
+            Console.Write(i + " ");
+        }
+        Console.WriteLine();
+    }
+}
+```
+
+```text
+1 3 
+```
+
+`break;` — exits the loop immediately, skipping every remaining iteration. Once `i == 5`, the loop stops entirely — `5`, `6`, `7`, `8`, `9` are never even checked.
+
+`continue;` — skips the rest of *this* iteration's body and jumps straight to the next one, without exiting the loop. `i % 2 == 0` is `true` for `0`, `2`, `4` — each of those is skipped by `continue` before reaching the `Console.Write` line, so only the odd numbers below `5` (`1` and `3`) actually print.
+
+**SE lens:** `break` and `continue` both interrupt a loop's normal, one-line-at-a-time flow — used sparingly, they make an early-exit condition instantly visible; overused, especially several `break`/`continue` statements scattered through one long loop body, they can make the actual order of execution hard to trace without running it.
+
+## Nested Loops
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                Console.Write(i * 3 + j + " ");
+            }
+        }
+        Console.WriteLine();
+    }
+}
+```
+
+```text
+0 1 2 3 4 5 6 7 8 
+```
+
+A loop's body can contain another loop. The inner `for (int j = ...)` runs to completion — all three values of `j` — for every single value of the outer `i`. `i` and `j` are independent counters; `j` resets to `0` at the start of each new outer iteration, which is why the inner loop always produces exactly three values (`0`, `1`, `2`) regardless of what `i` currently is.
+
+**CS lens:** Nesting loops multiplies their iteration counts — two loops each running `3` times produce `3 × 3 = 9` total inner-body executions, not `3 + 3 = 6`. This is the concrete origin of the O(n²) complexity class: an algorithm with one loop nested inside another, both scaling with the same input size `n`, does roughly `n²` units of work.
+
+## Challenge: count_vowels
+
+Write a `static int CountVowels(string text)` method that counts how many characters in `text` are vowels (`a`, `e`, `i`, `o`, `u`, case-insensitive). Use a `for` loop to visit every character by index, and check each one against the five vowels.
 
 ```challenge
-static List<string> TopStudents(List<(string Name, int Score)> students, int threshold)
+static int CountVowels(string text)
 {
     // TODO
 }
 ```
 
 ```test
-var students = new List<(string, int)>
-{
-    ("Alice", 92), ("Bob", 65), ("Carol", 88),
-    ("Dave", 72), ("Eve", 95), ("Frank", 58)
-};
-var top = TopStudents(students, 70);
-assert top.Count == 4
-assert top[0] == "Alice" && top[1] == "Carol"
-assert top[2] == "Dave" && top[3] == "Eve"
-assert TopStudents(students, 100).Count == 0
+assert CountVowels("hello") == 2
+assert CountVowels("HELLO") == 2
+assert CountVowels("xyz") == 0
+assert CountVowels("") == 0
+assert CountVowels("AEIOU") == 5
+assert CountVowels("programming") == 3
 ```
