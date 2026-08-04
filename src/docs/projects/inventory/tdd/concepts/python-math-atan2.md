@@ -93,7 +93,16 @@ one conveniently placed at `(0, 0)`.
 `radians-rotation-unit.md` (the unit `atan2`'s return value is
 measured in). This project's own first real use is computing a circular
 arc's start and end angle relative to its real, resolved center point
-(`core/path.py`'s `_add_arc_points`).
+(`core/path.py`'s `_add_arc_points`). A real, further instance from
+later in this project's own history, on the *parsing* side rather than
+the geometry side: a macro-expression grammar's real `ATAN` function
+turned out to have two genuinely different forms — an ordinary,
+one-argument arctangent, and a real two-argument `ATAN[Y]/[X]` syntax
+serving exactly the purpose this file's own two-argument `atan2`
+serves, resolved by the parser via one-token lookahead (see
+`recursive-descent-expression-parsing.md`'s own second facet) — the
+identical real two-argument need this file explains at the math level,
+surfacing again at the grammar level.
 
 ## Try It Yourself
 

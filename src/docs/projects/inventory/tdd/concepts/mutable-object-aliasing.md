@@ -142,3 +142,87 @@ Builds on `python-classes-instances.md`. This is the exact reasoning behind a st
 1. Confirm the aliasing bug for real with a plain dict instead of a class instance: append the *same* dict object to a list three times, mutating one of its keys between appends, and observe every list entry shows the final value.
 2. Fix the dict version using `history.append(dict(shared))` (a shallow copy) instead of `history.append(shared)`, and confirm each entry now correctly preserves its value at the time of the append.
 3. Construct a case where a *shallow* copy (`dict(original)`, or `copy.copy`) still isn't enough — a dict whose value is itself a mutable object (a list, or another dict) — and confirm mutating that nested object still leaks across every "copied" entry, because a shallow copy only copies the outer container, not what it points to. Use `copy.deepcopy` to fix that deeper case, and explain in your own words why it was needed here but not in the flatter examples above.
+
+## A Second Real Facet: The Identical Mechanism, Used Deliberately
+
+Everything above treats aliasing as a real bug to avoid. The exact
+same mechanism is also a real, deliberate tool — when two independent
+real views genuinely need to stay in sync automatically, sharing the
+*same* object on purpose is precisely how that's achieved:
+
+```python
+class Document:
+    def __init__(self, content):
+        self.content = content
+
+
+class TabView:
+    def __init__(self, document):
+        self.document = document
+
+    def show(self):
+        return f"[Tab] {self.document.content}"
+
+
+class ChannelView:
+    def __init__(self, document):
+        self.document = document
+
+    def show(self):
+        return f"[Channel] {self.document.content}"
+
+
+shared_doc = Document("original text")
+tab = TabView(shared_doc)
+channel = ChannelView(shared_doc)
+
+print(tab.show())
+print(channel.show())
+
+shared_doc.content = "edited text"
+print("after editing via shared_doc directly:")
+print(tab.show())
+print(channel.show())
+print("both views are the SAME real object:", tab.document is channel.document)
+```
+
+**Real output, run this session:**
+```
+[Tab] original text
+[Channel] original text
+after editing via shared_doc directly:
+[Tab] edited text
+[Channel] edited text
+both views are the SAME real object: True
+```
+
+**What this proves:** editing `shared_doc.content` **once** was
+immediately, automatically visible through **both** independent views
+— the identical real aliasing behavior this file's own first facet
+warns about, now genuinely intended: `TabView` and `ChannelView` never
+copy the document; they deliberately hold the same real reference, so
+neither view can ever silently drift out of sync with the other.
+
+**The real, honest distinction:** this is the *identical* underlying
+Python fact as the bug earlier in this file — the difference is
+entirely about **intent**. Collecting "snapshots over time" into a
+list needs independent copies, because each entry is meant to freeze
+one moment; two live *views* of one, single, currently-open real thing
+need the opposite — a shared reference is exactly what makes "edit
+here, see it there" work at all, with zero explicit synchronization
+code required anywhere.
+
+### Try It Yourself (second facet)
+
+1. Change `ChannelView` to hold a **copy** of the document instead
+   (`copy.copy(document)`) and confirm editing `shared_doc` no longer
+   updates `channel.show()` — direct, real proof of exactly what
+   deliberate aliasing was providing, once it's removed.
+2. Add a third, real view sharing the same `shared_doc` and confirm all
+   three stay in sync through a single edit — the sharing scales to
+   any number of real, simultaneous views.
+3. Write one sentence for each of this file's own two facets stating
+   the real, concrete test you'd use to decide which one applies to a
+   new, real situation you encounter — "is this meant to be one
+   changing thing observed from multiple places, or several independent
+   snapshots in time?"

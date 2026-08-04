@@ -82,3 +82,103 @@ Builds on `sql-create-table-and-schema.md` and `idempotent-initialization-guard.
 1. Reproduce the "silent no-op" behavior shown above (`CREATE TABLE IF NOT EXISTS` with an added column, against a table that already exists) and confirm for yourself that no error is raised at all — the change is simply, silently ignored, which is precisely why it's a dangerous trap for anyone expecting `IF NOT EXISTS` to also mean "or update it to match."
 2. Write a second, real `ALTER TABLE` migration (renaming a column, if your database supports it directly, or adding a second new column) and apply it to the same database, confirming both real schema changes persist together.
 3. Look up a real migration tool's actual "downgrade" mechanism (Alembic's `downgrade()` function, for instance) and write the reverse of your `ADD COLUMN` migration (`ALTER TABLE tools DROP COLUMN material`, if your database supports it) — confirming a real, tracked way exists to safely undo a specific, applied schema change.
+
+## A Second Real Facet: a Lightweight, Idempotent Alternative — No Migration History Needed
+
+A full migration tool (this file's own first facet) is real, valuable
+overhead: a tracking table, an ordered history, up/down pairs. A small
+application using plain SQLite directly, with no ORM, can reach the
+identical real goal — a column that's safely added whether or not it
+already exists — with a much lighter, real technique: check first,
+then add, every single time the application starts.
+
+```python
+def ensure_column(conn, table, column, declaration):
+    existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+    if column not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {declaration}")
+
+
+conn = sqlite3.connect(":memory:")
+conn.execute("CREATE TABLE tools (id INTEGER PRIMARY KEY, name TEXT)")
+conn.execute("INSERT INTO tools (name) VALUES ('end_mill_4fl')")
+conn.commit()
+
+ensure_column(conn, "tools", "material", "TEXT")
+print("columns after first call:", [row[1] for row in conn.execute("PRAGMA table_info(tools)")])
+
+ensure_column(conn, "tools", "material", "TEXT")  # e.g. the app's SECOND real startup
+print("columns after second call (idempotent, no crash):", [row[1] for row in conn.execute("PRAGMA table_info(tools)")])
+
+print("existing row survived untouched:", conn.execute("SELECT name, material FROM tools").fetchone())
+```
+
+**Real output, run this session:**
+```
+columns after first call: ['id', 'name', 'material']
+columns after second call (idempotent, no crash): ['id', 'name', 'material']
+existing row survived untouched: ('end_mill_4fl', None)
+```
+
+**What this proves:** `material` was correctly added on the first
+real call — and calling `ensure_column` a **second** time (standing
+in for the application's own next real startup, against the same,
+already-migrated database) neither crashed nor duplicated anything;
+`PRAGMA table_info` correctly reported the column as already present,
+so the `ALTER TABLE` never ran the second time. The existing row
+survived completely untouched throughout, its new `material` column
+correctly defaulting to `NULL`.
+
+**The real crash this check prevents:**
+
+```python
+conn2 = sqlite3.connect(":memory:")
+conn2.execute("CREATE TABLE tools (id INTEGER PRIMARY KEY, name TEXT)")
+conn2.execute("ALTER TABLE tools ADD COLUMN material TEXT")
+conn2.execute("ALTER TABLE tools ADD COLUMN material TEXT")  # no check first
+```
+
+**Real output, run this session:**
+```
+sqlite3.OperationalError: duplicate column name: material
+```
+
+**What this proves:** without `PRAGMA table_info`'s own upfront check,
+running the identical `ALTER TABLE` a second time — exactly what a
+second real application startup would do — genuinely crashes with a
+real, concrete `OperationalError`. The check-first pattern is what
+makes re-running the same "ensure this column exists" logic safe on
+every startup, indefinitely.
+
+**Mechanical note — the real, honest tradeoffs against a full
+migration tool:** this technique has no ordered history (every
+"migration" is just "does this column exist yet," checked fresh every
+time, not a numbered, sequential step), and no real downgrade path —
+it only ever knows how to move a schema *forward* to include a column,
+never how to remove one. It's the right real choice specifically for
+a small, single-file application where the full weight of a tracked
+migration history (a separate tool, a migrations directory, up/down
+pairs) is genuinely more real infrastructure than the actual, current
+schema-evolution need justifies — and the wrong choice the moment
+real changes get more complex than "does this column exist" (renaming
+a column, changing a type, restructuring a relationship), where a full
+migration tool's own ordered, reversible history becomes genuinely
+necessary.
+
+### Try It Yourself (second facet)
+
+1. Call `ensure_column` for a **second**, different new column on the
+   same table, and confirm both real columns coexist correctly — real
+   proof this generalizes to adding several columns over an
+   application's own real lifetime, one `ensure_column` call per real
+   column that was ever added.
+2. Reason about (then confirm) what `ensure_column` does if the
+   *table itself* doesn't exist yet at all — is a real, separate
+   `CREATE TABLE IF NOT EXISTS` still needed alongside it, or does
+   `PRAGMA table_info` handle that case gracefully on its own?
+3. Write a real, honest code comment (matching the style this file's
+   own first facet's Connection section values) explaining *why* a
+   project chose this lightweight technique over a full migration
+   tool — and what real, concrete signal (schema changes getting more
+   complex than adding columns) would be the trigger to reconsider
+   that choice, per `deferred-decision-with-trigger-condition.md`.

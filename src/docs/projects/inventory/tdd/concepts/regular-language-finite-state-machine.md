@@ -93,7 +93,9 @@ Recognizing when a problem is "regular" (a finite state machine, or a plain rege
 
 ## Connection
 
-Builds on `python-regex-search-findall.md` — this is the theoretical machine underneath it. Directly relevant the moment a project's own text format needs anything with nested or balanced structure (like expressions inside brackets) — that's the concrete signal a hand-written parser is needed, not a bigger regex.
+Builds on `python-regex-search-findall.md` — this is the theoretical machine underneath it. Directly relevant the moment a project's own text format needs anything with nested or balanced structure (like expressions inside brackets) — that's the concrete signal a hand-written parser is needed, not a bigger regex. `recursive-descent-expression-parsing.md` is the real, concrete technique this file's own signal points toward — a real, applied instance in this project's own history: a macro-expression grammar with real, arbitrary-depth `[...]` grouping, parsed with exactly the hand-written, recursive parser this file's own theoretical limit predicts is necessary.
+
+A second, real, concrete instance of the small end of this file's own spectrum: a text-cleanup utility recognizing "am I currently inside a parenthesized comment, or not" with exactly a two-state machine (`in_paren`: `True`/`False`) — genuinely regular (no nesting, no balance-counting needed, since a comment never contains another comment), hand-rolled as a character-by-character scan rather than a regex, in the same real codebase whose lexer solves the *identical* recognition job with a regex instead (`_PAREN_COMMENT_RE = re.compile(r"\([^)]*\)")`) — a real, worth-noticing case of the same regular-language problem solved two different real ways in two different real call sites, both legitimate, differing mainly in whether the surrounding code already needed to track other state alongside "in a comment or not."
 
 ## Try It Yourself
 

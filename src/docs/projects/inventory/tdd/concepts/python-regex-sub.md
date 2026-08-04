@@ -62,3 +62,78 @@ Builds on `python-regex-search-findall.md` and pairs directly with `regex-negate
 1. Use `re.sub` with a function as the replacement argument instead of a string (`re.sub(r"\d+", lambda m: str(int(m.group()) * 2), "a1 b2 c3")`) — confirm each matched number is individually doubled, not replaced with one fixed value. This is a real, distinct capability plain string replacement doesn't have.
 2. Add a `count` argument (`re.sub(pattern, replacement, text, count=1)`) to replace only the *first* match instead of all of them — confirm this recovers the "replace-first" behavior some other languages default to.
 3. Chain two separate `re.sub` calls — one removing block comments `(...)`, one removing everything after a `;` — against a string containing both, and confirm the combination produces genuinely clean text with neither kind of comment remaining.
+
+## A Second Real Facet: A Function as the Replacement Argument
+
+`replacement` doesn't have to be a fixed string — passing a **function**
+instead lets each match be replaced with a genuinely different,
+computed value, individually:
+
+```python
+import re
+
+PAREN_COMMENT_RE = re.compile(r"\([^)]*\)")
+
+line = "G1 (move to start) X10 Y5"
+
+# A fixed-string replacement collapses the comment to nothing, shifting
+# every later character's real column position:
+deleted = PAREN_COMMENT_RE.sub("", line)
+print("deleted:  ", repr(deleted))
+
+# A FUNCTION replacement can compute a different real value PER MATCH --
+# here, equal-length whitespace, so nothing after it shifts position.
+blanked = PAREN_COMMENT_RE.sub(lambda m: " " * len(m.group(0)), line)
+print("blanked:  ", repr(blanked))
+
+print("same real length as the original line:", len(blanked) == len(line))
+x_original = line.index("X10")
+x_blanked = blanked.index("X10")
+print("X10's real column position, original:", x_original)
+print("X10's real column position, blanked: ", x_blanked)
+print("position preserved:", x_original == x_blanked)
+```
+
+**Real output, run this session:**
+```
+deleted:   'G1  X10 Y5'
+blanked:   'G1                 X10 Y5'
+same real length as the original line: True
+X10's real column position, original: 19
+X10's real column position, blanked:  19
+position preserved: True
+```
+
+**What this proves:** deleting the comment (fixed-string `""`
+replacement) genuinely shifted `X10` to an earlier real column —
+everything after the removed text collapsed leftward. Replacing it
+with **equal-length whitespace** instead — computed per match, via
+`lambda m: " " * len(m.group(0))` — kept the string's total real
+length unchanged, and `X10`'s real column position identical before
+and after (`19` both times). This is the real, distinct capability a
+function replacement has that a fixed string never can: the
+replacement text can depend on the specific match itself (here, its
+own length), not just be one fixed value repeated at every match site.
+
+**Mechanical note:** when `replacement` is a function, `re.sub` calls
+it once per match, passing the real `Match` object (the same kind
+`python-regex-search-findall.md` already covers) — `m.group(0)` is the
+full matched text, and whatever string the function returns becomes
+that match's real replacement.
+
+### Try It Yourself (second facet)
+
+1. Use a function replacement that both counts and modifies matches —
+   `re.sub(r"\d+", lambda m: str(int(m.group()) * 2), "a1 b2 c3")` —
+   confirming each matched number is individually doubled, not replaced
+   with one fixed value.
+2. Explain, in your own words, *why* preserving a line's exact original
+   length and column positions matters for code that will run a
+   **second**, separate regex pass over the same blanked line
+   afterward — what would break if positions shifted between passes?
+3. Try a function replacement that returns a different-length string
+   for different matches (say, always `"X"` regardless of the match's
+   own length) and confirm the total string length **does** change in
+   that case — the position-preserving trick specifically requires the
+   replacement to match the original match's own length, not just use
+   a function at all.

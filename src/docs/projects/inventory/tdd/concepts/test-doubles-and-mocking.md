@@ -75,3 +75,71 @@ Builds on `pure-functions-testability.md` and `automated-testing-unit-test-basic
 1. Rewrite `is_expired` to call `time.time()` directly instead of accepting a `clock` parameter, and reason about (or attempt) how you'd write a deterministic, repeatable test against this version — confirming the difficulty is a direct, structural consequence of the dependency being hardcoded rather than injected.
 2. Use `spy_clock`'s recorded `calls` to assert `is_expired` calls the clock *exactly once* per invocation — then deliberately introduce a bug that calls it twice (checking the time, then re-checking it) and confirm the spy-based test catches this extra call even though the final boolean result might still happen to be correct.
 3. Look up your language's real mocking library (Python's `unittest.mock.Mock`, for instance) and rebuild the spy example using it instead of a hand-written list — comparing the built-in library's assertion helpers (`assert_called_once()`, `assert_called_with(...)`) against the manual version.
+
+## A Second Real Facet: Instance-Level Override, Not Class-Level Monkeypatching
+
+`pytest-monkeypatch-fixture.md`'s own technique replaces an attribute
+on a **class** (or module) — every instance is affected for the
+duration of the test. A real, different, simpler technique replaces a
+method on just **one specific instance**, using nothing but plain
+Python attribute assignment:
+
+```python
+class Panel:
+    def current_machine(self):
+        return "real machine from DEFAULT_MACHINES"
+
+    def describe(self):
+        return f"showing: {self.current_machine()}"
+
+
+panel_a = Panel()
+panel_b = Panel()
+
+panel_a.current_machine = lambda: "fake machine for this one test"
+
+print("panel_a (overridden):", panel_a.describe())
+print("panel_b (untouched):", panel_b.describe())
+```
+
+**Real output, run this session:**
+```
+panel_a (overridden): showing: fake machine for this one test
+panel_b (untouched): showing: real machine from DEFAULT_MACHINES
+```
+
+**What this proves:** `panel_a.current_machine = lambda: ...` replaced
+the method for `panel_a` **alone** — `panel_b`, a second, real,
+separately-constructed instance of the identical class, was
+completely unaffected, still calling the real, original method. This
+is real, plain Python attribute assignment (per `python-classes-
+instances.md`'s own instance-attribute mechanics) — no `monkeypatch`
+fixture, no `unittest.mock`, nothing beyond the language's own basic
+object model.
+
+**Mechanical note:** this works because Python looks up an attribute
+on an **instance** first, before falling back to the class — assigning
+`current_machine` directly onto `panel_a` creates a real, instance-
+level attribute that shadows the class's own method, for that one
+object only. It also reverts **automatically**, with no explicit
+cleanup needed at all — once `panel_a` itself goes out of scope (the
+test function ends), the override goes with it; there's no shared,
+longer-lived state (a class, a module) that needs restoring the way
+`monkeypatch`'s own automatic revert exists specifically to handle.
+
+### Try It Yourself (second facet)
+
+1. Try the identical override style against a **class** attribute
+   instead of an instance method (`Panel.current_machine = lambda self:
+   ...`) and confirm it now affects **every** instance, `panel_b`
+   included — direct, real proof of the real difference between
+   instance-level and class-level assignment.
+2. Confirm the override genuinely doesn't need explicit cleanup by
+   constructing a fresh `Panel()` after `panel_a`'s override and
+   confirming the new instance uses the real, original method —
+   nothing about the earlier override leaked into unrelated objects.
+3. Compare this technique against `monkeypatch.setattr(Panel,
+   "current_machine", ...)` for the identical real goal — reasoning
+   about when you'd genuinely want *every* instance affected (a class-
+   level patch) versus just one, specific, already-constructed object
+   under test (this file's own instance-level technique).

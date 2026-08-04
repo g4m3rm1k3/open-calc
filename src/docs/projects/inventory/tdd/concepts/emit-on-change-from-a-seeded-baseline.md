@@ -166,3 +166,62 @@ all.
    changing doesn't cause the other to spuriously re-emit.
 3. Run the sequence with zero elements at all. Confirm the fixed version
    produces no output and no error — the loop body simply never runs.
+
+## A Second Real Facet: When `None` *Is* the Correct Baseline
+
+This file's own Problem section treats seeding from `None` as the
+real bug to fix. A real, honest, second case exists where `None` is
+**not** a bug at all — it's the genuinely correct baseline, because
+nothing about the starting state is actually known to anyone:
+
+```python
+readings = ["idle", "idle", "running", "running", "stopped"]
+
+last = None  # genuinely unknown -- no prior real information exists
+for value in readings:
+    if value != last:
+        print(f"changed to {value}")
+        last = value
+```
+
+**Real output, run this session:**
+```
+changed to idle
+changed to running
+changed to stopped
+```
+
+**What this proves:** unlike the file's own original example (where a
+real, external baseline — `already_shown_elsewhere` — genuinely
+existed and got wrongly ignored), here there is no real information
+about the machine's state *before* these readings begin — nothing
+communicated it elsewhere, because nothing about it is knowable. The
+first, real "changed to idle" is completely correct here, not
+redundant — it's genuinely the first real fact anyone learns about
+this value.
+
+**The real, honest distinction:** seeding from `None` is a bug
+specifically when a real, external baseline *exists and is available*
+but gets ignored in favor of treating the sequence's own first element
+as if it were the beginning of time. Seeding from `None` is *correct*
+when no such real baseline genuinely exists — this project's own
+machine-state tracking (current tool, spindle state, coolant mode)
+seeds from `None` for exactly this reason: nothing real is known about
+a machine's state before a program file even starts running.
+
+### Try It Yourself (second facet)
+
+1. Reason about a real, different case in this project's own domain
+   where a genuine external baseline *would* exist (a job resuming
+   mid-program, where the machine's actual current state genuinely is
+   known ahead of time) — and what would have to change in the code to
+   correctly use it instead of `None`.
+2. Write a single, general function taking an optional real baseline
+   (defaulting to `None`) and confirm it produces this file's own
+   "naive" behavior when no baseline is given, and the "fixed" behavior
+   when one is — one real function correctly handling both cases.
+3. Explain, in your own words, why "seed from `None`" and "seed from a
+   known baseline" are not actually two different techniques, but the
+   *same* technique applied honestly to two genuinely different real
+   situations — what's the one, real question that decides which
+   applies?

@@ -86,7 +86,7 @@ The alternative — store the UUID as a plain 36-character string (`str(uuid.uui
 
 ## Connection
 
-Builds on `orm-object-relational-mapping.md` and `sqlalchemy-mapped-column-types.md`; the actual conversion logic inside it is `uuid-byte-order.md`, applied. Used throughout this project's `core/tools.py` — every `TlTool`/`TlToolMill`/`TlAssemblyItem` row's primary key is a `GUID` column.
+Builds on `orm-object-relational-mapping.md` and `sqlalchemy-mapped-column-types.md`; the actual conversion logic inside it is `uuid-byte-order.md`, applied. Used throughout this project's `core/tools.py` — every `TlTool`/`TlToolMill`/`TlAssemblyItem` row's primary key is a `GUID` column. Contrasted directly in `json-text-column-serialization.md` — the identical real conversion idea (a Python value ↔ a storable column representation), performed manually and explicitly instead of through this file's own automatic ORM hook, for a real, separate application (a different codebase modeling the identical real Mastercam tool-library schema this file's own citation draws from, deliberately using plain `sqlite3` with no ORM at all).
 
 ## Try It Yourself
 

@@ -67,7 +67,7 @@ The alternative — writing the logic directly inside the CLI script, no separat
 
 ## Connection
 
-Builds on `python-package-init.md` (the packaging mechanism that makes a clean `core` boundary possible) and `client-server-architecture.md` (a web-based delivery mechanism is one specific kind of "outer layer" that could sit on top of a `core` like this one).
+Builds on `python-package-init.md` (the packaging mechanism that makes a clean `core` boundary possible) and `client-server-architecture.md` (a web-based delivery mechanism is one specific kind of "outer layer" that could sit on top of a `core` like this one). A real, applied instance in one project's own history: a small, plain-data resolution module sitting between a real GUI widget and real persistence — the widget never touches the database directly, receiving already-resolved, plain data instead — keeping the GUI component fully testable without ever needing a real database connection or a real, live native rendering widget in the test process at all.
 
 ## Try It Yourself
 

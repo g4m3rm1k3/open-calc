@@ -71,3 +71,161 @@ Directly relevant to any real HTTP route or background process — a natural com
 1. Change the configured level from `INFO` to `WARNING` and confirm the `login_succeeded` line disappears too — direct proof that level filtering happens centrally, at configuration, not per call site.
 2. Add a `try`/`except` around code that can genuinely fail, and call `logger.error(...)` with the exception's message inside the `except` block — then compare this against `python-custom-exceptions.md`'s translate-and-re-raise pattern, and reason about why logging and translating aren't mutually exclusive — a real system often does both.
 3. Look up your logging library's support for automatic **context** (a request ID attached to every log line for the duration of one request, without passing it explicitly to every single log call) — a real, common refinement once structured logging is in place, letting every log line from one request be grouped together even across multiple functions.
+
+## A Second Real Example: Manual Setup, the Root Logger, and Reassignment
+
+`logging.basicConfig()` above is a real, convenient wrapper. A second,
+lower-level real style builds the same pieces by hand — worth its own
+example because it exposes real mechanics `basicConfig()` hides:
+
+```python
+import logging
+import sys
+
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
+handler.setFormatter(formatter)
+
+root = logging.getLogger()          # the shared ROOT logger -- no name given
+root.handlers = [handler]           # replace, not append
+root.setLevel(logging.INFO)
+
+app_log = logging.getLogger("app")  # a distinct, NAMED logger
+app_log.info("application starting")
+
+for _ in range(2):
+    handler2 = logging.StreamHandler(sys.stdout)
+    handler2.setFormatter(formatter)
+    root.handlers = [handler2]      # reassignment: always exactly one handler
+
+app_log.info("still exactly one line per message, not three")
+print("root is app_log's parent:", app_log.parent is root)
+```
+
+**Real output, run this session:**
+```
+INFO | app | application starting
+INFO | app | still exactly one line per message, not three
+root is app_log's parent: True
+```
+
+**What this proves:** even after the setup block runs three separate
+times (the original plus a loop of two more), each `app_log.info(...)`
+call still produces exactly **one** line, not three — `root.handlers =
+[handler2]` *replaces* the list each time rather than growing it.
+Had the code instead used `root.addHandler(handler2)` inside that same
+loop, each call would **append** a new handler alongside the existing
+ones — the third setup pass would leave three handlers attached, and
+every subsequent `app_log.info(...)` call would print the *same*
+message three times, once per attached handler — a real, easy-to-miss
+bug this reassignment style avoids entirely, and a concrete instance of
+`idempotent-initialization-guard.md`'s own idea (safe to run more than
+once, with no accumulating side effect) achieved by replacement rather
+than a check-then-act guard.
+
+**Two further real, mechanical facts this example makes concrete:**
+
+- `logging.getLogger()` called with **no** argument returns the single,
+  shared **root** logger — the top of a real hierarchy. `logging.
+  getLogger("app")` returns (creating on first call) a distinct
+  **named** logger, whose real `.parent` is the root logger by default
+  (confirmed directly above: `root is app_log's parent: True`) — a
+  named logger's own messages propagate up to the root's handlers
+  unless told not to, which is *why* `app_log.info(...)` output reaches
+  the handler that was only ever attached to `root`, never to `app_log`
+  itself.
+- `logging.Formatter("%(levelname)s | %(name)s | %(message)s")`'s
+  format string is its own small, real micro-syntax — `%(fieldname)s`
+  placeholders pulled from each real `LogRecord`'s own attributes
+  (`levelname`, `name`, `message`, and others like `asctime`, `filename`,
+  `lineno`) — a real, different thing from an f-string (`python-
+  f-strings.md`), which only ever interpolates values already in scope
+  at the point it's written, not named attributes of an object supplied
+  later, once, by the logging framework itself at the moment a record
+  is actually emitted.
+
+### Try It Yourself (second example)
+
+1. Replace `root.handlers = [handler2]` with `root.addHandler(handler2)`
+   inside the loop and re-run — confirm `app_log.info(...)` now really
+   does print each message three times, the concrete bug the
+   reassignment style avoids.
+2. Add `%(asctime)s` to the formatter's format string and confirm each
+   real log line now includes a real, current timestamp — read the
+   `logging` module's own documentation for which other `LogRecord`
+   attributes are available this way.
+3. Call `app_log.info(...)` before `app_log.setLevel(...)` has ever been
+   set on `app_log` itself (only `root.setLevel(logging.INFO)` was set)
+   and confirm it still respects that level — a named logger with no
+   level of its own defers to its parent's, up the real hierarchy,
+   until one is found.
+
+## A Third Real Example: Lazy `%`-Style Interpolation vs. Eager f-Strings
+
+Every example so far used a message that was cheap to build either
+way. This is a real, easily-missed distinction once a message is
+genuinely **expensive** to construct:
+
+```python
+import logging
+
+logging.basicConfig(level=logging.WARNING, format="%(message)s")
+log = logging.getLogger("app")
+
+str_calls = {"count": 0}
+
+
+class ExpensiveDetail:
+    """Simulates something real but costly to turn into a string."""
+    def __str__(self):
+        str_calls["count"] += 1
+        return "expensive-detail-computed"
+
+
+# Logger is configured at WARNING; .info() is below that level, so
+# neither call below should actually EMIT a line.
+
+log.info(f"eager: {ExpensiveDetail()}")
+print("after f-string call,       __str__ call count:", str_calls["count"])
+
+log.info("lazy: %s", ExpensiveDetail())
+print("after %-style call,        __str__ call count:", str_calls["count"])
+
+log.warning("lazy but at WARNING: %s", ExpensiveDetail())
+print("after a real WARNING call, __str__ call count:", str_calls["count"])
+```
+
+**Real output, run this session:**
+```
+lazy but at WARNING: expensive-detail-computed
+after f-string call,       __str__ call count: 1
+after %-style call,        __str__ call count: 1
+after a real WARNING call, __str__ call count: 2
+```
+
+**What this proves:** the f-string call (`f"eager: {ExpensiveDetail()}"`)
+bumped the real call count to `1` immediately — Python has to build the
+complete f-string, calling `ExpensiveDetail.__str__()`, *before*
+`log.info(...)` is even invoked, regardless of whether the message ever
+actually gets logged. The `%`-style call, at the identical suppressed
+`INFO` level, left the count at `1` — unchanged — because `logging`
+only performs `%`-substitution internally when a record is actually
+going to be emitted, and this one wasn't. The final, real `WARNING`
+call (which *does* get emitted, shown by its own printed line above the
+counts) finally bumps the count to `2` — direct, concrete proof the
+substitution genuinely only happens when needed.
+
+### Try It Yourself (third example)
+
+1. Lower the configured level to `INFO` and re-run — confirm the
+   `%`-style call's count now also increments on that call, since `INFO`
+   now qualifies for real emission.
+2. Replace `ExpensiveDetail` with a class whose `__str__` runs a real,
+   measurable amount of work (a loop building a large string) and time
+   the difference between the eager and lazy versions across many
+   suppressed calls, to see the real, not just theoretical, cost this
+   avoids at scale.
+3. Explain, in your own words, why `log.info(f"...")`'s cost is paid
+   "regardless of whether the message ever actually gets logged" — walk
+   through the real order Python evaluates an f-string versus when
+   `logging` decides whether a record is emitted.

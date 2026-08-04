@@ -144,7 +144,14 @@ Builds on nothing beyond arithmetic. Directly relevant any time two
 values from different real sources (a user's own stored preference, an
 imported file, a hardcoded default) might carry different real units,
 and are ever going to be placed in the same calculation, comparison, or
-coordinate space.
+coordinate space. A real, applied instance in this project's own
+history, confirming this file's own first facet directly: imported
+tools consistently in inch units even inside an otherwise-metric
+library, rendered ~25x too small until scaled to whatever unit system
+the specific program being rendered actually uses — plus a real,
+concrete instance of this file's own second facet in the identical
+codebase, a code comment explicitly naming a tool's tip angle as the
+one field deliberately excluded from that same scaling pass.
 
 ## Try It Yourself
 
@@ -162,3 +169,89 @@ coordinate space.
    real convention or documentation would a team need, so every future
    contributor knows which unit new code should convert *into*, not
    just that conversion needs to happen at all?
+
+## A Second Real Facet: Not Every Field Is a Length — Converting an Angle Is a Real, Different Trap
+
+This file's own fix converts *every* field, because every field in its
+own isolated example genuinely is a length. A real, further trap shows
+up the moment a data structure mixes length fields with **non-length**
+fields — a blanket "convert everything" pass silently corrupts
+whichever fields were never lengths to begin with.
+
+```python
+# BROKEN: scaling everything, including an angle, as if it were a length
+def scale_tool_broken(diameter, tip_angle_degrees, is_metric):
+    return {
+        "diameter": to_millimeters(diameter, is_metric),
+        "tip_angle_degrees": to_millimeters(tip_angle_degrees, is_metric),  # WRONG
+    }
+
+
+result = scale_tool_broken(0.5, 118, is_metric=False)  # a real 0.5in drill, a real 118-degree tip
+print("broken (angle scaled as if it were a length):", result)
+```
+
+**Real output, run this session:**
+```
+broken (angle scaled as if it were a length): {'diameter': 12.7, 'tip_angle_degrees': 2997.2}
+```
+
+**What this proves:** `diameter` correctly converted to `12.7` real
+millimeters — but `tip_angle_degrees`, run through the identical
+length-conversion function, came out as a nonsensical `2997.2` — a
+real drill tip only ever spans `0`-`180` real degrees; nothing about
+`2997.2` means anything physically. The exact same bug class this
+file's own first facet warns about (combining mismatched units) here
+comes from the *opposite* direction: not forgetting to convert a real
+length, but converting a value that was **never a length at all**.
+
+**The fix — only length-like fields pass through conversion:**
+
+```python
+def scale_tool_fixed(diameter, tip_angle_degrees, is_metric):
+    return {
+        "diameter": to_millimeters(diameter, is_metric),
+        "tip_angle_degrees": tip_angle_degrees,  # untouched -- degrees, not a length
+    }
+
+
+result2 = scale_tool_fixed(0.5, 118, is_metric=False)
+print("fixed (angle left untouched):", result2)
+```
+
+**Real output, run this session:**
+```
+fixed (angle left untouched): {'diameter': 12.7, 'tip_angle_degrees': 118}
+```
+
+**What this proves:** `tip_angle_degrees` genuinely survived
+unchanged (`118`, the real, correct angle) — only `diameter`, the
+field that actually *is* a length, went through conversion.
+
+**Mechanical note:** this facet's real lesson isn't "remember to
+convert" (this file's own first facet) — it's "know *which* fields are
+even eligible for conversion in the first place." A field's own real,
+physical dimension (length, angle, time, a plain count) determines
+whether a given unit-conversion factor applies to it at all; applying
+a length-conversion factor to a non-length field isn't a missed
+conversion, it's an incorrect one — a real, structurally different
+mistake requiring the fix to happen at the call site that decides
+*which* fields to touch, not at the conversion function itself.
+
+### Try It Yourself (second facet)
+
+1. Add a real, third field that's a plain **count** (say, `flute_
+   count`) to the tool data and confirm it, too, must be excluded from
+   conversion — reasoning about which real category of field
+   (length, angle, count, a unitless ratio) each one belongs to before
+   deciding whether it's eligible.
+2. Write a real, explicit allowlist (`LENGTH_FIELDS = {"diameter",
+   "overall_length"}`) and a function that converts only fields in
+   that set, leaving everything else untouched automatically —
+   comparing this structural approach against manually remembering to
+   skip each non-length field one at a time.
+3. Research a real, physical example of a quantity that looks like it
+   should scale with a unit system but doesn't (a percentage, a ratio,
+   a count, an angle) and explain, in your own words, what real
+   physical property (a "dimension," in the physics sense) determines
+   whether a conversion factor legitimately applies to it.

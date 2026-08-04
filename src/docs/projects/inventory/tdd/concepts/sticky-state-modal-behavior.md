@@ -94,6 +94,19 @@ The alternative — requiring every single operation to restate its full context
 
 Builds on `python-classes-instances.md` — sticky state is simply an instance attribute that specific operations update and other operations merely read. This is the general shape behind a G-code interpreter's motion mode, active tool, or active work-coordinate-system all persisting silently across many lines of a program until a line explicitly changes one of them.
 
+A real, applied instance in this project's own history, richer than
+this file's own single-flag example: a G-code motion parser tracking
+**three independent** sticky facts at once — motion mode (`G0`-`G3`),
+absolute/incremental positioning (`G90`/`G91`), and active work offset
+(`G54`-`G59`) — each a plain local variable carried forward across the
+loop's own iterations, read by every line that doesn't itself change
+it, with zero extra bookkeeping beyond the variables simply not being
+reset. The same real parser also demonstrates the honest boundary of
+"modal": `G28` (home) is a deliberate one-shot command, explicitly
+*not* sticky like the other three — real, concrete proof that
+recognizing modal state also means correctly recognizing which real
+commands *aren't* modal.
+
 ## Try It Yourself
 
 1. Add a second sticky mode, `self.uppercase`, toggled by `"UPPER_ON"`/`"UPPER_OFF"` commands, combinable with the bold state independently. Confirm both stick correctly and combine (bold + uppercase at once) when both are active.

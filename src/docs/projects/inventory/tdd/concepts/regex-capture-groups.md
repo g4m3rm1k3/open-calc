@@ -63,3 +63,80 @@ Builds directly on `python-regex-search-findall.md`. This is the exact mechanism
 1. Add a third capture group to the pattern (e.g. `([a-z])(\d+)(!*)` matching an optional trailing run of `!` characters) against `"a1! b22"`. Confirm each tuple now has three elements, including an empty string where no `!` was present.
 2. Use `re.search` (not `findall`) with the two-group pattern against `"x9"` and call `.group(1)` and `.group(2)` separately. Also try `.groups()` (no arguments) and observe it returns all captured groups as one tuple.
 3. Replace one of the capturing groups with a non-capturing one (`(?:[a-z])(\d+)`) and rerun `findall` against the same input. Confirm the result is now a plain list of strings (just the digits), not tuples — proof that only *capturing* groups affect the result shape.
+
+## A Second Real Facet: Inspecting `.groups` to Decide *Whether* a Value Was Captured
+
+Every use of capture groups so far assumed the pattern's own shape —
+how many groups it has — was already known when the code was written.
+A real, genuinely different situation: a pattern supplied **at
+runtime**, arbitrary, never written by the code reading it, where the
+code itself has to first ask "does this pattern even have a capture
+group?" before it can safely call `.group(1)` at all.
+
+```python
+import re
+
+# A pattern WITH a capture group.
+p1 = re.compile(r"M3([0-9][0-9])")
+print("p1.groups (count):", p1.groups)
+m1 = p1.search("N10 M300")
+print("m1.group(1):", m1.group(1))
+
+# A pattern with NO capture group -- a plain fixed code.
+p2 = re.compile(r"M100")
+print("p2.groups (count):", p2.groups)
+m2 = p2.search("N10 M100")
+print("m2 matched:", m2.group(0))
+try:
+    m2.group(1)
+except IndexError as e:
+    print(f"IndexError: {e}")
+```
+
+**Real output, run this session:**
+```
+p1.groups (count): 1
+m1.group(1): 00
+p2.groups (count): 0
+m2 matched: M100
+IndexError: no such group
+```
+
+**What this proves:** `p1.groups` — a real, plain **integer attribute**
+on a compiled `Pattern` object, not the `match.groups()` *method* this
+file's own Try It Yourself #2 already uses — correctly reported `1` for
+a pattern with one capture group, and `0` for a pattern with none.
+Calling `m2.group(1)` against a match with no capture group at all
+genuinely **raised** `IndexError` — there's no "group 1" to return,
+because `p2`'s own pattern text never defined one. Checking `p1.groups
+>= 1` (or, equivalently here, `> 0`) *before* calling `.group(1)` is
+what makes it safe to handle both a plain, fixed literal-as-regex
+(`M100`, no group) and a genuinely parameterized pattern (`M3([0-9][0-9])`,
+one group) with the identical code path, deciding at runtime which case
+applies rather than assuming one or the other in advance.
+
+**Mechanical note:** `regex.groups` (an attribute, no parentheses) and
+`match.groups()` (a method call) are two genuinely different, easily
+confused real APIs — the attribute is a single integer, known the
+moment the pattern is compiled, entirely independent of any specific
+match; the method returns a tuple of the *actual matched text* for
+every group, and only exists on a real `Match` object, after a search
+has already succeeded.
+
+### Try It Yourself (second facet)
+
+1. Compile a pattern with **two** capture groups and confirm
+   `.groups` correctly reports `2` — direct, real proof the attribute
+   counts groups defined in the pattern text itself, not anything about
+   a particular match.
+2. Write a small function `extract_value(pattern_text, line)` that
+   compiles `pattern_text`, searches `line`, and returns `match.group(1)`
+   if a capture group exists or `None` otherwise — using `.groups` to
+   decide, exactly as this facet's own example does inline. Call it with
+   both a grouped and an ungrouped pattern and confirm both produce
+   sensible results, with neither ever raising `IndexError`.
+3. Explain, in your own words, why this "check-before-you-call" pattern
+   matters specifically when the regex pattern itself is **user-supplied
+   at runtime** (this file's own hardcoded examples never needed it) —
+   connect your answer to `exception-vs-return-value-invalid-input-
+   signaling.md`'s own framing of anticipated-vs-unanticipated failure.

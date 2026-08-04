@@ -89,6 +89,31 @@ A project lesson's own body should very rarely contain a full isolated
 example anymore — that content belongs in a concept file, referenced by
 name, not duplicated inline.
 
+## Reference Implementation First
+
+This catalog is extracted from the reference implementation, not from the
+project roadmap.
+
+Create a new concept file only after a completed project feature requires a
+concept that cannot be satisfied by an existing catalog entry. The
+implementation comes first; the concept is documented afterward.
+
+**Failure mode:** creating concept files because a roadmap, vision document,
+or planned feature mentions them before any completed project work actually
+requires them. Future intent is not evidence that a catalog entry belongs
+here.
+
+The same rule applies even to concepts that are broadly applicable outside
+this project. The question is never "is this a worthwhile concept?" The
+question is "did completed project work require this concept?" If the answer
+is no, it does not belong in the catalog yet.
+
+Practical consequence: sessions that are not extracting concepts from
+completed project work are limited to maintaining the catalog itself
+(organization, consistency, compliance, and cross-references). They do not
+add new concept files based solely on planned architecture or future
+features.
+
 ## Status
 
 Actively being populated — the first real pass is lesson 1 of `cam-project`'s

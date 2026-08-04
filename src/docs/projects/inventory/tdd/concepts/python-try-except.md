@@ -61,3 +61,82 @@ Builds on `python-custom-exceptions.md`. Directly enables `exception-translation
 1. Add a second `except` clause for a different exception type (e.g. `except TypeError:`) on the same `try`, and trigger each one separately with different bad input, confirming each routes to its own handler.
 2. Add a bare `except:` as a final fallback after the specific ones, then deliberately trigger an exception type none of the specific clauses catches. Confirm it lands in the bare fallback — then reason about why the SE Lens above recommends being cautious with this pattern in real code.
 3. Add a `finally:` block after the `except` clause, printing a message. Confirm it runs both when an exception is caught and when the `try` block succeeds with no exception at all — `finally` runs unconditionally, a real, distinct guarantee from `except`.
+
+## A Real Second Facet: a Deliberate Broad `except Exception:` for Optional, Non-Critical Data
+
+This file's own SE Lens above warns that a bare, broad catch can
+silently swallow a real programming mistake. A real, legitimate
+exception to that caution: **optional** data whose loss should degrade
+gracefully rather than crash the whole program.
+
+```python
+import json
+
+
+def load_preference(raw_text, default):
+    try:
+        data = json.loads(raw_text)
+        return data.get("theme", default)
+    except Exception:
+        return default
+
+
+print("valid saved preference:", load_preference('{"theme": "Dark"}', "Light"))
+print("missing file simulated as empty text:", load_preference("", "Light"))
+print("corrupted file (truncated JSON):", load_preference('{"the', "Light"))
+```
+
+**Real output, run this session:**
+```
+valid saved preference: Dark
+missing file simulated as empty text: Light
+corrupted file (truncated JSON): Light
+```
+
+**What this proves:** all three real inputs — valid, empty, and
+genuinely corrupted JSON — return a usable real result. The broad
+`except Exception:` catches whatever specific real exception each
+failure mode happens to raise (`json.JSONDecodeError` for the
+truncated text, for instance) without needing to name every one of
+them individually, and falls back to `default` in every case.
+
+**Why this is the right real choice here, not the SE Lens's warned-
+against mistake:** a user's saved theme preference is genuinely
+optional, cosmetic data — if the file is missing, empty, or corrupted
+(a partial write during a crash, manual editing gone wrong), the
+correct real behavior is to quietly fall back to a sensible default and
+keep the application usable, not to crash on startup over a broken
+preferences file. This is a real, deliberate trade: `fail-fast-
+validation.md`'s own guidance is exactly right for input whose
+validity actually matters to the operation about to happen (a
+financial transaction, a machine-motion program); it would be actively
+wrong here, where refusing to start the whole application over one
+corrupted, non-critical file is a worse real outcome than silently
+using a default.
+
+**The real, honest cost, unchanged from the SE Lens's original
+warning:** this broad catch still can't distinguish "the file was
+corrupted" from "a genuine bug in this function's own logic" — both
+silently produce `default` with no visible error anywhere. The
+mitigating factor that makes it acceptable here is the *stakes*: a
+wrong theme falling back to a default is a cosmetic inconvenience, not
+a lost transaction or a corrupted real machine program — the bar for
+tolerating a silently-swallowed unknown failure should rise and fall
+with how much a wrong, silent fallback would actually cost.
+
+### Try It Yourself (second facet)
+
+1. Change the broad `except Exception:` to a narrow `except
+   json.JSONDecodeError:` and confirm a genuinely different bug (say,
+   `raw_text` being `None` instead of a string, raising `TypeError`)
+   now propagates instead of being silently swallowed — direct, real
+   proof of the real tradeoff this facet's broad catch accepts.
+2. Add a real `logging` call (per `logging-and-observability.md`)
+   inside the `except` block before returning `default` — a real,
+   practical middle ground that keeps the graceful fallback behavior
+   while still leaving a real, inspectable trace of what actually went
+   wrong, for whoever debugs it later.
+3. Think of (or find, in a real codebase) a second case in this
+   project's own history where a broad catch-and-fall-back was the
+   correct choice for the same reason — optional, low-stakes data
+   whose loss should degrade gracefully rather than crash anything.
