@@ -876,32 +876,28 @@ function MdCodeBlock({ language, code }) {
   );
 }
 
-// Lesson tracks that get inline concept-embed panels (`../concepts/x.md`
-// rendered as an expandable panel instead of a plain link/code span).
-// Hardcoded per-track for now, on purpose — not derived from DOCS_MODULES
-// or folder structure — until concepts become a global, non-tdd-specific
-// feature (a deliberately deferred bigger refactor).
-const CONCEPT_EMBED_LESSON_PATHS = [
-  "/projects/inventory/tdd/lessons/",
-  "/projects/inventory/tdd/wpf-lessons/",
-];
-
-function isConceptEmbedLessonFile(activeFile) {
-  return (
-    !!activeFile &&
-    CONCEPT_EMBED_LESSON_PATHS.some((p) => activeFile.includes(p))
-  );
+// Inline concept-embed panels (a `concepts/x.md` reference rendered as an
+// expandable panel instead of a plain link/code span) are addressed by
+// filename, not by a correctly-relative path. Concept catalogs are meant to
+// be portable/shared across projects (see concepts/README.md), so lesson
+// authors' `../concepts/x.md` references routinely have the wrong `../`
+// depth — there's no single "correct" relative path to a shared catalog.
+// Resolve by filename alone: search DOCS_MODULES for any file living in
+// *some* `concepts/` folder with a matching basename. A brand-new top-level
+// folder picks this up for free the moment its concepts/ catalog (its own,
+// or a shared one elsewhere) contains the file — no code change here.
+function findConceptDocPath(filename) {
+  if (!filename) return null;
+  const suffix = `/concepts/${filename}`;
+  return Object.keys(DOCS_MODULES).find((p) => p.endsWith(suffix)) || null;
 }
 
 function MdInlineCode({ children }) {
-  const { activeFile } = useContext(DocsCtx);
   const text = String(children);
 
-  const isTddLesson = isConceptEmbedLessonFile(activeFile);
-  if (isTddLesson && text.endsWith(".md")) {
+  if (text.endsWith(".md")) {
     const filename = text.split("/").pop();
-    const forcedHref = `../concepts/${filename}`;
-    const docPath = resolveDocPath(activeFile, forcedHref);
+    const docPath = findConceptDocPath(filename);
     if (docPath) {
       const title = filename.replace(".md", "").replace(/[-_]/g, " ");
       return <ConceptEmbed docPath={docPath} title={title} />;
@@ -1021,8 +1017,8 @@ function resolveDocPath(currentFilePath, href) {
 // walk the same trigger conditions MdInlineCode/MdLink use (recursing
 // through wrapper elements like `em`/`strong`, since the trigger is often
 // wrapped in emphasis) and report if any are found.
-function paragraphContainsConceptEmbed(node, activeFile) {
-  if (!node || !isConceptEmbedLessonFile(activeFile)) return false;
+function paragraphContainsConceptEmbed(node) {
+  if (!node) return false;
 
   function walk(n) {
     if (!n) return false;
@@ -1033,20 +1029,15 @@ function paragraphContainsConceptEmbed(node, activeFile) {
         .join("");
       if (text.endsWith(".md")) {
         const filename = text.split("/").pop();
-        const forcedHref = `../concepts/${filename}`;
-        if (resolveDocPath(activeFile, forcedHref)) return true;
+        if (findConceptDocPath(filename)) return true;
       }
     }
     if (n.type === "element" && n.tagName === "a") {
       const href = n.properties?.href || "";
       const hrefBase = href.split("#")[0];
-      const isRelativeMd =
-        hrefBase.endsWith(".md") &&
-        !href.startsWith("http") &&
-        !href.startsWith("//");
-      const isConcept = hrefBase.startsWith("../concepts/");
-      if (isRelativeMd && isConcept && resolveDocPath(activeFile, href)) {
-        return true;
+      if (hrefBase.endsWith(".md") && hrefBase.includes("/concepts/")) {
+        const filename = hrefBase.split("/").pop();
+        if (findConceptDocPath(filename)) return true;
       }
     }
     return (n.children || []).some(walk);
@@ -1145,10 +1136,18 @@ function MdLink({ href, children }) {
   if (isRelativeMd) {
     const docPath = resolveDocPath(activeFile, href);
 
-    const isTddLesson = isConceptEmbedLessonFile(activeFile);
-    const isConcept = hrefBase.startsWith("../concepts/");
-    if (isTddLesson && isConcept && docPath) {
-      return <ConceptEmbed docPath={docPath} title={extractText(children)} />;
+    // Concept references are addressed by filename, not by a correctly-
+    // relative path (see findConceptDocPath) — a link is treated as a
+    // concept reference if it's structurally pointing into *some*
+    // `concepts/` folder, regardless of whether the written `../` depth
+    // actually resolves against this doc's own location.
+    if (hrefBase.includes("/concepts/")) {
+      const conceptDocPath = findConceptDocPath(hrefBase.split("/").pop());
+      if (conceptDocPath) {
+        return (
+          <ConceptEmbed docPath={conceptDocPath} title={extractText(children)} />
+        );
+      }
     }
 
     return (
@@ -1247,8 +1246,7 @@ const MD_COMPONENTS = {
   h3: ({ children }) => <h3 id={useHeadingId(children)}>{children}</h3>,
   h4: ({ children }) => <h4 id={useHeadingId(children)}>{children}</h4>,
   p({ node, children }) {
-    const { activeFile } = useContext(DocsCtx);
-    if (paragraphContainsConceptEmbed(node, activeFile)) {
+    if (paragraphContainsConceptEmbed(node)) {
       // See paragraphContainsConceptEmbed's own comment: this paragraph
       // will render a ConceptEmbed whose expanded content can include
       // real block-level elements, invalid inside a real <p>. A <div>
@@ -2154,7 +2152,13 @@ export default function MarkdownHub() {
       monacoTheme: themeStyles.monaco,
       onRun: handleRunInCodeAlong,
       codeAlongOpen,
-      activeFile: tab === "tutorials" ? activeFile : null,
+      // In the Editor tab, an override doc's *non-concept* relative links
+      // (concept links resolve by filename alone, see findConceptDocPath)
+      // are still relative to the tutorial path it overrides
+      // (`activeOverridePath`), so those keep resolving in that live
+      // preview too. Freeform user docs have no such path, so this is null
+      // for those.
+      activeFile: tab === "tutorials" ? activeFile : activeOverridePath,
       onDocLink: selectTutorial,
       onNavigate: navigate,
       scrollToHeading,
@@ -2164,6 +2168,7 @@ export default function MarkdownHub() {
       handleRunInCodeAlong,
       codeAlongOpen,
       activeFile,
+      activeOverridePath,
       selectTutorial,
       tab,
       navigate,
