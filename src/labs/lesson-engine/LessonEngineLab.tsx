@@ -217,6 +217,18 @@ import javaLevel23 from './content/java-fundamentals/level-23.md?raw'
 import javaLevel24 from './content/java-fundamentals/level-24.md?raw'
 import javaLevel25 from './content/java-fundamentals/level-25.md?raw'
 
+import javaArchLevel0  from './content/java-architecture/level-0.md?raw'
+import javaArchLevel1  from './content/java-architecture/level-1.md?raw'
+import javaArchLevel2  from './content/java-architecture/level-2.md?raw'
+import javaArchLevel3  from './content/java-architecture/level-3.md?raw'
+import javaArchLevel4  from './content/java-architecture/level-4.md?raw'
+import javaArchLevel5  from './content/java-architecture/level-5.md?raw'
+import javaArchLevel6  from './content/java-architecture/level-6.md?raw'
+import javaArchLevel7  from './content/java-architecture/level-7.md?raw'
+import javaArchLevel8  from './content/java-architecture/level-8.md?raw'
+import javaArchLevel9  from './content/java-architecture/level-9.md?raw'
+import javaArchLevel10 from './content/java-architecture/level-10.md?raw'
+
 import htmlDomLevel0  from './content/html-dom/level-0.md?raw'
 import htmlDomLevel1  from './content/html-dom/level-1.md?raw'
 import htmlDomLevel2  from './content/html-dom/level-2.md?raw'
@@ -637,6 +649,18 @@ const LESSON_FILES: Record<string, string> = {
   'java-fundamentals/level-23.md': javaLevel23,
   'java-fundamentals/level-24.md': javaLevel24,
   'java-fundamentals/level-25.md': javaLevel25,
+
+  'java-architecture/level-0.md': javaArchLevel0,
+  'java-architecture/level-1.md': javaArchLevel1,
+  'java-architecture/level-2.md': javaArchLevel2,
+  'java-architecture/level-3.md': javaArchLevel3,
+  'java-architecture/level-4.md': javaArchLevel4,
+  'java-architecture/level-5.md': javaArchLevel5,
+  'java-architecture/level-6.md': javaArchLevel6,
+  'java-architecture/level-7.md': javaArchLevel7,
+  'java-architecture/level-8.md': javaArchLevel8,
+  'java-architecture/level-9.md': javaArchLevel9,
+  'java-architecture/level-10.md': javaArchLevel10,
   'html-dom/level-0.md':  htmlDomLevel0,
   'html-dom/level-1.md':  htmlDomLevel1,
   'html-dom/level-2.md':  htmlDomLevel2,
