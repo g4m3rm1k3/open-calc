@@ -73,7 +73,7 @@ describe('lesson corpus — wiring parity', () => {
 
 // ── Per-lesson structural checks (UPSKILLOS_CURRICULUM_CONTRACT.md, Part 3) ────────
 
-const SUPPORTED_TEST_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'css', 'jsx', 'react', 'vue', 'sql', 'sqlite', 'cpp', 'c', 'c++', 'cpp-program', 'csharp', 'cs', 'c#', 'java'])
+const SUPPORTED_TEST_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'css', 'jsx', 'react', 'vue', 'sql', 'sqlite', 'cpp', 'c', 'c++', 'cpp-program', 'csharp', 'cs', 'c#', 'java', 'kotlin'])
 const KNOWN_UNSUPPORTED_TEST_LANGS = new Set(['bash', 'shell', 'sh'])
 
 describe.each(registeredFiles.filter(f => filesOnDisk.includes(f)))('lesson: %s', file => {

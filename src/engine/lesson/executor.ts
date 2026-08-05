@@ -26,8 +26,13 @@ async function getCodeRunner() {
 }
 
 // Routed through codeRunner.js's Wandbox-backed runCode(), same as C/C++/C#/Java
-// below — kotlin/scala deliberately excluded, no working execution backend for
-// either right now (Wandbox's scalac is broken server-side, Piston is whitelist-only).
+// below — scala deliberately excluded, no working execution backend right now
+// (Wandbox's scalac is broken server-side, Piston is whitelist-only, and Judge0's
+// free instance has no Scala runtime configured). Kotlin used to be excluded for
+// the same reason but now has a live path: Piston is dead (confirmed 401,
+// whitelist-only), but codeRunner.js's Judge0 fallback (language id 111) was
+// verified live 2026-08-04 — real Kotlin compiles and runs, and the
+// PASS/FAIL/ERROR harness format below round-trips correctly through it.
 const WANDBOX_RUNNABLE_LANGS = new Set(['rust', 'go', 'ruby', 'php', 'haskell', 'swift', 'julia', 'r'])
 
 export async function executeCode(code: string, lang: Lang): Promise<ExecutionResult> {
@@ -92,13 +97,18 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
       const output = await runCode('java', code)
       if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
       else out(output || '(no output)')
+    } else if (norm === 'kotlin') {
+      const { runCode } = await getCodeRunner()
+      const output = await runCode('kotlin', code)
+      if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
+      else out(output || '(no output)')
     } else if (WANDBOX_RUNNABLE_LANGS.has(norm)) {
       const { runCode } = await getCodeRunner()
       const output = await runCode(norm, code)
       if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
       else out(output || '(no output)')
     } else {
-      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, C/C++, C#, Java, Rust, Go, Ruby, PHP, Haskell, Swift, Julia, and R.`)
+      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, C/C++, C#, Java, Kotlin, Rust, Go, Ruby, PHP, Haskell, Swift, Julia, and R.`)
     }
   } catch (e) {
     err(e instanceof Error ? e.message : String(e))
@@ -121,5 +131,6 @@ export function isRunnable(lang: Lang): boolean {
     'c', 'cpp', 'c++',
     'csharp', 'cs',
     'java',
+    'kotlin',
   ].includes(norm)
 }

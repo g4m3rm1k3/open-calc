@@ -30,6 +30,7 @@ const RUNNABLE_LANGS = new Set([
   'c', 'cpp', 'c++',
   'csharp', 'cs',
   'java',
+  'kotlin',
 ])
 const SPECIAL_LANGS  = new Set(['challenge', 'test'])
 
