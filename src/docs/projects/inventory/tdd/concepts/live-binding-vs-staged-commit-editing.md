@@ -131,16 +131,15 @@ observe.
 
 ## Connection
 
-Builds on `mutable-object-aliasing.md`. This project's own real
-`ProgramDetailsPanel` chose **live binding** deliberately — every field
-change writes directly into the current tab's `ProgramAssignment`
-immediately, with no separate "Apply" step, matching the identical
-"always reflects the one open real thing" reasoning this file's own
-SE Lens names. Live binding's own real correctness — when several
-widgets are updated *programmatically* at once, rather than by a real
-user edit — depends on `reentrancy-guard-flag-for-programmatic-
-updates.md`'s own real technique to avoid corrupting the very object
-being loaded.
+Builds on `mutable-object-aliasing.md`. A details/settings panel that
+always reflects one specific, currently-open real object — never several
+at once, never a saved-elsewhere draft — is the common real case where
+live binding is deliberately chosen over staged-commit, for exactly the
+"always reflects the one open real thing" reasoning this file's own SE
+Lens names. Live binding's own real correctness — when several widgets
+are updated *programmatically* at once, rather than by a real user edit
+— depends on `reentrancy-guard-flag-for-programmatic-updates.md`'s own
+real technique to avoid corrupting the very object being loaded.
 
 ## Try It Yourself
 

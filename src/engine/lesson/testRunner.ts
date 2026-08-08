@@ -188,6 +188,35 @@ function buildJavaHarness(userCode: string, testCode: string): string {
   return ['import java.util.*;', '', body].join('\n')
 }
 
+// Kotlin, unlike Java/C#, allows top-level functions and classes directly at file
+// scope — there is no synthesized entry-point class to nest userCode inside or
+// alongside (buildDotnetStyleHarness's hasOwnClass branching doesn't apply here).
+// userCode (the student's functions/classes) is emitted as-is, followed by a single
+// generated `fun main()` holding the interleaved preamble/assertion lines — the same
+// PASS/FAIL/ERROR-over-stdout contract every other harness here uses, verified live
+// against Judge0 (ce.judge0.com, language id 111) on 2026-08-04.
+function buildKotlinHarness(userCode: string, testCode: string): string {
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
+
+  const body: string[] = []
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      body.push(`    ${line}`)
+      continue
+    }
+    const expr = stripTrailingLineComment(line.slice('assert '.length))
+    const escaped = line.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    body.push(`    try {`)
+    body.push(`        val __ok: Boolean = (${expr})`)
+    body.push(`        println("${OC_PREFIX}" + (if (__ok) "PASS" else "FAIL") + "|${escaped}")`)
+    body.push(`    } catch (__e: Exception) {`)
+    body.push(`        println("${OC_PREFIX}ERROR|${escaped}|" + __e.message)`)
+    body.push(`    }`)
+  }
+
+  return [userCode, '', 'fun main() {', ...body, '}'].join('\n')
+}
+
 // Shared by runCSSTests and runJSXTests: same interleaving rule, but assertions report
 // into a `results` array via `results.push(...)` (read back through postMessage) rather
 // than printing OC_PREFIX-tagged stdout lines.
@@ -217,6 +246,7 @@ export function buildTestHarness(userCode: string, testCode: string, lang: strin
   if (norm === 'cpp' || norm === 'c++' || norm === 'c') return buildCppHarness(userCode, testCode)
   if (norm === 'csharp' || norm === 'cs' || norm === 'c#') return buildCSharpHarness(userCode, testCode)
   if (norm === 'java') return buildJavaHarness(userCode, testCode)
+  if (norm === 'kotlin') return buildKotlinHarness(userCode, testCode)
   return buildJSHarness(userCode, testCode)
 }
 

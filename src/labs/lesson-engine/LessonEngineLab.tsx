@@ -217,6 +217,41 @@ import javaLevel23 from './content/java-fundamentals/level-23.md?raw'
 import javaLevel24 from './content/java-fundamentals/level-24.md?raw'
 import javaLevel25 from './content/java-fundamentals/level-25.md?raw'
 
+import javaArchLevel0  from './content/java-architecture/level-0.md?raw'
+import javaArchLevel1  from './content/java-architecture/level-1.md?raw'
+import javaArchLevel2  from './content/java-architecture/level-2.md?raw'
+import javaArchLevel3  from './content/java-architecture/level-3.md?raw'
+import javaArchLevel4  from './content/java-architecture/level-4.md?raw'
+import javaArchLevel5  from './content/java-architecture/level-5.md?raw'
+import javaArchLevel6  from './content/java-architecture/level-6.md?raw'
+import javaArchLevel7  from './content/java-architecture/level-7.md?raw'
+import javaArchLevel8  from './content/java-architecture/level-8.md?raw'
+import javaArchLevel9  from './content/java-architecture/level-9.md?raw'
+import javaArchLevel10 from './content/java-architecture/level-10.md?raw'
+
+import kotlinLevel0  from './content/kotlin-fundamentals/level-0.md?raw'
+import kotlinLevel1  from './content/kotlin-fundamentals/level-1.md?raw'
+import kotlinLevel2  from './content/kotlin-fundamentals/level-2.md?raw'
+import kotlinLevel3  from './content/kotlin-fundamentals/level-3.md?raw'
+import kotlinLevel4  from './content/kotlin-fundamentals/level-4.md?raw'
+import kotlinLevel5  from './content/kotlin-fundamentals/level-5.md?raw'
+import kotlinLevel6  from './content/kotlin-fundamentals/level-6.md?raw'
+import kotlinLevel7  from './content/kotlin-fundamentals/level-7.md?raw'
+import kotlinLevel8  from './content/kotlin-fundamentals/level-8.md?raw'
+import kotlinLevel9  from './content/kotlin-fundamentals/level-9.md?raw'
+import kotlinLevel10 from './content/kotlin-fundamentals/level-10.md?raw'
+import kotlinLevel11 from './content/kotlin-fundamentals/level-11.md?raw'
+import kotlinLevel12 from './content/kotlin-fundamentals/level-12.md?raw'
+import kotlinLevel13 from './content/kotlin-fundamentals/level-13.md?raw'
+import kotlinLevel14 from './content/kotlin-fundamentals/level-14.md?raw'
+import kotlinLevel15 from './content/kotlin-fundamentals/level-15.md?raw'
+import kotlinLevel16 from './content/kotlin-fundamentals/level-16.md?raw'
+import kotlinLevel17 from './content/kotlin-fundamentals/level-17.md?raw'
+import kotlinLevel18 from './content/kotlin-fundamentals/level-18.md?raw'
+import kotlinLevel19 from './content/kotlin-fundamentals/level-19.md?raw'
+import kotlinLevel20 from './content/kotlin-fundamentals/level-20.md?raw'
+import kotlinLevel21 from './content/kotlin-fundamentals/level-21.md?raw'
+
 import htmlDomLevel0  from './content/html-dom/level-0.md?raw'
 import htmlDomLevel1  from './content/html-dom/level-1.md?raw'
 import htmlDomLevel2  from './content/html-dom/level-2.md?raw'
@@ -637,6 +672,41 @@ const LESSON_FILES: Record<string, string> = {
   'java-fundamentals/level-23.md': javaLevel23,
   'java-fundamentals/level-24.md': javaLevel24,
   'java-fundamentals/level-25.md': javaLevel25,
+
+  'java-architecture/level-0.md': javaArchLevel0,
+  'java-architecture/level-1.md': javaArchLevel1,
+  'java-architecture/level-2.md': javaArchLevel2,
+  'java-architecture/level-3.md': javaArchLevel3,
+  'java-architecture/level-4.md': javaArchLevel4,
+  'java-architecture/level-5.md': javaArchLevel5,
+  'java-architecture/level-6.md': javaArchLevel6,
+  'java-architecture/level-7.md': javaArchLevel7,
+  'java-architecture/level-8.md': javaArchLevel8,
+  'java-architecture/level-9.md': javaArchLevel9,
+  'java-architecture/level-10.md': javaArchLevel10,
+
+  'kotlin-fundamentals/level-0.md': kotlinLevel0,
+  'kotlin-fundamentals/level-1.md': kotlinLevel1,
+  'kotlin-fundamentals/level-2.md': kotlinLevel2,
+  'kotlin-fundamentals/level-3.md': kotlinLevel3,
+  'kotlin-fundamentals/level-4.md': kotlinLevel4,
+  'kotlin-fundamentals/level-5.md': kotlinLevel5,
+  'kotlin-fundamentals/level-6.md': kotlinLevel6,
+  'kotlin-fundamentals/level-7.md': kotlinLevel7,
+  'kotlin-fundamentals/level-8.md': kotlinLevel8,
+  'kotlin-fundamentals/level-9.md': kotlinLevel9,
+  'kotlin-fundamentals/level-10.md': kotlinLevel10,
+  'kotlin-fundamentals/level-11.md': kotlinLevel11,
+  'kotlin-fundamentals/level-12.md': kotlinLevel12,
+  'kotlin-fundamentals/level-13.md': kotlinLevel13,
+  'kotlin-fundamentals/level-14.md': kotlinLevel14,
+  'kotlin-fundamentals/level-15.md': kotlinLevel15,
+  'kotlin-fundamentals/level-16.md': kotlinLevel16,
+  'kotlin-fundamentals/level-17.md': kotlinLevel17,
+  'kotlin-fundamentals/level-18.md': kotlinLevel18,
+  'kotlin-fundamentals/level-19.md': kotlinLevel19,
+  'kotlin-fundamentals/level-20.md': kotlinLevel20,
+  'kotlin-fundamentals/level-21.md': kotlinLevel21,
   'html-dom/level-0.md':  htmlDomLevel0,
   'html-dom/level-1.md':  htmlDomLevel1,
   'html-dom/level-2.md':  htmlDomLevel2,
