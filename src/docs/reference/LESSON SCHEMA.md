@@ -267,6 +267,39 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    enumeration step exists specifically so that sorting is checked
    against the actual code, item by item, rather than trusted to memory.
 
+   > **Objects and methods used, not extended — show the shape, not just
+   > prose, once treatment (a) applies.** The Parent Contract Rule
+   > (below) already requires showing a framework type's real declared
+   > shape when a lesson has the reader `extend` or `implement` it. The
+   > same failure happens on the *usage* side, without any
+   > `extend`/`implement` in sight: a lesson's code calls a method on an
+   > external class or interface it neither wrote nor is subclassing —
+   > a library, a framework service, a standard-library type — and full
+   > treatment for that first appearance stays in prose only. Prose
+   > alone stops being enough once either holds: **(i)** the lesson
+   > calls more than one related member of that same external type (a
+   > registration method and its exact removal counterpart; a factory
+   > method plus the accessor methods it implicitly builds for you), or
+   > **(ii)** a value passed to or returned from the call is a
+   > *compound type* — a container, a builder, anything capable of
+   > holding more than the single value one call site happens to show.
+   > When either is true, show the real declared shape of only the
+   > specific members this lesson actually calls — never the whole
+   > class — as a code block verified against real documentation or
+   > source, at or before the first call site. This failed once
+   > already: a lesson's prose correctly stated that a factory method
+   > "builds a container holding your value," which was true and
+   > exactly where the reader got stuck, because nothing showed that
+   > the container could hold *more than one* such value, or named its
+   > other real members. The fix was not a longer sentence — it was
+   > showing the container's actual declared shape, so the reader could
+   > see its members in relation to each other instead of reconstructing
+   > that relationship from a single call site. Skip this when Define
+   > at Use's ordinary per-call treatment already fully covers what's
+   > called — a single simple method, one plain input, one plain
+   > output, needs no shown shape, just the explanation already required
+   > above.
+
    > **Explain, don't just describe — for every item, not only hard
    > concepts:** "explain" and "describe" are not interchangeable, and
    > this schema means the stronger one. To *describe* something is to
