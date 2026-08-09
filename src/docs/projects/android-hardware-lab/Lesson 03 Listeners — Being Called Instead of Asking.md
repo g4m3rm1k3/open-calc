@@ -15,25 +15,102 @@ it branches off from Lesson 01 directly.
 **Terms introduced in this lesson:**
 - **Listener / callback interface** — an interface whose whole purpose
   is being handed to some other object so *that* object can call your
-  code later, when something happens.
+  code later, when something happens. It exists because Java has no
+  way to pass a bare block of code as a value the way JavaScript passes
+  a raw function — wrapping that code in an object implementing a
+  named interface is Java's way of making "a piece of runnable code"
+  something you can hand to a method as an argument at all.
 - **Anonymous class** — an unnamed, one-off class, defined and
   instantiated in a single expression, usually to implement an
   interface on the spot without giving the implementation its own
-  named `.java` file.
+  named `.java` file. It exists so a listener used in exactly one place
+  doesn't force you to create, name, and maintain an entire separate
+  top-level class just to be constructed once, right where it's needed.
 - **Lambda expression** — shorthand syntax for exactly one specific
   case of an anonymous class: implementing an interface that declares
-  exactly one abstract method.
+  exactly one abstract method. It exists to strip away the remaining
+  ceremony an anonymous class still carries — the interface name, the
+  method name, the braces — once there's only one possible method it
+  could mean.
 - **Functional interface** — the formal name for an interface that
   declares exactly one abstract method, which is what makes the lambda
-  shorthand legal for it in the first place.
+  shorthand legal for it in the first place. The one-method limit isn't
+  arbitrary: a lambda's syntax has nowhere to *write* a method name, so
+  the compiler can only infer which method you're implementing when
+  there's exactly one candidate to choose from.
+- **Lexical scoping of `this`** — a notorious, easy-to-miss difference
+  between a lambda and an anonymous class, even though both can
+  implement the exact same interface. A lambda does not introduce a
+  new `this` at all — `this` inside one means exactly what `this`
+  already meant in the code immediately surrounding it. An anonymous
+  class does introduce a new `this` — its own, referring to the
+  anonymous class's own instance, not whatever object was constructing
+  it. Two pieces of code that look interchangeable can silently refer
+  to two completely different objects the moment either one reads
+  `this`.
 - **Inversion of control** — the general shift this lesson is about:
   instead of your code driving execution and asking questions, you
   hand another object a piece of your code and let *it* decide when to
-  run it.
+  run it. Without it, "wait for an event" can only mean polling in a
+  loop — spending CPU and battery checking a value that usually hasn't
+  changed; inversion of control moves that waiting cost onto whatever
+  already knows the instant the change happens.
 - **Observer pattern** — the formal name for the whole architecture
   this lesson builds: one object (the subject) keeps a list of other
   objects (observers) and calls each of them when its state changes.
-  "Listener" is Android's everyday word for an observer.
+  "Listener" is Android's everyday word for an observer. See CS Lens,
+  below, for how many unrelated places this same shape shows up.
+- **Process** — the OS's unit of isolation. When Android starts an
+  app, it builds a separate, memory-protected environment around it —
+  a fortress, not just a folder. Your calculator app cannot reach into
+  your banking app's memory to read what's typed there, and if one
+  process crashes, the rest of the phone keeps running. This isolation
+  is deliberate and load-bearing, not an obstacle Android works around
+  quietly — the very next term exists because of it.
+- **Inter-process communication (IPC)** — the OS-mediated channel that
+  lets two isolated processes exchange data without breaking the
+  isolation `Process` depends on. Neither process can reach into the
+  other's memory directly; both instead hand data to the OS, which
+  relays it on their behalf. Also recognized in: two microservices
+  talking over a network call instead of sharing memory, a browser's
+  per-tab process isolation (why one crashed tab doesn't take your
+  whole browser down with it), a client talking to a database server
+  rather than reading its files directly, a Unix pipe connecting two
+  separate running programs. Different mechanisms, same shape:
+  isolation stays intact, communication still happens, through a
+  mediator neither side has to trust directly.
+- **MIME type** — a universal standard, not an Android invention, for
+  stating exactly what format a piece of data is in, written as
+  `category/specific-type`: `text/plain`, `text/html`, `image/jpeg`,
+  `application/pdf`. (MIME stands for Multipurpose Internet Mail
+  Extensions — the "mail" is a historical leftover from where the
+  standard started; it now labels data formats everywhere, not just
+  email.) `ClipDescription` (see `ClipData`, below) carries one of
+  these labels alongside the actual clipboard data, so a receiving app
+  can check compatibility *before* trying to read it — a notepad app
+  that only understands `text/plain` sees an incoming `image/jpeg`
+  label and simply refuses, instead of crashing trying to render a
+  photo as text. Also recognized in: the `Content-Type` header on
+  every HTTP request and response, an email attachment's declared
+  format, a browser deciding whether to display a downloaded file
+  inline or offer to save it.
+- **Garbage collection (GC)** — Java's automatic memory reclamation.
+  Unlike C or C++, where a program must explicitly free memory it's
+  done with, the JVM runs a background process that periodically finds
+  every object nothing in the running program can still reach, and
+  frees only those. This is also the source of a common misconception,
+  worth naming directly: "Java can't leak memory, it has garbage
+  collection" is false. A Java leak isn't forgetting to free
+  something — it's accidentally keeping something *reachable*, via a
+  lingering reference, long after the program is really done with it.
+  A reference that shouldn't still exist acts as an anchor: the
+  collector isn't broken or lazy, it's correctly, permanently unable to
+  touch anything still reachable, no matter how obviously unused it
+  actually is. Also recognized in: Python's and Objective-C's reference
+  counting (same idea, different mechanism), a detached DOM node in
+  JavaScript that a forgotten event listener still references, "weak
+  reference" APIs in many languages that exist specifically to hold
+  something *without* preventing its collection.
 
 **Objects and methods this lesson uses:** this lesson isn't teaching
 `ClipboardManager` or `ClipData` as complete classes — it's teaching
@@ -51,13 +128,23 @@ members this lesson actually calls.
   holding the data. Lesson 01 already showed `getSystemService` hands
   you an object standing in for something the OS itself owns —
   `ClipboardManager` is that stand-in specifically for the clipboard.
-  Calling a method on it crosses a process boundary (IPC —
-  inter-process communication) to the one real clipboard the whole
-  device shares, which is exactly why two unrelated apps can copy and
-  paste between each other without ever knowing the other exists: both
-  only ever talk to this same middleman, never to each other directly.
-  The three members this lesson calls, exactly as Android declares
-  them:
+  Calling a method on it is real IPC (see Terms, above): your app's
+  own `Process` cannot reach another app's memory directly, so instead
+  your `Process` hands a message to the OS, and the OS relays it.
+  Concretely, for this lesson's own code:
+  1. Your app packages text into a `ClipData` box (below).
+  2. You call `clipboard.setPrimaryClip(...)`.
+  3. Android translates that call into an IPC message.
+  4. The OS carries that message out of your `Process` and into
+     Android's own core system `Process` — the actual, single,
+     phone-wide clipboard.
+  5. Later, a *completely different* app's `Process` uses this exact
+     same IPC path to ask that core system `Process` what's on the
+     clipboard.
+
+  Neither app's `Process` ever touches the other's memory — both only
+  ever talk to this same OS-mediated middleman. The three members this
+  lesson calls, exactly as Android declares them:
   ```java
   public void addPrimaryClipChangedListener(OnPrimaryClipChangedListener what);
   public void removePrimaryClipChangedListener(OnPrimaryClipChangedListener what);
@@ -67,15 +154,17 @@ members this lesson actually calls.
       void onPrimaryClipChanged(); // the one method a listener must implement
   }
   ```
-  `addPrimaryClipChangedListener` takes an object implementing that
-  one-method interface and keeps it — indefinitely, until told
-  otherwise. `removePrimaryClipChangedListener` takes that exact same
-  object back out of `clipboard`'s internal list. `setPrimaryClip`
-  takes a `ClipData` — not a `String` — and replaces whatever is
-  currently on the clipboard with it. (There's a fourth method you'll
-  see elsewhere but this lesson never calls: `getPrimaryClip()`, the
-  read counterpart to `setPrimaryClip` — pasting, not copying. Not
-  needed here since this lesson only ever writes to the clipboard.)
+  - `addPrimaryClipChangedListener` — takes an object implementing
+    that one-method interface and keeps it, indefinitely, until told
+    otherwise.
+  - `removePrimaryClipChangedListener` — takes that exact same object
+    back out of `clipboard`'s internal list.
+  - `setPrimaryClip` — takes a `ClipData`, not a `String`, and replaces
+    whatever is currently on the clipboard with it.
+  - `getPrimaryClip()` — not called anywhere in this lesson, but you'll
+    see it elsewhere: the read counterpart to `setPrimaryClip`,
+    pasting instead of copying. Not needed here since this lesson only
+    ever writes to the clipboard.
 - *Its use:* any time your app needs to hand data to, or take data
   from, literally any other app on the device, without either app
   knowing the other exists.
@@ -83,17 +172,20 @@ members this lesson actually calls.
 **`ClipData`**
 - *What it is:* the packed, labeled parcel you actually hand to
   `ClipboardManager` — not the raw text itself.
-- *Implementation:* a concrete container class, built from two parts:
-  a `ClipDescription` (a label stating what *kind* of data this is —
-  plain text, a link, an image — so a receiving app can check
-  compatibility before trying to use it) and one or more `Item`s (the
-  actual payload — text, a URI, or an `Intent`). A single `ClipData`
-  can hold *more than one* `Item` at once — the same way copying
-  several files at once in a file browser is still one clipboard
-  action carrying several things. Building a `ClipDescription` and
-  `Item` by hand is real work for the common case of "just some plain
-  text," so Android supplies a shortcut instead — the one factory
-  method this lesson calls:
+- *Implementation:* a concrete container class, built from two parts —
+  think of `ClipData` itself as the shipping box:
+  - `ClipDescription` — the label on the outside of the box. Carries a
+    MIME type (see Terms, above) stating what *kind* of data is inside.
+  - `Item` — the actual product inside the box: text, a URI, or an
+    `Intent`. Declared as a `public static class` nested directly
+    inside `ClipData` itself. A single `ClipData` can hold *more than
+    one* `Item` at once — the same way copying several files at once in
+    a file browser is still one clipboard action carrying several
+    things.
+
+  Building a `ClipDescription` and `Item` by hand is real work for the
+  common case of "just some plain text," so Android supplies a
+  shortcut instead — the one factory method this lesson calls:
   ```java
   public class ClipData {
       // Convenience factory used in this lesson: builds a whole
@@ -111,11 +203,56 @@ members this lesson actually calls.
       }
   }
   ```
-  `newPlainText(label, text)` builds one `Item` wrapping `text`, builds
-  a matching plain-text `ClipDescription`, and returns a `ClipData`
-  already holding both — the shortcut is still building the same real,
-  multi-part container underneath, which is why `setPrimaryClip` takes
-  a `ClipData` and not a bare `String`.
+  - `newPlainText(label, text)` — the only one this lesson calls, and
+    not an object itself: a `static` method has no state of its own —
+    it's a fixed recipe, not a "thing" sitting in memory the way a
+    `ClipData` instance is. It's also not magic: it's ordinary code a
+    real Android engineer wrote, sitting in a real file
+    (`ClipData.java`) your own Android Studio installation already has
+    a copy of — you can Ctrl-click (Cmd-click on a Mac) this method
+    name at its call site in Step 3's code and jump straight to it.
+    Its documented contract is public and citable — see [Android's own
+    `ClipData.newPlainText` reference
+    page](https://developer.android.com/reference/android/content/ClipData#newPlainText(java.lang.CharSequence,%20java.lang.CharSequence)),
+    which confirms exactly this: one `Item` holding your text, one
+    `ClipDescription` labeled `MIMETYPE_TEXT_PLAIN`. That page is the
+    fastest way to check any Android method's contract yourself, no
+    IDE required. Its real, verified implementation body, from
+    Android's own current source (not a paraphrase — this is the
+    actual code, fetched and confirmed this session):
+    ```java
+    static public ClipData newPlainText(CharSequence label, CharSequence text) {
+        Item item = new Item(text);
+        return new ClipData(label, MIMETYPES_TEXT_PLAIN, item);
+    }
+    ```
+    `MIMETYPES_TEXT_PLAIN` is a constant Android declares once —
+    `static final String[] MIMETYPES_TEXT_PLAIN = new String[] {
+    ClipDescription.MIMETYPE_TEXT_PLAIN }` — reused on every call
+    rather than rebuilt each time. It's a named constant instead of the
+    raw string `"text/plain"` typed out at every call site for the same
+    reason you'd do it yourself: a typo in a string literal
+    (`"text/plan"`) compiles fine and fails silently at runtime — every
+    receiving app just won't recognize the label — while a typo in a
+    constant's *name* (`MIMETYPE_TEXT_PLAN`) is caught immediately, by
+    the compiler, before the app ever runs. The three-argument `ClipData`
+    constructor this calls builds the `ClipDescription` for you
+    internally, and — worth noticing — includes the exact same
+    defensive null check Lesson 01 taught you to write yourself:
+    `if (item == null) { throw new NullPointerException("item is
+    null"); }`. Android's own engineers guard against the same mistake,
+    inside their own library, for the same reason you do.
+  - `addItem(Item item)` — not called in this lesson, and not what
+    `newPlainText` uses either (it builds its item list directly, not
+    through this public method). Called directly only when you need
+    more than one item in the same clip.
+  - `getItemAt(int index)` — not called in this lesson. The read side
+    of `addItem`: pulls a specific `Item` back out by position, for
+    when you're pasting rather than copying.
+  - `Item(CharSequence text)` / `getText()` — not called directly in
+    this lesson; `newPlainText` calls the constructor for you. `Item`
+    is the actual payload-holding object `ClipData` is a container of
+    — `getText()` is how you'd read one back out after pasting.
 - *Its use:* every time data crosses into or out of `ClipboardManager`,
   it travels packed inside one of these — never as a raw value alone.
 
@@ -130,6 +267,69 @@ what this lesson is teaching, but nothing in this series stays a
 mystery. Each gets what it is, how it's really built, and how you
 actually use it. Once an item gets this treatment, later lessons won't
 repeat it — they'll just point back here.
+
+- **`Intent`** (named in passing above, as one of the things a
+  `ClipData.Item` can hold — text, a URI, or this)
+  - *What it is:* a standardized, system-wide message requesting that
+    some action be performed.
+  - *Implementation:* a concrete Android class
+    (`android.content.Intent`) — a structured envelope holding an
+    *action* (e.g. "open a web page," "dial a number," "start this
+    screen") and, optionally, the data needed to carry it out (the
+    actual URL, the actual phone number).
+  - *Its use:* the primary way separate Android components talk to
+    each other — launching a new Activity, starting a background
+    service, broadcasting a system-wide announcement. Relevant here
+    specifically because a `ClipData.Item` can hold a fully-formed
+    `Intent` directly, not just plain data — copy one to the
+    clipboard, and whatever pastes it can execute the packaged action
+    immediately, without you writing any code to make that happen.
+
+- **`List<ChangeListener>` / `ArrayList<>`** (Step 1's `Publisher`, plain
+  Java — not Android)
+  - *What it is:* an ordered, growable collection of objects — a
+    notebook you can keep adding entries to, not a fixed-size box.
+  - *Implementation:* `List` is a Java Collections Framework
+    interface — the contract: ordered, allows duplicates, accessible
+    by index. `ArrayList` is one concrete class implementing that
+    contract, backed internally by an array that grows on its own as
+    you add more items than it currently has room for.
+  - *Its use:* `Publisher` keeps every registered listener in one
+    `List` so `setValue` can loop over all of them with a single `for`
+    loop, no matter how many have registered — one, three, or none.
+
+- **`final`** (in Step 1's `private final List<ChangeListener> listeners`)
+  - *What it is:* a Java keyword locking a variable so its reference
+    can never be replaced after it's first set.
+  - *Implementation:* a core Java modifier. Applied to a variable
+    holding an object, it forbids ever using `=` on that variable
+    again — attempting to reassign it is a compile error, not a
+    runtime one.
+  - *Its use:* protects `Publisher`'s structure — nothing can
+    accidentally swap `listeners` out for a different list entirely.
+    **Beginner trap:** `final` locks the *container*, not its
+    *contents*. `listeners.add(...)` and `listeners.remove(...)` still
+    work freely on a `final` list; the only thing forbidden is
+    `listeners = new ArrayList<>()` — replacing the list itself.
+
+- **`@Override`, `super.onCreate(...)`, `super.onDestroy()`**
+  - *What it is:* the Java mechanics underneath every lifecycle method
+    this series has overridden since Lesson 01, used constantly but
+    never named until now.
+  - *Implementation:* `@Override` is a Java annotation — a
+    compile-time check, not a runtime instruction — telling the
+    compiler "this method is meant to replace one declared on a parent
+    class; fail the build if it doesn't actually match one in name and
+    signature." `super.methodName(...)` explicitly calls the *parent*
+    class's own version of that method, instead of your override
+    silently replacing it.
+  - *Its use:* `Activity`'s real `onCreate`/`onDestroy` are not empty —
+    they run real OS-level setup and teardown Android depends on.
+    Skipping `super.onCreate(...)` inside an override doesn't just
+    "miss some extra behavior" — Android actively checks for it and
+    crashes the app immediately, before your own code runs, if it's
+    missing. This is why every override in this series starts with a
+    `super` call to the exact same method, first line, no exceptions.
 
 - **`AppCompatActivity`** (what `MainActivity extends`)
   - *What it is:* the modern, backward-compatible version of a screen's
@@ -167,6 +367,37 @@ repeat it — they'll just point back here.
     Logcat, Android Studio's log viewer — the exact tool you've been
     filtering by tag (`SysService`, `ContextCheck`, `ClipListener`)
     since Lesson 01.
+
+- **`CharSequence`** (in `newPlainText`'s parameters, and `Item`'s)
+  - *What it is:* a general, readable sequence of characters — broader
+    than a `String`.
+  - *Implementation:* a core Java **interface**, not a class. `String`
+    is one of several classes that implement it — anywhere a method
+    asks for a `CharSequence`, a plain `String` is always accepted.
+  - *Its use:* Android favors `CharSequence` over `String` in method
+    signatures like `newPlainText`'s because Android also has
+    "Spannable" text — a string with formatting (bold, color, a
+    tappable link) attached to specific character ranges, not
+    representable as a plain `String` at all. A parameter typed
+    `String` could never accept that; typed `CharSequence`, it accepts
+    an ordinary `String` and richly formatted text equally.
+
+- **`System.identityHashCode(this)`**
+  - *What it is:* the closest thing Java has to a raw memory address —
+    a semi-unique "serial number" for one specific object.
+  - *Implementation:* a `static` method on Java's standard `System`
+    class — plain Java, not Android-specific. Given any object
+    reference, it returns an `int` derived from where that object
+    currently lives in memory. Not guaranteed unique forever (a number
+    can theoretically repeat after an old object is garbage collected
+    and a new one happens to land in the same spot), but reliable
+    enough to tell apart every object that exists *at the same time*.
+  - *Its use:* this lesson uses it as a forensic tool inside the
+    lambda — proof that the Activity responding to a clipboard change
+    is, or isn't, the exact same Activity instance as a moment ago.
+    Lesson 02's leak demo and this lesson's Step 4 both depend on
+    exactly this proof technique to show their point, not just assert
+    it.
 
 - **`setContentView(R.layout.activity_main)`**
   - *What it is:* attaching your visual design to your screen's logic.
@@ -333,12 +564,21 @@ Got a change: second
 Nothing about `Publisher` changed, and nothing about what actually
 happens changed. `newValue -> System.out.println(...)` and `new
 ChangeListener() { public void onChanged(String newValue) { ... } }`
-compile to the same thing — the lambda is purely shorthand, legal only
-because `ChangeListener` happens to have just the one method. Keep this
-in mind: not every listener interface you'll meet has just one method,
-and when one doesn't, the lambda shorthand isn't available — you're
-back to an anonymous class, and this lesson's Step 1 form is the one
-you'll need.
+compile to the same thing for how they get called — the lambda is
+shorthand, legal only because `ChangeListener` happens to have just the
+one method. Keep this in mind: not every listener interface you'll meet
+has just one method, and when one doesn't, the lambda shorthand isn't
+available — you're back to an anonymous class, and this lesson's Step 1
+form is the one you'll need.
+
+One thing is *not* interchangeable between the two forms, and neither
+Step 1 nor this step's code touches it, so it hasn't mattered yet:
+`this`. Inside a lambda, `this` means exactly what it already meant in
+the surrounding code — a lambda doesn't get an instance of its own to
+be `this`. Inside an anonymous class, `this` means the anonymous
+class's own new instance instead — a genuinely different object. Step
+3 depends on this difference directly; flagged here so it isn't a
+surprise there.
 
 ### Introduce the Concept in Isolation — Step 3: The Real Thing
 
@@ -428,11 +668,22 @@ invoked your code.
 
 ### Mechanical Walkthrough
 
+- `(ClipboardManager) rawService` — **reappearing from Lesson 01, brief
+  reminder only.** `getSystemService` still returns a plain `Object`,
+  the cast still tells the compiler to trust that it's really a
+  `ClipboardManager`, and that claim is still checked at runtime, not
+  compile time. Nothing about this line is new; see Lesson 01 for the
+  full treatment if it's unfamiliar.
 - `ClipboardManager.OnPrimaryClipChangedListener` — **first
   appearance.** A functional interface *declared by* `ClipboardManager`
   itself — one abstract method, `onPrimaryClipChanged()`, taking no
   arguments. This is `ChangeListener` from Step 1, except Android wrote
-  it, not you.
+  it, not you. It's declared *nested inside* `ClipboardManager` rather
+  than as its own top-level interface because it has no meaning
+  outside that context — `VibratorManager`, `SensorManager`, and every
+  other manager with a listener declare their *own* nested
+  `OnXListener` instead of sharing one, so two unrelated managers can
+  each define a same-named callback with no collision.
 - `() -> { ... }` — a lambda implementing that one method. The empty
   `()` matches `onPrimaryClipChanged`'s empty parameter list — compare
   to Step 2's `newValue -> ...`, which had one parameter because
@@ -440,12 +691,25 @@ invoked your code.
 - `System.identityHashCode(this)` inside the lambda — **first
   appearance of something Steps 1–2 couldn't show you.** `Scratch.main`
   was `static` — no object, no `this`, nothing to capture. `onCreate`
-  is an instance method on a real `MainActivity` object, and this
-  lambda's body reads `this`, so the lambda captures a reference to
-  *this specific Activity instance* to be able to do that later, when
-  it eventually runs. The lambda object now indirectly holds onto the
+  is an instance method on a real `MainActivity` object, and — per
+  Step 2's lexical-scoping note — `this` inside this lambda means
+  exactly what `this` already means inside `onCreate` itself: the
+  running `MainActivity`. The lambda captures a reference to *that
+  specific Activity instance* to be able to do that later, when it
+  eventually runs. The lambda object now indirectly holds onto the
   Activity that created it — remember this; Step 4 is about exactly
-  what that costs you.
+  what that costs you. **This line only proves what it claims to
+  because it's a lambda.** Had this listener been written as an
+  anonymous class instead (Step 1's other form, still legal here —
+  `OnPrimaryClipChangedListener` is a one-method interface either way),
+  `this` inside it would mean the anonymous class's own new instance —
+  the listener object — not the Activity. `System.identityHashCode(this)`
+  would then print the *listener's* identity, not the Activity's, and
+  every rotation would produce a different listener anyway (a new one
+  is created and registered each time), so the numbers would never
+  reveal whether an old Activity survived at all. Step 4's whole proof
+  technique is only valid because Step 3 chose the lambda form —
+  Exercise 6, below, has you break this on purpose to see it fail.
 - `clipboard.addPrimaryClipChangedListener(listener)` — **first
   appearance.** This is `Publisher.addListener(...)` from Step 1,
   except it's a real method on a real `ClipboardManager`, appending
@@ -454,7 +718,13 @@ invoked your code.
   appearance.** A static factory method that builds a `ClipData` object
   — the real type the Android clipboard actually stores. `"label"` is
   a description of the data's purpose (shown in some system UI), not
-  the data itself; `"Lesson 3 test"` is the actual text.
+  the data itself; `"Lesson 3 test"` is the actual text. It's a factory
+  method rather than a plain constructor because building a valid
+  `ClipData` really means building a matching `ClipDescription` *and*
+  at least one `Item` together, correctly paired — a bare constructor
+  would let you forget one and hand `setPrimaryClip` something broken;
+  the factory method makes "forgot the description" not a mistake you
+  can make.
 - `clipboard.setPrimaryClip(clip)` — **first appearance.** Replaces
   whatever is currently on the clipboard with `clip`. This is the
   action that plays the role of `Publisher.setValue(...)` — the moment
@@ -505,6 +775,20 @@ like this became the more common convention. Android's `LiveData` and
 Kotlin's `Flow` — if you get there later — are more elaborate versions
 of the same core idea: something else calls you, when it has something
 new.
+
+Also recognized in, well outside Java or Android entirely: a browser's
+`addEventListener` on any DOM element; a spreadsheet automatically
+recalculating every cell that references one you just edited, without
+you telling it which cells depend on it; a stock-price alert that pages
+you the moment a price crosses a threshold, instead of you refreshing a
+quote every few seconds; a fire alarm panel triggering every connected
+bell in a building the instant one sensor trips, instead of each bell
+needing to check the sensor itself; Node.js's `EventEmitter` and
+message-broker systems like MQTT or Kafka, where publishers and
+subscribers never know about each other directly, only about the
+broker between them. Different languages, different hardware, same
+shape: one thing changes, everything that registered interest gets
+told, and nothing not registered is ever polled.
 
 ### SE Lens
 
@@ -567,10 +851,16 @@ D/ClipListener: Clipboard changed! (Activity 891573204)
 Three groups, growing by one line each rotation, the same three
 identity hashes repeating throughout — proof that all three Activity
 instances, including the first two, already-destroyed ones, are still
-alive and still reacting to clipboard changes. This is Lesson 02's leak
-demo again, reached by a different road: instead of a `static` field
-holding a `Context` directly, a long-lived system service is holding a
-listener that itself holds one.
+alive and still reacting to clipboard changes. This is garbage
+collection working exactly as documented (see Terms, above), not
+failing: `clipboard` — a system service, alive for the whole process —
+still holds a reference to each listener, and each listener still
+holds a reference to the Activity that created it. Nothing is unreachable,
+so nothing gets collected; the collector has no way to know your code
+considers these Activities "done." This is Lesson 02's leak demo again,
+reached by a different road: instead of a `static` field holding a
+`Context` directly, a long-lived system service is holding a listener
+that itself holds one.
 
 **The fix.** `clipboard` needs back the *exact same* listener object it
 was given, in order to remove it — which means `listener`, and
@@ -747,6 +1037,16 @@ separate event does that. Restore the two commented lines when done.
    can actually crash, and under what specific condition, then explain
    why that condition essentially never happens on a real device — tie
    your answer back to Lesson 01's nullability material.
+6. Rewrite Step 3's listener as an anonymous class instead of a lambda
+   (legal — `OnPrimaryClipChangedListener` is a one-method interface
+   either way), keeping `System.identityHashCode(this)` in the body
+   unchanged. Before running it, predict what you think will get
+   logged. Then run it, rotate the emulator a couple of times, and
+   compare the identity hashes you actually see to what Step 3's
+   lambda version produced. Explain the difference using this lesson's
+   Lexical Scoping term — specifically, what object `this` refers to
+   in each version, and why only one of them can actually prove
+   anything about the Activity's lifetime.
 
 ## Definition of Done
 
@@ -773,6 +1073,14 @@ separate event does that. Restore the two commented lines when done.
       cause reached two different ways.
 - [ ] You can state which thread this lesson's listener callback runs
       on, and that this is not guaranteed for every Android listener.
+- [ ] You completed Exercise 6 — saw `this` resolve to a different
+      object once the listener became an anonymous class instead of a
+      lambda, and can explain why that breaks Step 4's proof technique
+      specifically, not just "it's different."
+- [ ] You can explain garbage collection's actual role in Step 4's
+      leak, in your own words: not a failure of the collector, but a
+      lingering reachable reference the collector is correctly
+      forbidden from touching.
 - [ ] Commit: not applicable — Steps 1–2 were a scratch file
       (discarded); Step 3–4's code stays in your test project for now.
 

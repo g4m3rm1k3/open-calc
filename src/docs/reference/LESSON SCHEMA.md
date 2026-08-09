@@ -14,6 +14,48 @@ from the Concept Unit sequence below is missing between them.
 
 ---
 
+## The Repetition Rule
+
+Referenced throughout this document; defined here, once, so it's
+self-contained.
+
+A concept, construct, method, or term that already received full
+treatment earlier in the curriculum does not get full treatment again
+on reappearance. A **hard concept** (a design pattern, an SE principle,
+a CS idea, a named architectural decision) gets a real restatement of
+what it *is*, by name, in a clause — never silence, and never a bare
+"see Lesson N" citation with nothing else. A **basic, already-taught
+construct** (ordinary syntax, a previously-explained method signature)
+is silently reusable — no restatement owed at all.
+
+**The condition this depends on, stated explicitly because it has
+already failed once:** this rule only applies when the earlier
+appearance *actually gave the thing full treatment*. It does not apply
+— and the current lesson must give full, first-appearance treatment
+instead of a reminder — whenever the true earlier appearance:
+
+- predates this schema, or predates this schema's Header requirements
+  for "Terms introduced" / "Objects and methods used," and so was
+  never actually explained anywhere;
+- is in a lesson now frozen (already worked through by the student,
+  per this schema's own real-time delivery norms) and cannot be
+  retroactively edited to add the missing explanation; or
+- simply missed it — the Recursive Concept Extraction Rule's
+  enumeration is supposed to catch every new concept, but a miss is a
+  miss, and "it appeared before" does not un-miss it.
+
+A reminder that points back to an explanation that was never actually
+given leaves the reader with nothing to find — worse than either
+repeating the explanation or never mentioning the gap at all. When this
+condition is met, whichever not-yet-frozen lesson is being written is
+the *real* first appearance for teaching purposes, regardless of which
+lesson's code used the thing first, and must treat it that way: full
+entry in Terms Introduced or Objects and Methods, full treatment
+wherever step 7's enumeration meets it, not a citation to a prior
+lesson that never said anything.
+
+---
+
 ## Header (write once, before any Concept Units)
 
 ```
@@ -35,6 +77,33 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
   far — not just the stage this lesson adds. A lesson that only shows
   its own new stage in isolation leaves the reader unable to place it in
   the whole system.
+- **Terms introduced in this lesson** — a short glossary, immediately
+  after "What you need to know first." One line per term, new in this
+  lesson only (a term reappearing from an earlier lesson does not get a
+  second entry — per the Repetition Rule, above, a brief reminder where
+  it's used is enough, *provided that earlier lesson actually explained
+  it* — see the Repetition Rule's own stated exception before assuming
+  a prior appearance means it's covered). Format: the term, bolded, an
+  em-dash, a plain
+  definition — and, same as everywhere else in this schema, *why* the
+  term or thing exists or what problem it solves, not just what it
+  means. A reader who has never worked in this lesson's language or
+  framework before should be able to read this section once and feel
+  oriented before meeting any of these terms in real code, rather than
+  meeting each one cold, mid-block.
+- **Objects and methods used** — immediately after Terms introduced.
+  Every external class, interface, or method this lesson's code
+  depends on that is not itself the lesson's subject — framework,
+  library, or runtime pieces the code merely needs to compile and run
+  — gets real grounding here: what it conceptually is, how it's
+  actually implemented, and how it's used. Nothing gets skipped just
+  because it isn't "the point" of the lesson — if it appears in the
+  code, it gets explained somewhere, and this is where the supporting
+  cast goes so the reader isn't left to reverse-engineer it from
+  context. When such a type's shape isn't obvious from a single call
+  (see step 7's "Objects and methods used, not extended" callout,
+  below), show its real declared shape here too, not only inline at
+  the call site.
 
 ---
 
@@ -300,6 +369,62 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    > output, needs no shown shape, just the explanation already required
    > above.
 
+   > **Every method, object, or function explanation starts with its
+   > own bullet — never explained inline inside a paragraph about
+   > something else, even when there's only one.** This applies to the
+   > shape block above and to the Parent Contract Rule's shape block
+   > alike, and also beyond shown shapes entirely: any time prose
+   > names and explains what a specific method, class, or function is
+   > or does, that explanation gets its own bullet, leading with the
+   > name, rather than being folded as a clause into a sentence about
+   > something else. A paragraph that explains two or three things in
+   > a row — "`ClipData` is built from two parts: a `ClipDescription`
+   > \[...\], and one or more `Item`s \[...\]" — is factually complete
+   > and still fails this: the eye has nothing to align each thing with
+   > its matching line, and a reader skimming for "wait, what's an
+   > `Item`" has to read the whole paragraph to find it. This is not
+   > only a multi-member-shape rule; a single method mentioned in
+   > passing inside unrelated prose gets pulled out to its own bullet
+   > too, the moment it's actually being explained rather than just
+   > named. Plain prose stays plain prose only for connective narration
+   > between bulleted explanations — never as a container for one.
+
+   > **The purpose of all of this is demystification — prove it's
+   > ordinary, inspectable code, not opaque magic.** Before explaining
+   > any framework or library construct, get its actual *kind* right: a
+   > `static` method has no state and is not an object; a class is a
+   > blueprint, not a running thing; a constant is a fixed value
+   > computed once, not recomputed per use. Conflating these is itself
+   > a common source of confusion and worth a sentence whenever it
+   > isn't obvious. Then state, concretely, where the thing actually
+   > comes from: real source code, written by a real person, sitting in
+   > a real file the student's own toolchain already has a local or
+   > fetchable copy of — never "the framework handles this" or "the
+   > system generates this" as an unexamined black box. When the real
+   > implementation is short enough to be illuminating, show its actual
+   > body as the proof — fetched and confirmed from the genuine current
+   > source *this session*, never reconstructed from memory and never
+   > trusted from an unverified secondary reproduction (a blog post, a
+   > tutorial, another AI's paraphrase) that was itself never checked
+   > against the real thing. This failed once already: a secondhand
+   > reproduction of `ClipData.newPlainText`'s body looked plausible,
+   > read well, and was wrong — the real method calls a different
+   > constructor than the one shown, and builds its supporting constant
+   > differently. Fetching the actual current source caught it; nothing
+   > about reading the wrong version *felt* wrong until it was compared
+   > to the genuine artifact. State, generically for whatever language
+   > or tooling is in play, the concrete way a reader could go find this
+   > themselves — cite the library's own official public documentation
+   > for the method's contract when one exists (the fastest check, no
+   > IDE or source browsing required), and separately, for the
+   > implementation itself, an IDE's go-to-definition or the language
+   > or library's own public source repository. Anything the shown real
+   > implementation itself references — another type, a constant, a
+   > helper — must already be explained by this point in the lesson, or
+   > get explained now; a "here's the real code" reveal that quietly
+   > introduces new unexplained names has traded one mystery for
+   > another instead of removing one.
+
    > **Explain, don't just describe — for every item, not only hard
    > concepts:** "explain" and "describe" are not interchangeable, and
    > this schema means the stronger one. To *describe* something is to
@@ -500,8 +625,46 @@ for every unit; connection is not deferred to the end.
 
 Read the draft top to bottom and answer honestly:
 
+- [ ] For every construct in this lesson's code that also appeared in
+      an earlier lesson, did that earlier lesson actually explain it —
+      or are you assuming it's covered because it's not new? Per the
+      Repetition Rule's stated exception: if the true earlier
+      appearance predates this schema, is now frozen, or was simply
+      missed, this lesson owes it full first-appearance treatment, not
+      a citation to an explanation that was never given.
+- [ ] Does the Header have both a "Terms introduced in this lesson"
+      glossary and an "Objects and methods used" section, each entry
+      stating *why* the thing exists or what problem it solves, not
+      just what it means or does? A term or object left as a bare
+      description ("X is a Y that does Z," nothing more) fails this
+      exactly like an undescribed one would — the fix is the same
+      "explain, don't just describe" standard applied here, in the
+      Header, not only inside Concept Units.
 - [ ] Does any code block sit immediately next to another code block with
       no prose in between? If yes: split, interleave.
+- [ ] Does any paragraph explain what a specific method, class, or
+      function is or does as a clause folded into prose about
+      something else, rather than its own bullet leading with its
+      name — including a single one mentioned only in passing? A
+      paragraph that is factually complete still fails this: the
+      reader needs to scan for the one thing they're looking for, and
+      prose without a bullet per named thing can't be scanned, only
+      read start to finish. This applies inside shown shapes (Parent
+      Contract Rule or the Objects/methods usage callout) and equally
+      to ordinary explanatory prose anywhere else in the lesson.
+- [ ] For any real implementation body shown as proof (not just a
+      signature), was it actually fetched and confirmed from the
+      genuine current source this session — not written from memory,
+      not trusted from a secondhand reproduction? And does everything
+      that shown body itself references (a type, a constant, a helper)
+      already have its own explanation by this point, or get one now?
+- [ ] For every external type this lesson calls methods on but does not
+      `extend`/`implement`, did you check whether it calls more than one
+      related member of that type, or passes/returns a compound type? If
+      either is true, is that type's real declared shape actually shown
+      as code — not just described in a sentence? A type description
+      that reads correctly but never shows the shape is the exact
+      failure this check exists to catch.
 - [ ] For every "The New Code" block, did you actually write out the
       literal enumeration required by step 7 — every method call, every
       property access, every operator, in order — and sort each one into
