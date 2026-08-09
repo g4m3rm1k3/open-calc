@@ -32,6 +32,34 @@ lesson goes back and opens up the box Lesson 01 left closed.
   become eligible for garbage collection, but isn't, because something
   else — often something long-lived, like a `static` field — still
   holds a reference to it.
+- **Garbage collection (GC)** — Java's automatic memory reclamation.
+  Unlike C or C++, where a program must explicitly free memory it's
+  done with, the JVM runs a background process that periodically finds
+  every object nothing in the running program can still reach, and
+  frees only those. Worth naming a common misconception directly:
+  "Java can't leak memory, it has garbage collection" is false. A leak
+  isn't forgetting to free something — it's accidentally keeping
+  something *reachable*, via a lingering reference, long after the
+  program is really done with it. The collector isn't broken or lazy
+  in that case; it's correctly, permanently unable to touch anything
+  still reachable, no matter how obviously unused it actually is.
+
+**Objects and methods this lesson uses:**
+
+**`System.identityHashCode(Object)`**
+- *What it is:* the closest thing Java has to a raw memory address — a
+  semi-unique "serial number" for one specific object.
+- *Implementation:* a `static` method on Java's standard `System`
+  class — plain Java, not Android-specific. Given any object
+  reference, it returns an `int` derived from where that object
+  currently lives in memory. Not guaranteed unique forever (a number
+  can theoretically repeat after an old object is garbage collected
+  and a new one happens to land in the same spot), but reliable enough
+  to tell apart every object that exists *at the same time*.
+- *Its use:* this lesson's forensic tool, in "What Breaks Without
+  This," below — proof that two `MainActivity` instances logged across
+  a rotation are, or aren't, the exact same object in memory, rather
+  than trusting a description of what "should" be happening.
 
 ---
 
@@ -432,10 +460,13 @@ for the entire process. It is still holding a reference to the
 *first*, already-destroyed Activity — identity hash `366240857` —
 which means that entire object, and everything it points to (its full
 view tree, every `TextView` and layout inside it), cannot be garbage
-collected, ever, for as long as your process runs. You've leaked a
-destroyed screen. This is provable more rigorously with Android
-Studio's Profiler (a later lesson's territory), but the mismatched
-identity hashes above are the same fact, seen directly.
+collected (see Terms, above), ever, for as long as your process runs.
+This is garbage collection working exactly as documented, not
+failing: nothing is unreachable, so nothing gets collected — the
+collector has no way to know your code considers this Activity "done."
+You've leaked a destroyed screen. This is provable more rigorously
+with Android Studio's Profiler (a later lesson's territory), but the
+mismatched identity hashes above are the same fact, seen directly.
 
 Delete this experiment's code entirely — the `static leakedContext`
 field and its `onCreate` — and uncomment your real `onCreate` body

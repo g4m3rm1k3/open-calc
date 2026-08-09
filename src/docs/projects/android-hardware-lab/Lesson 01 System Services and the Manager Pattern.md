@@ -32,6 +32,76 @@ methods, casting between types. Nothing Android-specific.
   as `(ClipboardManager) someObject`. Checked at runtime — get it wrong
   and the program throws, it doesn't silently misbehave.
 
+**Objects and methods this lesson uses:** everything below appears in
+Step 3's real project file because Android Studio's template puts it
+there, or because this series uses it as its console — none of it is
+this lesson's own subject, but nothing in this series stays unexplained
+just because it isn't "the point."
+
+- **`AppCompatActivity`** (what `MainActivity extends`)
+  - *What it is:* the modern, backward-compatible version of a
+    screen's base class.
+  - *Implementation:* extends Android's real `Activity` class —
+    Lesson 02 opens up exactly what that inheritance chain really is;
+    for now, treat it as the base every screen in this series runs
+    inside. `AppCompatActivity` layers a large amount of code on top of
+    plain `Activity` whose entire job is making newer UI features
+    (toolbars, dark mode, etc.) behave correctly on older Android
+    versions, so an app doesn't break on a five-year-old phone.
+  - *Its use:* extended once per screen, then mostly forgotten about —
+    every example in this series runs inside a subclass of it.
+- **`Bundle savedInstanceState`** (the `onCreate` parameter)
+  - *What it is:* a small labeled box for saving pieces of screen
+    state right before that screen is about to be destroyed.
+  - *Implementation:* a real, `final` Android class that behaves
+    internally like a key-value map (`"score" -> 42`, and so on).
+  - *Its use:* when the OS is about to destroy an Activity — e.g. on
+    rotation — it hands the dying Activity a `Bundle` to pack values
+    into, then hands that *same* `Bundle` back into the brand-new
+    Activity's `onCreate`. This series passes it straight to
+    `super.onCreate(savedInstanceState)` without packing or unpacking
+    anything — a later lesson's subject, not this one's.
+- **`Log.d(String tag, String message)`**
+  - *What it is:* this series' stand-in for a console.
+  - *Implementation:* a `static` method on Android's `Log` utility
+    class. `d` is one of several severity levels — `d`ebug, `w`arning,
+    `e`rror, `i`nfo are the other common ones.
+  - *Its use:* a phone has no terminal window for `System.out.println`
+    to write to. `Log.d("tag", "message")` instead sends the line to
+    Logcat, Android Studio's log viewer — the tool this whole series
+    filters by tag to see real output.
+- **`setContentView(R.layout.activity_main)`**
+  - *What it is:* attaching a visual design to a screen's logic.
+  - *Implementation:* a method inherited from `Activity`.
+    `R.layout.activity_main` is a generated integer constant — part of
+    Android's auto-generated `R` class — pointing at the compiled
+    `activity_main.xml` file.
+  - *Its use:* a `.java` file has no visual shape by itself; this
+    method reads that XML, builds real `View` objects from it, and
+    attaches them as what the user actually sees. Almost always the
+    first real line inside `onCreate`.
+- **`findViewById(R.id.main)`, `EdgeToEdge.enable(this)`,
+  `ViewCompat.setOnApplyWindowInsetsListener(...)`**
+  - *What they are:* Android Studio's generated "draw behind the
+    system bars, but don't hide content under them" boilerplate.
+  - *Implementation:* `findViewById` walks the view tree
+    `setContentView` just built, looking for a `View` whose ID matches
+    the integer given. `EdgeToEdge` and `ViewCompat` are helper classes
+    from Android's modern UI libraries.
+  - *Its use:* not this lesson's subject and not touched again —
+    present because the project template puts it there. Left alone
+    throughout this series.
+- **`ClipboardManager`**
+  - *What it is:* the one, phone-wide clipboard every app shares — not
+    a private clipboard belonging to your app.
+  - *Implementation:* a concrete class, but not the thing actually
+    holding the data — the stand-in `getSystemService` hands you for
+    something the OS itself owns, per this lesson's own Concept Unit.
+  - *Its use:* this lesson's real-world example of the manager pattern.
+    Lesson 03 returns to it and actually calls its methods; the deeper
+    mechanism (how it talks to the rest of the OS) is covered there,
+    where it's actually used, not here where it's merely obtained.
+
 ---
 
 ## Concept Unit: Asking For Something You Didn't Make
@@ -165,34 +235,67 @@ only job was showing you the mechanism once, cheaply, before meeting
 Android's actual (much larger, OS-managed) version of the same table.
 
 Create a new minimal Android Studio project (Empty Views Activity is
-fine). In `MainActivity`'s `onCreate`, after `setContentView(...)`:
+fine). Its generated `MainActivity` already has real code in it —
+`EdgeToEdge.enable(this)`, `setContentView(...)`, and a generated
+insets listener — none of which this lesson is about (see Objects and
+methods, above). Leave that generated code exactly where it is. Below
+is the **whole file**, generated code included, with this lesson's new
+lines placed exactly where they go, right after `setContentView(...)`:
 
 ```java
+package com.example.myapplication; // your package name will differ
+
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 
-// ... inside onCreate, after setContentView(...):
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
-// Context.CLIPBOARD_SERVICE is just a String constant — check its
-// value in Android's source and it really is literally "clipboard".
-Object rawService = getSystemService(Context.CLIPBOARD_SERVICE);
+public class MainActivity extends AppCompatActivity {
 
-// getSystemService is declared @Nullable — the OS is allowed to hand
-// back null for a service that doesn't exist on this device/API level.
-// A cast never rejects null (null can be cast to any reference type
-// without complaint), so skipping this check doesn't fail here — it
-// fails later, on whatever line first calls a method on `clipboard`.
-if (rawService == null) {
-    android.util.Log.d("SysService", "Clipboard service unavailable on this device");
-    return;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);                 // <- generated, leave as-is
+        setContentView(R.layout.activity_main);  // <- generated, leave as-is
+
+        // ---- everything below this line is new, added by this lesson ----
+
+        // Context.CLIPBOARD_SERVICE is just a String constant — check its
+        // value in Android's source and it really is literally "clipboard".
+        Object rawService = getSystemService(Context.CLIPBOARD_SERVICE);
+
+        // getSystemService is declared @Nullable — the OS is allowed to
+        // hand back null for a service that doesn't exist on this
+        // device/API level. A cast never rejects null (null can be cast
+        // to any reference type without complaint), so skipping this
+        // check doesn't fail here — it fails later, on whatever line
+        // first calls a method on `clipboard`.
+        if (rawService == null) {
+            Log.d("SysService", "Clipboard service unavailable on this device");
+            return;
+        }
+
+        // We know the "clipboard" key maps to a ClipboardManager because
+        // Android's documentation says so — same as Step 2, where we had
+        // to already know "clipboard" mapped to a StringBuilder.
+        ClipboardManager clipboard = (ClipboardManager) rawService;
+
+        Log.d("SysService", "Got: " + clipboard.getClass().getSimpleName());
+
+        // ---- generated, leave as-is ----
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
 }
-
-// We know the "clipboard" key maps to a ClipboardManager because
-// Android's documentation says so — same as Step 2, where we had to
-// already know "clipboard" mapped to a StringBuilder.
-ClipboardManager clipboard = (ClipboardManager) rawService;
-
-android.util.Log.d("SysService", "Got: " + clipboard.getClass().getSimpleName());
 ```
 
 Run it in the emulator and check Logcat (filter on tag `SysService`).

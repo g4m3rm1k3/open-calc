@@ -285,6 +285,38 @@ repeat it — they'll just point back here.
     clipboard, and whatever pastes it can execute the packaged action
     immediately, without you writing any code to make that happen.
 
+- **`getSystemService(String name)`**
+  - *What it is:* the front door to every hardware- and OS-owned
+    feature on the phone — not just the clipboard.
+  - *Implementation:* declared on `Context` itself, returning a plain
+    `Object` because this one method has to be able to hand back
+    dozens of completely unrelated types — `ClipboardManager`,
+    `SensorManager`, `AudioManager`, `WifiManager` — depending only on
+    which string key is passed in. The caller is responsible for
+    casting the result to whatever type that specific key is
+    documented to correspond to; nothing about the method itself
+    enforces the connection between key and type.
+  - *Its use:* called once, at the very top of this lesson's
+    `onCreate`, to get the exact `ClipboardManager` every other line in
+    this lesson depends on. Lesson 01 covers this method as its entire
+    subject — the full mechanism, a real execution trace, why the
+    return type is `Object`, why the resulting cast is checked at
+    runtime and not compile time — none of that is repeated here, but
+    all of it applies, unchanged, to this exact call.
+- **`Context.CLIPBOARD_SERVICE`**
+  - *What it is:* the exact key used to ask for the clipboard,
+    specifically — not a general-purpose flag or setting.
+  - *Implementation:* a `public static final String` constant declared
+    on `Context`, holding nothing more exotic than the literal text
+    `"clipboard"`.
+  - *Its use:* passed as `getSystemService`'s argument instead of
+    typing `"clipboard"` by hand. The constant exists so a typo
+    (`"clipbord"`) becomes a compile error (an unresolvable symbol)
+    instead of a runtime bug that silently returns `null` — the same
+    "named constant over a raw literal" reasoning this lesson already
+    covered for `MIMETYPE_TEXT_PLAIN`, above, applied to the exact same
+    problem in a different spot.
+
 - **`List<ChangeListener>` / `ArrayList<>`** (Step 1's `Publisher`, plain
   Java — not Android)
   - *What it is:* an ordered, growable collection of objects — a
@@ -674,6 +706,21 @@ invoked your code.
   `ClipboardManager`, and that claim is still checked at runtime, not
   compile time. Nothing about this line is new; see Lesson 01 for the
   full treatment if it's unfamiliar.
+- **A newer overload this series doesn't use, worth knowing exists:**
+  `getSystemService(Class<T> serviceClass)` — added in API level 23,
+  confirmed this session against Android's own reference — takes a
+  `Class` reference instead of a `String`, and uses that argument to
+  tell the compiler the exact return type through Java generics, so no
+  cast is written at all: `ClipboardManager clipboard =
+  getSystemService(ClipboardManager.class);` compiles with no
+  `(ClipboardManager)` anywhere. Same nullability as the string-based
+  form — it can still return `null` for an unsupported service, so
+  Lesson 01's null check still applies. This series sticks to the
+  older, string-based form throughout, on purpose: it's the form
+  you'll see far more often in existing real-world code, documentation,
+  and Stack Overflow answers written before 2015, and understanding
+  *why* the cast exists (the whole point of Lesson 01) is easier to see
+  in the form that doesn't hide it.
 - `ClipboardManager.OnPrimaryClipChangedListener` — **first
   appearance.** A functional interface *declared by* `ClipboardManager`
   itself — one abstract method, `onPrimaryClipChanged()`, taking no
