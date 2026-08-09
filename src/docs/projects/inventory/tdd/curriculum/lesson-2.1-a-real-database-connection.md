@@ -50,8 +50,9 @@ past a restart.
 ### New concept, no match: Flask-SQLAlchemy's own style
 
 Full treatment in `concepts/flask-sqlalchemy-declarative-model.md` —
-not repeated here. That file exists specifically because `concepts/
-sqlalchemy-mapped-column-types.md` teaches modern SQLAlchemy's
+not repeated here. That file exists specifically because
+`concepts/sqlalchemy-mapped-column-types.md` teaches modern
+SQLAlchemy's
 `Mapped[T]`/`mapped_column()` syntax, which the original application
 does **not** use anywhere — it uses the older, still current,
 `db.Model`/`db.Column(db.Type, ...)` style throughout, a genuinely
@@ -178,9 +179,10 @@ current content is shown whole above.
   path, regardless of what directory the program was launched from.
 - `DATA_PATH = os.environ.get('DATA_PATH', str(BASE_DIR / "data"))` —
   what `os.environ.get(key, default)` does, and why it's used instead
-  of a plain `os.environ[key]` lookup, is covered in `concepts/os-
-  environ-get.md`; here it lets a real deployment override the data
-  location without editing this file, while defaulting to a `data`
+  of a plain `os.environ[key]` lookup, is covered in
+  `concepts/os-environ-get.md`; here it lets a real deployment override
+  the data location without editing this file, while defaulting to a
+  `data`
   folder next to this one on a developer's own machine.
 - `DATA_PATH` / `SQLALCHEMY_DATABASE_URI` /
   `SQLALCHEMY_TRACK_MODIFICATIONS` — direct application of `sqlite-
@@ -212,8 +214,9 @@ current content is shown whole above.
   `config.py` might itself grow to import things that import back from
   `app`).
 - `if config_name is None: config_name = os.environ.get('FLASK_ENV',
-  'development')` — `os.environ.get` reappearing (`concepts/os-environ-
-  get.md`, already cited above) — the first real *use* of
+  'development')` — `os.environ.get` reappearing
+  (`concepts/os-environ-get.md`, already cited above) — the first real
+  *use* of
   `config_name`, the parameter Lesson 1.1 ported but left unused until
   now.
 - `app.config.from_object(config.get(config_name, config['default']))`

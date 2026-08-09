@@ -154,14 +154,14 @@ All three files are brand-new and shown whole above.
   packages, the compiler, and the bundler are needed only to build/check
   the project, never by the running application itself — the same split
   `npm-package-json.md` already explains.
-- `"compilerOptions"` — direct application of `concepts/typescript-
-  tsconfig.md`'s already-cataloged fields; `"jsx": "react-jsx"`
-  specifically tells the compiler this project uses JSX
-  (`concepts/jsx-syntax.md`) at all.
-- `plugins: [react()]` — direct application of `concepts/vite-plugin-
-  system.md`'s own worked example; without it, the `.tsx` files this
-  project is about to add would fail to compile at all, per that file's
-  own demonstrated failure case.
+- `"compilerOptions"` — direct application of
+  `concepts/typescript-tsconfig.md`'s already-cataloged fields;
+  `"jsx": "react-jsx"` specifically tells the compiler this project
+  uses JSX (`concepts/jsx-syntax.md`) at all.
+- `plugins: [react()]` — direct application of
+  `concepts/vite-plugin-system.md`'s own worked example; without it,
+  the `.tsx` files this project is about to add would fail to compile
+  at all, per that file's own demonstrated failure case.
 
 ---
 
@@ -489,8 +489,9 @@ The identical page, reloaded, renders correctly again with no error.
 - [ ] `curl http://localhost:5173/` returns the identical `<title>` the
       original application's own `index.html` has.
 - [ ] `./node_modules/.bin/tsc --noEmit -p tsconfig.json` exits 0.
-- [ ] `concepts/react-strict-mode.md` and `concepts/reading-a-stack-
-      trace.md` both exist, were reasoned about for real this session,
+- [ ] `concepts/react-strict-mode.md` and
+      `concepts/reading-a-stack-trace.md` both exist, were reasoned
+      about for real this session,
       and are referenced by name here rather than re-derived.
 - [ ] `node scripts/check-fidelity.mjs diff <commit> --allow-new
       "<div>Rebuild in progress</div>"` exits 0 for this lesson's own

@@ -12,8 +12,8 @@ plain Python program into something a network client can talk to.
 
 Nothing project-specific — this is the first lesson. General Python
 (functions, `if __name__`) is assumed; everything Flask-specific is
-taught from scratch, in `concepts/flask-application-and-route-
-decorator.md`.
+taught from scratch, in
+`concepts/flask-application-and-route-decorator.md`.
 
 ## Terms introduced
 
@@ -42,10 +42,11 @@ answer, a network request at all.
 
 ### Learn it in isolation
 
-Full treatment, run this session, lives in `concepts/flask-application-
-and-route-decorator.md` — not repeated here. That file's isolation lab:
-a standalone Flask app on port 5099, one route, run with
-`python lab.py`, then queried from a second terminal:
+Full treatment, run this session, lives in
+`concepts/flask-application-and-route-decorator.md` — not repeated
+here. That file's isolation lab: a standalone Flask app on port 5099,
+one route, run with `python lab.py`, then queried from a second
+terminal:
 
 ```
 hello, real server
@@ -184,8 +185,9 @@ function already is the entire new structure.
   application's own `requirements.txt`, read this session) — an exact
   version, not a loose `flask>=3.0`, so a later install of this project
   gets identical behavior to what this lesson tested.
-- `if __name__ == '__main__':` — reapplies `concepts/flask-application-
-  and-route-decorator.md`'s already-established guard.
+- `if __name__ == '__main__':` — reapplies
+  `concepts/flask-application-and-route-decorator.md`'s already-
+  established guard.
   `app.run(port=5000)` — its real declared shape (what `port` defaults
   to when omitted, what `host`/`debug` do, why the call blocks) is
   covered in `concepts/flask-run-method.md`, not repeated here; bound
@@ -231,8 +233,9 @@ one.
 
 ### CS Lens
 
-Not a new CS idea beyond what `concepts/flask-application-and-route-
-decorator.md` already named (the dispatch-table pattern). This unit's
+Not a new CS idea beyond what
+`concepts/flask-application-and-route-decorator.md` already named (the
+dispatch-table pattern). This unit's
 own additional idea is the **factory pattern** — deferring construction
 of a complex object to a callable function instead of building it once,
 eagerly, at load time. Also recognized in: a database connection pool's
@@ -263,8 +266,9 @@ python -m venv .venv
 .venv/Scripts/python.exe run.py
 ```
 
-`python -m venv .venv` and the `pip install` step reapply `concepts/
-python-namespace-isolation-venv.md`'s already-cataloged commands, run
+`python -m venv .venv` and the `pip install` step reapply
+`concepts/python-namespace-isolation-venv.md`'s already-cataloged
+commands, run
 inside your backend folder. `python run.py` starts the server.
 
 ### Run it
@@ -380,9 +384,10 @@ permanently recorded in the project's history. The `-m` message is not a
 list of which files changed — git already records that automatically —
 it's an explanation of *why* the snapshot exists: "the backend can now
 be reached over HTTP at all, with the same health response the original
-application gives," not "added __init__.py." `concepts/git-basics-
-three-states-and-commit.md` covers the full model this relies on — a
-file moves through three states, modified → staged (`git add`) →
+application gives," not "added __init__.py."
+`concepts/git-basics-three-states-and-commit.md` covers the full model
+this relies on — a file moves through three states, modified → staged
+(`git add`) →
 committed (`git commit`) — worth reading in full before your first real
 commit, since every lesson from here on ends the same way.
 
