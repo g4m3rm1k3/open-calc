@@ -5,6 +5,10 @@ const PANEL_W = 960
 const PANEL_H = 640
 const MIN_W = 420
 const MIN_H = 320
+const SNAP_EDGE_PX = 24
+const TOP_MARGIN = 44 // stays clear of the app's own top bar, same margin used elsewhere in this file
+const TITLE_BAR_H = 32 // matches the h-8 title bar below; the drag-clamp keeps this much visible vertically
+const TITLE_BAR_MIN_VISIBLE = 80 // px of title bar kept on-screen horizontally at minimum — enough to grab and drag back
 
 function MacDots({ onClose, onMinimize, onMaximize, isMaximized }) {
   return (
@@ -22,7 +26,7 @@ function MacDots({ onClose, onMinimize, onMaximize, isMaximized }) {
   )
 }
 
-export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMaximize, onFocus }) {
+export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMaximize, onFocus, onDockChange }) {
   const offset = (win.offset ?? 0) * 24
   // A lab can request a bigger-than-default window (win.width/height, from
   // its own meta.js) — clamped against the actual screen so a request
@@ -42,17 +46,41 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
   const isMax = win.state === 'maximized'
   const Component = win.Component
 
+  // Edge-snap docking: drag the title bar to the left/right screen edge to
+  // snap the window to exactly that half. `isDocked`/`preDock` are refs, not
+  // state — nothing about them needs to trigger a render on their own, they
+  // only matter to startDrag/up, which read the current pos/size directly.
+  const isDocked = useRef(null) // 'left' | 'right' | null
+  const preDock = useRef(null) // { pos, size } captured just before the last dock
+  const [snapPreview, setSnapPreview] = useState(null) // 'left' | 'right' | null, live feedback while dragging
+
   function startDrag(e) {
     if (isMax || e.button !== 0) return
     e.preventDefault()
+    if (isDocked.current && preDock.current) {
+      // Picking a docked window back up restores its pre-dock size first,
+      // centered under the cursor — following the mouse at exactly
+      // half-screen width would feel like dragging a slab, not a window.
+      const restored = preDock.current
+      const wx = e.clientX - restored.size.w / 2
+      const wy = Math.max(TOP_MARGIN, e.clientY - 16)
+      setSize(restored.size)
+      setPos({ x: wx, y: wy })
+      origin.current = { mx: e.clientX, my: e.clientY, wx, wy }
+      isDocked.current = null
+      onDockChange?.(null)
+    } else {
+      origin.current = { mx: e.clientX, my: e.clientY, wx: pos.x, wy: pos.y }
+    }
     dragging.current = true
-    origin.current = { mx: e.clientX, my: e.clientY, wx: pos.x, wy: pos.y }
   }
 
   function startResize(e) {
     if (isMax || e.button !== 0) return
     e.preventDefault()
     e.stopPropagation()
+    if (isDocked.current) onDockChange?.(null)
+    isDocked.current = null // manual resize breaks the exact-half-screen docked state
     resizing.current = true
     resizeOrigin.current = { mx: e.clientX, my: e.clientY, sw: size.w, sh: size.h }
   }
@@ -60,10 +88,21 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
   useEffect(() => {
     const move = (e) => {
       if (dragging.current) {
+        const nx = origin.current.wx + e.clientX - origin.current.mx
+        const ny = origin.current.wy + e.clientY - origin.current.my
+        // Clamp so the title bar — the only thing close/minimize/resize
+        // live on — can never be dragged fully off-screen. Without this, a
+        // fast drag past the top or a side edge leaves the window
+        // unreachable with no visible chrome left to grab or click.
+        // Keeping at least TITLE_BAR_MIN_VISIBLE px on-screen both axes
+        // guarantees there's always something left to click back into view.
         setPos({
-          x: origin.current.wx + e.clientX - origin.current.mx,
-          y: origin.current.wy + e.clientY - origin.current.my,
+          x: Math.max(TITLE_BAR_MIN_VISIBLE - size.w, Math.min(nx, window.innerWidth - TITLE_BAR_MIN_VISIBLE)),
+          y: Math.max(0, Math.min(ny, window.innerHeight - TITLE_BAR_H)),
         })
+        if (e.clientX <= SNAP_EDGE_PX) setSnapPreview('left')
+        else if (e.clientX >= window.innerWidth - SNAP_EDGE_PX) setSnapPreview('right')
+        else setSnapPreview(null)
       }
       if (resizing.current) {
         const maxW = window.innerWidth - 40
@@ -74,14 +113,31 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
         })
       }
     }
-    const up = () => { dragging.current = false; resizing.current = false }
+    const up = () => {
+      if (dragging.current && snapPreview) {
+        preDock.current = { pos, size }
+        const dockedSize = { w: Math.round(window.innerWidth / 2), h: window.innerHeight - TOP_MARGIN }
+        setSize(dockedSize)
+        setPos({ x: snapPreview === 'right' ? window.innerWidth - dockedSize.w : 0, y: TOP_MARGIN })
+        isDocked.current = snapPreview
+        onDockChange?.(snapPreview)
+      }
+      dragging.current = false
+      resizing.current = false
+      setSnapPreview(null)
+    }
     window.addEventListener('mousemove', move)
     window.addEventListener('mouseup', up)
     return () => {
       window.removeEventListener('mousemove', move)
       window.removeEventListener('mouseup', up)
     }
-  }, [])
+    // pos/size/snapPreview/onDockChange are read (not just set) inside `up`,
+    // so — unlike the original zero-dependency version of this effect —
+    // this one has to resubscribe when they change to avoid `up` closing
+    // over stale values. Re-attaching two window listeners on drag/resize
+    // is cheap.
+  }, [pos, size, snapPreview, onDockChange])
 
   if (isMax) {
     return (
@@ -116,35 +172,53 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
   }
 
   return (
-    <div
-      className="fixed flex flex-col rounded-xl overflow-hidden shadow-2xl border border-black/15 dark:border-white/[0.08]"
-      style={{ left: pos.x, top: pos.y, width: size.w, height: size.h, zIndex }}
-      onMouseDown={onFocus}
-    >
+    <>
+      {snapPreview && (
+        <div
+          className="fixed pointer-events-none bg-blue-400/20 border-2 border-blue-400/60 rounded-lg"
+          style={{
+            top: TOP_MARGIN,
+            left: snapPreview === 'right' ? '50%' : 0,
+            width: '50%',
+            height: `calc(100vh - ${TOP_MARGIN}px)`,
+            // Deliberately above every normal window (BASE_Z=1700+) and above
+            // maximized (1800) — while dragging, the window being dragged is
+            // often sitting right over the target edge itself, and the
+            // preview needs to stay visible on top of it, not hidden under it.
+            zIndex: 5000,
+          }}
+        />
+      )}
       <div
-        className="flex-shrink-0 h-8 flex items-center gap-3 px-3 select-none cursor-grab active:cursor-grabbing bg-[#e8e8e8] dark:bg-[#2c2c2e] border-b border-black/10 dark:border-white/[0.08]"
-        onMouseDown={startDrag}
+        className="fixed flex flex-col rounded-xl overflow-hidden shadow-2xl border border-black/15 dark:border-white/[0.08]"
+        style={{ left: pos.x, top: pos.y, width: size.w, height: size.h, zIndex }}
+        onMouseDown={onFocus}
       >
-        <MacDots onClose={onClose} onMinimize={onMinimize} onMaximize={onMaximize} isMaximized={false} />
-        <span className="flex-1 text-center text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate pr-14">
-          {win.emoji ? `${win.emoji} ` : ''}{win.label}
-        </span>
+        <div
+          className="flex-shrink-0 h-8 flex items-center gap-3 px-3 select-none cursor-grab active:cursor-grabbing bg-[#e8e8e8] dark:bg-[#2c2c2e] border-b border-black/10 dark:border-white/[0.08]"
+          onMouseDown={startDrag}
+        >
+          <MacDots onClose={onClose} onMinimize={onMinimize} onMaximize={onMaximize} isMaximized={false} />
+          <span className="flex-1 text-center text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate pr-14">
+            {win.emoji ? `${win.emoji} ` : ''}{win.label}
+          </span>
+        </div>
+        {/* transform creates a containing block so fixed-position lab canvases clip to this window */}
+        <div className="flex-1 overflow-hidden relative" style={{ transform: 'translate(0,0)' }}>
+          <LabErrorBoundary label={win.label} backTo={win.backTo}>
+            <Component onBack={onClose} onClose={onClose} />
+          </LabErrorBoundary>
+        </div>
+        <div
+          onMouseDown={startResize}
+          title="Resize"
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-10 group"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" className="absolute bottom-0.5 right-0.5 pointer-events-none text-slate-400 dark:text-slate-500 opacity-60 group-hover:opacity-100 transition-opacity">
+            <path d="M12 2L2 12M12 7L7 12M12 12L12 12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+        </div>
       </div>
-      {/* transform creates a containing block so fixed-position lab canvases clip to this window */}
-      <div className="flex-1 overflow-hidden relative" style={{ transform: 'translate(0,0)' }}>
-        <LabErrorBoundary label={win.label} backTo={win.backTo}>
-          <Component onBack={onClose} onClose={onClose} />
-        </LabErrorBoundary>
-      </div>
-      <div
-        onMouseDown={startResize}
-        title="Resize"
-        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-10 group"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" className="absolute bottom-0.5 right-0.5 pointer-events-none text-slate-400 dark:text-slate-500 opacity-60 group-hover:opacity-100 transition-opacity">
-          <path d="M12 2L2 12M12 7L7 12M12 12L12 12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-        </svg>
-      </div>
-    </div>
+    </>
   )
 }

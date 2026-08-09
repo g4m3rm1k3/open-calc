@@ -64,6 +64,7 @@ import {
 } from "../../utils/inlineRunner.js";
 import { getThemeStyles, STUDIO_THEMES } from "../../utils/studioThemes.js";
 import { useGlobalTheme, FONT_OPTIONS } from "../../context/ThemeContext.jsx";
+import { useConceptWindow, useConceptNav } from "../desktop/ConceptWindowProvider.jsx";
 import CodeSettingsModal, {
   getCodeFontFamily,
   getCodeFontSize,
@@ -71,7 +72,10 @@ import CodeSettingsModal, {
 import DocsCodeWorkspace from "./DocsCodeWorkspace.jsx";
 import AdaPanel from "./AdaPanel.jsx";
 
-const DOCS_MODULES = import.meta.glob("/src/docs/**/*.md", {
+// Exported for ConceptWindowProvider.jsx, which needs to resolve and render
+// the same concept .md files this file's own inline embeds do — see the
+// comment on findConceptDocPath below for why lookup is filename-based.
+export const DOCS_MODULES = import.meta.glob("/src/docs/**/*.md", {
   query: "?raw",
   import: "default",
 });
@@ -886,7 +890,7 @@ function MdCodeBlock({ language, code }) {
 // *some* `concepts/` folder with a matching basename. A brand-new top-level
 // folder picks this up for free the moment its concepts/ catalog (its own,
 // or a shared one elsewhere) contains the file — no code change here.
-function findConceptDocPath(filename) {
+export function findConceptDocPath(filename) {
   if (!filename) return null;
   const suffix = `/concepts/${filename}`;
   return Object.keys(DOCS_MODULES).find((p) => p.endsWith(suffix)) || null;
@@ -900,7 +904,7 @@ function MdInlineCode({ children }) {
     const docPath = findConceptDocPath(filename);
     if (docPath) {
       const title = filename.replace(".md", "").replace(/[-_]/g, " ");
-      return <ConceptEmbed docPath={docPath} title={title} />;
+      return <ConceptEmbedTrigger docPath={docPath} title={title} />;
     }
   }
 
@@ -1003,20 +1007,18 @@ function resolveDocPath(currentFilePath, href) {
   return resolvedPath in DOCS_MODULES ? resolvedPath : null;
 }
 
-// Whether this hast paragraph node contains an inline trigger that
-// MdInlineCode/MdLink will turn into a <ConceptEmbed>. A ConceptEmbed's
-// expanded content is a full markdown document, including real block-level
-// elements (h1, p, ul, ...) — and those are invalid inside a <p> per the
-// HTML content model. Unlike parsing an HTML string, React's DOM renderer
-// does NOT auto-correct this: it silently constructs the broken tree
-// exactly as instructed (a real <h1> nested inside a real <p>), and
-// browsers then lay that out unpredictably rather than rejecting it —
-// this is what caused nested concept embeds to render at a fraction of
-// their real width with the wrong font. The fix is to never let a
-// paragraph containing one of these triggers become a real <p> at all —
-// walk the same trigger conditions MdInlineCode/MdLink use (recursing
-// through wrapper elements like `em`/`strong`, since the trigger is often
-// wrapped in emphasis) and report if any are found.
+// Whether this paragraph node contains an inline trigger that
+// MdInlineCode/MdLink will turn into a <ConceptEmbedTrigger>. Historically
+// this trigger expanded inline into a full markdown document — real
+// block-level elements (h1, p, ul, ...) landing inside what's structurally
+// a <p>, invalid per the HTML content model, which React's DOM renderer
+// does not auto-correct: it built the broken tree exactly as instructed,
+// and browsers laid it out unpredictably. That's fixed now for a more
+// direct reason — the trigger no longer renders block content inline at
+// all, it opens ConceptWindowProvider's own window instead (see
+// ConceptEmbedTrigger, below) — but this check is left in place as a
+// harmless no-op safeguard rather than removed, since a <button> trigger
+// is valid inside a <p> either way.
 function paragraphContainsConceptEmbed(node) {
   if (!node) return false;
 
@@ -1046,66 +1048,45 @@ function paragraphContainsConceptEmbed(node) {
   return (node.children || []).some(walk);
 }
 
-function ConceptEmbed({ docPath, title }) {
-  const { themeStyles, typography } = useGlobalTheme();
-  const [content, setContent] = useState(null);
-  const [open, setOpen] = useState(false);
+// Filenames in this docs tree are kebab/snake-case with no separate
+// "pretty title" stored anywhere for arbitrary files — the sidebar tree
+// gets its labels from a build-time script, not something callable here.
+// Same derivation already used for a concept's own title, reused for the
+// lesson (origin) title so both ends of the breadcrumb read consistently.
+function titleFromPath(path) {
+  if (!path) return "This lesson";
+  const filename = path.split("/").pop() || path;
+  return filename.replace(/\.md$/, "").replace(/[-_]/g, " ");
+}
 
-  useEffect(() => {
-    if (open && !content && DOCS_MODULES[docPath]) {
-      DOCS_MODULES[docPath]().then((res) => setContent(res));
-    }
-  }, [open, docPath, content]);
+// Concept references used to expand inline into an accordion that recursed
+// into another copy of itself for a concept-in-a-concept reference — each
+// level added its own border+padding, so nesting a few deep visibly shrank
+// and indented every level in (measured: 885px -> 835px -> ... one real
+// case, Lesson 05 giving-the-machine-a-memory's fold-vs-scan ->
+// fold-reduce-pattern). Now it's just a trigger: first click opens the
+// shared ConceptWindowProvider window; a concept reference found *inside*
+// that window's own content (see useConceptNav, checked below) pushes onto
+// that same window's breadcrumb instead of opening/nesting a second one.
+function ConceptEmbedTrigger({ docPath, title }) {
+  const conceptWindow = useConceptWindow();
+  const nav = useConceptNav();
+  const { activeFile } = useContext(DocsCtx);
 
   return (
-    <span className="my-6 border rounded-xl overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm block w-full">
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          setOpen(!open);
-        }}
-        className="w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
-      >
-        <span className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
-            📚
-          </span>
-          <span className="font-bold text-slate-800 dark:text-slate-200 text-base">
-            Concept: {title}
-          </span>
-        </span>
-        <span className="text-slate-400 dark:text-slate-500 text-xs">
-          {open ? "▼" : "▶"}
-        </span>
-      </button>
-      {open && (
-        <span
-          className="block p-6 border-t border-slate-200 dark:border-slate-800 w-full overflow-x-auto bg-white dark:bg-slate-900 cursor-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {content === null ? (
-            <span className="text-slate-500 animate-pulse text-sm">
-              Loading concept...
-            </span>
-          ) : (
-            <span className="block w-full">
-              <SectionedMarkdown
-                content={content}
-                ui={themeStyles?.ui}
-                accentColor={themeStyles?.accentHex || "#0ea5e9"}
-                isDark={themeStyles?.isDark}
-                font={typography?.font}
-                width={typography?.width}
-                lineHeight={typography?.lineHeight}
-                fontSize={typography?.fontSize}
-                textAlign={typography?.textAlign}
-                embedded
-              />
-            </span>
-          )}
-        </span>
-      )}
-    </span>
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        if (nav) {
+          nav.push(docPath, title);
+        } else {
+          conceptWindow.openFromLesson(docPath, title, titleFromPath(activeFile));
+        }
+      }}
+      className="inline-flex items-center gap-1.5 my-1 px-3 py-1.5 rounded-full font-bold text-sm transition-all duration-200 bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-500/30 text-brand-600 dark:text-brand-400 shadow-[0_2px_10px_-2px] shadow-brand-500/40 hover:shadow-[0_4px_18px_-2px] hover:shadow-brand-500/60 hover:-translate-y-0.5 hover:border-brand-400 dark:hover:border-brand-400"
+    >
+      <span className="text-[12px]">📚</span> Concept: {title}
+    </button>
   );
 }
 
@@ -1145,7 +1126,7 @@ function MdLink({ href, children }) {
       const conceptDocPath = findConceptDocPath(hrefBase.split("/").pop());
       if (conceptDocPath) {
         return (
-          <ConceptEmbed docPath={conceptDocPath} title={extractText(children)} />
+          <ConceptEmbedTrigger docPath={conceptDocPath} title={extractText(children)} />
         );
       }
     }
@@ -1562,7 +1543,7 @@ function splitMarkdownSections(markdown) {
 // (`ui`/`accentColor` come from ThemeContext's useMemo'd `themeStyles`), so
 // this memo boundary actually holds instead of being defeated by fresh
 // object identities every render.
-const SectionedMarkdown = memo(function SectionedMarkdown({
+export const SectionedMarkdown = memo(function SectionedMarkdown({
   content,
   ui,
   accentColor,
@@ -1797,6 +1778,10 @@ export default function MarkdownHub() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const tree = useMemo(() => buildTree(Object.keys(DOCS_MODULES)), []);
+  // When the concept window is docked to an edge, shrink this whole page to
+  // the other half instead of letting the (opaque, fixed-position) window
+  // merely sit on top of content that's still full width underneath it.
+  const { dockedEdge } = useConceptWindow();
 
   const [tab, setTab] = useState(() => {
     try {
@@ -2603,7 +2588,14 @@ export default function MarkdownHub() {
       />
 
       <div
-        className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[1650]`}
+        className={`flex flex-col h-[100vh] top-0 bottom-0 ${ui.bg0} ${ui.txt1} font-sans overflow-hidden fixed z-[1650] transition-[left,right,width] duration-200`}
+        style={
+          dockedEdge === "right"
+            ? { left: 0, right: "50vw", width: "50vw" }
+            : dockedEdge === "left"
+              ? { left: "50vw", right: 0, width: "50vw" }
+              : { left: 0, right: 0, width: "100%" }
+        }
       >
         <div
           className={`h-16 ${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 w-full gap-4 transition-all duration-300 overflow-visible`}

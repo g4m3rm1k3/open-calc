@@ -11,6 +11,7 @@ import { getLabEntry } from "./labs/labLoader.js";
 import { LABS } from "./labs/labRegistryLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
+import ConceptWindowProvider from "./components/desktop/ConceptWindowProvider.jsx";
 import { ChatProvider } from "./context/ChatContext.jsx";
 import RootErrorBoundary from "./components/layout/RootErrorBoundary.jsx";
 import { TourProvider } from "./context/TourContext.jsx";
@@ -87,6 +88,7 @@ export default function App() {
                   <MontyProvider>
                   <ChatProvider>
                   <DesktopProvider>
+                  <ConceptWindowProvider>
                     <FloatingVideoPlayer />
                     <Suspense fallback={null}>
                       <NotificationToast />
@@ -341,6 +343,7 @@ export default function App() {
                         </Suspense>
                       </AppShell>
                     </RootErrorBoundary>
+                  </ConceptWindowProvider>
                   </DesktopProvider>
                   </ChatProvider>
                   </MontyProvider>
