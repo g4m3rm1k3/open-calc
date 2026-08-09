@@ -99,35 +99,33 @@ session — each outer-loop pass tries every rule in order until one
 matches at position 0, then restarts the outer loop from where that
 match left off:
 
-```
-Pass 1: rest = "G01 X10.5 (rapid to start)", pos = 0
+- Pass 1: rest = "G01 X10.5 (rapid to start)", pos = 0
   comment rule: no match at index 0 (skip)
   gword rule: matches "G01" at index 0 → token {gword, "G01", pos:0}
   pos → 3, rest → " X10.5 (rapid to start)"
 
-Pass 2: rest = " X10.5 (rapid to start)", pos = 3
+- Pass 2: rest = " X10.5 (rapid to start)", pos = 3
   comment/gword/mword/axisword: no match at index 0 (skip each)
   whitespace rule: matches " " at index 0 → token {whitespace, " ", pos:3}
   pos → 4, rest → "X10.5 (rapid to start)"
 
-Pass 3: rest = "X10.5 (rapid to start)", pos = 4
+- Pass 3: rest = "X10.5 (rapid to start)", pos = 4
   comment/gword/mword: no match at index 0 (skip)
   axisword rule: matches "X10.5" at index 0 → token {axisword, "X10.5", pos:4}
   pos → 9, rest → " (rapid to start)"
 
-Pass 4: rest = " (rapid to start)", pos = 9
+- Pass 4: rest = " (rapid to start)", pos = 9
   comment rule: matches later in the string, but at index 1, not 0 → rejected
   gword/mword/axisword: no match at index 0
   whitespace rule: matches " " at index 0 → token {whitespace, " ", pos:9}
   pos → 10, rest → "(rapid to start)"
 
-Pass 5: rest = "(rapid to start)", pos = 10
+- Pass 5: rest = "(rapid to start)", pos = 10
   comment rule: matches "(rapid to start)" at index 0 → token {comment, "(rapid to start)", pos:10}
   pos → 27, rest → ""
 
-Pass 6: rest = "" → while (rest.length > 0) is false → loop ends
-Final: 5 tokens, matching the real output above exactly.
-```
+- Pass 6: rest = "" → while (rest.length > 0) is false → loop ends
+- Final: 5 tokens, matching the real output above exactly.
 
 Pass 4 is the one worth noticing: the comment rule's regex *does* match
 somewhere in `" (rapid to start)"`, but not at index `0` — the

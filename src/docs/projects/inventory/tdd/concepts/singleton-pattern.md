@@ -80,20 +80,18 @@ called.
 
 Two calls, traced against the real output above:
 
-```
-PrinterConnection()  [1st call]
+- PrinterConnection()  [1st call]
   cls._instance is None? Yes
     → print "creating the real connection (first time only)"
     → cls._instance = a brand-new object (call it OBJ-A)
   → returns OBJ-A
 
-PrinterConnection()  [2nd call]
+- PrinterConnection()  [2nd call]
   cls._instance is None? No (it's OBJ-A)
     → print "reusing the existing connection"
   → returns OBJ-A (the SAME object, not a new one)
 
-first is second → first is OBJ-A, second is OBJ-A → True
-```
+- first is second → first is OBJ-A, second is OBJ-A → True
 
 Both `first` and `second` end up bound to the identical object, `OBJ-A`
 — the second call never reached the branch that builds anything new.

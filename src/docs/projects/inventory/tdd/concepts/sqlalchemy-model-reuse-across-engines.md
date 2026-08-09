@@ -59,22 +59,20 @@ engine_b pets: ['Milo']
 
 Four real `Session` blocks, traced against the real output above:
 
-```
-Session(engine_a): add Pet(name="Rex")   → commit → engine_a's own
+- Session(engine_a): add Pet(name="Rex")   → commit → engine_a's own
   real database now has one row: Rex
 
-Session(engine_b): add Pet(name="Milo")  → commit → engine_b's own,
+- Session(engine_b): add Pet(name="Milo")  → commit → engine_b's own,
   completely separate real database now has one row: Milo
   (engine_a is untouched by this — different file/connection entirely)
 
-Session(engine_a): select(Pet) → queries engine_a's own database only
+- Session(engine_a): select(Pet) → queries engine_a's own database only
   → finds Rex (the only row engine_a has ever had)
   → print "engine_a pets: ['Rex']"
 
-Session(engine_b): select(Pet) → queries engine_b's own database only
+- Session(engine_b): select(Pet) → queries engine_b's own database only
   → finds Milo (the only row engine_b has ever had)
   → print "engine_b pets: ['Milo']"
-```
 
 The exact same `Pet` class and the exact same `select(Pet)` expression
 run in all four blocks — nothing about `Pet` changes between them. The

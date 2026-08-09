@@ -111,47 +111,43 @@ effect ran, upper = [A, B]
 against the real output above (6 "effect ran" lines: 1 initial mount +
 5 re-renders):
 
-```
-Broken version (upper = items.map(...), no useMemo):
+- Broken version (upper = items.map(...), no useMemo):
 
-Initial render: unrelated=0. upper = items.map(...) → new array ref #1
+- Initial render: unrelated=0. upper = items.map(...) → new array ref #1
   → useEffect's dependency [upper] has no "previous" yet → effect runs
   → logs "effect ran, upper = [A, B]"
 
-Click 1: setUnrelated(0→1) → re-render.
+- Click 1: setUnrelated(0→1) → re-render.
   upper = items.map(...) → NEW array ref #2 (items unchanged, but .map()
   always builds fresh) → ref #2 !== ref #1 (Object.is, reference check)
   → dependency "changed" → effect re-runs → logs "effect ran, upper = [A, B]"
 
-Click 2: setUnrelated(1→2) → re-render.
+- Click 2: setUnrelated(1→2) → re-render.
   upper = items.map(...) → NEW array ref #3 → ref #3 !== ref #2 → effect
   re-runs → logs "effect ran, upper = [A, B]"
 
-... identical for clicks 3, 4, 5 — refs #4, #5, #6, each different from
-the last, each triggering another real effect run.
+- ... identical for clicks 3, 4, 5 — refs #4, #5, #6, each different from
+- the last, each triggering another real effect run.
 
-Total: 6 real effect runs, even though upper's own CONTENTS ([A, B])
-never once actually changed.
-```
+- Total: 6 real effect runs, even though upper's own CONTENTS ([A, B])
+- never once actually changed.
 
-```
-Fixed version (upper = useMemo(() => items.map(...), [items])):
+- Fixed version (upper = useMemo(() => items.map(...), [items])):
 
-Initial render: upper = useMemo computes → array ref #1 (items dep: ref I1)
+- Initial render: upper = useMemo computes → array ref #1 (items dep: ref I1)
   → effect runs (no previous) → logs "effect ran, upper = [A, B]"
 
-Click 1: setUnrelated(0→1) → re-render.
+- Click 1: setUnrelated(0→1) → re-render.
   useMemo checks its OWN dependency: [items] → items is still ref I1
   (the parent never rebuilt it) → useMemo does NOT recompute → returns
   the SAME array ref #1 as before
   → useEffect's [upper] dependency: ref #1 === ref #1 → unchanged →
     effect does NOT re-run
 
-Click 2-5: identical — items stays ref I1, useMemo keeps returning ref
-#1, useEffect never sees a change → effect never re-runs again.
+- Click 2-5: identical — items stays ref I1, useMemo keeps returning ref
+- #1, useEffect never sees a change → effect never re-runs again.
 
-Total: 1 real effect run — the initial mount only.
-```
+- Total: 1 real effect run — the initial mount only.
 
 `.map()` itself runs identically in both versions on every render — the
 only difference is whether its *result* gets a fresh reference wrapped

@@ -61,8 +61,7 @@ function List() {
 
 Clicking "Add to front" once, traced against both keying strategies:
 
-```
-key={item.id}:
+- key={item.id}:
   Before: [{id:1,"Apple"} key=1, {id:2,"Banana"} key=2]
   After insert: [{id:0,"Cherry"} key=0, {id:1,"Apple"} key=1, {id:2,"Banana"} key=2]
   React's reconciler compares keys, not positions:
@@ -72,7 +71,7 @@ key={item.id}:
   → only Cherry's <li> is newly created; Apple/Banana's own DOM nodes
     (and any internal state they held) are reused untouched
 
-key={index}:
+- key={index}:
   Before: index 0 → Apple, index 1 → Banana
   After insert: index 0 → Cherry, index 1 → Apple, index 2 → Banana
   React's reconciler compares keys, which are now just positions:
@@ -86,7 +85,6 @@ key={index}:
   → every <li> except the last one gets patched with a state mismatch;
     only the LAST item in the list actually gets a fresh mount, which
     is the opposite of what actually changed (Cherry, at the front)
-```
 
 Both traces process the same 3 real items after the same insert — the
 only thing that changes is which value React treats as each item's

@@ -174,8 +174,7 @@ Both changes are configuration, read once at process startup rather
 than executed repeatedly — the trace here is the two different requests
 this configuration makes possible, traced separately:
 
-```
-Cross-origin request, relying on CORS:
+- Cross-origin request, relying on CORS:
 1. A browser page served from a different origin (simulated here with
    `curl -H "Origin: http://localhost:5173"`) sends a GET to
    http://127.0.0.1:5000/health.
@@ -189,7 +188,7 @@ Cross-origin request, relying on CORS:
    the page gets the data. Absent → withheld, per `cors-same-origin-
    policy.md`.
 
-Same-origin request, relying on the proxy:
+- Same-origin request, relying on the proxy:
 1. The frontend page, served from http://localhost:5173, calls
    `fetch('/api/...')` — a same-origin request from the browser's own
    point of view, since it never names a different host or port.
@@ -203,7 +202,6 @@ Same-origin request, relying on the proxy:
    response to the original `fetch`. The browser never made a
    cross-origin request at all, so step 4 above never triggers for
    this path.
-```
 
 ### CS Lens
 

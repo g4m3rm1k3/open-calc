@@ -64,8 +64,7 @@ total tags: 2
 Three sequential calls, traced against the real output above
 (`1 1 2` / `True` / `total tags: 2`):
 
-```
-Call 1: get_or_create_tag(session, "urgent")
+- Call 1: get_or_create_tag(session, "urgent")
   existing = query for Tag.name == "urgent" → None (table is empty)
   existing is not None? → False
   new_tag = Tag(name="urgent"); session.add(new_tag); session.commit()
@@ -73,19 +72,18 @@ Call 1: get_or_create_tag(session, "urgent")
   → returns new_tag (id=1)
   a = <Tag id=1, name="urgent">
 
-Call 2: get_or_create_tag(session, "urgent")
+- Call 2: get_or_create_tag(session, "urgent")
   existing = query for Tag.name == "urgent" → the real row from Call 1 (id=1)
   existing is not None? → True
   → returns existing immediately, no insert, no new id assigned
   b = <Tag id=1, name="urgent">  (same row as a)
 
-Call 3: get_or_create_tag(session, "later")
+- Call 3: get_or_create_tag(session, "later")
   existing = query for Tag.name == "later" → None (no such row yet)
   existing is not None? → False
   new_tag = Tag(name="later"); session.add(new_tag); session.commit()
   → new_tag.id = 2
   c = <Tag id=2, name="later">
-```
 
 `a.id == b.id` is `True` specifically because Call 2 never reached the
 `session.add`/`commit` lines at all — the query at the top of Call 2

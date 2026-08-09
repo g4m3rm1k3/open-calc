@@ -59,26 +59,24 @@ false
 One `geometry`, built once, reused by two separately-constructed `Line`
 objects — traced against the real output above:
 
-```
-vectors = points.map(...) → 3 real THREE.Vector3 objects
-geometry = new THREE.BufferGeometry().setFromPoints(vectors)
+- vectors = points.map(...) → 3 real THREE.Vector3 objects
+- geometry = new THREE.BufferGeometry().setFromPoints(vectors)
   → one real geometry object, built once, holding 3 vertex positions
 
-greenMaterial = new THREE.LineBasicMaterial({ color: 0x46d89f })
-redMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 })
+- greenMaterial = new THREE.LineBasicMaterial({ color: 0x46d89f })
+- redMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 })
   → two separate, independent material objects
 
-greenLine = new THREE.Line(geometry, greenMaterial)
+- greenLine = new THREE.Line(geometry, greenMaterial)
   → combines the ONE geometry object with greenMaterial
-redLine = new THREE.Line(geometry, redMaterial)
+- redLine = new THREE.Line(geometry, redMaterial)
   → combines the SAME geometry object (not a copy) with redMaterial
 
-greenLine.geometry === redLine.geometry
+- greenLine.geometry === redLine.geometry
   → both reference the identical object created once above → true
 
-greenLine.material === redLine.material
+- greenLine.material === redLine.material
   → greenMaterial and redMaterial are two different objects → false
-```
 
 `geometry` is only ever constructed once in this whole trace — both
 `Line` objects hold a reference to that same object, not a copy of it,

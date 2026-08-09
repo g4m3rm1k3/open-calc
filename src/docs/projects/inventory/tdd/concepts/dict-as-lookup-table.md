@@ -54,23 +54,21 @@ all match: ['Sunday', 'Monday', 'Tuesday', 'Unknown']
 
 Both functions run against the same 4 inputs, traced side by side:
 
-```
-n=0: day_name_branching(0) → n==0 branch → "Sunday"
+- n=0: day_name_branching(0) → n==0 branch → "Sunday"
      day_name_lookup(0)    → _DAY_NAMES.get(0, "Unknown") → 0 is a key → "Sunday"
      assert "Sunday" == "Sunday" ✓
 
-n=1: day_name_branching(1) → n==0? No → n==1 branch → "Monday"
+- n=1: day_name_branching(1) → n==0? No → n==1 branch → "Monday"
      day_name_lookup(1)    → _DAY_NAMES.get(1, "Unknown") → 1 is a key → "Monday"
      assert "Monday" == "Monday" ✓
 
-n=2: day_name_branching(2) → n==0? No → n==1? No → n==2 branch → "Tuesday"
+- n=2: day_name_branching(2) → n==0? No → n==1? No → n==2 branch → "Tuesday"
      day_name_lookup(2)    → _DAY_NAMES.get(2, "Unknown") → 2 is a key → "Tuesday"
      assert "Tuesday" == "Tuesday" ✓
 
-n=5: day_name_branching(5) → n==0? No → n==1? No → n==2? No → else → "Unknown"
+- n=5: day_name_branching(5) → n==0? No → n==1? No → n==2? No → else → "Unknown"
      day_name_lookup(5)    → _DAY_NAMES.get(5, "Unknown") → 5 not a key → "Unknown"
      assert "Unknown" == "Unknown" ✓
-```
 
 Every real input takes a different number of comparisons in the
 branching version (`n=0` short-circuits immediately, `n=5` has to fail

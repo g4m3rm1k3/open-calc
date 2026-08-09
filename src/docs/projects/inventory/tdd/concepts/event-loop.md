@@ -53,14 +53,12 @@ loop: stopping
 The queue is pre-loaded with 3 items (`"tick"`, `"tick"`, `"stop"`)
 before `event_loop()` ever runs — traced against the real output above:
 
-```
-Iteration 1: events.get() → "tick"  (queue: ["tick", "stop"] remaining)
+- Iteration 1: events.get() → "tick"  (queue: ["tick", "stop"] remaining)
   "tick" == "stop"? No → print "loop: reacting to 'tick'"
-Iteration 2: events.get() → "tick"  (queue: ["stop"] remaining)
+- Iteration 2: events.get() → "tick"  (queue: ["stop"] remaining)
   "tick" == "stop"? No → print "loop: reacting to 'tick'"
-Iteration 3: events.get() → "stop"  (queue: [] remaining)
+- Iteration 3: events.get() → "stop"  (queue: [] remaining)
   "stop" == "stop"? Yes → print "loop: stopping"; break
-```
 
 The loop ran exactly 3 times — once per item that was ever put in the
 queue — and every single iteration's first action was the same blocking

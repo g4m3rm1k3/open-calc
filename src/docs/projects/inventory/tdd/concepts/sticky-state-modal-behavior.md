@@ -57,20 +57,18 @@ again
 `f.apply(cmd)` called once per command, `self.bold` carried across every
 call — traced against the real output above:
 
-```
-Start: f.bold = False
+- Start: f.bold = False
 
-cmd="hello":    not "BOLD_ON"/"BOLD_OFF" → style = "" (bold is False)
+- cmd="hello":    not "BOLD_ON"/"BOLD_OFF" → style = "" (bold is False)
                 → return "hello" → printed "hello"
-cmd="BOLD_ON":  → f.bold = True → returns None → nothing printed
-cmd="world":    not a mode command → style = "**" (bold is now True)
+- cmd="BOLD_ON":  → f.bold = True → returns None → nothing printed
+- cmd="world":    not a mode command → style = "**" (bold is now True)
                 → return "**world**" → printed "**world**"
-cmd="there":    not a mode command → style = "**" (bold still True)
+- cmd="there":    not a mode command → style = "**" (bold still True)
                 → return "**there**" → printed "**there**"
-cmd="BOLD_OFF": → f.bold = False → returns None → nothing printed
-cmd="again":    not a mode command → style = "" (bold is False again)
+- cmd="BOLD_OFF": → f.bold = False → returns None → nothing printed
+- cmd="again":    not a mode command → style = "" (bold is False again)
                 → return "again" → printed "again"
-```
 
 `"BOLD_ON"` is stated exactly once, yet the *next two* commands
 (`"world"`, `"there"`) both read `bold=True` — `self.bold` was never

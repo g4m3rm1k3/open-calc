@@ -62,24 +62,22 @@ rejected: NOT NULL constraint failed: pets.name
 Two real inserts, a real read-back loop, then a real rejected insert —
 traced against the real output above:
 
-```
-INSERT (name="Rex", age=3)   → id auto-assigned 1 → row (1, "Rex", 3)
-INSERT (name="Milo", no age) → id auto-assigned 2 → age has no
+- INSERT (name="Rex", age=3)   → id auto-assigned 1 → row (1, "Rex", 3)
+- INSERT (name="Milo", no age) → id auto-assigned 2 → age has no
   constraint → stored as NULL → row (2, "Milo", None)
-commit()
+- commit()
 
-for row in SELECT * FROM pets:
+- for row in SELECT * FROM pets:
   Row 1: (1, "Rex", 3)   → print (1, 'Rex', 3)
   Row 2: (2, "Milo", None) → print (2, 'Milo', None)
   (loop ends — only 2 rows exist)
 
-try: INSERT (age=5, no name)
+- try: INSERT (age=5, no name)
   → the database checks the NOT NULL constraint on `name` BEFORE
     storing anything → name is missing → constraint violated
   → raises sqlite3.IntegrityError("NOT NULL constraint failed: pets.name")
-except sqlite3.IntegrityError as e:
+- except sqlite3.IntegrityError as e:
   → print("rejected:", e)
-```
 
 The loop only ever sees the 2 rows that actually made it into the
 table — the third, rejected insert never became a row at all, so it

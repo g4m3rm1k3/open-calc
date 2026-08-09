@@ -60,16 +60,14 @@ nickname VARCHAR nullable
 `inspect(engine).get_columns("pets")` returns one dict per real column,
 iterated in table order — traced against the real output above:
 
-```
-column = {"name": "id", ...}:       type: int → INTEGER; primary_key=True → not nullable
+- column = {"name": "id", ...}:       type: int → INTEGER; primary_key=True → not nullable
   → print "id INTEGER required"
-column = {"name": "name", ...}:     type: str (no | None) → VARCHAR, not nullable
+- column = {"name": "name", ...}:     type: str (no | None) → VARCHAR, not nullable
   → print "name VARCHAR required"
-column = {"name": "age", ...}:      type: int (no | None) → INTEGER, not nullable
+- column = {"name": "age", ...}:      type: int (no | None) → INTEGER, not nullable
   → print "age INTEGER required"
-column = {"name": "nickname", ...}: type: str | None → VARCHAR, nullable
+- column = {"name": "nickname", ...}: type: str | None → VARCHAR, nullable
   → print "nickname VARCHAR nullable"
-```
 
 Every column in this loop was produced from the exact same real class
 body — `Mapped[str]` and `Mapped[str | None]` (on `name` and

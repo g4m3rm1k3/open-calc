@@ -70,24 +70,22 @@ Three real queries against the same two-row table
 (`Pet(name="Rex", age=3)`, `Pet(name="Milo", age=5)`), traced against
 the real output above:
 
-```
-select(Pet).order_by(Pet.age):
+- select(Pet).order_by(Pet.age):
   rows sorted by age ascending: Rex(3), Milo(5)
   .scalars().all() → [Pet(Rex), Pet(Milo)]
   → prints "all: ['Rex', 'Milo']"
 
-select(Pet).where(Pet.name == "Rex"):
+- select(Pet).where(Pet.name == "Rex"):
   checks Rex: name == "Rex"? Yes → matches
   checks Milo: name == "Rex"? No → excluded
   exactly 1 match → .scalar_one_or_none() returns Pet(Rex), not None
   → prints "found: Rex"
 
-select(Pet).where(Pet.name == "Fido"):
+- select(Pet).where(Pet.name == "Fido"):
   checks Rex: name == "Fido"? No → excluded
   checks Milo: name == "Fido"? No → excluded
   0 matches → .scalar_one_or_none() returns None (not an error)
   → prints "missing: None"
-```
 
 The third query is the one worth noticing: zero rows matching is a
 real, valid outcome `.scalar_one_or_none()` is specifically built to

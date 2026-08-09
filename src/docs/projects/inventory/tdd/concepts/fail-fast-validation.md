@@ -73,19 +73,17 @@ fail-fast version failed before charging anything: gadget has a negative price
 Both functions run against the identical
 `order = [("widget", 10), ("gadget", -5), ("gizmo", 20)]`:
 
-```
-process_order_lazy(order):
+- process_order_lazy(order):
   ("widget", 10): 10 < 0? No  → total=10 → print "charged for widget"
   ("gadget", -5): -5 < 0? Yes → raise InvalidOrderError("gadget has a negative price")
   → exits here, "gizmo" is never even reached
 
-process_order_fail_fast(order):
+- process_order_fail_fast(order):
   Validation-only pass:
     ("widget", 10): 10 < 0? No
     ("gadget", -5): -5 < 0? Yes → raise InvalidOrderError("gadget has a negative price")
   → exits here, inside the validation loop — the sum() and second
     "charged for" loop below it never run at all
-```
 
 The real, visible difference: `process_order_lazy` already printed
 `"charged for widget"` — a real, committed side effect — before it ever

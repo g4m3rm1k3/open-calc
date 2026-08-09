@@ -37,20 +37,39 @@ document exists anywhere in this repo (checked directly). Every real
 requirement below is grounded in what the actual, real code *does*, never
 in a guess at what an unavailable BRD section might have said.
 
-**No separate "Lesson 0" fundamentals arc — and, with the same-stack
-decision, less first-appearance overhead than expected.** Per
-`extraction.md`'s "Reference Implementation First" rule, concepts are
-extracted from completed, real feature work, not pre-scheduled.
-`concepts/` already has 101 real, existing files directly relevant to
+**Reversed: there is now a Lesson 0.** The original reasoning below
+(concepts extracted from completed real feature work, not
+pre-scheduled) is still generally the right default — but it produced a
+real, confirmed gap: Lesson 1.1 built a genuine Flask server before the
+reader had ever been told what a server is, what a client/server
+exchange actually looks like, how routing decides which code runs, or
+why a framework needs a standard interface like WSGI to run under any
+real web server at all. `concepts/client-server-architecture.md`,
+`concepts/http-request-response.md`, and
+`concepts/http-routing-dispatch-table.md` already existed, already
+covered exactly this, and
+were sitting completely uncited. `Lesson 0` (`curriculum/lesson-0-
+servers-clients-and-the-interface-between-them.md`) now surfaces those
+three plus one genuinely new file
+(`concepts/wsgi-application-interface.md`) before Lesson 1.1, so the
+reader has the real foundation before Flask, not surface-level pattern-
+matching on `@app.route` with no idea what it's standing on. This
+doesn't overturn the broader just-in-time principle below — a
+foundational, always-true prerequisite (what a server *is*) is
+different from a project-specific feature concept, and gets taught
+once, up front, exactly because every later lesson depends on it rather
+than one specific feature needing it.
+
+`concepts/` already has 101+ real, existing files directly relevant to
 this stack (`python-*`, `flask-*`, `sql-*`/`sqlalchemy-*`, `react-*`,
 `typescript-*`, `jsx-*`) from prior, real projects. Per the 100%-match
-rule (`extraction.md`), Arc 1 checks each one as it's actually needed:
-a genuine, exact match gets named and reused, not re-taught from
-scratch; anything that's only superficially similar, or genuinely new
-(Flask patterns specific to this app's own real architecture, for
-instance), still gets full, real treatment and its own new file. Expect
-Arc 1 to still be substantial — just not from-zero the way a Rust/Svelte
-Arc 1 would have been.
+rule (`extraction.md`), each Arc still checks these as needed: a
+genuine, exact match gets named and reused, not re-taught from scratch;
+anything only superficially similar, or genuinely new (Flask patterns
+specific to this app's own real architecture, for instance), still
+gets full, real treatment and its own new file. Expect each Arc to
+still be substantial — just not from-zero the way a Rust/Svelte
+version would have been.
 
 **No field is ever narrowed to *hide* it or pretend it's simpler than it
 really is** — the last attempt's real failure was silently narrowing

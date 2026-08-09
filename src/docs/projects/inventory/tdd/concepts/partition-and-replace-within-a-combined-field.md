@@ -81,14 +81,12 @@ print(result)
 
 `replace_group(["red", "large"], is_color, ["green"])`:
 
-```
-kept = [c for c in codes if not in_group(c)]
+- kept = [c for c in codes if not in_group(c)]
   c="red":   in_group("red")   → is_color("red")   → True  → not True  → False → excluded
   c="large": in_group("large") → is_color("large")  → False → not False → True  → kept
   kept = ["large"]
 
-return kept + new_values → ["large"] + ["green"] → ["large", "green"]
-```
+- return kept + new_values → ["large"] + ["green"] → ["large", "green"]
 
 Compare against the naive version, which never inspects `codes` at
 all — `naive_result = ["green"]` simply discards the whole list and

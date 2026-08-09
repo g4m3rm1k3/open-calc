@@ -51,18 +51,16 @@ OSError: [Errno 48] Address already in use
 Two real, sequential attempts to construct a `TCPServer` on the same
 `(address, port)` pair:
 
-```
-Terminal 1: TCPServer(("127.0.0.1", 9001), ...) constructed
+- Terminal 1: TCPServer(("127.0.0.1", 9001), ...) constructed
   → the OS successfully binds port 9001 to this process
   → prints "bound port 9001 successfully"
   → server.serve_forever() — this process now holds the port indefinitely
 
-Terminal 2 (while Terminal 1 is still running): TCPServer(("127.0.0.1", 9001), ...) constructed
+- Terminal 2 (while Terminal 1 is still running): TCPServer(("127.0.0.1", 9001), ...) constructed
   → the OS checks: is (127.0.0.1, 9001) already bound? → yes, by Terminal 1's process
   → the constructor itself raises: OSError: [Errno 48] Address already in use
   → "this should fail" is never reached — the exception happens during
     construction, before the with-block's own body even starts
-```
 
 Both attempts run the identical code — the only real difference is
 *when* each one runs relative to the other; the second one fails purely

@@ -51,21 +51,19 @@ true
 
 Both versions run against `points = [{x:1,y:2}, {x:3,y:4}, {x:5,y:6}]`:
 
-```
-Hand-written loop:
+- Hand-written loop:
   Start: labelsLoop = []
   p={x:1,y:2}: labelsLoop.push("(1, 2)") → labelsLoop = ["(1, 2)"]
   p={x:3,y:4}: labelsLoop.push("(3, 4)") → labelsLoop = ["(1, 2)", "(3, 4)"]
   p={x:5,y:6}: labelsLoop.push("(5, 6)") → labelsLoop = ["(1, 2)", "(3, 4)", "(5, 6)"]
 
-.map() version:
+- .map() version:
   p={x:1,y:2}: callback returns "(1, 2)" → collected
   p={x:3,y:4}: callback returns "(3, 4)" → collected
   p={x:5,y:6}: callback returns "(5, 6)" → collected
   labelsMap = ["(1, 2)", "(3, 4)", "(5, 6)"]
 
-JSON.stringify(labelsLoop) === JSON.stringify(labelsMap) → true
-```
+- JSON.stringify(labelsLoop) === JSON.stringify(labelsMap) → true
 
 Both traces visit the same 3 elements in the same order and produce the
 identical string at each step — `.map()` isn't computing anything

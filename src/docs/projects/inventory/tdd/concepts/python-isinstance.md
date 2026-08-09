@@ -49,23 +49,21 @@ False
 
 Four checks against the same real `fido = Dog()`:
 
-```
-isinstance(fido, Dog)
+- isinstance(fido, Dog)
   → fido's actual type is Dog → matches directly → True
 
-isinstance(fido, Animal)
+- isinstance(fido, Animal)
   → fido's actual type is Dog, not Animal directly
   → isinstance walks Dog's inheritance chain: Dog → Animal
   → Animal found in that chain → True
 
-type(fido) == Dog
+- type(fido) == Dog
   → type(fido) is exactly Dog → Dog == Dog → True
 
-type(fido) == Animal
+- type(fido) == Animal
   → type(fido) is exactly Dog, not Animal
   → Dog == Animal → False (no inheritance walk — this is a direct
     equality check between two type objects)
-```
 
 The third and fourth checks both use `type(fido)`, which returns the
 same exact value (`Dog`) both times — it's the comparison target

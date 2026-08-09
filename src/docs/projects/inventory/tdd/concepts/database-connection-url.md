@@ -52,12 +52,10 @@ mysql://user:password@localhost:3306/mydb
 The loop carries no state between iterations — each pass just prints one
 already-built string — so the trace is short, but real:
 
-```
-Iteration 1: url = "sqlite:///:memory:"                              → printed
-Iteration 2: url = "sqlite:////absolute/path/to/app.db"              → printed
-Iteration 3: url = "postgresql://user:password@localhost:5432/mydb"  → printed
-Iteration 4: url = "mysql://user:password@localhost:3306/mydb"       → printed
-```
+- Iteration 1: url = "sqlite:///:memory:"                              → printed
+- Iteration 2: url = "sqlite:////absolute/path/to/app.db"              → printed
+- Iteration 3: url = "postgresql://user:password@localhost:5432/mydb"  → printed
+- Iteration 4: url = "mysql://user:password@localhost:3306/mydb"       → printed
 
 Four structurally different real databases, one loop, one `print(url)`
 — the loop itself has no idea which dialect it's currently printing;

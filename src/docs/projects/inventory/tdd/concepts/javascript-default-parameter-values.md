@@ -66,21 +66,19 @@ entirely rather than merging with it.
 Two calls to the same function, each checked against the default's own
 condition ("is `actions` `undefined`?"):
 
-```
-Call 1: RibbonToolbar({ groups: [] })
+- Call 1: RibbonToolbar({ groups: [] })
   Destructuring {groups, actions = []} against {groups: []}
   → groups = [] (present in the object)
   → actions: is the "actions" property undefined? Yes (absent entirely)
   → default applies: actions = []
   console.log → "actions: [] length: 0"
 
-Call 2: RibbonToolbar({ groups: [], actions: [{id: "settings"}] })
+- Call 2: RibbonToolbar({ groups: [], actions: [{id: "settings"}] })
   Destructuring {groups, actions = []} against {groups: [], actions: [...]}
   → groups = []
   → actions: is the "actions" property undefined? No — it's [{id: "settings"}]
   → default does NOT apply: actions = [{id: "settings"}]  (the caller's own value, used as-is)
   console.log → "actions: [ { id: 'settings' } ] length: 1"
-```
 
 The default expression `[]` is evaluated fresh on Call 1 only — Call 2
 never touches it at all, since the condition that triggers it

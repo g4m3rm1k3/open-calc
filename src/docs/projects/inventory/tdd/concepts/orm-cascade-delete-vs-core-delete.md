@@ -85,12 +85,11 @@ remaining cars: []
 Attempt 1 (`session.delete()` on loaded objects), traced against the
 real `AssertionError`:
 
-```
-car = the loaded Car(id=1), with car.gas_engine = GasEngine(id=1)
-car.gas_engine is not None → True → session.delete(car.gas_engine)  (marked, not yet issued)
-car.electric_engine is not None → False (never created) → skipped
-session.delete(car)  (marked, not yet issued)
-session.commit() → triggers a flush:
+- car = the loaded Car(id=1), with car.gas_engine = GasEngine(id=1)
+- car.gas_engine is not None → True → session.delete(car.gas_engine)  (marked, not yet issued)
+- car.electric_engine is not None → False (never created) → skipped
+- session.delete(car)  (marked, not yet issued)
+- session.commit() → triggers a flush:
   unit of work examines Car's own relationship()s to figure out real
   dependency order before issuing any DELETE
   → sees GasEngine.id is a foreign key to car.id AND GasEngine's own
@@ -100,27 +99,24 @@ session.commit() → triggers a flush:
   → NULL into a primary key column is invalid → AssertionError, raised
     from inside SQLAlchemy itself, before any real SQL even reaches the
     database
-→ prints "FAILS: AssertionError Dependency rule on column 'car.id'
+- → prints "FAILS: AssertionError Dependency rule on column 'car.id'
    tried to blank-out primary key column 'gas_engine.id'"
-```
 
 Attempt 2 (explicit Core deletes, in dependency order):
 
-```
-car_id = 1 (queried fresh)
-execute(delete(GasEngine).where(GasEngine.id == 1))
+- car_id = 1 (queried fresh)
+- execute(delete(GasEngine).where(GasEngine.id == 1))
   → real DELETE FROM gas_engine WHERE id = 1, no relationship inference
     involved at all — the row is just gone
-execute(delete(ElectricEngine).where(ElectricEngine.id == 1))
+- execute(delete(ElectricEngine).where(ElectricEngine.id == 1))
   → real DELETE FROM electric_engine WHERE id = 1 — 0 rows affected
     (none existed), not an error
-execute(delete(Car).where(Car.id == 1))
+- execute(delete(Car).where(Car.id == 1))
   → real DELETE FROM car WHERE id = 1 — now safe, since gas_engine's
     own referencing row is already gone
-session.commit() → all three real deletes committed together
-query: select(Car) → [] (no cars remain)
-→ prints "remaining cars: []"
-```
+- session.commit() → all three real deletes committed together
+- query: select(Car) → [] (no cars remain)
+- → prints "remaining cars: []"
 
 The two attempts delete the exact same real rows, in the same real
 order (child before parent) — the only difference is *which mechanism*

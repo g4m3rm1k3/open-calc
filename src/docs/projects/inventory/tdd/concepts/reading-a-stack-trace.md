@@ -108,7 +108,6 @@ recent first.
 
 One call, traced through the stack it built before failing:
 
-```
 1. `summarize([])` is called at module level (the outermost frame).
 2. `summarize` calls `average([])` — a new frame is pushed onto the
    stack: [summarize, average].
@@ -122,7 +121,6 @@ One call, traced through the stack it built before failing:
    then the module-level call that started it all.
 6. With no code anywhere in this chain written to catch the exception,
    Python prints the full traceback and stops the program.
-```
 
 Nothing here is unique to this example — every uncaught exception in
 Python builds and prints its stack this same way, and every uncaught

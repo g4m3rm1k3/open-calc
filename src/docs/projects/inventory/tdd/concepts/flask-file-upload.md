@@ -96,19 +96,17 @@ with app.test_client() as c:
 Two real requests against the same route, each exercising a different
 branch — traced against the real output above:
 
-```
-Request 1: POST /upload, file=(BytesIO(b"hello world"), "../../etc/passwd")
+- Request 1: POST /upload, file=(BytesIO(b"hello world"), "../../etc/passwd")
   f = request.files.get("file")  → the uploaded file object, not None
   f is None or f.filename == ""?  → False → continue
   name = secure_filename("../../etc/passwd")  → "etc_passwd"
   data = f.read()  → b"hello world" (11 bytes)
   → return {"filename": "etc_passwd", "bytes": 11}, implicit 200
 
-Request 2: POST /upload, data={} (no file field at all)
+- Request 2: POST /upload, data={} (no file field at all)
   f = request.files.get("file")  → None (key not present)
   f is None or f.filename == ""?  → True → early return
   → return {"error": "no file"}, 400
-```
 
 Both requests run through the identical function body up to the
 presence check — the only thing that differs between them is what

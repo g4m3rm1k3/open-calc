@@ -49,17 +49,16 @@ got a Match object: <re.Match object; span=(8, 11), match='333'> -> 333
 
 Against `text = "a1 b22 c333"`, traced against the real output above:
 
-```
-all_at_once = re.findall(r"\d+", text)
+- all_at_once = re.findall(r"\d+", text)
   → scans the entire string immediately, finds all 3 matches
   → builds and returns a complete list right away: ['1', '22', '333']
   → type(all_at_once) → <class 'list'>
 
-one_at_a_time = re.finditer(r"\d+", text)
+- one_at_a_time = re.finditer(r"\d+", text)
   → returns an iterator immediately — no scanning has happened yet
   → type(one_at_a_time) → <class 'callable_iterator'>
 
-for match in one_at_a_time:
+- for match in one_at_a_time:
   Step 1: loop asks the iterator for the next match
     → iterator scans from where it left off (start of string), finds "1"
     → yields Match(span=(1,2), match='1')
@@ -73,7 +72,6 @@ for match in one_at_a_time:
     → yields Match(span=(8,11), match='333')
     → print(..., "->", "333")
   Step 4: loop asks again → iterator has nothing left → loop ends
-```
 
 `findall`'s single call does all 3 matches' worth of work before the
 `print` on the next line even runs; `finditer`'s iterator does none of

@@ -56,19 +56,17 @@ undefined
 Both calls iterate the identical `names = ["Rex", "Fido", "Buddy"]`,
 traced against the real output above:
 
-```
-names.map((name) => { console.log(...); }):
+- names.map((name) => { console.log(...); }):
   name="Rex":   logs "Hello, Rex"   → callback returns undefined (no return statement) → collected: [undefined]
   name="Fido":  logs "Hello, Fido"  → returns undefined → collected: [undefined, undefined]
   name="Buddy": logs "Hello, Buddy" → returns undefined → collected: [undefined, undefined, undefined]
   mapResult = [undefined, undefined, undefined]
 
-names.forEach((name) => { console.log(...); }):
+- names.forEach((name) => { console.log(...); }):
   name="Rex":   logs "Hello, Rex"   → return value discarded
   name="Fido":  logs "Hello, Fido"  → return value discarded
   name="Buddy": logs "Hello, Buddy" → return value discarded
   forEachResult = undefined
-```
 
 Both loops call the identical callback, in the identical order, with
 the identical side effect (`console.log`) — the only difference

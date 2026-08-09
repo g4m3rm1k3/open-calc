@@ -85,25 +85,23 @@ runs.
 
 ## Execution Trace
 
-```
-step=0, cmd="SET_URGENT": urgent_this_step=False (reset)
+- step=0, cmd="SET_URGENT": urgent_this_step=False (reset)
   cmd matches → urgent=True, urgent_this_step=True
   urgent and urgent_this_step → "freshly marked urgent"
 
-step=1, cmd="ping": urgent_this_step=False (reset)
+- step=1, cmd="ping": urgent_this_step=False (reset)
   cmd doesn't match → urgent stays True, urgent_this_step stays False
   urgent (True) but not urgent_this_step → "still urgent (not new)"
 
-step=2, cmd="ping": urgent_this_step=False (reset)
+- step=2, cmd="ping": urgent_this_step=False (reset)
   same as step 1 → "still urgent (not new)"
 
-step=3, cmd="SET_URGENT": urgent_this_step=False (reset)
+- step=3, cmd="SET_URGENT": urgent_this_step=False (reset)
   cmd matches → urgent=True (already was), urgent_this_step=True
   urgent and urgent_this_step → "freshly marked urgent"
 
-step=4, cmd="ping": urgent_this_step=False (reset)
+- step=4, cmd="ping": urgent_this_step=False (reset)
   → "still urgent (not new)"
-```
 
 The reset-every-iteration line is what makes steps 1, 2, and 4 read
 `urgent_this_step=False` even though `urgent` itself has been `True`

@@ -55,8 +55,7 @@ scan: [3, 4, 8, 9, 14]
 Both functions run against `numbers = [3, 1, 4, 1, 5]` — traced side by
 side to show exactly where they diverge:
 
-```
-running_total_fold:
+- running_total_fold:
   Start: total = 0
   n=3: total = 0+3 = 3    (not kept anywhere)
   n=1: total = 3+1 = 4    (not kept anywhere)
@@ -65,7 +64,7 @@ running_total_fold:
   n=5: total = 9+5 = 14   → returned
   Final: 14
 
-running_total_scan:
+- running_total_scan:
   Start: total = 0, history = []
   n=3: total = 0+3 = 3    → history.append(3)  → history = [3]
   n=1: total = 3+1 = 4    → history.append(4)  → history = [3, 4]
@@ -73,7 +72,6 @@ running_total_scan:
   n=1: total = 8+1 = 9    → history.append(9)  → history = [3, 4, 8, 9]
   n=5: total = 9+5 = 14   → history.append(14) → history = [3, 4, 8, 9, 14]
   Final: [3, 4, 8, 9, 14]
-```
 
 `total` takes the exact same 5 values, in the exact same order, in
 both functions — the scan version's only real difference is that it

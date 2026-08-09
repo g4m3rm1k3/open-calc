@@ -80,23 +80,21 @@ which would be both slower and ambiguous if any words repeated.
 `group_ranges(groups)` for `groups = [words[0:3], words[3:6], words[6:9]]`
 (three groups of 3), traced against the real output above:
 
-```
-Before the loop: cursor = 0, ranges = []
+- Before the loop: cursor = 0, ranges = []
 
-Group 1 (len 3): start = cursor = 0
+- Group 1 (len 3): start = cursor = 0
                  cursor += 3 → cursor = 3
                  ranges.append((0, 3-1)) → ranges = [(0, 2)]
 
-Group 2 (len 3): start = cursor = 3
+- Group 2 (len 3): start = cursor = 3
                  cursor += 3 → cursor = 6
                  ranges.append((3, 6-1)) → ranges = [(0, 2), (3, 5)]
 
-Group 3 (len 3): start = cursor = 6
+- Group 3 (len 3): start = cursor = 6
                  cursor += 3 → cursor = 9
                  ranges.append((6, 9-1)) → ranges = [(0, 2), (3, 5), (6, 8)]
 
-Final: ranges = [(0, 2), (3, 5), (6, 8)]
-```
+- Final: ranges = [(0, 2), (3, 5), (6, 8)]
 
 Each iteration reads `cursor` *before* advancing it (that's `start`) and
 writes the range using the value *after* advancing it (that's `end`) —

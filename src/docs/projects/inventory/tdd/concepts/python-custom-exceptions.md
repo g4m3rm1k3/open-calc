@@ -52,20 +52,18 @@ ok
 
 Two calls to `check_temp`, tracing both the raising and non-raising paths:
 
-```
-try: check_temp(-5)
+- try: check_temp(-5)
   t = -5.  t < 0? → True → raise TooColdError("-5 is below freezing")
   → normal execution inside check_temp stops immediately; the
     exception propagates up to the try block
-except TooColdError as e:
+- except TooColdError as e:
   → e is the TooColdError instance just raised
   → print("caught:", e) → "caught: -5 is below freezing"
 
-print(check_temp(10))
+- print(check_temp(10))
   t = 10.  t < 0? → False → skip the raise entirely
   → return "ok"
   → print("ok")
-```
 
 The first call never reaches its own `return "ok"` line at all — the
 `raise` inside the `if` block is a real, immediate exit from the

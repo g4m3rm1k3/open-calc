@@ -50,21 +50,19 @@ print(process_lines(lines, verbose_mode_enabled=True))
 The identical 3-line input, run through the loop twice — once per flag
 value — traced against the real output above:
 
-```
-process_lines(lines, verbose_mode_enabled=False):
+- process_lines(lines, verbose_mode_enabled=False):
   "real output":          is_debug_line=False → not skipped → results=["real output"]
   "#debug: internal state": is_debug_line=True → (True and False)=False → not skipped
                             → results=["real output", "#debug: internal state"]
   "more output":          is_debug_line=False → not skipped
                             → results=["real output", "#debug: internal state", "more output"]
 
-process_lines(lines, verbose_mode_enabled=True):
+- process_lines(lines, verbose_mode_enabled=True):
   "real output":          is_debug_line=False → not skipped → results=["real output"]
   "#debug: internal state": is_debug_line=True → (True and True)=True → continue (skipped!)
                             → results=["real output"]  (unchanged)
   "more output":          is_debug_line=False → not skipped
                             → results=["real output", "more output"]
-```
 
 `is_debug_line` is computed identically on every iteration in both
 runs — it's only the `and verbose_mode_enabled` half of the condition

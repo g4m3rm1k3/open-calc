@@ -45,31 +45,27 @@ print(total_via_reduce)
 
 The hand-written loop against `numbers = [3, 1, 4, 1, 5, 9]`:
 
-```
-Start: total = 0
-n=3: total = 0 + 3 = 3
-n=1: total = 3 + 1 = 4
-n=4: total = 4 + 4 = 8
-n=1: total = 8 + 1 = 9
-n=5: total = 9 + 5 = 14
-n=9: total = 14 + 9 = 23
-Final: total = 23
-```
+- Start: total = 0
+- n=3: total = 0 + 3 = 3
+- n=1: total = 3 + 1 = 4
+- n=4: total = 4 + 4 = 8
+- n=1: total = 8 + 1 = 9
+- n=5: total = 9 + 5 = 14
+- n=9: total = 14 + 9 = 23
+- Final: total = 23
 
 `reduce(lambda acc, n: acc + n, numbers, 0)` runs the identical
 sequence, just with `acc` as the parameter name instead of `total`, and
 the combining step expressed as a lambda instead of a loop body:
 
-```
-Start: acc = 0 (the initial value)
-acc=0, n=3: lambda(0, 3)  = 3   → acc = 3
-acc=3, n=1: lambda(3, 1)  = 4   → acc = 4
-acc=4, n=4: lambda(4, 4)  = 8   → acc = 8
-acc=8, n=1: lambda(8, 1)  = 9   → acc = 9
-acc=9, n=5: lambda(9, 5)  = 14  → acc = 14
-acc=14, n=9: lambda(14, 9) = 23 → acc = 23
-Final: total_via_reduce = 23
-```
+- Start: acc = 0 (the initial value)
+- acc=0, n=3: lambda(0, 3)  = 3   → acc = 3
+- acc=3, n=1: lambda(3, 1)  = 4   → acc = 4
+- acc=4, n=4: lambda(4, 4)  = 8   → acc = 8
+- acc=8, n=1: lambda(8, 1)  = 9   → acc = 9
+- acc=9, n=5: lambda(9, 5)  = 14  → acc = 14
+- acc=14, n=9: lambda(14, 9) = 23 → acc = 23
+- Final: total_via_reduce = 23
 
 Every intermediate accumulator value is identical between the two —
 `reduce` isn't computing anything differently, it's just the same

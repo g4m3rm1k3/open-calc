@@ -61,17 +61,15 @@ error TS2741: Property 'age' is missing in type '{ name: string; }' but required
 
 `tsc` checks `badPack: Dog[]`'s two elements against `Dog`, one at a time:
 
-```
-Element 0: { name: "Rex", age: 3 }
+- Element 0: { name: "Rex", age: 3 }
   has "name" (string)? Yes.  has "age" (number)? Yes.
   → matches Dog's shape → no error
 
-Element 1: { name: "NoAge" }
+- Element 1: { name: "NoAge" }
   has "name" (string)? Yes.  has "age" (number)? No — missing entirely.
   → does NOT match Dog's shape
   → error TS2741: Property 'age' is missing in type '{ name: string; }'
     but required in type 'Dog'.
-```
 
 `Dog[]` doesn't just check "is this an array" once at the top — it
 re-applies the full `Dog` shape check to every individual element, which
@@ -80,11 +78,9 @@ incomplete one is caught specifically.
 
 Real (valid) `pack.map((dog) => dog.name)`, run at runtime:
 
-```
-dog={name:"Rex",age:3}:  → "Rex"
-dog={name:"Fido",age:5}: → "Fido"
-Final: ["Rex", "Fido"]
-```
+- dog={name:"Rex",age:3}:  → "Rex"
+- dog={name:"Fido",age:5}: → "Fido"
+- Final: ["Rex", "Fido"]
 
 ## CS Lens
 

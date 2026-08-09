@@ -62,8 +62,7 @@ scene.add(gridRotated);
 Two separately-constructed grids, same size/divisions, traced against
 their real, different orientations:
 
-```
-grid = new THREE.GridHelper(500, 50, 0x131c28, 0x131c28)
+- grid = new THREE.GridHelper(500, 50, 0x131c28, 0x131c28)
   → internally builds 51 lines one direction + 51 the other = 102
     real line segments, as real vertex geometry
   → grid.geometry.attributes.position.count → 204 (2 vertices per
@@ -71,16 +70,15 @@ grid = new THREE.GridHelper(500, 50, 0x131c28, 0x131c28)
   → print(102)
   → default orientation: flat on the X/Z plane (Y-up convention)
 
-gridDefault = new THREE.GridHelper(500, 50)  → same construction,
+- gridDefault = new THREE.GridHelper(500, 50)  → same construction,
   no rotation applied → stays flat on X/Z, identical to `grid` above
 
-gridRotated = new THREE.GridHelper(500, 50)  → identical construction
-gridRotated.rotation.x = Math.PI / 2
+- gridRotated = new THREE.GridHelper(500, 50)  → identical construction
+- gridRotated.rotation.x = Math.PI / 2
   → this ONE property write reorients the whole object: what was
     flat on X/Z now lies flat on X/Y instead — the underlying
     geometry (which vertices, how many) is completely unchanged;
     only the object's own transform changed
-```
 
 `gridDefault` and `gridRotated` are built from the identical
 constructor call — the only difference in this entire trace is the one

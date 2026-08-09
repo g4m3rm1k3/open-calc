@@ -54,25 +54,23 @@ FrozenInstanceError cannot assign to field 'x'
 Three real operations against two separately-constructed instances,
 traced against the real output above:
 
-```
-p1 = Point(1, 2)  → generated __init__(self, x, y) runs → p1.x=1, p1.y=2
-p2 = Point(1, 2)  → a second, separate instance → p2.x=1, p2.y=2
+- p1 = Point(1, 2)  → generated __init__(self, x, y) runs → p1.x=1, p1.y=2
+- p2 = Point(1, 2)  → a second, separate instance → p2.x=1, p2.y=2
 
-print(p1)
+- print(p1)
   → generated __repr__ runs → "Point(x=1, y=2)"
 
-print(p1 == p2)
+- print(p1 == p2)
   → generated __eq__ runs → compares p1.x==p2.x (1==1 → True) and
     p1.y==p2.y (2==2 → True) → both True → overall True
   → printed: True
 
-p1.x = 99
+- p1.x = 99
   → frozen=True's own __setattr__ override intercepts this assignment
     before it ever reaches p1's real storage
   → raises FrozenInstanceError("cannot assign to field 'x'")
   → caught by except Exception as e
   → printed: "FrozenInstanceError cannot assign to field 'x'"
-```
 
 `p1` and `p2` are two distinct objects in memory the entire time —
 `p1 == p2` being `True` comes entirely from the generated `__eq__`

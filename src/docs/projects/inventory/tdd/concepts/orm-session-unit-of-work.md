@@ -64,24 +64,22 @@ visible from a fresh session: ['Rex']
 
 `session.new`'s own real state, traced across the commit boundary:
 
-```
-session.add(Pet(name="Rex"))
+- session.add(Pet(name="Rex"))
   → the Pet object is staged, not yet inserted
   → session.new = IdentitySet({<Pet object>})  (one pending object)
   → prints "pending before commit: IdentitySet({<Pet object>})"
 
-session.commit()
+- session.commit()
   → flushes the pending Pet as a real INSERT, then commits the transaction
   → the object is no longer "new" — it's now a committed, persistent row
   → session.new = IdentitySet({})  (empty — nothing pending anymore)
   → prints "pending after commit: IdentitySet({})"
 
-second_session = a completely separate Session, same engine
-second_session.execute(select(Pet)).scalars().all()
+- second_session = a completely separate Session, same engine
+- second_session.execute(select(Pet)).scalars().all()
   → queries the real database fresh — not the first session's own memory
   → finds the row committed above
   → prints "visible from a fresh session: ['Rex']"
-```
 
 `session.new` is real, live bookkeeping that changes shape at exactly
 one moment — the `commit()` call — going from "one pending object" to

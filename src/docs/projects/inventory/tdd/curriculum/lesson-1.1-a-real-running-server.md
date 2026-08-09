@@ -10,8 +10,11 @@ plain Python program into something a network client can talk to.
 
 ## What you need to know first
 
-Nothing project-specific — this is the first lesson. General Python
-(functions, `if __name__`) is assumed; everything Flask-specific is
+Lesson 0 — what a server/client actually are, the real shape of an
+HTTP request/response, how routing decides which code runs, and what
+WSGI is. This lesson assumes all four and builds the first real thing
+that uses them together. General Python (functions, `if __name__`) is
+also assumed; everything Flask-specific beyond Lesson 0's foundation is
 taught from scratch, in
 `concepts/flask-application-and-route-decorator.md`.
 
@@ -205,7 +208,6 @@ function already is the entire new structure.
 This code runs, so trace what actually happens on one real request —
 that's what an execution trace means here, not just for a loop:
 
-```
 1. `python run.py` runs. `create_app()` executes once: it builds `app`,
    registers `/health` → `health_check` in Flask's internal routing
    table, and returns `app`. `app.run(port=5000)` binds port 5000 on
@@ -224,7 +226,6 @@ that's what an execution trace means here, not just for a loop:
    header.
 7. `curl` prints the body it received:
    `{"message":"Manufacturing Platform API is running","status":"healthy"}`
-```
 
 A request for any path other than `/health` never finds an entry in
 step 4's routing table — traced concretely in "What breaks without

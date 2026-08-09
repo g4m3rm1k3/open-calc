@@ -68,25 +68,23 @@ with pooling, 20 queries:    0.00s
 traced against the real 0.05s-per-`fake_connect()` cost and the real
 timings above:
 
-```
-FakePool(size=5) construction:
+- FakePool(size=5) construction:
   self.connections = [fake_connect() for _ in range(5)]
   → 5 calls to fake_connect(), each sleeping 0.05s → ~0.25s paid once, upfront
 
-without_pooling(20):
+- without_pooling(20):
   Iteration 1:  conn = fake_connect()  → sleeps 0.05s
   Iteration 2:  conn = fake_connect()  → sleeps 0.05s
   ...
   Iteration 20: conn = fake_connect()  → sleeps 0.05s
   → 20 real 0.05s sleeps, one per iteration → total ≈ 1.00s
 
-with_pooling(20, pool):
+- with_pooling(20, pool):
   Iteration 1:  conn = pool.borrow()  → returns connections[0], no sleep
   Iteration 2:  conn = pool.borrow()  → returns connections[0] again, no sleep
   ...
   Iteration 20: conn = pool.borrow()  → returns connections[0] again, no sleep
   → 0 real sleeps inside the loop → total ≈ 0.00s
-```
 
 The loop shape is identical in both functions — 20 iterations, one
 `conn = ...` per iteration — the entire real cost difference comes from

@@ -56,15 +56,13 @@ bob: 95 (silver)
 `Object.entries(scoresByPlayer)` returns 2 real `[key, Score]` pairs,
 iterated in insertion order:
 
-```
-Object.entries(scoresByPlayer) → [["alice", {points:120,level:"gold"}],
+- Object.entries(scoresByPlayer) → [["alice", {points:120,level:"gold"}],
                                    ["bob", {points:95,level:"silver"}]]
 
-Iteration 1: [player, score] = ["alice", {points:120, level:"gold"}]
+- Iteration 1: [player, score] = ["alice", {points:120, level:"gold"}]
   → console.log("alice: 120 (gold)")
-Iteration 2: [player, score] = ["bob", {points:95, level:"silver"}]
+- Iteration 2: [player, score] = ["bob", {points:95, level:"silver"}]
   → console.log("bob: 95 (silver)")
-```
 
 Every `score` value destructured in this loop is statically known to be
 a `Score` — `score.points`/`score.level` are checked against that

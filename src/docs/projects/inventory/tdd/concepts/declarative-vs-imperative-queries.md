@@ -71,19 +71,17 @@ underlying data.
 The imperative version's real step-by-step state, traced against
 `pets = [Rex/3, Milo/5, Fido/1]`:
 
-```
-Before the loop: result = []
+- Before the loop: result = []
 
-pet = {name: "Rex", age: 3}:  age (3) > 2  → True  → result.append(Rex)
+- pet = {name: "Rex", age: 3}:  age (3) > 2  → True  → result.append(Rex)
                                result = [Rex]
-pet = {name: "Milo", age: 5}: age (5) > 2  → True  → result.append(Milo)
+- pet = {name: "Milo", age: 5}: age (5) > 2  → True  → result.append(Milo)
                                result = [Rex, Milo]
-pet = {name: "Fido", age: 1}: age (1) > 2  → False → not appended
+- pet = {name: "Fido", age: 1}: age (1) > 2  → False → not appended
                                result = [Rex, Milo]  (unchanged)
 
-result.sort(key=lambda p: p["name"]) → compares "Rex" vs "Milo" alphabetically
+- result.sort(key=lambda p: p["name"]) → compares "Rex" vs "Milo" alphabetically
   "Milo" < "Rex" → result = [Milo, Rex]
-```
 
 The declarative version has no equivalent trace to walk — `SELECT *
 FROM pets WHERE age > 2 ORDER BY name` names the same filter and sort as

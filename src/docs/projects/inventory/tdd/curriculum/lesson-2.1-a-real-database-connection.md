@@ -242,7 +242,6 @@ current content is shown whole above.
 
 This code runs on every server startup — trace it:
 
-```
 1. `python run.py` calls `create_app()`.
 2. `config_name` is `None` (the default), so it falls back to
    `os.environ.get('FLASK_ENV', 'development')` → `'development'`
@@ -263,7 +262,6 @@ This code runs on every server startup — trace it:
    exist — currently zero, since no model has been declared yet.
 8. `/health` is registered, as in Lesson 1.1. `create_app()` returns
    `app`. `run.py` starts listening.
-```
 
 ## CS Lens
 

@@ -110,19 +110,17 @@ relationship trying (and failing) to commit to one owner.
 Two real `CatalogEntry` rows, each resolved against both relationships,
 traced against the real output above:
 
-```
-for entry in session.query(CatalogEntry).all():  → 2 real entries
+- for entry in session.query(CatalogEntry).all():  → 2 real entries
 
-Entry 1: CatalogEntry(id=1, name="A real widget's catalog row")
+- Entry 1: CatalogEntry(id=1, name="A real widget's catalog row")
   entry.widget: primaryjoin CatalogEntry.id(1) == Widget.id → Widget(id=1) exists → <Widget id=1>
   entry.gadget: primaryjoin CatalogEntry.id(1) == Gadget.id → no Gadget with id=1 → None
   → print "A real widget's catalog row -> widget: <Widget id=1> gadget: None"
 
-Entry 2: CatalogEntry(id=2, name="A real gadget's catalog row")
+- Entry 2: CatalogEntry(id=2, name="A real gadget's catalog row")
   entry.widget: primaryjoin CatalogEntry.id(2) == Widget.id → no Widget with id=2 → None
   entry.gadget: primaryjoin CatalogEntry.id(2) == Gadget.id → Gadget(id=2) exists → <Gadget id=2>
   → print "A real gadget's catalog row -> widget: None gadget: <Gadget id=2>"
-```
 
 Both relationships are evaluated for *every* entry, every iteration —
 `entry.widget` doesn't know in advance that entry 2 won't match; it

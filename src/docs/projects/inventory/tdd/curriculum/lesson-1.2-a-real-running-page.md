@@ -329,7 +329,6 @@ All three files are brand-new and shown whole above.
 The page runs, so trace what a browser actually does with it, start to
 finish:
 
-```
 1. `npm run dev` starts Vite, listening on http://localhost:5173.
 2. A browser requests `http://localhost:5173/`. Vite serves
    `index.html` as written above.
@@ -347,7 +346,6 @@ finish:
    result is the JSX `<div>Rebuild in progress</div>`.
 7. React inserts that into the real DOM, inside `#root`. The browser now
    shows the text "Rebuild in progress" on the page.
-```
 
 ### CS Lens
 

@@ -53,8 +53,7 @@ uncompiled: 0.1842s, compiled: 0.1213s
 The two loops run the identical 50 iterations each — what differs is
 what happens *inside* each iteration, not the loop shape:
 
-```
-Uncompiled loop:
+- Uncompiled loop:
   Iteration 1:  re.findall(r"\d+", text) → parses "\d+" into an internal
                 pattern representation, THEN scans text → result discarded
   Iteration 2:  re.findall(r"\d+", text) → parses "\d+" again (Python's
@@ -64,7 +63,7 @@ Uncompiled loop:
   Iteration 50: same as above
   → uncompiled_time = total wall-clock time for all 50 parse+scan passes
 
-Compiled loop:
+- Compiled loop:
   (parsing already happened once, before this loop even starts:
    compiled = re.compile(r"\d+"))
   Iteration 1:  compiled.findall(text) → scans text directly, no parsing
@@ -72,7 +71,6 @@ Compiled loop:
   ...
   Iteration 50: same as above
   → compiled_time = total wall-clock time for 50 scan-only passes
-```
 
 Both loops do the identical real scanning work (50 passes over the
 same 130,000-character `text`) — the only structural difference is that

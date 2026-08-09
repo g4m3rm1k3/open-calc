@@ -104,16 +104,14 @@ file actually occupies right now.
 One file, three real state transitions, traced against the exact
 commands and output above:
 
-```
-git init                    → notes.txt doesn't exist yet
-echo "version 1" > notes.txt → notes.txt exists, git has never seen it: UNTRACKED
-git add notes.txt           → git now has "version 1" queued: STAGED
-git commit -m "..."         → "version 1" written to history permanently.
+- git init                    → notes.txt doesn't exist yet
+- echo "version 1" > notes.txt → notes.txt exists, git has never seen it: UNTRACKED
+- git add notes.txt           → git now has "version 1" queued: STAGED
+- git commit -m "..."         → "version 1" written to history permanently.
                                Staging area cleared. File now: unmodified,
                                matches the last commit exactly.
-echo "version 2" >> notes.txt → file content now differs from the last
+- echo "version 2" >> notes.txt → file content now differs from the last
                                commit, nothing staged for it: MODIFIED
-```
 
 Each transition happened because of exactly one command — staging didn't
 happen automatically when the file changed, and committing didn't happen

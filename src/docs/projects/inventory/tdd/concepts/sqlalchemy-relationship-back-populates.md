@@ -70,28 +70,26 @@ Le Guin
 Two books added with `author=a` (never touching `a.books` directly),
 then read back from both directions — traced against the real output above:
 
-```
-a = Author(name="Le Guin")
-session.add(a)
-session.add(Book(title="The Dispossessed", author=a))
+- a = Author(name="Le Guin")
+- session.add(a)
+- session.add(Book(title="The Dispossessed", author=a))
   → back_populates syncs the reverse direction automatically:
     a.books now includes this Book, even though a.books was never
     assigned to directly
-session.add(Book(title="The Left Hand of Darkness", author=a))
+- session.add(Book(title="The Left Hand of Darkness", author=a))
   → same automatic sync → a.books now has both books
-session.commit()
+- session.commit()
 
-row = select(Author).scalar_one() → the real, committed Author (Le Guin)
-print(row.name) → "Le Guin"
-print([b.title for b in row.books]):
+- row = select(Author).scalar_one() → the real, committed Author (Le Guin)
+- print(row.name) → "Le Guin"
+- print([b.title for b in row.books]):
   b=Book("The Dispossessed"):        → "The Dispossessed"
   b=Book("The Left Hand of Darkness"): → "The Left Hand of Darkness"
   → ['The Dispossessed', 'The Left Hand of Darkness']
 
-book = select(Book).where(title LIKE "%Dispossessed%").scalar_one()
+- book = select(Book).where(title LIKE "%Dispossessed%").scalar_one()
   → The Dispossessed, found by title
-print(book.author.name) → follows the "one" direction back → "Le Guin"
-```
+- print(book.author.name) → follows the "one" direction back → "Le Guin"
 
 `a.books` was never written to directly anywhere in this trace — both
 entries in it came entirely from `back_populates` watching the

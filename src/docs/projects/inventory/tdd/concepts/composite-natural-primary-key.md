@@ -89,17 +89,15 @@ these rows individually addressable.
 Three real rows inserted, then read back — traced against the real
 output above:
 
-```
-Insert: OutlineSegment(shape_id=1, position=0, x=0.0, y=0.0)
-Insert: OutlineSegment(shape_id=1, position=1, x=1.0, y=0.0)
-Insert: OutlineSegment(shape_id=2, position=0, x=0.0, y=0.0)
-session.commit() → all three rows written, keyed by (shape_id, position)
+- Insert: OutlineSegment(shape_id=1, position=0, x=0.0, y=0.0)
+- Insert: OutlineSegment(shape_id=1, position=1, x=1.0, y=0.0)
+- Insert: OutlineSegment(shape_id=2, position=0, x=0.0, y=0.0)
+- session.commit() → all three rows written, keyed by (shape_id, position)
 
-Query: order_by(shape_id, position) — sorts by the composite key itself
-Row 1: (shape_id=1, position=0) → "1 0 0.0 0.0"
-Row 2: (shape_id=1, position=1) → "1 1 1.0 0.0"
-Row 3: (shape_id=2, position=0) → "2 0 0.0 0.0"
-```
+- Query: order_by(shape_id, position) — sorts by the composite key itself
+- Row 1: (shape_id=1, position=0) → "1 0 0.0 0.0"
+- Row 2: (shape_id=1, position=1) → "1 1 1.0 0.0"
+- Row 3: (shape_id=2, position=0) → "2 0 0.0 0.0"
 
 Note `(shape_id=1, position=0)` and `(shape_id=2, position=0)` are two
 different, valid rows — `position=0` repeats across shapes, which is

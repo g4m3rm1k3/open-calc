@@ -98,25 +98,23 @@ advance.
 independent of the other except that both write into the same shared
 `camera` object:
 
-```
-frameCamera(camera, tiny):  tiny = Mesh(SphereGeometry(radius=0.05))
+- frameCamera(camera, tiny):  tiny = Mesh(SphereGeometry(radius=0.05))
   box.setFromObject(tiny) → size = (0.1, 0.1, 0.1), center = (0, 0, 0)
   maxDimension = max(0.1, 0.1, 0.1, 0.001) = 0.1
   distance = 0.1 * 2 = 0.2
   camera.position = (0+0.2, 0-0.2, 0+0.12) = (0.2, -0.2, 0.12)
   camera.near = 0.1/100 = 0.001; camera.far = 0.1*100 = 10
   return center = (0, 0, 0)
-distance from camera.position to (0,0,0) = sqrt(0.2² + 0.2² + 0.12²) ≈ 0.3072
+- distance from camera.position to (0,0,0) = sqrt(0.2² + 0.2² + 0.12²) ≈ 0.3072
 
-frameCamera(camera, huge):  huge = Mesh(SphereGeometry(radius=50))
+- frameCamera(camera, huge):  huge = Mesh(SphereGeometry(radius=50))
   box.setFromObject(huge) → size = (100, 100, 100), center = (0, 0, 0)
   maxDimension = max(100, 100, 100, 0.001) = 100
   distance = 100 * 2 = 200
   camera.position = (0+200, 0-200, 0+120) = (200, -200, 120)  ← overwrites the tiny-object values
   camera.near = 100/100 = 1; camera.far = 100*100 = 10000
   return center = (0, 0, 0)
-distance from camera.position to (0,0,0) = sqrt(200² + 200² + 120²) ≈ 307.25
-```
+- distance from camera.position to (0,0,0) = sqrt(200² + 200² + 120²) ≈ 307.25
 
 The second call doesn't combine with or average against the first —
 `camera.position`, `.near`, and `.far` are simply overwritten wholesale,

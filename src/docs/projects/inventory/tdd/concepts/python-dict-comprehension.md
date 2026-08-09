@@ -55,20 +55,18 @@ True
 
 Both versions iterate the same `allowed_fields = ("name", "type", "diameter_mm")` against the same `body`:
 
-```
-By hand:
+- By hand:
   Start: by_hand = {}
   field="name":         "name" in body?         → True  → by_hand["name"] = "face_mill_50"
   field="type":         "type" in body?         → True  → by_hand["type"] = "Face Mill"
   field="diameter_mm":  "diameter_mm" in body?  → True  → by_hand["diameter_mm"] = 50
   Final: by_hand = {'name': 'face_mill_50', 'type': 'Face Mill', 'diameter_mm': 50}
 
-Comprehension — identical 3 checks, same order:
+- Comprehension — identical 3 checks, same order:
   field="name":         in body → include ("name", "face_mill_50")
   field="type":         in body → include ("type", "Face Mill")
   field="diameter_mm":  in body → include ("diameter_mm", 50)
   Final: comprehension = {'name': 'face_mill_50', 'type': 'Face Mill', 'diameter_mm': 50}
-```
 
 `"unexpected_field"` never appears in either trace at all — both loops
 only ever iterate `allowed_fields` (3 items), never `body`'s own keys

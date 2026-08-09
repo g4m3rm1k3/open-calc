@@ -46,18 +46,16 @@ size: 500x220
 
 Two real callback firings, traced against the real output above:
 
-```
-observer.observe(box) called
+- observer.observe(box) called
   → callback fires immediately (1st firing), entries = [one entry for #box]
   → entry.contentRect = {width: 300, height: 100} (the element's starting size)
   → for (const entry of entries): one iteration, logs "size: 300x100"
 
-#box's width/height changed to 500px/220px via JavaScript
+- #box's width/height changed to 500px/220px via JavaScript
   → browser detects the real size change, schedules the callback again
   → callback fires (2nd firing), entries = [one entry for #box]
   → entry.contentRect = {width: 500, height: 220} (the new size)
   → for (const entry of entries): one iteration, logs "size: 500x220"
-```
 
 The `for...of` loop inside the callback runs exactly once per firing here
 (one observed element), but its real job is handling *however many*

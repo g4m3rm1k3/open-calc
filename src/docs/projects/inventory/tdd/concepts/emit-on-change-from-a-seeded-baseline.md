@@ -90,25 +90,21 @@ after that.
 The naive version, seeded from `None`, against
 `readings = ["green", "green", "yellow", "yellow", "red"]`:
 
-```
-Start: last = None
-value="green":  "green" != None  → True  → print "changed to green"; last="green"
-value="green":  "green" != "green" → False → nothing printed
-value="yellow": "yellow" != "green" → True → print "changed to yellow"; last="yellow"
-value="yellow": "yellow" != "yellow" → False → nothing printed
-value="red":    "red" != "yellow" → True → print "changed to red"; last="red"
-```
+- Start: last = None
+- value="green":  "green" != None  → True  → print "changed to green"; last="green"
+- value="green":  "green" != "green" → False → nothing printed
+- value="yellow": "yellow" != "green" → True → print "changed to yellow"; last="yellow"
+- value="yellow": "yellow" != "yellow" → False → nothing printed
+- value="red":    "red" != "yellow" → True → print "changed to red"; last="red"
 
 The fixed version, seeded from the real baseline `"green"`:
 
-```
-Start: last = "green"  (already_shown_elsewhere, not None)
-value="green":  "green" != "green" → False → nothing printed
-value="green":  "green" != "green" → False → nothing printed
-value="yellow": "yellow" != "green" → True → print "changed to yellow"; last="yellow"
-value="yellow": "yellow" != "yellow" → False → nothing printed
-value="red":    "red" != "yellow" → True → print "changed to red"; last="red"
-```
+- Start: last = "green"  (already_shown_elsewhere, not None)
+- value="green":  "green" != "green" → False → nothing printed
+- value="green":  "green" != "green" → False → nothing printed
+- value="yellow": "yellow" != "green" → True → print "changed to yellow"; last="yellow"
+- value="yellow": "yellow" != "yellow" → False → nothing printed
+- value="red":    "red" != "yellow" → True → print "changed to red"; last="red"
 
 Same 5 real readings, same loop, same comparison — only `last`'s
 starting value differs, and that one difference is what turns a false

@@ -64,15 +64,13 @@ const contents: string = fs.readFileSync("data.txt", "utf-8");
 `leftpad`'s own real `while` loop, run at actual runtime (unaffected by
 whether `tsc` can see its types) for `leftpad("5", 3, "0")`:
 
-```
-Start: str = "5" (length 1)
-Check: str.length (1) < len (3)? → True
+- Start: str = "5" (length 1)
+- Check: str.length (1) < len (3)? → True
   str = "0" + "5" = "05" (length 2)
-Check: str.length (2) < len (3)? → True
+- Check: str.length (2) < len (3)? → True
   str = "0" + "05" = "005" (length 3)
-Check: str.length (3) < len (3)? → False → loop ends
-Return: "005"
-```
+- Check: str.length (3) < len (3)? → False → loop ends
+- Return: "005"
 
 This loop runs identically whether `@types/leftpad-demo` is installed
 or not — the `TS7016` error (before installing) and the clean compile

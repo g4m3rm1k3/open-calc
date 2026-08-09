@@ -61,18 +61,16 @@ xabc -> False
 All 5 real test strings, character by character, traced against the
 real output above:
 
-```
-"ac":    start --a--> seen_a --c--> accept.  End of input, state=accept → True
-"abc":   start --a--> seen_a --b--> seen_a (stays) --c--> accept.  → True
-"abbbc": start --a--> seen_a --b--> seen_a --b--> seen_a --b--> seen_a --c--> accept.  → True
-"abcx":  start --a--> seen_a --b--> seen_a --c--> accept --x--> reject
+- "ac":    start --a--> seen_a --c--> accept.  End of input, state=accept → True
+- "abc":   start --a--> seen_a --b--> seen_a (stays) --c--> accept.  → True
+- "abbbc": start --a--> seen_a --b--> seen_a --b--> seen_a --b--> seen_a --c--> accept.  → True
+- "abcx":  start --a--> seen_a --b--> seen_a --c--> accept --x--> reject
          (the "accept" branch: state = "reject", nothing allowed after c)
          End of input, state=reject → False
-"xabc":  start --x--> reject (start branch: ch is not "a" → reject)
+- "xabc":  start --x--> reject (start branch: ch is not "a" → reject)
          --a--> break (the "reject" branch exits the loop immediately,
          "b" and "c" are never even read)
          End (via break), state=reject → False
-```
 
 `"abbbc"` is the one worth noticing for the "finite" part of "finite
 state machine": however many `b`s appear, the machine stays in the

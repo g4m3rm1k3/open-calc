@@ -87,17 +87,15 @@ so there's nothing to configure.
 The same input, `43`, run through `apply_m_data_driven` twice with two
 different banks:
 
-```
-Call 1: apply_m_data_driven(43, MACHINE_M_CODES["okuma"])
+- Call 1: apply_m_data_driven(43, MACHINE_M_CODES["okuma"])
   bank = {"spindle_cw": [3, 43], "coolant_flood": [8, 51]}
   43 in bank["spindle_cw"] ([3, 43])?    → True  → return "spindle_cw"
 
-Call 2: apply_m_data_driven(43, MACHINE_M_CODES["fanuc"])
+- Call 2: apply_m_data_driven(43, MACHINE_M_CODES["fanuc"])
   bank = {"spindle_cw": [3], "coolant_flood": [8]}
   43 in bank["spindle_cw"] ([3])?        → False
   43 in bank["coolant_flood"] ([8])?     → False
   → falls through to return "unknown"
-```
 
 `apply_m_data_driven`'s own source code never changed between the two
 calls — only the `bank` argument did. `apply_g_hardcoded(0)`, by

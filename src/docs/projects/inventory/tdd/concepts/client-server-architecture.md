@@ -63,19 +63,17 @@ server: got 'what time is it?', answering
 The `while True` loop runs across two threads at once — traced as the
 real sequence of events, not just what each thread does in isolation:
 
-```
-Main thread: starts server_thread
-Server thread: enters while True, calls mailbox.get() → blocks (queue empty)
-Main thread: prints "client: sending a request"
-Main thread: mailbox.put("what time is it?")
-Server thread: mailbox.get() unblocks, returns "what time is it?"
-Server thread: request != "STOP" → prints "server: got 'what time is it?', answering"
-Server thread: loop repeats, calls mailbox.get() again → blocks (queue empty again)
-Main thread: mailbox.put("STOP")
-Server thread: mailbox.get() unblocks, returns "STOP"
-Server thread: request == "STOP" → break, loop ends, thread finishes
-Main thread: server_thread.join() returns (server thread already finished)
-```
+- Main thread: starts server_thread
+- Server thread: enters while True, calls mailbox.get() → blocks (queue empty)
+- Main thread: prints "client: sending a request"
+- Main thread: mailbox.put("what time is it?")
+- Server thread: mailbox.get() unblocks, returns "what time is it?"
+- Server thread: request != "STOP" → prints "server: got 'what time is it?', answering"
+- Server thread: loop repeats, calls mailbox.get() again → blocks (queue empty again)
+- Main thread: mailbox.put("STOP")
+- Server thread: mailbox.get() unblocks, returns "STOP"
+- Server thread: request == "STOP" → break, loop ends, thread finishes
+- Main thread: server_thread.join() returns (server thread already finished)
 
 The loop iterates exactly twice — once per real `put()` call — and
 spends nearly all of its time *blocked inside* `mailbox.get()`, not

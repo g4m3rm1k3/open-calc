@@ -61,25 +61,23 @@ print(repo.find_by_name("drill_hss"))
 
 Two real adds, then two real reads, traced against the real output above:
 
-```
-repo = ToolRepository()  → self._tools = [] (the `or []` default applies)
+- repo = ToolRepository()  → self._tools = [] (the `or []` default applies)
 
-repo.add({"name": "end_mill_4fl", "diameter_mm": 10})
+- repo.add({"name": "end_mill_4fl", "diameter_mm": 10})
   → self._tools.append(...) → _tools = [end_mill_4fl]
 
-repo.add({"name": "drill_hss", "diameter_mm": 6})
+- repo.add({"name": "drill_hss", "diameter_mm": 6})
   → self._tools.append(...) → _tools = [end_mill_4fl, drill_hss]
 
-describe_inventory(repo):
+- describe_inventory(repo):
   tools = repo.all() → list(self._tools) → a real copy, [end_mill_4fl, drill_hss]
   return f"{len(tools)} tool(s) on hand" → "2 tool(s) on hand"
 
-repo.find_by_name("drill_hss"):
+- repo.find_by_name("drill_hss"):
   next((t for t in self._tools if t["name"] == "drill_hss"), None)
     check end_mill_4fl: name == "drill_hss"? No
     check drill_hss:    name == "drill_hss"? Yes → return this dict immediately
   → {"name": "drill_hss", "diameter_mm": 6}
-```
 
 `describe_inventory` never once reaches into `_tools` itself — every
 value it works with came back through `repo.all()`, a named method. If
