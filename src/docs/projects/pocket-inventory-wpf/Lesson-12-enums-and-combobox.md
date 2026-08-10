@@ -52,6 +52,12 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
   string and an enum type, finds the member whose name matches
   exactly, throwing if none does.
 
+**Objects and methods used**
+- `enum` itself (Lesson 5a) and `Enum.GetValues` reappear here, already
+  given full treatment — brief reminder only, per the Repetition Rule.
+  `ComboBox`, `enumValue.ToString()`, and `Enum.Parse<T>` are this
+  lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `enum` — Applying What Lesson 05a Already Proved

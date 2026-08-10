@@ -30,6 +30,12 @@ unchanged, reused here exactly as it already exists.
   connection closed for real, releasing any file handles they're still
   quietly holding.
 
+**Objects and methods used**
+- `SqliteConnection`/`File.Copy` (Lessons 9, 25) reappear here, already
+  given full treatment — brief reminder only, per the Repetition Rule.
+  `ClearAllPools()` is this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: Why a Plain `File.Copy` Restore Silently Fails

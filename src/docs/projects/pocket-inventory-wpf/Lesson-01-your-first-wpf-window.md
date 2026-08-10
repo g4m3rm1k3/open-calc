@@ -45,6 +45,20 @@ behind.
   spliced into the result directly; C#'s
   equivalent of Python's `f"..."`.
 
+**Objects and methods used**
+- **`System.DateTime`** — a built-in .NET struct representing a specific
+  point in calendar time. `DateTime.Now` is a `static` property (no
+  parentheses — reading it, not calling a method with arguments) that
+  returns the current local date and time at the exact moment it's
+  read, computed fresh from the operating system's own clock each time,
+  never a value fixed once and reused. Full treatment of what it's
+  actually used for is in this lesson's third Concept Unit, since it's
+  supporting material this lesson's own code depends on, not this
+  lesson's subject.
+- `Console.WriteLine`, already given full treatment in Lesson 00a,
+  reappears in this lesson's own throwaway interpolation lab — brief
+  reminder only, per the Repetition Rule.
+
 ---
 
 ## Concept Unit: StackPanel

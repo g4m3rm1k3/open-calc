@@ -60,6 +60,14 @@ and `MainWindow.xaml.cs` Lesson 1 left behind, since this lesson edits both.
   not an analogy — the literal term WPF's own tooling (Visual Studio's
   Live Visual Tree window) uses for it.
 
+**Objects and methods used**
+- `Console.WriteLine` (Lesson 00a) and `Dictionary<TKey, TValue>`/
+  target-typed `new()` (Lesson 01a) reappear in this lesson's own
+  `GridRowRegistry` lab — already given full treatment, brief reminder
+  only, per the Repetition Rule. `Grid`, its attached properties, and
+  `Border` are this lesson's own subject, given full treatment in the
+  Concept Units below.
+
 ---
 
 ## Concept Unit: `Grid.RowDefinitions` and Row Sizing

@@ -26,6 +26,12 @@ updates already proven for `{Binding}`.
   `T` and returning `bool`. `Filter`'s actual type is
   `Predicate<object>`, since a view can hold any kind of item.
 
+**Objects and methods used**
+- `ICollectionView` (Lesson 17) and `delegate` (Lesson 6b) reappear
+  here, already given full treatment — brief reminder only, per the
+  Repetition Rule. `ICollectionView.Filter` and `Predicate<T>` are
+  this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `ICollectionView.Filter` and `Predicate<T>`

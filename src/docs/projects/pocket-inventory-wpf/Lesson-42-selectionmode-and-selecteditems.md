@@ -28,6 +28,12 @@ the direct contrast this lesson draws against.
   a collection of plain `object`s, not a strongly-typed
   `IList<InventoryItem>`.
 
+**Objects and methods used**
+- `SelectedItem`/`DataGrid` (Lessons 8, 16) reappear here, already
+  given full treatment — brief reminder only, per the Repetition Rule.
+  `SelectionMode`/`SelectedItems`/`IList` are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `SelectedItems` — a Real, Non-Generic `IList`

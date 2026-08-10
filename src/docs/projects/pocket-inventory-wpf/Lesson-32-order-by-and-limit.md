@@ -32,6 +32,12 @@ Lesson 14: `PurchaseDate`, `DateTime?`, genuine absence. Lesson 31:
   from numeric ordering the moment the values involved have a different
   number of digits.
 
+**Objects and methods used**
+- `GROUP BY`/`SUM()` (Lessons 30, 31) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `ORDER BY ... DESC LIMIT` is this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: `ORDER BY` — Proving It Sorts Text as Text

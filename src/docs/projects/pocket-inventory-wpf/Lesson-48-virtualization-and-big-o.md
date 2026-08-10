@@ -31,6 +31,12 @@ Lesson 17: `CollectionViewSource`, grouping, already applied to
   rows scroll past) — a further optimization layered on top of
   virtualization itself.
 
+**Objects and methods used**
+- `DataGrid` (Lesson 16) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `VirtualizingStackPanel`/`VirtualizationMode` are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: UI Virtualization — Realizing Only What's Visible

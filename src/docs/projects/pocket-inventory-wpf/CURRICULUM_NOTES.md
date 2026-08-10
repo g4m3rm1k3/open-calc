@@ -610,6 +610,110 @@ avoids that, since the string no longer starts with a digit. Keep this
 convention for every lesson from here on; don't revert to the bare
 `NN-slug.md` pattern lessons 0–1 originally used.
 
+## 2026-08-10 audit: Objects/methods section, shared concept catalog, layout-panel gap
+
+Three findings from a fresh session, applying `LESSON SCHEMA.md`'s
+Header requirements (grown since this project's early lessons were
+written) and a fresh look at WPF's own layout-panel toolbox against what
+this course actually teaches:
+
+1. **"Objects and methods used" header section is absent from all 61
+   lesson files** (verified: zero matches, `grep -rn "Objects and
+   methods" *.md`). This section postdates this project — same shape as
+   the Repetition Rule's own stated exception (predates the schema's
+   Header requirement, not a real gap in the lessons' actual teaching).
+   Retrofitting it lesson-by-lesson is ongoing; this note is the record
+   of when and why it started, so a future session doesn't re-diagnose
+   the same gap from scratch. Where a lesson's own "Terms introduced"
+   already gives a supporting framework piece full treatment, the
+   Objects/methods section doesn't duplicate it — only genuinely
+   uncovered supporting API gets a fresh entry.
+2. **This project now draws from and contributes to `src/docs/concepts/`**
+   — the platform's single shared concept catalog (see that folder's own
+   `README.md` for the format rules: Setup/Problem/Isolated Example/
+   Mechanical Walkthrough/CS+SE Lens/Connection/Try It Yourself, and the
+   100%-match rule). Seven WPF/XAML concept files already existed there
+   (written for the separate `wpf-lessons`/`CncWpf` stub project) but
+   were never referenced from this course; two more
+   (`wpf-styles-and-setters.md`, `wpf-resourcedictionary-and-staticresource.md`)
+   were extracted from this course's own Lesson 5 real, verified content
+   and added same session. Use `src/docs/concepts/GLOSSARY.md` to check
+   for an existing match before writing a new concept file or a fresh
+   inline explanation.
+3. **Layout-panel gap, confirmed by grep, not guessed:** this course uses
+   only `Grid` and `StackPanel` for all 54 lessons.
+   `DockPanel`/`WrapPanel`/`Canvas`/`UniformGrid` — four of WPF's other
+   standard layout panels — appear in zero lesson files. Closed via
+   [Lesson 02a](Lesson-02-a-other-layout-panels.md), a prepended,
+   throwaway-lab-only lesson (same shape as Lesson 05a's `enum` lab —
+   nothing it teaches enters the real project), each unit backed by its
+   own new concept file (`wpf-dockpanel.md`, `wpf-wrappanel.md`,
+   `wpf-canvas.md`, `wpf-uniformgrid.md`) and connected back to a real,
+   concrete "would this project's own code use this panel instead, and
+   why or why not" judgment call, not just an isolated fact.
+
+Ran `scripts/check-narrative-lessons.mjs` against the whole project
+after these changes: 65 files, 12 issues, all soft/judgment-call kinds
+(`dense-concept-unit`, `note-unverified-hidden-behavior`,
+`note-no-cs-lens`) except three `code-prose-interleaved-in-fence` hits in
+Lesson 51, all three confirmed false positives on inspection — the
+flagged "before"/"after" words are literal text inside a real
+`Console.WriteLine` string argument, not prose crammed into a fence.
+Spot-checked both `note-unverified-hidden-behavior` hits (Lessons 6 and
+7's auto-property backing-field claims): both already have real proof
+(Lesson 6 shows the actual `<Name>k__BackingField` via reflection;
+Lesson 7's claim explicitly cites that same proof back rather than
+re-asserting it ungrounded). Remaining `dense-concept-unit`/`note-no-cs-lens`
+flags (Lessons 0, 6, 9, 11, 49) not individually re-verified this
+session — same category this project's own 2026-07-31 note already
+found to be mostly cohesive-mechanism false positives; flag for a future
+session rather than re-deriving now.
+
+**Update, same session — the "Objects and methods used" retrofit is
+complete.** All 64 lesson files (every `Lesson-*.md` in this folder,
+including the new Lesson 02a) now have the section. Per file, it either
+names genuinely uncovered supporting-cast API with full treatment, or
+states plainly that everything the lesson touches is either its own
+subject (covered in its Terms glossary/Concept Units) or a brief,
+Repetition-Rule-compliant reminder of something an earlier lesson
+already gave full treatment. Two real, previously-unflagged gaps were
+found and closed in the process, beyond the section itself:
+
+- **Lesson 00b** used `List<T>`, collection-initializer syntax, and
+  `foreach` with zero explanation, eleven lessons before Lesson 6's own
+  "official" `List<T>` lab — missed by both the 2026-07-29 and
+  2026-08-01 audit passes. Closed with a real Objects/methods entry at
+  its true point of use.
+- **Lesson 51** used `System.Diagnostics.Stopwatch`
+  (`.StartNew()`/`.Stop()`/`.ElapsedMilliseconds`) — the lesson's own
+  actual proof mechanism that a synchronous call blocks and an async one
+  doesn't — with zero explanation anywhere. Closed the same way.
+- **Lesson 53** used `Environment.NewLine` and `File.ReadAllText` with
+  zero explanation; both closed with brief entries (simple enough not
+  to need a full shown shape, per the Usage Contract Rule's own
+  exception for single, plain-input/output calls).
+
+Also closed, at its true first appearance rather than piecemeal: the
+**ternary conditional operator** (`?:`) and **string interpolation**
+were both used, unexplained, starting in Lesson 00a's very first code
+sample (`$"This bulb is {(IsOn ? "on" : "off")}"`), and multiple later
+lessons (01a among them) cited them as "already established" when they
+never actually had been. Both now get real Terms entries and a
+Mechanical Walkthrough bullet in Lesson 00a itself — every later lesson
+citing them as reappearing is now actually correct, not just plausible.
+
+Re-ran `scripts/check-narrative-lessons.mjs` after the full pass: still
+65 files, still the same 12 pre-existing soft flags (line numbers
+shifted only by the inserted sections) — confirms none of the 64 edits
+introduced a structural regression.
+
+**What this pass deliberately did not do:** a full re-audit of every
+lesson's Terms glossary for other possibly-implicit basic syntax, the
+way `?:`/`$"..."` were caught here — those two were found incidentally
+while verifying Objects/methods claims, not from a systematic sweep.
+Worth a dedicated future pass if the same "nothing implicit" standard
+is meant to extend past what this pass happened to notice along the way.
+
 ## Independence from the Android track
 
 `../track/` (Android) and this project cover a lot of the same ground —

@@ -56,6 +56,58 @@ lesson that never said anything.
 
 ---
 
+## Concept Files — Reuse Across Lessons and Curricula
+
+The Repetition Rule above governs reuse *within* a curriculum's own
+lesson sequence. A concept file is the same idea applied *across*
+lessons and curricula: a standalone file explaining one piece of
+supporting material — never this lesson's own subject, only something
+Terms Introduced or Objects and Methods would otherwise have to explain
+inline.
+
+**There is one shared catalog, not one per curriculum: `src/docs/concepts/`.**
+Every curriculum draws from and contributes to this same folder — do not
+create a project-local `concepts/` subfolder next to a lesson series;
+that fragments a catalog that's deliberately meant to be single and
+shared. `src/docs/concepts/README.md` is the authoritative format spec
+for a concept file (Header, Setup, Problem, Isolated Example with real
+run output, Mechanical Walkthrough, CS/SE Lens, Connection, Try It
+Yourself) and its own rules for when a new file is warranted (the
+100%-match rule: resembling an existing file is not enough to skip
+writing a new one) — read it before authoring a concept file, and don't
+re-derive a competing format here. `src/docs/concepts/GLOSSARY.md` is a
+generated index, one line per file — check it before opening candidate
+files by hand, though a matching name or summary still has to be
+confirmed by reading the real file, never assumed.
+
+**Lookup, from a lesson, is by filename, not by path.** A lesson
+references a concept file with a `` `some-concept.md` `` code span or a
+`../concepts/some-concept.md`-shaped link; the viewer resolves it
+against `src/docs/concepts/` by filename regardless of the actual
+relative path written, so an author never has to compute the correct
+`../` depth by hand. The reference renders as a clickable trigger, not
+inline text: it opens the concept in its own panel with its own
+breadcrumb, separate from the lesson's reading flow. A concept file's
+own body can reference another concept file the same way — the panel's
+breadcrumb handles the chain, so this is always safe and needs no
+special handling by the author.
+
+**When to factor something out instead of writing it inline:** the
+supporting concept is general enough that it plausibly recurs in a
+*different* lesson or a *different* curriculum — a design pattern, a
+CS idea, a language feature not specific to this lesson's own code.
+Genuinely narrow, one-off material — what one specific line of *this*
+lesson's own code does — stays inline, as it always has.
+
+**Self-check:** for every Terms/Objects-and-methods entry this lesson
+writes inline, could it plausibly recur in another lesson or another
+curriculum? If yes, does `src/docs/concepts/GLOSSARY.md` already show a
+matching file — and if not, should this lesson's explanation be the one
+written as a new concept file there, per `concepts/README.md`'s format,
+rather than inlined?
+
+---
+
 ## Header (write once, before any Concept Units)
 
 ```

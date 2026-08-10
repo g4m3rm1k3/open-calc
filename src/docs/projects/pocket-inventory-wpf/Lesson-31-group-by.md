@@ -24,6 +24,11 @@ the real floating-point caveat already proven and handled there. Lesson
   aggregate function (`SUM()`, `COUNT()`, and others) *per group*
   instead of across the whole table.
 
+**Objects and methods used**
+- `SUM()`/`ExecuteReader()` (Lesson 30) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `GROUP BY` is this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `GROUP BY` — One Row Per Category

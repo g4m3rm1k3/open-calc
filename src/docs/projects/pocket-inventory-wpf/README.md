@@ -164,6 +164,7 @@ exist so far:
 - [Lesson 6a — Generics, Writing Your Own](Lesson-06-a-generics-writing-your-own.md) — directly after Lesson 6's own `List<T>`; Lesson 48's `CountDescendants<T> where T : DependencyObject` uses this silently, 42 lessons later, with no prior explanation.
 - [Lesson 6b — Custom Delegates and Events](Lesson-06-b-custom-delegates-and-events.md) — directly after 6a; explains the `delegate`/`event` mechanism behind `PropertyChangedEventHandler`/`PropertyChanged` (Lesson 7), used correctly but never explained.
 - [Lesson 23a — Custom Exceptions](Lesson-23-a-custom-exceptions.md) — directly after Lesson 23, before Lesson 24's real `catch (SqliteException ex)` — explains how a `catch` block can distinguish exception types at all.
+- [Lesson 02a — Choosing a Layout Panel for the Shape You Actually Have](Lesson-02-a-other-layout-panels.md) — directly after Lesson 2; this course uses only `Grid` and `StackPanel` for all 54 lessons and never once mentions `DockPanel`, `WrapPanel`, `Canvas`, or `UniformGrid` — found by a 2026-08-10 audit of WPF's own layout-panel toolbox against what this course actually teaches.
 
 More get added as they're found reading forward — this list grows, not
 all at once.
@@ -406,6 +407,7 @@ above:
 - [x] [Lesson 1a — `static`, `readonly`, `Dictionary<K,V>`, and Safe Lookups](Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md) *(prepended 2026-07-29)*
 - [x] [Lesson 1b — Structs and Extension Methods](Lesson-01-b-structs-and-extension-methods.md) *(prepended 2026-08-01)*
 - [x] [Lesson 2 — Grid and the Visual Tree](Lesson-02-grid-and-the-visual-tree.md)
+- [x] [Lesson 02a — Choosing a Layout Panel for the Shape You Actually Have](Lesson-02-a-other-layout-panels.md) *(prepended 2026-08-10)*
 - [x] [Lesson 3 — Frame/Page Navigation](Lesson-03-frame-page-navigation.md)
 - [x] [Lesson 4 — The Navigation Stack](Lesson-04-the-navigation-stack.md)
 - [x] [Lesson 5 — Styles and Resource Dictionaries](Lesson-05-styles-and-resource-dictionaries.md)

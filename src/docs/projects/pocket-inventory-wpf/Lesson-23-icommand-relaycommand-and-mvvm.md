@@ -38,6 +38,13 @@ or wraps.
   object, instead of a bare method call, so it can be passed around,
   bound to, disabled, and (Lesson 45) reversed.
 
+**Objects and methods used**
+- `INotifyPropertyChanged` (Lesson 7) and `delegate` (Lesson 6b)
+  reappear here, already given full treatment — brief reminder only,
+  per the Repetition Rule. `ICommand` and the hand-written
+  `RelayCommand` are this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: `ICommand` and a Hand-Written `RelayCommand`

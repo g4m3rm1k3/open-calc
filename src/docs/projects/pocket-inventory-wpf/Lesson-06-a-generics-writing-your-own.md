@@ -38,6 +38,12 @@ unit.
   generic code, at the cost of no longer accepting completely
   unrelated types.
 
+**Objects and methods used**
+- `Console.WriteLine` (Lesson 00a) and `List<T>` (Lesson 6) reappear in
+  this lesson's own labs, already given full treatment — brief
+  reminder only, per the Repetition Rule. Writing a generic type or
+  method is this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `Container<T>` — Catching a Mistake at Compile Time Instead of Runtime

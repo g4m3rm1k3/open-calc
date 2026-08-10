@@ -38,6 +38,12 @@ free text. Lesson 23: `InventoryViewModel`.
   item (here, a `Supplier`'s `Id`) instead of the whole object
   `SelectedItem` gives you.
 
+**Objects and methods used**
+- `ComboBox`/`SelectedItem` (Lesson 12) and `SqliteCommand` (Lesson 9)
+  reappear here, already given full treatment — brief reminder only,
+  per the Repetition Rule. `FOREIGN KEY`/`INNER JOIN` are this lesson's
+  own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `FOREIGN KEY` and `INNER JOIN`

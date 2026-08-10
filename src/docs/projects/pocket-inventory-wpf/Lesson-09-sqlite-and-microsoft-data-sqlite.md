@@ -66,6 +66,13 @@ added — this lesson's first real one.
   stronger than a normal field, since it can never be changed
   anywhere, including in the class's own constructor.
 
+**Objects and methods used**
+- `Console.WriteLine`, already given full treatment in Lesson 00a,
+  reappears in this lesson's own labs — brief reminder only, per the
+  Repetition Rule. `SqliteConnection`, `SqliteCommand`, and every
+  ADO.NET member used here are this lesson's own subject, given full
+  treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Process Memory Versus Persistent Storage

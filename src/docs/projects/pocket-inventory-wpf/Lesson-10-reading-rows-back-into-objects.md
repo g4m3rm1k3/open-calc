@@ -37,6 +37,12 @@ nothing populates `Items` from what's already saved. Lesson 7:
   column's value from the current row, by zero-based position matching
   the `SELECT` clause's own column order.
 
+**Objects and methods used**
+- `List<T>` (Lesson 6) and `SqliteConnection`/`SqliteCommand` (Lesson 9)
+  reappear here, already given full treatment — brief reminder only,
+  per the Repetition Rule. `SqliteDataReader` and its members are this
+  lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `SqliteDataReader` — Reading Rows Back, One at a Time

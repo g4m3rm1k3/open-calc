@@ -48,6 +48,12 @@ it.
 - **`ValidatesOnDataErrors`** — tells a binding to actually check
   `IDataErrorInfo` on its source object on every update.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `string.IsNullOrWhiteSpace` and `IDataErrorInfo` are both this
+  lesson's own subject, already given full treatment in its Terms
+  glossary above and Concept Units below.
+
 ---
 
 ## Concept Unit: `string.IsNullOrWhiteSpace`

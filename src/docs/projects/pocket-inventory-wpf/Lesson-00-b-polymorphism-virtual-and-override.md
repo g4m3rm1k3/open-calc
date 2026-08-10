@@ -42,6 +42,24 @@ inheritance, base class/derived class.
   object at runtime — without that code ever checking or caring which
   derived type it's holding.
 
+**Objects and methods used**
+- **`List<Lightbulb>`** — a real, generic, growable collection type from
+  .NET's base class library (`System.Collections.Generic`), used here
+  purely as a vehicle to hold several bulbs at once — this lesson's own
+  subject is what happens when they're looped over, not the list itself,
+  which gets its own full, from-scratch treatment in Lesson 6. `new
+  List<Lightbulb> { new Lightbulb(true), new SmartLightbulb(true) }` —
+  the `{ ... }` immediately after the constructor call is a **collection
+  initializer**: sugar that adds each listed value to the new list, in
+  order, right after it's constructed, equivalent to constructing an
+  empty list and calling `.Add(...)` once per value.
+- **`foreach (Lightbulb bulb in bulbs)`** — a loop that runs its body
+  once per element in `bulbs`, in order, binding `bulb` to the current
+  element each time — no manual index or `.Count` check needed, unlike a
+  plain `for` loop. `bulb`'s declared type here is `Lightbulb`, matching
+  the list's own element type, which is the exact mechanical reason this
+  unit's bug happens at all (see the Execution Trace below).
+
 ---
 
 ## Concept Unit: Re-Declaring a Method Doesn't Replace It

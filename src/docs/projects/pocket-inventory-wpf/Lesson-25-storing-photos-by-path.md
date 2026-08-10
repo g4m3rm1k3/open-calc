@@ -32,6 +32,11 @@ instead of categories).
   directly inside a database column (a BLOB) versus storing only a file
   path and keeping the actual bytes on disk.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `OpenFileDialog`, `BitmapImage`, and `File.Copy` are given full
+  treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Copying a File Into an App-Owned Folder

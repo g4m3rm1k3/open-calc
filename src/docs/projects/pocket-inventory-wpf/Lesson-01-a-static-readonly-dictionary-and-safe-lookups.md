@@ -51,6 +51,13 @@ Concept Unit. Nothing about C# beyond Lesson 00a.
   `false` for whether the key existed, and hands back the value through
   an `out` parameter — never throws, unlike the indexer.
 
+**Objects and methods used**
+- `Console.WriteLine` and the ternary conditional operator both reappear
+  from Lesson 00a, which already gave each full treatment — brief
+  reminder only, per the Repetition Rule. `Dictionary<TKey, TValue>` and
+  its members are this lesson's own subject, given full treatment in
+  Concept Units 3 and 4 above, not deferred to this section.
+
 ---
 
 ## Concept Unit: `static` — Belonging to the Class, Not the Object

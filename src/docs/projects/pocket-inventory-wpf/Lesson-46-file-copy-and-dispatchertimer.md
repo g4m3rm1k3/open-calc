@@ -22,6 +22,12 @@ independent, parallel concern.
   the UI thread, at a real, configurable interval, safe to touch UI
   elements from directly (unlike a plain background timer).
 
+**Objects and methods used**
+- `File.Copy` (Lesson 25) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `DispatcherTimer` is this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: A Real, Ticking `DispatcherTimer`

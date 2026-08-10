@@ -32,6 +32,12 @@ worked example.
   enumerated (a `foreach`, or a method like `.ToList()`), re-reading
   whatever the source collection contains *at that moment*.
 
+**Objects and methods used**
+- `Predicate<T>` (Lesson 19) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule. `.Where()`,
+  `.Select()`, and deferred execution are this lesson's own subject,
+  given full treatment below.
+
 ---
 
 ## Concept Unit: `.Where()` — The Filter Loop, Named and Reused

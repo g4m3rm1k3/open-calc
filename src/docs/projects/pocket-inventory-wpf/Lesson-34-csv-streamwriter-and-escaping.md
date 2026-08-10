@@ -27,6 +27,10 @@ echo). Lesson 30–33: reading `InventoryItem`s back out with `SELECT`.
   that itself contains a comma, a quote, or a newline: wrap it in double
   quotes, and double any literal quote inside it.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject — `StreamWriter`
+  and CSV escaping are given full treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Why "Just Join With Commas" Breaks

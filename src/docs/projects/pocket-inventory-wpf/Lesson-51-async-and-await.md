@@ -33,6 +33,20 @@ Lesson 46: `DispatcherTimer`.
   a `void` method, and `async Task<T>` is the equivalent of a method
   returning `T`.
 
+**Objects and methods used**
+- **`System.Diagnostics.Stopwatch`** — a class for measuring real
+  elapsed wall-clock time. `Stopwatch.StartNew()` is a `static` factory
+  method: it constructs a new `Stopwatch` *and* immediately starts it
+  timing, in one call, returning the running instance — used instead of
+  `new Stopwatch()` followed by a separate `.Start()` call, which would
+  work identically but takes two lines to say the same thing.
+  `.Stop()` freezes the elapsed-time measurement without discarding it.
+  `.ElapsedMilliseconds` reads the accumulated time, as a whole number
+  of milliseconds, between the matching `StartNew()` and `.Stop()` —
+  this lesson's actual proof that the synchronous version genuinely
+  blocks for the real duration and the asynchronous version doesn't
+  block the UI thread while still taking the same real time to finish.
+
 ---
 
 ## Concept Unit: A Blocking Call Really Does Block Everything

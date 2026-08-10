@@ -35,6 +35,12 @@ Lesson 00a (class, object). Basic Python: functions, data types, loops,
   member is secretly an integer underneath, assigned in declared order
   starting at `0`.
 
+**Objects and methods used**
+- `Console.WriteLine`, already given full treatment in Lesson 00a,
+  reappears in this lesson's own `Season` lab — brief reminder only,
+  per the Repetition Rule. `enum` and `Enum.GetValues` are this
+  lesson's own subject, given full treatment above.
+
 ---
 
 ## Concept Unit: `enum` — Declaring a Closed Set of Named Values

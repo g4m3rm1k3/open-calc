@@ -38,6 +38,12 @@ Lesson 0a: class, object, inheritance, base/derived class. Lesson 0b:
   can implement any number of interfaces, but inherit from only one
   base class (`abstract` or not).
 
+**Objects and methods used**
+- No new supporting cast beyond this lesson's own subject —
+  `List<Lightbulb>`, the collection-initializer syntax, `foreach`, and
+  `Console.WriteLine` all reappear from Lessons 0a/0b, which already
+  gave each full treatment.
+
 ---
 
 ## Concept Unit: `abstract` — A Base Class That Refuses to Stand Alone

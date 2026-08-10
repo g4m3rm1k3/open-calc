@@ -25,6 +25,14 @@ pattern's first appearance. Lesson 4: a navigation *stack*, LIFO order
   pops the most recently executed one and reverses it — the same LIFO
   ordering Lesson 4's navigation stack already established.
 
+**Objects and methods used**
+- `ICommand`/`RelayCommand` (Lesson 23) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `Stack<T>`, used here for the first time as a literal C# type (Lesson
+  4's own back stack is `Frame`'s internal mechanism, not an exposed
+  `Stack<T>` object), and the Memento pattern are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: A Reversible Command, Proven With Real LIFO Order

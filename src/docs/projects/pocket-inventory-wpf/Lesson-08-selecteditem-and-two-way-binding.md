@@ -35,6 +35,13 @@ extends with a second column.
   UI edit back to its source; `PropertyChanged` fires on every
   keystroke, versus `TextBox`'s own default of `LostFocus`.
 
+**Objects and methods used**
+- No new supporting cast beyond this lesson's own subject —
+  `SelectedItem`, binding modes, and `UpdateSourceTrigger` are given
+  full treatment below; `INotifyPropertyChanged`/`{Binding}`/
+  `DataContext` (Lesson 7) reappear already fully explained, per the
+  Repetition Rule.
+
 ---
 
 ## Concept Unit: `SelectedItem` and `SelectionChanged`

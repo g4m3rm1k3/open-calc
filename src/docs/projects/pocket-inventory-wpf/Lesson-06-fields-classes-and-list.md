@@ -60,6 +60,14 @@ this lesson's new button.
 - **`ListBox.Items`** — a `ListBox`'s own internal collection of what
   it's currently displaying; `.Clear()` empties it.
 
+**Objects and methods used**
+- `Console.WriteLine`, already given full treatment in Lesson 00a,
+  reappears in this lesson's own reflection-based proof — brief
+  reminder only, per the Repetition Rule. Every other construct named
+  above (`class`, auto-properties, `List<T>`, `TextBox`, `ListBox`) is
+  this lesson's own subject, given full treatment in the Concept Units
+  below.
+
 ---
 
 ## Concept Unit: `class` — Grouping Data Under One Name

@@ -33,6 +33,11 @@ the first time.
   same underlying items into named groups, with no items moved, copied,
   or removed from the original collection.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `CollectionViewSource`, `ICollectionView`, and `GroupDescriptions` are
+  given full treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: `ICollectionView` and `GroupDescriptions`

@@ -66,6 +66,12 @@ out of `MainWindow.xaml.cs` into a new file entirely.
   to the top (push) and removing the top entry (pop) — both always at
   the same end, never in the middle.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject — `Page`,
+  `Frame`, `NavigationService`, and `Button`/`Padding`/events are all
+  given full treatment in this lesson's own Terms glossary and Concept
+  Units, not deferred to this section.
+
 ---
 
 ## Concept Unit: `Page` — Content That Isn't a Window

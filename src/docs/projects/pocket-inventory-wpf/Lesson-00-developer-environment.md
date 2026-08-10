@@ -76,6 +76,16 @@ explained from zero, even the ones that look familiar.
   creating a repository, staging changes, and permanently recording a
   named snapshot of everything staged.
 
+**Objects and methods used**
+- **`Console.WriteLine`** — used in this lesson's own throwaway console
+  app; already given full treatment in Lesson 0a, which this lesson
+  follows in reading order — brief reminder only, per the Repetition
+  Rule.
+- No other external supporting cast: this lesson's own subject *is* the
+  toolchain (the SDK, the CLR, `.csproj` settings, the WPF project
+  template) — everything else it names gets full treatment in its own
+  Terms glossary above, not deferred to this section.
+
 ---
 
 ## Concept Unit: Interpreted, Dynamically-Typed Execution

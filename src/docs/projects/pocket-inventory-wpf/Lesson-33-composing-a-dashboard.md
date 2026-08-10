@@ -26,6 +26,12 @@ this dashboard displays.
   code doesn't need to change to add that behavior); this lesson is a
   direct demonstration, not just a definition.
 
+**Objects and methods used**
+- `SUM()`, `GROUP BY`, and `ORDER BY ... LIMIT` (Lessons 30–32)
+  reappear here, already given full treatment — brief reminder only,
+  per the Repetition Rule; this lesson composes them, it doesn't
+  introduce new supporting cast.
+
 ---
 
 ## Concept Unit: Does `GoBack()` Actually Preserve State?

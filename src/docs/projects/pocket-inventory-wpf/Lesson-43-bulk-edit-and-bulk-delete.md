@@ -28,6 +28,12 @@ actions.
   not explicitly wrapped in a transaction is its own separate
   transaction, committed to disk immediately, one at a time.
 
+**Objects and methods used**
+- `SelectedItems`/`IList` (Lesson 42) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  SQLite transactions are this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: A Real Transaction — Proving It's Actually Faster

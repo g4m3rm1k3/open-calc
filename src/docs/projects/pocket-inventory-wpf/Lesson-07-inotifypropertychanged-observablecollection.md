@@ -62,6 +62,13 @@ different use of the same underlying `event` keyword.
 - **`DisplayMemberPath`** — tells a `ListBox` which property of each
   bound object to actually display.
 
+**Objects and methods used**
+- `Console.WriteLine` and `System.Reflection` (Lesson 6) reappear in
+  this lesson's own labs, already given full treatment — brief
+  reminder only, per the Repetition Rule. `INotifyPropertyChanged`,
+  `ObservableCollection<T>`, and data binding are this lesson's own
+  subject, given full treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: `INotifyPropertyChanged` — an Object Announcing Its Own Changes

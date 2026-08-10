@@ -45,6 +45,12 @@ detail panel, and the SQLite table shape together.
   `SelectedDate` property is itself `DateTime?` — genuinely, natively
   representing "no date chosen" as `null`, not a fake sentinel date.
 
+**Objects and methods used**
+- `DateTime` (Lesson 1) reappears here, already given full treatment —
+  brief reminder only, per the Repetition Rule. `Nullable<T>`/`DateTime?`
+  and `DatePicker` are this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: `Nullable<T>` — Two Different `?`s

@@ -29,6 +29,12 @@ Lesson 12–15: every field this lesson finally makes genuinely editable.
   `UPDATE`/`DELETE`, telling you how many rows actually matched the
   `WHERE` clause, distinct from whether the command itself succeeded.
 
+**Objects and methods used**
+- `SqliteConnection`/`SqliteCommand`/`ExecuteNonQuery()` (Lesson 9)
+  reappear here, already given full treatment — brief reminder only,
+  per the Repetition Rule. `UPDATE ... WHERE` is this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Loading an Existing Object's Values Into a Form

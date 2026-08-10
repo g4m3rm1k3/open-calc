@@ -26,6 +26,12 @@ now applied to a file instead of a `TextBox`.
   the rest of the file from importing; each row succeeds or fails
   independently.
 
+**Objects and methods used**
+- CSV escaping rules (Lesson 34) reappear here, already given full
+  treatment — brief reminder only, per the Repetition Rule. The
+  quote-aware parser itself is this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: Parsing a CSV Line for Real

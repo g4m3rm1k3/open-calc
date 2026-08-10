@@ -29,6 +29,12 @@ predicates. Lesson 22: real, permanent `DeleteItemFromDatabase`.
   over a collection, distinct from the one `CollectionViewSource.GetDefaultView`
   always returns.
 
+**Objects and methods used**
+- `ICollectionView`/`Filter` (Lessons 17, 19) and `MessageBox.Show`
+  (Lesson 22) reappear here, already given full treatment — brief
+  reminder only, per the Repetition Rule. `ListCollectionView` is this
+  lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: A Second, Independent `ICollectionView`

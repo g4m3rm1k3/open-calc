@@ -40,6 +40,12 @@ detail panel, and the SQLite table shape together.
   to change a control's appearance in response to a bound value changing,
   with no code-behind `if` statement written anywhere.
 
+**Objects and methods used**
+- `Style` itself (Lesson 5) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `TextWrapping`, `CheckBox`, and `Style.Triggers`/`DataTrigger` are
+  this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Growing `InventoryItem` — Notes and IsFavorite

@@ -28,6 +28,12 @@ pointing at them anymore.
   from most of this project's other operations, which fail loudly on a
   missing target.
 
+**Objects and methods used**
+- `File.Copy`/`BitmapImage` (Lesson 25) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `File.Delete` is this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: `File.Delete` — What It Actually Does on a Missing Path

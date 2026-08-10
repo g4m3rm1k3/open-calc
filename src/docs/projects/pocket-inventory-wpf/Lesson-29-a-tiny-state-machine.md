@@ -30,6 +30,11 @@ pattern, extended here to a real, multi-value status.
   another that the system's own rules permit; every other change is
   invalid by definition, not just unusual.
 
+**Objects and methods used**
+- `enum` (Lesson 5a) reappears here, already given full treatment —
+  brief reminder only, per the Repetition Rule. The state machine
+  itself is this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Guarding Transitions, Not Just States

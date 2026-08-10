@@ -36,6 +36,13 @@ there; picked up again in more depth in a later lesson).
   were a real instance method on the type named by that parameter, even
   for types you don't own or can't inherit from.
 
+**Objects and methods used**
+- `Console.WriteLine` and string interpolation both reappear from Lesson
+  00a, already given full treatment — brief reminder only, per the
+  Repetition Rule. `struct`/`class` copy semantics and extension methods
+  are this lesson's own subject, given full treatment in the Concept
+  Units below.
+
 ---
 
 ## Concept Unit: `struct` vs. `class` — Copied vs. Shared

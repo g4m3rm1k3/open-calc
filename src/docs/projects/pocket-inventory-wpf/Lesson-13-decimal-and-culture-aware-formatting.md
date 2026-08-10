@@ -40,6 +40,11 @@ panel, and the SQLite table shape together, in one lesson.
   converting a `TextBox`'s `string` text to and from a bound property's
   real type (here, `decimal`), with no converter code written by hand.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject — `decimal`,
+  `ToString("C")`, and `CultureInfo` are given full treatment in the
+  Concept Units below.
+
 ---
 
 ## Concept Unit: `decimal` vs. `double` — Proving the Representation Error

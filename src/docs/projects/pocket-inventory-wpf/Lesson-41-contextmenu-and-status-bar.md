@@ -27,6 +27,12 @@ triggers, the same idea this lesson extends to a third trigger.
 - **`StatusBar`** — a WPF control conventionally docked at the bottom of
   a window, showing brief, live status information.
 
+**Objects and methods used**
+- `ICommand` and `Command="{Binding ...}"` (Lesson 23) reappear here,
+  already given full treatment — brief reminder only, per the
+  Repetition Rule. `ContextMenu`/`PlacementTarget`/`StatusBar` are this
+  lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Why a `ContextMenu`'s Bindings Don't "Just Work"

@@ -31,6 +31,12 @@ found, not vague generalities.
   established, without any single change ever being wrong enough on its
   own to notice.
 
+**Objects and methods used**
+- No new supporting cast — this lesson reviews and refactors this
+  project's own existing `SqliteConnection`/`SqliteCommand` code
+  (Lesson 9) into a `Repository` class; nothing external and
+  unexplained is introduced.
+
 ---
 
 ## Concept Unit: Extracting an `ItemRepository`

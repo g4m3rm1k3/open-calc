@@ -30,6 +30,12 @@ dedicated class shaped for one purpose. Lesson 25: `AppContext.BaseDirectory`
   Windows itself designates for exactly this: an application's own
   settings and data, separate from its installed program files.
 
+**Objects and methods used**
+- `JsonSerializer` (Lesson 36) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `Environment.SpecialFolder` is this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: Resolving a Real, Correct Settings Location

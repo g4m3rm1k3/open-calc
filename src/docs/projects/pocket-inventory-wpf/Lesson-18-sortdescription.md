@@ -31,6 +31,12 @@ unexplained until now.
   this project sorts by (`string`, `decimal`, `DateTime`), never written
   by hand in this project.
 
+**Objects and methods used**
+- `ICollectionView` (Lesson 17) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `SortDescription` and `IComparable` are this lesson's own subject,
+  given full treatment below.
+
 ---
 
 ## Concept Unit: `SortDescription` — Ordering a View, Not the Data

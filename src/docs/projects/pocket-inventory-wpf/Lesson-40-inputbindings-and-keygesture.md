@@ -24,6 +24,12 @@ giving it a second trigger is nearly free.
 - **`KeyGesture`** — the actual key combination an `InputBinding`
   listens for (`Key` plus `Modifiers`, like `Ctrl`).
 
+**Objects and methods used**
+- `ICommand`/`RelayCommand` (Lesson 23) reappear here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `InputBinding`/`KeyGesture` are this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: `KeyBinding` — Proving It Resolves to the Real Command

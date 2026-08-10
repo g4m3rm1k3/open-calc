@@ -27,6 +27,11 @@ operation, a new trigger for it.
   something is dropped; `.Data`, an `IDataObject`, is where the actual
   dragged payload lives.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `DragDrop.DoDragDrop`, `AllowDrop`, and `DragEventArgs`/`IDataObject`
+  are given full treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: `IDataObject` — Proving the Payload Actually Travels

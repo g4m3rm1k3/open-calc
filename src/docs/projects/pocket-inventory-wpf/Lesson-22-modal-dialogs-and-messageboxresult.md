@@ -26,6 +26,12 @@ dialog. Nothing disappears from a single accidental click.
 - **`DELETE ... WHERE`** — the SQL statement that permanently removes rows
   matching a condition.
 
+**Objects and methods used**
+- `ExecuteNonQuery()` (Lesson 9) reappears here, already given full
+  treatment — brief reminder only, per the Repetition Rule.
+  `MessageBox.Show`/`MessageBoxResult`/`MessageBoxButton` are this
+  lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `DELETE ... WHERE Id = @id`

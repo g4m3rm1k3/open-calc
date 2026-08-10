@@ -34,6 +34,11 @@ shape, the direct contrast this lesson draws against.
   CSV represents only a flat table, one fixed row shape, no nesting at
   all.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `JsonSerializer.Serialize`/`Deserialize` are given full treatment in
+  the Concept Units below.
+
 ---
 
 ## Concept Unit: `JsonSerializer` — Nesting, Attributes, and Real Round-Trips

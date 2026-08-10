@@ -30,6 +30,11 @@ same data.
 - **`DocumentPaginator`** — the object responsible for splitting a
   `FlowDocument`'s content into real, discrete pages.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `FlowDocument`, `PrintDialog`, and `DocumentPaginator` are given full
+  treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Building and Really Printing a `FlowDocument`

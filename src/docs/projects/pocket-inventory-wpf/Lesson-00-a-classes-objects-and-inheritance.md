@@ -53,6 +53,30 @@ exactly that and explains everything from zero. Nothing about C# or
 - **Base class / derived class** — the general class being extended
   (base) and the specific class extending it (derived); a derived class
   gains the base's members, never the other way around.
+- **String interpolation (`$"..."`)** — a string literal prefixed with
+  `$`, letting `{ }` embed a real expression directly inside the text;
+  C# evaluates whatever is inside the braces and substitutes its actual
+  value into the resulting string, in place, at that exact position.
+  The direct cousin of Python's own f-strings (`f"..."`) — same idea,
+  different prefix character.
+- **Ternary conditional operator (`condition ? a : b`)** — a single
+  expression, not a statement, that evaluates to `a` if `condition` is
+  `true` and `b` if it's `false`. Exists specifically because an
+  ordinary `if`/`else` is a *statement* (it runs code, it doesn't
+  produce a value) — `?:` is the shorthand for the common case of
+  choosing between two plain values inline, without a temporary
+  variable and a multi-line `if`/`else` just to set it.
+
+**Objects and methods used**
+- **`Console`** — a `static` class from .NET's base class library
+  representing this program's connection to the terminal it's running
+  in. `static` means there is no `Console` *object* anywhere — you never
+  write `new Console()` — because a running program has exactly one
+  console, not a variable number of separate `Console` objects each with
+  their own text. `Console.WriteLine(...)` is a `static` method on it:
+  called on the class itself, not on an instance, for the same reason.
+  Every real output shown in this lesson's labs comes from this one
+  method, called with a plain string or a `$"..."`-interpolated one.
 
 ---
 
@@ -166,6 +190,14 @@ class and an object are; it will not appear in Pocket Inventory.
   function that belongs to the class, with automatic access to
   *whichever object it's currently running on*'s own `IsOn` — not some
   single, shared value.
+- `$"This bulb is {(IsOn ? "on" : "off")}"` — (first appearance) **string
+  interpolation**: the `$` prefix means `{ ... }` inside this string is a
+  real expression, evaluated and substituted in, not literal text —
+  here, the expression is `(IsOn ? "on" : "off")` itself. That
+  expression is a **ternary conditional operator**: if `IsOn` is `true`,
+  the whole expression evaluates to the string `"on"`; if `false`, to
+  `"off"` — one of exactly two values, chosen inline, with no separate
+  `if`/`else` statement needed just to decide which string to print.
 - `Lightbulb kitchen = new Lightbulb();` — (first appearance) `new
   Lightbulb()` is what actually builds a real object from the blueprint
   — a distinct thing in memory with its own copy of `IsOn`. `Lightbulb

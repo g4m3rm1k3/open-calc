@@ -42,6 +42,14 @@ example of a popup window in this project.
 - **`Window.Owner`** — associates a secondary `Window` with the one
   that opened it, for taskbar grouping, z-ordering, and later lookup.
 
+**Objects and methods used**
+- `Window` itself (the base class every window in this project,
+  including `MainWindow`, has extended since Lesson 0/1) reappears
+  here, already given full treatment — brief reminder only, per the
+  Repetition Rule. `Window.GetWindow(this)`, `ShowDialog`, and
+  `Window.Owner` are this lesson's own subject, given full treatment
+  below.
+
 ---
 
 ## Concept Unit: Framework-Dependent vs. Self-Contained — a Real, Measured Difference

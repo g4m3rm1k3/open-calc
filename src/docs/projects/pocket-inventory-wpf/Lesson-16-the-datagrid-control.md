@@ -35,6 +35,12 @@ display patterns, already proven in `DetailPanel`.
   double-click a cell and edit it directly; `false` by default, unlike
   `ListBox`, which has no concept of editable cells at all.
 
+**Objects and methods used**
+- `ObservableCollection<T>`/`{Binding}` (Lesson 7) reappear here,
+  already given full treatment — brief reminder only, per the
+  Repetition Rule. `DataGrid` and its columns are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `DataGrid` — Auto-Generated vs. Explicit Columns

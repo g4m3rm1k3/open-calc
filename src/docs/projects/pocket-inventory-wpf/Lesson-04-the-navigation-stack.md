@@ -48,6 +48,14 @@ lesson adds a third one to.
 - **`Frame.GoBack()`** — pops the top entry off the back stack and
   navigates to it.
 
+**Objects and methods used**
+- `Console.WriteLine`, already given full treatment in Lesson 00a,
+  reappears in this lesson's own throwaway `Doorbell`/`Chime` lab —
+  brief reminder only, per the Repetition Rule. `event`, `+=`,
+  `?.Invoke()`, and every `Frame`/`NavigationService` member used here
+  are this lesson's own subject, given full treatment in the Concept
+  Units below.
+
 ---
 
 ## Concept Unit: Subscribing to an Event From C#, With `+=`

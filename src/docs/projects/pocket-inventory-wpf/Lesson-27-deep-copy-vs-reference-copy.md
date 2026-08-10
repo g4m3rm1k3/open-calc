@@ -32,6 +32,11 @@ just assumed.
   recursively copied, so no mutable state is ever shared between
   original and copy.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject — shallow vs.
+  deep copy, and the copy-constructor pattern used to achieve it, are
+  given full treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Where a Shallow Copy Silently Breaks

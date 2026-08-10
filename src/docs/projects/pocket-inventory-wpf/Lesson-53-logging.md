@@ -31,6 +31,20 @@ attached console. Lesson 23a: `catch`, `Exception`.
   caught anywhere — the last point before the entire app would
   otherwise crash.
 
+**Objects and methods used**
+- **`Environment.NewLine`** — a `static`, read-only `string` holding the
+  correct line-ending sequence for whatever operating system the
+  program is actually running on (`\r\n` on Windows, `\n` elsewhere) —
+  used instead of a hardcoded `"\n"` so a log file's line endings are
+  always the ones native tools on that machine expect.
+- **`File.ReadAllText(path)`** — a `static` method that opens a file,
+  reads its entire contents into one `string`, and closes it — used
+  here once, to display the log file's real contents back for
+  verification. `File.AppendAllText` (Lesson 34's `StreamWriter`-based
+  writing, reappearing here in a different shape) and `DateTime.Now`'s
+  `"O"` round-trip format specifier are this lesson's own subject,
+  given full treatment below.
+
 ---
 
 ## Concept Unit: A Log That Survives the Process That Wrote It

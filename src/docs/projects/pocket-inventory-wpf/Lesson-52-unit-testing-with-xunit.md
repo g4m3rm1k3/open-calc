@@ -32,6 +32,12 @@ instinct applies to test assertions).
   failure message — naming exactly what was expected and what actually
   happened — when it doesn't hold.
 
+**Objects and methods used**
+- The `Repository` class (Lesson 50) reappears here, already given
+  full treatment — brief reminder only, per the Repetition Rule.
+  `[Fact]` and `Assert` are this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: A Real Test Project — Proof That Survives

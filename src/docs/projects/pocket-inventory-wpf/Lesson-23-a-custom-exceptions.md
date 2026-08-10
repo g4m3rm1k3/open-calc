@@ -34,6 +34,15 @@ shape applies here).
   one whose declared exception type matches the thrown exception's real
   type (or a base type of it).
 
+**Objects and methods used**
+- **`System.Exception`** — the base class every exception type in .NET
+  ultimately derives from, including this lesson's own custom one; its
+  `Message` property (a `string` describing what went wrong) and its
+  constructor chain (a derived exception's constructor typically calls
+  `: base(message)` to store that text) are inherited automatically —
+  this lesson's own custom exception class is this lesson's real
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Why a Generic `Exception` Isn't Enough

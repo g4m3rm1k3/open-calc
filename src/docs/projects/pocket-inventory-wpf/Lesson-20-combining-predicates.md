@@ -22,6 +22,11 @@ together, not overriding each other.
   condition, instead of writing separate, nested `if` branches for every
   combination.
 
+**Objects and methods used**
+- `Predicate<T>` and `ICollectionView.Filter` (Lesson 19) reappear
+  here, already given full treatment — brief reminder only, per the
+  Repetition Rule.
+
 ---
 
 ## Concept Unit: Combining Conditions With `&&` Instead of Branching

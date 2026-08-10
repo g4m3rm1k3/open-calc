@@ -64,6 +64,17 @@ button), whose padding this lesson also centralizes.
   can't actually be resolved; the window never opens rather than
   silently falling back to a wrong default.
 
+**Objects and methods used**
+- No new supporting cast beyond this lesson's own subject —
+  `SolidColorBrush`, `Style`/`Setter`, and `StaticResource`'s lookup
+  chain are this lesson's own subject, given full treatment in the
+  Concept Units below. This lesson's own real, tested content is also
+  available as two standalone, project-independent concept files in
+  the shared catalog — `wpf-styles-and-setters.md` and
+  `wpf-resourcedictionary-and-staticresource.md` — for any future
+  lesson (in this project or any other) that needs a brief reminder
+  instead of re-deriving this material from scratch.
+
 ---
 
 ## Concept Unit: `Style` — a Named Bundle of Property Values

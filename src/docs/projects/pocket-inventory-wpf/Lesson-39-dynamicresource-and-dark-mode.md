@@ -27,6 +27,14 @@ gives real, visible effect.
   one for shared styles; this lesson adds a second, alternate one (a
   dark theme) and swaps which is active at runtime.
 
+**Objects and methods used**
+- `StaticResource`/`Style`/`Setter` (Lesson 5) reappear here, already
+  given full treatment — brief reminder only, per the Repetition Rule.
+  `DynamicResource` is this lesson's own subject, given full treatment
+  below (also detailed as a standalone concept file,
+  `wpf-resourcedictionary-and-staticresource.md`, for the
+  `StaticResource` half of this same contrast).
+
 ---
 
 ## Concept Unit: Proving `StaticResource` Doesn't Update, and `DynamicResource` Does

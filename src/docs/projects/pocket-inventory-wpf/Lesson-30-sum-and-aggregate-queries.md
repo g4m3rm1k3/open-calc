@@ -29,6 +29,12 @@ has.
 - **Scalar query** — a query whose entire result is a single value, read
   with `ExecuteScalar()` instead of `ExecuteReader()`.
 
+**Objects and methods used**
+- `SqliteCommand`/`ExecuteReader()` (Lessons 9, 10) reappear here,
+  already given full treatment — brief reminder only, per the
+  Repetition Rule. `SUM()` and `ExecuteScalar()` are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: `SUM()` — and Its Real, Honest Limit
