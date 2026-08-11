@@ -29,11 +29,17 @@ of their behavior.
   away from its neighbors; distinct from padding (Lesson 08), which
   reserves space *inside* a container's own edge.
 
-**Objects and methods used**
-- `android:padding` — space reserved *inside* a container's own edge,
-  Lesson 08 — reappears here by contrast, exactly as already taught.
-  `themes.xml`/`colors.xml` and margins are this lesson's own subject,
-  given full treatment above.
+**Objects and methods used:** `themes.xml`/`colors.xml` and margins are
+this lesson's own subject, given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`android:padding`**
+  - *What it is:* space reserved *inside* a container's own edge.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* the login screen's existing outer `24dp` padding, named
+    here by contrast to define what a margin, this lesson's own subject,
+    is not.
 
 ---
 

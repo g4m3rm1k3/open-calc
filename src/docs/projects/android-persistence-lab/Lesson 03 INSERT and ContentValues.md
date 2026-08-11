@@ -21,10 +21,36 @@ that trap, not just how to add a row.
   names to the values to write, passed to `insert`/`update` instead of
   building SQL text by hand.
 
-**Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `ContentValues` and `SQLiteDatabase.insert` are given full treatment
-  in the Concept Units below.
+**Objects and methods used:**
+
+**`ContentValues`**
+- *What it is:* an Android key-value container mapping column names to
+  the values to write.
+- *Implementation:* a real, concrete class; `put(String, ...)` adds one
+  column/value pair, overloaded per value type — built up once per
+  insert, then handed to `insert` as a single argument instead of
+  hand-built SQL text.
+- *Its use:* built inside `addItem`, holding the new row's real column
+  values.
+
+**`SQLiteDatabase.insert(String, String, ContentValues)`**
+- *What it is:* the method that writes one new row, safely.
+- *Implementation:* `public long insert(String table, String
+  nullColumnHack, ContentValues values)`, real declared signature,
+  confirmed against Android's own reference documentation — returns the
+  new row's id, or `-1` on failure.
+- *Its use:* called once inside `addItem`, the safe alternative to
+  concatenating a SQL string by hand.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`SQLiteDatabase.execSQL(String)`**
+  - *What it is:* a method that runs one SQL statement with no result
+    rows expected.
+  - *Implementation:* given full treatment in Lesson 02.
+  - *Its use:* named here only by contrast — the unsafe, string-
+    concatenated alternative this lesson's real subject exists to
+    replace.
 
 ---
 

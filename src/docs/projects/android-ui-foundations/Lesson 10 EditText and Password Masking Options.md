@@ -27,8 +27,16 @@ resources, `wrap_content`, `sp`).
   widget adding features like a show/hide password toggle on top of a
   plain `EditText`.
 
-**Objects and methods used:** `EditText` and `inputType` are this
-lesson's own subject, given full treatment below.
+**Objects and methods used:**
+
+**`EditText`**
+- *What it is:* the standard Android widget for user-editable text
+  input.
+- *Implementation:* a subclass of `TextView`, inheriting text display
+  and styling, adding the ability to accept and display typed input on
+  top.
+- *Its use:* this lesson's two new fields — username and password — both
+  built from it.
 
 **Everything else in the file, not this lesson's subject but still
 explained:**

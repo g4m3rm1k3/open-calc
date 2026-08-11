@@ -21,11 +21,35 @@ Manifest entries for each screen), Lesson 31 (the Notifications screen).
   additional background-color parameter, and only usable on that API
   level or higher.
 
-**Objects and methods used**
-- `startActivity(Intent)` — the `Activity` method requesting the OS
-  start a different Activity, Lesson 17 — reappears here exactly as
-  already taught. `overridePendingTransition`/`overrideActivityTransition`
-  are this lesson's own subject, given full treatment below.
+**Objects and methods used:**
+
+**`overridePendingTransition(int, int)`**
+- *What it is:* an `Activity` method setting a custom enter/exit
+  animation pair for the transition immediately following a
+  `startActivity` or `finish` call.
+- *Implementation:* deprecated as of API 34 but fully functional there,
+  and the only one of the two real options that works on every API
+  level this project targets.
+- *Its use:* the option this project builds, called once per navigation
+  right after each existing `startActivity` call.
+
+**`overrideActivityTransition(int, int, int, int)`**
+- *What it is:* the newer replacement API, added in Android 14 (API
+  level 34).
+- *Implementation:* takes an additional background-color parameter,
+  smoothing a visual gap the older API can leave between screens — only
+  usable on API 34 or higher.
+- *Its use:* a real alternative, recognized here but not built by this
+  project, since this project's minimum supported version is below 34.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`startActivity(Intent)`**
+  - *What it is:* the `Activity` method requesting the OS start a
+    different Activity.
+  - *Implementation:* given full treatment in Lesson 17.
+  - *Its use:* the existing call in every navigation this lesson adds an
+    `overridePendingTransition` line directly after.
 
 ---
 

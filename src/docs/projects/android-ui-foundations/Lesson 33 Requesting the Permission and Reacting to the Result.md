@@ -22,15 +22,46 @@ Lesson 32 (the ternary operator).
   changes anything or shows any UI; calling it any number of times has
   the same effect as calling it once.
 
-**Objects and methods used**
-- `ActivityResultContracts.RequestPermission`/`registerForActivityResult`
-  — the modern, registered-callback permission-request API, Lesson 31
-  — `findViewById` — the generic, bounded method locating a `View` by
-  its `android:id`, Lesson 13 — and the ternary operator — the compact
-  `condition ? a : b` expression, Lesson 32 — all reappear here as real
-  project code, exactly as already taught. `ContextCompat.checkSelfPermission`
-  and `getString` are this lesson's own subject, given full treatment
-  above.
+**Objects and methods used:**
+
+**`ContextCompat.checkSelfPermission(Context, String)`**
+- *What it is:* a static method reporting whether a permission is
+  currently granted.
+- *Implementation:* `public static int checkSelfPermission(Context
+  context, String permission)`, returning
+  `PackageManager.PERMISSION_GRANTED` or `PERMISSION_DENIED` — an
+  idempotent check, never itself changing anything or showing UI.
+- *Its use:* wrapped in `isSmsPermissionGranted()`, called both once at
+  screen open and again inside the button's own click listener.
+
+**`getString(int)`**
+- *What it is:* an `Activity` method resolving a string resource
+  reference to its real text.
+- *Implementation:* inherited (same chain as `findViewById`); the
+  Java-code equivalent of the `@string/...` XML syntax Lesson 09
+  introduced.
+- *Its use:* called from `updateStatusText`, since this code sets text
+  from Java rather than declaring it in a layout.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`ActivityResultContracts.RequestPermission` / `registerForActivityResult`**
+  - *What it is:* the modern, registered-callback permission-request
+    API.
+  - *Implementation:* given full treatment in Lesson 31.
+  - *Its use:* the field-initializer pairing this lesson's `isGranted ->`
+    lambda finally reacts through, now as real, running project code.
+- **`findViewById`**
+  - *What it is:* the generic, bounded method locating a `View` by its
+    `android:id`.
+  - *Implementation:* given full treatment in Lesson 13.
+  - *Its use:* looks up `statusText` and `enableButton`, both inside
+    `onCreate` and again inside the permission-result lambda.
+- **The ternary operator**
+  - *What it is:* the compact `condition ? a : b` expression.
+  - *Implementation:* given full treatment in Lesson 32.
+  - *Its use:* `updateStatusText`'s single-line choice between the
+    granted and denied status strings.
 
 ---
 

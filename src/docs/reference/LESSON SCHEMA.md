@@ -144,18 +144,73 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
   oriented before meeting any of these terms in real code, rather than
   meeting each one cold, mid-block.
 - **Objects and methods used** — immediately after Terms introduced.
-  Every external class, interface, or method this lesson's code
-  depends on that is not itself the lesson's subject — framework,
-  library, or runtime pieces the code merely needs to compile and run
-  — gets real grounding here: what it conceptually is, how it's
-  actually implemented, and how it's used. Nothing gets skipped just
-  because it isn't "the point" of the lesson — if it appears in the
-  code, it gets explained somewhere, and this is where the supporting
-  cast goes so the reader isn't left to reverse-engineer it from
-  context. When such a type's shape isn't obvious from a single call
-  (see step 7's "Objects and methods used, not extended" callout,
-  below), show its real declared shape here too, not only inline at
-  the call site.
+  Covers every real external class, interface, or method this lesson's
+  code depends on — never a language keyword, annotation, or operator
+  (`extends`, `@Override`, `abstract`, a generic type parameter, the
+  ternary operator, an access modifier); those are concepts, not
+  objects or methods, and belong in Terms Introduced instead, with
+  their own real definition there. This includes the lesson's own
+  subject when that subject is a real class or method, not only
+  supporting cast: a lesson teaching `println`/`javac`/`java` (Java's
+  entry-point mechanics) still gives each of those three its own real
+  entry here, even though they're what the lesson is *about* — "given
+  full treatment below" is a deferral, not a substitute for an entry,
+  and it has to resolve into one.
+
+  **Format: one bolded name, then three labeled sub-bullets** — *What
+  it is:* (its conceptual identity), *Implementation:* (its real,
+  concrete shape — a signature, a return type, an inheritance
+  relationship, a constant's actual value), *Its use:* (why this
+  lesson's code reaches for it specifically). This is not prose wrapped
+  around the same three facts; a paragraph that mixes "what it is" and
+  "why it's here" into one flowing sentence fails this the same way a
+  multi-member shape explained as one paragraph fails the "own bullet"
+  rule below — the reader needs the three facts visually separable, not
+  just present somewhere in the text.
+
+  **Primary vs. supporting cast is about placement, not treatment.**
+  Every entry gets the full three-part format regardless of category.
+  Items that *are* this lesson's own subject go first, in the order the
+  lesson's own Concept Units introduce them — often right where the
+  code or the framework contract that uses them is first shown, not
+  bunched separately. Everything else — a reappearing construct from an
+  earlier lesson, a class named only because it appears in a quoted
+  framework contract or an XML tag, a diagnostic tool used to prove a
+  claim — goes under a trailing heading, verbatim: **"Everything else
+  in the file, not this lesson's subject but still explained."** A
+  reappearing item's *Implementation* line cites the lesson that gave
+  it full treatment instead of re-deriving it; it still gets all three
+  labels, never a bare citation with nothing else (this is the
+  Repetition Rule applied at the level of this section's own format).
+
+  **A tag, declaration, or file is its own artifact, separate from
+  whatever class or concept it names or wires to.** An XML `<activity>`
+  entry is not the same thing as the `Activity` subclass it declares; a
+  Manifest permission tag is not the same thing as the runtime
+  permission constant it names. When a lesson's code contains such a
+  declaration, the declaration itself — not only the class or constant
+  it references — gets its own entry if its own syntax carries meaning
+  worth explaining (a leading-dot package shorthand, an attribute that
+  changes build-time behavior).
+
+  **Every "Lesson N" forward-reference is a promise that must be kept,
+  correctly addressed.** When this lesson explicitly defers a concept's
+  real explanation to a specific future lesson ("flagged, not explained
+  yet — Lesson N covers this"), that citation is a commitment: Lesson N
+  must actually deliver it, under that exact name, by the time this
+  curriculum is done. This is not a one-time check — restructuring
+  which lesson actually explains something (a common, legitimate
+  outcome of later editing) obligates updating every earlier citation
+  that pointed at the old location, not just adding the new
+  explanation elsewhere. An unfulfilled or misdirected "Lesson N"
+  citation reads, to a working student, exactly like a promise that was
+  never kept — worse than an honest "not needed yet," because it
+  invites them to go looking for something that isn't where it says it
+  is.
+
+  When such a type's shape isn't obvious from a single call (see step
+  7's "Objects and methods used, not extended" callout, below), show
+  its real declared shape here too, not only inline at the call site.
 
 ---
 
@@ -369,8 +424,14 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
 7. **Mechanical walkthrough — how it works in isolation.** Before writing
    a word of prose, literally enumerate every distinct syntactic element
    in step 5's code block, in the order it appears — every method call,
-   every property access, every operator, every literal. Do not read the
-   block holistically and write about "what seems worth mentioning"; that
+   every property access, every operator, every literal. **A fluent or
+   chained call sequence (`builder.a(...).b(...).c(...)`) is every one of
+   those method calls, not one code block to wave through as a unit** —
+   each link gets its own place in the enumeration, the same as if the
+   calls were written on separate lines; showing the whole chain once
+   and explaining only its overall effect is exactly the same failure as
+   skipping any other syntactic element. Do not read the block
+   holistically and write about "what seems worth mentioning"; that
    is exactly the failure mode this step exists to prevent, and it has
    failed silently before under this schema, more than once, in exactly
    this way. For each item on that enumeration, decide one of three

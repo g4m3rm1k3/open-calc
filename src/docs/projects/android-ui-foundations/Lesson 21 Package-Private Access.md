@@ -18,11 +18,17 @@ proven with real compiler errors).
   the same package, invisible to code in a different package, regardless
   of any inheritance relationship.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  lab exactly as before. Package-private access is this lesson's own
-  subject, given full treatment above.
+**Objects and methods used:** Package-private access is this lesson's
+own subject, given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints `Widget.describe()`'s result from `SameyPackageUser`,
+    proving same-package access works before the cross-package rejection
+    is shown.
 
 ---
 

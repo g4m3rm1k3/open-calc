@@ -19,18 +19,32 @@ reference type, never a primitive).
   code tries to call a method or read a field through a reference that
   currently holds `null`.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  labs exactly as before.
-- **`String`** — Java's built-in text type; a real class (a reference
-  type, per this lesson's own point), not a primitive, even though
-  string literals (`"..."`) look like they could be. **`.length()`** —
-  an instance method every `String` object has, returning its number
-  of characters as an `int`. Used here specifically because calling it
-  on a `null` reference is what actually triggers this lesson's
-  `NullPointerException` — not this lesson's own subject, but the
-  concrete example that makes the subject real.
+**Objects and methods used:** `null` and `NullPointerException` are this
+lesson's own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each lab's real output, including `println`'s own
+    special-cased handling of a `null` argument.
+- **`String`**
+  - *What it is:* Java's built-in text type.
+  - *Implementation:* a real class — a reference type, per this lesson's
+    own point — not a primitive, even though a string literal (`"..."`)
+    might look like one.
+  - *Its use:* the concrete reference type this lesson's `null` variable
+    is declared as, since `null` is only ever possible for a reference
+    type.
+- **`String.length()`**
+  - *What it is:* an instance method every `String` object has.
+  - *Implementation:* returns the string's number of characters as an
+    `int`.
+  - *Its use:* calling it on a `null` reference is what actually
+    triggers this lesson's real, captured `NullPointerException` — not
+    this lesson's own subject, but the concrete example that makes the
+    subject real.
 
 ---
 

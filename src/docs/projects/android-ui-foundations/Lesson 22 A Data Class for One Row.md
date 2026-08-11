@@ -23,14 +23,35 @@ Lesson 20 (`ArrayList<E>`), Lesson 21 (package-private access).
   Java syntax for exactly this "a few named fields traveling together"
   case, generating a constructor, getters, and more automatically.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's static print method, Lesson 01 —
-  `private` — visible only inside the declaring class, Lesson 13 —
-  `final` on a field — assignable once, never after, Lesson 13 — and
-  `this` — the currently-running object, first met disambiguating a
-  constructor parameter from a same-named field, Lesson 16 — all
-  reappear here exactly as already taught. Constructors and getter
-  methods are this lesson's own subject, given full treatment below.
+**Objects and methods used:** Constructors and getter methods are this
+lesson's own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints `origin`/`corner`'s independent coordinates,
+    proving each `Point` object holds its own state.
+- **`private`**
+  - *What it is:* an access modifier meaning "visible only inside the
+    declaring class."
+  - *Implementation:* given full treatment in Lesson 13.
+  - *Its use:* `Point`'s and `InventoryItem`'s fields, requiring the
+    getter methods this lesson's own subject builds.
+- **`final` on a field**
+  - *What it is:* a field assignable once, never after.
+  - *Implementation:* given full treatment in Lesson 13.
+  - *Its use:* `Point`'s `x`/`y` fields, combined with a required
+    constructor, making the object structurally incapable of an
+    invalid, half-initialized state.
+- **`this` as a disambiguator**
+  - *What it is:* the currently-running object.
+  - *Implementation:* first met disambiguating a constructor parameter
+    from a same-named field in Lesson 16, on an Activity; a related but
+    distinct role here.
+  - *Its use:* `this.x = x;` inside `Point`'s constructor, distinguishing
+    the field from the same-named parameter.
 
 ---
 

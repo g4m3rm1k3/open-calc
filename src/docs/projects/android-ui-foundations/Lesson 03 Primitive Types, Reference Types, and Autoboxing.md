@@ -28,14 +28,27 @@ aliasing).
   value into its wrapper object (autoboxing) or back (unboxing) when the
   surrounding code requires it.
 
-**Objects and methods used**
-- **`Object.getClass()`** — a method every Java object has (inherited
-  from `Object`, the root of every class), returning a `Class` object
-  describing the value's actual runtime type. **`Class.getName()`** — a
-  method on that returned `Class` object, giving its fully-qualified
-  name as a `String`. Used together here purely as a verification tool
-  — proving autoboxing really produced an `Integer` object, not this
-  lesson's own subject.
+**Objects and methods used:** Primitive types, reference types, and
+autoboxing/unboxing are this lesson's own subject, given full treatment
+below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`Object.getClass()`**
+  - *What it is:* a method every Java object has, inherited from
+    `Object`, the root of every class.
+  - *Implementation:* returns a `Class` object describing the value's
+    actual runtime type.
+  - *Its use:* used purely as a verification tool here, proving
+    autoboxing really produced a real `Integer` object rather than just
+    asserting it.
+- **`Class.getName()`**
+  - *What it is:* a method on the `Class` object `getClass()` returns.
+  - *Implementation:* returns that type's fully-qualified name as a
+    `String`.
+  - *Its use:* paired with `getClass()` to turn "autoboxing produced an
+    `Integer`" from a written claim into the verified `java.lang.Integer`
+    shown in this lesson's real output.
 
 ---
 

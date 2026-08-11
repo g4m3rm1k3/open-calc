@@ -36,14 +36,29 @@ explaining).
   configuration data rather than executable code; unlike Java, nothing
   compiles it to bytecode — the OS reads it directly as data.
 
-**Objects and methods used**
-- **`android.util.Log`** — a class Android provides for writing to
-  Logcat. `.d(tag, message)` is its debug-level logging method (`.i`
-  info, `.w` warning, `.e` error are the same shape at different
-  severities) — a diagnostic tool used here to prove a claim, not this
-  lesson's own subject. `Activity.onCreate(Bundle)` — this lesson's
-  real subject — is given full treatment above, verified against
-  Android's own official reference documentation.
+**Objects and methods used:**
+
+**`Activity.onCreate(Bundle)`**
+- *What it is:* the lifecycle callback the OS calls once, when an
+  Activity is starting.
+- *Implementation:* `protected void onCreate(Bundle savedInstanceState)`
+  — real, declared signature, verified this session against Android's
+  own official reference documentation, quoted in full below.
+- *Its use:* the exact method already sitting in `MainActivity.java`
+  since Lesson 05, now proven — via the `Log.d` line this lesson adds
+  — to run without your own code ever calling it.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`android.util.Log`**
+  - *What it is:* a class Android provides for writing to Logcat, a
+    filterable debug-output channel separate from a plain console.
+  - *Implementation:* `.d(tag, message)` is its debug-level logging
+    method — `.i` info, `.w` warning, `.e` error are the same call
+    shape at different severities.
+  - *Its use:* a diagnostic tool used here to prove a claim (that
+    `onCreate` really runs without your own code calling it), not this
+    lesson's own subject.
 
 ---
 

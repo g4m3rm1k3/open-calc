@@ -16,11 +16,16 @@ Lesson 06 (`extends`, classes generally).
   class, for organizational purposes, that does **not** hold any
   implicit reference to an instance of its enclosing class.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  lab exactly as before. Static nested classes are this lesson's own
-  subject, given full treatment above.
+**Objects and methods used:** Static nested classes are this lesson's
+own subject, given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints the constructed `Inner` instance's `describe()`
+    result, proving it was built with no enclosing `Outer` required.
 
 ---
 

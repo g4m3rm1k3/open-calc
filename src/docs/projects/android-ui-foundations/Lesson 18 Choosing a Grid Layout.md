@@ -28,44 +28,89 @@ this grid inside).
   row views for a much larger scrollable dataset, instead of creating one
   view object per data item.
 
-**Objects and methods used**
-- `ViewGroup` — the `View` subtype whose entire job is arranging its
-  children, taught in Lesson 08.
-- `GridLayout` — a static XML `ViewGroup` that arranges a fixed, known
-  set of child views into declared rows and columns, decided entirely at
-  layout time, with no concept of runtime data.
-- `GridView` — an older Android widget purpose-built for scrollable
-  grids, backed by an `Adapter` object that supplies however many rows
-  the underlying data actually has at runtime; a real alternative,
-  recognized here but not built by this project.
-- `ArrayAdapter<String>` — a general-purpose `Adapter` implementation
-  that maps each element of an array or `List` to one row view, using a
-  built-in row layout; used in Option B above to adapt `itemNames` into
-  `GridView`'s rows.
-- `RecyclerView` — a modern, flexible widget for scrollable lists and
-  grids that delegates arrangement to a `LayoutManager` and content to
-  an `Adapter`, and recycles a small, fixed pool of row views instead of
-  creating one per data item; the option this project builds.
-- `LayoutManager` — the object handed to a `RecyclerView` that decides
-  *where* each item is positioned on screen, independent of what each
-  item displays.
-- `LinearLayoutManager` — a real `LayoutManager` implementation
-  arranging items in a single scrolling column, one record per row —
-  the shape this project's tabular inventory data needs, and the one it
-  builds forward with.
-- `GridLayoutManager` — a real `LayoutManager` implementation arranging
-  whole items into a tile/card grid, several complete items per row —
-  the right fit for a photo gallery or icon launcher, not this
-  project's data.
-- `Adapter` — the object handed to a `GridView` or `RecyclerView` that
-  decides *what* each item looks like and *how many* exist;
-  `RecyclerView.Adapter`'s own real, declared shape is given full
-  treatment next lesson.
-- `setAdapter(...)` — the method attaching a data-supplying `Adapter` to
-  either a `GridView` or `RecyclerView`.
-- `setLayoutManager(...)` — the method assigning a specific
-  `LayoutManager` to a `RecyclerView`, deciding its arrangement
-  independently of its data.
+**Objects and methods used:** `GridLayout`, `GridView`, `RecyclerView`,
+`ArrayAdapter<String>`, `LayoutManager` (`LinearLayoutManager`/
+`GridLayoutManager`), `Adapter`, and `setAdapter(...)`/
+`setLayoutManager(...)` are this lesson's own subject, given full
+treatment above.
+
+**`GridLayout`**
+- *What it is:* a static XML `ViewGroup`.
+- *Implementation:* arranges a fixed, known set of child views into
+  declared rows and columns, decided entirely at layout time, with no
+  concept of runtime data.
+- *Its use:* Option A above — the right tool only when the exact set of
+  items is fixed and known ahead of time.
+
+**`GridView`**
+- *What it is:* an older Android widget purpose-built for scrollable
+  grids.
+- *Implementation:* one XML element, backed by an `Adapter` object that
+  supplies however many rows the underlying data actually has at
+  runtime.
+- *Its use:* Option B above — a real, working alternative, recognized
+  here but not built by this project.
+
+**`ArrayAdapter<String>`**
+- *What it is:* a general-purpose `Adapter` implementation.
+- *Implementation:* maps each element of an array or `List` to one row
+  view, using a built-in row layout.
+- *Its use:* Option B's own code, adapting `itemNames` into `GridView`'s
+  rows.
+
+**`RecyclerView`**
+- *What it is:* a modern, flexible widget for scrollable lists and
+  grids.
+- *Implementation:* delegates arrangement to a `LayoutManager` and
+  content to an `Adapter`, and recycles a small, fixed pool of row views
+  instead of creating one per data item.
+- *Its use:* Option C — the option this project builds forward with.
+
+**`LayoutManager`**
+- *What it is:* the object handed to a `RecyclerView` that decides
+  *where* each item is positioned on screen.
+- *Implementation:* a swappable strategy, independent of what each item
+  displays.
+- *Its use:* attached via `setLayoutManager(...)`, below.
+
+**`LinearLayoutManager`**
+- *What it is:* a real `LayoutManager` implementation.
+- *Implementation:* arranges items in a single scrolling column, one
+  record per row.
+- *Its use:* the shape this project's tabular inventory data needs, and
+  the one it builds forward with.
+
+**`GridLayoutManager`**
+- *What it is:* a real `LayoutManager` implementation.
+- *Implementation:* arranges whole items into a tile/card grid, several
+  complete items per row.
+- *Its use:* the right fit for a photo gallery or icon launcher — not
+  this project's data.
+
+**`Adapter`**
+- *What it is:* the object handed to a `GridView` or `RecyclerView` that
+  decides *what* each item looks like and *how many* exist.
+- *Implementation:* `RecyclerView.Adapter`'s own real, declared shape is
+  given full treatment next lesson.
+- *Its use:* paired with a `LayoutManager` inside `RecyclerView`, or
+  used alone inside `GridView`.
+
+**`setAdapter(...)` / `setLayoutManager(...)`**
+- *What they are:* the methods wiring a widget to its data source and
+  arrangement strategy.
+- *Implementation:* `setAdapter` works on both `GridView` and
+  `RecyclerView`; `setLayoutManager` only on `RecyclerView`.
+- *Their use:* the actual calls connecting Option B/C's real widgets to
+  the objects above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`ViewGroup`**
+  - *What it is:* the `View` subtype whose entire job is arranging its
+    children.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* the shared ancestor of all three container options this
+    lesson compares.
 
 ---
 

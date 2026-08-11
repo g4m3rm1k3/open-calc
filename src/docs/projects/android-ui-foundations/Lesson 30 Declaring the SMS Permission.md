@@ -27,13 +27,18 @@ declarations — the same file, a different kind of entry).
   location, contacts) additionally require an explicit runtime prompt
   the user can accept or refuse.
 
-**Objects and methods used**
-- `AndroidManifest.xml` — the file, read by the OS before any app code
-  runs, declaring which classes are real launchable components,
-  Lesson 07 — reappears here exactly as already taught, now holding a
-  different kind of entry. `<uses-permission>`/`<uses-feature>` and the
-  normal/dangerous split are this lesson's own subject, given full
-  treatment above.
+**Objects and methods used:** `<uses-permission>`/`<uses-feature>` and
+the normal/dangerous split are this lesson's own subject, given full
+treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`AndroidManifest.xml`**
+  - *What it is:* the file, read by the OS before any app code runs,
+    declaring which classes are real launchable components.
+  - *Implementation:* given full treatment in Lesson 07.
+  - *Its use:* the same file `<activity>` entries live in, now holding
+    two new, different kinds of top-level entries this lesson adds.
 
 ---
 

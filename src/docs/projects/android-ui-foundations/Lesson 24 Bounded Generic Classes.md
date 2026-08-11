@@ -18,14 +18,29 @@ Lesson 20 (generic classes, `ArrayList<E>`).
   constrained to some specific type or its subtypes, combining Lesson
   20's generic-class shape with Lesson 13's bounding idea.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's static print method, Lesson 01 —
-  generic classes — a class whose own declaration carries a type
-  parameter, Lesson 20 — and bounded type parameters — a type
-  parameter constrained to a specific type or its subtypes, Lesson 13 —
-  all reappear in this lesson's own lab exactly as already taught.
-  Combining the two into a bounded generic class is this lesson's own
-  subject, given full treatment above.
+**Objects and methods used:** Combining a generic class with a bound
+into one bounded generic class is this lesson's own subject, given full
+treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints `dogCage.describeOccupant()`'s result, proving the
+    bound lets a type-specific method be called with no cast.
+- **Generic classes**
+  - *What it is:* a class whose own declaration carries a type
+    parameter.
+  - *Implementation:* given full treatment in Lesson 20.
+  - *Its use:* `Cage<A>`'s own shape — the type parameter belongs to the
+    whole class, not just one method.
+- **Bounded type parameters**
+  - *What it is:* a type parameter constrained to a specific type or its
+    subtypes.
+  - *Implementation:* given full treatment in Lesson 13.
+  - *Its use:* `<A extends Animal>`, restricting what `Cage` can ever
+    hold to `Animal` or a subtype.
 
 ---
 

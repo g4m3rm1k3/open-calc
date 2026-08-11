@@ -22,12 +22,21 @@ pattern-match.
   type parameter from the arguments passed, without it being written out
   explicitly.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's static print method, Lesson 01 —
-  and autoboxing — the automatic primitive-to-wrapper conversion,
-  Lesson 03 — reappear in this lesson's own lab exactly as already
-  taught. Generic methods are this lesson's own subject, given full
-  treatment above.
+**Objects and methods used:** Generic methods are this lesson's own
+subject, given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each call's inferred, correctly-typed result.
+- **Autoboxing**
+  - *What it is:* the automatic primitive-to-wrapper conversion.
+  - *Implementation:* given full treatment in Lesson 03.
+  - *Its use:* silently converts `42` and `0` into `Integer` objects
+    before `firstNonNull` ever sees them, which is why the generic
+    method can accept them at all.
 
 ---
 

@@ -21,11 +21,16 @@ this lesson is deliberately contrasted against).
   individual call site, which overloaded method actually matches based
   on the arguments provided.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  lab exactly as before. Method overloading is this lesson's own
-  subject, given full treatment below.
+**Objects and methods used:** Method overloading is this lesson's own
+subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each overload's result, showing the compiler
+    correctly resolving both call sites.
 
 ---
 

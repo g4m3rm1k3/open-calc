@@ -27,16 +27,30 @@ without losing data.
   each row in a table; every other table's foreign keys, and every
   direct row lookup, refer back to it.
 
-**Objects and methods used**
-- `SQLiteOpenHelper` — the framework base class managing a SQLite
-  database file's own creation and version upgrades — and `onCreate` —
-  the lifecycle method it calls exactly once, the first time the
-  database file doesn't yet exist — both taught in Lesson 01, reappear
-  here unchanged, now with real SQL inside the method body.
-  `SQLiteDatabase.execSQL(String)` — a method that runs one SQL
-  statement with no result rows expected (the right tool for `CREATE
-  TABLE`, as opposed to a method that returns query results) — full
-  treatment below, since this is its first real use.
+**Objects and methods used:**
+
+**`SQLiteDatabase.execSQL(String)`**
+- *What it is:* a method that runs one SQL statement with no result
+  rows expected.
+- *Implementation:* `public void execSQL(String sql)`, real declared
+  signature — the right tool for `CREATE TABLE`, as opposed to a method
+  that returns query results.
+- *Its use:* called twice inside `onCreate`, once per table this
+  lesson's schema declares.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`SQLiteOpenHelper`**
+  - *What it is:* the framework base class managing a SQLite database
+    file's own creation and version upgrades.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* `DatabaseHelper`'s parent, unchanged from Lesson 01.
+- **`onCreate(SQLiteDatabase)`**
+  - *What it is:* the lifecycle method `SQLiteOpenHelper` calls exactly
+    once, the first time the database file doesn't yet exist.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* now holds real SQL inside its body for the first time —
+    the two `CREATE TABLE` statements this lesson adds.
 
 ---
 

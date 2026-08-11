@@ -32,10 +32,18 @@ lesson's central class is built the same way.
   once; any attempt to reassign it anywhere else is a compile error,
   the same guarantee C#'s `readonly` provides.
 
-**Objects and methods used**
-- No supporting cast beyond this lesson's own subject — `SQLiteOpenHelper`
-  and its lifecycle are given full treatment below, verified against
-  Android's own official reference documentation.
+**Objects and methods used:**
+
+**`SQLiteOpenHelper`**
+- *What it is:* the framework base class managing a SQLite database
+  file's own creation and version upgrades.
+- *Implementation:* `public abstract class SQLiteOpenHelper`, real
+  declared shape verified against Android's own official reference
+  documentation, quoted in full below — a constructor plus two abstract
+  methods, `onCreate(SQLiteDatabase)` and `onUpgrade(SQLiteDatabase,
+  int, int)`.
+- *Its use:* the class `DatabaseHelper` extends, giving this project a
+  real database file that outlives the process.
 
 ---
 

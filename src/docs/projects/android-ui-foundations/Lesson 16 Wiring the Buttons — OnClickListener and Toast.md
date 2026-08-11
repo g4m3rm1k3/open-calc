@@ -36,10 +36,48 @@ return types).
   `CharSequence` — Lesson 15's covariant return type, reappearing on a
   real framework class.
 
-**Objects and methods used**
-- `Object.toString()` — every Java object has this method, inherited
-  from `Object`; called here to convert the `Editable` `getText()`
-  returns into a plain `String`.
+**Objects and methods used:**
+
+**`View.OnClickListener`**
+- *What it is:* the real, single-method interface Android defines for
+  click handling.
+- *Implementation:* a functional interface (Lesson 14) with one abstract
+  method, `onClick(View v)`, implemented here via a lambda.
+- *Its use:* the contract both login buttons' listeners fulfill.
+
+**`setOnClickListener`**
+- *What it is:* the method every `View` has for registering a click
+  callback.
+- *Implementation:* takes an `OnClickListener` and holds onto it,
+  calling it back later when the view is actually tapped.
+- *Its use:* called once per button, registering this lesson's two
+  lambdas.
+
+**`Toast`**
+- *What it is:* a small, temporary on-screen message.
+- *Implementation:* `Toast.makeText(context, text, duration)` builds
+  one; `.show()` actually displays it, auto-dismissing after the given
+  duration.
+- *Its use:* shown from the login button's listener as visible feedback
+  that the tap and the typed value were both read correctly.
+
+**`EditText.getText()` / `Editable`**
+- *What they are:* `EditText`'s own covariant override of
+  `TextView.getText()`, and the more specific type it returns.
+- *Implementation:* Lesson 15's covariant return type, reappearing on a
+  real framework class — `Editable` is a mutable `CharSequence`.
+- *Their use:* reads each field's typed value, then converted to a plain
+  `String` via `.toString()`, below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`Object.toString()`**
+  - *What it is:* a method every Java object has, inherited from
+    `Object`.
+  - *Implementation:* returns a `String` representation of the object.
+  - *Its use:* converts the `Editable` `EditText.getText()` returns into
+    a plain `String`, the type `Toast.makeText` and string concatenation
+    both actually need.
 
 ---
 
@@ -164,10 +202,10 @@ public class MainActivity extends AppCompatActivity {
   `this` refers to the specific `MainActivity` object currently running —
   needed here because `Toast.makeText` requires a `Context` (a handle
   many Android APIs need, representing "the app's or screen's current
-  environment"; a full explanation is deferred, flagged, to whichever
-  later lesson first needs `Context` for its own sake). `Activity` is
-  itself a `Context` (through its own inheritance chain), so `this`
-  satisfies that requirement directly.
+  environment"; a full explanation is deferred, flagged, to Lesson 17,
+  the first place this project needs `Context`'s real inheritance chain
+  for its own sake). `Activity` is itself a `Context` (through its own
+  inheritance chain), so `this` satisfies that requirement directly.
 
 ### Execution Trace — Registration Now, Invocation Later
 

@@ -23,10 +23,15 @@ formality.
   scales with the user's chosen system font size, used specifically for
   text sizes.
 
-**Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `TextView`, string resources, and `sp` are given full treatment in
-  the Concept Unit below.
+**Objects and methods used:**
+
+**`TextView`**
+- *What it is:* the basic Android widget for displaying a run of text.
+- *Implementation:* a leaf `View` — it has no children of its own —
+  reading its displayed text from `android:text`, which this lesson
+  points at a string resource rather than a literal.
+- *Its use:* the first real, visible child inside the login screen's
+  `LinearLayout`, showing the title.
 
 ---
 

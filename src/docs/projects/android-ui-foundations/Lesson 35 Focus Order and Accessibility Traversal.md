@@ -25,13 +25,25 @@ themed and grouped).
 - **`android:contentDescription`** — text read aloud by a screen reader
   for an element with no visible text of its own to read.
 
-**Objects and methods used**
-- `LinearLayout` — the `ViewGroup` arranging its children in a single
-  row or column — and `android:orientation` — the attribute picking
-  which — both taught in Lesson 08, reappear here unchanged across all
-  three screens. Focus order, `imeOptions`, accessibility traversal, and
-  `contentDescription` are this lesson's own subject, given full
-  treatment above.
+**Objects and methods used:** Focus order, `imeOptions`, accessibility
+traversal, and `contentDescription` are this lesson's own subject,
+given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`LinearLayout`**
+  - *What it is:* the `ViewGroup` arranging its children in a single row
+    or column.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* the root container of all three screens, whose
+    declaration order this lesson confirms already matches logical
+    focus order.
+- **`android:orientation`**
+  - *What it is:* the attribute picking which axis a `LinearLayout`
+    stacks along.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* `vertical` on every screen, the same declaration order
+    this lesson's focus-order confirmation directly depends on.
 
 ---
 

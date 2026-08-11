@@ -26,17 +26,47 @@ fulfills).
   weight/style (`bold`, `italic`, or both); used here to visually
   distinguish the header row from ordinary data rows.
 
-**Objects and methods used**
-- `RecyclerView` — the scrolling widget that displays a large or
-  changing dataset by recycling a small pool of row views, Lesson 18 —
-  `LinearLayoutManager` — the layout manager arranging items in a single
-  scrolling column, Lesson 18 — and `InventoryAdapter` — the class
-  fulfilling `RecyclerView.Adapter`'s real contract, Lesson 26 — reappear
-  here connected together for the first time. `LinearLayout` — the
-  `ViewGroup` arranging children in a row or column — and `TextView` —
-  the text-display widget — both taught in Lessons 08–09, reappear here
-  building the static header row. `setLayoutManager`/`setAdapter` are
-  this lesson's own subject, given full treatment below.
+**Objects and methods used:**
+
+**`setLayoutManager(...)` / `setAdapter(...)`**
+- *What they are:* the two `RecyclerView` methods connecting it to its
+  arrangement strategy and its data source, respectively.
+- *Implementation:* both are plain setter-style methods on `RecyclerView`
+  itself, called once during setup.
+- *Their use:* wired together for the first time in this lesson, turning
+  a bare `RecyclerView` into a real, visible, populated grid.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`RecyclerView`**
+  - *What it is:* the scrolling widget that displays a large or
+    changing dataset by recycling a small pool of row views.
+  - *Implementation:* given full treatment in Lesson 18.
+  - *Its use:* the real, visible widget this lesson finally connects to
+    `InventoryAdapter` and a `LayoutManager`, together, for the first
+    time.
+- **`LinearLayoutManager`**
+  - *What it is:* the layout manager arranging items in a single
+    scrolling column.
+  - *Implementation:* given full treatment in Lesson 18.
+  - *Its use:* passed to `setLayoutManager`, telling this lesson's
+    `RecyclerView` how to arrange its rows.
+- **`InventoryAdapter`**
+  - *What it is:* the class fulfilling `RecyclerView.Adapter`'s real
+    contract.
+  - *Implementation:* given full treatment in Lesson 26.
+  - *Its use:* passed to `setAdapter`, supplying the data and row views
+    this lesson's `RecyclerView` displays.
+- **`LinearLayout`**
+  - *What it is:* the `ViewGroup` arranging children in a row or column.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* the root tag of the new static header row this lesson
+    adds above the grid.
+- **`TextView`**
+  - *What it is:* the text-display widget.
+  - *Implementation:* given full treatment in Lesson 09.
+  - *Its use:* the two column-label widgets ("Item", "Qty") inside the
+    new header row.
 
 ---
 

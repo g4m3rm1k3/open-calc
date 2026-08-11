@@ -17,14 +17,32 @@ sits between "ordinary class" and "interface."
   all (`abstract` methods), cannot be instantiated directly, and exists
   specifically to be subclassed by something that fills those methods in.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's static print method, Lesson 01 —
-  `extends` — a class inheriting another's fields and methods —
-  `super` — calling the parent's own version of an overridden method —
-  and `@Override` — the compiler-checked override annotation — all
-  Lesson 06 — reappear in this lesson's own lab exactly as already
-  taught. `abstract` classes are this lesson's own subject, given full
-  treatment above.
+**Objects and methods used:** `abstract` classes are this lesson's own
+subject, given full treatment above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints `square.describe()`'s result, combining a real
+    method body with an abstract one this lesson's subject fills in.
+- **`extends`**
+  - *What it is:* a class inheriting another's fields and methods.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* `Square extends Shape`, the relationship an abstract
+    class still requires even though some of its methods have no body.
+- **`super`**
+  - *What it is:* calling the parent's own version of an overridden
+    method or constructor.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* `Square`'s constructor calls `super("Square")`, setting
+    `Shape`'s own `label` field.
+- **`@Override`**
+  - *What it is:* the compiler-checked override annotation.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* marks `Square.area()` as fulfilling `Shape`'s abstract
+    method, the requirement this lesson's own subject imposes.
 
 ---
 

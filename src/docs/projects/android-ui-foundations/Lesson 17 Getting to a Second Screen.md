@@ -272,22 +272,23 @@ Tapping "Log In" now shows the `Toast`, then genuinely navigates to
   `onCreate`/`super.onCreate`/`setContentView` all reappear identically —
   every Activity you write from here on follows this exact same shape.
 - `<activity android:name=".InventoryActivity" android:exported="false" />`
-  — **first appearance of a second `<activity>` entry.** The `<activity>`
-  tag itself is an XML element declaring one Activity component to the
-  OS — its presence, not the Java class alone, is what makes
-  `InventoryActivity` a real, launchable component the system's
-  intent-resolution mechanism can find; this is exactly the "What
-  Breaks Without This" proof below. `android:name="..."` — **first
-  appearance.** The value here isn't a bare class name: the leading dot
-  is shorthand the Android build tools expand by prepending the app's
-  own package name, so `.InventoryActivity` means exactly the same
+  — **first appearance of a second `<activity>` entry**, reusing
+  Lesson 07's mechanism on a second class. The `<activity>` tag itself
+  is an XML element declaring one Activity component to the OS — its
+  presence, not the Java class alone, is what makes `InventoryActivity`
+  a real, launchable component the system's intent-resolution mechanism
+  can find; this is exactly the "What Breaks Without This" proof below.
+  `android:name="..."` — reappearing (Lesson 07): the leading dot is
+  still the same shorthand, still expanded by prepending the app's own
+  package name, so `.InventoryActivity` means exactly the same
   fully-qualified class `InventoryActivity.java` declares
-  (`com.yourname.yourapp.InventoryActivity`). This is a real
-  convenience and a real trap in the same breath: moving this class
-  into a sub-package later silently changes what the dot expands to,
-  and a mismatch fails at runtime — the same `ActivityNotFoundException`
-  shown below — not at compile time, since the Manifest and the Java
-  source are two separate files the compiler never cross-checks.
+  (`com.yourname.yourapp.InventoryActivity`) — worth restating precisely
+  here, not just citing, because the trap it carries is real and easy to
+  forget: moving this class into a sub-package later silently changes
+  what the dot expands to, and a mismatch fails at runtime — the same
+  `ActivityNotFoundException` shown below — not at compile time, since
+  the Manifest and the Java source are two separate files the compiler
+  never cross-checks.
 - `new Intent(this, InventoryActivity.class)` — **first appearance.**
   `Intent`'s real two-argument constructor here: the first argument is a
   `Context` — `this`, a Java keyword referring to the exact

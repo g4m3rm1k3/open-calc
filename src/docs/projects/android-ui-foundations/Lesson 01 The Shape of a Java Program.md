@@ -37,10 +37,32 @@ specifically.
 - **Compiler (`javac`) / bytecode / JVM (`java`)** — Java's two separate
   steps, translate-then-run.
 
-**Objects and methods used**
-- No supporting cast to cover separately — `System.out.println` is
-  this lesson's own subject, and gets full treatment below rather than
-  being deferred to this section.
+**Objects and methods used:**
+
+**`System.out.println(...)`**
+- *What it is:* Java's built-in mechanism for printing text to the
+  console, followed by a new line.
+- *Implementation:* a method call (`println`) executed on a pre-built,
+  `static` object (`out`) that represents the standard output stream,
+  itself living inside the OS-facing `System` class.
+- *Its use:* outputting `"Hello, Java"` to the terminal, real proof this
+  program actually ran.
+
+**`javac`**
+- *What it is:* the Java compiler.
+- *Implementation:* a command-line tool that reads a `.java` text file
+  and generates a compiled `.class` bytecode file.
+- *Its use:* catches a large category of mistakes before the program
+  ever runs, and translates human-written source into the format `java`
+  can actually execute.
+
+**`java`**
+- *What it is:* the JVM (Java Virtual Machine) launcher.
+- *Implementation:* a command-line tool that loads a compiled class by
+  name and looks inside it for a method matching the exact
+  `public static void main(String[] args)` shape.
+- *Its use:* actually executes the compiled bytecode, starting at
+  `main`.
 
 ---
 

@@ -25,16 +25,52 @@ screen's request depends on).
   the same job, using a request-code-based callback instead of a
   registered one.
 
-**Objects and methods used**
-- `Activity` — the framework base class every screen extends, Lesson
-  06 — `Intent` — an object describing a request for the OS to do
-  something, Lesson 17 — and `startActivity` — the method handing an
-  `Intent` to the OS to act on, Lesson 17 — reappear here exactly as
-  before, building and launching this third screen.
-  `ContextCompat.checkSelfPermission`,
-  `ActivityResultContracts.RequestPermission`, and
-  `ActivityCompat.requestPermissions` are this lesson's own subject,
-  given full treatment above.
+**Objects and methods used:**
+
+**`ContextCompat.checkSelfPermission(Context, String)`**
+- *What it is:* a method returning whether a given permission is
+  currently granted.
+- *Implementation:* a `static` method, returning
+  `PackageManager.PERMISSION_GRANTED` or `PERMISSION_DENIED`, without
+  showing any prompt.
+- *Its use:* the check this lesson's screen would run before ever
+  triggering a real request (wired for real next lesson).
+
+**`ActivityResultContracts.RequestPermission` / `registerForActivityResult`**
+- *What they are:* a modern, type-safe API for requesting one runtime
+  permission and receiving its result via a registered callback.
+- *Implementation:* `registerForActivityResult` pairs a contract object
+  with a callback lambda, called once at construction time; `.launch(...)`
+  triggers the real request later.
+- *Their use:* the option this project builds, Option B below.
+
+**`ActivityCompat.requestPermissions` / `onRequestPermissionsResult`**
+- *What they are:* the older, longer-standing API for the same job.
+- *Implementation:* `requestPermissions` triggers the dialog tagged with
+  an arbitrary integer request code; the result arrives later in an
+  overridden `onRequestPermissionsResult`, matched by that same code.
+- *Their use:* a real alternative, Option A below — recognized, not
+  built by this project.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`Activity`**
+  - *What it is:* the framework base class every screen extends.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* `NotificationsActivity`'s own parent, the same
+    `AppCompatActivity` chain as every other screen.
+- **`Intent`**
+  - *What it is:* an object describing a request for the OS to do
+    something.
+  - *Implementation:* given full treatment in Lesson 17.
+  - *Its use:* built to name `NotificationsActivity.class`, reaching
+    this new third screen.
+- **`startActivity`**
+  - *What it is:* the method handing an `Intent` to the OS to act on.
+  - *Implementation:* given full treatment in Lesson 17.
+  - *Its use:* called from `InventoryActivity`'s new button, launching
+    this lesson's screen exactly the way `MainActivity` once launched
+    `InventoryActivity`.
 
 ---
 

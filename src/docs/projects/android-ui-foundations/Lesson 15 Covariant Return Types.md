@@ -19,13 +19,27 @@ special case to just accept when it shows up.
   allowed as long as the more specific type is itself a subtype of the
   original.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, taught in Lesson 01 — `extends` — a class inheriting another's
-  fields and methods — and `@Override` — the compiler-checked override
-  annotation — both taught in Lesson 06, reappear in this lesson's own
-  lab exactly as before. Covariant return types are this lesson's own
-  subject, given full treatment below.
+**Objects and methods used:** Covariant return types are this lesson's
+own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints both objects' `getContents()` results, showing the
+    narrower type's value alongside the wider one.
+- **`extends`**
+  - *What it is:* a class inheriting another's fields and methods.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* `LabeledBox extends Container`, the relationship whose
+    override this lesson narrows the return type on.
+- **`@Override`**
+  - *What it is:* the compiler-checked override annotation.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* marks `LabeledBox.getContents()` as replacing
+    `Container`'s version, with the narrower return type this lesson's
+    own subject makes legal.
 
 ---
 

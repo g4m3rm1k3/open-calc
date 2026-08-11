@@ -26,12 +26,47 @@ uses), Lesson 28 (`notifyItemInserted`, the sibling method this lesson's
 - **`notifyItemRemoved`** — the `RecyclerView.Adapter` method telling a
   `RecyclerView` exactly which single position no longer exists.
 
-**Objects and methods used**
-- `RecyclerView.ViewHolder` (the real contract's base class, Lesson 26)
-  and `notifyItemInserted` (tells `RecyclerView` exactly which position
-  now holds new data, Lesson 28) reappear here exactly as already
-  taught. `getBindingAdapterPosition`/`NO_POSITION`/`notifyItemRemoved`
-  are this lesson's own subject, given full treatment below.
+**Objects and methods used:**
+
+**`getBindingAdapterPosition()`**
+- *What it is:* a `RecyclerView.ViewHolder` method returning a holder's
+  *current* position.
+- *Implementation:* queried fresh at the moment it's called, as opposed
+  to a position value captured earlier and potentially stale.
+- *Its use:* called inside the delete listener at the moment of the
+  actual tap, avoiding the stale-position bug a captured value would
+  risk.
+
+**`RecyclerView.NO_POSITION`**
+- *What it is:* a constant (`-1`).
+- *Implementation:* what a holder's position methods return when the
+  holder isn't currently bound to any valid row.
+- *Its use:* guards the delete listener against acting on an invalid
+  position mid-removal-animation.
+
+**`notifyItemRemoved(int)`**
+- *What it is:* the `RecyclerView.Adapter` method telling a
+  `RecyclerView` exactly which single position no longer exists.
+- *Implementation:* inherited from `RecyclerView.Adapter` (Lesson 26);
+  takes the removed item's index.
+- *Its use:* called immediately after `items.remove(currentPosition)`,
+  the direct sibling of Lesson 28's `notifyItemInserted`.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`RecyclerView.ViewHolder`**
+  - *What it is:* the real contract's base class every `ViewHolder`
+    subclass extends.
+  - *Implementation:* given full treatment in Lesson 26.
+  - *Its use:* `InventoryViewHolder`'s parent, the class
+    `getBindingAdapterPosition` is actually declared on.
+- **`notifyItemInserted`**
+  - *What it is:* the `RecyclerView.Adapter` method telling a
+    `RecyclerView` exactly which position now holds new data.
+  - *Implementation:* given full treatment in Lesson 28.
+  - *Its use:* this lesson's direct sibling and point of comparison —
+    `notifyItemRemoved` mirrors its exact shape for the opposite
+    change.
 
 ---
 

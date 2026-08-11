@@ -35,11 +35,31 @@ explains).
   entirely — the mechanism that lets a subclass add behavior on top of
   the parent's instead of only substituting its own.
 
-**Objects and methods used**
-- **`AppCompatActivity`** — the real framework base class
-  `MainActivity` extends; this lesson's own actual subject, given full
-  treatment below including its real declared shape, verified against
-  the AndroidX source, per the Parent Contract Rule.
+**Objects and methods used:**
+
+**`AppCompatActivity`**
+- *What it is:* the real framework base class `MainActivity` extends.
+- *Implementation:* `extends FragmentActivity`, declaring (among others)
+  `onCreate`, `onStart`, `onStop`, `onDestroy`, `onPostCreate`, and
+  `onSaveInstanceState` — real, declared shape verified against the
+  AndroidX source this session, quoted in full below, per the Parent
+  Contract Rule.
+- *Its use:* the class `MainActivity` extends, inheriting its entire
+  lifecycle for free.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`FragmentActivity`**
+  - *What it is:* the next link up the real inheritance chain
+    (`AppCompatActivity extends FragmentActivity`, quoted below).
+  - *Implementation:* a framework base class adding older Android
+    Fragment-hosting support — real, and genuinely inherited the moment
+    `MainActivity` writes `extends AppCompatActivity`, but not itself
+    this lesson's subject, and not a class this project's screens ever
+    touch directly.
+  - *Its use:* named here only to show the chain is real and doesn't
+    stop at `AppCompatActivity` — its own behavior isn't detailed,
+    since nothing in this project needs it.
 
 ---
 
@@ -249,7 +269,7 @@ keeping everything else `AppCompatActivity` already does.
   completely replaces it unless the override deliberately calls back into
   the original with `super`.
 - `setContentView(R.layout.activity_main);` — flagged, not explained yet;
-  Lesson 07 covers what puts a layout on screen and what `R.layout` is.
+  Lesson 08 covers what puts a layout on screen and what `R.layout` is.
 
 ### CS Lens
 

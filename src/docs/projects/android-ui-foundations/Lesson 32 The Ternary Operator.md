@@ -17,11 +17,16 @@ familiar from before this series began.
   that produces a value directly, rather than executing a branching
   statement.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  lab exactly as before. The ternary operator is this lesson's own
-  subject, given full treatment below.
+**Objects and methods used:** The ternary operator is this lesson's own
+subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each ternary expression's result directly, showing
+    it evaluates to a real value rather than just running a branch.
 
 ---
 

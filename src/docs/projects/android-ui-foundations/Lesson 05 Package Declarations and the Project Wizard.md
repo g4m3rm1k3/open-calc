@@ -27,11 +27,16 @@ model.
   for every project; what it actually does is deferred to the first
   lesson that needs to edit its configuration.
 
-**Objects and methods used**
-- `javac`/`java` — the two-step compile-then-run toolchain taught in
-  Lesson 01 — reappear here with one new flag (`-d`), given full
-  treatment above, since a new flag on an already-known tool is new
-  material, not a bare reminder.
+**Objects and methods used:** the `-d` flag is new material, this
+lesson's own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`javac` / `java`**
+  - *What they are:* the two-step compile-then-run toolchain.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Their use:* the same two commands from Lesson 01, now invoked with
+    the new `-d` flag to make the package/folder relationship visible.
 
 ---
 

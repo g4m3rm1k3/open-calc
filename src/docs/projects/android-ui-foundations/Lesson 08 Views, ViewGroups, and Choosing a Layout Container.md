@@ -23,6 +23,10 @@ running project, `onCreate`, `setContentView`, and the Manifest.
   (stacked, constrained, gridded, etc.).
 - **`LinearLayout`** — a real, built-in `ViewGroup` subclass that stacks
   its children along a single axis, in the exact order they're declared.
+- **`ConstraintLayout` (recognition, real alternative)** — the wizard's
+  own default root container, and a more flexible `ViewGroup` subclass
+  where each child declares its own position via constraints rather than
+  relying on declaration order.
 - **XML namespace declaration (`xmlns:`)** — an attribute on a layout's
   root element that makes a prefix like `android:` resolve to a specific,
   real set of attribute definitions, rather than being an arbitrary,
@@ -36,12 +40,50 @@ running project, `onCreate`, `setContentView`, and the Manifest.
   with a screen's physical pixel density, so a size specified in `dp`
   looks the same physical size across different devices.
 
-**Objects and methods used**
-- `setContentView(int)` — the `Activity` method that builds the visual
-  tree from a layout XML resource, already taught in Lesson 05 —
-  reappears here exactly as before. Every `View`/`ViewGroup`/layout XML
-  construct named above is this lesson's own subject, given full
-  treatment in the Concept Units below.
+**Objects and methods used:**
+
+**`View`**
+- *What it is:* the base class for every single visible thing on an
+  Android screen.
+- *Implementation:* a real Android class; a button, a line of text, and
+  an image are all, underneath, a `View`.
+- *Its use:* the root type every widget and container this lesson builds
+  ultimately is.
+
+**`ViewGroup`**
+- *What it is:* a `View` that can contain other `View`s.
+- *Implementation:* extends `View`, additionally holding a list of child
+  `View`s (including other `ViewGroup`s), forming a tree rather than a
+  flat list.
+- *Its use:* the category every layout container below belongs to.
+
+**`LinearLayout`**
+- *What it is:* a real, built-in `ViewGroup` subclass.
+- *Implementation:* stacks its children along a single axis —
+  `vertical` or `horizontal`, set by `android:orientation` — strictly in
+  the order they appear in the XML.
+- *Its use:* the container this project's login screen is built on,
+  chosen over `ConstraintLayout` for this lesson's simple vertical form.
+
+**`ConstraintLayout`**
+- *What it is:* the wizard's own default root container (Lesson 05).
+- *Implementation:* a `ViewGroup` subclass with no built-in stacking
+  behavior; each child instead declares its own constraints relative to
+  its parent or siblings.
+- *Its use:* the rejected alternative here — more expressive than this
+  project's simple form needs, at the cost of per-child constraint
+  bookkeeping `LinearLayout` doesn't require.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`setContentView(int)`**
+  - *What it is:* the `Activity` method that puts a layout on screen.
+  - *Implementation:* inherited from `Activity`; takes a compiled layout
+    resource reference (`R.layout.<filename>`), parses that XML file's
+    tree, and builds real `View` objects from it in memory.
+  - *Its use:* called once, at the top of `onCreate`, pointing at this
+    lesson's own new `activity_main.xml` — the line that turns the XML
+    this lesson writes into a real, visible screen.
 
 ---
 

@@ -20,13 +20,38 @@ complete, wired data grid.
   a `RecyclerView` exactly which single position now holds new data, so
   it can update only what's actually changed.
 
-**Objects and methods used**
-- `ArrayList<InventoryItem>` — the real, populated, growable list
-  backing the grid, Lesson 22 — and `RecyclerView.Adapter` — the real
-  contract this project's `InventoryAdapter` fulfills, Lesson 26 —
-  reappear here exactly as already taught. `AlertDialog` and
-  `notifyItemInserted` are this lesson's own subject, given full
-  treatment below.
+**Objects and methods used:**
+
+**`AlertDialog`**
+- *What it is:* a small, modal overlay window Android provides for
+  short, focused input or confirmation.
+- *Implementation:* `AlertDialog.Builder` configures it via chained
+  calls (`setTitle`, `setView`, `setPositiveButton`,
+  `setNegativeButton`), then `.show()` displays it.
+- *Its use:* the real, working "add item" form this lesson builds,
+  chosen over a second screen since the form is genuinely this small.
+
+**`notifyItemInserted`**
+- *What it is:* the `RecyclerView.Adapter` method that tells a
+  `RecyclerView` exactly which single position now holds new data.
+- *Implementation:* inherited from `RecyclerView.Adapter` (Lesson 26);
+  takes the new item's index.
+- *Its use:* called immediately after `items.add(...)`, the one
+  explicit step that makes the underlying data change actually visible
+  on screen.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`ArrayList<InventoryItem>`**
+  - *What it is:* the real, populated, growable list backing the grid.
+  - *Implementation:* given full treatment in Lesson 22.
+  - *Its use:* the list `items.add(...)` appends the new row to, and
+    `notifyItemInserted` reports the fresh position of.
+- **`RecyclerView.Adapter`**
+  - *What it is:* the real contract `InventoryAdapter` fulfills.
+  - *Implementation:* given full treatment in Lesson 26.
+  - *Its use:* `notifyItemInserted` is one of its inherited methods,
+    called on `adapter` to tell `RecyclerView` what changed.
 
 ---
 

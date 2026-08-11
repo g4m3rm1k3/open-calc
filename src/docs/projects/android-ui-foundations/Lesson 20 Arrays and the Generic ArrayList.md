@@ -28,12 +28,32 @@ runtime-editable data), Lesson 19 (method overloading).
   (`List`) and a concrete implementing class (`ArrayList`), both generic,
   representing a growable, ordered collection.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, Lesson 01 — and `interface` — a type declaring method
-  signatures with no implementation of its own, Lesson 14 — reappear in
-  this lesson's own labs exactly as before. Arrays and `ArrayList<E>`
-  are this lesson's own subject, given full treatment above.
+**Objects and methods used:**
+
+**`List<E>` / `ArrayList<E>`**
+- *What they are:* a standard-library interface (`List`) and a concrete
+  implementing class (`ArrayList`), both generic.
+- *Implementation:* `List` describes an ordered collection with no
+  implementation of its own; `ArrayList` implements it, backed
+  internally by a real array it resizes on its own as elements are
+  added.
+- *Their use:* the growable collection type the grid screen's data
+  actually needs, replacing the plain array's fixed-size limitation.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each lab's real output, including the captured
+    `ArrayIndexOutOfBoundsException`.
+- **`interface`**
+  - *What it is:* a type declaring method signatures with no
+    implementation of its own.
+  - *Implementation:* given full treatment in Lesson 14.
+  - *Its use:* `List` itself is one — the contract `ArrayList` implements
+    — reappearing here on a real standard-library type instead of a
+    hand-written example.
 
 ---
 

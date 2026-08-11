@@ -20,12 +20,26 @@ redesigning the layout.
   series, since the next lesson wires clicks from Java code instead, for
   reasons that lesson explains.
 
-**Objects and methods used**
-- `TextView` — the text-display widget class, Lesson 09 — `EditText` —
-  the editable-text subclass of `TextView`, Lesson 10 — and
-  `android:id`/`@+id/` — the attribute assigning a findable identity to a
-  view, Lesson 09 — all reappear here unchanged on the two new buttons.
-  `Button` is this lesson's own subject, given full treatment below.
+**Objects and methods used:** `Button` is this lesson's own subject,
+given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`TextView`**
+  - *What it is:* the text-display widget class.
+  - *Implementation:* given full treatment in Lesson 09.
+  - *Its use:* the ancestor class `Button` (through an intermediate
+    subclass) itself extends, supplying label rendering for free.
+- **`EditText`**
+  - *What it is:* the editable-text subclass of `TextView`.
+  - *Implementation:* given full treatment in Lesson 10.
+  - *Its use:* sits directly above the two new buttons in the layout,
+    unchanged by this lesson.
+- **`android:id` / `@+id/`**
+  - *What it is:* the attribute assigning a findable identity to a view.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* each new `Button` gets its own unique id, the same
+    mechanism as every prior widget.
 
 ---
 

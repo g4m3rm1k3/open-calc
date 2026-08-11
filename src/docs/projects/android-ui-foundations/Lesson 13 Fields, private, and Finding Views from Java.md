@@ -27,12 +27,18 @@ complete static login layout, with every widget already carrying a real
   alternative to `findViewById` that generates a typed class with a
   field per view, checked at compile time instead of at runtime.
 
-**Objects and methods used**
-- **`Activity.findViewById(int id)`** — inherited from `Activity`
-  (through `AppCompatActivity`, Lesson 06), a generic method — this
-  lesson's own subject, `<T extends View> T findViewById(int id)` —
-  given full treatment in the Concept Unit below, bounding Lesson 12's
+**Objects and methods used:**
+
+**`Activity.findViewById(int id)`**
+- *What it is:* the method that looks up a specific, already-inflated
+  `View` by its `android:id`.
+- *Implementation:* `public <T extends View> T findViewById(@IdRes int
+  id)` — a bounded generic method, real declared shape confirmed this
+  session against Android's own API documentation, inherited from
+  `Activity` through `AppCompatActivity` (Lesson 06); bounds Lesson 12's
   plain generic-method mechanism to only `View` subtypes.
+- *Its use:* called four times in this lesson, wiring each of
+  `MainActivity`'s new fields to its real, corresponding widget.
 
 ---
 

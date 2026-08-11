@@ -22,12 +22,16 @@ rather than a pointer to one that might be shared, or missing entirely.
   reference, meaning both point at one shared object rather than two
   independent copies.
 
-**Objects and methods used**
-- `System.out.println(...)` — Java's `static` print-to-standard-output
-  method, already taught in Lesson 01 — reappears in this lesson's own
-  labs, printing each demo's real output exactly as before. `new`,
-  references, and aliasing are this lesson's own subject, given full
-  treatment below.
+**Objects and methods used:** `new`, references, and aliasing are this
+lesson's own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`System.out.println(...)`**
+  - *What it is:* Java's `static` print-to-standard-output method.
+  - *Implementation:* given full treatment in Lesson 01.
+  - *Its use:* prints each demo's real output in this lesson's own labs,
+    exactly as before.
 
 ---
 
