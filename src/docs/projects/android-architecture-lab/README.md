@@ -103,8 +103,7 @@ treatment this repository gives every deliberately-deferred tool.
 
 ## Status
 
-- [x] Lessons 1–5 — written
-- [ ] Lessons 6–14 — in progress
+- [x] Lessons 1–14 — written. Series complete.
 
 ## Definition of Done (whole series)
 

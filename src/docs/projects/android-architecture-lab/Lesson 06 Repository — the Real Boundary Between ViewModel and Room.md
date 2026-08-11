@@ -240,19 +240,24 @@ viewModel.getAllItems().observe(this, items -> {
 viewModel.addItem("Bolts", 120);
 ```
 
-Run it. Real, captured Logcat output, from running this just now:
+Run it on a real device or emulator and watch Logcat, filtered on
+`InventoryViewModel`. Two real, separate log lines are the expected,
+predicted result, grounded directly in this lesson's own verified
+`observe`/Room contracts, not yet confirmed by an actual run in this
+environment:
 
 ```
 D/InventoryViewModel: Item count: 0
 D/InventoryViewModel: Item count: 1
 ```
 
-Two real, separate log lines — the first the moment `observe` registers
-(the table starts empty on a fresh install), the second automatically,
-after `addItem` genuinely writes a new row through
-`InventoryViewModel → ItemRepository → ItemDao → Room`, with no
-manual reload anywhere in this exact call chain — direct, on-device
-proof every layer built this lesson is wired correctly end to end.
+The first line is predicted the moment `observe` registers (the table
+starts empty on a fresh install); the second, automatically, once
+`addItem` genuinely writes a new row through
+`InventoryViewModel → ItemRepository → ItemDao → Room`, with no manual
+reload anywhere in this exact call chain. Confirm both lines actually
+appear, in this exact order, on your own device before trusting this
+lesson's own claim that every layer is wired correctly end to end.
 
 ### CS Lens
 
