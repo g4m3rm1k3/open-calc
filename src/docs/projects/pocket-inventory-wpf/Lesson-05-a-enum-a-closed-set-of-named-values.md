@@ -198,6 +198,9 @@ mechanism, already real by the time you read it. Lesson 12 builds a
 real one, `Category`, into the actual Pocket Inventory model, in this
 same shape.
 
+*See also:* `csharp-enum.md` — a standalone, project-independent
+treatment of this exact mechanism, with its own fresh `CS0266` proof.
+
 ---
 
 ## Closing

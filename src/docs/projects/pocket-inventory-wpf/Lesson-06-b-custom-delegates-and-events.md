@@ -303,7 +303,10 @@ this next.
 
 - `public NotifyHandler? Notify;`, no `event` — **first appearance of
   the exact vulnerability `event` exists to close**, proven directly by
-  the real, silent subscriber loss above.
+  the real, silent subscriber loss above. The trailing `?` is the same
+  nullable-reference-type marker covered fully in
+  `csharp-nullable-reference-types.md` — here it lets `Notify` start
+  out with no subscribers at all.
 - `public event NotifyHandler? Notify;` — **first appearance of
   `event`.** One keyword, changing what code outside `Publisher` is
   permitted to do with `Notify` — from "anything a plain field allows"

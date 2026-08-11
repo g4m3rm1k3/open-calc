@@ -172,7 +172,10 @@ project.
   wrote.
 - `public T? Value;` — a field typed as the placeholder itself; every
   real instantiation (`Container<int>`, `Container<string>`) replaces every `T`
-  inside `Container`'s own body with that specific real type.
+  inside `Container`'s own body with that specific real type. The
+  trailing `?` is the same nullable-reference-type marker covered fully
+  in `csharp-nullable-reference-types.md` — here it lets `Value` start
+  out unset, before anything has been assigned to it.
 - Instantiating `Container` with `int` filled in for `T` — **first
   appearance of instantiating a self-written generic type**, the
   identical syntax shape `List<string>` (Lesson 6) already used, now on

@@ -714,6 +714,133 @@ while verifying Objects/methods claims, not from a systematic sweep.
 Worth a dedicated future pass if the same "nothing implicit" standard
 is meant to extend past what this pass happened to notice along the way.
 
+## 2026-08-11 audit: closing the "nothing implicit" gap the 2026-08-10 pass deferred
+
+The 2026-08-10 audit's own closing note explicitly deferred a deeper pass:
+*"a full re-audit of every lesson's Terms glossary for other
+possibly-implicit basic syntax... worth a dedicated future pass if the
+same 'nothing implicit' standard is meant to extend past what this pass
+happened to notice along the way."* This session is that pass, prompted
+directly by re-reading `android-hardware-lab`'s Lesson 03 as the
+explicit quality bar and asking whether this project's own "Objects and
+methods used" sections actually matched its depth (they did not — that
+lesson gives ~15 entries full "What it is/Implementation/Its use"
+treatment, including methods never even called in its own code;
+Lesson 1's version here was two thin one-liners).
+
+**Method:** four parallel read-only audit agents, each assigned a
+contiguous lesson range (00a–06b, 07–20, 21–37, 38–54), independently
+read every file in full against `LESSON SCHEMA.md` and the Android
+exemplar, and reported concrete, file-specific gaps — not a
+paraphrase. Findings were spot-checked against `GLOSSARY.md` directly
+(grep, then opened the real candidate files) before trusting any
+"no existing concept file covers this" claim. Overall finding: the
+project was already much closer to the bar than the 2026-08-10 note's
+tone suggested — most lessons were already thorough; real gaps
+clustered into a small number of concrete, repeatable patterns rather
+than being spread evenly across all 65 files.
+
+**Cross-cutting gaps found (same root cause, multiple lessons):**
+- `<Nullable>enable</Nullable>` (shown verbatim in Lesson 0's `.csproj`)
+  and the resulting `?` on reference types (`Action?`, `T? Value`,
+  `NotifyHandler? Notify`) were never actually explained anywhere,
+  despite being load-bearing for every later nullable annotation.
+  Confirmed present, unexplained, in Lessons 0, 4, 6a, and 6b.
+- `Dispatcher.Invoke(() => {}, DispatcherPriority.ContextIdle)` /
+  `CommandManager.InvalidateRequerySuggested()`, introduced unexplained
+  in Lesson 23's own lab, reused silently in Lesson 33.
+- Six foundational lessons (00b, 00c, 01a, 01b, 05a — 01a and 01b each
+  cover two constructs) taught solid, correct, from-scratch C#
+  material entirely inline with no matching file in the shared
+  `src/docs/concepts/` catalog, even though the catalog already has
+  this exact granularity for other languages and for three other C#
+  topics from this same project (`csharp-classes-objects-and-fields.md`,
+  `csharp-constructors.md`, `csharp-inheritance.md`).
+
+**Real, lesson-specific gaps found and fixed** (four parallel write
+agents, one per audited range, disjoint file ownership to avoid
+conflicts, `GLOSSARY.md`/this file reserved for a single consolidating
+pass afterward):
+
+- **Major** — Lesson 20's own proof code used named value tuples and
+  local functions throughout with zero explanation, undermining the
+  lesson's own point. Lesson 44's header claimed "no supporting cast"
+  while silently depending on `Point`, `MouseButtonEventArgs`,
+  `SystemParameters.Minimum*DragDistance`, `DragDropEffects`, and a
+  compound `ItemsControl`/`DataTemplate` shape.
+- **Moderate** — Lesson 17's `is Type name` pattern match, Lesson 21's
+  missing walkthrough for its own `UpdateItemInDatabase` block (plus
+  `CultureInfo.InvariantCulture`/`DBNull.Value`), Lesson 23's
+  `Dispatcher`/`CommandManager` gap, Lesson 25's false "no supporting
+  cast" claim (real gap: `Path`/`Directory`/`FileInfo`/`Uri`, this
+  project's first real `System.IO` use), Lesson 48's `IValueConverter`
+  and `ScrollViewer`.
+- **Minor** — target-typed `new()` in Lesson 11; a bare `<Separator />`
+  in Lesson 41; the Strategy, Memento, and deferred-execution/lazy-eval
+  CS ideas named but never linked to a standalone concept file
+  (Lessons 11, 45, 54); two verify-before-citing checks (Lesson 27
+  against `mutable-object-aliasing.md` — genuine match, cited; Lesson 29
+  against `regular-language-finite-state-machine.md` — confirmed **not**
+  a match after actually reading it, since that file is specifically
+  about regex-recognition FSMs, not guarded domain-object transitions,
+  so a new file was written instead).
+
+**19 new files added to `src/docs/concepts/`** (all project-independent,
+each with its own fresh isolated example and real output actually run
+this session — `dotnet` 10.0.301 is available in this environment, so
+every compiler warning/error and program output shown was verified, not
+recalled or invented): `csharp-nullable-reference-types.md`,
+`csharp-value-tuples.md`, `csharp-local-functions.md`,
+`csharp-type-pattern-matching.md`, `strategy-pattern.md`,
+`memento-pattern.md`, `wpf-itemscontrol-and-datatemplate.md`,
+`wpf-ivalueconverter.md`, `ui-virtualization-windowing.md`,
+`csharp-virtual-override-polymorphism.md`,
+`csharp-abstract-classes-vs-interfaces.md`,
+`csharp-static-and-readonly-fields.md`, `csharp-dictionary-collection.md`,
+`csharp-struct-value-semantics.md`, `csharp-extension-methods.md`,
+`csharp-enum.md`, `ado-net-provider-pattern.md`,
+`finite-state-machine-guarded-transitions.md`,
+`deferred-execution-lazy-evaluation.md`. `GLOSSARY.md` updated with all
+19 in one consolidating pass afterward (not by the parallel agents
+themselves, to avoid a four-way write conflict on one shared file);
+cross-checked file-by-file that every new filename actually appears
+before considering the index complete.
+
+**24 lesson files edited**: `Lesson-00-b`, `Lesson-00-c`,
+`Lesson-00-developer-environment`, `Lesson-01-a`, `Lesson-01-b`,
+`Lesson-04`, `Lesson-05-a`, `Lesson-06-a`, `Lesson-06-b`, `Lesson-09`,
+`Lesson-11`, `Lesson-17`, `Lesson-20`, `Lesson-21`, `Lesson-23`,
+`Lesson-25`, `Lesson-27`, `Lesson-29`, `Lesson-33`, `Lesson-41`,
+`Lesson-44`, `Lesson-45`, `Lesson-48`, `Lesson-54` — all additive
+(new Objects-and-methods entries, new Mechanical Walkthrough bullets,
+new concept-file citations, or a corrected false "no supporting cast"
+claim); no existing correct explanation was shortened or removed,
+consistent with this project's own "existing lessons stay as
+committed, close gaps additively" convention already established for
+the prepended-lesson strategy above.
+
+Ran `scripts/check-narrative-lessons.mjs` after all of the above: 65
+files, 16 issues — up from the 2026-08-10 baseline of 12, all four new
+ones traced to this session's own edits. Two were real:
+`<Nullable>enable</Nullable>` (Lesson 0) and `<Separator />` (Lesson 41)
+had been given first-appearance treatment in their Mechanical
+Walkthroughs but never added to their own lesson's "Terms introduced"
+header list — fixed directly, one bullet each. The other two
+(`dense-concept-unit` hits on Lesson 25's and Lesson 44's own newly-
+expanded Concept Units) were not re-investigated — same category the
+2026-08-10 pass already found to be mostly cohesive-mechanism false
+positives for this project; flagged here rather than re-derived. Re-ran
+after the two real fixes: 65 files, 14 issues, matching the prior
+session's 12 pre-existing soft flags plus these 2 now-confirmed false
+positives.
+
+**What this pass deliberately did not do:** re-verify the 12
+pre-existing soft flags from the 2026-08-10 pass itself (still open,
+still judgment calls per that note); or touch
+`Lesson-06-fields-classes-and-list.md`,
+`Lesson-02-a-other-layout-panels.md`, or any of the ~40 files the audit
+confirmed already met the bar as-is.
+
 ## Independence from the Android track
 
 `../track/` (Android) and this project cover a lot of the same ground —

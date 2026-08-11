@@ -36,6 +36,31 @@ Lesson 17: `CollectionViewSource`, grouping, already applied to
   treatment — brief reminder only, per the Repetition Rule.
   `VirtualizingStackPanel`/`VirtualizationMode` are this lesson's own
   subject, given full treatment below.
+- **`IValueConverter`** — a compound, multi-member interface
+  (`Convert`/`ConvertBack`, both taking a `CultureInfo culture`
+  parameter), covered in full, standalone, in `wpf-ivalueconverter.md`;
+  applied here, in this lesson's own second lab, in the Concept Unit
+  below.
+- **`ScrollViewer`**
+  - *What it is:* the real WPF control that manages scrolling — showing
+    only the portion of its content that currently fits in the space
+    available, and exposing how far it's currently scrolled.
+  - *Implementation:* a concrete class
+    (`System.Windows.Controls.ScrollViewer`). The one member this
+    lesson calls, `ScrollToVerticalOffset(double offset)`, moves the
+    content programmatically to an exact vertical position — the same
+    movement a real scrollbar drag or mouse wheel produces.
+  - *Its use:* `DataGrid` builds one of these internally, as part of
+    its own default control template, to handle scrolling a grid taller
+    than its viewport — never declared in this project's own XAML,
+    always present. This lesson's third lab locates it with
+    `FindDescendant<ScrollViewer>` and drives it directly, to run a
+    real scroll session without a human at the keyboard.
+- General **UI virtualization** — the "render only what's visible"
+  pattern this whole lesson proves against `DataGrid` specifically — is
+  covered generically, standalone, in `ui-virtualization-windowing.md`;
+  this lesson's own labs are the "applied to this project's real code"
+  step for that general pattern.
 
 ---
 
@@ -182,7 +207,11 @@ holds `10`, `10000`, or `10000000` — the container count tracks the
 grid build one real container per item up front, and the real cost is
 severe: `34324ms` (over 34 real seconds) spent constructing 10,000
 `DataGridRow` objects the user can, at any given moment, actually see at
-most a few dozen of.
+most a few dozen of. The general pattern behind this result — not tied
+to `DataGrid`, or even to WPF — is covered in full, standalone, in
+`ui-virtualization-windowing.md`; this lesson's three labs, across all
+three of its Concept Units, are that general pattern's "applied to this
+project's real code" step.
 
 ### Discard the Throwaway Example
 Delete the `lab-virtualize` folder. `VirtualizingStackPanel`/
@@ -430,6 +459,22 @@ Delete the `lab-virtualize-grouped` folder.
   — reappearing exactly (Lesson 17's own grouping mechanism), applied
   here to a plain `List<int>` instead of `Items`, to isolate grouping
   itself from every other real-project concern.
+- `public class ModConverter : IValueConverter` with `Convert`/
+  `ConvertBack` — **first appearance of `IValueConverter`** anywhere in
+  this project. The general mechanism — why binding needs a seam
+  between a stored value and a differently-shaped displayed value, and
+  what `Convert`/`ConvertBack`'s four parameters (including the
+  `CultureInfo culture` this lab's own `ModConverter` receives but
+  never actually uses) are each for — is covered in full, standalone,
+  in `wpf-ivalueconverter.md`. Applied here: `ModConverter.Convert`
+  turns each raw `int` into a group key (`i % 100`), a value that
+  doesn't exist as a real property anywhere on the source data — the
+  exact situation that file's own Problem section describes.
+- `ConvertBack` throwing `NotSupportedException` — this lab's grouping
+  is read-only (nothing ever writes a new group back onto an item), so
+  the reverse direction genuinely has no meaning here; a real, honest
+  choice `wpf-ivalueconverter.md`'s own Try It Yourself section covers
+  directly.
 - `new PropertyGroupDescription(null, new ModConverter())` — (first
   appearance of `PropertyGroupDescription`'s converter overload) — a
   `null` property name means "run the converter against the whole item,"
@@ -662,8 +707,16 @@ in the real project next.
 
 ### Mechanical Walkthrough
 
+- `ScrollViewer? scrollViewer = FindDescendant<ScrollViewer>(grid);` —
+  **first appearance of `ScrollViewer` itself** (full treatment in this
+  lesson's header, above). `FindDescendant<T>` — reappearing generic
+  pattern (this lesson's own first Concept Unit's `CountDescendants<T>`,
+  searching instead of counting) — walks the real, live visual tree
+  looking for the one `ScrollViewer` `DataGrid`'s own default template
+  builds internally; nothing in this project's XAML ever declares one
+  directly.
 - `ScrollViewer.ScrollToVerticalOffset(offset)` — **first appearance.**
-  Programmatically moves the same internal `ScrollViewer` a real mouse
+  Programmatically moves that same internal `ScrollViewer` a real mouse
   wheel or scrollbar drag would move, letting this lab drive a real
   scroll session without a human at the keyboard.
 - `HashSet<DataGridRow>` — reappearing shape (`HashSet<T>`'s

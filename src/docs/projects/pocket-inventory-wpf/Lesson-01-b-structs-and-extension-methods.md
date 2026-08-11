@@ -177,6 +177,9 @@ The next unit turns to a completely unrelated C# feature — adding a
 method to a type without being able to modify or inherit from it at
 all.
 
+*See also:* `csharp-struct-value-semantics.md` — a standalone,
+project-independent treatment of this exact `struct`-vs-`class` proof.
+
 ---
 
 ## Concept Unit: Extension Methods — Adding a Method You Don't Own
@@ -316,6 +319,10 @@ methods. Both are real, standard C# tools worth recognizing on sight —
 `SortDescription` (Lesson 18) is a `struct`, and `Enumerable.Where`
 itself, part of LINQ, is an extension method on `IEnumerable<T>` — even
 though this specific project never authors either one directly.
+
+*See also:* `csharp-extension-methods.md` — a standalone,
+project-independent treatment of this exact `this`-parameter mechanism,
+with its own fresh `CS0509` proof.
 
 ---
 

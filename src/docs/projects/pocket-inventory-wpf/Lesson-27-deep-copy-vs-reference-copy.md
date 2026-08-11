@@ -139,7 +139,11 @@ reference, not the object itself. Copying that variable — a field
 assignment, a method parameter, an `Items[index] = ...` — always copies
 the reference. Whether that's a bug depends entirely on whether anything
 afterward mutates the object through one reference while expecting the
-other to stay unaffected.
+other to stay unaffected. This is the identical, language-independent
+idea `mutable-object-aliasing.md` covers in full, in Python instead of
+C#: two names referring to the same underlying object, where a mutation
+through either one is visible through both, purely because there was
+never more than one real object to begin with.
 
 ### SE Lens
 

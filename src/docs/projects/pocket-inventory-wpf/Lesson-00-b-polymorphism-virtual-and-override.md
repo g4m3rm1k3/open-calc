@@ -324,6 +324,10 @@ compiler "generate code that checks the real type at runtime for this
 one," instead of the plain, compile-time-only method lookup every other
 method in this project has used since Lesson 0a.
 
+*See also:* `csharp-virtual-override-polymorphism.md` — a standalone,
+project-independent treatment of this exact mechanism, with its own
+fresh `CS0108` proof.
+
 ### SE Lens
 
 Where has this project already been relying on polymorphism without

@@ -261,6 +261,18 @@ interface uses an indexer with this exact shape, read-only, next.
 
 ### Mechanical Walkthrough
 
+- `private Dictionary<string, string> drawers = new();` — **first
+  appearance of target-typed `new()`.** Every earlier `new` in this
+  project spells out the full type after it (`new InventoryItem()`,
+  `new List<InventoryItem>()`); here, `new()` has no type name at all.
+  This is legal specifically because the variable's declared type,
+  `Dictionary<string, string>`, already sits on the left of the `=` —
+  the compiler infers that a bare `new()` on the right must mean
+  exactly that same type, rather than making you spell
+  `new Dictionary<string, string>()` a second time on the same line.
+  It's a small, purely typing-saving shorthand — nothing about which
+  constructor runs or what the object contains changes; write it as
+  `new Dictionary<string, string>()` and the behavior is identical.
 - `public string this[string drawerName] { get; set; }` — **first
   appearance of an indexer.** A member literally named `this`, taking a
   parameter in `[...]`, letting instances be indexed with square
@@ -507,14 +519,17 @@ different, complementary contracts, both satisfied by one class.
 
 ### CS Lens
 
-`IDataErrorInfo` is the **Strategy pattern** again — reappearing from
-the `Frame`/`Page` split before (there, arrangement strategy; here,
-validation strategy): WPF's binding system doesn't know or care *how*
-`InventoryItem` decides what's valid — it only knows to call this
-specific indexer and interpret an empty-versus-non-empty string. A
-completely different class, with completely different validation rules,
-plugs into the exact same binding mechanism by implementing the same
-interface.
+`IDataErrorInfo` is the **Strategy pattern** (`strategy-pattern.md`)
+again — reappearing from the `Frame`/`Page` split before (there,
+arrangement strategy; here, validation strategy): an interchangeable
+behavior — "how do I decide what's valid?" — sits behind one shared
+interface, so the code calling it (WPF's binding system) never needs
+to know which concrete implementation it's actually talking to. WPF's
+binding system doesn't know or care *how* `InventoryItem` decides
+what's valid — it only knows to call this specific indexer and
+interpret an empty-versus-non-empty string. A completely different
+class, with completely different validation rules, plugs into the
+exact same binding mechanism by implementing the same interface.
 
 ### SE Lens
 

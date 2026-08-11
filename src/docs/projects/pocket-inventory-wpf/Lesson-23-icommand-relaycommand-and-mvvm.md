@@ -37,6 +37,12 @@ or wraps.
 - **The Command pattern** — encapsulating "an action to perform" as an
   object, instead of a bare method call, so it can be passed around,
   bound to, disabled, and (Lesson 45) reversed.
+- **Requery** — WPF's own word for re-checking a command's `CanExecute`
+  right now, rather than waiting for whatever would naturally trigger
+  that check later; both `CommandManager.RequerySuggested`/
+  `InvalidateRequerySuggested()` and this lesson's own
+  `RaiseCanExecuteChanged()` exist to make requery happen at a specific,
+  chosen moment.
 
 **Objects and methods used**
 - `INotifyPropertyChanged` (Lesson 7) and `delegate` (Lesson 6b)
@@ -44,6 +50,74 @@ or wraps.
   per the Repetition Rule. `ICommand` and the hand-written
   `RelayCommand` are this lesson's own subject, given full treatment
   below.
+
+**`Predicate<T>`**
+- *What it is:* a **delegate type**, built into the .NET Base Class
+  Library, whose values are methods matching one specific signature:
+  take one argument of type `T`, return `bool`.
+- *Implementation:* `delegate`, as a keyword and a concept, was given
+  full treatment in Lesson 6b via a hand-written delegate type,
+  `NotifyHandler`. `Predicate<T>` is that identical mechanism, except
+  the BCL already declares it for you — nothing about it is special
+  syntax; it's an ordinary `delegate bool Predicate<T>(T obj);`
+  somewhere in .NET's own source, reusable for *any* "does this one
+  value pass a test?" shape instead of every codebase hand-declaring
+  its own equivalent, the way `NotifyHandler` was declared by hand only
+  because no built-in delegate happened to match its exact
+  `void(string)` shape.
+- *Its use:* `RelayCommand`'s `canExecute` field is typed
+  `Predicate<object?>` — any method (or lambda) taking one `object?` and
+  returning `bool` can be assigned to it, which is exactly the shape
+  `ICommand.CanExecute(object? parameter)` itself requires.
+
+**`CommandManager.RequerySuggested` / `CommandManager.InvalidateRequerySuggested()`**
+- *What it is:* a WPF-wide, static notification mechanism — not tied to
+  any one `ICommand` — for "something happened that might mean a
+  command's `CanExecute` answer has changed; every listening command
+  should requery."
+- *Implementation:* `CommandManager` is a `static` class.
+  `RequerySuggested` is a `static` event any number of commands can
+  subscribe to at once; WPF itself raises it automatically on common
+  UI activity (keyboard input, mouse clicks, focus changes).
+  `InvalidateRequerySuggested()` is a `static` method that raises that
+  same event manually, on demand, for situations WPF's own automatic
+  triggers wouldn't catch.
+- *Its use:* `RelayCommand`'s WPF-aware `CanExecuteChanged` event (this
+  lesson's second unit) forwards straight to `RequerySuggested` instead
+  of managing its own subscriber list — every `RelayCommand` in this
+  project shares the identical, single, WPF-provided notification
+  channel. `InvalidateRequerySuggested()` is called directly, in this
+  lesson's own lab, to force an immediate requery in code — standing in
+  for the real mouse click or keystroke that triggers it automatically
+  in the actual, running app.
+
+**`Dispatcher` / `Dispatcher.Invoke` / `DispatcherPriority.ContextIdle`**
+- *What it is:* `Dispatcher` is WPF's own message queue for the single
+  UI thread — every property change, every layout pass, every click
+  handler this project has ever run has actually run *as a queued item*
+  on this exact object, not the instant the triggering event happened.
+  `Dispatcher.Invoke` schedules a piece of work onto that same queue and
+  *waits* for it to actually run before returning, rather than queuing
+  it and moving on immediately. `DispatcherPriority` is an `enum`
+  ranking how urgent a queued item is relative to everything else
+  already waiting; `ContextIdle` is one specific priority level, lower
+  than ordinary input handling, meaning "run this only once the
+  dispatcher has nothing more urgent left to do."
+- *Implementation:* `Dispatcher.Invoke(Action, DispatcherPriority)` — an
+  overload taking the work to run (here, an empty `() => { }`) and the
+  priority to run it at.
+- *Its use:* `CommandManager.InvalidateRequerySuggested()` doesn't
+  update `IsEnabled` synchronously, in place — it queues the actual
+  recheck onto the `Dispatcher`, at a low priority, to run once the UI
+  thread is otherwise idle. A test or lab running in a tight loop, with
+  no idle moment of its own, would finish checking `IsEnabled` *before*
+  that queued recheck ever ran. `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle)`
+  is a deliberately empty piece of work, queued at that exact same
+  `ContextIdle` priority — the dispatcher can't run it until every
+  already-queued item at or above that priority (including the real
+  requery) has already run first, so by the time this call returns, the
+  requery this lesson needs to observe is guaranteed to have already
+  happened.
 
 ---
 
@@ -152,9 +226,18 @@ discarded — the real `RelayCommand.cs` file uses exactly this next.
   An interface with exactly three members — this class is the first,
   concrete implementation this project writes.
 - `Action<object?> execute` / `Predicate<object?> canExecute` — two
-  delegate fields, taking `execute`/`canExecute` in via the constructor —
-  `RelayCommand` itself contains no actual increment/validation logic; it
-  only ever calls whatever it was handed.
+  delegate-typed fields, taking `execute`/`canExecute` in via the
+  constructor — `RelayCommand` itself contains no actual
+  increment/validation logic; it only ever calls whatever it was
+  handed. `Predicate<object?>` — **first appearance of a built-in BCL
+  delegate type** (cited in full in this lesson's own Header) — is the
+  same underlying mechanism Lesson 6b's hand-written `NotifyHandler`
+  used, except .NET already declares this one for the extremely common
+  "does this one value pass a test?" shape, so `RelayCommand` doesn't
+  need to invent its own. `Action<object?>` is `Predicate<object?>`'s
+  own sibling in the same BCL family — an equally built-in delegate
+  type for "takes one argument, returns nothing" instead of "returns
+  `bool`."
 - `public bool CanExecute(object? parameter) => canExecute(parameter);` /
   `public void Execute(object? parameter) => execute(parameter);` —
   `ICommand`'s two required methods, each a one-line forward to the
@@ -300,15 +383,26 @@ Counter=3, IncrementButton.IsEnabled=False
 1. Before the loop, `Counter` is `0` and `IncrementButton.IsEnabled` is
    `True` — `CanExecute` (`Counter < 3`) is satisfied.
 2. **Iteration 1:** `IncrementCommand.Execute(null)` runs, `Counter`
-   becomes `1`; forcing a requery confirms `IsEnabled` is still `True`
-   (`1 < 3`).
-3. **Iteration 2:** `Execute` runs again, `Counter` becomes `2`;
-   `IsEnabled` is still `True` (`2 < 3`).
+   becomes `1`. `CommandManager.InvalidateRequerySuggested()` raises
+   `RequerySuggested` right now, on demand — this `RelayCommand`'s
+   `CanExecuteChanged` (this lesson's first unit's own event, wired
+   straight to that same WPF-wide signal) fires, which is what tells
+   `IncrementButton` to re-check `CanExecute`. That recheck itself
+   doesn't run synchronously, in place — WPF queues it onto the
+   `Dispatcher`; `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle)`
+   queues this lab's own empty follow-up work at that identical low
+   priority, so it can't run until the real, queued recheck has already
+   run first. Only once `Dispatcher.Invoke` returns is `IsEnabled`
+   actually guaranteed current — confirmed here as still `True` (`1 <
+   3`).
+3. **Iteration 2:** `Execute` runs again, `Counter` becomes `2`; the same
+   `InvalidateRequerySuggested()`/`Dispatcher.Invoke` pair runs again,
+   and `IsEnabled` is still `True` (`2 < 3`).
 4. **Iteration 3:** `Execute` runs a third time, `Counter` becomes `3`;
-   forcing a requery this time shows `IsEnabled` has flipped to `False`
-   — `CanExecute` now evaluates `3 < 3`, which is `False`, and the
-   button's own displayed state changed to match, with no code directly
-   setting `IsEnabled` anywhere.
+   the same pair runs once more — this time `CanExecute` evaluates
+   `3 < 3`, which is `False`, and `IsEnabled` has genuinely flipped to
+   `False` by the time `Dispatcher.Invoke` returns, with no code
+   directly setting `IsEnabled` anywhere.
 
 *What this proves:* `Command="{Binding IncrementCommand}"` — with no
 `IsEnabled` binding written anywhere — ties `IncrementButton.IsEnabled`
@@ -320,8 +414,11 @@ of code that reads or sets `IsEnabled` directly. In the real, interactive
 app, clicking the button itself (not calling `Execute` from code, the
 way this lab does to stay automatable) triggers WPF's own automatic
 re-check after every click — the manual `CommandManager.InvalidateRequerySuggested()`
-call here exists only to force that same re-check synchronously, for a
-lab with no real mouse click to trigger it.
+call here exists only to force that same re-check, on demand, for a lab
+with no real mouse click to trigger it; the `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle)`
+call right after it exists only so this lab's own `Console.WriteLine`
+doesn't read `IsEnabled` before that queued re-check has actually had a
+chance to run.
 
 ### Discard the Throwaway Example
 Delete the `lab-commandbutton` folder. `Command="{Binding ...}"` and this
@@ -335,12 +432,30 @@ Delete the `lab-commandbutton` folder. `Command="{Binding ...}"` and this
   property in this project, here targeting `Button`'s built-in `Command`
   property instead of `Click`.
 - `public event EventHandler? CanExecuteChanged { add { CommandManager.RequerySuggested += value; } remove { ... } }`
-  — (first appearance of `CommandManager.RequerySuggested`, a WPF-specific
-  member unavailable in the previous unit's plain console lab) —
-  subscribing to WPF's own built-in "something happened that might affect
-  commands" signal (keyboard/mouse activity, focus changes, and more),
-  instead of requiring every command author to remember to call
-  `RaiseCanExecuteChanged()` by hand after every relevant change.
+  — (first appearance of `CommandManager.RequerySuggested`, cited in full
+  in this lesson's own Header; a WPF-specific member unavailable in the
+  previous unit's plain console lab) — subscribing to WPF's own built-in
+  "something happened that might affect commands" signal (keyboard/mouse
+  activity, focus changes, and more), instead of requiring every command
+  author to remember to call `RaiseCanExecuteChanged()` by hand after
+  every relevant change.
+- `CommandManager.InvalidateRequerySuggested();` — **first appearance**
+  (cited in full in this lesson's own Header). Raises `RequerySuggested`
+  manually, right now — standing in, inside this lab, for the real mouse
+  click or keystroke that raises it automatically in the actual,
+  interactive app; called once per loop iteration specifically because
+  `IncrementCommand.Execute` was invoked from plain code, not from a real
+  click WPF itself would already be reacting to.
+- `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);` —
+  **first appearance** (cited in full in this lesson's own Header).
+  `InvalidateRequerySuggested()` only *queues* the real recheck onto the
+  UI thread's own `Dispatcher`; it doesn't run it synchronously. This
+  line queues a second, deliberately empty piece of work at that same
+  low `ContextIdle` priority, and *waits* for it — since the dispatcher
+  runs queued work in priority order, this call can't return until the
+  real, already-queued recheck has run first, which is what makes the
+  very next `Console.WriteLine`'s `IsEnabled` read trustworthy rather
+  than a race against work still pending.
 
 ### CS Lens
 

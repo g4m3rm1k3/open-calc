@@ -32,11 +32,69 @@ the first time.
   rules (usually a single property name) describing how to partition the
   same underlying items into named groups, with no items moved, copied,
   or removed from the original collection.
+- **Type pattern** (`is CollectionViewGroup group`) — tests an object's
+  runtime type and, only if it matches, binds it to a new, correctly-
+  typed variable, in one expression — distinct from a plain `(Type)`
+  cast, which throws instead of returning `false` when the value turns
+  out to be the wrong type. Full treatment, an isolated lab, and real
+  verified output: `csharp-type-pattern-matching.md`.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `CollectionViewSource`, `ICollectionView`, and `GroupDescriptions` are
-  given full treatment in the Concept Units below.
+- `CollectionViewSource` and `GroupDescriptions` are this lesson's own
+  subject, given full treatment in the Concept Units below.
+- **`ICollectionView`**
+  - *What it is:* the interface itself — what `GetDefaultView(...)`
+    actually returns, and what every property this lesson reads off it
+    (`GroupDescriptions`, `Groups`) is really declared on.
+  - *Implementation:* a real WPF interface
+    (`System.ComponentModel.ICollectionView`, in `WindowsBase.dll`),
+    implemented internally by `CollectionView` and its subclasses —
+    confirmed against [Microsoft's own `ICollectionView` reference
+    page](https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.icollectionview)
+    this session. This lesson calls two of its real members — its
+    actual declared shape, limited to those two, not the ~20-member
+    interface in full:
+    ```csharp
+    public interface ICollectionView : IEnumerable, INotifyCollectionChanged
+    {
+        ObservableCollection<GroupDescription> GroupDescriptions { get; }
+        ReadOnlyObservableCollection<object> Groups { get; } // null if no groups exist
+    }
+    ```
+  - *Its use:* `GroupDescriptions` is written to (`.Add(...)`) to
+    configure grouping; `Groups` is read afterward to see the result —
+    same object, two different members, two different directions
+    (write the rule in, read the outcome back out).
+- **`CollectionViewGroup`**
+  - *What it is:* the real object `ICollectionView.Groups` actually
+    hands back for each group `GroupDescriptions` produces — not a
+    plain string label, a full object.
+  - *Implementation:* an `abstract` WPF class
+    (`System.Windows.Data.CollectionViewGroup`, in `PresentationFramework.dll`)
+    implementing `INotifyPropertyChanged` — confirmed against
+    [Microsoft's own `CollectionViewGroup` reference page](https://learn.microsoft.com/en-us/dotnet/api/system.windows.data.collectionviewgroup)
+    and its [`Items` property page](https://learn.microsoft.com/en-us/dotnet/api/system.windows.data.collectionviewgroup.items)
+    this session. Its real declared shape, limited to the members this
+    lesson actually reads:
+    ```csharp
+    public abstract class CollectionViewGroup : INotifyPropertyChanged
+    {
+        public object Name { get; }
+        public int ItemCount { get; }
+        public ReadOnlyObservableCollection<object> Items { get; }
+        public bool IsBottomLevel { get; }
+    }
+    ```
+    Being `abstract` means you never construct one directly — WPF's own
+    grouping machinery builds the real, concrete instances internally;
+    application code only ever reads one back, never creates one.
+  - *Its use:* `Name` is what a group's own distinct value was (`"Orange"`),
+    `ItemCount` is how many items landed in it — both read directly in
+    this unit's own `foreach`, below. `Items`/`IsBottomLevel` aren't
+    called anywhere in this lesson, included here so the shape shown
+    isn't silently incomplete — `Items` is the read side of nested
+    (multi-level) grouping, not used since this lesson only groups one
+    level deep.
 
 ---
 
@@ -180,8 +238,28 @@ exactly this next.
   `"Orange"` lands in the same group, automatically, with no manual
   partitioning code written.
 - `GroupedView.Groups` — **first appearance.** A read-only collection of
-  the resulting groups, each one a real `CollectionViewGroup` with a
-  `Name` (the distinct property value, `"Orange"`) and an `ItemCount`.
+  the resulting groups, each one a real `CollectionViewGroup` — real
+  declared shape shown in "Objects and methods used," above.
+- `foreach (object entry in GroupedView.Groups)` — `Groups` is declared
+  as a collection of plain `object`, not `CollectionViewGroup`
+  specifically (WPF's own real declared shape, so the same collection
+  type can hold different concrete group implementations in other
+  scenarios) — which is exactly why the next line has to check what
+  each `entry` actually is before using it as a `CollectionViewGroup`.
+- `if (entry is CollectionViewGroup group)` — **first appearance of a
+  type pattern.** Tests whether `entry`'s real runtime type is
+  `CollectionViewGroup` and, only when it matches, binds it to a new
+  variable `group`, already typed as `CollectionViewGroup` — in one
+  expression, with no separate cast line and no exception if it didn't
+  match. Full treatment, an isolated lab, and real verified output:
+  `csharp-type-pattern-matching.md`.
+- `group.Name` / `group.ItemCount` — **first appearance of reading
+  `CollectionViewGroup`'s own members.** Only reachable *because* the
+  `is` check above already proved `entry` really is a
+  `CollectionViewGroup` — reading `.Name`/`.ItemCount` on a plain
+  `object` (before the pattern match narrowed it) would be a compile
+  error; the type pattern is what makes these two ordinary property
+  reads legal at all.
 
 ### CS Lens
 

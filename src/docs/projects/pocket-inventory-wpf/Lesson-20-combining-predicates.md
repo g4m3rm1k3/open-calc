@@ -21,6 +21,23 @@ together, not overriding each other.
   with `&&` (all must hold) or `||` (any must hold) into one larger
   condition, instead of writing separate, nested `if` branches for every
   combination.
+- **Value tuple** (`(string Name, string Category, bool IsFavorite)`,
+  and tuple literals like `("Hex Bolts", "Tools", true)`) — a
+  lightweight, unnamed way of grouping several related values together
+  without writing a whole class just to carry them — each element gets
+  a real name (`item.Name`, not `item.Item1`), read like property
+  access even though no class or property was ever declared. Full
+  treatment, an isolated lab, and real verified output:
+  `csharp-value-tuples.md`.
+- **Local function** (`bool Matches(...)`, `void PrintMatches(...)`) —
+  a named function declared directly inside another function, or —
+  as here — inside top-level statements, rather than as its own class
+  member. It exists for logic scoped tightly to one file or method that
+  has no business being reachable from anywhere else, and it behaves
+  differently from a lambda assigned to a variable in one specific,
+  easy-to-miss way (it can be called before its own textual
+  declaration; a lambda-holding variable cannot). Full treatment, an
+  isolated lab, and real verified output: `csharp-local-functions.md`.
 
 **Objects and methods used**
 - `Predicate<T>` and `ICollectionView.Filter` (Lesson 19) reappear
@@ -147,6 +164,29 @@ not discarded — the real `GroupedItems.Filter` uses exactly this next.
 
 ### Mechanical Walkthrough
 
+- `List<(string Name, string Category, bool IsFavorite)> items = new()`
+  — **first appearance of a value tuple.** `(string Name, string
+  Category, bool IsFavorite)` is a named tuple type — a lightweight
+  grouping of three related values, each with a real, declared name,
+  used here as `List<T>`'s type argument exactly the way `List<int>` or
+  `List<InventoryItem>` would be. Full treatment, an isolated lab, and
+  real verified output: `csharp-value-tuples.md`.
+- `("Hex Bolts", "Tools", true)` and the three literals after it —
+  **first appearance of tuple literal syntax** — each one builds a
+  three-element value matching `items`'s declared element type by
+  position, with no `new` keyword and no type named explicitly. Same
+  concept file as above.
+- `bool Matches((string Name, string Category, bool IsFavorite) item, string searchText, string? categoryFilter, bool favoritesOnly)`
+  — **first appearance of a local function.** `Matches` is declared
+  directly inside this file's top-level statements, not as a member of
+  any class — a named function scoped to exactly this file, callable
+  from anywhere below it (and, as local functions allow, even from
+  above it in the source, unlike an ordinary local variable). Its first
+  parameter's type is the same named tuple type `items` holds, so
+  `item.Name`/`item.Category`/`item.IsFavorite` are available inside
+  `Matches`'s body by name, not by `Item1`/`Item2`/`Item3`. Full
+  treatment, an isolated lab, and real verified output:
+  `csharp-local-functions.md`.
 - `bool matchesCategory = categoryFilter == null || item.Category == categoryFilter;`
   — (first appearance of this "inactive filter passes everything"
   pattern) — when `categoryFilter` is `null` (no category chosen), the
@@ -161,6 +201,22 @@ not discarded — the real `GroupedItems.Filter` uses exactly this next.
   project — an item passes only if every single one is `true` — the
   direct meaning of **Boolean composition** this unit's glossary entry
   names.
+- `void PrintMatches(string searchText, string? categoryFilter, bool favoritesOnly)`
+  — **a second local function**, same concept as `Matches` above,
+  reappearing — no restatement owed a second time in the same unit.
+- `foreach (var item in items)` — reappearing, already-established
+  syntax (`foreach` over a collection, taught in an earlier lesson) —
+  the only new detail is that `var` here infers `item`'s type as the
+  named tuple type itself, so `item.Name` inside the loop body (below)
+  reads by name with no extra step.
+- `if (Matches(item, searchText, categoryFilter, favoritesOnly))` —
+  an ordinary function call, already-basic syntax; calling a local
+  function looks and behaves identically to calling any other method
+  from the caller's side — the only difference local functions carry is
+  *where* they're allowed to be declared and called from, not how a
+  call site reads.
+- `Console.WriteLine($"  {item.Name}");` — reappearing tuple member
+  access by name, same as `Matches`'s own parameter above.
 
 ### CS Lens
 

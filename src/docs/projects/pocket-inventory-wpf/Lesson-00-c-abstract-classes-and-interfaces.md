@@ -406,6 +406,10 @@ support one capability" (`IDimmable`, implementable by a lightbulb, a
 thermostat, or anything else that can be dimmed, with zero shared
 ancestry required).
 
+*See also:* `csharp-abstract-classes-vs-interfaces.md` — a standalone,
+project-independent treatment of this exact contrast, with its own
+fresh `CS0144`/`CS0534`/`CS1721` proofs.
+
 ### SE Lens
 
 This project's own real interfaces already made this choice, once each,

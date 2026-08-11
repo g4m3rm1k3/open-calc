@@ -149,7 +149,15 @@ Yellow → Red, never Red → Yellow directly); a vending machine (Idle →
 Selecting → Dispensing → Idle); an HTTP connection (Closed →
 Connecting → Open → Closing → Closed). This project's own `editingItemId`
 (Lesson 21) was a small, informal instance of the identical idea, named
-properly here for the first time.
+properly here for the first time. `finite-state-machine-guarded-transitions.md`
+covers this exact pattern — a closed set of named states plus an
+explicit table of valid transitions, rejecting anything outside it — in
+full, standalone, and project-independent form; worth naming distinctly
+from a *different* real use of the same underlying machine, recognizing
+whether a whole *string* matches a pattern one character at a time
+(regular expressions, covered by `regular-language-finite-state-machine.md`),
+which is a genuinely different job from guarding one long-lived object's
+own valid transitions, the job this lesson's own `BorrowStatus` solves.
 
 ### SE Lens
 

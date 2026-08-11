@@ -292,6 +292,12 @@ query re-runs every time it's enumerated, against the source
 collection's *current* contents, unless something forces it to run
 immediately and produce a real, independent result (`.ToList()`,
 proven here to genuinely freeze the result the moment it's called).
+`deferred-execution-lazy-evaluation.md` covers this exact idea in full,
+standalone, project-independent form — the same real, contrasting
+`Select`/`.ToList()` proof shown there too, plus a CS Lens naming
+Python's and JavaScript's own generator functions, and Haskell's
+laziness, as other real, recognized instances of the identical
+underlying idea.
 
 ### Discard the Throwaway Example
 Delete the `LinqLab` folder. `Where`/`Select`/deferred execution are

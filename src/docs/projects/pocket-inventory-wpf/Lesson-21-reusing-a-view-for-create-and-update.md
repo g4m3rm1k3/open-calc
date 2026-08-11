@@ -35,6 +35,35 @@ Lesson 12–15: every field this lesson finally makes genuinely editable.
   per the Repetition Rule. `UPDATE ... WHERE` is this lesson's own
   subject, given full treatment below.
 
+**`CultureInfo.InvariantCulture`**
+- *What it is:* reappearing from Lesson 13's fifth unit — a fixed,
+  non-regional culture that never changes no matter what machine runs
+  this code.
+- *Implementation:* Lesson 13's fifth unit gives this its full
+  treatment (a `static` property on `System.Globalization.CultureInfo`);
+  here it's the exact same value, reused unchanged, not re-derived.
+- *Its use:* formats `item.Value` for this lesson's `UPDATE`'s `@value`
+  parameter the identical way `SaveItemToDatabase`'s original `INSERT`
+  already does — a value round-tripping through SQL needs a fixed,
+  always-`.`-separated decimal format so it parses back correctly on
+  any machine, regardless of that machine's own regional settings; that
+  is a different problem from `ToString("C")`'s *display* formatting,
+  which deliberately follows whichever culture is currently running.
+
+**`DBNull.Value`**
+- *What it is:* reappearing from Lesson 14's fifth unit — ADO.NET's own
+  sentinel meaning "this specific database cell is genuinely empty,"
+  distinct from C#'s own `null`.
+- *Implementation:* Lesson 14's fifth unit gives this its full
+  treatment, including why passing a bare C# `null` to
+  `Parameters.AddWithValue` throws at runtime where `DBNull.Value`
+  does not.
+- *Its use:* inside `(object?)item.PurchaseDate?.ToString("O") ?? DBNull.Value`,
+  exactly as first used in `SaveItemToDatabase` — when `PurchaseDate` is
+  absent, this lesson's `UPDATE`'s `@purchaseDate` parameter has to
+  write a real SQL `NULL`, not the four-character string `"null"` and
+  not a C# `null` reference the driver would reject.
+
 ---
 
 ## Concept Unit: Loading an Existing Object's Values Into a Form
@@ -423,6 +452,19 @@ private void UpdateItemInDatabase(InventoryItem item)
   `editingItemId` actually has a value — a cleaner alternative to
   `editingItemId.HasValue` plus `editingItemId.Value` (Lesson 14) doing
   the same two things separately.
+- `NewItemDraft.Id = id;` — reappearing (plain property assignment,
+  familiar since Lesson 1), the specific detail worth naming: `Id` has,
+  until now, only ever been assigned by `LoadItemsFromDatabase` reading
+  a real row back (Lesson 10); this is the first time this project's own
+  code assigns it directly, specifically so the freshly-copied
+  `NewItemDraft` (built with no `Id` of its own, back in
+  `ItemsGrid_SelectionChanged`) carries the *same* `Id` the row being
+  edited already has in the database — without this line,
+  `UpdateItemInDatabase`'s own `WHERE Id = @id` below would target row
+  `0`, matching nothing.
+- `UpdateItemInDatabase(NewItemDraft);` — **first appearance of this
+  call site.** Forward-references the method defined next; walked
+  through fully, below, once its own code is shown.
 - `for (int index = 0; index < Items.Count; index++) { if (Items[index].Id == id) { ... } }`
   — reappearing (a plain indexed loop, the same shape as any `for` loop
   already assumed known from this project's stated floor), scanning
@@ -439,6 +481,67 @@ private void UpdateItemInDatabase(InventoryItem item)
   stated floor), stopping the scan the moment the matching `Id` is
   found, since `Id` is unique and no later iteration could ever match
   again.
+
+### Mechanical Walkthrough — `UpdateItemInDatabase`'s Own Body
+
+The call site above only *reaches* `UpdateItemInDatabase`; this method's
+own code — this lesson's actual SQL-update subject matter — hasn't been
+enumerated yet:
+
+- `using SqliteConnection connection = new SqliteConnection(ConnectionString); connection.Open(); using SqliteCommand command = connection.CreateCommand();`
+  — reappearing (Lesson 9's connect/open/create-command shape), the
+  identical three lines this lesson's own second unit's throwaway lab
+  already used to run its `UPDATE`, now inside the real project.
+- `command.CommandText = "UPDATE Items SET Name = @name, Category = @category, Location = @location, Value = @value, PurchaseDate = @purchaseDate, Notes = @notes, IsFavorite = @isFavorite WHERE Id = @id";`
+  — reappearing (`UPDATE ... WHERE`, this lesson's second unit, given
+  full treatment there with real, rows-affected output) — the same
+  shape, extended from updating just `Name` to every column
+  `InventoryItem` actually has.
+- `command.Parameters.AddWithValue("@name", item.Name);` — reappearing
+  (Lesson 9's parameterized-query pattern), guarding `Name` against SQL
+  injection the identical way `SaveItemToDatabase`'s own `INSERT`
+  already does.
+- `command.Parameters.AddWithValue("@category", item.Category.ToString());`
+  — reappearing (Lesson 12's `enum`-as-`TEXT` serialization) — the same
+  `ToString()` round-trip already proven for `INSERT`.
+- `command.Parameters.AddWithValue("@location", item.Location);` —
+  reappearing, a plain `string` parameter, the same shape as `@name`.
+- `command.Parameters.AddWithValue("@value", item.Value.ToString(CultureInfo.InvariantCulture));`
+  — reappearing (`CultureInfo.InvariantCulture`, Lesson 13's fifth unit,
+  cited in full in this lesson's own Header) — the exact fixed,
+  machine-independent decimal format `SaveItemToDatabase` already writes,
+  required here for the identical reason: this text has to
+  `decimal.Parse` back correctly regardless of which machine's regional
+  settings are running when it's later read.
+- `command.Parameters.AddWithValue("@purchaseDate", (object?)item.PurchaseDate?.ToString("O") ?? DBNull.Value);`
+  — reappearing (Lesson 14's fifth unit gives `?.`, `??`, `"O"`, and
+  `DBNull.Value` each full treatment; `DBNull.Value` is also cited in
+  full in this lesson's own Header) — `?.` short-circuits to `null`
+  when `PurchaseDate` is absent rather than throwing on `.ToString("O")`;
+  `?? DBNull.Value` then swaps that C# `null` for ADO.NET's own
+  "genuinely empty cell" sentinel, since a bare `null` here would throw
+  instead of writing a real SQL `NULL`.
+- `command.Parameters.AddWithValue("@notes", item.Notes);` — reappearing,
+  the same plain `string` parameter shape as `@name`/`@location`.
+- `command.Parameters.AddWithValue("@isFavorite", item.IsFavorite ? 1 : 0);`
+  — reappearing (the ternary/conditional operator applied to a `bool`
+  going into SQLite, first given full treatment in Lesson 15) — SQLite
+  has no native boolean column type, so `true`/`false` round-trips as
+  `1`/`0`, the identical conversion `SaveItemToDatabase` already
+  performs.
+- `command.Parameters.AddWithValue("@id", item.Id);` — reappearing
+  (a plain `int` parameter, the same shape every other parameter here
+  uses), the value this lesson's second unit already proved, with real
+  output, correctly restricts the `UPDATE` to exactly one row — here
+  supplied by `NewItemDraft.Id`, set moments earlier in
+  `AddButton_Click`.
+- `command.ExecuteNonQuery();` — reappearing (`ExecuteNonQuery()`,
+  Lesson 9; its **rows affected** return value, Lesson 21's own second
+  unit) — the return value is discarded here, unlike the throwaway
+  lab's `int rowsAffected = ...`, because the real UI already has its
+  own, separate confirmation that the edit worked: `Items[index] =
+  NewItemDraft`, back in `AddOrUpdateItem`, visibly updates the grid the
+  instant this call returns.
 
 ### CS Lens
 

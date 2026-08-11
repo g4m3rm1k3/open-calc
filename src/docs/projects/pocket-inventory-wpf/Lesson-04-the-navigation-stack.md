@@ -49,6 +49,20 @@ lesson adds a third one to.
   navigates to it.
 
 **Objects and methods used**
+- **`System.Action`** — *What it is:* a built-in, generic delegate
+  type — one of a small family (`Action`, `Action<T>`, `Action<T1,
+  T2>`, and so on through several type parameters, plus `Func<...>`
+  for the return-a-value case) the .NET base class library already
+  provides. *Implementation:* `Action` (no type parameters, used here)
+  matches any method taking no parameters and returning `void`;
+  `Action<T>` matches one taking a single `T` parameter and returning
+  `void`, and so on — each one is a ready-made delegate signature, not
+  something this project defines. *Its use:* this lesson's
+  `DoorOpened` event needs a delegate type describing "just run this,
+  no return value, no parameters" — `Action` is that exact shape,
+  already written, so nothing here needs to declare its own
+  single-purpose `delegate void SomeHandler();` the way a hand-written
+  delegate would.
 - `Console.WriteLine`, already given full treatment in Lesson 00a,
   reappears in this lesson's own throwaway `Doorbell`/`Chime` lab —
   brief reminder only, per the Repetition Rule. `event`, `+=`,
@@ -129,9 +143,16 @@ every navigation `Frame` performs.
 
 ### Mechanical Walkthrough
 
-- `public event Action? DoorOpened;` — **first appearance.** Declares
-  `DoorOpened` as an event — something other code subscribes to, not a
-  value to read directly.
+- `public event Action? DoorOpened;` — **first appearance.** `event`
+  declares `DoorOpened` as something other code subscribes to, not a
+  value to read directly. `Action` (see Objects and methods, above) is
+  the built-in delegate type describing "a method, no parameters, no
+  return value" — the exact shape a subscriber to this event has to
+  match. The trailing `?` marks `DoorOpened` as nullable — genuinely
+  allowed to be `null` before anything has subscribed to it, which is
+  exactly the case `?.Invoke()`, below, exists to handle safely; full
+  treatment of what `?` on a type actually means to the compiler:
+  `csharp-nullable-reference-types.md`.
 - `alarm.DoorOpened += () => Console.WriteLine(...)` — **first
   appearance of `+=` on an event.** Not numeric addition — "run this
   code too, whenever `DoorOpened` fires," in addition to any other

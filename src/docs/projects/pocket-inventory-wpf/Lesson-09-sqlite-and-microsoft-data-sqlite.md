@@ -301,6 +301,14 @@ PostgreSQL's — implements this same ADO.NET shape
 (`*Connection`/`*Command`/`*Reader`, `Open()`/`ExecuteNonQuery()`/
 `ExecuteReader()`), which is *why* the specific steps in this lesson
 transfer directly to any other ADO.NET provider, not just SQLite's own.
+That shared shape isn't just a naming convention every provider happens
+to follow, either — `SqliteConnection`, `SqliteCommand`, and
+`SqliteDataReader` each genuinely inherit from a real, shared base class
+(`DbConnection`/`DbCommand`/`DbDataReader`), the exact mechanism
+`ado-net-provider-pattern.md` covers in full, including what code
+written against those shared base types — rather than `Sqlite`'s own
+concrete classes — actually buys a project later, if the underlying
+database ever needs to change.
 This project's stated approach (see `CURRICULUM_NOTES.md`) is raw
 ADO.NET before any ORM, deliberately: an ORM like Entity Framework is
 built *on top of* ADO.NET, and would hide every one of these steps

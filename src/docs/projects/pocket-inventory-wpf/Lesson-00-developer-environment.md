@@ -59,6 +59,12 @@ explained from zero, even the ones that look familiar.
   set of common `using` statements to every file, project-wide.
 - **`<UseWPF>`** — turns on the WPF-specific build tooling that
   compiles `.xaml` files into part of the program.
+- **`<Nullable>enable</Nullable>`** — a `.csproj` setting turning on the
+  compiler's nullable-reference-type checking for the whole project, so
+  a reference-typed variable written without a `?` is treated as
+  "should never be null" and a `?`-suffixed one (`string?`) is treated
+  as explicitly allowed to be — full mechanism, real compiler warnings,
+  in `csharp-nullable-reference-types.md`.
 - **Code-behind** (`.xaml.cs`) — the C# file paired with a `.xaml`
   markup file, holding that window or page's actual logic (event
   handlers, computed values) — structure and behavior kept in two
@@ -784,7 +790,19 @@ plain console executable, which always has one. `TargetFramework` ends in
 `-windows` — this project can now use Windows-only APIs (like WPF itself)
 that a plain `net10.0` project is blocked from referencing at all, by design,
 so a cross-platform console project can never accidentally depend on a
-Windows-only type. `ImplicitUsings` — (first appearance) — when `enable`,
+Windows-only type. `Nullable` — (first appearance) — when `enable`, the
+compiler turns on **nullable reference type** checking for the entire
+project: every reference-typed variable written without a trailing `?`
+(a plain `string`, for instance) is now treated as required to always
+hold a real value, and the compiler warns wherever it can't prove that;
+writing `string?` instead explicitly marks a variable as allowed to be
+`null`. This is what makes every `T?`, `Action?`, and similar nullable
+annotation the rest of this curriculum uses actually mean something —
+without this setting, C# treats every reference type as silently,
+uniformly "maybe null," with no warning at the specific line that
+introduces a real gap. Full mechanics, with real compiler warnings
+produced and fixed: `csharp-nullable-reference-types.md`.
+`ImplicitUsings` — (first appearance) — when `enable`,
 the compiler silently adds a small, fixed set of the most common `using`
 statements (`System`, `System.Collections.Generic`, `System.Linq`, and a
 handful more, different per project type) to every file in the project,
@@ -820,6 +838,12 @@ logic for this specific window.
   appearance of the `-windows` suffix.** Unlocks Windows-only APIs
   (WPF itself among them); a plain `net10.0` target is blocked from
   referencing them at all, by design.
+- `<Nullable>enable</Nullable>` — **first appearance.** Turns on
+  nullable reference type checking project-wide — a plain `string`
+  is now treated as required to always hold a real value, and `string?`
+  explicitly marks a variable as allowed to be `null`. See
+  `csharp-nullable-reference-types.md` for the full mechanism, real
+  compiler warnings included.
 - `<ImplicitUsings>enable</ImplicitUsings>` — **first appearance.**
   The compiler silently adds a small, fixed set of common `using`
   statements to every file, project-wide — why code in this curriculum

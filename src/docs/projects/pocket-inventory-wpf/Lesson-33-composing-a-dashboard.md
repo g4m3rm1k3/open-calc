@@ -147,6 +147,13 @@ extra state-preservation code at all.
 - `ContentFrame.GoBack()` — reappearing (Lesson 4), the specific detail
   proven here for the first time: it navigates back to a *cached* page
   instance, not a freshly constructed one.
+- `Pump()` — reappearing (a hard concept, per the Repetition Rule): the
+  same `Dispatcher`/`ContextIdle` pump Lesson 23 first gave full
+  treatment to, queuing a deliberately empty piece of work at the same
+  low priority a binding-driven UI update is queued at, so this lab's
+  own `Console.WriteLine` calls never read a property (`CanGoBack`,
+  `Content`) before WPF has actually finished applying whatever change
+  just triggered it.
 
 ### CS Lens
 

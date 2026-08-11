@@ -33,9 +33,81 @@ instead of categories).
   path and keeping the actual bytes on disk.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `OpenFileDialog`, `BitmapImage`, and `File.Copy` are given full
-  treatment in the Concept Units below.
+- `OpenFileDialog`, `BitmapImage`, and `File.Copy` are this lesson's
+  own subject, given full treatment in the Concept Units below.
+- This lesson's own throwaway labs turn out to be this project's first
+  real use of `System.IO`'s plain-file-I/O static-class family — `Path`
+  and `Directory` — plus `FileInfo` and `Uri`. Each gets its own real
+  entry here, not folded into surrounding prose.
+
+**`Path`**
+- *What it is:* a `static` class of pure, no-filesystem-access helper
+  methods for building and taking apart file/folder path strings —
+  never a class you construct an instance of.
+- *Implementation:* every member is `static` (a fixed, stateless
+  operation, not a "thing" sitting in memory) — none of them read or
+  write anything on disk. `Path.Combine(string, string)` joins path
+  segments with the correct separator for the current OS (`\` on
+  Windows), so code never has to hardcode which slash to use.
+  `Path.GetTempPath()` returns the current user's own OS-designated
+  temporary-files folder (on Windows, typically something under
+  `C:\Users\<you>\AppData\Local\Temp\`) as a plain `string` — the OS
+  decides where that is, not this project.
+- *Its use:* `Path.Combine(Path.GetTempPath(), "lab-photo-app-owned")`
+  builds a real, valid folder path for this lab's own scratch files
+  without this lesson's code ever hardcoding a drive letter or a
+  particular separator character; the real project's own `AddPhoto`
+  method reuses `Path.Combine` the identical way, against
+  `AppContext.BaseDirectory` instead of a temp folder.
+
+**`Directory`**
+- *What it is:* a `static` class of filesystem-*mutating* operations on
+  whole folders — distinct from `Path`, which only ever manipulates
+  path *strings* and never touches the disk at all.
+- *Implementation:* `Directory.CreateDirectory(string path)` creates
+  every folder in `path` that doesn't already exist yet (including any
+  missing parent folders), and does nothing — no exception — if the
+  folder is already there, the same "safe to call unconditionally"
+  shape `CREATE TABLE IF NOT EXISTS` (Lesson 9) already established for
+  a table. `Directory.Delete(string path, bool recursive)` removes a
+  folder; passing `recursive: true` also removes everything inside it
+  first — omitting that argument (or passing `false`) throws instead of
+  silently deleting a non-empty folder.
+- *Its use:* `Directory.CreateDirectory(appPhotosFolder)` guarantees
+  this lab's own destination folder exists before `File.Copy` ever
+  tries to write into it. `Directory.Delete(appPhotosFolder, recursive: true)`,
+  at the end of the lab, tears the whole scratch folder back down —
+  this specific lab's own cleanup, not a pattern the real project reuses
+  (the real `Photos` folder is meant to persist, not be deleted).
+
+**`FileInfo`**
+- *What it is:* an object representing one specific file's own
+  metadata — its size, its last-modified time, whether it exists — as
+  distinct from `File`, a `static` class of one-off operations
+  (`File.Copy`, `File.Exists`) that take a path string every time and
+  hold no state of their own between calls.
+- *Implementation:* `new FileInfo(sourcePath)` constructs a real object
+  tied to one specific path; `.Length` is an instance property on that
+  object, reading the file's real size in bytes from the filesystem.
+- *Its use:* `new FileInfo(sourcePath).Length`, inside this lab's own
+  `Console.WriteLine`, reports the real source photo's size purely as
+  a sanity check before copying it — proof the file this lab is about
+  to copy is a real, substantial image (`1602752` bytes, per this
+  lesson's own real output), not an empty placeholder.
+
+**`Uri`**
+- *What it is:* a structured representation of a resource
+  location — a local file path, an `http://` address, or several other
+  schemes — parsed once into real, addressable parts (scheme, path)
+  rather than treated as an opaque string.
+- *Implementation:* `new Uri(destinationPath)` parses a plain file
+  system path string into a real `Uri` object; passed a path with no
+  explicit scheme, it infers the local `file://` scheme automatically.
+- *Its use:* `BitmapImage.UriSource` (below) requires a real `Uri`, not
+  a bare `string` — `BitmapImage` is built generically enough to load
+  an image from a remote `http://` address the identical way it loads
+  one from a local disk path, and `Uri` is the one shared type that can
+  represent either.
 
 ---
 
@@ -141,6 +213,28 @@ discarded — the real project's `PhotoPath` field uses exactly this next.
 
 ### Mechanical Walkthrough
 
+- `new FileInfo(sourcePath).Length` — **first appearance of `FileInfo`.**
+  Builds a real object tied to `sourcePath` specifically and reads its
+  actual on-disk size in bytes — `File.Exists`, alongside it in the same
+  `WriteLine`, is a `static`, one-off check on the same path with no
+  object of its own; `FileInfo` is the alternative shape used any time
+  more than one fact about the *same* file is needed together.
+- `Path.Combine(Path.GetTempPath(), "lab-photo-app-owned")` — **first
+  appearance of `Path.Combine` and `Path.GetTempPath()`.**
+  `Path.GetTempPath()` asks the OS for this user's own temp-files
+  folder, as a plain `string`; `Path.Combine` joins that string and
+  `"lab-photo-app-owned"` with the correct separator for whatever OS
+  this code happens to run on, rather than this lesson's code hardcoding
+  `\` and risking it being wrong on a different OS.
+- `Directory.CreateDirectory(appPhotosFolder)` — **first appearance.**
+  Creates the folder `Path.Combine` just built a name for, doing nothing
+  (no exception) if it happens to already exist — the identical
+  "idempotent, safe to call every time" shape `CREATE TABLE IF NOT
+  EXISTS` (Lesson 9) already established, applied here to a folder
+  instead of a database table.
+- `Path.Combine(appPhotosFolder, $"{Guid.NewGuid()}.jpg")` — reappearing
+  (`Path.Combine`, moments above), building the actual destination file
+  path this time, not just a folder.
 - `File.Copy(sourcePath, destinationPath)` — **first appearance.**
   Copies a file's bytes to a new location; throws if `destinationPath`
   already exists (an overload accepting `overwrite: true` exists but
@@ -150,7 +244,7 @@ discarded — the real project's `PhotoPath` field uses exactly this next.
   unique identifier, used here as the copied file's own name, guaranteed
   never to collide with another photo this project ever copies in,
   regardless of what the original filename was.
-- `new BitmapImage(); BeginInit(); UriSource = ...; CacheOption = BitmapCacheOption.OnLoad; EndInit();`
+- `new BitmapImage(); BeginInit(); ...; CacheOption = BitmapCacheOption.OnLoad; EndInit();`
   — **first appearance of `BitmapImage`.** `BeginInit()`/`EndInit()`
   bracket a batch of property assignments WPF applies together, only
   once `EndInit()` runs — the same batching idea behind
@@ -159,6 +253,21 @@ discarded — the real project's `PhotoPath` field uses exactly this next.
   lesson's single most important detail, proven with real consequences
   in the next unit — forces the entire image to be read into memory
   immediately, during `EndInit()`, instead of lazily, on demand, later.
+- `UriSource = new Uri(destinationPath)` — **first appearance of `Uri`,
+  called out on its own** (not folded into the `BitmapImage` bullet
+  above, since it's a distinct type with its own real job): parses
+  `destinationPath` — a plain local file path string — into a real,
+  structured `Uri` object, inferring the local `file://` scheme since
+  none was written explicitly. `BitmapImage.UriSource` requires exactly
+  this type, not a bare `string`, because the same property also has to
+  accept a remote `http://` image address, and `Uri` is the one type
+  general enough to represent either.
+- `Directory.Delete(appPhotosFolder, recursive: true)` — **first
+  appearance.** Removes `appPhotosFolder` and everything inside it —
+  `recursive: true` is required here specifically because the folder
+  isn't empty (it holds the one copied photo); passing `false` instead,
+  or omitting the argument, would throw rather than silently leaving
+  files behind.
 
 ### CS Lens
 

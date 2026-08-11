@@ -164,12 +164,17 @@ are not discarded — the real `DeleteItem` undo uses exactly this next.
 
 ### CS Lens
 
-This is the **Memento pattern**, named directly: an object's state,
-captured at a specific moment, held separately from the object itself,
-specifically so it can be restored later without the object needing to
-know how to undo anything on its own. `DeleteCommand` — not `string`
-itself — is what remembers the position; the data being deleted stays
-completely ordinary.
+This is the **Memento pattern** — covered in full, standalone, in
+`memento-pattern.md`: an object's state, captured at a specific moment,
+held separately from the object itself, so it can be restored later
+without exposing that state's own internal structure to whatever's
+doing the capturing. Applied here: `DeleteCommand` plays both
+Originator and Memento at once — it's the thing `removedFromIndex` gets
+captured *from*, and it's also the object that value is held on;
+`undoStack` (a plain `Stack<IUndoableCommand>`) plays the Caretaker,
+pushing and popping commands without ever reading `removedFromIndex`
+itself. `DeleteCommand` — not `string` — is what remembers the
+position; the data being deleted stays completely ordinary.
 
 ### SE Lens
 

@@ -26,6 +26,9 @@ triggers, the same idea this lesson extends to a third trigger.
   menu.
 - **`StatusBar`** — a WPF control conventionally docked at the bottom of
   a window, showing brief, live status information.
+- **`Separator`** — a thin, non-interactive divider line, dropped
+  between two items inside a `StatusBar`, `Menu`, or similar container
+  to group related items visually with no logic of its own.
 
 **Objects and methods used**
 - `ICommand` and `Command="{Binding ...}"` (Lesson 23) reappear here,
@@ -249,6 +252,13 @@ nothing shows a live item count at a glance.
   (Lesson 7) raises its own change notification for `Count` on every
   add/remove, the same mechanism that's kept `ItemsGrid` live all
   along, now also driving a plain `TextBlock`.
+- `<Separator />` — **first appearance.** A real `StatusBar` (and
+  `Menu`) divider control — a thin, non-interactive visual rule with no
+  data and no logic of its own, no properties set here at all. Dropped
+  between the two `StatusBarItem`s purely so a reader's eye has
+  something to catch on between "item count" and "total value," instead
+  of two `TextBlock`s running together with nothing marking where one
+  ends and the next begins.
 
 ### CS Lens
 

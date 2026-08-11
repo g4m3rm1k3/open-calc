@@ -184,6 +184,10 @@ Lesson 2's real code uses a `static` field to hold one shared lookup
 table for an entire feature — not per-object state, exactly this
 mechanism.
 
+*See also:* `csharp-static-and-readonly-fields.md` — a standalone,
+project-independent treatment of both `static` and `readonly`,
+including this exact `readonly` proof next.
+
 ---
 
 ## Concept Unit: `readonly` — Assignable Once, Then Locked
@@ -499,6 +503,10 @@ found" as an ordinary `false`, not a thrown error.
 Lesson 2's own lab combines this exact `TryGetValue`/ternary shape with
 a `static readonly Dictionary<object, int>` — every construct this
 lesson isolated, together, in the real code you're about to read.
+
+*See also:* `csharp-dictionary-collection.md` — a standalone,
+project-independent treatment of `Dictionary<TKey, TValue>` and
+`TryGetValue`, with its own fresh `KeyNotFoundException` proof.
 
 ---
 

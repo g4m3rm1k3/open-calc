@@ -28,9 +28,92 @@ operation, a new trigger for it.
   dragged payload lives.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `DragDrop.DoDragDrop`, `AllowDrop`, and `DragEventArgs`/`IDataObject`
-  are given full treatment in the Concept Units below.
+- `DragDrop.DoDragDrop`, `AllowDrop`, and `DragEventArgs`/`IDataObject`
+  are this lesson's own subject, given full treatment in the Concept
+  Units below.
+- **`Point`**
+  - *What it is:* a plain, immutable pair of coordinates — an X and a Y,
+    nothing else.
+  - *Implementation:* a WPF struct (`System.Windows.Point`), copied by
+    value on assignment, not shared by reference. The two real members
+    this lesson reads: `public double X { get; }` and `public double Y
+    { get; }`.
+  - *Its use:* `dragStartPoint` and `currentPosition` (below) each hold
+    one — the on-screen location the mouse was at, at two different
+    moments, so the code can measure how far it's actually moved.
+- **`MouseButtonEventArgs`/`MouseEventArgs`**
+  - *What it is:* the real event-argument objects WPF hands a mouse
+    event handler — everything the handler is told about the mouse at
+    the moment the event fired.
+  - *Implementation:* both are real WPF classes; `MouseButtonEventArgs`
+    (used by `PreviewMouseLeftButtonDown`) extends `MouseEventArgs`
+    (used by `PreviewMouseMove`), adding button-specific members a
+    plain move event doesn't need. The one member this lesson calls on
+    either, `GetPosition(IInputElement? relativeTo)`, is declared on
+    the shared base, `MouseEventArgs` itself; `e.LeftButton` is
+    declared there too.
+  - *Its use:* every mouse-related handler in this unit receives one of
+    these as its second parameter — `e`, by the same convention every
+    event handler in this project has used — and reads the real mouse
+    position and button state off it, rather than polling the mouse
+    from anywhere else.
+- **`e.GetPosition(null)`**
+  - *What it is:* a method that answers "where was the mouse, in
+    coordinates relative to some specific element?"
+  - *Implementation:* `Point GetPosition(IInputElement? relativeTo)` —
+    passing a real element returns coordinates relative to that
+    element's own top-left corner; passing `null` — exactly what this
+    lesson's code does, both times it's called — returns coordinates
+    relative to the whole window instead, the one reference frame
+    guaranteed to stay consistent regardless of which specific element
+    the mouse happens to be over at that instant.
+  - *Its use:* both mouse handlers below call this to get a `Point` in
+    the same, shared coordinate space, so the two calls' results can be
+    meaningfully subtracted from each other.
+- **`MouseButtonState.Pressed`**
+  - *What it is:* one named value of a small, closed set — the real,
+    current state of a specific mouse button.
+  - *Implementation:* `MouseButtonState` is a WPF `enum` with exactly
+    two values, `Pressed` and `Released`; `e.LeftButton` returns
+    whichever one currently applies.
+  - *Its use:* checked against `!=` to bail out of a handler the moment
+    the button is no longer actually held down — see the Mechanical
+    Walkthrough below for the exact line.
+- **`SystemParameters.MinimumHorizontalDragDistance`/`MinimumVerticalDragDistance`**
+  - *What it is:* the operating system's own, user-configurable answer
+    to "how far does the mouse have to move, while a button is held,
+    before that counts as a drag instead of a click?"
+  - *Implementation:* two real `static double` properties on WPF's
+    `SystemParameters` class, both reading a genuine Windows system
+    setting — not a WPF-invented constant, the exact distance a person
+    can configure in their own OS accessibility settings.
+  - *Its use:* compared against how far the mouse has actually moved
+    since the button first went down — moving less than this distance
+    is treated as an ordinary click/selection, not a drag attempt;
+    moving past it is what actually starts the real drag.
+- **`DragDropEffects`**
+  - *What it is:* a small, closed set of named values describing what
+    kind of drop operation is being offered or accepted — move, copy,
+    a scroll request, or none at all.
+  - *Implementation:* a WPF `[Flags] enum` (`System.Windows.DragDropEffects`),
+    meaning its values can be combined with `|`, though this lesson only
+    ever passes one at a time: `.Move`. `DragDrop.DoDragDrop`'s third
+    parameter is this type — what the drag source declares it's
+    offering; a drop target's own code can inspect it back (via
+    `DragEventArgs.Effects` — not read anywhere in this lesson's own
+    code) to decide whether to accept it, and WPF itself uses it to
+    change the mouse cursor during the drag — a "move" cursor, a "copy"
+    cursor, or a "no drop" cursor, depending on the value and whether
+    the pointer is currently over a valid target.
+  - *Its use:* `DragDrop.DoDragDrop(ItemsGrid, data, DragDropEffects.Move)`
+    declares this drag as a move — conceptually, "the item is leaving
+    its old category and landing in a new one," not "a copy is being
+    left behind in both."
+- **`ItemsControl`/`ItemsControl.ItemTemplate`/`DataTemplate`** — a
+  compound shape (`ItemsSource` and `ItemTemplate` used together),
+  covered in full, standalone, in `wpf-itemscontrol-and-datatemplate.md`;
+  applied to this project's own real code — the category drop targets —
+  in the Concept Unit below.
 
 ---
 
@@ -298,19 +381,75 @@ that one-line, deliberately thin wrapper, not a reimplementation.
 
 ### Mechanical Walkthrough
 
-- `PreviewMouseLeftButtonDown`/`PreviewMouseMove` — (first appearance
-  of manually detecting a drag gesture) — WPF has no built-in "start
+- `private Point dragStartPoint;` — **first appearance of `Point`
+  as a field** (full treatment in this lesson's header, above). Holds
+  where the mouse was the moment the button first went down, so a
+  later moment's position can be compared against it.
+- `ItemsGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)`
+  — **first appearance of `MouseButtonEventArgs`** (header, above).
+  WPF hands this specific event-args type to a button-related mouse
+  handler; the parameter named `e`, by the same convention every event
+  handler in this project has followed.
+- `dragStartPoint = e.GetPosition(null);` — **first appearance of
+  `GetPosition`** (header, above). Reads the mouse's real position,
+  relative to the whole window (`null`), and stores it.
+- `PreviewMouseLeftButtonDown`/`PreviewMouseMove` — **first appearance
+  of manually detecting a drag gesture.** WPF has no built-in "start
   dragging this row" behavior for `DataGrid`; this project has to watch
-  for the mouse moving a real minimum distance
-  (`SystemParameters.MinimumHorizontalDragDistance`) while the left
-  button stays held, the standard, real pattern every hand-rolled WPF
-  drag source uses.
+  for the mouse moving a real minimum distance while the left button
+  stays held, the standard, real pattern every hand-rolled WPF drag
+  source uses.
+- `ItemsGrid_PreviewMouseMove(object sender, MouseEventArgs e)` —
+  **first appearance of `MouseEventArgs`** (header, above; the base
+  type `MouseButtonEventArgs` itself extends). A plain mouse-move
+  carries no button-specific data, so this handler gets the plainer of
+  the two types.
+- `e.LeftButton != MouseButtonState.Pressed` — **first appearance of
+  `MouseButtonState`** (header, above). `e.LeftButton` reports the
+  real, current state of the left button; this check is what stops an
+  ordinary mouse move — button already released — from being mistaken
+  for an in-progress drag.
+- `ItemsGrid.SelectedItem is not InventoryItem selected` — reappearing
+  shape (pattern-matching `is`, already established earlier in this
+  project), combined with a `not` check: bails out of the whole
+  handler immediately unless something is genuinely selected.
+- `Point currentPosition = e.GetPosition(null);` — the second call to
+  `GetPosition`, in the same shared, window-relative coordinate space
+  as `dragStartPoint`'s own — the two are only meaningfully comparable
+  because both were measured the same way.
+- `Math.Abs(currentPosition.X - dragStartPoint.X) < SystemParameters.MinimumHorizontalDragDistance`
+  (and the matching `.Y`/`MinimumVerticalDragDistance` check) — **first
+  appearance of `SystemParameters.Minimum*DragDistance`** (header,
+  above). Subtracting the two `Point`s' matching coordinates gives real
+  signed distance moved on each axis; `Math.Abs` makes direction
+  irrelevant (a drag up-and-left counts the same as down-and-right);
+  comparing against the OS's own configured threshold, rather than a
+  made-up constant, is what makes this check behave the way every other
+  Windows application's own drag detection does.
+- `DataObject data = new DataObject(); data.SetData(typeof(InventoryItem), selected);`
+  — reappearing exactly (this lesson's own first Concept Unit,
+  `IDataObject`/`DataObject.SetData`), now packaging the real, selected
+  `InventoryItem` instead of the lab's throwaway `Item`.
 - `DragDrop.DoDragDrop(ItemsGrid, data, DragDropEffects.Move)` — **first
-  appearance.** Starts the real drag operation; this call *blocks*
-  until the user releases the mouse, over a valid drop target or not —
-  the same "modal until the user answers" shape `MessageBox.Show`
-  (Lesson 22) and `PrintDialog.ShowDialog()` (Lesson 37) have both
-  already established, here for a mouse gesture instead of a dialog.
+  appearance of starting the real drag operation, and of
+  `DragDropEffects.Move`'s actual meaning** (header, above, for
+  `DragDropEffects` itself). This call *blocks* until the user releases
+  the mouse, over a valid drop target or not — the same "modal until
+  the user answers" shape `MessageBox.Show` (Lesson 22) and
+  `PrintDialog.ShowDialog()` (Lesson 37) have both already established,
+  here for a mouse gesture instead of a dialog. Passing `.Move`
+  specifically declares this drag as *moving* the item to a new
+  category, not leaving a copy behind in the old one — WPF reflects
+  that back to the user during the drag itself, showing a "move" cursor
+  rather than a "copy" cursor once the pointer is over a valid target.
+- `<ItemsControl ItemsSource="{Binding CategoryValues}"><ItemsControl.ItemTemplate><DataTemplate>...`
+  — **first appearance of `ItemsControl`/`ItemTemplate`/`DataTemplate`
+  together**, a compound shape covered in full, standalone, in
+  `wpf-itemscontrol-and-datatemplate.md`: one real `Border` gets built
+  per value in `CategoryValues`, each one bound to its own category —
+  applied here exactly as that file's own isolated example proves,
+  with `CategoryValues` (this project's own real enum-values
+  collection) standing in for that file's plain string list.
 - `AllowDrop="True"` on each category `Border` — reappearing shape
   (a plain attribute, familiar since Lesson 1), required on every
   element meant to ever receive a `Drop` event — without it, dropping
@@ -319,6 +458,17 @@ that one-line, deliberately thin wrapper, not a reimplementation.
   general-purpose property every `FrameworkElement` has, here holding
   which `Category` this specific `Border` represents, read back inside
   `CategoryTarget_Drop` via `((Border)sender).Tag`.
+- `e.Data.GetDataPresent(typeof(InventoryItem))`/`e.Data.GetData(typeof(InventoryItem))`
+  — reappearing exactly (this lesson's own first Concept Unit), now
+  called on a real `DragEventArgs.Data` instead of the lab's manually
+  constructed one.
+- `Category newCategory = (Category)((Border)sender).Tag;` — an
+  ordinary cast, reading back the exact value `Tag="{Binding}"` stored,
+  above.
+- `InventoryViewModel viewModel = (InventoryViewModel)DataContext;` —
+  reappearing shape (a `DataContext` cast, the same pattern this
+  project's code-behind has used since early lessons whenever
+  code-behind needs to reach the ViewModel directly).
 
 ### CS Lens
 
@@ -401,10 +551,12 @@ silent one to debug. Restore `AllowDrop="True"` afterward.
   `IDataObject` that never had `SetData(typeof(Item), ...)` called on
   it at all — confirm, with real output, that `GetDataPresent` correctly
   reports `False` and the method safely does nothing.
-- Predict, in your own words, what `DragDropEffects.Move` versus
-  `DragDropEffects.Copy` actually changes about this project's real
-  drag-and-drop behavior — does anything about `CategoryTarget_Drop`'s
-  own code depend on which one was passed to `DoDragDrop`?
+- Now that you know what `DragDropEffects.Move` itself declares:
+  predict, in your own words, whether swapping it for
+  `DragDropEffects.Copy` would change anything about
+  `CategoryTarget_Drop`'s own *behavior* — given that its code never
+  reads `e.Effects` at all — versus what you'd expect to change only
+  *visually*, during the drag itself. Then test it and confirm.
 - Add a real visual cue — changing the cursor, or highlighting the
   `Border` currently being dragged over — using `DragEnter`/`DragLeave`
   events, both new to this project, both following the identical
