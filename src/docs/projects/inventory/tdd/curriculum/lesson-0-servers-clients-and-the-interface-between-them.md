@@ -25,6 +25,10 @@ Nothing — this is the first lesson.
 - **Request / response** — the client's message asking for something,
   and the server's message answering it; in HTTP specifically, both
   have a fixed, text-based structure.
+- **`curl`** — a command-line HTTP client used throughout this
+  curriculum to send a real, fully-controlled request and see exactly
+  what came back, with nothing rendered or hidden the way a browser
+  would.
 - **Status code** — a three-digit number in an HTTP response stating
   the outcome category: `2xx` success, `4xx` the client's request was
   invalid, `5xx` the server itself failed while handling it.
@@ -100,6 +104,9 @@ and the next begins?
 - `concepts/http-request-response.md` — the full treatment: a real,
   raw HTTP exchange captured with `curl -v` against a minimal server
   built from Python's own `http.server`, no framework hiding any of it.
+- `concepts/curl-command-line-http-client.md` — what `curl` itself is
+  and what its flags do; `http-request-response.md`'s own example uses
+  it to send the request and print the raw response.
 
 ### Project Change
 

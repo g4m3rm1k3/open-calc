@@ -39,7 +39,8 @@ taught from scratch, in
 ### The Problem
 
 The backend doesn't exist yet. Before anything else gets built, this
-project needs the smallest possible thing a browser or `curl` can
+project needs the smallest possible thing a browser or `curl`
+(`concepts/curl-command-line-http-client.md`, from Lesson 0) can
 actually reach — proof that a Python program can listen for, and
 answer, a network request at all.
 

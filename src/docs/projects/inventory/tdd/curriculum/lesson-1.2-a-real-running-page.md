@@ -394,7 +394,8 @@ VITE v5.4.21  ready in 214 ms
 ```
 
 Captured proof the page loads and the module compiles, via `curl`
-against the running dev server:
+(`concepts/curl-command-line-http-client.md`, from Lesson 0) against
+the running dev server:
 
 ```html
 <!DOCTYPE html>

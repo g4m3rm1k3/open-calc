@@ -28,7 +28,7 @@ class Handler(BaseHTTPRequestHandler):
 HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
 ```
 
-Then, from a second terminal, send a raw request and look at the literal response:
+Then, from a second terminal, send a raw request and look at the literal response. `curl` is a command-line HTTP client — what it is, and what each flag used here and elsewhere in this project does, is covered in full in `concepts/curl-command-line-http-client.md`, not repeated here:
 ```
 curl -v http://127.0.0.1:8000/
 ```

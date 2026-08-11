@@ -26,7 +26,8 @@ class Handler(BaseHTTPRequestHandler):
 HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
 ```
 
-Then, from the same machine:
+Then, from the same machine (`curl` itself — what it is, what its
+flags do — is covered in `concepts/curl-command-line-http-client.md`):
 ```
 curl http://127.0.0.1:8000/
 ```

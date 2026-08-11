@@ -295,7 +295,9 @@ Dependencies, above — SQLite will not create it for you.
 
 ## Run it
 
-Captured this session — the backend still answers:
+Captured this session (`curl` and its `-s` flag:
+`concepts/curl-command-line-http-client.md`, from Lesson 0) — the
+backend still answers:
 
 ```
 curl -s http://127.0.0.1:5000/health

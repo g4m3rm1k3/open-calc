@@ -60,7 +60,8 @@ with make_server("127.0.0.1", 8001, application) as server:
     server.serve_forever()
 ```
 
-Then, from a second terminal:
+Then, from a second terminal (`concepts/curl-command-line-http-client.md`
+covers `curl` and the `-i` flag used here):
 ```
 curl -i http://127.0.0.1:8001/
 curl -i http://127.0.0.1:8001/nope

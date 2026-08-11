@@ -176,8 +176,9 @@ this configuration makes possible, traced separately:
 
 - Cross-origin request, relying on CORS:
 1. A browser page served from a different origin (simulated here with
-   `curl -H "Origin: http://localhost:5173"`) sends a GET to
-   http://127.0.0.1:5000/health.
+   `curl -H "Origin: http://localhost:5173"` —
+   `concepts/curl-command-line-http-client.md`, from Lesson 0, covers
+   `curl` and its `-H` flag) sends a GET to http://127.0.0.1:5000/health.
 2. Flask's own CORS extension inspects the `Origin` header on the way
    in, checks it against `resources={r"/*": {"origins": "*"}}`, and
    finds a match.
