@@ -61,8 +61,7 @@ established for pure-Java concepts.
 
 ## Status
 
-- [x] Lessons 1–4 — written
-- [ ] Lessons 5–10 — in progress
+- [x] Lessons 1–10 — written. Series complete.
 
 ## Definition of Done (whole series)
 
