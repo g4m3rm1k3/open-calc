@@ -841,6 +841,70 @@ still judgment calls per that note); or touch
 `Lesson-02-a-other-layout-panels.md`, or any of the ~40 files the audit
 confirmed already met the bar as-is.
 
+## 2026-08-11, same-day follow-up: the "show the shape" rule, checked directly
+
+While re-reading Lesson 17 after the pass above, a second, narrower failure
+mode surfaced that the pass above hadn't specifically checked for:
+`LESSON SCHEMA.md` step 7's own "Objects and methods used, not extended —
+show the shape, not just prose" callout — a compound external type with 2+
+related members read needs its real declared shape shown as code, not just
+described in a sentence. Real, confirmed example found in Lesson 17:
+`.Groups` returns `CollectionViewGroup` objects, and the lesson read both
+`.Name` and `.ItemCount` off one, but only ever said "each one a real
+`CollectionViewGroup` with a `Name`... and an `ItemCount`" in prose — the
+shape itself was never shown. One level up, `ICollectionView` itself had
+the same problem: two of its own members (`GroupDescriptions`, `Groups`)
+are both read, and the interface's real declared shape was never shown
+either. Both fixed by fetching the real shapes from Microsoft's own current
+`ICollectionView`/`CollectionViewGroup` reference pages this session (not
+reconstructed from memory) and adding proper "Objects and methods used"
+entries with real declared-shape code blocks, limited to the members this
+lesson actually calls.
+
+Given a first attempt at auditing the rest of the curriculum for this same
+pattern via four parallel `opus`-model subagents burned through the whole
+session's usage limit with zero surviving output (a real, costly lesson —
+see below), the actual sweep was redone directly, sequentially, no
+subagents: every one of the 65 lesson files' own "Objects and methods
+used" header section was read and checked by hand for the same failure
+shape — an external type with 2+ related members read, or a
+container/builder/EventArgs-style compound type, described only in prose
+with no shown shape anywhere. **Result: Lesson 17 was the only real
+violation found.** Every other lesson's header already either (a) correctly
+scopes its own subject with "given full treatment in the Concept Units
+below" and that treatment genuinely does show real code exercising each
+member, (b) correctly cites the Repetition Rule for a prior lesson's
+already-completed treatment, or (c) correctly cites a standalone concept
+file. A few borderline cases (`Path`/`Directory` in Lesson 25,
+`Stopwatch` in Lesson 51) document each individual method's real signature
+directly in prose without a wrapping code block — judged acceptable, not a
+repeat of the Lesson 17 failure, since the concrete signature information
+is actually present, just not fenced; `SelectionChangedEventArgs` appears
+in several lesson signatures (Lessons 8, 9, 10, 42) but its own members
+(`AddedItems`/`RemovedItems`) are never actually read in any of that code,
+only mentioned once in Lesson 42's SE Lens as a rejected alternative
+approach — outside the rule's actual trigger ("the lesson **calls**... more
+than one related member"). Re-ran `check-narrative-lessons.mjs` after: 65
+files, 15 issues (up one from this pass's own start, entirely explained by
+the legitimate new `group.ItemCount` walkthrough bullet landing inside an
+already-flagged, already-reviewed-as-false-positive dense unit in Lesson 17
+— not a new class of problem).
+
+**A real, expensive mistake worth recording so it isn't repeated:** the
+first attempt at this second sweep spawned four parallel `Explore` agents
+with `model: opus` overridden (unnecessary — these were narrow, bounded
+read-only checks the default model handles fine) immediately after a first
+four-agent sweep had already run earlier the same session. All four hit
+the account's session usage limit before any produced a single finding,
+and none of that in-progress work was recoverable — background subagent
+work does not persist partial progress the way direct, sequential edits
+do. The fix, and the standing rule going forward for this project: prefer
+direct, sequential work over parallel subagent fan-out unless the task's
+scope has already been sized down as much as possible and genuinely
+justifies it, and don't reach for a more expensive model override for a
+narrow, bounded task without a specific reason the default model would
+actually fail at it.
+
 ## Independence from the Android track
 
 `../track/` (Android) and this project cover a lot of the same ground —
