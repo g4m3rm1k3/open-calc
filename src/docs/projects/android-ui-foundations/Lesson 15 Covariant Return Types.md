@@ -19,6 +19,14 @@ special case to just accept when it shows up.
   allowed as long as the more specific type is itself a subtype of the
   original.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, taught in Lesson 01 — `extends` — a class inheriting another's
+  fields and methods — and `@Override` — the compiler-checked override
+  annotation — both taught in Lesson 06, reappear in this lesson's own
+  lab exactly as before. Covariant return types are this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Narrowing a Return Type on Override
@@ -73,6 +81,8 @@ Real output:
 generic contents
 labeled contents
 ```
+
+### Mechanical Walkthrough
 
 `Container.getContents()` is declared returning `Object` — Java's own
 most general type, the ultimate ancestor of every class. `LabeledBox`

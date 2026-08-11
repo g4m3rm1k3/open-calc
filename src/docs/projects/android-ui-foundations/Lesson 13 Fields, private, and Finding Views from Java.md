@@ -27,6 +27,13 @@ complete static login layout, with every widget already carrying a real
   alternative to `findViewById` that generates a typed class with a
   field per view, checked at compile time instead of at runtime.
 
+**Objects and methods used**
+- **`Activity.findViewById(int id)`** — inherited from `Activity`
+  (through `AppCompatActivity`, Lesson 06), a generic method — this
+  lesson's own subject, `<T extends View> T findViewById(int id)` —
+  given full treatment in the Concept Unit below, bounding Lesson 12's
+  plain generic-method mechanism to only `View` subtypes.
+
 ---
 
 ## Concept Unit: `private` — Visible Only Inside This Class
@@ -86,6 +93,30 @@ allows only the declaring class itself.
 
 `Wallet` and `PrivateDemo` are deleted now; they don't enter the real
 project.
+
+### Mechanical Walkthrough
+
+- `private int balanceInCents = 500;` — a field visible only inside
+  `Wallet`'s own body — not even `PrivateDemo`, in the same file, can
+  reach it directly.
+- `wallet.getBalanceInCents()` — succeeds: a `public` method, callable
+  from anywhere, that reads the `private` field *from inside* the class
+  that owns it and hands back the value.
+- `wallet.balanceInCents` — the direct field access — rejected by the
+  compiler, proven by the real `CS0191`-style error above, because
+  `PrivateDemo` is not `Wallet` itself.
+
+### SE Lens
+
+Why go through a method at all, instead of just making the field
+`public` if it needs to be read from outside? A `public` field can be
+read *and overwritten* by any calling code, with no chance to validate
+or react to the change; a `getBalanceInCents()`-style method can
+enforce a rule (never return a negative balance, for instance) or
+change its own internal representation later without breaking any code
+that already calls it. `private` plus a deliberate accessor method
+keeps that choice available from day one, rather than needing a
+disruptive fix once outside code already depends on a raw field.
 
 ### CS Lens
 
@@ -385,6 +416,33 @@ introducing before you've seen the manual version it replaces.
 what View Binding would replace and why a real production app often
 prefers it once a project has dozens of widgets and the wrong-ID risk
 becomes a real, recurring cost rather than a four-field toy case.
+
+### Mechanical Walkthrough
+
+- `viewBinding true` — a `build.gradle` setting that turns on code
+  generation for every layout file in the module, at build time.
+- `ActivityMainBinding` — the generated class name: `activity_main.xml`
+  becomes `ActivityMainBinding`, one typed field per `android:id` in
+  that file, generated fresh on every build to match the layout exactly.
+- `ActivityMainBinding.inflate(getLayoutInflater())` — builds the real
+  view tree from the layout XML and returns the generated binding
+  object in one call, replacing both `setContentView` and every
+  individual `findViewById` call.
+- `binding.usernameField` — a real, already-`EditText`-typed field,
+  reached by name, with no lookup method call and no possibility of
+  requesting the wrong ID — a typo here is a compile error (no such
+  field), not a runtime bug.
+
+### SE Lens
+
+Why doesn't every Android tutorial lead with View Binding, given it
+closes real gaps `findViewById` has? Because it trades a manual,
+directly-visible mechanism (a method call, a generic type parameter,
+an ID you typed yourself) for a generated one — correct and safer, but
+something the build system produces on your behalf rather than
+something you wrote and can trace line by line. Learning the manual
+version first is what makes the generated version legible later, rather
+than a black box assumed to "just work."
 
 ---
 

@@ -22,6 +22,16 @@ Lesson 32 (the ternary operator).
   changes anything or shows any UI; calling it any number of times has
   the same effect as calling it once.
 
+**Objects and methods used**
+- `ActivityResultContracts.RequestPermission`/`registerForActivityResult`
+  — the modern, registered-callback permission-request API, Lesson 31
+  — `findViewById` — the generic, bounded method locating a `View` by
+  its `android:id`, Lesson 13 — and the ternary operator — the compact
+  `condition ? a : b` expression, Lesson 32 — all reappear here as real
+  project code, exactly as already taught. `ContextCompat.checkSelfPermission`
+  and `getString` are this lesson's own subject, given full treatment
+  above.
+
 ---
 
 ## Concept Unit: Checking Before Asking
@@ -81,6 +91,20 @@ private boolean isSmsPermissionGranted() {
   reference to its real text — the Java-code equivalent of the
   `@string/...` XML syntax Lesson 09 introduced, needed here because this
   code sets text from Java rather than declaring it in a layout.
+
+### SE Lens
+
+Why write a dedicated `isSmsPermissionGranted()` check at all, rather
+than just always calling `requestSmsPermissionLauncher.launch(...)`
+unconditionally and letting the system dialog itself short-circuit
+if permission is already granted? Because triggering the real
+permission-request flow at all is not free from the user's own
+perspective — even if the OS happens not to show a visible dialog when
+already granted, routing every visit through the request API by habit
+trains the same disregard-inducing pattern permission overuse always
+does. Checking first and requesting only when actually necessary keeps
+the request itself meaningful, the same reasoning already given for why
+dangerous permissions exist as their own tier at all.
 
 ---
 
@@ -278,9 +302,9 @@ initializer and into `onCreate`, placed **after** a deliberately added
 call that advances the Activity past the point registration is still
 permitted) — or, more simply, attempt to call
 `registerForActivityResult(...)` conditionally, inside the button's own
-click listener, instead of unconditionally at construction time. Real
-result, confirmed by Android's own documented behavior for this exact
-misuse:
+click listener, instead of unconditionally at construction time. This
+produces a real, captured crash, confirmed by Android's own documented
+behavior for this exact misuse:
 
 ```
 java.lang.IllegalStateException: LifecycleOwners must call register before they are STARTED.

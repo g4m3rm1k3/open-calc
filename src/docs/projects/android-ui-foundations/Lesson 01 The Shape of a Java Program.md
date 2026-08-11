@@ -37,6 +37,11 @@ specifically.
 - **Compiler (`javac`) / bytecode / JVM (`java`)** — Java's two separate
   steps, translate-then-run.
 
+**Objects and methods used**
+- No supporting cast to cover separately — `System.out.println` is
+  this lesson's own subject, and gets full treatment below rather than
+  being deferred to this section.
+
 ---
 
 ## Concept Unit: The Shape of a Java Program

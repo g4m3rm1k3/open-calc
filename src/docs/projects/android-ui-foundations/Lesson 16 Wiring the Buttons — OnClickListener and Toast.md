@@ -30,6 +30,16 @@ return types).
   referring to the specific object the method is currently running on;
   here, the specific `MainActivity` object handling this exact
   `onCreate` call.
+- **`EditText.getText()` / `Editable`** — `EditText`'s own covariant
+  override of `TextView.getText()`, returning the more specific
+  `Editable` (a mutable `CharSequence`) instead of the parent's plainer
+  `CharSequence` — Lesson 15's covariant return type, reappearing on a
+  real framework class.
+
+**Objects and methods used**
+- `Object.toString()` — every Java object has this method, inherited
+  from `Object`; called here to convert the `Editable` `getText()`
+  returns into a plain `String`.
 
 ---
 
@@ -353,6 +363,26 @@ created around it, so `this` inside a lambda always refers to the
 enclosing class directly, exactly as used in the lambda version above.
 This project uses lambdas throughout, both for brevity and to avoid this
 exact `this`-versus-`MainActivity.this` distinction entirely.
+
+### Mechanical Walkthrough
+
+`createAccountButton.setOnClickListener((view) -> { ... })` is the
+identical mechanism the previous unit already walked through in full —
+`setOnClickListener` accepting a lambda implementing
+`View.OnClickListener`'s single `onClick` method — applied to a second
+`Button` field with a different message. No new construct appears in
+this unit; the point being proven is that the mechanism, once learned,
+needs no re-explanation to reuse.
+
+### SE Lens
+
+This unit is deliberately anticlimactic — real proof that a mechanism
+learned properly once (a real interface, a real lambda, a real,
+verified click handler) generalizes for free to every future button
+this project ever adds, rather than needing its own fresh explanation
+each time. That reuse is the actual payoff of Lesson 14's investment in
+teaching interfaces from first principles instead of only showing the
+lambda shorthand.
 
 ---
 

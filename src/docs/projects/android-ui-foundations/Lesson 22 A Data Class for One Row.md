@@ -23,6 +23,15 @@ Lesson 20 (`ArrayList<E>`), Lesson 21 (package-private access).
   Java syntax for exactly this "a few named fields traveling together"
   case, generating a constructor, getters, and more automatically.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's static print method, Lesson 01 —
+  `private` — visible only inside the declaring class, Lesson 13 —
+  `final` on a field — assignable once, never after, Lesson 13 — and
+  `this` — the currently-running object, first met disambiguating a
+  constructor parameter from a same-named field, Lesson 16 — all
+  reappear here exactly as already taught. Constructors and getter
+  methods are this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: A Class With No Behavior, Just Data
@@ -81,6 +90,23 @@ Real output:
 10, 20
 ```
 
+#### Execution Trace
+
+1. `Point origin = new Point(0, 0);` — `new` allocates a real `Point`
+   object and runs the constructor with `x = 0`, `y = 0`; `this.x = x`
+   and `this.y = y` copy those parameters into `origin`'s own fields.
+2. `Point corner = new Point(10, 20);` — a second, independent call to
+   `new Point(...)`, allocating a *different* object with its own
+   fields — `x = 10`, `y = 20` — because every `new` call, per Lesson
+   02, allocates a fresh object regardless of what any earlier call did.
+3. `origin.getX() + ", " + origin.getY()` — reads `origin`'s own fields
+   (`0`, `0`), untouched by step 2's separate allocation.
+4. `corner.getX() + ", " + corner.getY()` — reads `corner`'s own fields
+   (`10`, `20`) — proof, not assertion, that the two objects hold
+   genuinely independent state.
+
+### Mechanical Walkthrough
+
 `Point(int x, int y) { ... }` is a **constructor**: a method sharing the
 class's exact name, with no return type at all (not even `void`),
 called specifically by `new`. `new Point(0, 0)` allocates a brand-new
@@ -118,6 +144,18 @@ Also recognized in: every object-oriented language's constructor concept
 (C++, C#, Python's `__init__`), and the general design principle that
 an object should never exist in a legitimately invalid, half-initialized
 state.
+
+### SE Lens
+
+Why require a constructor at all, instead of letting code construct a
+bare `Point` and set `x`/`y` afterward through setter methods? A
+required constructor makes "valid state" and "exists at all" the same
+guaranteed moment — there is no window where a `Point` object exists
+with an unset `x` or `y` that some other code could accidentally read
+first. Combined with `final` fields (no setter possible at all after
+construction), this specific class doesn't just default to being
+initialized correctly — it's structurally incapable of ever being
+anything else.
 
 ---
 

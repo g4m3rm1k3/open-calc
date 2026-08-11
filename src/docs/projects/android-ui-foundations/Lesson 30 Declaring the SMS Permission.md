@@ -27,6 +27,14 @@ declarations — the same file, a different kind of entry).
   location, contacts) additionally require an explicit runtime prompt
   the user can accept or refuse.
 
+**Objects and methods used**
+- `AndroidManifest.xml` — the file, read by the OS before any app code
+  runs, declaring which classes are real launchable components,
+  Lesson 07 — reappears here exactly as already taught, now holding a
+  different kind of entry. `<uses-permission>`/`<uses-feature>` and the
+  normal/dangerous split are this lesson's own subject, given full
+  treatment above.
+
 ---
 
 ## Concept Unit: Normal vs. Dangerous Permissions
@@ -57,6 +65,31 @@ at runtime, and the user can refuse — the entire subject of Lesson 31.
 financial and privacy risk: an app quietly sending premium-rate texts or
 messages to a user's entire contact list without their knowledge is a
 real, historical category of malware, not a hypothetical concern.
+
+### Mechanical Walkthrough
+
+- **Normal permission** — declared once, in the Manifest, via
+  `<uses-permission>`; the OS grants it automatically at install time,
+  with no further code required to actually use the capability.
+- **Dangerous permission** — the identical `<uses-permission>`
+  declaration is still required (necessary), but is not, on its own,
+  enough (not sufficient) — the app must additionally request it at
+  runtime (Lesson 31), and the user can refuse even after the app asks.
+- The classification itself (which specific permissions count as
+  "normal" versus "dangerous") is decided by the Android platform, not
+  by the app declaring them — an app cannot opt a dangerous permission
+  down into requiring only the install-time declaration.
+
+### SE Lens
+
+Why not just require every permission to go through a runtime prompt,
+for consistency, rather than splitting them into two tiers? Prompting
+for genuinely low-risk capabilities (checking network state, for
+instance) would train users to reflexively tap "Allow" on every prompt
+without reading any of them — the exact failure mode that makes runtime
+prompts meaningless as a real consent mechanism. Reserving the runtime
+prompt specifically for capabilities with real privacy, safety, or
+financial consequence keeps it meaningful precisely because it's rare.
 
 ### CS Lens
 

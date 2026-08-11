@@ -27,6 +27,29 @@ resources, `wrap_content`, `sp`).
   widget adding features like a show/hide password toggle on top of a
   plain `EditText`.
 
+**Objects and methods used:** `EditText` and `inputType` are this
+lesson's own subject, given full treatment below.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`TextView`**
+  - *What it is:* the leaf `View` class for displaying text, which
+    `EditText` is itself a subclass of.
+  - *Implementation:* given full treatment in Lesson 09.
+  - *Its use:* every attribute `TextView` supports (`textSize`, and so
+    on) is available on `EditText` too, by inheritance.
+- **`android:id` / `@+id/`**
+  - *What it is:* the attribute assigning a view a findable identity.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Its use:* each new `EditText` gets its own unique id, so Java code
+    can look it up later.
+- **`wrap_content` / `match_parent`**
+  - *What they are:* the two sizing keywords a `layout_width`/
+    `layout_height` attribute can hold.
+  - *Implementation:* given full treatment in Lesson 08.
+  - *Their use:* sizing each `EditText` field exactly as any other
+    `View` already met.
+
 ---
 
 ## Concept Unit: `EditText` — `TextView` You Can Type Into
@@ -73,6 +96,19 @@ wrote. The same dynamic-dispatch reasoning from Lesson 06 applies: an
 `EditText` object used through a `TextView`-typed reference (which happens
 constantly in Android APIs that accept a `TextView` parameter) still
 behaves like the real, more specific `EditText` it is.
+
+### SE Lens
+
+Why does Android give `EditText` its own class at all, instead of just
+adding an "editable" flag to plain `TextView`? A flag would mean every
+single `TextView` — including ones that only ever display static
+labels — carries the memory and behavioral overhead of being
+potentially editable, whether or not anything ever uses it. A separate
+subclass means that cost is paid only by widgets that are actually
+meant to accept input, while every non-editable `TextView` stays as
+simple as Lesson 09 already showed it to be — the same "pay for what
+you use" reasoning behind keeping primitives and wrapper classes
+separate.
 
 ---
 
@@ -178,6 +214,22 @@ top-to-bottom exactly as `LinearLayout`'s `vertical` orientation
 guarantees. Each field has its own `android:id` — the same `@+id/`
 mechanism from Lesson 08 — because a future lesson's Java code will need
 to find each one individually to read what the user typed.
+
+### Mechanical Walkthrough
+
+- `android:inputType="textPassword"` — **first appearance.** A single
+  attribute controlling two things at once: which on-screen keyboard
+  Android shows, and whether typed characters render as dots instead of
+  themselves. `textPassword` specifically: full alphabetic keyboard,
+  every character masked.
+- `android:inputType="numberPassword"` — the same attribute, a
+  different value: numeric keypad only, digits masked the same way —
+  shown here purely as the rejected alternative, never applied to the
+  real project.
+- `android:id="@+id/usernameField"` / `android:id="@+id/passwordField"`
+  — the same `@+id/` mechanism Lesson 08 introduced, now applied to two
+  real, distinct fields this project's Java code will need to look up
+  individually.
 
 ### SE Lens
 

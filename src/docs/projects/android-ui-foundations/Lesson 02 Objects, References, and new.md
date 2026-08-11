@@ -22,6 +22,13 @@ rather than a pointer to one that might be shared, or missing entirely.
   reference, meaning both point at one shared object rather than two
   independent copies.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  labs, printing each demo's real output exactly as before. `new`,
+  references, and aliasing are this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: A Class Is a Blueprint; an Object Is a Real Thing Built From It
@@ -78,21 +85,44 @@ Kitchen: on
 Bedroom: off
 ```
 
-`Lightbulb` is the blueprint: it says every lightbulb has an `isOn`
-state, a way to turn on, and a way to describe itself — but `class
-Lightbulb { ... }` by itself never turned any actual lightbulb on. `new
-Lightbulb()` is what does that: it's called a **constructor call** (a
-plain, no-argument one here — a version that accepts arguments gets its
-own full lesson once this project needs one), and it does two distinct
-things: it allocates a brand-new `Lightbulb` **object** — real, individual
-memory holding its own `isOn` field, completely separate from any other
-`Lightbulb` — and it hands back a **reference**: a value that lets you
-reach that specific object later, stored here in the variable
-`kitchenBulb`. `bedroomBulb` is a second, independent call to `new
-Lightbulb()`, producing a second, independent object with its own
-separate `isOn` field. Turning on `kitchenBulb` has zero effect on
-`bedroomBulb` — proven directly by the output above, not just claimed:
-two completely separate objects, from the same blueprint.
+#### Execution Trace
+
+1. `Lightbulb kitchenBulb = new Lightbulb();` — `new Lightbulb()`
+   allocates a brand-new `Lightbulb` **object** in memory (its own,
+   independent `isOn` field, starting `false` per the field's own
+   declaration) and hands back a **reference** to it, stored in
+   `kitchenBulb`.
+2. `Lightbulb bedroomBulb = new Lightbulb();` — a second, independent
+   call to `new Lightbulb()`, because `new` always allocates a fresh
+   object — `bedroomBulb` gets its own separate `isOn` field, unrelated
+   to `kitchenBulb`'s.
+3. `kitchenBulb.turnOn();` — reaches through `kitchenBulb`'s own
+   reference and sets *that specific object's* `isOn` to `true`.
+   `bedroomBulb`'s object is untouched, since `kitchenBulb` and
+   `bedroomBulb` reference two different objects, not one shared one.
+4. `kitchenBulb.describe()` — reads `kitchenBulb`'s own `isOn`
+   (`true`, from step 3) and prints `"on"`.
+5. `bedroomBulb.describe()` — reads `bedroomBulb`'s own `isOn` — still
+   `false`, because step 3 never touched it — and prints `"off"`.
+
+### Mechanical Walkthrough
+
+- `class Lightbulb { ... }` — the **blueprint**: it says every
+  `Lightbulb` will have an `isOn` field, a `turnOn` method, and a
+  `describe` method — but declaring it builds zero actual lightbulbs.
+- `new Lightbulb()` — a **constructor call** (a plain, no-argument one
+  here — a version that accepts arguments gets its own full lesson once
+  this project needs one). It does two distinct things: allocates a
+  real, individual `Lightbulb` object in memory, and hands back a
+  **reference** — a value that lets you reach that specific object
+  later.
+- `Lightbulb kitchenBulb = ...` / `Lightbulb bedroomBulb = ...` — each
+  stores the reference `new Lightbulb()` just returned into its own
+  variable; two separate `new` calls, so two separate objects, as the
+  Execution Trace above proves directly rather than just asserts.
+- `kitchenBulb.turnOn()` / `kitchenBulb.describe()` — the `.` reaches
+  through `kitchenBulb`'s own reference to call a method on *that
+  specific object* — never on `bedroomBulb`'s.
 
 ### CS Lens
 
@@ -108,6 +138,18 @@ syntax (Python's `Lightbulb()`, JavaScript's `new Lightbulb()`, C#'s `new
 Lightbulb()`), and, more generally, any system distinguishing a
 *template* (a class, a recipe, a blueprint) from the *specific things*
 built from it (a cake, a house, an object).
+
+### SE Lens
+
+Why does a class have to be built up through an explicit `new` call at
+all, rather than a program just declaring "one `Lightbulb`" directly the
+way it declares an `int`? Because a program routinely needs an unknown
+number of objects of the same kind, decided at runtime — zero
+lightbulbs, three, a hundred — and a class describes the *shape*
+every one of them will share without committing to how many will ever
+actually exist. `new` is the one, explicit moment that turns "a shape
+that could exist" into "a real, specific instance that now does," which
+is exactly why it's a distinct step from writing the class itself.
 
 ---
 
@@ -165,6 +207,22 @@ lightbulbs to begin with; they're two names for the same one. This
 specific situation — two variables referencing one shared object — is
 called **aliasing**.
 
+### Mechanical Walkthrough
+
+- `Lightbulb original = new Lightbulb();` — the same mechanism as the
+  previous unit: one real object, one reference, stored in `original`.
+- `Lightbulb alias = original;` — **first appearance of copying a
+  reference without `new`.** No object is built here at all — this
+  copies the *value stored in* `original` (a reference) into `alias`,
+  the same way `int y = x;` copies whatever number `x` holds into `y`.
+  What's being copied is the pointer, not the thing it points to.
+- `alias.turnOn()` — reaches through `alias`'s reference — which, after
+  the line above, points at the exact same object `original` does — and
+  mutates that one object's `isOn` field.
+- `original.describe()` — reads `isOn` off the same object `alias` just
+  mutated, because `original` and `alias` were never separate objects
+  to begin with — proving aliasing directly, not just naming it.
+
 ### Discard the Throwaway Example
 
 `Lightbulb`, `ObjectDemo`, and `AliasDemo` are deleted now — they never
@@ -173,7 +231,9 @@ object and hands back a reference; assignment between object-typed
 variables copies the reference, not the object — carries forward into
 every object this project builds from here on, including ones built
 much later where two different classes end up holding a reference to
-the exact same shared list.
+the exact same shared list. Both labs in this lesson are also available
+as a standalone concept file, `java-references-and-aliasing.md`, for a
+quick refresher later without re-reading this whole lesson.
 
 ### CS Lens
 

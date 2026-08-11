@@ -21,6 +21,12 @@ this lesson is deliberately contrasted against).
   individual call site, which overloaded method actually matches based
   on the arguments provided.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  lab exactly as before. Method overloading is this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Same Name, Different Parameters
@@ -70,6 +76,8 @@ Real output:
 Hello, Alex
 Hello, AlexHello, Alex
 ```
+
+### Mechanical Walkthrough
 
 Both methods are named `greet` — this is legal, and is called **method
 overloading**, because their **parameter lists** genuinely differ: one

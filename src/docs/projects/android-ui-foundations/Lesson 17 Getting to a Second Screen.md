@@ -27,6 +27,68 @@ wired login screen.
   it directly; flagged in an earlier lesson, explained here for the
   first time.
 
+**Objects and methods used:** this lesson isn't teaching `Intent` or
+`startActivity` as complete classes — it's teaching how the OS starts a
+second screen, using these two specifically as the real mechanism. Real
+grounding below, not just usage.
+
+**`Intent`**
+- *What it is:* an object describing a request for the OS to perform
+  some action — most commonly here, "start this exact other Activity."
+- *Implementation:* a concrete Android class (`android.content.Intent`).
+  The two-argument constructor this lesson calls, real and confirmed
+  this session against Android's own reference documentation:
+  ```java
+  public Intent(Context packageContext, Class<?> cls)
+  ```
+  Building an `Intent` this way — naming the exact target class,
+  `InventoryActivity.class` — is called an **explicit intent**, as
+  opposed to an *implicit* intent (naming only an action and letting the
+  OS match any willing app), which this same-app navigation has no
+  reason to use.
+- *Its use:* built once, then handed straight to `startActivity`, below,
+  as the description of what screen to open next.
+
+**`startActivity(Intent)`**
+- *What it is:* the method that actually asks the OS to carry out the
+  transition an `Intent` describes.
+- *Implementation:* declared directly on `Activity` itself — confirmed
+  this session against Android's own reference documentation, not
+  inherited from an ancestor class:
+  ```java
+  public void startActivity(Intent intent)
+  ```
+  Calling it hands the `Intent` off and returns immediately; the OS
+  constructs the target Activity and calls its `onCreate` on its own
+  schedule — the same Inversion-of-Control mechanism Lesson 07 first
+  showed for app startup, triggered here by your own code instead of the
+  user tapping a home-screen icon.
+- *Its use:* called once, inside the login button's click listener,
+  immediately after building the `Intent` above.
+
+**Everything else in the file, not this lesson's subject but still
+explained:**
+- **`AppCompatActivity`**
+  - *What it is:* the framework base class every screen in this project
+    extends.
+  - *Implementation:* given full treatment in Lesson 06.
+  - *Its use:* `InventoryActivity` extends it exactly the way
+    `MainActivity` already does — a second screen following the same
+    shape, no new behavior.
+- **`onCreate(Bundle savedInstanceState)`**
+  - *What it is:* the lifecycle method the OS calls once a new Activity
+    instance exists.
+  - *Implementation:* given full treatment in Lesson 07.
+  - *Its use:* `InventoryActivity`'s own `onCreate` runs the moment this
+    lesson's `startActivity` call causes the OS to construct it.
+- **`setContentView(int)`**
+  - *What it is:* the method that inflates and displays a layout
+    resource as the current screen.
+  - *Implementation:* given full treatment in Lesson 07.
+  - *Its use:* called inside `InventoryActivity.onCreate`, pointing at
+    the new, currently-blank `activity_inventory.xml` layout this lesson
+    creates.
+
 ---
 
 ## Concept Unit: Three Real Ways to Show a Second Screen
@@ -71,6 +133,19 @@ getSupportFragmentManager()
     .addToBackStack(null)
     .commit();
 ```
+
+Reading this chain mechanically, without needing to use it: `getSupportFragmentManager()`
+returns the `FragmentManager` object that owns this Activity's Fragments.
+`.beginTransaction()` asks that manager for a new, pending
+`FragmentTransaction` object — nothing changes on screen yet.
+`.replace(R.id.fragmentContainer, new InventoryFragment())` queues, inside
+that same transaction, "remove whatever Fragment currently occupies this
+container view, put this new one there instead." `.addToBackStack(null)`
+queues one more instruction: remember this transaction so the device's
+back gesture can reverse it (the `null` names the back-stack entry itself
+— not used here). `.commit()` is what would actually execute every
+queued instruction above, all at once; without it, nothing above ever
+happens — a transaction only describes a change, it doesn't apply one.
 
 This keeps everything inside a single Activity (a single `onCreate`,
 a single Manifest entry), with the "screen" swap handled entirely by the
@@ -196,10 +271,33 @@ Tapping "Log In" now shows the `Toast`, then genuinely navigates to
   (Lesson 06's inheritance), same relationship as `MainActivity`.
   `onCreate`/`super.onCreate`/`setContentView` all reappear identically —
   every Activity you write from here on follows this exact same shape.
+- `<activity android:name=".InventoryActivity" android:exported="false" />`
+  — **first appearance of a second `<activity>` entry.** The `<activity>`
+  tag itself is an XML element declaring one Activity component to the
+  OS — its presence, not the Java class alone, is what makes
+  `InventoryActivity` a real, launchable component the system's
+  intent-resolution mechanism can find; this is exactly the "What
+  Breaks Without This" proof below. `android:name="..."` — **first
+  appearance.** The value here isn't a bare class name: the leading dot
+  is shorthand the Android build tools expand by prepending the app's
+  own package name, so `.InventoryActivity` means exactly the same
+  fully-qualified class `InventoryActivity.java` declares
+  (`com.yourname.yourapp.InventoryActivity`). This is a real
+  convenience and a real trap in the same breath: moving this class
+  into a sub-package later silently changes what the dot expands to,
+  and a mismatch fails at runtime — the same `ActivityNotFoundException`
+  shown below — not at compile time, since the Manifest and the Java
+  source are two separate files the compiler never cross-checks.
 - `new Intent(this, InventoryActivity.class)` — **first appearance.**
   `Intent`'s real two-argument constructor here: the first argument is a
-  `Context` (`this`, same reasoning as Lesson 16's `Toast` call); the
-  second is a `Class` object — `InventoryActivity.class` is a literal
+  `Context` — `this`, a Java keyword referring to the exact
+  `MainActivity` instance whose `onCreate` is currently running,
+  accepted here because Android's real `Activity` class — which
+  `AppCompatActivity` extends (Lesson 06) — itself extends
+  `ContextThemeWrapper extends ContextWrapper extends Context`, real
+  and unchanged for the platform's entire history: every Activity
+  genuinely *is* a `Context`, not just something that happens to be
+  accepted where one is asked for; the second is a `Class` object — `InventoryActivity.class` is a literal
   expression referring to the `Class` object representing the
   `InventoryActivity` type itself (every class has exactly one such
   object, generated by the JVM, used here purely to tell the `Intent`
@@ -270,7 +368,7 @@ the device's back gesture returns to the still-paused `MainActivity`.
 
 Remove the `<activity android:name=".InventoryActivity" ... />` entry
 from the Manifest entirely, leaving the Java class in place, and tap
-"Log In." Real result: the app crashes with
+"Log In." This produces a real, captured crash,
 `android.content.ActivityNotFoundException`, naming
 `InventoryActivity` directly in its message — the same manifest-
 registration requirement Lesson 07 already proved for `MainActivity`,

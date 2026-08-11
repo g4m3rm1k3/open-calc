@@ -26,6 +26,13 @@ uses), Lesson 28 (`notifyItemInserted`, the sibling method this lesson's
 - **`notifyItemRemoved`** — the `RecyclerView.Adapter` method telling a
   `RecyclerView` exactly which single position no longer exists.
 
+**Objects and methods used**
+- `RecyclerView.ViewHolder` (the real contract's base class, Lesson 26)
+  and `notifyItemInserted` (tells `RecyclerView` exactly which position
+  now holds new data, Lesson 28) reappear here exactly as already
+  taught. `getBindingAdapterPosition`/`NO_POSITION`/`notifyItemRemoved`
+  are this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Why the Row Itself Can't Just "Know" Its Position

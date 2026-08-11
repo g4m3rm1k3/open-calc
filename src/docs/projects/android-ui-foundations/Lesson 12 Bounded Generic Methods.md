@@ -22,6 +22,13 @@ pattern-match.
   type parameter from the arguments passed, without it being written out
   explicitly.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's static print method, Lesson 01 —
+  and autoboxing — the automatic primitive-to-wrapper conversion,
+  Lesson 03 — reappear in this lesson's own lab exactly as already
+  taught. Generic methods are this lesson's own subject, given full
+  treatment above.
+
 ---
 
 ## Concept Unit: A Method That Works for Any Type, Correctly Typed Each Time
@@ -69,6 +76,8 @@ fallback
 42
 ```
 
+### Mechanical Walkthrough
+
 `static <T> T firstNonNull(T first, T second)` — the `<T>` immediately
 after `static` (and before the return type) is what makes this a
 **generic method**: `T` is a placeholder type, decided fresh at each
@@ -99,7 +108,8 @@ carries forward; this exact code does not. The very next lesson meets
 `findViewById`'s real signature, which adds exactly one more idea on top
 of what was just proven: **bounding** the type parameter (`<T extends
 View>` instead of plain `<T>`), restricting which types are even legal
-to infer.
+to infer. Also available as a standalone concept file,
+`java-generic-methods.md`.
 
 ### CS Lens
 

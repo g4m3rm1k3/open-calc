@@ -31,6 +31,19 @@ explaining).
   real, launchable screens.
 - **`Log.d` / Logcat** — Android's filterable debug-output channel,
   separate from a plain console.
+- **XML** — a text format built from nested `<tag>...</tag>` pairs
+  carrying `attribute="value"` pairs, describing structured
+  configuration data rather than executable code; unlike Java, nothing
+  compiles it to bytecode — the OS reads it directly as data.
+
+**Objects and methods used**
+- **`android.util.Log`** — a class Android provides for writing to
+  Logcat. `.d(tag, message)` is its debug-level logging method (`.i`
+  info, `.w` warning, `.e` error are the same shape at different
+  severities) — a diagnostic tool used here to prove a claim, not this
+  lesson's own subject. `Activity.onCreate(Bundle)` — this lesson's
+  real subject — is given full treatment above, verified against
+  Android's own official reference documentation.
 
 ---
 
@@ -147,6 +160,32 @@ everyone else.
 
 `base`, `sub`, and `outsider` are deleted now — three throwaway packages,
 never part of the real project.
+
+### Mechanical Walkthrough
+
+- `protected void internalSetup()` — a method visible to `Base` itself,
+  every subclass of `Base` regardless of package, and other code in
+  `Base`'s own package — narrower than `public`, wider than
+  package-private.
+- `Sub extends Base` calling `internalSetup()` — succeeds because
+  inheritance grants access to a parent's `protected` members, even
+  across the package boundary between `sub` and `base`.
+- `Outsider` (no inheritance relationship, different package) calling
+  `b.internalSetup()` — rejected by the compiler, proving `protected`
+  access genuinely depends on the inheritance relationship, not merely
+  on holding a reference to an object of that type.
+
+### SE Lens
+
+Why does `protected` grant access based on inheritance rather than just
+package location alone (the narrower `package-private` a later
+exercise in this lesson isolates directly)? A framework author
+publishing a class like `Activity` wants subclasses — the entire point
+of the class — to be able to reach certain internal methods no matter
+what package they're written in, since an app's own code will never
+live in Android's own package. `package-private` alone couldn't grant
+that; `protected` is the specific tool for "open to the extension
+mechanism itself, not to arbitrary callers."
 
 ### CS Lens
 

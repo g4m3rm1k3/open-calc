@@ -18,6 +18,15 @@ Lesson 20 (generic classes, `ArrayList<E>`).
   constrained to some specific type or its subtypes, combining Lesson
   20's generic-class shape with Lesson 13's bounding idea.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's static print method, Lesson 01 —
+  generic classes — a class whose own declaration carries a type
+  parameter, Lesson 20 — and bounded type parameters — a type
+  parameter constrained to a specific type or its subtypes, Lesson 13 —
+  all reappear in this lesson's own lab exactly as already taught.
+  Combining the two into a bounded generic class is this lesson's own
+  subject, given full treatment above.
+
 ---
 
 ## Concept Unit: A Generic Class, Constrained
@@ -79,6 +88,8 @@ Real output:
 ```
 Woof
 ```
+
+### Mechanical Walkthrough
 
 `class Cage<A extends Animal>` — the type parameter `A` belongs to the
 whole `Cage` class (Lesson 20's generic-class shape: every field and

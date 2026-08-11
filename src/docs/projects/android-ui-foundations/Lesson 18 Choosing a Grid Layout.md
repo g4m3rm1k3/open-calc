@@ -28,6 +28,45 @@ this grid inside).
   row views for a much larger scrollable dataset, instead of creating one
   view object per data item.
 
+**Objects and methods used**
+- `ViewGroup` — the `View` subtype whose entire job is arranging its
+  children, taught in Lesson 08.
+- `GridLayout` — a static XML `ViewGroup` that arranges a fixed, known
+  set of child views into declared rows and columns, decided entirely at
+  layout time, with no concept of runtime data.
+- `GridView` — an older Android widget purpose-built for scrollable
+  grids, backed by an `Adapter` object that supplies however many rows
+  the underlying data actually has at runtime; a real alternative,
+  recognized here but not built by this project.
+- `ArrayAdapter<String>` — a general-purpose `Adapter` implementation
+  that maps each element of an array or `List` to one row view, using a
+  built-in row layout; used in Option B above to adapt `itemNames` into
+  `GridView`'s rows.
+- `RecyclerView` — a modern, flexible widget for scrollable lists and
+  grids that delegates arrangement to a `LayoutManager` and content to
+  an `Adapter`, and recycles a small, fixed pool of row views instead of
+  creating one per data item; the option this project builds.
+- `LayoutManager` — the object handed to a `RecyclerView` that decides
+  *where* each item is positioned on screen, independent of what each
+  item displays.
+- `LinearLayoutManager` — a real `LayoutManager` implementation
+  arranging items in a single scrolling column, one record per row —
+  the shape this project's tabular inventory data needs, and the one it
+  builds forward with.
+- `GridLayoutManager` — a real `LayoutManager` implementation arranging
+  whole items into a tile/card grid, several complete items per row —
+  the right fit for a photo gallery or icon launcher, not this
+  project's data.
+- `Adapter` — the object handed to a `GridView` or `RecyclerView` that
+  decides *what* each item looks like and *how many* exist;
+  `RecyclerView.Adapter`'s own real, declared shape is given full
+  treatment next lesson.
+- `setAdapter(...)` — the method attaching a data-supplying `Adapter` to
+  either a `GridView` or `RecyclerView`.
+- `setLayoutManager(...)` — the method assigning a specific
+  `LayoutManager` to a `RecyclerView`, deciding its arrangement
+  independently of its data.
+
 ---
 
 ## Concept Unit: Three Real Tools for the Same Job
@@ -152,6 +191,26 @@ record's own fields across separate grid cells instead of keeping a
 record's fields together on one row — the wrong tool for tabular data,
 even though the word "grid" fits both cases informally.
 
+### Mechanical Walkthrough
+
+- `<GridLayout android:columnCount="2">` — a plain `ViewGroup`
+  (Lesson 08) arranging a fixed number of already-written child
+  elements into the declared column count, wrapping automatically —
+  every cell is a real, separate XML element, with no concept of
+  "data" driving how many exist.
+- `<GridView ... />` + `inventoryGrid.setAdapter(adapter)` — one XML
+  element, backed by an `Adapter` object supplying rows from real data
+  at runtime — Android's original answer to dynamic, scrollable grids.
+- `<androidx.recyclerview.widget.RecyclerView ... />` +
+  `setLayoutManager(...)` + `setAdapter(...)` — the same one-element,
+  data-backed shape as `GridView`, but split into two separate,
+  swappable objects: a `LayoutManager` (where each item goes) and an
+  `Adapter` (what each item looks like, and how many exist).
+- `new GridLayoutManager(this, 2)` vs. `new LinearLayoutManager(this)`
+  — two real, interchangeable `LayoutManager` implementations against
+  the identical `RecyclerView`/`Adapter` pair — tile/card arrangement
+  versus single-column tabular rows, a one-line swap between them.
+
 ### The Tradeoff
 
 `GridLayout` costs nothing to understand — it's plain, static XML,
@@ -214,12 +273,41 @@ possible with `GridView`'s more bundled design.
 
 ---
 
+## Connect the Pieces
+
+One trace, through the actual decision rather than through code (this
+lesson changes no project files): the requirement is dynamic,
+user-editable, tabular data. `GridLayout` is ruled out first — it has
+no concept of data at all, only fixed, hand-written XML. Between the
+two real dynamic-data options, `RecyclerView`'s split
+`LayoutManager`/`Adapter` design and built-in view recycling are a
+strict improvement over `GridView`'s more bundled, less efficient
+design, at the cost of more setup. `LinearLayoutManager`, not
+`GridLayoutManager`, is the correct choice within `RecyclerView`
+specifically because the data is shaped as one-record-per-row with
+several named fields, not self-contained tiles. Every later lesson
+building this project's actual grid inherits this exact chain of
+reasoning.
+
 ## What This Lesson Doesn't Build Yet
 
 No code changes in this lesson — the next lesson introduces `ArrayList`
 as the backing data structure this decision assumes exists, and the one
 after that builds the real `Adapter`/`ViewHolder` classes `RecyclerView`
 needs.
+
+## What Breaks Without This
+
+Not a runtime failure this lesson can trigger — no code changed — but a
+real, concrete design failure worth naming precisely: building this
+project's actual editable, tabular inventory data with static
+`GridLayout` instead would mean every add or delete requires generating
+and re-inflating XML at runtime, something `GridLayout` was never
+designed to do; building it with `GridLayoutManager` instead of
+`LinearLayoutManager` would scatter each record's own name and quantity
+into separate, misaligned grid cells instead of keeping them together
+on one row. Both are real, avoidable mistakes this unit's reasoning
+exists to prevent before either is ever written.
 
 ## Exercises
 

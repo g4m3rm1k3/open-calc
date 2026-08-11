@@ -35,6 +35,12 @@ Lesson 13 (fields, `private`).
   method, the specific kind of interface a lambda expression can
   implement.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  labs exactly as before. Interfaces, anonymous classes, and lambdas
+  are this lesson's own subject, given full treatment above.
+
 ---
 
 ## Concept Unit: Interfaces — a Contract With No Implementation
@@ -124,6 +130,21 @@ single call site. The next unit removes exactly that ceremony.
 `InterfaceDemo` are all deleted now — the concept survives, none of this
 code enters the real project.
 
+### Mechanical Walkthrough
+
+- `interface Greeter { String greet(String name); }` — **first
+  appearance.** A method signature with no body at all, ended by a
+  semicolon instead of `{ }` — declares *what* any implementer must
+  provide, nothing about *how*.
+- `class FormalGreeter implements Greeter` — **first appearance of
+  `implements`.** Declares that `FormalGreeter` fulfills `Greeter`'s
+  contract; the compiler then requires a real body for every method
+  the interface declares, exactly one (`greet`) here.
+- `Greeter formal = new FormalGreeter();` — a `Greeter`-typed variable
+  holding a real `FormalGreeter` object — the same reference-through-a-
+  more-general-type shape Lesson 06's `Animal formal = new Dog();`
+  already proved, now for an interface type instead of a class type.
+
 ### CS Lens
 
 An interface separating *what* from *how* is **abstraction** — one of
@@ -202,12 +223,35 @@ class exists only inside this one variable's initializer.
 
 Deleted now — the concept carries forward, this exact code does not.
 
+### Mechanical Walkthrough
+
+- `new Greeter() { @Override public String greet(String name) { ... } }`
+  — **first appearance of an anonymous class.** `new Greeter()`
+  followed immediately by a `{ }` body creates a brand-new, unnamed
+  class implementing `Greeter` and constructs its one and only
+  instance, in a single expression — no separate `class ... implements
+  Greeter` declaration exists anywhere.
+- `excited.greet("Alex")` — called exactly like any other object
+  implementing `Greeter`; the caller has no way to tell, or need to
+  care, that the class behind `excited` has no name.
+
 ### CS Lens
 
 An anonymous class is still, fundamentally, **abstraction through an
 interface** — the same concept as the unit above — with the ceremony of
 a separate named declaration removed for the specific case where an
 implementation is only ever needed once, at one call site.
+
+### SE Lens
+
+Why keep the option of a separate, named class at all, if an anonymous
+class can implement the same interface with less ceremony? A named
+class is still the right choice the moment an implementation needs to
+be reused in more than one place, or needs its own fields carrying real
+state across multiple calls — an anonymous class, defined inline at one
+call site, has nowhere else to be referenced from. Anonymous classes
+trade that reusability away specifically for the common case where
+neither is ever needed.
 
 ---
 
@@ -266,6 +310,19 @@ the syntax reduced to only the parts that actually differ between one
 ### Discard the Throwaway Example
 
 Deleted now.
+
+### Mechanical Walkthrough
+
+- `(name) -> "AMAZING TO SEE YOU, " + name + "!!!"` — **first appearance
+  of a lambda expression.** Everything before `->` is the parameter
+  list — `name`'s type (`String`) is inferred from `Greeter.greet`'s own
+  declared signature, not restated. Everything after `->` is the single
+  expression the method body evaluates and returns — no `{ }`, no
+  `return` keyword, no method name, no `@Override`, because exactly one
+  abstract method exists for this to possibly implement.
+- `Greeter excited = (name) -> ...;` — assigns the real object the
+  lambda creates to a `Greeter`-typed variable, identical in effect to
+  the anonymous-class version above.
 
 ### CS Lens
 

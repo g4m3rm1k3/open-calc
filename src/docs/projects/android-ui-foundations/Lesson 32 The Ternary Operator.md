@@ -17,6 +17,12 @@ familiar from before this series began.
   that produces a value directly, rather than executing a branching
   statement.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  lab exactly as before. The ternary operator is this lesson's own
+  subject, given full treatment below.
+
 ---
 
 ## Concept Unit: An Expression That Picks One of Two Values
@@ -56,6 +62,8 @@ Real output:
 warm
 cold
 ```
+
+### Mechanical Walkthrough
 
 `temperature > 20 ? "warm" : "cold"` is a **ternary operator** expression
 — "ternary" meaning it takes three operands, separated by `?` and `:`.

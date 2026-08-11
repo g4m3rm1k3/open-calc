@@ -19,6 +19,19 @@ reference type, never a primitive).
   code tries to call a method or read a field through a reference that
   currently holds `null`.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  labs exactly as before.
+- **`String`** — Java's built-in text type; a real class (a reference
+  type, per this lesson's own point), not a primitive, even though
+  string literals (`"..."`) look like they could be. **`.length()`** —
+  an instance method every `String` object has, returning its number
+  of characters as an `int`. Used here specifically because calling it
+  on a `null` reference is what actually triggers this lesson's
+  `NullPointerException` — not this lesson's own subject, but the
+  concrete example that makes the subject real.
+
 ---
 
 ## Concept Unit: `null` — a Reference to Nothing
@@ -74,6 +87,33 @@ to `0` if never assigned.
 carries forward into every reference-type field this project declares,
 starting with the very next unit.
 
+### Mechanical Walkthrough
+
+- `String message = null;` — assigns the `null` literal to a
+  reference-type variable — legal specifically because `String` is a
+  reference type (Lesson 03); the same line written as `int message =
+  null;` would not compile at all.
+- `System.out.println(message);` — `println` has a real, specific
+  special case for a `null` argument: it prints the literal text
+  `null` instead of crashing, which is why this line succeeds even
+  though `message` points at nothing.
+- `message == null` — an ordinary `==` comparison (already-established
+  syntax), here comparing a reference against the `null` literal rather
+  than against another object.
+
+### SE Lens
+
+Why does Java represent "no object here" as a real, distinct value
+(`null`) that any reference-type variable can hold, rather than
+requiring every reference to always point at something real? Genuine
+"nothing here yet" states are unavoidable — a field that only gets its
+real value once something else finishes loading, a search that
+legitimately finds no match. `null` gives every reference type a
+built-in way to represent that state without a separate sentinel object
+or a special "empty" subclass for every type that might need one — the
+cost of that convenience, a crash instead of a compile error when code
+forgets to check, is exactly what the next unit proves directly.
+
 ---
 
 ## Concept Unit: `NullPointerException` — Using a Reference That Points at Nothing
@@ -125,7 +165,22 @@ failure.
 `NullPointerDemo` is deleted now. This exact exception — same shape,
 same kind of message — is the real, concrete failure mode waiting behind
 any reference-typed field this project reads before it's actually been
-assigned a real object.
+assigned a real object. Both labs in this lesson are also available as
+a standalone concept file, `java-null-and-nullpointerexception.md`.
+
+### Mechanical Walkthrough
+
+- `String message = null;` — same mechanism as the previous unit: a
+  reference-type variable holding no object.
+- `message.length()` — **first appearance of calling a method through a
+  `null` reference.** `.length()` is a real method `String` objects
+  have, but there is no object here to call it on — Java's runtime
+  detects exactly this and throws, rather than silently returning `0`
+  or some other placeholder.
+- The thrown `NullPointerException` — its message names both the exact
+  method call (`String.length()`) and the exact variable (`"message"`)
+  responsible, real, specific diagnostic information produced by the
+  JVM at the moment of the crash, not a generic failure message.
 
 ### CS Lens
 

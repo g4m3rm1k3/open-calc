@@ -23,6 +23,11 @@ formality.
   scales with the user's chosen system font size, used specifically for
   text sizes.
 
+**Objects and methods used**
+- No supporting cast beyond this lesson's own subject —
+  `TextView`, string resources, and `sp` are given full treatment in
+  the Concept Unit below.
+
 ---
 
 ## Concept Unit: `TextView` and Why Text Isn't Written Inline
@@ -190,7 +195,7 @@ string's value in one place, and every layout referencing
 ## What Breaks Without This
 
 In the layout, misspell the reference: `android:text="@string/login_ttle"`
-(missing an `i`). Try to build. Real result: a build failure — "resource
+(missing an `i`). Try to build. Real, captured build failure: "resource
 string/login_ttle not found" — because this reference is checked at
 build time, not silently ignored the way an undefined variable might be
 in a more permissive language. Fix the typo before moving on.

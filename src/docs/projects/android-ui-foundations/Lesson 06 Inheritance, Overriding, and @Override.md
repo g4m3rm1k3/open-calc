@@ -30,6 +30,16 @@ explains).
 - **Dynamic dispatch** — which specific method body actually runs is
   decided by the object's real type at the moment of the call, not by the
   type of the variable holding the reference.
+- **`super`** — inside an overriding method, calls the parent class's own
+  version of that same method explicitly, rather than replacing it
+  entirely — the mechanism that lets a subclass add behavior on top of
+  the parent's instead of only substituting its own.
+
+**Objects and methods used**
+- **`AppCompatActivity`** — the real framework base class
+  `MainActivity` extends; this lesson's own actual subject, given full
+  treatment below including its real declared shape, verified against
+  the AndroidX source, per the Parent Contract Rule.
 
 ---
 

@@ -20,6 +20,58 @@ classes), Lesson 25 (static nested classes).
 - **`LayoutInflater`** — the system service that turns a layout XML
   resource into real, live `View` objects at runtime, outside of
   `setContentView`'s own automatic use of it.
+- **`String.valueOf(...)`** — a `static` overload that converts any
+  value (an `int`, here) to its `String` representation, used where an
+  API requires text but the real value is numeric.
+
+**Objects and methods used**
+- `RecyclerView.Adapter`/`ViewHolder`, verified against official Android
+  reference documentation, are this lesson's own subject, given full
+  treatment above, per the Parent Contract Rule.
+- `onCreateViewHolder`, `onBindViewHolder`, `getItemCount` — the three
+  abstract methods the real contract above requires; every subclass of
+  `RecyclerView.Adapter` must supply real bodies for exactly these
+  three, with these exact signatures, or it remains abstract and
+  uninstantiable.
+- `abstract` — a class or method that declares a signature with no
+  body, forcing a subclass to supply one before it can be instantiated,
+  taught in Lesson 23, reappears here on the real framework contract
+  itself.
+- Generic classes — a class whose own declaration carries a type
+  parameter (like `ArrayList<E>`), taught in Lesson 20, reappears here
+  as `Adapter<VH>`.
+- Bounded type parameters — a type parameter constrained to a specific
+  type or its subtypes, taught in Lesson 13, reappears here as `VH
+  extends RecyclerView.ViewHolder`.
+- Static nested classes — a class declared inside another purely for
+  organization, carrying no implicit reference back to an enclosing
+  instance, taught in Lesson 25, reappears here as `InventoryViewHolder`
+  nested inside `InventoryAdapter`. All four reappear here combined for
+  the first time in one real declaration, exactly as already taught
+  individually.
+- `ViewGroup` — the `View` subtype whose entire job is arranging its
+  children, taught in Lesson 18 — reappears here as the parent argument
+  every `onCreateViewHolder` call receives.
+- `View` — the base class every visible UI element extends, taught in
+  Lesson 08 — reappears here as the type `ViewHolder.itemView` and
+  `LayoutInflater.inflate(...)`'s own return value both carry.
+- `TextView` and `setText()` — the widget class taught in Lesson 09 via
+  its `android:text` XML attribute, and its Java-code method equivalent
+  for setting the same value from code — both reappear here, called
+  directly on the cached `TextView` fields inside `onBindViewHolder`.
+- `List`, `List.get(int)`, `List.size()` — the generic interface and its
+  index-lookup and count methods, taught in Lesson 20 — reappear here
+  reading `InventoryItem`s out of the populated list by position and
+  reporting the grid's total row count.
+- `findViewById` — the method for locating a specific `View` by its
+  declared `android:id`, taught in Lesson 13 on `Activity` — reappears
+  here as `View`'s own identical method instead, called on `rowView`
+  inside `InventoryViewHolder`'s constructor rather than on an
+  `Activity`, looked up once per holder rather than once per bind.
+- `<LinearLayout>` — the `ViewGroup` arranging its children in a row or
+  column, taught in Lesson 08 — reappears here as `item_inventory.xml`'s
+  own root tag, laid out horizontally so its two `TextView` columns sit
+  side by side on one row.
 
 ---
 
@@ -59,6 +111,8 @@ public abstract static class ViewHolder {
 }
 ```
 
+### Mechanical Walkthrough
+
 Read this precisely, term by term, before writing anything that fills it
 in:
 
@@ -96,6 +150,21 @@ Lesson 06's concept, reappearing at a harder level: rather than one
 overridden method (`onCreate`), here an entire class is built around
 **three** methods a subclass must fill in, together, before the class
 becomes usable at all.
+
+### SE Lens
+
+Why does `RecyclerView.Adapter` split its contract into three separate
+abstract methods instead of one method that does everything? Each
+method is called at a genuinely different moment for a genuinely
+different reason: `onCreateViewHolder` only when the recycled pool
+(Lesson 18's own concept) needs a brand-new holder built from scratch,
+`onBindViewHolder` every time any holder — new or reused — needs to
+display different data, and `getItemCount` whenever `RecyclerView`
+needs to know the data's current size at all. Bundling all three into
+one method would force `RecyclerView` to guess which of three unrelated
+jobs a subclass actually meant to do on any given call, instead of the
+framework calling exactly the right one, precisely when it's actually
+needed.
 
 ---
 

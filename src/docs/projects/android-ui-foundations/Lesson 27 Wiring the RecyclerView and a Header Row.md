@@ -22,6 +22,21 @@ fulfills).
 - **`setLayoutManager` / `setAdapter`** — the two `RecyclerView` methods
   connecting it to its arrangement strategy and its data source,
   respectively.
+- **`android:textStyle`** — a `TextView` attribute controlling font
+  weight/style (`bold`, `italic`, or both); used here to visually
+  distinguish the header row from ordinary data rows.
+
+**Objects and methods used**
+- `RecyclerView` — the scrolling widget that displays a large or
+  changing dataset by recycling a small pool of row views, Lesson 18 —
+  `LinearLayoutManager` — the layout manager arranging items in a single
+  scrolling column, Lesson 18 — and `InventoryAdapter` — the class
+  fulfilling `RecyclerView.Adapter`'s real contract, Lesson 26 — reappear
+  here connected together for the first time. `LinearLayout` — the
+  `ViewGroup` arranging children in a row or column — and `TextView` —
+  the text-display widget — both taught in Lessons 08–09, reappear here
+  building the static header row. `setLayoutManager`/`setAdapter` are
+  this lesson's own subject, given full treatment below.
 
 ---
 
@@ -329,8 +344,9 @@ method call.
 ## What Breaks Without This
 
 Comment out the `recyclerView.setAdapter(...)` line only (leave
-`setLayoutManager` in place) and run the app. Real result: the header
-row displays correctly, but the grid area beneath it is entirely blank —
+`setLayoutManager` in place) and run the app. Real, verified failure to
+render: the header row displays correctly, but the grid area beneath it
+is entirely blank —
 no rows, no crash, no error at all, since a `RecyclerView` with a
 `LayoutManager` but no `Adapter` has a valid arrangement strategy and
 simply nothing to arrange. Restore the line and confirm all three sample

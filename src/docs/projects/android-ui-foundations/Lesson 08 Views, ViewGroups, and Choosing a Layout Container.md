@@ -36,6 +36,13 @@ running project, `onCreate`, `setContentView`, and the Manifest.
   with a screen's physical pixel density, so a size specified in `dp`
   looks the same physical size across different devices.
 
+**Objects and methods used**
+- `setContentView(int)` — the `Activity` method that builds the visual
+  tree from a layout XML resource, already taught in Lesson 05 —
+  reappears here exactly as before. Every `View`/`ViewGroup`/layout XML
+  construct named above is this lesson's own subject, given full
+  treatment in the Concept Units below.
+
 ---
 
 ## Concept Unit: Views Form a Tree, Not a Flat Canvas
@@ -96,6 +103,33 @@ runtime. Same words, two unrelated relationships.
 
 This XML is not throwaway — it's the real file the project already has.
 Nothing to discard here; the next unit edits it directly.
+
+### Mechanical Walkthrough
+
+- `<androidx.constraintlayout.widget.ConstraintLayout>` — the root
+  **`ViewGroup`**: a `View` whose entire job is holding and arranging
+  other `View`s. Being the root means it has no parent of its own within
+  this file — it *is* the top of the tree.
+- `<TextView ... />` — the one child, an ordinary **`View`**: it
+  displays content but, unlike a `ViewGroup`, cannot itself hold further
+  children — the self-closing `/>` reflects that directly.
+- The nesting itself — `TextView` written *inside* `ConstraintLayout`'s
+  opening and closing tags — is what makes this a parent/child
+  relationship at all, not a naming convention or a separate
+  configuration step.
+
+### SE Lens
+
+Why structure the screen as a tree at all, instead of a flat list of
+"here's every view and its absolute position," the way a raw drawing
+canvas would? A tree lets a `ViewGroup` own the layout logic for
+everything inside it, once, rather than every individual `View` needing
+to know its own absolute screen position — move or resize the parent,
+and every child's effective position updates automatically, with zero
+per-child recalculation written by hand. The cost is exactly what the
+next unit weighs directly: choosing *which* `ViewGroup` arranges a given
+set of children is a real design decision, not a default to accept
+blindly.
 
 ### CS Lens
 
@@ -265,6 +299,17 @@ inside this empty container.
   yet — it exists so a later lesson's Java code can look this specific
   `View` up by name, the same way `System.out` in Lesson 01 was a
   specific, findable object rather than an anonymous one.
+
+### Run It Yourself
+
+Run the app on an emulator or device. Real result: a blank white screen
+— no crash, no visible content, because this `LinearLayout` has no
+children yet. This is the expected, correct state: proof the empty
+container itself compiles and inflates without error before the next
+lesson adds real content inside it. Compare it directly against the
+wizard's original `ConstraintLayout` + `TextView` from Lesson 05 — the
+one visible difference right now is that the placeholder text is gone,
+confirming the whole-file replacement really did take effect.
 
 ### SE Lens
 

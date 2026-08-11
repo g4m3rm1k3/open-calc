@@ -21,6 +21,12 @@ Manifest entries for each screen), Lesson 31 (the Notifications screen).
   additional background-color parameter, and only usable on that API
   level or higher.
 
+**Objects and methods used**
+- `startActivity(Intent)` — the `Activity` method requesting the OS
+  start a different Activity, Lesson 17 — reappears here exactly as
+  already taught. `overridePendingTransition`/`overrideActivityTransition`
+  are this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: Two Real Ways to Customize a Transition

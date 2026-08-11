@@ -27,6 +27,12 @@ model.
   for every project; what it actually does is deferred to the first
   lesson that needs to edit its configuration.
 
+**Objects and methods used**
+- `javac`/`java` — the two-step compile-then-run toolchain taught in
+  Lesson 01 — reappear here with one new flag (`-d`), given full
+  treatment above, since a new flag on an already-known tool is new
+  material, not a bare reminder.
+
 ---
 
 ## Concept Unit: Package Declarations Are a Promise About Folder Location
@@ -124,7 +130,25 @@ class's real identity, from the compiler's point of view.
 ### Discard the Throwaway Example
 
 Delete the `pkgdemo` folder now. It was only ever a throwaway lab; it
-does not become part of any real project.
+does not become part of any real project. Also available as a
+standalone concept file, `java-package-declarations.md`.
+
+### Mechanical Walkthrough
+
+- `package com.example.demo;` — a **package declaration**: a
+  compiler-checked claim that this file lives at the end of a folder
+  path matching `com/example/demo/`, regardless of where the file
+  physically sits when `javac` is invoked.
+- `javac -d wrongplace_out wrongplace/Greeter.java` — the same `javac`
+  from Lesson 01, now with the `-d` flag: build the full
+  `com/example/demo/` folder structure under `wrongplace_out`, derived
+  entirely from the `package` line inside the file, not from
+  `wrongplace/` (the source file's own, unrelated folder).
+- `java -cp wrongplace_out com.example.demo.Greeter` — running it
+  requires the class's **fully-qualified name**
+  (`com.example.demo.Greeter`), not the bare `Greeter` Lesson 01 used —
+  direct proof the package is a real part of the class's identity, not
+  a cosmetic label.
 
 ### CS Lens
 

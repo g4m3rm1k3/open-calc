@@ -18,6 +18,12 @@ proven with real compiler errors).
   the same package, invisible to code in a different package, regardless
   of any inheritance relationship.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, already taught in Lesson 01 — reappears in this lesson's own
+  lab exactly as before. Package-private access is this lesson's own
+  subject, given full treatment above.
+
 ---
 
 ## Concept Unit: No Modifier at All Is Still a Real, Specific Choice
@@ -97,6 +103,8 @@ outside/OutsidePackageUser.java:6: error: Widget is not public in inside; cannot
 import inside.Widget;
              ^
 ```
+
+### Mechanical Walkthrough
 
 `class Widget` — no modifier at all — is **package-private**:
 `SameyPackageUser`, in the *same* package (`inside`), could construct and

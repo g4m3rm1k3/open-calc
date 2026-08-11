@@ -20,6 +20,14 @@ complete, wired data grid.
   a `RecyclerView` exactly which single position now holds new data, so
   it can update only what's actually changed.
 
+**Objects and methods used**
+- `ArrayList<InventoryItem>` — the real, populated, growable list
+  backing the grid, Lesson 22 — and `RecyclerView.Adapter` — the real
+  contract this project's `InventoryAdapter` fulfills, Lesson 26 —
+  reappear here exactly as already taught. `AlertDialog` and
+  `notifyItemInserted` are this lesson's own subject, given full
+  treatment below.
+
 ---
 
 ## Concept Unit: Where Does "Add" Live? — Dialog vs. New Screen

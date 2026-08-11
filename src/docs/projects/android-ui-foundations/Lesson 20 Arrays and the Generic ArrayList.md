@@ -28,6 +28,13 @@ runtime-editable data), Lesson 19 (method overloading).
   (`List`) and a concrete implementing class (`ArrayList`), both generic,
   representing a growable, ordered collection.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's `static` print-to-standard-output
+  method, Lesson 01 — and `interface` — a type declaring method
+  signatures with no implementation of its own, Lesson 14 — reappear in
+  this lesson's own labs exactly as before. Arrays and `ArrayList<E>`
+  are this lesson's own subject, given full treatment above.
+
 ---
 
 ## Concept Unit: Arrays — Fixed-Size and Indexed
@@ -67,6 +74,8 @@ Real output:
 Banana
 3
 ```
+
+### Mechanical Walkthrough
 
 `new String[3]` creates an array with room for exactly three `String`
 values — a fixed size, decided at creation and never changeable
@@ -111,6 +120,18 @@ Also recognized in: every language's array or fixed-size buffer type,
 raw memory buffers in systems programming, and pixel buffers in graphics
 programming, where a fixed, contiguous, indexed block is exactly the
 right structure for genuinely fixed-size data.
+
+### SE Lens
+
+Why does Java fix an array's size at creation instead of letting it grow
+automatically, the way a Python list does by default? A fixed-size
+array can be laid out as one genuinely contiguous block of memory,
+known in full at allocation time — the most efficient possible shape
+for reading and writing by index, with no bookkeeping for potential
+growth. That efficiency is exactly why `ArrayList` (the next unit)
+doesn't replace arrays at the language level; it's built *on top of*
+one internally, adding the resizing behavior a fixed array can't
+provide, at a small, real cost in overhead.
 
 ---
 
@@ -166,6 +187,8 @@ Banana
 4
 [Apple, Cherry, Date]
 ```
+
+### Mechanical Walkthrough
 
 `List<String>` and `ArrayList<String>` are both **generic types**: `List`
 is an interface (Lesson 14's concept, reappearing — a contract with no

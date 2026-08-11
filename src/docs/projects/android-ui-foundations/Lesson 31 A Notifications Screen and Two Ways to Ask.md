@@ -25,6 +25,17 @@ screen's request depends on).
   the same job, using a request-code-based callback instead of a
   registered one.
 
+**Objects and methods used**
+- `Activity` — the framework base class every screen extends, Lesson
+  06 — `Intent` — an object describing a request for the OS to do
+  something, Lesson 17 — and `startActivity` — the method handing an
+  `Intent` to the OS to act on, Lesson 17 — reappear here exactly as
+  before, building and launching this third screen.
+  `ContextCompat.checkSelfPermission`,
+  `ActivityResultContracts.RequestPermission`, and
+  `ActivityCompat.requestPermissions` are this lesson's own subject,
+  given full treatment above.
+
 ---
 
 ## Concept Unit: A Third Screen
@@ -123,6 +134,17 @@ unit; the point worth noticing is that building a new screen is now fast
 and familiar, the actual payoff of having learned each piece once,
 properly, rather than by pattern-matching a template.
 
+### SE Lens
+
+Why does this project keep the permission-request screen separate from
+the grid screen, rather than requesting the permission the moment the
+app first launches? Asking for a dangerous permission with no visible,
+immediate reason attached is a well-documented way to make a user
+reflexively deny it — a permission request tied to a specific screen
+whose purpose is obviously connected to that permission (a
+"Notifications" screen asking for SMS access) gives the user real
+context for what they're being asked to grant, and why.
+
 ---
 
 ## Concept Unit: Two Real Ways to Request a Dangerous Permission
@@ -132,6 +154,8 @@ properly, rather than by pattern-matching a template.
 With the screen in place, something needs to actually trigger the
 system's permission dialog when "Enable Low-Stock Notifications" is
 tapped, and receive the user's answer afterward.
+
+### Mechanical Walkthrough
 
 ### Option A — the Legacy, Request-Code-Based API
 

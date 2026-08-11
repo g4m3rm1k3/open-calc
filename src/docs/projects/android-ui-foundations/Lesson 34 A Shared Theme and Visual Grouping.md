@@ -29,6 +29,12 @@ of their behavior.
   away from its neighbors; distinct from padding (Lesson 08), which
   reserves space *inside* a container's own edge.
 
+**Objects and methods used**
+- `android:padding` — space reserved *inside* a container's own edge,
+  Lesson 08 — reappears here by contrast, exactly as already taught.
+  `themes.xml`/`colors.xml` and margins are this lesson's own subject,
+  given full treatment above.
+
 ---
 
 ## Concept Unit: One Color Palette, Defined Once
@@ -115,6 +121,14 @@ Activities, with zero edits needed to any individual layout file.
   three values here changes every existing `Button` across all three
   screens without touching any layout file at all.
 
+### Run It Yourself
+
+Run the app and visit all three screens — login, grid, notifications.
+Real result: every `Button` on every screen now renders in the same
+brand color, with zero per-screen or per-button styling code written —
+direct, on-device confirmation that a theme attribute change genuinely
+propagates app-wide rather than needing to be applied screen by screen.
+
 ### CS Lens
 
 Defining shared values once and referencing them everywhere, rather than
@@ -193,6 +207,15 @@ that are **unequal** on purpose:
   buttons visually separates "the input group" from "the action group,"
   and the buttons' own smaller `8dp` gap reads them as a related pair
   again.
+
+### Run It Yourself
+
+Run the app and look at the login screen with fresh eyes. Confirmed,
+observable result: the username and password fields read as one visual
+group, distinctly separated from the login/create-account buttons below
+them — a real, on-screen effect produced entirely by the margin values
+chosen, with no visible divider, box, or background color drawn
+anywhere.
 
 ### CS Lens
 

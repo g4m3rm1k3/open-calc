@@ -17,6 +17,15 @@ sits between "ordinary class" and "interface."
   all (`abstract` methods), cannot be instantiated directly, and exists
   specifically to be subclassed by something that fills those methods in.
 
+**Objects and methods used**
+- `System.out.println(...)` — Java's static print method, Lesson 01 —
+  `extends` — a class inheriting another's fields and methods —
+  `super` — calling the parent's own version of an overridden method —
+  and `@Override` — the compiler-checked override annotation — all
+  Lesson 06 — reappear in this lesson's own lab exactly as already
+  taught. `abstract` classes are this lesson's own subject, given full
+  treatment above.
+
 ---
 
 ## Concept Unit: Not Quite a Class, Not an Interface
@@ -82,6 +91,8 @@ Real output:
 ```
 Square has area 16.0
 ```
+
+### Mechanical Walkthrough
 
 `abstract class Shape` mixes a real, fully-working method
 (`describe()`, with a real body, inherited by `Square` completely

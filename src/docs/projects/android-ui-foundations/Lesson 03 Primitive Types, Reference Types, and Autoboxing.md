@@ -28,6 +28,15 @@ aliasing).
   value into its wrapper object (autoboxing) or back (unboxing) when the
   surrounding code requires it.
 
+**Objects and methods used**
+- **`Object.getClass()`** — a method every Java object has (inherited
+  from `Object`, the root of every class), returning a `Class` object
+  describing the value's actual runtime type. **`Class.getName()`** — a
+  method on that returned `Class` object, giving its fully-qualified
+  name as a `String`. Used together here purely as a verification tool
+  — proving autoboxing really produced an `Integer` object, not this
+  lesson's own subject.
+
 ---
 
 ## Concept Unit: Primitives Copy Their Value, Not a Reference
@@ -83,7 +92,34 @@ are never constructed as objects.
 
 `PrimitiveCopyDemo` is deleted now. The contrast it proved — primitives
 copy independently, references alias — carries forward every time this
-project mixes the two, starting with the next unit.
+project mixes the two, starting with the next unit. Also available as
+a standalone concept file, `java-primitive-vs-reference-types.md`.
+
+### Mechanical Walkthrough
+
+- `int original = 5;` — a **primitive type** holding a raw value
+  directly, no `new`, no object, no reference — the value `5` itself
+  lives in `original`.
+- `int copy = original;` — copies the raw value `5` out of `original`
+  and into `copy` — after this line, the two variables share nothing;
+  each holds its own independent `5`.
+- `copy = 100;` — overwrites `copy`'s own value. `original` cannot be
+  affected, because there was never a reference connecting them the way
+  Lesson 02's object variables were.
+
+### SE Lens
+
+Why does Java keep a separate family of primitive types at all, instead
+of making every value — even a plain number — a full reference-type
+object the way Lesson 02's `Lightbulb` is? A primitive's value-copy
+semantics mean assigning or passing one is always just copying a few
+raw bytes, with no object allocation, no reference indirection, and
+nothing for later cleanup — a real, deliberate performance tradeoff for
+the values (numbers, booleans) a typical program creates and copies
+constantly. The cost of that tradeoff — primitives can't be used
+anywhere Java's own generic, reference-type-only APIs require an
+object — is exactly the gap the next unit's wrapper classes exist to
+bridge.
 
 ### CS Lens
 
@@ -156,7 +192,26 @@ matching wrapper class — `int`/`Integer`, `double`/`Double`,
 `boolean`/`Boolean`, and so on — and this exact silent conversion is what
 makes it possible to hand a plain `int` value to code that's declared to
 only accept objects, which a later lesson's generic method actually
-does.
+does. Also available as a standalone concept file,
+`java-autoboxing-and-unboxing.md`.
+
+### Mechanical Walkthrough
+
+- `Integer boxed = 42;` — **first appearance of a wrapper class.**
+  `Integer` is a real reference type, not a primitive — the literal
+  `42` (an `int`) is autoboxed into a real `Integer` object, and
+  `boxed` holds a reference to it, exactly like any other object
+  variable.
+- `int unboxed = boxed;` — **unboxing**, the reverse conversion:
+  extracts the raw `int` value back out of the `Integer` object `boxed`
+  references.
+- `boxed.getClass().getName()` — `getClass()` is a real method every
+  object in Java has (inherited from `Object`, covered fully once this
+  project needs inheritance directly); it returns an object representing
+  the value's actual runtime type, and `.getName()` reads that type's
+  fully-qualified name as a `String` — this is the line that turns
+  "autoboxing produces a real object" from a claim into the verified
+  `java.lang.Integer` shown in the real output above.
 
 ### CS Lens
 

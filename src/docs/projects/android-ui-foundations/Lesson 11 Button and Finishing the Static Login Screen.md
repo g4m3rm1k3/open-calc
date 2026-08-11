@@ -20,6 +20,13 @@ redesigning the layout.
   series, since the next lesson wires clicks from Java code instead, for
   reasons that lesson explains.
 
+**Objects and methods used**
+- `TextView` — the text-display widget class, Lesson 09 — `EditText` —
+  the editable-text subclass of `TextView`, Lesson 10 — and
+  `android:id`/`@+id/` — the attribute assigning a findable identity to a
+  view, Lesson 09 — all reappear here unchanged on the two new buttons.
+  `Button` is this lesson's own subject, given full treatment below.
+
 ---
 
 ## Concept Unit: One Screen, Two Buttons — a Design Decision

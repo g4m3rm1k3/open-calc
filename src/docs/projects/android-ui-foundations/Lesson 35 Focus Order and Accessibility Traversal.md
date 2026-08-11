@@ -25,6 +25,14 @@ themed and grouped).
 - **`android:contentDescription`** — text read aloud by a screen reader
   for an element with no visible text of its own to read.
 
+**Objects and methods used**
+- `LinearLayout` — the `ViewGroup` arranging its children in a single
+  row or column — and `android:orientation` — the attribute picking
+  which — both taught in Lesson 08, reappear here unchanged across all
+  three screens. Focus order, `imeOptions`, accessibility traversal, and
+  `contentDescription` are this lesson's own subject, given full
+  treatment above.
+
 ---
 
 ## Concept Unit: Default Focus Order Already Matches — Confirm It, Don't Assume It
@@ -35,7 +43,7 @@ Before changing anything, it's worth actually confirming what this
 project's current focus order really is, rather than assuming it's
 correct because the layout "looks fine."
 
-### The Check
+### Mechanical Walkthrough
 
 Android's default focus order for elements inside a `LinearLayout`
 follows the order they're declared in the XML — exactly the same order
@@ -44,17 +52,32 @@ follows the order they're declared in the XML — exactly the same order
 and buttons declared in the exact sequence a user would naturally
 complete them (title, username, password, log in, create account), the
 default focus order already matches the logical task order, with no
-extra attributes needed to force it. This is worth testing directly, not
-assuming: on an emulator or device, tap into the username field, then
-press the keyboard's Tab key (a physical or Bluetooth keyboard, or the
-emulator's own Tab key) and confirm focus actually moves to the password
-field next, not to one of the buttons out of sequence.
+extra attributes needed to force it.
 
+### Run It Yourself
+
+Test this directly, not by assumption: on an emulator or device, tap
+into the username field, then press the keyboard's Tab key (a physical
+or Bluetooth keyboard, or the emulator's own Tab key) and confirm focus
+actually moves to the password field next, not to one of the buttons
+out of sequence — direct, on-device proof, not just a claim about XML
+order.
+
+### SE Lens
+
+Why does Android derive focus order from declaration order by default,
+rather than requiring every screen to explicitly number its own focus
+sequence? Deriving it automatically means the common case — a layout
+already written in logical reading/task order, which most real screens
+are — gets correct focus order for free, with zero extra attributes.
 This is a direct, concrete payoff of Lesson 11's own design decision
-(one screen, fields before buttons, in that specific order) — a
-deliberate layout order chosen for logical flow turns out to also be the
-correct focus order for free, precisely because both are driven by the
-same underlying XML sequence.
+(one screen, fields before buttons, in that specific order): a
+deliberate layout order chosen for logical flow turns out to also be
+the correct focus order for free, precisely because both are driven by
+the same underlying XML sequence. The cost of this default only shows
+up when visual order and logical order genuinely diverge — exactly the
+case the next unit's `imeOptions` and a later explicit-override
+mechanism exist to handle.
 
 ---
 
@@ -118,6 +141,15 @@ a small, cheap attribute that directly removes a genuinely common point
 of user friction: fumbling to manually tap the next field instead of the
 form simply flowing forward.
 
+### Run It Yourself
+
+Run the app, tap into the username field, type something, and tap the
+soft keyboard's own action key. Confirmed, observable result: the key
+reads "Next" and focus moves directly to the password field with no
+manual tap; typing there and tapping the action key again shows "Done"
+and dismisses the keyboard instead — direct, on-device proof both
+`imeOptions` values behave as declared.
+
 ---
 
 ## Concept Unit: Accessibility Traversal — When Visual Order and Reading Order Diverge
@@ -139,6 +171,8 @@ cases where it would be.
     android:accessibilityTraversalAfter="@id/importantWarningText"
     ... />
 ```
+
+### Mechanical Walkthrough
 
 `android:accessibilityTraversalAfter` (and its sibling,
 `accessibilityTraversalBefore`) explicitly overrides TalkBack's default
