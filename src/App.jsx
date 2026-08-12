@@ -38,6 +38,12 @@ const LinearAlgebraReferencePage = lazy(
 const LAConceptExplorerPage = lazy(
   () => import("./pages/LAConceptExplorerPage.jsx"),
 );
+const RegexReferencePage = lazy(
+  () => import("./pages/RegexReferencePage.jsx"),
+);
+const RegexConceptExplorerPage = lazy(
+  () => import("./pages/RegexConceptExplorerPage.jsx"),
+);
 const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage.jsx"));
 const CalendarPage = lazy(() => import("./features/calendar/CalendarPage.tsx"));
 const CompassPage = lazy(() => import("./features/compass/CompassPage.tsx"));
@@ -129,6 +135,14 @@ export default function App() {
                             <Route
                               path="la-explorer"
                               element={<LAConceptExplorerPage />}
+                            />
+                            <Route
+                              path="regex-reference"
+                              element={<RegexReferencePage />}
+                            />
+                            <Route
+                              path="regex-explorer"
+                              element={<RegexConceptExplorerPage />}
                             />
                             <Route
                               path="courses"

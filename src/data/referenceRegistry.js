@@ -33,6 +33,13 @@ export const REFERENCE_ITEMS = [
     Component: lazy(() => import('../pages/LAConceptExplorerPage.jsx')),
   },
   {
+    key: 'regex-reference',
+    label: 'Regex Reference',
+    emoji: '🔤',
+    color: 'red',
+    Component: lazy(() => import('../pages/RegexReferencePage.jsx')),
+  },
+  {
     key: 'regex-explorer',
     label: 'Regex Concept Explorer',
     emoji: '🧬',
