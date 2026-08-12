@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { CATEGORY_STYLES } from './categoryStyles.js';
 
-const CATEGORY_ORDER = ['foundations', 'core', 'spectral', 'orthogonality', 'decompositions', 'applications'];
+const DEFAULT_CATEGORY_ORDER = ['foundations', 'core', 'spectral', 'orthogonality', 'decompositions', 'applications'];
 
-export default function ConceptSearch({ topics, onSelect, selected }) {
+export default function ConceptSearch({ topics, onSelect, selected, categoryOrder = DEFAULT_CATEGORY_ORDER }) {
   const [query, setQuery] = useState('');
+  const CATEGORY_ORDER = categoryOrder;
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
