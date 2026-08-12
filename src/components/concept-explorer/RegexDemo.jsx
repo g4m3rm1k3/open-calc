@@ -270,32 +270,58 @@ function formatCapture(val) {
   return val === null || val === undefined ? '—' : JSON.stringify(val);
 }
 
-export default function RegexDemo({ topic }) {
-  const demo = topic.demo ?? { pattern: '', flags: 'g', testString: '' };
+// A live "what Python actually runs" line — the JS tab gets this for free
+// from /pattern/flags syntax; Python's r"..." literal has nowhere to show
+// flags, so without this, toggling a flag button changes the result below
+// but nothing visibly changes next to the pattern itself.
+function pythonCallPreview(pattern, flags) {
+  const consts = [];
+  if (flags.includes('i')) consts.push('re.IGNORECASE');
+  if (flags.includes('m')) consts.push('re.MULTILINE');
+  if (flags.includes('s')) consts.push('re.DOTALL');
+  const flagsArg = consts.length ? `, ${consts.join(' | ')}` : '';
+  const method = flags.includes('g') ? 'findall' : 'search';
+  return `re.${method}(r"${pattern}", text${flagsArg})`;
+}
 
-  const [lang, setLang] = useState('javascript');
-  const [pattern, setPattern] = useState(demo.pattern);
-  const [flags, setFlags] = useState(demo.flags ?? 'g');
-  const [testString, setTestString] = useState(demo.testString ?? '');
+// A demo's inputs, per language — falls back to the shared `demo` when a
+// concept has no Python-specific one (most syntax genuinely is the same).
+function inputsFrom(demoObj) {
+  return { pattern: demoObj?.pattern ?? '', flags: demoObj?.flags ?? 'g', testString: demoObj?.testString ?? '' };
+}
 
-  // A new topic ships its own example — reload it instead of carrying
-  // whatever the learner was typing into the previous concept's demo.
+export default function RegexDemo({ topic, lang: controlledLang, onLangChange }) {
+  const jsDemo = topic.demo ?? { pattern: '', flags: 'g', testString: '' };
+  const pyDemo = topic.python?.demo ?? jsDemo;
+
+  const [internalLang, setInternalLang] = useState('javascript');
+  const lang = controlledLang ?? internalLang;
+  const setLang = onLangChange ?? setInternalLang;
+
+  const [jsInputs, setJsInputs] = useState(() => inputsFrom(jsDemo));
+  const [pyInputs, setPyInputs] = useState(() => inputsFrom(pyDemo));
+  const inputs = lang === 'python' ? pyInputs : jsInputs;
+  const setInputs = lang === 'python' ? setPyInputs : setJsInputs;
+  const activeDemo = lang === 'python' ? pyDemo : jsDemo;
+
+  // A new topic ships its own example(s) — reload them instead of carrying
+  // whatever the learner was typing into the previous concept's demo. Only
+  // resets the internal tab when this instance owns its own tab state.
   useEffect(() => {
-    setLang('javascript');
-    setPattern(demo.pattern);
-    setFlags(demo.flags ?? 'g');
-    setTestString(demo.testString ?? '');
+    if (!controlledLang) setInternalLang('javascript');
+    setJsInputs(inputsFrom(jsDemo));
+    setPyInputs(inputsFrom(pyDemo));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic.id]);
 
-  const jsState = useSafeJsMatcher(pattern, flags, testString);
-  const pyState = usePythonMatcher(pattern, flags, testString, lang === 'python');
+  const jsState = useSafeJsMatcher(jsInputs.pattern, jsInputs.flags, jsInputs.testString);
+  const pyState = usePythonMatcher(pyInputs.pattern, pyInputs.flags, pyInputs.testString, lang === 'python');
   const { status, matches, error } = lang === 'python' ? pyState : jsState;
 
-  const segments = useMemo(() => buildSegments(testString, matches), [testString, matches]);
+  const segments = useMemo(() => buildSegments(inputs.testString, matches), [inputs.testString, matches]);
 
   function toggleFlag(f) {
-    setFlags(prev => (prev.includes(f) ? prev.replace(f, '') : prev + f));
+    setInputs(prev => ({ ...prev, flags: prev.flags.includes(f) ? prev.flags.replace(f, '') : prev.flags + f }));
   }
 
   const isTimedOut = status === 'timeout';
@@ -303,42 +329,51 @@ export default function RegexDemo({ topic }) {
 
   return (
     <div className="rounded-xl border border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-900 shadow-inner overflow-hidden">
-      {/* Language tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
-        {[
-          { id: 'javascript', label: 'JavaScript' },
-          { id: 'python', label: 'Python (re)' },
-        ].map(l => (
-          <button
-            key={l.id}
-            onClick={() => setLang(l.id)}
-            className={`px-4 py-2 text-[12px] font-bold transition-all border-b-2 ${
-              lang === l.id
-                ? 'text-red-600 dark:text-red-400 border-red-500'
-                : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
-          >
-            {l.label}
-          </button>
-        ))}
-      </div>
+      {/* Language tabs — only rendered when this instance owns its own tab
+          state; a controlled parent (the Reference page's per-card tab,
+          which also switches prose) renders its own and drives `lang` here. */}
+      {!controlledLang && (
+        <div className="flex border-b border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-950/40">
+          {[
+            { id: 'javascript', label: 'JavaScript' },
+            { id: 'python', label: 'Python (re)' },
+          ].map(l => (
+            <button
+              key={l.id}
+              onClick={() => setLang(l.id)}
+              className={`px-4 py-2 text-[12px] font-bold transition-all border-b-2 ${
+                lang === l.id
+                  ? 'text-red-600 dark:text-red-400 border-red-500'
+                  : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="p-5 space-y-4">
         {/* Pattern input */}
         <div>
           <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-1.5">
-            Pattern {lang === 'python' && <span className="normal-case font-normal text-slate-400 dark:text-slate-500">— same string, run through Python's re.compile()</span>}
+            Pattern {lang === 'python' && <span className="normal-case font-normal text-slate-400 dark:text-slate-500">— run through Python's re.compile()</span>}
           </label>
           <div className="flex items-center gap-1 font-mono text-sm">
             <span className="text-slate-400 dark:text-slate-600">{lang === 'python' ? 'r"' : '/'}</span>
             <input
-              value={pattern}
-              onChange={e => setPattern(e.target.value)}
+              value={inputs.pattern}
+              onChange={e => setInputs(prev => ({ ...prev, pattern: e.target.value }))}
               spellCheck={false}
               className="flex-1 bg-slate-100 dark:bg-slate-950/60 text-slate-800 dark:text-slate-200 rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700/60 focus:outline-none focus:border-red-400 dark:focus:border-red-500/60 focus:ring-1 focus:ring-red-400/30"
             />
-            <span className="text-slate-400 dark:text-slate-600">{lang === 'python' ? '"' : `/${flags}`}</span>
+            <span className="text-slate-400 dark:text-slate-600">{lang === 'python' ? '"' : `/${inputs.flags}`}</span>
           </div>
+          {lang === 'python' && (
+            <p className="mt-1.5 text-[11px] font-mono text-slate-400 dark:text-slate-500">
+              {pythonCallPreview(inputs.pattern, inputs.flags)}
+            </p>
+          )}
         </div>
 
         {/* Flags */}
@@ -354,7 +389,7 @@ export default function RegexDemo({ topic }) {
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold border transition-all ${
                   disabledForPython
                     ? 'bg-slate-50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800/40 text-slate-300 dark:text-slate-700 cursor-not-allowed line-through'
-                    : flags.includes(flag)
+                    : inputs.flags.includes(flag)
                     ? 'bg-red-500/20 border-red-500/50 text-red-600 dark:text-red-300'
                     : 'bg-slate-100 dark:bg-slate-950/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-red-400/50'
                 }`}
@@ -371,8 +406,8 @@ export default function RegexDemo({ topic }) {
             Test string
           </label>
           <textarea
-            value={testString}
-            onChange={e => setTestString(e.target.value)}
+            value={inputs.testString}
+            onChange={e => setInputs(prev => ({ ...prev, testString: e.target.value }))}
             rows={3}
             spellCheck={false}
             className="w-full font-mono text-sm bg-slate-100 dark:bg-slate-950/60 text-slate-800 dark:text-slate-200 rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700/60 focus:outline-none focus:border-red-400 dark:focus:border-red-500/60 focus:ring-1 focus:ring-red-400/30 resize-y"
@@ -426,7 +461,7 @@ export default function RegexDemo({ topic }) {
                   <span key={i} className="text-slate-700 dark:text-slate-300">{seg.text}</span>
                 ),
               )}
-              {testString === '' && <span className="text-slate-400 dark:text-slate-600 italic">Type a test string above</span>}
+              {inputs.testString === '' && <span className="text-slate-400 dark:text-slate-600 italic">Type a test string above</span>}
             </div>
           )}
         </div>
@@ -459,9 +494,9 @@ export default function RegexDemo({ topic }) {
           </div>
         )}
 
-        {demo.note && (
+        {activeDemo.note && (
           <p className="text-[12px] text-slate-500 dark:text-slate-400 italic border-t border-slate-200 dark:border-slate-800/60 pt-3">
-            {demo.note}
+            {activeDemo.note}
           </p>
         )}
       </div>

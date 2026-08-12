@@ -39,6 +39,9 @@ export const REGEX_CONCEPTS = [
     when: 'Worth knowing before debugging a "why does this regex mean something different in Python vs. JavaScript" problem — the answer is almost always which of these historical lineages (POSIX, PCRE, ECMA-262) that language\'s engine actually followed.',
     watchout: 'There is no single "regex" specification. POSIX, PCRE, and JavaScript\'s own ECMA-262 grammar disagree on details — assuming one true syntax is the single most common source of copy-pasted regex silently behaving differently.',
     demo: { pattern: 'grep|g/re/p', flags: 'gi', testString: "Thompson's g/re/p in ed became the standalone tool grep.", note: 'The name is literally the command spelled out.' },
+    python: {
+      example: "Python's own `re` module landed in Python 1.5 (1997), replacing the older `regex`/`regsub` modules — Fredrik Lundh's \"Secret Labs' Regular Expression Engine\" (SRE), still the engine underneath `re` today, arriving squarely in the same PCRE-influenced era this history describes.",
+    },
   },
 
   // ── CORE SYNTAX ───────────────────────────────────────────────────────────
@@ -127,6 +130,14 @@ export const REGEX_CONCEPTS = [
     when: '`g` for "find them all"; `i` for case-insensitive matching; `m` for line-oriented text; `u` whenever \\p{...} is used.',
     watchout: 'Without the `g` flag, `.exec()` always returns the same first match and never advances — a `while (re.exec(str))` loop with no `g` flag is an infinite loop.',
     demo: { pattern: '^\\d+', flags: 'gm', testString: '10 apples\n20 oranges\n5 pears', note: 'Remove the m flag and only the first line\'s number still matches.' },
+    python: {
+      plain: "Python has no g or y flags at all — \"find every match\" means calling a different method (re.findall/finditer) instead of setting a flag. The rest are named constants you OR together: re.IGNORECASE, re.MULTILINE, re.DOTALL. Unicode matching is the default for str patterns, so there's no 'u' flag to opt into — and Python has one JS lacks entirely: re.VERBOSE, which lets a pattern be written with whitespace and # comments spread across multiple lines.",
+      formal: '\\texttt{re.compile(p,\\ re.IGNORECASE\\ |\\ re.MULTILINE)}',
+      example: "`re.findall(r'^\\d+', text, re.MULTILINE)` — \"global\" is just calling findall/finditer instead of match/search; MULTILINE is passed as an argument, not baked into the pattern string.",
+      when: 'Reach for re.VERBOSE the moment a pattern gets dense enough to want inline comments — something a JS regex literal cannot do at all.',
+      watchout: 'Flags combine with the bitwise OR operator on named constants (`re.IGNORECASE | re.MULTILINE`), not by concatenating letters into a string — passing `"im"` where a flags argument is expected is a TypeError.',
+      demo: { pattern: '^\\d+', flags: 'm', testString: '10 apples\n20 oranges\n5 pears', note: "In real Python: re.findall(r'^\\d+', text, re.MULTILINE). This demo's g toggle stands in for calling finditer() instead of search()." },
+    },
   },
 
   // ── ENGINE INTERNALS ──────────────────────────────────────────────────────
@@ -141,6 +152,9 @@ export const REGEX_CONCEPTS = [
     when: 'This is the default engine design in almost every mainstream language — worth understanding any time a match is slower or different than expected.',
     watchout: 'The engine never "looks ahead" to pick the right amount for a greedy quantifier to consume — it always grabs the maximum first, which is exactly what makes it capable of going exponential.',
     demo: { pattern: 'a.*b', flags: '', testString: 'axbxc', note: 'Try "axbxbxb" — it stops at the last b, because .* is still greedy.' },
+    python: {
+      watchout: "Python's re module ships its own backtracking engine, nicknamed SRE (Fredrik Lundh, part of CPython's standard library since version 1.5/1.6) — a different concrete implementation than PCRE or JavaScript's V8 engine, but the backtracking behavior described here is identical in kind, including vulnerability to catastrophic backtracking.",
+    },
   },
   {
     id: 'ref-thompson-nfa',
@@ -191,6 +205,13 @@ export const REGEX_CONCEPTS = [
     when: 'Reach for capture groups any time downstream code needs a specific piece of the match, not just a yes/no; named groups once a pattern has more than one or two groups.',
     watchout: 'Backreferences are a backtracking-only feature — a Thompson-NFA engine like RE2 cannot support them at all, because "match whatever an earlier group captured" is not expressible as a finite automaton.',
     demo: { pattern: '(\\w+) \\1', flags: '', testString: 'hi hi and bye bye and hi ho', note: '\\1 requires the exact same text group 1 captured.' },
+    python: {
+      plain: 'Same idea, different spelling for named groups: (?P<name>…) instead of (?<name>…). Numbered backreferences (\\1) work identically in both — only the named form differs, both for the group definition and for referring back to it.',
+      formal: '\\texttt{(?P<year>\\textbackslash d\\{4\\})} \\Rightarrow \\texttt{match.group("year")}',
+      example: '`re.match(r"(?P<year>\\d{4})-(?P<month>\\d{2})", "2024-03").group("year")` → "2024" — Python reads named groups off match.groupdict() or match.group("name").',
+      watchout: 'Copy-pasting a JS pattern with `(?<name>…)` into Python raises `re.error: unknown extension ?<n` — the P is not optional in Python\'s syntax. A named backreference is `(?P=name)`, not `\\k<name>`.',
+      demo: { pattern: '(?P<word>\\w+) (?P=word)', flags: '', testString: 'hi hi and bye bye and hi ho', note: "Python's named-backreference syntax: (?P=word), not \\k<word>. Numbered \\1 also still works, unchanged." },
+    },
   },
   {
     id: 'ref-lookahead',
@@ -215,6 +236,10 @@ export const REGEX_CONCEPTS = [
     when: 'The same extraction use case as lookahead, when the required context sits before the value instead of after it.',
     watchout: "JavaScript's lookbehind (ES2018+) allows variable-length patterns inside it — plenty of other regex flavors historically require lookbehind to be a fixed length, since scanning backward by an unknown amount is a harder engine problem.",
     demo: { pattern: '(?<=\\$)\\d+', flags: 'g', testString: 'Total: $50, tax: 5, shipping: $12', note: "A plain '5' with no $ doesn't qualify." },
+    python: {
+      watchout: "Python's re has always required fixed-width lookbehind — `(?<=\\d{3})` compiles, `(?<=\\d+)` raises `re.error: look-behind requires fixed-width pattern`. There is no variable-length lookbehind in the standard library at all; the third-party `regex` package lifts this limit.",
+      demo: { pattern: '(?<=\\$+)\\d+', flags: '', testString: 'Total: $50, tax: 5, shipping: $12', note: "\\$+ is variable-width, so Python raises re.error here. Remove the + — (?<=\\$)\\d+ — and it works, same as the JavaScript version." },
+    },
   },
   {
     id: 'ref-unicode-property-escapes',
@@ -227,6 +252,13 @@ export const REGEX_CONCEPTS = [
     when: 'Any text processing that has to handle more than English/ASCII input — names, addresses, multilingual search.',
     watchout: 'Requires the `u` flag — without it, most engines either error on `\\p{...}` or misread it as a literal "p" followed by literal braces.',
     demo: { pattern: '\\p{L}+', flags: 'gu', testString: 'café Müller Владимир 東京', note: 'Swap the pattern to \\w+ and watch accented and non-Latin letters get cut apart.' },
+    python: {
+      plain: "Python's built-in re module does not support \\p{...} at all — there is no Unicode-category escape in the standard library, in any released version. The third-party regex package (pip install regex, import regex as re) is a near drop-in replacement that adds it back.",
+      example: 'The closest stdlib approximation is checking `str.isalpha()`/`unicodedata.category()` per character by hand — neither is a real substitute for matching a property escape across a whole pattern.',
+      when: "The moment \\p{...} comes up in real Python code, it's a signal to reach for `pip install regex` — not to hand-roll something that fights the standard library.",
+      watchout: 'This is a hard, permanent stdlib limitation, not a version gap to wait out — no released Python has ever supported \\p{...} in `re`.',
+      demo: { pattern: '\\p{L}+', flags: 'gu', testString: 'café Müller Владимир 東京', note: "Raises re.error: bad escape \\p — there's no pattern rewrite that fixes this short of switching to the third-party regex package." },
+    },
   },
 
   // ── ENGINE INTERNALS (continued) ──────────────────────────────────────────
@@ -279,6 +311,11 @@ export const REGEX_CONCEPTS = [
     when: 'Every code review touching a regex: is the pattern trying to parse something with real nesting? Would a named group, or a comment stating intent, make this reviewable?',
     watchout: 'Most production "email regexes" are deliberately loose approximations of RFC 5322 — that\'s the correct engineering call, not a bug waiting to be fixed.',
     demo: { pattern: '^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$', flags: '', testString: 'name.tag+sort@example.co.uk', note: 'A deliberately "good enough" email pattern.' },
+    python: {
+      plain: "The same 'regex isn't a parser' lesson, plus two Python-specific habits: always write patterns as raw strings (r'...') so backslashes reach re unescaped, and re.compile() a pattern once outside a loop instead of re-parsing the same string on every call.",
+      example: 're.compile(r"\\d+") once at module scope, then .finditer() per call — compiling inside a hot loop is the most common Python-specific regex performance mistake, distinct from the email-myth/parser-vs-regex mistake that applies everywhere.',
+      watchout: "Forgetting the r prefix on a pattern containing \\d, \\w, \\b, etc. \\d and \\w usually still work by accident since Python doesn't recognize them as string escapes, but \\b is a real Python string escape (backspace) — without the r prefix, an intended word-boundary pattern silently becomes a literal backspace character instead.",
+    },
   },
   {
     id: 'ref-capstone-log-parser',
@@ -290,6 +327,11 @@ export const REGEX_CONCEPTS = [
     when: 'Any time structured fields need to come out of semi-structured text — logs, CSV-like formats, simple config lines.',
     watchout: 'A pattern built to match one sample line perfectly, instead of the actual grammar of the format, is the most common way this exact kind of code silently breaks on the next slightly different line.',
     demo: { pattern: '^(?<timestamp>[\\d-]+T[\\d:]+) \\[(?<level>\\w+)\\] (?<message>.+)$', flags: '', testString: '2024-03-15T10:22:01 [ERROR] connection refused', note: 'Check the Capture Groups panel — every field is named.' },
+    python: {
+      plain: "Same fields, Python's named-group spelling: (?P<name>…) instead of (?<name>…). Everything else — anchoring the pattern to the log line's real shape, not just one sample — applies exactly the same way.",
+      example: 're.match(r"^(?P<timestamp>[\\d-]+T[\\d:]+) \\[(?P<level>\\w+)\\] (?P<message>.+)$", line).groupdict() returns a plain dict of the three named fields.',
+      demo: { pattern: '^(?P<timestamp>[\\d-]+T[\\d:]+) \\[(?P<level>\\w+)\\] (?P<message>.+)$', flags: '', testString: '2024-03-15T10:22:01 [ERROR] connection refused', note: "Same pattern as the JavaScript tab, translated to Python's (?P<name>…) named-group syntax — the version that actually runs." },
+    },
   },
 ]
 

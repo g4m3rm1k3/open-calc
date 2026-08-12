@@ -31,10 +31,22 @@ function Section({ label, color, children }) {
   )
 }
 
+const LANG_TABS = [
+  { id: 'javascript', label: 'JavaScript' },
+  { id: 'python', label: 'Python (re)' },
+]
+
 function ConceptCard({ concept, forceExpanded }) {
   const [localExpanded, setLocalExpanded] = useState(false)
+  const [lang, setLang] = useState('javascript')
   const expanded = forceExpanded || localExpanded
   const c = COLOR_CLASSES[concept.color] ?? COLOR_CLASSES.cyan
+
+  // Every prose field falls back to the JavaScript version unless the concept
+  // ships a Python-specific override — most syntax genuinely is the same, so
+  // most fields never need one; only the fields that actually diverge do.
+  const py = concept.python
+  const field = (key) => (lang === 'python' && py?.[key] !== undefined) ? py[key] : concept[key]
 
   return (
     <div
@@ -69,53 +81,75 @@ function ConceptCard({ concept, forceExpanded }) {
       {expanded && (
         <div className="px-6 py-5 space-y-6">
 
+          {/* Language tabs — drive both the prose below and RegexDemo's
+              engine, as one switch instead of two. A card with no Python
+              overrides authored just shows the same prose on both tabs,
+              which is itself an accurate statement ("this part really is
+              the same"), plus a live demo genuinely running real Python. */}
+          <div className="flex gap-1 -mt-1">
+            {LANG_TABS.map(l => (
+              <button
+                key={l.id}
+                onClick={() => setLang(l.id)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${
+                  lang === l.id
+                    ? 'bg-white/10 border-white/20 text-white'
+                    : 'bg-transparent border-slate-700/50 text-slate-500 hover:text-slate-300 hover:border-slate-600'
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+
           {/* Plain English */}
           <Section label="In Plain English" color="text-slate-400">
-            <p className="text-slate-200 text-[14px] leading-relaxed">{concept.plain}</p>
-            {concept.intuition && (
-              <p className="mt-2 text-slate-400 text-[13px] leading-relaxed italic border-l-2 border-slate-700 pl-3">{concept.intuition}</p>
+            <p className="text-slate-200 text-[14px] leading-relaxed">{field('plain')}</p>
+            {field('intuition') && (
+              <p className="mt-2 text-slate-400 text-[13px] leading-relaxed italic border-l-2 border-slate-700 pl-3">{field('intuition')}</p>
             )}
           </Section>
 
           {/* Two-column: Formal + Example */}
-          {(concept.formal || concept.example) && (
+          {(field('formal') || field('example')) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {concept.formal && (
+              {field('formal') && (
                 <Section label="Formally" color="text-slate-400">
                   <div className="overflow-x-auto rounded-xl bg-[#13131f] border border-slate-700/50 px-4 py-3 text-center text-slate-100 shadow-inner min-h-[60px] flex items-center justify-center">
-                    <KatexBlock latex={concept.formal} display />
+                    <KatexBlock latex={field('formal')} display />
                   </div>
                 </Section>
               )}
-              {concept.example && (
+              {field('example') && (
                 <Section label="Concrete Example" color="text-slate-400">
-                  <p className="text-slate-300 text-[13px] leading-relaxed">{concept.example}</p>
+                  <p className="text-slate-300 text-[13px] leading-relaxed">{field('example')}</p>
                 </Section>
               )}
             </div>
           )}
 
           {/* When / Where */}
-          {concept.when && (
+          {field('when') && (
             <Section label="Where You'll See This" color="text-amber-500/70">
-              <p className="text-slate-300 text-[13px] leading-relaxed">{concept.when}</p>
+              <p className="text-slate-300 text-[13px] leading-relaxed">{field('when')}</p>
             </Section>
           )}
 
           {/* Watch out / don't confuse */}
-          {concept.watchout && (
+          {field('watchout') && (
             <Section label="Don't Confuse With" color="text-rose-400/70">
-              <p className="text-slate-300 text-[13px] leading-relaxed">{concept.watchout}</p>
+              <p className="text-slate-300 text-[13px] leading-relaxed">{field('watchout')}</p>
             </Section>
           )}
 
           {/* Live demo — same RegexDemo used by the Concept Explorer, in place
               of linear-algebra-data.js's "Open in OpenMAT" runnable code block:
               regex has no separate lab to hand code off to, so the demo is
-              just inline and self-contained. */}
+              just inline and self-contained. Controlled by the same lang
+              state as the prose above, instead of owning a second tab bar. */}
           {concept.demo && (
             <Section label="Try It" color="text-emerald-400/70">
-              <RegexDemo topic={concept} />
+              <RegexDemo topic={concept} lang={lang} onLangChange={setLang} />
             </Section>
           )}
 
