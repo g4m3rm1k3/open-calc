@@ -29,10 +29,27 @@ pointing at them anymore.
   missing target.
 
 **Objects and methods used**
-- `File.Copy`/`BitmapImage` (Lesson 25) reappear here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  `File.Delete` is this lesson's own subject, given full treatment
-  below.
+- **`File.Delete`**
+  - *What it is:* removes a file from disk.
+  - *Implementation:* a `static` method on `System.IO.File`,
+    `Delete(string path)` — silently does nothing if the path doesn't
+    already exist, a real, useful, worth-confirming difference from
+    most of this project's other operations, which fail loudly on a
+    missing target.
+  - *Its use:* this lesson's own subject — the real cleanup step that
+    removes a photo's actual `.jpg` file the moment nothing in the
+    database points at it anymore. Full lab, real output, and both
+    lenses in this lesson's own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`File.Copy` / `BitmapImage`**
+  - *What they are:* copies a file to a new path, and a WPF type
+    representing a loaded, decoded image.
+  - *Implementation:* full treatment already given in
+    `Lesson-25-storing-photos-by-path.md`.
+  - *Its use:* unchanged from Lesson 25 — this lesson only adds the
+    matching delete-side cleanup.
 
 ---
 

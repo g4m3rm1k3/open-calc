@@ -61,12 +61,73 @@ and `MainWindow.xaml.cs` Lesson 1 left behind, since this lesson edits both.
   Live Visual Tree window) uses for it.
 
 **Objects and methods used**
-- `Console.WriteLine` (Lesson 00a) and `Dictionary<TKey, TValue>`/
-  target-typed `new()` (Lesson 01a) reappear in this lesson's own
-  `GridRowRegistry` lab — already given full treatment, brief reminder
-  only, per the Repetition Rule. `Grid`, its attached properties, and
-  `Border` are this lesson's own subject, given full treatment in the
-  Concept Units below.
+- **`Grid`**
+  - *What it is:* a layout panel that divides its available space into
+    named rows and columns, sized by declared rule, and places each
+    child into one specific row/column cell.
+  - *Implementation:* `System.Windows.Controls.Grid`. Its
+    `RowDefinitions`/`ColumnDefinitions` properties (each a collection,
+    set via property-element syntax — `<Grid.RowDefinitions>` — since
+    a list can't fit in a plain attribute) hold `RowDefinition`/
+    `ColumnDefinition` objects, each with a `Height`/`Width` of a fixed
+    pixel number, `Auto` (as tall/wide as its content needs), or `*`
+    (all space not claimed by any other row/column). A `Grid` can be
+    nested inside another `Grid`'s own cell, each one solving its own,
+    local row/column layout with zero knowledge of the other.
+  - *Its use:* this lesson's own subject — replaces Lesson 1's
+    `StackPanel` with a three-row header/content/footer layout, and a
+    second, nested `Grid` (two columns) inside the header row itself,
+    for the icon-plus-title layout. Full lab, real output, and both
+    lenses across this lesson's first and third Concept Units.
+- **`Grid.Row` / `Grid.Column`**
+  - *What it is:* the mechanism that tells a `Grid` which row/column one
+    of its children belongs to — set directly on the child, even though
+    the property itself is owned by the parent `Grid`, not by the
+    child's own class.
+  - *Implementation:* an **attached property** — real WPF plumbing
+    (`DependencyProperty`) this lesson's own throwaway
+    `GridRowRegistry` lab imitates with a plain `Dictionary<object,
+    int>`: the owner (`Grid`) keeps its own lookup table mapping any
+    child object to a row/column number, rather than the child carrying
+    that value itself. Omitting `Grid.Row`/`Grid.Column` on a child
+    defaults it to `0`.
+  - *Its use:* every top-level child of this lesson's outer `Grid`
+    (`Grid.Row="0"`/`"1"`/`"2"`) and every child of the nested header
+    `Grid` (`Grid.Column="0"`/`"1"`) uses this to declare which cell it
+    occupies. Full lab, real output, and both lenses in this lesson's
+    second Concept Unit.
+- **`Border`**
+  - *What it is:* a simple control whose job is drawing a background
+    and/or an outline behind whatever it holds — or, used alone with an
+    explicit size and no content, a plain solid rectangle.
+  - *Implementation:* `System.Windows.Controls.Border`. `Background`
+    accepts either a named color (Lesson 1's `Foreground="Gray"`) or a
+    hex color code (`#2E5945` — three pairs of hex digits for red,
+    green, and blue), giving access to any color rather than only
+    WPF's fixed set of named ones.
+  - *Its use:* `<Border Grid.Column="0" Background="#2E5945" Width="32"
+    Height="32" />` — the small, solid dark-green icon square sitting
+    beside the app title in this lesson's new header.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* this lesson's own throwaway `GridRowRegistry` lab, to
+    print the real, proven output confirming the lookup-table model of
+    attached properties.
+- **`Dictionary<TKey, TValue>`**
+  - *What it is:* C#'s key-value lookup collection.
+  - *Implementation:* full treatment, including its `TryGetValue` safe
+    lookup and target-typed `new()`, already given in
+    `Lesson-01-a-static-readonly-dictionary-and-safe-lookups.md`.
+  - *Its use:* `GridRowRegistry`'s own `private static readonly
+    Dictionary<object, int> rowsByChild` — the plain-C# stand-in this
+    lesson's lab uses to model how a real attached property's storage
+    actually works.
 
 ---
 

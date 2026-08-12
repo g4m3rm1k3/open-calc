@@ -31,10 +31,29 @@ dedicated class shaped for one purpose. Lesson 25: `AppContext.BaseDirectory`
   settings and data, separate from its installed program files.
 
 **Objects and methods used**
-- `JsonSerializer` (Lesson 36) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `Environment.SpecialFolder` is this lesson's own subject, given full
-  treatment below.
+- **`Environment.SpecialFolder` / `Environment.GetFolderPath`**
+  - *What they are:* the enum naming real, standard Windows folders,
+    and the method that resolves one to a real path on the current
+    machine.
+  - *Implementation:* `System.Environment.SpecialFolder` (an `enum` —
+    `ApplicationData`, `MyDocuments`, and others);
+    `Environment.GetFolderPath(SpecialFolder)` is a `static` method
+    returning the real, current-user path for the requested folder —
+    the actual value behind the informal name `%AppData%`.
+  - *Its use:* `Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)`
+    — resolves this project's real settings-file location, correctly
+    per-user and per-machine, without hardcoding a path. Full lab,
+    real output, and both lenses in this lesson's own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`JsonSerializer`**
+  - *What it is:* converts between real C# objects and JSON text.
+  - *Implementation:* full treatment already given in
+    `Lesson-36-system-text-json.md`.
+  - *Its use:* serializes this lesson's own small `AppSettings` class,
+    the same mechanism as the inventory export, applied to a much
+    smaller object.
 
 ---
 

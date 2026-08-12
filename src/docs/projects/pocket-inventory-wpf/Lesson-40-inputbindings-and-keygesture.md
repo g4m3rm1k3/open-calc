@@ -25,10 +25,35 @@ giving it a second trigger is nearly free.
   listens for (`Key` plus `Modifiers`, like `Ctrl`).
 
 **Objects and methods used**
-- `ICommand`/`RelayCommand` (Lesson 23) reappear here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  `InputBinding`/`KeyGesture` are this lesson's own subject, given full
-  treatment below.
+- **`KeyBinding`**
+  - *What it is:* the concrete `InputBinding` this lesson actually
+    uses — connecting one specific key press to one `ICommand`,
+    independent of any `Button`.
+  - *Implementation:* `System.Windows.Input.KeyBinding`, a real
+    `InputBinding` subclass with its own `Key`, `Modifiers`
+    (`KeyGesture`'s two parts), and `Command` properties, added to a
+    `Window`'s `InputBindings` collection.
+  - *Its use:* `<KeyBinding Key="N" Modifiers="Control"
+    Command="{Binding AddCommand}" />` — this lesson's own real
+    `Ctrl+N` shortcut, proven with `ReferenceEquals` to resolve to the
+    *exact same* command object the toolbar button already uses. Full
+    lab, real output, and both lenses in this lesson's own Concept
+    Unit.
+
+`InputBinding` (the general base class) and `KeyGesture` (`Key` plus
+`Modifiers`) are this lesson's own subject, given full treatment above
+in Terms Introduced.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ICommand` / `RelayCommand`**
+  - *What they are:* the built-in "something executable, askable in
+    advance" interface, and this project's own hand-written
+    implementation of it.
+  - *Implementation:* full treatment already given in
+    `Lesson-23-icommand-relaycommand-and-mvvm.md`.
+  - *Its use:* `AddCommand`, unchanged — this lesson gives it a second
+    trigger, not a second implementation.
 
 ---
 

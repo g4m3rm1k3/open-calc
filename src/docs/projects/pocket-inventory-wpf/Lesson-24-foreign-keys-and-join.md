@@ -39,10 +39,51 @@ free text. Lesson 23: `InventoryViewModel`.
   `SelectedItem` gives you.
 
 **Objects and methods used**
-- `ComboBox`/`SelectedItem` (Lesson 12) and `SqliteCommand` (Lesson 9)
-  reappear here, already given full treatment — brief reminder only,
-  per the Repetition Rule. `FOREIGN KEY`/`INNER JOIN` are this lesson's
-  own subject, given full treatment below.
+- **`ComboBox.SelectedValue` / `SelectedValuePath`**
+  - *What they are:* a second way to bind a `ComboBox`'s selection, to
+    one specific *property* of the selected item instead of the whole
+    object `SelectedItem` (Lesson 12) gives you.
+  - *Implementation:* `SelectedValuePath` names which property of each
+    bound item to treat as its "value" (here, a `Supplier`'s `Id`);
+    `SelectedValue` then reads (or, `TwoWay`-bound, writes) that
+    specific value directly, rather than the whole `Supplier` object.
+  - *Its use:* the Supplier dropdown reads/writes a plain `SupplierId`
+    integer — the real foreign key column — without the ViewModel ever
+    needing to hold a full `Supplier` object just to know which one was
+    picked.
+- **`SqliteException`**
+  - *What it is:* the real, library-authored exception type
+    `Microsoft.Data.Sqlite` throws for a database-level failure —
+    distinguishable from a generic `Exception`, per
+    `Lesson-23-a-custom-exceptions.md`'s own general mechanism.
+  - *Implementation:* `Microsoft.Data.Sqlite.SqliteException`, carrying
+    a real `SqliteErrorCode` alongside the inherited `Message`.
+  - *Its use:* `catch (SqliteException ex)` — this lesson's real, first
+    place code depends on someone else's custom exception type, to
+    catch and report a real foreign-key-violation error (`SQLite Error
+    19`) distinctly from any other kind of failure.
+
+`FOREIGN KEY`/`INNER JOIN` are SQL syntax, not C# classes or methods —
+this lesson's own subject, given full treatment above in Terms
+Introduced and in the Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ComboBox` / `SelectedItem`**
+  - *What they are:* a dropdown restricted to one choice, and the
+    property holding whichever item is currently selected.
+  - *Implementation:* full treatment already given in
+    `Lesson-12-enums-and-combobox.md` and
+    `Lesson-08-selecteditem-and-two-way-binding.md`.
+  - *Its use:* the Supplier dropdown itself, alongside its new
+    `SelectedValue`/`SelectedValuePath` binding.
+- **`SqliteCommand`**
+  - *What it is:* one SQL statement, tied to a specific open
+    connection.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md`.
+  - *Its use:* the real `CREATE TABLE Suppliers`/`INNER JOIN` queries
+    this lesson adds, built the same way as every prior SQL command.
 
 ---
 

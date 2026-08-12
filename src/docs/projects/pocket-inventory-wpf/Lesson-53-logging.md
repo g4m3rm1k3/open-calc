@@ -32,18 +32,74 @@ attached console. Lesson 23a: `catch`, `Exception`.
   otherwise crash.
 
 **Objects and methods used**
-- **`Environment.NewLine`** — a `static`, read-only `string` holding the
-  correct line-ending sequence for whatever operating system the
-  program is actually running on (`\r\n` on Windows, `\n` elsewhere) —
-  used instead of a hardcoded `"\n"` so a log file's line endings are
-  always the ones native tools on that machine expect.
-- **`File.ReadAllText(path)`** — a `static` method that opens a file,
-  reads its entire contents into one `string`, and closes it — used
-  here once, to display the log file's real contents back for
-  verification. `File.AppendAllText` (Lesson 34's `StreamWriter`-based
-  writing, reappearing here in a different shape) and `DateTime.Now`'s
-  `"O"` round-trip format specifier are this lesson's own subject,
-  given full treatment below.
+- **`File.AppendAllText(path, contents)`**
+  - *What it is:* a `static` method that opens a file, adds text to the
+    end of its existing contents (creating the file first if it
+    doesn't exist yet), and closes it — unlike a write that replaces a
+    file's contents, this one accumulates.
+  - *Implementation:* `System.IO.File.AppendAllText`, called once per
+    logged line, each call independently opening and closing the file.
+  - *Its use:* every real line `FileLogger.Write` produces — proven,
+    across three separate, independent process runs, to accumulate all
+    three entries in one durable file rather than each process
+    overwriting the last.
+- **`Environment.NewLine`**
+  - *What it is:* a `static`, read-only `string` holding the correct
+    line-ending sequence for whatever operating system the program is
+    actually running on (`\r\n` on Windows, `\n` elsewhere).
+  - *Implementation:* a property on `System.Environment`.
+  - *Its use:* appended to the end of every line `FileLogger.Write`
+    writes, instead of a hardcoded `"\n"`, so the log file's line
+    endings are always the ones native tools on that machine expect.
+- **`DateTime.Now` with the `"O"` format specifier**
+  - *What it is:* the current local date and time, formatted with
+    `"O"` (round-trip) into a real, sortable, unambiguous timestamp
+    string — distinct from the `{0:d}` short-date format `PurchaseDate`
+    (Lesson 13) already used for display.
+  - *Implementation:* `DateTime.Now` is a `static` property;
+    `$"{DateTime.Now:O}"` applies the `"O"` format specifier inside
+    string interpolation.
+  - *Its use:* the leading timestamp on every real line `FileLogger.Write`
+    produces, proven, across three separate process runs, to record the
+    real, distinct moment each line was actually written.
+- **`FileLogger` / `LogLevel`**
+  - *What they are:* this lesson's own small, real logging class —
+    three public methods (`LogInformation`/`LogWarning`/`LogError`)
+    that each format and append one timestamped, leveled line, plus the
+    `enum` distinguishing the three levels.
+  - *Implementation:* a private `Write(LogLevel, string)` method,
+    combining `DateTime.Now:O`, the level, the message, and
+    `Environment.NewLine` into one line, written with
+    `File.AppendAllText`; `LogInformation`/`LogWarning`/`LogError` each
+    call it with a fixed `LogLevel`.
+  - *Its use:* wired into the real project's `App.xaml.cs`, called from
+    `App_DispatcherUnhandledException` so a real, unhandled crash
+    leaves a real, readable, leveled record on disk.
+- **`Application.DispatcherUnhandledException` / `DispatcherUnhandledExceptionEventArgs.Handled`**
+  - *What they are:* a real WPF event, raised on the `Application`
+    object whenever an exception escapes all the way up through a UI
+    event handler without being caught anywhere — the last point before
+    the entire app would otherwise crash — and the property on its
+    event args that decides what happens next.
+  - *Implementation:* subscribed in `App.xaml.cs`'s constructor
+    (`DispatcherUnhandledException += App_DispatcherUnhandledException;`);
+    setting `e.Handled = true` inside the handler tells WPF the
+    exception has been dealt with, keeping the app running instead of
+    crashing; leaving it `false` lets the crash proceed after logging.
+  - *Its use:* this project's real, final safety net — every unhandled
+    exception, from anywhere in the app, is logged via `FileLogger`
+    before the app decides whether to keep running or exit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`File.ReadAllText(path)`**
+  - *What it is:* a `static` method that opens a file, reads its entire
+    contents into one `string`, and closes it.
+  - *Implementation:* full treatment already given in
+    `Lesson-38-appdata-and-settings-persistence.md`.
+  - *Its use:* used here once per lab, purely to display the log file's
+    real contents back for verification, not as part of `FileLogger`
+    itself.
 
 ---
 

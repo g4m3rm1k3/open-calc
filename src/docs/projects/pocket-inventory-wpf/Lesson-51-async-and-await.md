@@ -34,18 +34,70 @@ Lesson 46: `DispatcherTimer`.
   returning `T`.
 
 **Objects and methods used**
-- **`System.Diagnostics.Stopwatch`** — a class for measuring real
-  elapsed wall-clock time. `Stopwatch.StartNew()` is a `static` factory
-  method: it constructs a new `Stopwatch` *and* immediately starts it
-  timing, in one call, returning the running instance — used instead of
-  `new Stopwatch()` followed by a separate `.Start()` call, which would
-  work identically but takes two lines to say the same thing.
-  `.Stop()` freezes the elapsed-time measurement without discarding it.
-  `.ElapsedMilliseconds` reads the accumulated time, as a whole number
-  of milliseconds, between the matching `StartNew()` and `.Stop()` —
-  this lesson's actual proof that the synchronous version genuinely
-  blocks for the real duration and the asynchronous version doesn't
-  block the UI thread while still taking the same real time to finish.
+- **`System.Diagnostics.Stopwatch`**
+  - *What it is:* a class for measuring real elapsed wall-clock time.
+  - *Implementation:* `Stopwatch.StartNew()` is a `static` factory
+    method — it constructs a new `Stopwatch` *and* immediately starts
+    it timing, in one call, returning the running instance, instead of
+    `new Stopwatch()` followed by a separate `.Start()` call. `.Stop()`
+    freezes the elapsed-time measurement without discarding it.
+    `.ElapsedMilliseconds` reads the accumulated time, as a whole
+    number of milliseconds, between the matching `StartNew()` and
+    `.Stop()`.
+  - *Its use:* this lesson's actual proof, in real milliseconds, that
+    the synchronous version genuinely blocks for the real duration and
+    the asynchronous version doesn't block the UI thread while still
+    taking the same real time to finish.
+- **`Thread.Sleep(int)`**
+  - *What it is:* pauses the *calling thread itself* for a given
+    number of milliseconds — genuinely, synchronously blocking, unlike
+    `Task.Delay`.
+  - *Implementation:* a `static` method on `System.Threading.Thread`.
+  - *Its use:* a deliberate stand-in for a slow, synchronous SQLite
+    call, chosen specifically because it has the identical effect on
+    the calling thread — this lesson's first, real proof that a
+    synchronous call freezes the entire UI thread, measured as zero
+    `DispatcherTimer` ticks during a real 3-second block.
+- **`Task.Delay(int)`**
+  - *What it is:* an awaitable, non-blocking wait — represents "some
+    number of milliseconds have not yet elapsed" as a real `Task`,
+    rather than occupying the calling thread until they have.
+  - *Implementation:* a `static` method on `System.Threading.Tasks.Task`,
+    returning a `Task` that completes once the given duration elapses.
+  - *Its use:* `await Task.Delay(3000)`, the identical duration as the
+    `Thread.Sleep(3000)` stand-in — this lesson's real, measured proof
+    (`0` timer ticks vs. `28`) that `await` yields the UI thread instead
+    of occupying it.
+- **`SqliteConnection.OpenAsync()` / `SqliteCommand.ExecuteReaderAsync()` / `SqliteDataReader.ReadAsync()`**
+  - *What they are:* real, awaitable equivalents of `Open()`,
+    `ExecuteReader()`, and `Read()` — each performs the identical
+    database work, but yields the calling thread while waiting instead
+    of blocking it.
+  - *Implementation:* async methods on `Microsoft.Data.Sqlite`'s
+    `SqliteConnection`/`SqliteCommand`/`SqliteDataReader`, each awaited
+    in turn inside `ItemRepository.GetAllAsync()`.
+  - *Its use:* the real conversion of `ItemRepository.GetAll()`
+    (Lesson 50) into `GetAllAsync()`, added alongside the existing
+    synchronous method rather than replacing it.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`DispatcherTimer`**
+  - *What it is:* a `Timer` that fires its `Tick` event on the UI
+    thread itself, at a set interval.
+  - *Implementation:* full treatment already given in
+    `Lesson-46-file-copy-and-dispatchertimer.md`.
+  - *Its use:* this lesson's real, measurable heartbeat for UI-thread
+    responsiveness — its tick count, before and after each blocking
+    call, is the actual evidence this lesson's proofs are built on.
+- **`SqliteConnection` / `SqliteCommand` / `SqliteDataReader`**
+  - *What they are:* the synchronous ADO.NET objects for opening a
+    SQLite connection, building a command, and reading rows back.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md`.
+  - *Its use:* `ItemRepository.GetAll()` (Lesson 50), the synchronous
+    method this lesson's `GetAllAsync()` is converted from, call by
+    call.
 
 ---
 

@@ -43,22 +43,37 @@ inheritance, base class/derived class.
   derived type it's holding.
 
 **Objects and methods used**
-- **`List<Lightbulb>`** — a real, generic, growable collection type from
-  .NET's base class library (`System.Collections.Generic`), used here
-  purely as a vehicle to hold several bulbs at once — this lesson's own
-  subject is what happens when they're looped over, not the list itself,
-  which gets its own full, from-scratch treatment in Lesson 6. `new
-  List<Lightbulb> { new Lightbulb(true), new SmartLightbulb(true) }` —
-  the `{ ... }` immediately after the constructor call is a **collection
-  initializer**: sugar that adds each listed value to the new list, in
-  order, right after it's constructed, equivalent to constructing an
-  empty list and calling `.Add(...)` once per value.
-- **`foreach (Lightbulb bulb in bulbs)`** — a loop that runs its body
-  once per element in `bulbs`, in order, binding `bulb` to the current
-  element each time — no manual index or `.Count` check needed, unlike a
-  plain `for` loop. `bulb`'s declared type here is `Lightbulb`, matching
-  the list's own element type, which is the exact mechanical reason this
-  unit's bug happens at all (see the Execution Trace below).
+- **`List<Lightbulb>`**
+  - *What it is:* a growable, ordered collection holding several bulbs
+    at once — the shape a real program actually stores objects in,
+    rather than one variable per object.
+  - *Implementation:* the generic type `System.Collections.Generic.List<T>`,
+    here with `T` fixed to `Lightbulb`. `new List<Lightbulb> { new
+    Lightbulb(true), new SmartLightbulb(true) }` uses a **collection
+    initializer** — the `{ ... }` immediately after the constructor
+    call adds each listed value to the new list, in order, right after
+    it's constructed, equivalent to constructing an empty list and
+    calling `.Add(...)` once per value. `List<T>` itself gets its own
+    full, from-scratch treatment in Lesson 6; used here only as a
+    vehicle, before that lesson.
+  - *Its use:* holds one plain `Lightbulb` and one `SmartLightbulb`
+    together, both stored in `Lightbulb`-typed slots — the exact setup
+    this lesson's bug (and its fix) depends on, since a mixed collection
+    accessed through its declared element type is precisely where the
+    difference between method hiding and polymorphism becomes visible.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment — what `Console` is, why it's
+    `static`, why there's no `Console` object — already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's two labs (the
+    `CS0108` warning run and the corrected `virtual`/`override` run)
+    comes from this same method, called on plain strings and
+    `$"..."`-interpolated ones exactly as before.
 
 ---
 

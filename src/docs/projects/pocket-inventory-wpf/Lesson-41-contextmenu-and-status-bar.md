@@ -31,10 +31,44 @@ triggers, the same idea this lesson extends to a third trigger.
   to group related items visually with no logic of its own.
 
 **Objects and methods used**
-- `ICommand` and `Command="{Binding ...}"` (Lesson 23) reappear here,
-  already given full treatment — brief reminder only, per the
-  Repetition Rule. `ContextMenu`/`PlacementTarget`/`StatusBar` are this
-  lesson's own subject, given full treatment below.
+- **`ContextMenu`**
+  - *What it is:* a popup menu shown on right-click.
+  - *Implementation:* `System.Windows.Controls.ContextMenu`, attached
+    to any element via that element's own `ContextMenu` property — a
+    separate popup root in its own right, not part of the normal
+    visual tree, which is exactly why it doesn't inherit `DataContext`
+    the way every other element in this project has.
+  - *Its use:* the real right-click Edit/Delete/Duplicate menu on each
+    grid row, reusing this project's already-proven `RelayCommand`s.
+    Full lab, real output, and both lenses in this lesson's first
+    Concept Unit.
+- **`PlacementTarget`**
+  - *What it is:* the element a `ContextMenu` was actually opened from.
+  - *Implementation:* a property on `ContextMenu`, reachable from
+    inside a `MenuItem` via `{Binding PlacementTarget.DataContext,
+    RelativeSource={RelativeSource AncestorType=ContextMenu}}` — the
+    real, working fix for `ContextMenu`'s own broken `DataContext`
+    inheritance.
+  - *Its use:* the exact mechanism this lesson's `MenuItem`s use to
+    reach the real, selected `InventoryItem` despite the popup-root
+    problem.
+- **`StatusBar`**
+  - *What it is:* a WPF control conventionally docked at the bottom of
+    a window, showing brief, live status information.
+  - *Implementation:* `System.Windows.Controls.Primitives.StatusBar`,
+    holding ordinary bindable content (a `TextBlock` bound to
+    `Items.Count`, for instance).
+  - *Its use:* the live item-count footer this lesson adds.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ICommand` (`Command="{Binding ...}"`)**
+  - *What it is:* the built-in "something executable, askable in
+    advance" interface.
+  - *Implementation:* full treatment already given in
+    `Lesson-23-icommand-relaycommand-and-mvvm.md`.
+  - *Its use:* the same real commands, now reachable a third way
+    (menu, in addition to button and keyboard shortcut).
 
 ---
 

@@ -41,9 +41,37 @@ panel, and the SQLite table shape together, in one lesson.
   real type (here, `decimal`), with no converter code written by hand.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject — `decimal`,
-  `ToString("C")`, and `CultureInfo` are given full treatment in the
-  Concept Units below.
+- **`decimal`**
+  - *What it is:* a 128-bit numeric type built specifically for money
+    and other values where exact base-10 arithmetic matters — distinct
+    from `double`/`float`, which store numbers in binary and cannot
+    represent most decimal fractions exactly.
+  - *Implementation:* `System.Decimal`, a real .NET struct (a value
+    type, per `csharp-struct-value-semantics.md`), written with an `m`
+    suffix on a literal (`19.99m`) to tell the compiler it's a
+    `decimal` literal, not a `double`.
+  - *Its use:* `InventoryItem.Value` — this lesson's own subject,
+    proven directly against a real, captured `double` representation
+    error in this lesson's first Concept Unit.
+- **`decimal.ToString("C")`**
+  - *What it is:* formats a number as real currency — a symbol,
+    thousands separators, and a fixed number of decimal places —
+    instead of its bare digits.
+  - *Implementation:* the `"C"` **format string**, resolved against a
+    `CultureInfo` (explicit, or the current thread's own default if
+    none is given) to decide the actual symbol and separator
+    characters used.
+  - *Its use:* displaying `Value` as `$1,299.00` rather than a bare
+    `1299`.
+- **`CultureInfo`**
+  - *What it is:* a .NET type describing region-specific formatting
+    rules — currency symbol, decimal separator, thousands separator.
+  - *Implementation:* `System.Globalization.CultureInfo`. Passed
+    explicitly to `ToString("C", culture)` to force one specific
+    region's formatting regardless of the machine's own default, or
+    omitted to use the current thread's culture automatically.
+  - *Its use:* this lesson's own proof that the identical `decimal`
+    value renders differently depending on which culture formats it.
 
 ---
 

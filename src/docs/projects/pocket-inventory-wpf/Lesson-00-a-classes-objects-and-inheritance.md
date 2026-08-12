@@ -68,15 +68,22 @@ exactly that and explains everything from zero. Nothing about C# or
   variable and a multi-line `if`/`else` just to set it.
 
 **Objects and methods used**
-- **`Console`** — a `static` class from .NET's base class library
-  representing this program's connection to the terminal it's running
-  in. `static` means there is no `Console` *object* anywhere — you never
-  write `new Console()` — because a running program has exactly one
-  console, not a variable number of separate `Console` objects each with
-  their own text. `Console.WriteLine(...)` is a `static` method on it:
-  called on the class itself, not on an instance, for the same reason.
-  Every real output shown in this lesson's labs comes from this one
-  method, called with a plain string or a `$"..."`-interpolated one.
+- **`Console`**
+  - *What it is:* this program's connection to the terminal it's running
+    in — the thing that actually shows text on screen when a console
+    app runs.
+  - *Implementation:* a `static` class in .NET's base class library
+    (`System.Console`). `static` means there is no `Console` *object*
+    anywhere — nothing in this lesson ever writes `new Console()` —
+    because a running program has exactly one console, not a variable
+    number of separate `Console` objects each holding their own text.
+    `WriteLine(string)` is a `static` method on it: called on the class
+    itself (`Console.WriteLine(...)`), never on an instance, for the
+    same reason.
+  - *Its use:* every real output shown in this lesson's three labs comes
+    from this one method, called with a plain string or a
+    `$"..."`-interpolated one — the only way any of this lesson's real,
+    captured output actually reaches the screen.
 
 ---
 

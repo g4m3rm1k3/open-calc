@@ -37,11 +37,44 @@ there; picked up again in more depth in a later lesson).
   for types you don't own or can't inherit from.
 
 **Objects and methods used**
-- `Console.WriteLine` and string interpolation both reappear from Lesson
-  00a, already given full treatment — brief reminder only, per the
-  Repetition Rule. `struct`/`class` copy semantics and extension methods
-  are this lesson's own subject, given full treatment in the Concept
-  Units below.
+- **`string`**
+  - *What it is:* C#'s built-in text type — used constantly already
+    (every `InventoryItem.Name`, `Category`, `Location`), but never
+    before checked for what kind of type it actually *is*.
+  - *Implementation:* `System.String`, a reference type marked
+    `sealed` — no class may ever inherit from it, for any reason,
+    proven directly in this lesson by a real `CS0509` compiler error
+    the moment `class BlankableString : string` is attempted.
+  - *Its use:* the concrete example this lesson's second unit builds an
+    extension method for, specifically *because* real inheritance is
+    closed off to it.
+- **`string.IsNullOrWhiteSpace(string?)`**
+  - *What it is:* a check for whether a string is empty, `null`, or
+    contains only whitespace characters — three different "not really
+    any real text" cases collapsed into one true/false answer.
+  - *Implementation:* a `static` method on `System.String`, taking one
+    `string?` and returning `bool` — no object of its own, called on
+    the class itself (`string.IsNullOrWhiteSpace(...)`), not on an
+    instance.
+  - *Its use:* the entire real body of this lesson's `IsBlank()`
+    extension method (`return string.IsNullOrWhiteSpace(value);`) —
+    `IsBlank()` exists purely to make this exact check callable with
+    instance-method syntax.
+
+`struct`/`class` copy semantics and extension methods are this lesson's
+own subject — the language mechanism itself, not an external class or
+method — given full treatment in the Concept Units below and in Terms
+Introduced, above.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's two labs comes
+    from this same method, called with `$"..."`-interpolated strings.
 
 ---
 

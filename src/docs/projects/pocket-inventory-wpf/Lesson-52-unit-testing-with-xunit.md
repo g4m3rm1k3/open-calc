@@ -33,10 +33,42 @@ instinct applies to test assertions).
   happened — when it doesn't hold.
 
 **Objects and methods used**
-- The `Repository` class (Lesson 50) reappears here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  `[Fact]` and `Assert` are this lesson's own subject, given full
-  treatment below.
+- **`Assert.Equal` / `Assert.Single` / `Assert.Empty`**
+  - *What they are:* xUnit's own `static` assertion methods — each
+    checks one specific real condition and produces a structured
+    failure message, naming exactly what was expected and what
+    actually happened, when it doesn't hold.
+  - *Implementation:* `Assert.Equal(expected, actual)` compares two
+    values and fails with both printed if they differ; `Assert.Single(collection)`
+    fails unless the collection contains exactly one item, and returns
+    that item; `Assert.Empty(collection)` fails unless the collection
+    contains none.
+  - *Its use:* every `[Fact]` method in this lesson's two real test
+    projects — first against `2 + 2`, then against `ItemRepository`'s
+    own `Add`/`GetAll`/`Delete`, confirming a row was inserted
+    (`Assert.Single`), correctly counted, or fully removed
+    (`Assert.Empty`) after each real database call.
+- **`dotnet test`**
+  - *What it is:* the .NET CLI command that discovers and runs every
+    `[Fact]`-marked method in a project automatically.
+  - *Implementation:* reappearing shape (`dotnet run`/`dotnet publish`,
+    already familiar) — this time with no test named directly on the
+    command line; it finds every `[Fact]` itself.
+  - *Its use:* run against both this lesson's throwaway `XunitLab` and
+    the real `RepositoryTestLab`, producing this lesson's own real
+    Passed/Failed console output, including one deliberately wrong test
+    to prove a real failure is reported correctly.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ItemRepository`**
+  - *What it is:* this project's own data-access class, owning every
+    `SqliteConnection`-based CRUD method.
+  - *Implementation:* full treatment already given in
+    `Lesson-50-refactor-architecture-review-and-a-retrospective.md`.
+  - *Its use:* the real object under test in this lesson's second unit
+    — proven correct exactly once, by hand, in Lesson 50's own labs;
+    given its first permanent, automated tests here.
 
 ---
 

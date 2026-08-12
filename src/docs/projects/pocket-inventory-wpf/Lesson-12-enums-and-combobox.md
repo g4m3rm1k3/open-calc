@@ -53,10 +53,40 @@ class already follows. Lesson 9/10: `EnsureDatabaseCreated`,
   exactly, throwing if none does.
 
 **Objects and methods used**
-- `enum` itself (Lesson 5a) and `Enum.GetValues` reappear here, already
-  given full treatment — brief reminder only, per the Repetition Rule.
-  `ComboBox`, `enumValue.ToString()`, and `Enum.Parse<T>` are this
-  lesson's own subject, given full treatment below.
+- **`ComboBox`**
+  - *What it is:* a dropdown control restricted to choosing exactly one
+    item from whatever list it's given — unlike `TextBox`, no
+    arbitrary typed value is ever possible.
+  - *Implementation:* `System.Windows.Controls.ComboBox`. Its
+    `ItemsSource` accepts any bound collection (here, every value
+    `Enum.GetValues` returns); `SelectedItem` (the same property
+    `ListBox` has, Lesson 8) holds whichever one the user picked.
+  - *Its use:* `CategoryComboBox`, bound to every `Category` member —
+    the closed-set-of-choices UI this lesson's `enum` needs, replacing
+    a `TextBox` that could otherwise accept any typo or blank. Full
+    lab, real output, and both lenses in this lesson's second Concept
+    Unit.
+- **`enumValue.ToString()` / `Enum.Parse<T>(string)`**
+  - *What they are:* the two matched, opposite-direction operations
+    every enum member needs to be saved as text and read back
+    correctly — a real, if miniature, serialization pair.
+  - *Implementation:* every enum member automatically has `.ToString()`,
+    returning its declared name as a string (e.g. `Category.Tools.ToString()`
+    → `"Tools"`). `Enum.Parse<T>(string)` is the reverse: given a
+    string and an enum type, finds the member whose name matches
+    exactly, throwing if none does.
+  - *Its use:* `.ToString()` when saving `Category` into SQLite's
+    `TEXT`-typed column (SQLite has no native enum column type);
+    `Enum.Parse<Category>(...)` when reading that same column back out
+    of a `SqliteDataReader` row into a real `Category` value.
+
+`enum` itself and `Enum.GetValues` reappear from
+`Lesson-05-a-enum-a-closed-set-of-named-values.md`, already given full
+treatment there — brief reminder only, per the Repetition Rule.
+`Array`, the general, non-generic collection type `Enum.GetValues`
+returns, is narrow enough to stay a brief mention rather than its own
+full entry — this lesson never calls a second member of it beyond
+enumerating it with `foreach`.
 
 ---
 

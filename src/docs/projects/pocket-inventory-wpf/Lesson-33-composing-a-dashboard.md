@@ -27,10 +27,42 @@ this dashboard displays.
   direct demonstration, not just a definition.
 
 **Objects and methods used**
-- `SUM()`, `GROUP BY`, and `ORDER BY ... LIMIT` (Lessons 30–32)
-  reappear here, already given full treatment — brief reminder only,
-  per the Repetition Rule; this lesson composes them, it doesn't
-  introduce new supporting cast.
+- **`object.ReferenceEquals(object?, object?)`**
+  - *What it is:* a check for whether two variables point at the
+    literal same object in memory.
+  - *Implementation:* full treatment already given in
+    `Lesson-27-deep-copy-vs-reference-copy.md`.
+  - *Its use:* this lesson's own real, decisive proof that
+    `Frame.GoBack()` returns to the *exact same* cached `Page`
+    instance, not a freshly-constructed one — the load-bearing fact
+    this whole lesson's "compose, don't reload" design depends on.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Frame.GoBack()` / `Frame.CanGoBack`**
+  - *What they are:* pops the back stack and navigates to the previous
+    page, and the live check for whether that's currently possible.
+  - *Implementation:* full treatment already given in
+    `Lesson-04-the-navigation-stack.md`.
+  - *Its use:* the exact mechanism this lesson verifies actually
+    preserves `InventoryViewModel`'s state across a Dashboard visit.
+- **`Dispatcher.Invoke` / `DispatcherPriority.ContextIdle`**
+  - *What they are:* WPF's UI-thread message queue, and the mechanism
+    for scheduling work onto it at a specific priority.
+  - *Implementation:* full treatment already given in
+    `Lesson-23-icommand-relaycommand-and-mvvm.md`.
+  - *Its use:* the same `Pump()`/`ContextIdle` pattern used earlier, to
+    let a binding-driven navigation settle before this lesson's own
+    `ReferenceEquals` assertions run.
+- **`SUM()` / `GROUP BY` / `ORDER BY ... LIMIT`**
+  - *What they are:* the SQL aggregate/grouping/ordering machinery
+    behind every number this dashboard displays.
+  - *Implementation:* full treatment already given in
+    `Lesson-30-sum-and-aggregate-queries.md`,
+    `Lesson-31-group-by.md`, and `Lesson-32-order-by-and-limit.md`.
+  - *Its use:* not used directly in this lesson's own code — this
+    lesson composes the existing properties those queries already
+    populate, introducing zero new SQL.
 
 ---
 

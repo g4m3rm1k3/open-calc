@@ -65,15 +65,59 @@ button), whose padding this lesson also centralizes.
   silently falling back to a wrong default.
 
 **Objects and methods used**
-- No new supporting cast beyond this lesson's own subject —
-  `SolidColorBrush`, `Style`/`Setter`, and `StaticResource`'s lookup
-  chain are this lesson's own subject, given full treatment in the
-  Concept Units below. This lesson's own real, tested content is also
-  available as two standalone, project-independent concept files in
-  the shared catalog — `wpf-styles-and-setters.md` and
-  `wpf-resourcedictionary-and-staticresource.md` — for any future
-  lesson (in this project or any other) that needs a brief reminder
-  instead of re-deriving this material from scratch.
+- **`Style` / `Setter`**
+  - *What it is:* a named bundle of property-value pairs, applied to
+    any element of a matching type that opts in — a `Setter` is one
+    property-value pair inside it.
+  - *Implementation:* `System.Windows.Style`, keyed with `x:Key` and
+    restricted to one `TargetType`; each child `System.Windows.Setter`
+    names one `Property` and the `Value` to assign it. Applying a
+    `Style` to an element is opt-in — `Style="{StaticResource ...}"` —
+    never automatic just because the `Style` exists somewhere in scope.
+  - *Its use:* `HeaderTitleStyle`/`ToolbarButtonStyle`, defined once in
+    `App.xaml`, replace every hand-typed `FontSize`/`FontWeight`/
+    `Padding` this project had scattered across `MainWindow.xaml` and
+    `HomePage.xaml`. Full lab, real output, and both lenses in this
+    lesson's first Concept Unit — also available as a standalone,
+    project-independent concept file, `wpf-styles-and-setters.md`.
+- **`SolidColorBrush`**
+  - *What it is:* the real object type underneath any WPF color
+    property — a plain hex string like `"#2E5945"` is silently
+    converted into one of these by XAML.
+  - *Implementation:* `System.Windows.Media.SolidColorBrush`. Giving
+    one an explicit `x:Key` (`<SolidColorBrush x:Key="BrandColorBrush"
+    Color="#2E5945" />`) makes that same brush *object* referenceable
+    and reusable by name, instead of an equivalent-but-separate one
+    being silently created everywhere `#2E5945` was typed directly.
+  - *Its use:* `BrandColorBrush`, this project's one, centrally-defined
+    brand color, referenced from the header `Border`'s `Background`.
+- **`StaticResource`**
+  - *What it is:* a markup extension that resolves a resource
+    reference once, at the moment the XAML loads.
+  - *Implementation:* `{StaticResource KeyName}` — curly-brace **markup
+    extension** syntax telling the XAML parser "resolve this as an
+    expression," not a literal string. Searches outward from the
+    referencing element through each enclosing scope, up to
+    `Application`, using the first `x:Key` match found; "static" means
+    this lookup happens once, not re-checked later.
+  - *Its use:* every value this lesson extracted —
+    `{StaticResource BrandColorBrush}`,
+    `{StaticResource HeaderTitleStyle}`,
+    `{StaticResource ToolbarButtonStyle}` — replacing every hardcoded
+    equivalent in `MainWindow.xaml`/`HomePage.xaml`. Full lab, real
+    output, and both lenses in this lesson's third Concept Unit — also
+    available as a standalone, project-independent concept file,
+    `wpf-resourcedictionary-and-staticresource.md`.
+- **`XamlParseException`**
+  - *What it is:* the error WPF throws at startup when a XAML file
+    references something — like a misspelled resource key — that can't
+    actually be resolved.
+  - *Implementation:* `System.Windows.Markup.XamlParseException`,
+    thrown before the window ever opens, naming the specific resource
+    key it couldn't find.
+  - *Its use:* triggered directly, on purpose, in this lesson's "What
+    Breaks Without This" — misspelling `ToolbarButtonStyle` produces a
+    real, captured instance of this exact exception.
 
 ---
 

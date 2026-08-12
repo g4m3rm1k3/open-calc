@@ -39,10 +39,17 @@ together, not overriding each other.
   declaration; a lambda-holding variable cannot). Full treatment, an
   isolated lab, and real verified output: `csharp-local-functions.md`.
 
-**Objects and methods used**
-- `Predicate<T>` and `ICollectionView.Filter` (Lesson 19) reappear
-  here, already given full treatment — brief reminder only, per the
-  Repetition Rule.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Predicate<T>` / `ICollectionView.Filter`**
+  - *What they are:* the delegate type describing "does this one item
+    pass," and the `ICollectionView` property that applies one to every
+    item in a view.
+  - *Implementation:* full treatment already given in
+    `Lesson-19-predicates-and-live-search.md`.
+  - *Its use:* this lesson's own `Matches` local function is exactly
+    the `Predicate<InventoryItem>` shape, now testing three conditions
+    combined with `&&` instead of one.
 
 ---
 

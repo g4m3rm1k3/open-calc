@@ -38,11 +38,27 @@ Lesson 0a: class, object, inheritance, base/derived class. Lesson 0b:
   can implement any number of interfaces, but inherit from only one
   base class (`abstract` or not).
 
-**Objects and methods used**
-- No new supporting cast beyond this lesson's own subject —
-  `List<Lightbulb>`, the collection-initializer syntax, `foreach`, and
-  `Console.WriteLine` all reappear from Lessons 0a/0b, which already
-  gave each full treatment.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`List<Lightbulb>`**
+  - *What it is:* a growable, ordered collection holding several bulbs
+    at once.
+  - *Implementation:* full treatment — the generic type itself, the
+    collection-initializer syntax used to build one inline — already
+    given in `Lesson-00-b-polymorphism-virtual-and-override.md`.
+  - *Its use:* holds a `SmartLightbulb` and a `ColorLightbulb` together
+    in this lesson's third lab, proving `Announce()` (shared, on the
+    `abstract` base) and `Describe()` (required, per derived class)
+    both work correctly through the same `foreach` shape Lesson 0b
+    already established.
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output and every real compiler error shown in
+    this lesson's three labs is captured directly from this method's
+    own output, or from `dotnet run`'s own error text.
 
 ---
 

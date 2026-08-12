@@ -35,10 +35,26 @@ established by this course's own Terms sections).
   instead of reaching for whichever panel was used most recently.
 
 **Objects and methods used**
-- **`DockPanel`**, **`WrapPanel`**, **`Canvas`**, **`UniformGrid`** —
-  four of WPF's standard layout panels, none of which this project's
-  own screens use — full treatment in each unit below, each backed by
-  its own standalone concept file per this course's shared catalog.
+- **`DockPanel`** — arranges children against the edges of its own
+  space, in declaration order, with the last child filling whatever
+  remains. Full lab, real output, mechanical walkthrough, both lenses:
+  `wpf-dockpanel.md`.
+- **`WrapPanel`** — flows children in a line that wraps onto a new row
+  (or column) once it runs out of room, unlike `Grid`/`StackPanel`.
+  Full lab, real output, mechanical walkthrough, both lenses:
+  `wpf-wrappanel.md`.
+- **`Canvas`** — places children at exact, explicit `(Left, Top)`
+  coordinates instead of computing a position, the deliberate exception
+  among WPF's layout panels. Full lab, real output, mechanical
+  walkthrough, both lenses: `wpf-canvas.md`.
+- **`UniformGrid`** — divides its space into `Rows × Columns`
+  equal-sized cells and fills them in declaration order automatically,
+  with no `RowDefinitions`/`ColumnDefinitions` block. Full lab, real
+  output, mechanical walkthrough, both lenses: `wpf-uniformgrid.md`.
+- None of these four are used by this project's own real screens —
+  `Grid`/`StackPanel` remain what Pocket Inventory actually builds
+  with; this lesson exists so that choice stays deliberate, not
+  default.
 
 ---
 

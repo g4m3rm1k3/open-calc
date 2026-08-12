@@ -29,10 +29,38 @@ the direct contrast this lesson draws against.
   `IList<InventoryItem>`.
 
 **Objects and methods used**
-- `SelectedItem`/`DataGrid` (Lessons 8, 16) reappear here, already
-  given full treatment — brief reminder only, per the Repetition Rule.
-  `SelectionMode`/`SelectedItems`/`IList` are this lesson's own
-  subject, given full treatment below.
+- **`DataGrid.SelectionMode`**
+  - *What it is:* controls whether a selectable control allows one
+    selected item or several at once.
+  - *Implementation:* an enum-backed property; `Single` allows one row,
+    `Extended` (proven this lesson to already be `DataGrid`'s own real
+    default) supports Ctrl-click and Shift-click for multiple.
+  - *Its use:* confirmed, not assumed — this lesson's own real proof
+    that multi-selection already worked before any code changed it.
+- **`SelectedItems` / `IList`**
+  - *What they are:* the plural counterpart to `SelectedItem` — a real,
+    live collection of every currently selected row — and the actual,
+    non-generic collection type it returns.
+  - *Implementation:* `DataGrid.SelectedItems` returns
+    `System.Collections.IList`, a collection of plain `object`s, not a
+    strongly-typed `IList<InventoryItem>` — each element needs an
+    explicit cast to use as a real `InventoryItem`.
+  - *Its use:* this lesson's own real, correctly-typed handle on
+    "everything currently selected," proven with 2 of 3 lab items
+    selected, deliberately built with nothing yet acting on it (Lesson
+    43 does). Full lab, real output, and both lenses in this lesson's
+    own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SelectedItem` / `DataGrid`**
+  - *What they are:* the property holding one currently-selected item,
+    and the table control this lesson extends.
+  - *Implementation:* full treatment already given in
+    `Lesson-08-selecteditem-and-two-way-binding.md` and
+    `Lesson-16-the-datagrid-control.md`.
+  - *Its use:* named here only as the direct, singular contrast this
+    lesson's plural `SelectedItems` is drawn against.
 
 ---
 

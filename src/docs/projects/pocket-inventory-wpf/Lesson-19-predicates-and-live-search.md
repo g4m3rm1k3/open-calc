@@ -27,10 +27,35 @@ updates already proven for `{Binding}`.
   `Predicate<object>`, since a view can hold any kind of item.
 
 **Objects and methods used**
-- `ICollectionView` (Lesson 17) and `delegate` (Lesson 6b) reappear
-  here, already given full treatment — brief reminder only, per the
-  Repetition Rule. `ICollectionView.Filter` and `Predicate<T>` are
-  this lesson's own subject, given full treatment below.
+- **`ICollectionView.Filter`**
+  - *What it is:* a property accepting a function; every item in the
+    view is passed to it, and only items the function returns `true`
+    for stay visible — nothing is removed, deleted, or copied out of
+    the underlying collection.
+  - *Implementation:* a `Predicate<object>`-typed property on
+    `ICollectionView` (Lesson 17). Assigning it — or reassigning it,
+    or calling `.Refresh()` afterward — re-evaluates every item in the
+    view against the new function.
+  - *Its use:* `GroupedItems.Filter = item => ((InventoryItem)item).Name.Contains(searchText)`
+    — this lesson's own live, narrowing search, coexisting with
+    grouping (Lesson 17) and sorting (Lesson 18) on the exact same
+    view. Full lab, real output, and both lenses in this lesson's own
+    Concept Unit.
+- **`Predicate<T>`**
+  - *What it is:* a built-in delegate type — a function taking one `T`
+    and returning `bool`.
+  - *Implementation:* `System.Predicate<T>`, part of the same "ready-
+    made delegate signature" family as `Action`/`Func` (Lesson 4).
+    `Filter`'s own real type is specifically `Predicate<object>`, not
+    `Predicate<InventoryItem>`, since a view can hold any kind of item.
+  - *Its use:* the exact type a lambda assigned to `Filter` has to
+    match — read directly, not constructed by hand.
+
+`ICollectionView` reappears from
+`Lesson-17-collectionviewsource-and-grouping.md`; the `delegate`
+mechanism reappears from
+`Lesson-06-b-custom-delegates-and-events.md` — both already given full
+treatment there, brief reminder only, per the Repetition Rule.
 
 ---
 

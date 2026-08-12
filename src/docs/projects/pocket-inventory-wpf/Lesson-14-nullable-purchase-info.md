@@ -46,10 +46,38 @@ detail panel, and the SQLite table shape together.
   representing "no date chosen" as `null`, not a fake sentinel date.
 
 **Objects and methods used**
-- `DateTime` (Lesson 1) reappears here, already given full treatment —
-  brief reminder only, per the Repetition Rule. `Nullable<T>`/`DateTime?`
-  and `DatePicker` are this lesson's own subject, given full treatment
-  below.
+- **`Nullable<T>` (`DateTime?`)**
+  - *What it is:* a wrapper that lets a value type (`DateTime`, `int`,
+    `decimal` — none of which can be `null` on their own) genuinely
+    hold "no value at all," distinct from faking it with a sentinel
+    like `DateTime.MinValue`.
+  - *Implementation:* `System.Nullable<T>`, a generic `struct`.
+    `DateTime?` is shorthand for `Nullable<DateTime>` — the `?` here
+    is a **nullable value type** annotation, a genuinely different
+    mechanism from the nullable *reference* type `?` on
+    `PropertyChangedEventHandler?` (Lesson 7), despite the identical
+    character. `.HasValue` (`bool`) reports whether it currently holds
+    a real value; `.Value` reads the wrapped value, throwing if
+    accessed while `HasValue` is `false`.
+  - *Its use:* `InventoryItem.PurchaseDate`, typed `DateTime?` — this
+    lesson's own subject, proven directly against a real `CS0037`
+    compiler error confirming a plain `DateTime` can't hold `null` at
+    all. Full lab, real output, and both lenses in this lesson's first
+    Concept Unit.
+- **`DatePicker`**
+  - *What it is:* a WPF control for picking a calendar date.
+  - *Implementation:* `System.Windows.Controls.DatePicker`. Its own
+    `SelectedDate` property is itself genuinely `DateTime?` — natively
+    representing "no date chosen" as `null`, not a fake sentinel date,
+    the same "might not exist" language this lesson's `Nullable<T>`
+    speaks.
+  - *Its use:* bound to `PurchaseDate` in the Add row and detail panel,
+    including the ability to clear it back to `null`. Full lab, real
+    output, and both lenses in this lesson's second Concept Unit.
+
+`System.DateTime` reappears from
+`Lesson-01-your-first-wpf-window.md`, already given full treatment
+there — brief reminder only, per the Repetition Rule.
 
 ---
 

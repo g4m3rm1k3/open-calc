@@ -83,14 +83,51 @@ explained from zero, even the ones that look familiar.
   named snapshot of everything staged.
 
 **Objects and methods used**
-- **`Console.WriteLine`** — used in this lesson's own throwaway console
-  app; already given full treatment in Lesson 0a, which this lesson
-  follows in reading order — brief reminder only, per the Repetition
-  Rule.
-- No other external supporting cast: this lesson's own subject *is* the
-  toolchain (the SDK, the CLR, `.csproj` settings, the WPF project
-  template) — everything else it names gets full treatment in its own
-  Terms glossary above, not deferred to this section.
+- **`Console`**
+  - *What it is:* the running program's connection to the terminal it's
+    printing to.
+  - *Implementation:* a `static` class in .NET's base class library
+    (`System.Console`); `WriteLine(string)` is a `static` method on it,
+    called on the class itself, never on an instance.
+  - *Its use:* every real output shown in this lesson's console labs
+    (Concept Units 1, 3, 4) comes from this one method — the direct C#
+    equivalent of Python's `print(...)`, used throughout to make each
+    claim about typing behavior checkable, not just asserted.
+- **`Window`**
+  - *What it is:* the C# class a WPF application's top-level, movable,
+    closable screen actually is.
+  - *Implementation:* `System.Windows.Window`. `<Window ...>` in XAML
+    (Concept Unit 7) is not a convention or a comment — it directly
+    means "create one instance of this real .NET class"; every
+    attribute on the tag (`Title`, `Height`, `Width`) is a property
+    assignment on that instance, the same as writing
+    `window.Title = "...";` in C#.
+  - *Its use:* `MainWindow.xaml`'s own root element, scaffolded by
+    `dotnet new wpf` — the object this entire lesson's final visible
+    result (a real window showing text) is built inside of.
+- **`Grid`**
+  - *What it is:* a layout container — an element whose job is arranging
+    other elements inside it, not displaying content of its own.
+  - *Implementation:* `System.Windows.Controls.Grid`, scaffolded empty
+    (`<Grid></Grid>`) inside `MainWindow.xaml`'s `Window` tag. This
+    lesson uses it only as an empty container to place one `TextBlock`
+    into; its real subject — rows, columns, and the visual tree — is
+    Lesson 2's own, full treatment.
+  - *Its use:* holds this lesson's one visible `TextBlock`, centered,
+    as `Window`'s single child.
+- **`TextBlock`**
+  - *What it is:* the basic WPF control for displaying a run of text on
+    screen — the closest WPF equivalent to a printed console line,
+    except permanent and visible rather than a line sent to a terminal.
+  - *Implementation:* `System.Windows.Controls.TextBlock`. Its `Text`
+    property holds the string actually displayed; `FontSize` (a
+    `double`) controls text size; `HorizontalAlignment`/
+    `VerticalAlignment` (each a closed, named `enum` value — `Center`,
+    here) position it within whatever space its parent (the `Grid`)
+    gives it.
+  - *Its use:* `<TextBlock Text="Pocket Inventory is running." ... />`
+    is this lesson's entire visible deliverable — the first real,
+    on-screen proof this project's toolchain actually works end to end.
 
 ---
 

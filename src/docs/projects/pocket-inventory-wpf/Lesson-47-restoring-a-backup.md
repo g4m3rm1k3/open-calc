@@ -31,10 +31,31 @@ unchanged, reused here exactly as it already exists.
   quietly holding.
 
 **Objects and methods used**
-- `SqliteConnection`/`File.Copy` (Lessons 9, 25) reappear here, already
-  given full treatment — brief reminder only, per the Repetition Rule.
-  `ClearAllPools()` is this lesson's own subject, given full treatment
-  below.
+- **`SqliteConnection.ClearAllPools()`**
+  - *What it is:* forces every pooled native SQLite connection closed
+    for real, releasing any file handles they're still quietly
+    holding.
+  - *Implementation:* a `static` method on
+    `Microsoft.Data.Sqlite.SqliteConnection` — necessary because
+    ADO.NET providers keep underlying native connections open and
+    reusable behind the scenes by default, even after a C#
+    `SqliteConnection` object is disposed.
+  - *Its use:* this lesson's own subject — called before `File.Copy`
+    overwrites the live database file, proven directly (both ways,
+    with and without it) to be the real, required fix for a restore
+    that otherwise silently fails to take effect. Full lab, real
+    output, and both lenses in this lesson's own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SqliteConnection` / `File.Copy`**
+  - *What they are:* a real, held connection to a SQLite database file,
+    and the method that copies a file to a new path.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md` and
+    `Lesson-25-storing-photos-by-path.md`.
+  - *Its use:* the same connection and copy mechanisms as before, now
+    combined to overwrite the live database with a chosen backup.
 
 ---
 

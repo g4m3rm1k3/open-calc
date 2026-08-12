@@ -30,10 +30,46 @@ has.
   with `ExecuteScalar()` instead of `ExecuteReader()`.
 
 **Objects and methods used**
-- `SqliteCommand`/`ExecuteReader()` (Lessons 9, 10) reappear here,
-  already given full treatment — brief reminder only, per the
-  Repetition Rule. `SUM()` and `ExecuteScalar()` are this lesson's own
-  subject, given full treatment below.
+- **`SqliteCommand.ExecuteScalar()`**
+  - *What it is:* runs a query whose entire real result is a single
+    value — a **scalar query** — and returns exactly that one value,
+    rather than a row-by-row reader.
+  - *Implementation:* returns `object?` — `null` if the command itself
+    produced no result at all, or a real `DBNull` (distinct from C#
+    `null`, Lesson 14) if the SQL result genuinely was `NULL` (which a
+    bare `SUM()` over an empty table is, proven directly this lesson,
+    not `0`).
+  - *Its use:* `SELECT SUM(Value) FROM Items` — reading the one real
+    total number back, and, in the real project, guarding against the
+    genuine `DBNull` case with `result is DBNull ? 0m :
+    Convert.ToDecimal(result)`. Full lab, real output, and both lenses
+    in this lesson's own Concept Unit.
+- **`Convert.ToDecimal(object)`**
+  - *What it is:* converts a boxed value of unknown-but-compatible type
+    into a real `decimal`.
+  - *Implementation:* a `static` method on `System.Convert`. Throws a
+    real, immediate exception if given a genuine `DBNull.Value` —
+    proven directly this lesson, which is exactly why the real code
+    checks `is DBNull` first rather than calling this unconditionally.
+  - *Its use:* the real project's `GetTotalValue()`, converting
+    `ExecuteScalar()`'s boxed `object` result into the `decimal` the
+    rest of the app actually needs.
+
+`SUM()` is SQL syntax, not a C# class or method — this lesson's own
+subject, given full treatment above in Terms Introduced and in the
+Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SqliteCommand` / `ExecuteReader()`**
+  - *What they are:* one SQL statement tied to an open connection, and
+    the method that runs a query returning rows.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md` and
+    `Lesson-10-reading-rows-back-into-objects.md`.
+  - *Its use:* named here only by contrast against this lesson's own
+    `ExecuteScalar()` — a `SELECT SUM(...)` never needs a row-by-row
+    reader.
 
 ---
 

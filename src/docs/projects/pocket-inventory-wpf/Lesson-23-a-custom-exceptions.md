@@ -35,13 +35,16 @@ shape applies here).
   type (or a base type of it).
 
 **Objects and methods used**
-- **`System.Exception`** — the base class every exception type in .NET
-  ultimately derives from, including this lesson's own custom one; its
-  `Message` property (a `string` describing what went wrong) and its
-  constructor chain (a derived exception's constructor typically calls
-  `: base(message)` to store that text) are inherited automatically —
-  this lesson's own custom exception class is this lesson's real
-  subject, given full treatment below.
+- **`System.Exception`**
+  - *What it is:* the base class every exception type in .NET
+    ultimately derives from.
+  - *Implementation:* declares a `Message` property (a `string`
+    describing what went wrong) and a constructor chain — a derived
+    exception's own constructor typically calls `: base(message)` to
+    store that text, inherited automatically rather than re-declared.
+  - *Its use:* the real base class this lesson's own
+    `InvalidCategoryException` derives from — this lesson's own
+    subject, given full treatment in the Concept Unit below.
 
 ---
 

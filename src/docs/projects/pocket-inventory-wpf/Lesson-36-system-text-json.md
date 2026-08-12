@@ -35,9 +35,28 @@ shape, the direct contrast this lesson draws against.
   all.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `JsonSerializer.Serialize`/`Deserialize` are given full treatment in
-  the Concept Units below.
+- **`JsonSerializer.Serialize`/`Deserialize`**
+  - *What they are:* convert between real C# objects and JSON text
+    automatically, using reflection over public properties.
+  - *Implementation:* `static` methods on
+    `System.Text.Json.JsonSerializer`. `Serialize<T>(value, options)`
+    produces JSON text from an object graph; `Deserialize<T>(json,
+    options)` reverses it, reconstructing real objects — including
+    nested ones, like `Supplier`, per item.
+  - *Its use:* this lesson's own real, round-tripping JSON export/
+    import — this lesson's own subject, given full treatment in the
+    Concept Unit below.
+- **`JsonSerializerOptions` / `JsonStringEnumConverter`**
+  - *What they are:* configuration for how serialization behaves, and
+    a specific converter changing how `enum` values are represented.
+  - *Implementation:* `JsonSerializerOptions.WriteIndented = true`
+    produces human-readable, indented JSON; `Converters = { new
+    JsonStringEnumConverter() }` makes an `enum` property (like
+    `Category`) serialize as its real member name (`"Tools"`) instead
+    of its default, less-readable underlying integer.
+  - *Its use:* passed to every `Serialize`/`Deserialize` call this
+    lesson makes, so the exported JSON is both readable and correctly
+    round-trips `Category` as text, not a bare number.
 
 ---
 

@@ -24,10 +24,23 @@ the real floating-point caveat already proven and handled there. Lesson
   aggregate function (`SUM()`, `COUNT()`, and others) *per group*
   instead of across the whole table.
 
-**Objects and methods used**
-- `SUM()`/`ExecuteReader()` (Lesson 30) reappear here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  `GROUP BY` is this lesson's own subject, given full treatment below.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SUM()` / `ExecuteReader()`**
+  - *What they are:* a SQL aggregate function computing one total from
+    many rows, and the ADO.NET method that runs a query returning
+    rows.
+  - *Implementation:* full treatment already given in
+    `Lesson-30-sum-and-aggregate-queries.md` and
+    `Lesson-10-reading-rows-back-into-objects.md`.
+  - *Its use:* `SUM(Value)` reappears here, now paired with `GROUP BY`
+    so it computes once per category instead of once across the whole
+    table; the result — multiple rows this time, not one scalar value
+    — is read back with `ExecuteReader()`, not `ExecuteScalar()`.
+
+`GROUP BY` is SQL syntax, not a C# class or method — this lesson's own
+subject, given full treatment above in Terms Introduced and in the
+Concept Unit below.
 
 ---
 

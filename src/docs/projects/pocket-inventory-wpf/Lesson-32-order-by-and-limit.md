@@ -32,11 +32,19 @@ Lesson 14: `PurchaseDate`, `DateTime?`, genuine absence. Lesson 31:
   from numeric ordering the moment the values involved have a different
   number of digits.
 
-**Objects and methods used**
-- `GROUP BY`/`SUM()` (Lessons 30, 31) reappear here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  `ORDER BY ... DESC LIMIT` is this lesson's own subject, given full
-  treatment below.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`GROUP BY` / `SUM()`**
+  - *What they are:* a SQL clause partitioning rows into groups, and an
+    aggregate function computing one total per group.
+  - *Implementation:* full treatment already given in
+    `Lesson-31-group-by.md` and `Lesson-30-sum-and-aggregate-queries.md`.
+  - *Its use:* not used directly in this lesson's own queries — named
+    only as prior context this lesson's `SELECT`s build on.
+
+`ORDER BY ... DESC LIMIT`, `CAST`, and `WHERE ... IS NULL` are SQL
+syntax, not C# classes or methods — this lesson's own subject, given
+full treatment above in Terms Introduced and in the Concept Unit below.
 
 ---
 

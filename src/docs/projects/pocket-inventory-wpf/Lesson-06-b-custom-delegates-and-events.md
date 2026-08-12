@@ -35,11 +35,18 @@ Lesson 0a: class, object, method. Lesson 6a: generic type parameters
   *outside* the declaring class to only `+=`/`-=` — never direct
   invocation, never wholesale replacement with `=`.
 
-**Objects and methods used**
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own labs — brief reminder only, per the
-  Repetition Rule. `delegate` and `event` are this lesson's own
-  subject, given full treatment below.
+`delegate` and `event` are language keywords, not external classes or
+methods — this lesson's own subject, given full treatment above in
+Terms Introduced and in the Concept Units below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's labs.
 
 ---
 

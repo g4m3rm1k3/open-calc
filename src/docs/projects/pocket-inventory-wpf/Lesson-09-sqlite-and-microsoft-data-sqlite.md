@@ -67,11 +67,70 @@ added — this lesson's first real one.
   anywhere, including in the class's own constructor.
 
 **Objects and methods used**
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own labs — brief reminder only, per the
-  Repetition Rule. `SqliteConnection`, `SqliteCommand`, and every
-  ADO.NET member used here are this lesson's own subject, given full
-  treatment in the Concept Units below.
+- **`SqliteConnection`**
+  - *What it is:* a real, held connection to a specific SQLite database
+    file — analogous to an open file handle or a network socket, which
+    must be explicitly released rather than left for the garbage
+    collector to eventually notice.
+  - *Implementation:* `Microsoft.Data.Sqlite.SqliteConnection`,
+    constructed from a **connection string**
+    (`"Data Source=pocketinventory.db"`). `.Open()` actually
+    establishes the connection — and, SQLite-specifically, creates the
+    file itself if it doesn't already exist, no separate "create the
+    database" step required. `.State` reports the connection's current
+    status. `SqliteConnection` inherits from ADO.NET's shared
+    `DbConnection` base class — every other .NET database provider
+    (SQL Server, MySQL, PostgreSQL) exposes the identical
+    `*Connection`/`*Command`/`*Reader` shape, the exact mechanism
+    `ado-net-provider-pattern.md` covers in full.
+  - *Its use:* opened fresh inside both `EnsureDatabaseCreated()` and
+    `SaveItemToDatabase(...)`, always wrapped in a `using` statement so
+    it's guaranteed closed even if an error occurs. Full lab, real
+    output, and both lenses in this lesson's second Concept Unit.
+- **`SqliteCommand`**
+  - *What it is:* one SQL statement, tied to a specific open
+    connection, ready to run.
+  - *Implementation:* produced by `connection.CreateCommand()`. Its
+    `.CommandText` property holds the actual SQL string to run;
+    `.ExecuteNonQuery()` runs a statement that returns no rows (a
+    `CREATE TABLE` or `INSERT`, contrasted against `SELECT`, Lesson
+    10's subject); `.Parameters.AddWithValue("@name", value)` binds a
+    real value to a named placeholder in `.CommandText`, the mechanism
+    that prevents SQL injection by keeping the value structurally
+    separate from the SQL text itself, no matter what characters it
+    contains.
+  - *Its use:* `CREATE TABLE IF NOT EXISTS Items (...)` (Concept Unit
+    3) and the parameterized `INSERT INTO Items (Name) VALUES
+    (@name)` (Concept Unit 4) — this project's first two real,
+    persistent database writes. Full lab, real output (including a
+    real, deliberately-triggered SQL injection attack and its fix),
+    and both lenses across this lesson's third and fourth Concept
+    Units.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's throwaway labs.
+- **`RoutedEventArgs` / `SelectionChangedEventArgs`**
+  - *What they are:* the real event-argument objects WPF hands `Click`
+    and `SelectionChanged` handlers, respectively.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md` and
+    `Lesson-08-selecteditem-and-two-way-binding.md`.
+  - *Its use:* `AddButton_Click`/`ItemListBox_SelectionChanged`'s
+    unchanged required signatures, carried over from earlier lessons.
+- **`ObservableCollection<T>`**
+  - *What it is:* a `List<T>`-like collection that automatically
+    announces its own membership changes.
+  - *Implementation:* full treatment already given in
+    `Lesson-07-inotifypropertychanged-observablecollection.md`.
+  - *Its use:* `Items.Add(newItem)` inside `AddButton_Click`, unchanged
+    — this lesson adds a second, independent action
+    (`SaveItemToDatabase`) alongside it, not a replacement for it.
 
 ---
 

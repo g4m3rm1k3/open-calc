@@ -38,11 +38,25 @@ unit.
   generic code, at the cost of no longer accepting completely
   unrelated types.
 
-**Objects and methods used**
-- `Console.WriteLine` (Lesson 00a) and `List<T>` (Lesson 6) reappear in
-  this lesson's own labs, already given full treatment — brief
-  reminder only, per the Repetition Rule. Writing a generic type or
-  method is this lesson's own subject, given full treatment below.
+Writing a generic type or method (`<T>`, `where T : ...`) is a language
+mechanism, not an external class or method — this lesson's own subject,
+given full treatment above in Terms Introduced and in the Concept Units
+below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's labs.
+- **`List<T>`**
+  - *What it is:* .NET's standard growable collection.
+  - *Implementation:* full treatment already given in
+    `Lesson-06-fields-classes-and-list.md`.
+  - *Its use:* referenced as an already-familiar example of a generic
+    type this lesson's own `Container<T>` is modeled after.
 
 ---
 

@@ -36,10 +36,42 @@ display patterns, already proven in `DetailPanel`.
   `ListBox`, which has no concept of editable cells at all.
 
 **Objects and methods used**
-- `ObservableCollection<T>`/`{Binding}` (Lesson 7) reappear here,
-  already given full treatment — brief reminder only, per the
-  Repetition Rule. `DataGrid` and its columns are this lesson's own
-  subject, given full treatment below.
+- **`DataGrid`**
+  - *What it is:* a WPF control for displaying a bound collection as a
+    real table — rows, columns, sortable headers, resizable widths,
+    built in.
+  - *Implementation:* `System.Windows.Controls.DataGrid`.
+    `AutoGenerateColumns` (`true` by default) inspects the bound item
+    type's public properties via reflection and builds one column per
+    property automatically; `IsReadOnly` (`false` by default, unlike
+    `ListBox`, which has no concept of editable cells at all) controls
+    whether a user can double-click a cell to edit it directly.
+  - *Its use:* replaces `ItemListBox` (a plain `ListBox`, Lesson 6)
+    without changing `InventoryItem`, `Items`, or a single line of
+    SQLite code — the exact "swap the control, not the data" this
+    lesson's whole point depends on. Full lab, real output, and both
+    lenses in this lesson's own Concept Unit.
+- **`DataGridTextColumn`**
+  - *What it is:* one explicitly declared column, naming its own header
+    text and its own `{Binding}` path — used instead of relying on
+    `AutoGenerateColumns`'s reflection-based default.
+  - *Implementation:* `System.Windows.Controls.DataGridTextColumn`,
+    added to `DataGrid.Columns`; `Header` sets the displayed column
+    title, `Binding="{Binding PropertyName}"` sets what each cell
+    shows.
+  - *Its use:* the real project's own six explicit columns, chosen
+    over auto-generation for control over header text, order, and
+    which fields actually appear.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ObservableCollection<T>` / `{Binding}`**
+  - *What they are:* the self-announcing collection type, and the
+    XAML-to-C# connection mechanism.
+  - *Implementation:* full treatment already given in
+    `Lesson-07-inotifypropertychanged-observablecollection.md`.
+  - *Its use:* `Items`, unchanged — only the control displaying it
+    changes this lesson.
 
 ---
 

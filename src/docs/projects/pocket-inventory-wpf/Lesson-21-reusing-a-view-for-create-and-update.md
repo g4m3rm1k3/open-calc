@@ -30,39 +30,46 @@ Lesson 12–15: every field this lesson finally makes genuinely editable.
   `WHERE` clause, distinct from whether the command itself succeeded.
 
 **Objects and methods used**
-- `SqliteConnection`/`SqliteCommand`/`ExecuteNonQuery()` (Lesson 9)
-  reappear here, already given full treatment — brief reminder only,
-  per the Repetition Rule. `UPDATE ... WHERE` is this lesson's own
-  subject, given full treatment below.
+- **`CultureInfo.InvariantCulture`**
+  - *What it is:* a fixed, non-regional culture that never changes no
+    matter what machine runs this code.
+  - *Implementation:* full treatment already given in
+    `Lesson-13-decimal-and-culture-aware-formatting.md` (a `static`
+    property on `System.Globalization.CultureInfo`); reused here
+    unchanged, not re-derived.
+  - *Its use:* formats `item.Value` for this lesson's `UPDATE`'s
+    `@value` parameter the identical way `SaveItemToDatabase`'s
+    original `INSERT` already does — a value round-tripping through
+    SQL needs a fixed, always-`.`-separated decimal format so it
+    parses back correctly on any machine, regardless of regional
+    settings, a different problem from `ToString("C")`'s *display*
+    formatting.
+- **`DBNull.Value`**
+  - *What it is:* ADO.NET's own sentinel meaning "this specific
+    database cell is genuinely empty," distinct from C#'s own `null`.
+  - *Implementation:* full treatment already given in
+    `Lesson-14-nullable-purchase-info.md`, including why passing a bare
+    C# `null` to `Parameters.AddWithValue` throws at runtime where
+    `DBNull.Value` does not.
+  - *Its use:* inside `(object?)item.PurchaseDate?.ToString("O") ??
+    DBNull.Value`, exactly as first used in `SaveItemToDatabase` —
+    when `PurchaseDate` is absent, this lesson's `UPDATE`'s
+    `@purchaseDate` parameter has to write a real SQL `NULL`.
 
-**`CultureInfo.InvariantCulture`**
-- *What it is:* reappearing from Lesson 13's fifth unit — a fixed,
-  non-regional culture that never changes no matter what machine runs
-  this code.
-- *Implementation:* Lesson 13's fifth unit gives this its full
-  treatment (a `static` property on `System.Globalization.CultureInfo`);
-  here it's the exact same value, reused unchanged, not re-derived.
-- *Its use:* formats `item.Value` for this lesson's `UPDATE`'s `@value`
-  parameter the identical way `SaveItemToDatabase`'s original `INSERT`
-  already does — a value round-tripping through SQL needs a fixed,
-  always-`.`-separated decimal format so it parses back correctly on
-  any machine, regardless of that machine's own regional settings; that
-  is a different problem from `ToString("C")`'s *display* formatting,
-  which deliberately follows whichever culture is currently running.
+`UPDATE ... WHERE` is this lesson's own subject (a SQL statement, not a
+C# class or method), given full treatment above in Terms Introduced and
+in the Concept Unit below.
 
-**`DBNull.Value`**
-- *What it is:* reappearing from Lesson 14's fifth unit — ADO.NET's own
-  sentinel meaning "this specific database cell is genuinely empty,"
-  distinct from C#'s own `null`.
-- *Implementation:* Lesson 14's fifth unit gives this its full
-  treatment, including why passing a bare C# `null` to
-  `Parameters.AddWithValue` throws at runtime where `DBNull.Value`
-  does not.
-- *Its use:* inside `(object?)item.PurchaseDate?.ToString("O") ?? DBNull.Value`,
-  exactly as first used in `SaveItemToDatabase` — when `PurchaseDate` is
-  absent, this lesson's `UPDATE`'s `@purchaseDate` parameter has to
-  write a real SQL `NULL`, not the four-character string `"null"` and
-  not a C# `null` reference the driver would reject.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SqliteConnection` / `SqliteCommand` / `ExecuteNonQuery()`**
+  - *What they are:* a real, held connection to a SQLite database file,
+    one SQL statement tied to it, and the method that runs a statement
+    returning no rows.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md`.
+  - *Its use:* the same parameterized-query pattern as `SaveItemToDatabase`,
+    now running `UPDATE` instead of `INSERT`.
 
 ---
 

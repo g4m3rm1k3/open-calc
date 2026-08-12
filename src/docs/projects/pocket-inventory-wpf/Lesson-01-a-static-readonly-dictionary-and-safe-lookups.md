@@ -52,11 +52,39 @@ Concept Unit. Nothing about C# beyond Lesson 00a.
   an `out` parameter — never throws, unlike the indexer.
 
 **Objects and methods used**
-- `Console.WriteLine` and the ternary conditional operator both reappear
-  from Lesson 00a, which already gave each full treatment — brief
-  reminder only, per the Repetition Rule. `Dictionary<TKey, TValue>` and
-  its members are this lesson's own subject, given full treatment in
-  Concept Units 3 and 4 above, not deferred to this section.
+- **`Dictionary<TKey, TValue>`**
+  - *What it is:* C#'s key-value lookup collection — the direct cousin
+    of Python's `dict`, storing values addressed by key instead of by
+    numeric position.
+  - *Implementation:* the generic type `System.Collections.Generic.Dictionary<TKey, TValue>`.
+    Reading or writing by key uses the indexer, `dict[key]`; reading a
+    key that doesn't exist throws a real `KeyNotFoundException`, proven
+    directly this lesson, rather than returning a default or `null`.
+  - *Its use:* this lesson's own from-scratch subject — every real lab
+    in Concept Units 3 and 4 builds one and proves both its indexer's
+    throwing behavior and `TryGetValue`'s non-throwing alternative.
+- **`Dictionary<TKey, TValue>.TryGetValue`**
+  - *What it is:* `Dictionary`'s safe lookup method — answers "does this
+    key exist, and if so, what's its value" in one call, with no
+    exception thrown either way.
+  - *Implementation:* `bool TryGetValue(TKey key, out TValue value)` —
+    returns `true`/`false` for whether `key` existed, and, when `true`,
+    hands the matching value back through the `out` parameter `value`
+    in the same call.
+  - *Its use:* this lesson's real, proven alternative to the indexer for
+    a key that might not exist — the fix Concept Unit 4 builds and
+    verifies against the exact `KeyNotFoundException` Concept Unit 3
+    just caused on purpose.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's four labs comes
+    from this same method.
 
 ---
 

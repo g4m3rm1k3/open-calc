@@ -27,10 +27,38 @@ dialog. Nothing disappears from a single accidental click.
   matching a condition.
 
 **Objects and methods used**
-- `ExecuteNonQuery()` (Lesson 9) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `MessageBox.Show`/`MessageBoxResult`/`MessageBoxButton` are this
-  lesson's own subject, given full treatment below.
+- **`MessageBox.Show`**
+  - *What it is:* opens a real, modal system dialog box and blocks the
+    calling code until the user responds to it.
+  - *Implementation:* a `static` method on `System.Windows.MessageBox`.
+    One overload takes a message, a title, and a `MessageBoxButton`
+    (which buttons to offer — `YesNo`, `OKCancel`, `YesNoCancel`, and
+    others), returning a `MessageBoxResult`.
+  - *Its use:* the real confirmation gate before this lesson's
+    `DELETE` ever runs — nothing is removed from a single click alone.
+    Full lab, real output, and both lenses in this lesson's own
+    Concept Unit.
+- **`MessageBoxResult`**
+  - *What it is:* which button the user actually clicked.
+  - *Implementation:* an `enum` (`System.Windows.MessageBoxResult`) —
+    `Yes`, `No`, `OK`, `Cancel`, and others, depending on which
+    `MessageBoxButton` set was offered — returned directly by
+    `MessageBox.Show`.
+  - *Its use:* checked with `== MessageBoxResult.Yes` before the real
+    `DELETE` statement runs.
+
+`DELETE ... WHERE` is this lesson's own subject (a SQL statement, not a
+C# class or method), given full treatment above in Terms Introduced and
+in the Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ExecuteNonQuery()`**
+  - *What it is:* runs a SQL command that returns no rows.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md`.
+  - *Its use:* runs this lesson's parameterized `DELETE`, the same
+    pattern as every prior `INSERT`/`UPDATE`.
 
 ---
 

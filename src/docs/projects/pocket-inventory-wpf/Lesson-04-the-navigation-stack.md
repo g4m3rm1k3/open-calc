@@ -63,12 +63,66 @@ lesson adds a third one to.
   already written, so nothing here needs to declare its own
   single-purpose `delegate void SomeHandler();` the way a hand-written
   delegate would.
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own throwaway `Doorbell`/`Chime` lab —
-  brief reminder only, per the Repetition Rule. `event`, `+=`,
-  `?.Invoke()`, and every `Frame`/`NavigationService` member used here
-  are this lesson's own subject, given full treatment in the Concept
-  Units below.
+- **`Frame.Navigated`**
+  - *What it is:* an event every `Frame` raises automatically whenever
+    a navigation — forward or backward — finishes.
+  - *Implementation:* declared on `System.Windows.Controls.Frame`,
+    subscribed to with `+=` from C# (this lesson's first Concept Unit),
+    since no XAML attribute exists for it. Handlers match the shape
+    `void Handler(object sender, NavigationEventArgs e)`.
+  - *Its use:* `ContentFrame.Navigated += ContentFrame_Navigated;` —
+    the one subscription that lets `BackButton.IsEnabled` stay correct
+    after every navigation anywhere in the app, not just once at
+    startup.
+- **`NavigationEventArgs`**
+  - *What it is:* the real event-argument object a `Navigated` handler
+    receives — details about the navigation that just occurred.
+  - *Implementation:* `System.Windows.Navigation.NavigationEventArgs`,
+    the required second parameter of any `Frame.Navigated` handler.
+  - *Its use:* `ContentFrame_Navigated(object sender, NavigationEventArgs e)`
+    — `e` itself is never read in this lesson's handler; only `sender`'s
+    type context (a `Frame` navigated) matters here.
+- **`Frame.CanGoBack`**
+  - *What it is:* a live, read-only answer to "is there anything to go
+    back to right now."
+  - *Implementation:* a `bool` property on `Frame`, `true` exactly when
+    its back stack has at least one entry — computed fresh every time
+    it's read, never a cached or separately-tracked flag.
+  - *Its use:* read twice — once inside `ContentFrame_Navigated`, to
+    keep `BackButton.IsEnabled` truthful, and once inside
+    `BackButton_Click`, as a defensive guard before calling `GoBack()`.
+- **`Frame.GoBack()`**
+  - *What it is:* the operation that actually pops the top entry off a
+    `Frame`'s back stack and navigates to it.
+  - *Implementation:* a method on `Frame`, taking no arguments — the
+    literal pop half of the push (`Navigate`)/pop pair that defines a
+    stack as a data structure.
+  - *Its use:* `ContentFrame.GoBack();` inside `BackButton_Click` —
+    this lesson's entire real, working "return to the previous screen"
+    behavior, in one call.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* this lesson's own throwaway `DoorAlarm` lab, proving the
+    real subscribe-then-fire output ordering.
+- **`Button`**
+  - *What it is:* a clickable control.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* the new "◀ Back" button in the header, starting
+    `IsEnabled="False"`.
+- **`RoutedEventArgs`**
+  - *What it is:* the real event-argument object WPF hands a `Click`
+    handler.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* `BackButton_Click(object sender, RoutedEventArgs e)` —
+    same required signature as the Add Item button's own handler.
 
 ---
 

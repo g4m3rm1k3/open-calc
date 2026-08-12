@@ -29,10 +29,30 @@ actions.
   transaction, committed to disk immediately, one at a time.
 
 **Objects and methods used**
-- `SelectedItems`/`IList` (Lesson 42) reappear here, already given
-  full treatment — brief reminder only, per the Repetition Rule.
-  SQLite transactions are this lesson's own subject, given full
-  treatment below.
+- **`SqliteTransaction`**
+  - *What it is:* a real, held group of database operations treated as
+    one atomic unit — either all take effect, or none do.
+  - *Implementation:* `Microsoft.Data.Sqlite.SqliteTransaction`,
+    returned by `connection.BeginTransaction()`; every `SqliteCommand`
+    run against that same connection while it's open becomes part of
+    the transaction. `.Commit()` makes every change permanent at once;
+    `.Rollback()` discards every change made since the transaction
+    began.
+  - *Its use:* wraps this lesson's bulk edit/delete loop in one real
+    transaction instead of 200 separate auto-committed writes — proven
+    directly, with real measured numbers (~146x faster), not just
+    asserted. Full lab, real output, and both lenses in this lesson's
+    own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`SelectedItems` / `IList`**
+  - *What they are:* the live collection of currently-selected rows,
+    and the non-generic collection type it returns.
+  - *Implementation:* full treatment already given in
+    `Lesson-42-selectionmode-and-selecteditems.md`.
+  - *Its use:* iterated once per bulk action, to build the list of
+    items this lesson's transaction actually operates on.
 
 ---
 

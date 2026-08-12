@@ -905,6 +905,105 @@ justifies it, and don't reach for a more expensive model override for a
 narrow, bounded task without a specific reason the default model would
 actually fail at it.
 
+## 2026-08-11, second follow-up: all 15 remaining checker flags individually resolved
+
+The prior two passes' own closing notes both deferred this: 2026-07-31
+checked 4 of the recurring `dense-concept-unit` flags and called the rest
+"not individually re-verified... flag for a future session." This pass is
+that session — every one of the 15 flags `check-narrative-lessons.mjs`
+currently reports was opened and read individually, not assumed clean by
+category. Result: **zero real gaps.**
+
+- `dense-concept-unit` ×9 (Lesson 00 "Anatomy of a WPF Project"; Lesson 06
+  `List<T>`; Lesson 09 `SqliteConnection` and `CREATE TABLE`/
+  `ExecuteNonQuery`; Lesson 17 `ICollectionView`/`GroupDescriptions`
+  — new this session, a direct side effect of the legitimate
+  `CollectionViewGroup`/`ICollectionView` shape fix above; Lesson 25
+  "Copying a File Into an App-Owned Folder"; Lesson 44 "Real Drag-and-Drop
+  Re-Categorization"; Lesson 49 "An About Window") — each is a real,
+  cohesive unit where every flagged term gets its own Mechanical
+  Walkthrough bullet, backed by one real, single execution (one
+  `dotnet run`, one real lab, or — for 17/44/49 specifically — real
+  project-code application of terms already isolated earlier in the same
+  lesson or shown in the header). The checker's density heuristic counts
+  "first appearance" tags per unit with no way to know whether they're
+  actually proven together or just asserted together; every one checked
+  this pass was proven, not asserted.
+- `note-no-cs-lens` ×2 (Lesson 00 "WPF Among Windows UI Frameworks" —
+  a framework-tradeoff survey with no computational concept to name;
+  Lesson 11 "Wiring Live Validation Into the Form" — pure XAML wiring of
+  the Strategy-pattern `IDataErrorInfo` the *previous* unit already gave
+  a full CS Lens to) — both correct, deliberate omissions.
+- `note-unverified-hidden-behavior` ×2 (Lessons 06, 07 auto-property
+  backing-field claims) — already confirmed backed by real reflection
+  proof in the 2026-08-10 pass; re-confirmed, not re-derived.
+- `code-prose-interleaved-in-fence` ×3 (Lesson 51) — confirmed again
+  directly: the flagged "before"/"after" text is the literal
+  `beforeSync`/`afterSync`/`beforeAsync`/`afterAsync` variable names
+  inside real `Console.WriteLine` string interpolations, not prose
+  crammed into a fence.
+
+No edits were needed for any of these 15 — this pass was verification
+only. Don't re-open any of them from scratch in a future session on the
+checker's say-so alone; this note is the record that all 15, individually,
+already were.
+
+## 2026-08-11, third follow-up: "Objects and methods used" rewritten to match the Android track's own gold-standard format
+
+The two passes above (2026-08-10, 2026-08-11) checked that every "Objects
+and methods used" header *cited* its real supporting cast somewhere,
+correctly — but that check itself surfaced a sharper problem, raised
+directly by re-reading `../track/` (Android) Lesson 3 side by side with
+this project's own headers: Android Lesson 3's header gives every real
+external class/method a labeled, three-part entry — `*What it is:*`,
+`*Implementation:*`, `*Its use:*` — while this project's headers, even
+where technically compliant with the Repetition Rule, mostly deferred
+that actual explanation to "given full treatment below" or folded it into
+one dense paragraph. Read side by side, the gap was real: Android Lesson
+3 tells a reader unfamiliar with a class or method what it *is*, how it's
+*actually declared*, and why *this lesson* calls it, in three separate,
+scannable lines, before a single line of the lesson's own body; this
+project's headers made a reader go hunting through the Concept Units to
+reconstruct the same thing, or accept a bare citation.
+
+`LESSON SCHEMA.md`'s Header section had, by this point, already been
+amended (an external commit, "482ceae5 android stuff," not made this
+session) to require exactly this: every real external class/interface/
+method gets its own bolded-name entry, then the three labeled sub-bullets,
+full treatment regardless of whether it's this lesson's own subject or a
+reappearing supporting-cast item (a reappearing item's *Implementation*
+line cites back to the lesson that gave it full treatment instead of
+re-deriving it, but still carries all three labels — never a bare
+citation); language keywords/operators/annotations stay out of this
+section entirely and belong in Terms Introduced instead. That schema
+amendment was verified correct and left as-is — the actual gap was
+between the schema and the 65 lesson files, not within the schema itself.
+
+Every one of the 65 lesson files' "Objects and methods used" sections was
+read and rewritten directly, sequentially, no subagents (per the standing
+rule recorded above): the lesson's own subject items listed first, each
+with genuine, pulled-up-from-the-body 3-part content (not reworded
+prose — the real declared signature, the real behavior proven in that
+lesson's own labs, the real call site in this project's code); reappearing
+items moved to a trailing **"Everything else in the file, not this
+lesson's subject but still explained"** section, each still fully
+3-part but with *Implementation* citing the exact source lesson file by
+its real, verified `.md` filename. A recurring structural bug — several
+lessons (17, 21, 23, 25, 41, 48) had well-written 3-part entries sitting
+as disconnected top-level bold paragraphs after a blank line, rather than
+nested list items under the "Objects and methods used" bullet list — was
+found and fixed each time it appeared, merging into one continuous list.
+
+Re-ran `check-narrative-lessons.mjs` after: same 65 files, same 15 issues
+as the prior pass's own closing count — all 15 already individually
+verified false positives (dense-concept-unit ×9, note-no-cs-lens ×2,
+note-unverified-hidden-behavior ×2, code-prose-interleaved-in-fence ×3),
+none touched by this pass's edits, none newly introduced. This pass's
+edits were scoped strictly to the "Objects and methods used" section of
+each file; lesson bodies, Concept Units, and Terms Introduced sections
+were left alone except where a citation or filename inside a rewritten
+header needed correcting.
+
 ## Independence from the Android track
 
 `../track/` (Android) and this project cover a lot of the same ground —

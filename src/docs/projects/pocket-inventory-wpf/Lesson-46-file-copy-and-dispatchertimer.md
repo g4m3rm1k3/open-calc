@@ -23,10 +23,27 @@ independent, parallel concern.
   elements from directly (unlike a plain background timer).
 
 **Objects and methods used**
-- `File.Copy` (Lesson 25) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `DispatcherTimer` is this lesson's own subject, given full treatment
-  below.
+- **`DispatcherTimer`**
+  - *What it is:* a WPF timer that raises its `Tick` event on the UI
+    thread, at a real, configurable interval — safe to touch UI
+    elements from directly, unlike a plain background timer.
+  - *Implementation:* `System.Windows.Threading.DispatcherTimer`.
+    `Interval` (a `TimeSpan`) sets how often; `Tick` is the event
+    subscribed to via `+=`; `Start()`/`Stop()` control whether it's
+    currently running.
+  - *Its use:* this lesson's own subject — the real, scheduled trigger
+    for an automatic backup, with no manual action required. Full lab,
+    real, measured output (~300ms apart), and both lenses in this
+    lesson's own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`File.Copy`**
+  - *What it is:* copies a file from one path to another.
+  - *Implementation:* full treatment already given in
+    `Lesson-25-storing-photos-by-path.md`.
+  - *Its use:* copies `pocketinventory.db` into a timestamped backup
+    file, each time `DispatcherTimer.Tick` fires.
 
 ---
 

@@ -38,10 +38,39 @@ nothing populates `Items` from what's already saved. Lesson 7:
   the `SELECT` clause's own column order.
 
 **Objects and methods used**
-- `List<T>` (Lesson 6) and `SqliteConnection`/`SqliteCommand` (Lesson 9)
-  reappear here, already given full treatment — brief reminder only,
-  per the Repetition Rule. `SqliteDataReader` and its members are this
-  lesson's own subject, given full treatment below.
+- **`SqliteDataReader`**
+  - *What it is:* a stream of rows, walked one at a time, rather than
+    every result loaded into memory at once.
+  - *Implementation:* returned by `SqliteCommand.ExecuteReader()`
+    (contrast `.ExecuteNonQuery()`, which returns no rows). `.Read()`
+    advances to the next available row, returning `true`, or `false`
+    once there are none left — the loop-termination condition for
+    walking an entire result set. `GetInt32(index)`/`GetString(index)`
+    read one column's value from the *current* row, by zero-based
+    position matching the `SELECT` clause's own column order, not by
+    column name.
+  - *Its use:* `SELECT Id, Name FROM Items`, walked with `while
+    (reader.Read())`, mapping each row directly into a new
+    `InventoryItem` — this lesson's entire real load path, the
+    other half of Lesson 9's save path. Full lab, real output, and
+    both lenses in this lesson's first Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`List<T>`**
+  - *What it is:* .NET's standard growable collection.
+  - *Implementation:* full treatment already given in
+    `Lesson-06-fields-classes-and-list.md`.
+  - *Its use:* `LoadItemsFromDatabase()`'s own return type,
+    `List<InventoryItem>`, built up locally before being copied into
+    the real `ObservableCollection<InventoryItem>` `Items`.
+- **`SqliteConnection` / `SqliteCommand`**
+  - *What they are:* a real, held connection to a SQLite database file,
+    and one SQL statement tied to it.
+  - *Implementation:* full treatment already given in
+    `Lesson-09-sqlite-and-microsoft-data-sqlite.md`.
+  - *Its use:* opened and built exactly as before, this time running a
+    `SELECT` instead of an `INSERT`/`CREATE TABLE`.
 
 ---
 

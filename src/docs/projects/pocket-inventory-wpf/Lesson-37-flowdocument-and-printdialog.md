@@ -31,9 +31,32 @@ same data.
   `FlowDocument`'s content into real, discrete pages.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `FlowDocument`, `PrintDialog`, and `DocumentPaginator` are given full
-  treatment in the Concept Units below.
+- **`FlowDocument`'s content model (`Paragraph`, `Run`, `Table`,
+  `TableRow`, `TableCell`)**
+  - *What it is:* the real building blocks a `FlowDocument`'s content
+    is actually made of — logical structure, not fixed pixel
+    positions.
+  - *Implementation:* all in `System.Windows.Documents`.
+    `Paragraph`/`Run` hold ordinary text; `Table`/`TableColumn`/
+    `TableRowGroup`/`TableRow`/`TableCell` build a real, structured
+    table, added to `document.Blocks`.
+  - *Its use:* this lesson's real inventory printout — one `Paragraph`
+    heading, one `Table` with a row per `InventoryItem`. Full lab,
+    real output, and both lenses in this lesson's own Concept Unit.
+- **`XpsDocument` / `XpsDocumentWriter`**
+  - *What they are:* the real, underlying document format and writer
+    `PrintDialog` itself uses internally to actually produce pages.
+  - *Implementation:* `System.Windows.Xps.Packaging.XpsDocument`
+    (constructed against a file path and `FileAccess.Write`);
+    `XpsDocument.CreateXpsDocumentWriter(xpsDocument)` returns the
+    writer that actually paginates and writes a `FlowDocument` out.
+  - *Its use:* this lesson's own proof that a real, complete,
+    byte-verified file gets produced through the exact same pipeline
+    `PrintDialog` uses, not just constructed and trusted.
+
+`FlowDocument`, `PrintDialog`, and `DocumentPaginator` themselves are
+this lesson's own subject, given full treatment above in Terms
+Introduced and in the Concept Unit below.
 
 ---
 

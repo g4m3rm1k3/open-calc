@@ -46,18 +46,49 @@ behind.
   equivalent of Python's `f"..."`.
 
 **Objects and methods used**
-- **`System.DateTime`** — a built-in .NET struct representing a specific
-  point in calendar time. `DateTime.Now` is a `static` property (no
-  parentheses — reading it, not calling a method with arguments) that
-  returns the current local date and time at the exact moment it's
-  read, computed fresh from the operating system's own clock each time,
-  never a value fixed once and reused. Full treatment of what it's
-  actually used for is in this lesson's third Concept Unit, since it's
-  supporting material this lesson's own code depends on, not this
-  lesson's subject.
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own throwaway interpolation lab — brief
-  reminder only, per the Repetition Rule.
+- **`StackPanel`**
+  - *What it is:* a layout panel that arranges its children in a single
+    vertical (default) or horizontal sequence, one after another, each
+    keeping its own natural size.
+  - *Implementation:* `System.Windows.Controls.StackPanel`. Every direct
+    child is placed one after the previous, in source order — no
+    row/column structure to declare, unlike `Grid`.
+  - *Its use:* this lesson's own subject — replaces Lesson 0's single,
+    centered `TextBlock` inside `MainWindow.xaml`'s `Grid`, arranging
+    three `TextBlock`s (title, welcome message, footer) in a vertical
+    stack. Full treatment, real running proof, and both lenses in
+    Concept Unit 1, below.
+- **`System.DateTime`**
+  - *What it is:* a built-in .NET struct representing a specific point
+    in calendar time.
+  - *Implementation:* `DateTime.Now` is a `static` property (no
+    parentheses — reading it, not calling a method with arguments) that
+    returns the current local date and time at the exact moment it's
+    read, computed fresh from the operating system's own clock each
+    time, never a value fixed once and reused.
+  - *Its use:* `WelcomeMessage.Text = $"Welcome — today is
+    {DateTime.Now:MMMM d, yyyy}."` — the welcome message's date is
+    genuinely computed live, at the moment the window opens, not a
+    fixed string baked into the markup. Full treatment in this lesson's
+    third Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`TextBlock`**
+  - *What it is:* the basic WPF control for displaying a run of text.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-developer-environment.md`.
+  - *Its use:* three of them, here — a bold title, a computed welcome
+    message, and a gray footer — stacked inside this lesson's new
+    `StackPanel`.
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* this lesson's own throwaway string-interpolation lab,
+    proving `$"..."` and the real `f"..."` compile error, before either
+    ever touches real project code.
 
 ---
 

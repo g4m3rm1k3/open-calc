@@ -32,35 +32,46 @@ Lesson 17: `CollectionViewSource`, grouping, already applied to
   virtualization itself.
 
 **Objects and methods used**
-- `DataGrid` (Lesson 16) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `VirtualizingStackPanel`/`VirtualizationMode` are this lesson's own
-  subject, given full treatment below.
-- **`IValueConverter`** — a compound, multi-member interface
-  (`Convert`/`ConvertBack`, both taking a `CultureInfo culture`
-  parameter), covered in full, standalone, in `wpf-ivalueconverter.md`;
-  applied here, in this lesson's own second lab, in the Concept Unit
-  below.
+- **`IValueConverter`**
+  - *What it is:* a compound, multi-member interface (`Convert`/
+    `ConvertBack`, both taking a `CultureInfo culture` parameter) that
+    lets a binding transform a value on its way to or from the UI.
+  - *Implementation:* covered in full, standalone, in
+    `wpf-ivalueconverter.md`.
+  - *Its use:* applied here, in this lesson's own second lab, to prove
+    virtualization holds up even when each row's content is computed
+    by a converter, not read directly.
 - **`ScrollViewer`**
   - *What it is:* the real WPF control that manages scrolling — showing
     only the portion of its content that currently fits in the space
     available, and exposing how far it's currently scrolled.
-  - *Implementation:* a concrete class
-    (`System.Windows.Controls.ScrollViewer`). The one member this
-    lesson calls, `ScrollToVerticalOffset(double offset)`, moves the
-    content programmatically to an exact vertical position — the same
-    movement a real scrollbar drag or mouse wheel produces.
+  - *Implementation:* `System.Windows.Controls.ScrollViewer`. The one
+    member this lesson calls, `ScrollToVerticalOffset(double offset)`,
+    moves the content programmatically to an exact vertical position —
+    the same movement a real scrollbar drag or mouse wheel produces.
   - *Its use:* `DataGrid` builds one of these internally, as part of
-    its own default control template, to handle scrolling a grid taller
-    than its viewport — never declared in this project's own XAML,
-    always present. This lesson's third lab locates it with
-    `FindDescendant<ScrollViewer>` and drives it directly, to run a
-    real scroll session without a human at the keyboard.
-- General **UI virtualization** — the "render only what's visible"
-  pattern this whole lesson proves against `DataGrid` specifically — is
-  covered generically, standalone, in `ui-virtualization-windowing.md`;
-  this lesson's own labs are the "applied to this project's real code"
-  step for that general pattern.
+    its own default control template — never declared in this
+    project's own XAML, always present. This lesson's third lab
+    locates it with `FindDescendant<ScrollViewer>` and drives it
+    directly, to run a real scroll session without a human at the
+    keyboard.
+- General **UI virtualization** (the "render only what's visible"
+  pattern) is covered generically, standalone, in
+  `ui-virtualization-windowing.md`; `VirtualizingStackPanel`/
+  `VirtualizationMode` themselves are this lesson's own subject, given
+  full treatment above in Terms Introduced and in the Concept Units
+  below — this lesson's own labs are the "applied to this project's
+  real code" step for that general pattern.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`DataGrid`**
+  - *What it is:* a WPF control for displaying a bound collection as a
+    real table.
+  - *Implementation:* full treatment already given in
+    `Lesson-16-the-datagrid-control.md`.
+  - *Its use:* `ItemsGrid`, unchanged — this lesson only measures and
+    names what it's already been doing since Lesson 16.
 
 ---
 

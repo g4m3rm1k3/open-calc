@@ -40,8 +40,30 @@ the first time.
   verified output: `csharp-type-pattern-matching.md`.
 
 **Objects and methods used**
-- `CollectionViewSource` and `GroupDescriptions` are this lesson's own
-  subject, given full treatment in the Concept Units below.
+- **`CollectionViewSource.GetDefaultView(object)`**
+  - *What it is:* the entry point for getting a specific collection's
+    `ICollectionView` — the one WPF already created and has been
+    maintaining behind the scenes since that collection was first
+    bound to anything.
+  - *Implementation:* a `static` method on
+    `System.Windows.Data.CollectionViewSource`. Not a new object each
+    call — the *same* view, retrieved, every time it's called against
+    the identical source collection.
+  - *Its use:* `CollectionViewSource.GetDefaultView(Items)` — how this
+    lesson gets a real, configurable `ICollectionView` over `Items`
+    without constructing anything new.
+- **`PropertyGroupDescription`**
+  - *What it is:* one rule describing how to partition a collection's
+    items into named groups, by a single property's own distinct
+    values.
+  - *Implementation:* `System.ComponentModel.PropertyGroupDescription`,
+    constructed with the property name to group by (as a string, or —
+    in the real project — `nameof(InventoryItem.Category)` for
+    compile-time safety).
+  - *Its use:* added to `GroupedItems.GroupDescriptions` — the one
+    line that actually tells `ICollectionView` how to group `Items` by
+    `Category`, with no items moved, copied, or removed from the
+    original collection.
 - **`ICollectionView`**
   - *What it is:* the interface itself — what `GetDefaultView(...)`
     actually returns, and what every property this lesson reads off it

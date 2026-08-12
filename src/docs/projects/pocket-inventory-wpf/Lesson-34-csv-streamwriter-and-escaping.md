@@ -28,8 +28,21 @@ echo). Lesson 30–33: reading `InventoryItem`s back out with `SELECT`.
   quotes, and double any literal quote inside it.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject — `StreamWriter`
-  and CSV escaping are given full treatment in the Concept Units below.
+- **`StreamWriter`**
+  - *What it is:* a .NET type for writing text to a file, one line or
+    one chunk at a time, without building the entire file's content as
+    one giant string in memory first.
+  - *Implementation:* `System.IO.StreamWriter`, typically opened with
+    `new StreamWriter(path)` inside a `using` statement (the same
+    resource-lifetime guarantee `SqliteConnection`, Lesson 9, relies
+    on). `.WriteLine(string)` writes one line, followed by a newline.
+  - *Its use:* this lesson's own real CSV export — writing one line per
+    `InventoryItem`, each field correctly escaped. Full lab, real
+    output, and both lenses in this lesson's own Concept Unit.
+
+CSV escaping (the RFC 4180 quoting rule) is a data-format convention,
+not a C# class or method — this lesson's own subject, given full
+treatment above in Terms Introduced and in the Concept Unit below.
 
 ---
 

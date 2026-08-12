@@ -36,11 +36,64 @@ extends with a second column.
   keystroke, versus `TextBox`'s own default of `LostFocus`.
 
 **Objects and methods used**
-- No new supporting cast beyond this lesson's own subject —
-  `SelectedItem`, binding modes, and `UpdateSourceTrigger` are given
-  full treatment below; `INotifyPropertyChanged`/`{Binding}`/
-  `DataContext` (Lesson 7) reappear already fully explained, per the
-  Repetition Rule.
+- **`SelectedItem` / `SelectionChanged`**
+  - *What they are:* the property holding whichever item a selection
+    control (like `ListBox`) currently has selected, and the event
+    that fires the instant that selection changes.
+  - *Implementation:* both declared on `System.Windows.Controls.ListBox`
+    (and other selection controls generally). `SelectedItem` returns
+    plain `object` — a `ListBox` has no built-in knowledge of what
+    kind of thing it displays — and is `null` when nothing is
+    selected. A `SelectionChanged` handler matches
+    `void Handler(object sender, SelectionChangedEventArgs e)`.
+  - *Its use:* `ItemListBox_SelectionChanged` reads
+    `ItemListBox.SelectedItem` (cast, implicitly, into the detail
+    panel's `DataContext`) the instant a row is clicked — the entire
+    mechanism that connects a list selection to the detail panel. Full
+    lab, real output, and both lenses in this lesson's first Concept
+    Unit.
+- **`SelectionChangedEventArgs`**
+  - *What it is:* the real event-argument object a `SelectionChanged`
+    handler receives.
+  - *Implementation:* `System.Windows.Controls.SelectionChangedEventArgs`,
+    the required second parameter of any `SelectionChanged` handler.
+  - *Its use:* `ItemListBox_SelectionChanged(object sender,
+    SelectionChangedEventArgs e)` — `e` itself is never read; this
+    lesson only needs `sender`'s implied context and `SelectedItem`.
+
+Binding modes (`OneWay`/`TwoWay`) and `UpdateSourceTrigger` are XAML
+binding concepts, not external classes or methods — this lesson's own
+subject, given full treatment above in Terms Introduced and in the
+Concept Units below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`INotifyPropertyChanged` / `ObservableCollection<T>` / `{Binding}` /
+  `DataContext`**
+  - *What they are:* the model-announces-its-own-changes interface, the
+    self-announcing collection, and the XAML-to-C# connection
+    mechanism.
+  - *Implementation:* full treatment already given in
+    `Lesson-07-inotifypropertychanged-observablecollection.md`.
+  - *Its use:* this lesson is where their payoff finally becomes
+    visible — `InventoryItem`'s `PropertyChanged` (built, unused, in
+    Lesson 7) now has a real trigger: the detail panel's `TwoWay`
+    binding writing back into `Name`.
+- **`ListBox` / `TextBox` / `TextBlock` / `Button`**
+  - *What they are:* a scrollable selectable list, a typed-text input,
+    a display-only text control, and a clickable control.
+  - *Implementation:* full treatment already given in
+    `Lesson-06-fields-classes-and-list.md` and
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* unchanged from Lesson 6/7 — this lesson adds a detail
+    panel beside them, not new controls of these types.
+- **`RoutedEventArgs`**
+  - *What it is:* the real event-argument object WPF hands a `Click`
+    handler.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* `AddButton_Click`'s unchanged signature, carried over
+    from Lesson 6/7.
 
 ---
 

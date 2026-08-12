@@ -33,81 +33,87 @@ instead of categories).
   path and keeping the actual bytes on disk.
 
 **Objects and methods used**
-- `OpenFileDialog`, `BitmapImage`, and `File.Copy` are this lesson's
-  own subject, given full treatment in the Concept Units below.
-- This lesson's own throwaway labs turn out to be this project's first
-  real use of `System.IO`'s plain-file-I/O static-class family — `Path`
-  and `Directory` — plus `FileInfo` and `Uri`. Each gets its own real
-  entry here, not folded into surrounding prose.
-
-**`Path`**
-- *What it is:* a `static` class of pure, no-filesystem-access helper
-  methods for building and taking apart file/folder path strings —
-  never a class you construct an instance of.
-- *Implementation:* every member is `static` (a fixed, stateless
-  operation, not a "thing" sitting in memory) — none of them read or
-  write anything on disk. `Path.Combine(string, string)` joins path
-  segments with the correct separator for the current OS (`\` on
-  Windows), so code never has to hardcode which slash to use.
-  `Path.GetTempPath()` returns the current user's own OS-designated
-  temporary-files folder (on Windows, typically something under
-  `C:\Users\<you>\AppData\Local\Temp\`) as a plain `string` — the OS
-  decides where that is, not this project.
-- *Its use:* `Path.Combine(Path.GetTempPath(), "lab-photo-app-owned")`
-  builds a real, valid folder path for this lab's own scratch files
-  without this lesson's code ever hardcoding a drive letter or a
-  particular separator character; the real project's own `AddPhoto`
-  method reuses `Path.Combine` the identical way, against
-  `AppContext.BaseDirectory` instead of a temp folder.
-
-**`Directory`**
-- *What it is:* a `static` class of filesystem-*mutating* operations on
-  whole folders — distinct from `Path`, which only ever manipulates
-  path *strings* and never touches the disk at all.
-- *Implementation:* `Directory.CreateDirectory(string path)` creates
-  every folder in `path` that doesn't already exist yet (including any
-  missing parent folders), and does nothing — no exception — if the
-  folder is already there, the same "safe to call unconditionally"
-  shape `CREATE TABLE IF NOT EXISTS` (Lesson 9) already established for
-  a table. `Directory.Delete(string path, bool recursive)` removes a
-  folder; passing `recursive: true` also removes everything inside it
-  first — omitting that argument (or passing `false`) throws instead of
-  silently deleting a non-empty folder.
-- *Its use:* `Directory.CreateDirectory(appPhotosFolder)` guarantees
-  this lab's own destination folder exists before `File.Copy` ever
-  tries to write into it. `Directory.Delete(appPhotosFolder, recursive: true)`,
-  at the end of the lab, tears the whole scratch folder back down —
-  this specific lab's own cleanup, not a pattern the real project reuses
-  (the real `Photos` folder is meant to persist, not be deleted).
-
-**`FileInfo`**
-- *What it is:* an object representing one specific file's own
-  metadata — its size, its last-modified time, whether it exists — as
-  distinct from `File`, a `static` class of one-off operations
-  (`File.Copy`, `File.Exists`) that take a path string every time and
-  hold no state of their own between calls.
-- *Implementation:* `new FileInfo(sourcePath)` constructs a real object
-  tied to one specific path; `.Length` is an instance property on that
-  object, reading the file's real size in bytes from the filesystem.
-- *Its use:* `new FileInfo(sourcePath).Length`, inside this lab's own
-  `Console.WriteLine`, reports the real source photo's size purely as
-  a sanity check before copying it — proof the file this lab is about
-  to copy is a real, substantial image (`1602752` bytes, per this
-  lesson's own real output), not an empty placeholder.
-
-**`Uri`**
-- *What it is:* a structured representation of a resource
-  location — a local file path, an `http://` address, or several other
-  schemes — parsed once into real, addressable parts (scheme, path)
-  rather than treated as an opaque string.
-- *Implementation:* `new Uri(destinationPath)` parses a plain file
-  system path string into a real `Uri` object; passed a path with no
-  explicit scheme, it infers the local `file://` scheme automatically.
-- *Its use:* `BitmapImage.UriSource` (below) requires a real `Uri`, not
-  a bare `string` — `BitmapImage` is built generically enough to load
-  an image from a remote `http://` address the identical way it loads
-  one from a local disk path, and `Uri` is the one shared type that can
-  represent either.
+- **`OpenFileDialog`**
+  - *What it is:* a built-in Windows file-picker dialog.
+  - *Implementation:* `Microsoft.Win32.OpenFileDialog`. `ShowDialog()`
+    opens it and blocks, the same modal pattern `MessageBox.Show`
+    (Lesson 22) already established; a `bool?` return and `.FileName`
+    report what the user picked, or that they cancelled.
+  - *Its use:* the real "Add Photo" flow's entry point — the user picks
+    a real file from their own disk.
+- **`File.Copy`**
+  - *What it is:* copies a file from one path to another, leaving the
+    original untouched.
+  - *Implementation:* a `static` method on `System.IO.File`,
+    `Copy(string sourceFileName, string destFileName)`.
+  - *Its use:* copies the user's picked photo into a folder this
+    project owns, so the original file's location (which could move,
+    be renamed, or be on removable media) never matters again.
+- **`BitmapImage`**
+  - *What it is:* a WPF type representing a loaded, decoded image.
+  - *Implementation:* `System.Windows.Media.Imaging.BitmapImage`,
+    built explicitly via `BeginInit()`/`UriSource`/`CacheOption`/
+    `EndInit()` — rather than relying on WPF's implicit string-to-image
+    conversion — specifically to control *when* the underlying file is
+    read and released.
+  - *Its use:* loads the copied photo for real display, and — this
+    lesson's own genuinely important finding — `CacheOption.OnLoad`
+    is what actually releases the file handle afterward, letting
+    Lesson 26's `File.Delete` succeed where a plain XAML string
+    binding would leave the file locked.
+- **`Path`**
+  - *What it is:* a `static` class of pure, no-filesystem-access helper
+    methods for building and taking apart file/folder path strings —
+    never a class you construct an instance of.
+  - *Implementation:* every member is `static` — none of them read or
+    write anything on disk. `Path.Combine(string, string)` joins path
+    segments with the correct separator for the current OS; `Path.GetTempPath()`
+    returns the current user's own OS-designated temporary-files
+    folder as a plain `string`.
+  - *Its use:* `Path.Combine(Path.GetTempPath(), "lab-photo-app-owned")`
+    builds a real, valid folder path with no hardcoded drive letter or
+    separator; the real project's own `AddPhoto` method reuses
+    `Path.Combine` the identical way, against `AppContext.BaseDirectory`
+    instead of a temp folder.
+- **`Directory`**
+  - *What it is:* a `static` class of filesystem-*mutating* operations
+    on whole folders — distinct from `Path`, which only ever
+    manipulates path *strings* and never touches the disk at all.
+  - *Implementation:* `Directory.CreateDirectory(string path)` creates
+    every folder in `path` that doesn't already exist yet, doing
+    nothing if it's already there — the same "safe to call
+    unconditionally" shape `CREATE TABLE IF NOT EXISTS` (Lesson 9)
+    already established. `Directory.Delete(string path, bool recursive)`
+    removes a folder; `recursive: true` also removes everything inside
+    it first.
+  - *Its use:* `Directory.CreateDirectory(appPhotosFolder)` guarantees
+    the destination folder exists before `File.Copy` writes into it.
+- **`FileInfo`**
+  - *What it is:* an object representing one specific file's own
+    metadata — its size, its last-modified time, whether it exists —
+    distinct from `File`, a `static` class of one-off operations that
+    take a path string every time and hold no state between calls.
+  - *Implementation:* `new FileInfo(sourcePath)` constructs a real
+    object tied to one specific path; `.Length` is an instance property
+    reading the file's real size in bytes from the filesystem.
+  - *Its use:* `new FileInfo(sourcePath).Length` reports the real
+    source photo's size as a sanity check before copying it — proof
+    the file is a real, substantial image (`1602752` bytes, per this
+    lesson's own real output), not an empty placeholder.
+- **`Uri`**
+  - *What it is:* a structured representation of a resource location —
+    a local file path, an `http://` address, or several other schemes
+    — parsed once into real, addressable parts rather than treated as
+    an opaque string.
+  - *Implementation:* `new Uri(destinationPath)` parses a plain file
+    system path string into a real `Uri` object; passed a path with no
+    explicit scheme, it infers the local `file://` scheme
+    automatically.
+  - *Its use:* `BitmapImage.UriSource` requires a real `Uri`, not a
+    bare `string` — `BitmapImage` is built generically enough to load
+    an image from a remote `http://` address the identical way it
+    loads one from a local disk path, and `Uri` is the one shared type
+    that can represent either.
 
 ---
 

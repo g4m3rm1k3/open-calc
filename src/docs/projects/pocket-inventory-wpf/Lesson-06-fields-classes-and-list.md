@@ -61,12 +61,91 @@ this lesson's new button.
   it's currently displaying; `.Clear()` empties it.
 
 **Objects and methods used**
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own reflection-based proof — brief
-  reminder only, per the Repetition Rule. Every other construct named
-  above (`class`, auto-properties, `List<T>`, `TextBox`, `ListBox`) is
-  this lesson's own subject, given full treatment in the Concept Units
-  below.
+- **`List<T>`**
+  - *What it is:* .NET's standard growable collection — a generic type
+    (`T` is filled in by whatever it holds — `string`, then
+    `InventoryItem`) that resizes itself automatically as elements are
+    added, unlike a fixed-size array.
+  - *Implementation:* `System.Collections.Generic.List<T>`. `.Add(item)`
+    appends one element, growing the list internally as needed;
+    `.Count` reports how many elements are currently stored, always
+    accurate; a plain `foreach` visits every element in insertion
+    order.
+  - *Its use:* `InventoryPage`'s own `private List<InventoryItem> items`
+    — the real, growing backing collection every "Add" click appends
+    to. Full lab, real output, and both lenses in this lesson's third
+    Concept Unit.
+- **`TextBox`**
+  - *What it is:* the control that accepts typed keyboard input —
+    unlike `TextBlock`, which only ever displays text and cannot be
+    typed into.
+  - *Implementation:* `System.Windows.Controls.TextBox`. Its `Text`
+    property is read to get whatever the user currently has typed, and
+    written to (`NameInput.Text = "";`) to clear it programmatically.
+  - *Its use:* `NameInput`, the item-name entry field on the new
+    Inventory screen — read inside `AddButton_Click`, cleared after
+    each successful add.
+- **`ListBox`**
+  - *What it is:* a control displaying a scrollable, selectable list of
+    items.
+  - *Implementation:* `System.Windows.Controls.ListBox`. Its `Items`
+    property is itself a real collection — every `ListBox` maintains
+    its own internal list of what it's currently displaying;
+    `.Clear()` empties it, `.Add(object)` appends one displayed entry.
+  - *Its use:* `ItemListBox`, manually cleared and completely rebuilt,
+    from `items`, on every single "Add" click — this lesson's
+    deliberately naive refresh strategy, the exact cost Lesson 7
+    exists to remove.
+- **`System.Reflection`**
+  - *What it is:* the part of .NET that lets code inspect a type's
+    actual members at runtime, including ones never named in any
+    source file you wrote.
+  - *Implementation:* `typeof(Cat).GetFields(BindingFlags.NonPublic |
+    BindingFlags.Instance)` returns `FieldInfo` objects for every
+    non-public, per-instance field a type actually has;
+    `field.GetValue(cat)` reads that field's real value off a specific
+    object.
+  - *Its use:* this lesson's own proof, inside the auto-property lab,
+    that `{ get; set; }` really does generate a hidden backing field
+    (`<Name>k__BackingField`) — not just asserted, inspected directly
+    at runtime.
+
+`class` and the auto-property shorthand (`{ get; set; }`) are language
+constructs, not external classes or methods — this lesson's own
+subject, given full treatment above in Terms Introduced and in this
+lesson's first two Concept Units.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* this lesson's throwaway `Dog`/`Cat` labs, and the
+    reflection-based proof of the auto-property's hidden backing field.
+- **`StackPanel`**
+  - *What it is:* a panel that arranges its children in a single
+    vertical or horizontal sequence.
+  - *Implementation:* full treatment already given in
+    `Lesson-01-your-first-wpf-window.md`. `Orientation`, its
+    enum-backed layout-direction property, defaults to `Vertical` —
+    every prior use in this project relied on that unstated default.
+  - *Its use:* `Orientation="Horizontal"` on the new input row, laying
+    `NameInput` and the Add button side by side instead of stacked.
+- **`Button`**
+  - *What it is:* a clickable control.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* the "Add" button, styled with `{StaticResource
+    ToolbarButtonStyle}` (Lesson 5), wired via `Click="AddButton_Click"`.
+- **`RoutedEventArgs`**
+  - *What it is:* the real event-argument object WPF hands a `Click`
+    handler.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* `AddButton_Click(object sender, RoutedEventArgs e)` —
+    the required signature, `e` unused in this handler's own body.
 
 ---
 

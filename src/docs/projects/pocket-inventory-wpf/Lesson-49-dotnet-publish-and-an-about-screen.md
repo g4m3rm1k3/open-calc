@@ -43,12 +43,43 @@ example of a popup window in this project.
   that opened it, for taskbar grouping, z-ordering, and later lookup.
 
 **Objects and methods used**
-- `Window` itself (the base class every window in this project,
-  including `MainWindow`, has extended since Lesson 0/1) reappears
-  here, already given full treatment — brief reminder only, per the
-  Repetition Rule. `Window.GetWindow(this)`, `ShowDialog`, and
-  `Window.Owner` are this lesson's own subject, given full treatment
-  below.
+- **`Window.GetWindow(DependencyObject)`**
+  - *What it is:* finds the real top-level `Window` a given element is
+    actually hosted inside — even if that element sits several layers
+    deep, inside a `Page` inside a `Frame`.
+  - *Implementation:* a `static` method on `System.Windows.Window`,
+    walking up the visual tree from the given element until it finds a
+    `Window`.
+  - *Its use:* `Window.GetWindow(this)`, called from inside a real
+    `Page`, proven this lesson to return the exact same object as
+    `Application.Current.MainWindow` — the real owner this lesson's
+    About window needs. Full lab, real output, and both lenses in this
+    lesson's own Concept Unit.
+- **`ShowDialog()` / `Window.Owner`**
+  - *What they are:* opens a `Window` modally (blocking the calling
+    code until it closes, unlike `Show()`, which returns immediately),
+    and the property associating a secondary `Window` with the one
+    that opened it.
+  - *Implementation:* `ShowDialog()` is a method on `Window`, returning
+    once the dialog is closed; `Owner` is a settable property, read by
+    Windows itself for taskbar grouping, z-ordering, and disabling the
+    owner while the dialog is open.
+  - *Its use:* the real About window this lesson adds — opened with
+    `ShowDialog()`, `Owner` set to the result of `Window.GetWindow(this)`
+    — proven, with real output ordering, to genuinely block, and
+    `Owner.IsEnabled` proven to stay `True` throughout (this project's
+    About dialog deliberately doesn't disable its owner).
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Window`**
+  - *What it is:* the C# class a WPF application's top-level screen
+    actually is.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-developer-environment.md`.
+  - *Its use:* the base class every window in this project, including
+    `MainWindow`, has extended since Lesson 0/1 — and the base class
+    this lesson's new `AboutWindow` extends too.
 
 ---
 

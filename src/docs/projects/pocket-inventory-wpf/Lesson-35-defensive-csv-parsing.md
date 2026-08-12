@@ -27,10 +27,27 @@ now applied to a file instead of a `TextBox`.
   independently.
 
 **Objects and methods used**
-- CSV escaping rules (Lesson 34) reappear here, already given full
-  treatment — brief reminder only, per the Repetition Rule. The
-  quote-aware parser itself is this lesson's own subject, given full
-  treatment below.
+- **`File.ReadAllLines(string)`**
+  - *What it is:* reads an entire text file and returns it as an array
+    of strings, one per line.
+  - *Implementation:* a `static` method on `System.IO.File`.
+  - *Its use:* `File.ReadAllLines(dialog.FileName)` — loads the whole
+    imported CSV file at once, before this lesson's own per-line
+    parsing and per-row `try`/`catch` begin.
+
+The quote-aware parser itself, and per-row error isolation via
+`try`/`catch`, are this lesson's own subject, given full treatment
+above in Terms Introduced and in the Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **CSV escaping**
+  - *What it is:* the RFC 4180 quoting rule for a field containing a
+    comma, quote, or newline.
+  - *Implementation:* full treatment already given in
+    `Lesson-34-csv-streamwriter-and-escaping.md`.
+  - *Its use:* this lesson's parser is the exact reverse operation —
+    correctly un-escaping what Lesson 34's export correctly escaped.
 
 ---
 

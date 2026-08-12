@@ -45,79 +45,95 @@ or wraps.
   chosen moment.
 
 **Objects and methods used**
-- `INotifyPropertyChanged` (Lesson 7) and `delegate` (Lesson 6b)
-  reappear here, already given full treatment — brief reminder only,
-  per the Repetition Rule. `ICommand` and the hand-written
-  `RelayCommand` are this lesson's own subject, given full treatment
-  below.
+- **`ICommand`**
+  - *What it is:* a real, built-in .NET interface describing "something
+    that can be executed, and asked in advance whether it currently
+    can be."
+  - *Implementation:* `System.Windows.Input.ICommand`, declaring
+    `Execute(object? parameter)`, `CanExecute(object? parameter)` (a
+    `bool`), and a `CanExecuteChanged` event. WPF's `Button.Command`
+    (and every other `ICommand`-aware control) binds directly to it,
+    calling `CanExecute` to decide `IsEnabled` and `Execute` on click.
+  - *Its use:* the contract this lesson's own hand-written
+    `RelayCommand` implements, and the type every `Command="{Binding
+    ...}"` binding in this project's real XAML now targets. Full lab,
+    real output, and both lenses in this lesson's own Concept Unit.
+- **`Predicate<T>`**
+  - *What it is:* a **delegate type**, built into the .NET Base Class
+    Library, whose values are methods matching one specific signature:
+    take one argument of type `T`, return `bool`.
+  - *Implementation:* the `delegate` mechanism itself was given full
+    treatment in `Lesson-06-b-custom-delegates-and-events.md` via a
+    hand-written delegate type, `NotifyHandler`. `Predicate<T>` is
+    that identical mechanism, except the BCL already declares it for
+    you — an ordinary `delegate bool Predicate<T>(T obj);` somewhere
+    in .NET's own source, reusable for *any* "does this one value pass
+    a test?" shape, unlike `NotifyHandler`, declared by hand only
+    because no built-in delegate matched its exact `void(string)`
+    shape.
+  - *Its use:* `RelayCommand`'s `canExecute` field is typed
+    `Predicate<object?>` — any method (or lambda) taking one `object?`
+    and returning `bool` can be assigned to it, exactly the shape
+    `ICommand.CanExecute(object? parameter)` itself requires.
+- **`CommandManager.RequerySuggested` / `CommandManager.InvalidateRequerySuggested()`**
+  - *What it is:* a WPF-wide, static notification mechanism — not tied
+    to any one `ICommand` — for "something happened that might mean a
+    command's `CanExecute` answer has changed; every listening command
+    should requery."
+  - *Implementation:* `CommandManager` is a `static` class.
+    `RequerySuggested` is a `static` event any number of commands can
+    subscribe to at once; WPF itself raises it automatically on common
+    UI activity (keyboard input, mouse clicks, focus changes).
+    `InvalidateRequerySuggested()` is a `static` method that raises
+    that same event manually, on demand, for situations WPF's own
+    automatic triggers wouldn't catch.
+  - *Its use:* `RelayCommand`'s WPF-aware `CanExecuteChanged` event
+    forwards straight to `RequerySuggested` instead of managing its
+    own subscriber list — every `RelayCommand` in this project shares
+    the identical, single, WPF-provided notification channel.
+    `InvalidateRequerySuggested()` is called directly, in this
+    lesson's own lab, to force an immediate requery in code — standing
+    in for the real mouse click or keystroke that triggers it
+    automatically in the running app.
+- **`Dispatcher` / `Dispatcher.Invoke` / `DispatcherPriority.ContextIdle`**
+  - *What it is:* `Dispatcher` is WPF's own message queue for the
+    single UI thread — every property change, every layout pass, every
+    click handler this project has ever run has actually run *as a
+    queued item* on this exact object, not the instant the triggering
+    event happened. `Dispatcher.Invoke` schedules a piece of work onto
+    that same queue and *waits* for it to actually run before
+    returning, rather than queuing it and moving on immediately.
+    `DispatcherPriority` is an `enum` ranking how urgent a queued item
+    is relative to everything else already waiting; `ContextIdle` is
+    one specific priority level, lower than ordinary input handling,
+    meaning "run this only once the dispatcher has nothing more urgent
+    left to do."
+  - *Implementation:* `Dispatcher.Invoke(Action, DispatcherPriority)` —
+    an overload taking the work to run (here, an empty `() => { }`)
+    and the priority to run it at.
+  - *Its use:* `CommandManager.InvalidateRequerySuggested()` doesn't
+    update `IsEnabled` synchronously, in place — it queues the actual
+    recheck onto the `Dispatcher`, at a low priority, to run once the
+    UI thread is otherwise idle. A test or lab running in a tight
+    loop, with no idle moment of its own, would finish checking
+    `IsEnabled` *before* that queued recheck ever ran.
+    `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle)` is a
+    deliberately empty piece of work, queued at that exact same
+    `ContextIdle` priority — the dispatcher can't run it until every
+    already-queued item at or above that priority (including the real
+    requery) has already run first, so by the time this call returns,
+    the requery this lesson needs to observe is guaranteed to have
+    already happened.
 
-**`Predicate<T>`**
-- *What it is:* a **delegate type**, built into the .NET Base Class
-  Library, whose values are methods matching one specific signature:
-  take one argument of type `T`, return `bool`.
-- *Implementation:* `delegate`, as a keyword and a concept, was given
-  full treatment in Lesson 6b via a hand-written delegate type,
-  `NotifyHandler`. `Predicate<T>` is that identical mechanism, except
-  the BCL already declares it for you — nothing about it is special
-  syntax; it's an ordinary `delegate bool Predicate<T>(T obj);`
-  somewhere in .NET's own source, reusable for *any* "does this one
-  value pass a test?" shape instead of every codebase hand-declaring
-  its own equivalent, the way `NotifyHandler` was declared by hand only
-  because no built-in delegate happened to match its exact
-  `void(string)` shape.
-- *Its use:* `RelayCommand`'s `canExecute` field is typed
-  `Predicate<object?>` — any method (or lambda) taking one `object?` and
-  returning `bool` can be assigned to it, which is exactly the shape
-  `ICommand.CanExecute(object? parameter)` itself requires.
-
-**`CommandManager.RequerySuggested` / `CommandManager.InvalidateRequerySuggested()`**
-- *What it is:* a WPF-wide, static notification mechanism — not tied to
-  any one `ICommand` — for "something happened that might mean a
-  command's `CanExecute` answer has changed; every listening command
-  should requery."
-- *Implementation:* `CommandManager` is a `static` class.
-  `RequerySuggested` is a `static` event any number of commands can
-  subscribe to at once; WPF itself raises it automatically on common
-  UI activity (keyboard input, mouse clicks, focus changes).
-  `InvalidateRequerySuggested()` is a `static` method that raises that
-  same event manually, on demand, for situations WPF's own automatic
-  triggers wouldn't catch.
-- *Its use:* `RelayCommand`'s WPF-aware `CanExecuteChanged` event (this
-  lesson's second unit) forwards straight to `RequerySuggested` instead
-  of managing its own subscriber list — every `RelayCommand` in this
-  project shares the identical, single, WPF-provided notification
-  channel. `InvalidateRequerySuggested()` is called directly, in this
-  lesson's own lab, to force an immediate requery in code — standing in
-  for the real mouse click or keystroke that triggers it automatically
-  in the actual, running app.
-
-**`Dispatcher` / `Dispatcher.Invoke` / `DispatcherPriority.ContextIdle`**
-- *What it is:* `Dispatcher` is WPF's own message queue for the single
-  UI thread — every property change, every layout pass, every click
-  handler this project has ever run has actually run *as a queued item*
-  on this exact object, not the instant the triggering event happened.
-  `Dispatcher.Invoke` schedules a piece of work onto that same queue and
-  *waits* for it to actually run before returning, rather than queuing
-  it and moving on immediately. `DispatcherPriority` is an `enum`
-  ranking how urgent a queued item is relative to everything else
-  already waiting; `ContextIdle` is one specific priority level, lower
-  than ordinary input handling, meaning "run this only once the
-  dispatcher has nothing more urgent left to do."
-- *Implementation:* `Dispatcher.Invoke(Action, DispatcherPriority)` — an
-  overload taking the work to run (here, an empty `() => { }`) and the
-  priority to run it at.
-- *Its use:* `CommandManager.InvalidateRequerySuggested()` doesn't
-  update `IsEnabled` synchronously, in place — it queues the actual
-  recheck onto the `Dispatcher`, at a low priority, to run once the UI
-  thread is otherwise idle. A test or lab running in a tight loop, with
-  no idle moment of its own, would finish checking `IsEnabled` *before*
-  that queued recheck ever ran. `Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle)`
-  is a deliberately empty piece of work, queued at that exact same
-  `ContextIdle` priority — the dispatcher can't run it until every
-  already-queued item at or above that priority (including the real
-  requery) has already run first, so by the time this call returns, the
-  requery this lesson needs to observe is guaranteed to have already
-  happened.
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`INotifyPropertyChanged`**
+  - *What it is:* the contract a class implements to announce, live,
+    that one of its own properties just changed.
+  - *Implementation:* full treatment already given in
+    `Lesson-07-inotifypropertychanged-observablecollection.md`.
+  - *Its use:* every real ViewModel this lesson introduces continues to
+    implement it, unchanged.
 
 ---
 

@@ -33,9 +33,45 @@ just assumed.
   original and copy.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject — shallow vs.
-  deep copy, and the copy-constructor pattern used to achieve it, are
-  given full treatment in the Concept Units below.
+- **`object.ReferenceEquals(object?, object?)`**
+  - *What it is:* a check for whether two variables point at the
+    literal same object in memory, as opposed to `==`, which some
+    types override to compare contents instead.
+  - *Implementation:* a `static` method on `System.Object`, inherited
+    by every type. Never overridable — it always means exactly
+    "are these the same object," regardless of what a type's own `==`
+    does.
+  - *Its use:* this lesson's own real, decisive proof — `ReferenceEquals(original.Tags,
+    shallowCopy.Tags)` returning `True` is what actually demonstrates
+    a shallow copy shares its reference-type fields, not just an
+    assertion.
+- **`string.Join(string, IEnumerable<string>)`**
+  - *What it is:* combines a sequence of strings into one, with a
+    given separator inserted between each.
+  - *Implementation:* a `static` method on `System.String`.
+  - *Its use:* `string.Join(", ", original.Tags)` — formats each lab's
+    `List<string>` for readable `Console.WriteLine` output.
+
+Shallow vs. deep copy, and the copy-constructor pattern used to achieve
+it, are this lesson's own subject (a design pattern, not an external
+class or method), given full treatment above in Terms Introduced and in
+the Concept Units below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`List<T>`**
+  - *What it is:* .NET's standard growable collection.
+  - *Implementation:* full treatment already given in
+    `Lesson-06-fields-classes-and-list.md`.
+  - *Its use:* `Cat.Tags`, this lesson's own example reference-type
+    field, standing in for any mutable collection field on a real
+    class.
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's two labs.
 
 ---
 

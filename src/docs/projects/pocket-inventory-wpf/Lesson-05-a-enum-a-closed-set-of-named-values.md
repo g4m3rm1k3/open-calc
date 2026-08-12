@@ -36,10 +36,31 @@ Lesson 00a (class, object). Basic Python: functions, data types, loops,
   starting at `0`.
 
 **Objects and methods used**
-- `Console.WriteLine`, already given full treatment in Lesson 00a,
-  reappears in this lesson's own `Season` lab — brief reminder only,
-  per the Repetition Rule. `enum` and `Enum.GetValues` are this
-  lesson's own subject, given full treatment above.
+- **`Enum.GetValues(Type)`**
+  - *What it is:* a way to get every legal value of a given `enum` type
+    back as a real, iterable collection.
+  - *Implementation:* a `static` method on .NET's `System.Enum` class,
+    taking a `Type` (produced by `typeof(Season)`) and returning every
+    member of that enum, in declared order — not something `Season`
+    itself defines; `Enum` works generically against any enum type
+    passed to it.
+  - *Its use:* `foreach (Season season in Enum.GetValues(typeof(Season)))`
+    — this lesson's own proof that an enum's declared order is real and
+    queryable, not just an internal implementation detail.
+
+`enum` itself is a language keyword, not an external class or method —
+this lesson's own subject, given full treatment above in Terms
+Introduced and in the Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's one lab comes
+    from this same method.
 
 ---
 

@@ -41,10 +41,45 @@ detail panel, and the SQLite table shape together.
   with no code-behind `if` statement written anywhere.
 
 **Objects and methods used**
-- `Style` itself (Lesson 5) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `TextWrapping`, `CheckBox`, and `Style.Triggers`/`DataTrigger` are
-  this lesson's own subject, given full treatment below.
+- **`TextWrapping`**
+  - *What it is:* controls whether text too long for its available
+    width wraps onto additional lines, or stays on one line, clipped
+    or overflowing.
+  - *Implementation:* an enum-backed property on text-displaying WPF
+    controls (`TextBox`, `TextBlock`). `Wrap` wraps; `NoWrap`, the
+    default, doesn't.
+  - *Its use:* the Notes field's multi-line `TextBox`, so a long note
+    grows downward instead of scrolling sideways off-screen.
+- **`CheckBox`**
+  - *What it is:* a WPF control representing an on/off, checked/
+    unchecked state.
+  - *Implementation:* `System.Windows.Controls.CheckBox`. Its
+    `IsChecked` property is itself bindable, and — genuinely a
+    `bool?` rather than a plain `bool` at the type level, to represent
+    a third, indeterminate state some checkboxes support — binds
+    naturally to a plain `bool` property like `IsFavorite`.
+  - *Its use:* `IsFavorite`'s real UI control, in both the Add row and
+    the detail panel.
+- **`Style.Triggers` / `DataTrigger`**
+  - *What they are:* a declarative way to change a control's appearance
+    in response to a bound value changing, with no code-behind `if`
+    statement written anywhere.
+  - *Implementation:* `Style.Triggers` is a collection on `Style`
+    (Lesson 5) holding `DataTrigger` objects; each `DataTrigger` names
+    a `Binding` and a `Value` to watch for, plus one or more `Setter`s
+    that apply only while the bound value matches.
+  - *Its use:* a favorite item's row (or its star icon) changes
+    appearance — color, weight — purely from `IsFavorite`'s own bound
+    value, with zero code-behind toggling it manually. Full lab, real
+    output, and both lenses in this lesson's own Concept Unit.
+
+`bool` is a language built-in value type, not an external class or
+method — this lesson's own subject, given full treatment above in
+Terms Introduced.
+
+`Style` itself reappears from
+`Lesson-05-styles-and-resource-dictionaries.md`, already given full
+treatment there — brief reminder only, per the Repetition Rule.
 
 ---
 

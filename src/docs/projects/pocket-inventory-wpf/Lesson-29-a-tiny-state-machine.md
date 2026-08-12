@@ -31,9 +31,42 @@ pattern, extended here to a real, multi-value status.
   invalid by definition, not just unusual.
 
 **Objects and methods used**
-- `enum` (Lesson 5a) reappears here, already given full treatment —
-  brief reminder only, per the Repetition Rule. The state machine
-  itself is this lesson's own subject, given full treatment below.
+- **`CommandParameter` (with `ElementName` binding)**
+  - *What it is:* an extra value passed along with a command's
+    `Execute`/`CanExecute` calls, beyond the command itself.
+  - *Implementation:* a property on any `ICommand`-bound control
+    (`Button.CommandParameter`), settable to a plain value or, as here,
+    a `{Binding ElementName=..., Path=...}` expression — reading a
+    live value off a *named sibling element* rather than the current
+    `DataContext`.
+  - *Its use:* `CommandParameter="{Binding ElementName=BorrowerNameBox,
+    Path=Text}"` carries whatever's currently typed in
+    `BorrowerNameBox` through to `BorrowCommand`'s `Execute`, proven
+    this lesson to arrive correctly at the exact moment the button is
+    clicked.
+
+The state machine itself (guarded transitions between named states) is
+this lesson's own subject, given full treatment above in Terms
+Introduced and in the Concept Unit below.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`enum`**
+  - *What it is:* a closed set of named values.
+  - *Implementation:* full treatment already given in
+    `Lesson-05-a-enum-a-closed-set-of-named-values.md`.
+  - *Its use:* `BorrowStatus`, this lesson's own two-member enum
+    (`Available`/`Borrowed`).
+- **`RelayCommand` / `CanExecute`**
+  - *What they are:* the hand-written `ICommand` implementation this
+    project uses everywhere, and the method deciding whether a command
+    is currently allowed to run.
+  - *Implementation:* full treatment already given in
+    `Lesson-23-icommand-relaycommand-and-mvvm.md`.
+  - *Its use:* `BorrowCommand`/`ReturnCommand`'s own `CanExecute`
+    delegates are where this lesson's valid-transition guard actually
+    lives — the UI-level enforcement, backstopped by an identical
+    check inside `Execute` itself.
 
 ---
 

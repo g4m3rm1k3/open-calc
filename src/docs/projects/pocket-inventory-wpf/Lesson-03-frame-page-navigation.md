@@ -67,10 +67,94 @@ out of `MainWindow.xaml.cs` into a new file entirely.
   the same end, never in the middle.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject — `Page`,
-  `Frame`, `NavigationService`, and `Button`/`Padding`/events are all
-  given full treatment in this lesson's own Terms glossary and Concept
-  Units, not deferred to this section.
+- **`Page`**
+  - *What it is:* WPF content meant to be hosted inside something else
+    (a `Frame`), not a standalone top-level window.
+  - *Implementation:* `System.Windows.Controls.Page`. Paired with its
+    own code-behind via `x:Class`, the identical pattern `Window`
+    itself uses — but `Page` has no `Show()` method anywhere on it or
+    anything it inherits from, proven directly this lesson by a real
+    `CS1061` compiler error.
+  - *Its use:* the base class for every real screen this project builds
+    from here on — `HomePage` and `AddItemPage`, both built this
+    lesson. Full lab, the real `CS1061` proof, and both lenses in this
+    lesson's first Concept Unit.
+- **`Frame`**
+  - *What it is:* a control whose entire job is hosting and displaying
+    a `Page`, swapping which one is showing without the window itself
+    ever closing or reopening.
+  - *Implementation:* `System.Windows.Controls.Frame`. `Source="..."`
+    tells it which `Page` to display immediately, declaratively,
+    in markup. `NavigationUIVisibility` controls whether its own
+    built-in browser-style Back/Forward toolbar is shown — `Hidden` in
+    this project, since Lesson 4 builds a deliberately-designed Back
+    button instead of relying on `Frame`'s generic default one.
+  - *Its use:* `MainWindow.xaml`'s content row (`Grid.Row="1"`) now
+    holds a `Frame` instead of a bare control — the real host `Page`
+    needed the moment the previous unit proved it has no way to appear
+    on its own. Full lab, real output, and both lenses in this lesson's
+    second Concept Unit.
+- **`NavigationService`**
+  - *What it is:* a property every `Page` gets access to automatically,
+    once it's actually hosted inside a `Frame` — the hosting `Frame`'s
+    own navigation system, reachable from the `Page`'s own code without
+    the `Page` needing a direct reference to that `Frame`.
+  - *Implementation:* inherited from `Page` itself — `null` if the
+    `Page` isn't currently hosted anywhere, and bound to *this specific*
+    `Frame`'s navigation once it is. `Navigate(object content)` tells
+    the hosting `Frame` to replace its currently-displayed `Page` with
+    a new one, constructed and passed in directly.
+  - *Its use:* `NavigationService.Navigate(new AddItemPage())` — the
+    home screen's "Add Item" button handler, swapping the `Frame`'s
+    content from `HomePage` to a brand-new `AddItemPage` instance. Full
+    lab, real output, and both lenses in this lesson's third Concept
+    Unit.
+- **`Button`**
+  - *What it is:* a clickable control.
+  - *Implementation:* `System.Windows.Controls.Button`. Its `Content`
+    property (not `Text`, unlike `TextBlock`) holds what displays
+    inside it, named `Content` specifically because a `Button` can hold
+    far more than plain text — an image, an entire layout — text is
+    only the most common case. Raises a `Click` **event** (a signal a
+    control fires when something specific happens to it) that XAML's
+    `Click="MethodName"` syntax wires directly to a named C# method.
+  - *Its use:* `<Button Content="Add Item" ... Click="AddItemButton_Click" />`
+    — the home screen's only interactive element, triggering navigation
+    to `AddItemPage` when clicked.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`RoutedEventArgs`**
+  - *What it is:* the real event-argument object WPF hands a `Click`
+    handler.
+  - *Implementation:* `System.Windows.RoutedEventArgs`, in the parameter
+    list every `Click` handler must have (`object sender,
+    RoutedEventArgs e`) — named for WPF's event *routing* through the
+    visual tree, a mechanism this project doesn't use directly yet,
+    only the required signature.
+  - *Its use:* `AddItemButton_Click(object sender, RoutedEventArgs e)`
+    — `e` itself is never read in this lesson's handler body, only
+    required by the signature `Click="..."` expects.
+- **`StackPanel`**
+  - *What it is:* a panel that arranges its children in a single
+    vertical or horizontal sequence.
+  - *Implementation:* full treatment already given in
+    `Lesson-01-your-first-wpf-window.md`.
+  - *Its use:* both `HomePage.xaml` and `AddItemPage.xaml` use one to
+    center their content.
+- **`TextBlock`**
+  - *What it is:* the basic WPF control for displaying a run of text.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-developer-environment.md`.
+  - *Its use:* the welcome message (relocated from `MainWindow` into
+    `HomePage`) and the Add Item screen's placeholder heading.
+- **`System.DateTime`**
+  - *What it is:* a built-in .NET struct representing a specific point
+    in calendar time.
+  - *Implementation:* full treatment already given in
+    `Lesson-01-your-first-wpf-window.md`.
+  - *Its use:* `HomePage.xaml.cs`'s constructor, relocated unchanged
+    from `MainWindow.xaml.cs`.
 
 ---
 

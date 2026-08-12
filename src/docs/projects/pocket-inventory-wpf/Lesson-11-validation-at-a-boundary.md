@@ -49,10 +49,33 @@ it.
   `IDataErrorInfo` on its source object on every update.
 
 **Objects and methods used**
-- No supporting cast beyond this lesson's own subject —
-  `string.IsNullOrWhiteSpace` and `IDataErrorInfo` are both this
-  lesson's own subject, already given full treatment in its Terms
-  glossary above and Concept Units below.
+- **`string.IsNullOrWhiteSpace(string?)`**
+  - *What it is:* a single check for whether a string is genuinely
+    empty, `null`, or contains only whitespace characters — three
+    different "not really any real text" cases, collapsed into one
+    true/false answer.
+  - *Implementation:* a `static` method on `System.String`, taking one
+    `string?` and returning `bool` — called on the class itself, not
+    on an instance.
+  - *Its use:* the exact boundary check `AddButton_Click` needs before
+    trusting `NameInput.Text` — full lab, real output, and both lenses
+    in this lesson's first Concept Unit.
+- **`IDataErrorInfo`**
+  - *What it is:* a built-in .NET interface WPF's binding system checks
+    for on any bound object, to surface per-property validation errors
+    directly through the binding itself.
+  - *Implementation:* `System.ComponentModel.IDataErrorInfo`, declaring
+    an `Error` property (an object-level message) and an **indexer**
+    (`string this[string propertyName]`) returning a message for one
+    specific property — an empty string means "this property is
+    currently valid," a non-empty one means "here's what's wrong."
+    WPF's binding engine calls the indexer automatically, passing the
+    bound property's own name, whenever `ValidatesOnDataErrors=True`
+    is set on that binding.
+  - *Its use:* `InventoryItem` implements it so `NameInput`'s own
+    binding can reject a blank name live, through the binding system
+    itself, rather than only inside `AddButton_Click`. Full lab, real
+    output, and both lenses in this lesson's second Concept Unit.
 
 ---
 

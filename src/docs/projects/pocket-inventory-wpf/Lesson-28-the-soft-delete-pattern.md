@@ -30,10 +30,39 @@ predicates. Lesson 22: real, permanent `DeleteItemFromDatabase`.
   always returns.
 
 **Objects and methods used**
-- `ICollectionView`/`Filter` (Lessons 17, 19) and `MessageBox.Show`
-  (Lesson 22) reappear here, already given full treatment — brief
-  reminder only, per the Repetition Rule. `ListCollectionView` is this
-  lesson's own subject, given full treatment below.
+- **`ListCollectionView`**
+  - *What it is:* a concrete `ICollectionView` implementation that can
+    be constructed directly, giving a genuinely independent view over a
+    collection — distinct from the one, shared view
+    `CollectionViewSource.GetDefaultView` always returns for a given
+    source.
+  - *Implementation:* `System.Windows.Data.ListCollectionView`,
+    constructed with `new ListCollectionView(items)`, implementing
+    `ICollectionView` (Lesson 17) the same as the default view does —
+    its own `Filter`, `SortDescriptions`, and `GroupDescriptions` are
+    completely separate from any other view over the same source.
+  - *Its use:* a second, real, independent view over `Items` — one
+    showing active items, the other archived ones — proven this
+    lesson, with `ReferenceEquals`, to genuinely be two different
+    objects. Full lab, real output, and both lenses in this lesson's
+    own Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`ICollectionView` / `Filter`**
+  - *What they are:* the interface a bound view implements, and the
+    property that narrows which items in it are currently visible.
+  - *Implementation:* full treatment already given in
+    `Lesson-17-collectionviewsource-and-grouping.md` and
+    `Lesson-19-predicates-and-live-search.md`.
+  - *Its use:* both `ListCollectionView`s this lesson builds use
+    `Filter` to show only active or only archived items, respectively.
+- **`MessageBox.Show`**
+  - *What it is:* opens a real, modal system dialog box.
+  - *Implementation:* full treatment already given in
+    `Lesson-22-modal-dialogs-and-messageboxresult.md`.
+  - *Its use:* confirms restoring an archived item, the same pattern as
+    Lesson 22's delete confirmation.
 
 ---
 

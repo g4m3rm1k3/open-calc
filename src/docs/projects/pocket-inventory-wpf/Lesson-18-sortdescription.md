@@ -32,10 +32,37 @@ unexplained until now.
   by hand in this project.
 
 **Objects and methods used**
-- `ICollectionView` (Lesson 17) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule.
-  `SortDescription` and `IComparable` are this lesson's own subject,
-  given full treatment below.
+- **`SortDescription`**
+  - *What it is:* a small, real value naming one property and one
+    direction to sort by — added to a view, not something you compute
+    an order from by hand.
+  - *Implementation:* `System.ComponentModel.SortDescription`, a real
+    `struct` (value-type semantics, per
+    `csharp-struct-value-semantics.md`), constructed with a property
+    name and a `ListSortDirection` (`Ascending`/`Descending`). Added to
+    `ICollectionView.SortDescriptions`, a real collection every
+    `ICollectionView` exposes alongside `GroupDescriptions` (Lesson
+    17).
+  - *Its use:* `GroupedItems.SortDescriptions.Add(new
+    SortDescription(nameof(InventoryItem.Name), ListSortDirection.Ascending))`
+    — this lesson's own real, declared default order, reordering the
+    view without touching `Items` itself. Full lab, real output, and
+    both lenses in this lesson's own Concept Unit.
+- **`IComparable`**
+  - *What it is:* the interface .NET's built-in sorting — including
+    `SortDescription`'s own comparisons — relies on to know how to
+    order two values of the same type.
+  - *Implementation:* `System.IComparable`, declaring one method,
+    `CompareTo`, returning negative/zero/positive to mean
+    less-than/equal/greater-than. Already implemented by every built-in
+    type this project sorts by (`string`, `decimal`, `DateTime`) —
+    never written by hand in this project.
+  - *Its use:* the real, invisible mechanism `SortDescription` calls
+    into whenever it compares two items' values for a given property.
+
+`ICollectionView` reappears from
+`Lesson-17-collectionviewsource-and-grouping.md`, already given full
+treatment there — brief reminder only, per the Repetition Rule.
 
 ---
 

@@ -63,11 +63,96 @@ different use of the same underlying `event` keyword.
   bound object to actually display.
 
 **Objects and methods used**
-- `Console.WriteLine` and `System.Reflection` (Lesson 6) reappear in
-  this lesson's own labs, already given full treatment — brief
-  reminder only, per the Repetition Rule. `INotifyPropertyChanged`,
-  `ObservableCollection<T>`, and data binding are this lesson's own
-  subject, given full treatment in the Concept Units below.
+- **`INotifyPropertyChanged`**
+  - *What it is:* the contract a class implements to announce, live,
+    that one of its own properties just changed.
+  - *Implementation:* `System.ComponentModel.INotifyPropertyChanged`,
+    a real interface with exactly one required member, confirmed
+    against the actual current interface this session:
+    ```csharp
+    public interface INotifyPropertyChanged
+    {
+        event PropertyChangedEventHandler? PropertyChanged;
+    }
+    ```
+    Everything beyond raising `PropertyChanged` correctly (a backing
+    field, a `nameof`-built argument) is this project's own design
+    choice, not something the interface itself demands.
+  - *Its use:* `InventoryItem : INotifyPropertyChanged` — this project's
+    model announcing every real change to `Name`, so any interested
+    view can react without `InventoryItem` needing to know that view
+    exists. Full lab, real output, and both lenses in this lesson's
+    first Concept Unit.
+- **`PropertyChangedEventHandler` / `PropertyChangedEventArgs`**
+  - *What they are:* the delegate type `PropertyChanged` must be, and
+    the event-argument object every subscriber to it receives.
+  - *Implementation:* both in `System.ComponentModel`.
+    `PropertyChangedEventHandler` is .NET's own standard delegate
+    shape for exactly this kind of notification.
+    `PropertyChangedEventArgs(string? propertyName)`'s constructor
+    takes the changed property's name — built here with `nameof(Name)`
+    rather than a raw string literal, so a future rename fails to
+    compile until this call site is updated too.
+  - *Its use:* `PropertyChanged?.Invoke(this, new
+    PropertyChangedEventArgs(nameof(Name)));` inside `Name`'s `set` —
+    the entire real mechanism behind this lesson's first Concept Unit.
+- **`ObservableCollection<T>`**
+  - *What it is:* a `List<T>`-like collection that automatically
+    announces its own membership changes — no code inside `Add`/
+    `Remove` has to remember to raise anything, unlike
+    `INotifyPropertyChanged`, which has to be hand-written per class.
+  - *Implementation:* `System.Collections.ObjectModel.ObservableCollection<T>`,
+    implementing `INotifyCollectionChanged` for you. Every `List<T>`
+    method (`Add`, `Remove`, `Count`, `foreach`) works identically;
+    its `CollectionChanged` event fires on every mutation, carrying an
+    `e.Action` (`Add`, `Remove`, and others) describing what kind of
+    change just happened.
+  - *Its use:* `InventoryPage`'s `public ObservableCollection<InventoryItem>
+    Items` — replaces the earlier plain `List<InventoryItem>`,
+    letting the bound `ListBox` react to additions with no
+    code-behind rebuild logic at all. Full lab, real output, and both
+    lenses in this lesson's second Concept Unit.
+- **`DataContext` / `{Binding}` / `ItemsSource` / `DisplayMemberPath`**
+  - *What they are:* the mechanism that connects a XAML element
+    directly to a C# property, with no code-behind maintaining the
+    connection by hand.
+  - *Implementation:* `DataContext` is a property every WPF element
+    inherits from its parent unless it sets its own; `{Binding
+    PropertyName}` is a markup extension resolving `PropertyName`
+    against whatever object is currently the element's `DataContext`.
+    `ListBox.ItemsSource` accepts a bound collection directly;
+    `DisplayMemberPath` names which property of each bound object to
+    actually display (without it, a bound `ListBox` shows each item's
+    default `ToString()` instead).
+  - *Its use:* `DataContext = this;` in `InventoryPage`'s constructor,
+    plus `ItemsSource="{Binding Items}" DisplayMemberPath="Name"` on
+    `ItemListBox` — together, the entire real connection between
+    `Items` changing and the screen updating. Full lab, real output,
+    and both lenses in this lesson's third Concept Unit.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Console.WriteLine`**
+  - *What it is:* .NET's way of printing a line of text to the running
+    program's terminal.
+  - *Implementation:* full treatment already given in
+    `Lesson-00-a-classes-objects-and-inheritance.md`.
+  - *Its use:* every real output shown in this lesson's three labs.
+- **`ListBox` / `TextBox` / `Button`**
+  - *What they are:* a scrollable selectable list, a typed-text input,
+    and a clickable control, respectively.
+  - *Implementation:* full treatment already given in
+    `Lesson-06-fields-classes-and-list.md` (`ListBox`/`TextBox`) and
+    `Lesson-03-frame-page-navigation.md` (`Button`).
+  - *Its use:* unchanged from Lesson 6 — only how `ItemListBox` gets
+    populated changes this lesson, not the controls themselves.
+- **`RoutedEventArgs`**
+  - *What it is:* the real event-argument object WPF hands a `Click`
+    handler.
+  - *Implementation:* full treatment already given in
+    `Lesson-03-frame-page-navigation.md`.
+  - *Its use:* `AddButton_Click(object sender, RoutedEventArgs e)` —
+    the required signature, unchanged from Lesson 6.
 
 ---
 

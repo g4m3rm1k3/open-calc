@@ -28,12 +28,35 @@ gives real, visible effect.
   dark theme) and swaps which is active at runtime.
 
 **Objects and methods used**
-- `StaticResource`/`Style`/`Setter` (Lesson 5) reappear here, already
-  given full treatment — brief reminder only, per the Repetition Rule.
-  `DynamicResource` is this lesson's own subject, given full treatment
-  below (also detailed as a standalone concept file,
-  `wpf-resourcedictionary-and-staticresource.md`, for the
-  `StaticResource` half of this same contrast).
+- **`ResourceDictionary.MergedDictionaries`**
+  - *What it is:* the real, ordered list of resource dictionaries an
+    `Application`'s own resources are actually built from — swappable
+    at runtime, not fixed at startup.
+  - *Implementation:* `Application.Current.Resources.MergedDictionaries`,
+    an `ObservableCollection`-like list; a new `ResourceDictionary`
+    (loaded via `Source = new Uri("pack://application:,,,/DarkTheme.xaml")`)
+    can be added or removed from it at any time while the app runs.
+  - *Its use:* `.Clear()` then `.Add(theme)` — the real mechanism this
+    lesson's dark-mode toggle uses to swap the entire active theme
+    live, with every `DynamicResource` reference re-resolving
+    immediately against the new dictionary.
+
+`DynamicResource` is this lesson's own subject, given full treatment
+above in Terms Introduced and in the Concept Unit below — also detailed
+as a standalone concept file,
+`wpf-resourcedictionary-and-staticresource.md`, for the `StaticResource`
+half of this same contrast.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`StaticResource` / `Style` / `Setter`**
+  - *What they are:* a one-time resource lookup, and a named bundle of
+    property-value pairs.
+  - *Implementation:* full treatment already given in
+    `Lesson-05-styles-and-resource-dictionaries.md`.
+  - *Its use:* this lesson's own contrasting proof — the exact same
+    resource key, read once via `StaticResource` and continuously via
+    `DynamicResource`, side by side.
 
 ---
 

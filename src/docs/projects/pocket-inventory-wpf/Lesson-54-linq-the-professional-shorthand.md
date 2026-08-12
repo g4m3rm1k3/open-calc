@@ -33,10 +33,62 @@ worked example.
   whatever the source collection contains *at that moment*.
 
 **Objects and methods used**
-- `Predicate<T>` (Lesson 19) reappears here, already given full
-  treatment — brief reminder only, per the Repetition Rule. `.Where()`,
-  `.Select()`, and deferred execution are this lesson's own subject,
-  given full treatment below.
+- **`.Where(predicate)`**
+  - *What it is:* a LINQ extension method that filters a sequence,
+    keeping only the elements for which a given condition returns
+    `true` — the shorthand for a `foreach` with an `if` check inside it.
+  - *Implementation:* an extension method on `IEnumerable<T>`, taking a
+    lambda (`i => i.Category == "Tools"`) and returning a new,
+    unmaterialized sequence — nothing is actually filtered until that
+    sequence is enumerated.
+  - *Its use:* proven, against Lesson 20's own hand-rolled
+    `Matches`/`PrintMatches` loop, to produce byte-identical real
+    output; later replaces `viewModel.Items`' manual archived-item
+    filter in Lesson 37's print feature.
+- **`.Select(transform)`**
+  - *What it is:* a LINQ extension method that transforms each element
+    of a sequence into something else, one at a time — the shorthand
+    for a `foreach` loop that builds up a new list from an old one.
+  - *Implementation:* an extension method on `IEnumerable<T>`, taking a
+    lambda (`i => i.Name`) and returning a new, unmaterialized sequence
+    of the transformed values.
+  - *Its use:* chained directly after `.Where()`
+    (`items.Where(...).Select(i => i.Name)`), reducing a full
+    `InventoryItem` filter-then-extract-name loop to one line.
+- **`.ToList()`**
+  - *What it is:* forces a LINQ query to actually run right now,
+    against the source collection's current contents, and copies the
+    results into a real, independent `List<T>`.
+  - *Implementation:* an extension method on `IEnumerable<T>`,
+    enumerating the entire query and materializing every result.
+  - *Its use:* this lesson's own real, contrasted proof of **deferred
+    execution** — a query read *before* `.ToList()` sees a later
+    addition to the source list; the identical query, materialized with
+    `.ToList()` immediately, does not.
+- **`IEnumerable<T>`**
+  - *What it is:* the real return type of an unmaterialized LINQ query
+    — represents "a sequence that can be enumerated," not a concrete,
+    already-computed collection.
+  - *Implementation:* the interface `.Where()`/`.Select()` both return;
+    assigning their result to an `IEnumerable<T>` variable (rather than
+    `List<T>`) keeps the query un-run until something actually
+    enumerates it.
+  - *Its use:* `IEnumerable<string> query = names.Where(...)`, this
+    lesson's own real, direct proof that a LINQ query re-reads its
+    source collection at enumeration time, not at the moment it's
+    written.
+
+**Everything else in the file, not this lesson's subject but still
+explained**
+- **`Predicate<T>`**
+  - *What it is:* a delegate type representing "a method that takes a
+    `T` and returns `bool`."
+  - *Implementation:* full treatment already given in
+    `Lesson-19-predicates-and-live-search.md`.
+  - *Its use:* the hand-written filtering shape (`ICollectionView.Filter`)
+    this lesson's `.Where()` is shown to be the professional shorthand
+    for — pure language plumbing (lambdas, generic syntax) stays in
+    Terms Introduced, not repeated here.
 
 ---
 
