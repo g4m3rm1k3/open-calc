@@ -14,7 +14,7 @@ function Section({ label, color, children }) {
   )
 }
 
-export default function ConceptNode({ topic, topicMap, onNavigate }) {
+export default function ConceptNode({ topic, topicMap, onNavigate, DemoComponent }) {
   const [showCode, setShowCode] = useState(false);
   const scrollRef = useRef(null);
 
@@ -74,6 +74,15 @@ export default function ConceptNode({ topic, topicMap, onNavigate }) {
                   ))}
                 </ol>
               </div>
+            </Section>
+          )}
+
+          {/* Live demo — an interactive alternative to the static Python/MATLAB
+              code toggle below, for subjects (like regex) where "run it and
+              see what happens" is the primary teaching tool, not a supplement. */}
+          {DemoComponent && (
+            <Section label="Try It" color={c.section}>
+              <DemoComponent topic={topic} />
             </Section>
           )}
 
