@@ -78,6 +78,18 @@
  *      fixed same session: pocket-inventory-wpf Lesson 3's `Page` unit
  *      asserted "`Page` has no `Show()`" without the reader ever actually
  *      trying it and seeing the real `CS1061` compiler error.
+ *  14. (C++ only, LOOSE PRECISION) A real `std::`-qualified call, or one
+ *      of a fixed list of notable keywords (`explicit`, `virtual`,
+ *      `throw`, etc.), appears inside a ```cpp fence but is never
+ *      mentioned in this lesson's own Header or any earlier lesson's
+ *      (filename order) — added after a manual self-check on
+ *      pocket-db's Lesson 4 found `std::to_string` and `explicit` both
+ *      silently undocumented, missed by every check above since neither
+ *      is a structural gap. Matches against a normalized, combined blob
+ *      of every prior Header's text, not per-entry — can't confirm an
+ *      entry's *explanation* is any good, only that some mention exists
+ *      somewhere; still narrows "read every lesson" to "check N flagged
+ *      names."
  *
  * What this CANNOT catch, on purpose — don't extend it to pretend it can:
  *   - Whether an explanation is actually *correct* (the Observer vs.
@@ -161,6 +173,8 @@ const NON_LESSON_FILENAMES = new Set([
   'CURRICULUM_NOTES.MD',
   'HOW-TO-RUN-EXAMPLES.MD',
   'CONCEPT-GRAPH.MD',
+  'BRD.MD',
+  'LESSONS.MD',
 ])
 
 function isMarkdownFile(name) {
@@ -871,6 +885,97 @@ function checkFirstAppearanceUnitHasProof(fileLabel, text, issues) {
   }
 }
 
+// ---------------------------------------------------------------------
+// Code-vocabulary coverage: extracts real API surface directly from
+// fenced C++ code blocks and checks each one is actually documented —
+// either in this lesson's own Header, or an EARLIER lesson's Header
+// (same folder, filename order, matching findLessonFiles' own .sort())
+// per the Repetition Rule. Added after a manual self-check pass on
+// pocket-db's Lesson 4 found two real, undocumented gaps
+// (`std::to_string` used with no "Objects and methods used" entry;
+// `explicit` used since Lesson 2 with no "Terms introduced" entry
+// anywhere) that every check above missed, because they're content
+// gaps, not structural ones. This narrows the same "read every lesson"
+// problem the density/proof checks above already narrow — it can't
+// confirm an entry's *explanation* is any good, only that one exists.
+//
+// Two separate vocabularies, because the schema itself splits them:
+// a bare language keyword (`explicit`, `virtual`) belongs in "Terms
+// introduced"; a qualified library call (`std::to_string`) belongs in
+// "Objects and methods used". Deliberately scoped to C++ (```cpp
+// fences) only for now — the active language in this repo's curricula
+// that actually needs it. Extend CPP_NOTABLE_KEYWORDS and add an
+// equivalent qualified-call pattern for Python/other languages if a
+// curriculum in that language wants this same check.
+//
+// Precision note, same direction as checkGlossary's own coreTermCandidates
+// comment: this errs toward under-flagging (a loose substring match
+// against the combined, normalized header text) rather than over-
+// flagging — missing a real gap is recoverable by a human read-through;
+// false-flagging common, thoroughly-covered names (std::string,
+// std::vector) on every single lesson is exactly the noise that defeats
+// this kind of check's own purpose.
+// ---------------------------------------------------------------------
+
+const CPP_NOTABLE_KEYWORDS = [
+  'explicit', 'virtual', 'override', 'throw', 'try', 'catch',
+  'template', 'friend', 'mutable', 'volatile', 'noexcept', 'constexpr',
+  'typedef', 'enum', 'static_cast', 'reinterpret_cast', 'const_cast',
+  'dynamic_cast',
+]
+
+const CPP_STD_QUALIFIED_RE = /\bstd::[A-Za-z_][A-Za-z0-9_]*/g
+
+function extractCppFences(text) {
+  const blocks = []
+  const re = /```cpp\n([\s\S]*?)```/g
+  let m
+  while ((m = re.exec(text))) blocks.push(m[1])
+  return blocks
+}
+
+// Header = everything before the first '---' or first '## Concept Unit'
+// heading — same boundary convention extractGlossarySection already
+// relies on for the same region.
+function extractHeaderSection(text) {
+  const end = text.search(/\n(---|##\s+Concept Unit)/i)
+  return end === -1 ? text : text.slice(0, end)
+}
+
+function checkCodeVocabularyCoverage(fileLabel, text, priorHeaderTexts, issues) {
+  const cppBlocks = extractCppFences(text)
+  if (cppBlocks.length === 0) return
+  const joinedCode = cppBlocks.join('\n')
+
+  const combinedHeader = [...priorHeaderTexts, extractHeaderSection(text)].join('\n')
+  const normalizedCoverage = normalizeTerm(combinedHeader)
+
+  for (const kw of CPP_NOTABLE_KEYWORDS) {
+    if (!new RegExp(`\\b${kw}\\b`).test(joinedCode)) continue
+    if (!normalizedCoverage.includes(normalizeTerm(kw))) {
+      issues.push({
+        file: fileLabel,
+        line: null,
+        kind: 'undocumented-keyword',
+        message: `\`${kw}\` appears in this lesson's own C++ code, but no "Terms introduced" entry for it appears in this lesson or any earlier one (filename order) — a real language keyword needs a real entry somewhere per its true first appearance`,
+      })
+    }
+  }
+
+  const stdCalls = new Set(joinedCode.match(CPP_STD_QUALIFIED_RE) || [])
+  for (const call of stdCalls) {
+    const core = normalizeTerm(call.replace('std::', ''))
+    if (core && !normalizedCoverage.includes(core)) {
+      issues.push({
+        file: fileLabel,
+        line: null,
+        kind: 'undocumented-std-call',
+        message: `\`${call}\` appears in this lesson's own C++ code, but no "Objects and methods used" entry seems to cover it, in this lesson or any earlier one (filename order) — verify it has real treatment somewhere, or add one`,
+      })
+    }
+  }
+}
+
 // Cross-file check: the same backticked term marked "first appearance"
 // in more than one lesson means an earlier lesson (in filename order) grew
 // a dependency on something a later lesson still claims to own first.
@@ -914,6 +1019,7 @@ function main() {
       console.log(`(no lesson files found in ${folder})`)
       continue
     }
+    const priorHeaderTexts = []
     for (const filePath of files) {
       const fileLabel = join(basename(dirname(filePath)), basename(filePath))
       const text = readFileSync(filePath, 'utf-8')
@@ -929,6 +1035,8 @@ function main() {
       checkHeadingCaseDrift(fileLabel, text, allIssues)
       checkConceptUnitDensity(fileLabel, text, allIssues)
       checkFirstAppearanceUnitHasProof(fileLabel, text, allIssues)
+      checkCodeVocabularyCoverage(fileLabel, text, priorHeaderTexts, allIssues)
+      priorHeaderTexts.push(extractHeaderSection(text))
     }
   }
 
