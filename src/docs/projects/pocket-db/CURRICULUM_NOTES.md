@@ -523,3 +523,54 @@ was verified with the same rigor as S00-S01: isolated proofs compiled/
 run for real, full assemblies checker-passed, then copied into and
 re-verified against the real reference project at
 `C:\Users\g4m3r\Documents\pocketdb\`, before moving to the next slice.
+
+## 2026-08-13 — `database_table_names` (Lesson 28, S14)
+
+The new `pocket-studio` project (a real Electron/React/TypeScript GUI
+client for `.pdb` files — see `../pocket-studio/`) needs to list a
+database's own table names without already knowing them — the one
+real thing no `pocket-db` lesson ever needed, since every lesson's own
+code always already knew the tables it had just created. Not a hole in
+"S00-S13 complete": every lesson's own real Definition of Done was
+scoped to what that lesson actually built and used, and none of them
+needed this. It's a real, new requirement from a real, new, different
+kind of consumer (a generic file browser, not code that authored the
+file it's reading) — legitimately covered by the original BRD's own
+stated goals (`brd.md`, goal #13 "excellent introspection," goal #14
+"easy to embed into desktop applications") and its own "Catalog
+Manager" architecture layer, which `pocket-db`'s real `catalog.cpp`
+(Lesson 16) already implements — the table names were always sitting
+in `Database::tables`, just never exposed to Python.
+
+**Correction, same day:** this was first added directly to the real
+reference project and only described here, in `CURRICULUM_NOTES.md` —
+a real mistake, caught immediately: this file is a "why" doc, not
+something anyone builds `pocket-db` from. Anyone actually following
+the lessons from scratch would never get this code at all. Fixed by
+writing it up as a real, proper `Lesson-28` (S14) — small and honest
+about being small (one function, reusing already-taught patterns), but
+real, structured, checker-passed lesson content, the same as every
+other addition in this project. `CURRICULUM_NOTES.md` records *why*;
+the lesson itself is what anyone actually builds from — that
+distinction is the one that broke here, now restored.
+
+## 2026-08-13 — `Cursor.description` (Lesson 29, S15)
+
+Same real shape as S14, this time in `dbapi.py`: `pocket-studio`'s own
+S05 (a real query input, reusing this project's own `WHERE`/
+`ORDER BY`/`LIMIT` support) needs a real query's own result column
+names, and `Cursor` (Lesson 19/22) never exposed them — only real,
+unlabeled tuples via `fetchall()`/`fetchone()`. Real, standard DB-API
+2.0 (PEP 249) already names the answer: `cursor.description`, which
+real `sqlite3` already has — `dbapi.py`'s own real, stated Lesson 19
+goal ("a real, if partial, drop-in" for `sqlite3`-shaped code) was
+honestly incomplete without it.
+
+Written as a real lesson from the start this time (Lesson 28's own
+correction, applied immediately, not re-learned): `Cursor.description`
+set to `None` in `__init__`, a real list of 7-tuples
+(`(name, None, None, None, None, None, None)`, matching real PEP 249's
+own exact shape) after a real `SELECT`, `None` again after a real
+`INSERT`. Verified against a real query and a real insert, and the
+real `AttributeError` that would occur without the `__init__` default,
+caught and restored. Full `demo.py` regression run clean afterward.

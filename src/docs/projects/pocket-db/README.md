@@ -171,10 +171,14 @@ or fewer than the estimate.
 | S11 | — (engine stable) | NumPy/pandas layered on top of `pocketdb.query(...)`, hand-built vs. professional-tool comparison | Analytical workload, the same "why professional tools exist" beat the rest of this repo's curricula already use |
 | S12 | — | scikit-learn → hand-built neural net → TensorFlow/Keras, trained on data actually stored in your own engine | *Deep Learning with Keras*'s material, taught against your own data, not a textbook's |
 | S13 | An interface the RL side can persist experience through | OpenAI Gym agent (*Applied Reinforcement Learning*'s material), experience replay stored via `pocketdb`, not an in-memory list | A trained agent whose training data survives the process that trained it — the persistence story from S02, paid off |
+| S14 | `database_table_names`/`Database.table_names()` — real table-name introspection | (Python-side use is external — see `pocket-studio`) | A real, external caller can discover what tables a `.pdb` file has without already knowing them — the one real question no S00-S13 lesson ever needed to ask itself |
 
 Concurrency, further query-language growth, columnar storage, and
-anything past S13 are deliberately not planned yet — added when S00–S13
-are real and there's an actual next felt need, not speculatively now.
+anything past S14 are deliberately not planned yet — added when
+there's an actual next felt need, not speculatively now. S14 itself
+was added the same way: a real, external, different-shaped consumer
+(`pocket-studio`, a GUI client) surfaced one real, small, missing
+capability.
 
 **Noted future direction (not scheduled):** a real GUI client — an
 Electron + React + TypeScript app in the shape of DBeaver — talking to
@@ -238,8 +242,14 @@ are written. Lesson numbers are one single, project-wide sequence
 | S11 | `Lesson-25` (No engine changes. Python: real, queried `Record` rows converted into a real `pandas.DataFrame`; a real, side-by-side comparison — a per-team average and a real standard deviation, computed both by an explicit, hand-built loop and with `pandas.groupby`/`numpy.std(ddof=1)` — agreeing exactly, differing only in how much real code and reusable generality each costs; the same "why professional tools exist" beat this repo's other curricula already use. **S11 complete.**) |
 | S12 | `Lesson-26` (No engine changes. Python: a real, hand-worked single gradient-descent step verified by hand first (`sigmoid`, error, gradient, one update, prediction moving correctly toward the target); a real, `150`-row dataset stored in and queried from PocketDB, then trained three real ways — `scikit-learn`'s `LogisticRegression`, a real, hand-built single-neuron training loop, and a real `Keras` `Sequential` model — all learning the identical relationship; `scikit-learn`'s own higher accuracy honestly explained (a better optimizer, not a different model) rather than left as unexplained "professional tools are better." **S12 complete.**) |
 | S13 | `Lesson-27` (No engine changes. Python: a real, hand-worked Q-learning (Bellman equation) update verified by hand first; a real `gymnasium` `FrozenLake-v1` agent, trained live for 5000 episodes to a perfect (1.00) win rate, then a small, real, bounded sample of its own converged experience (60 transitions, batched per episode via Lesson 24's `Transaction`) persisted through `pocketdb` — honestly bounded by S02's own real, established one-page-per-table capacity, reframed as a real, standard, bounded replay-buffer design rather than a limitation; a completely separate process then replayed nothing but those 60 stored rows into an equally perfect (1.00) win-rate policy, with no live environment at all. **S13 complete — the full, planned curriculum (S00-S13) is done.**) |
+| S14 | `Lesson-28` (C++: `database_table_names` — real table-name introspection, reusing Lesson 18's own comma-joined convention and Lesson 7's own exception-safety pattern exactly, over data `Database::tables` has held correctly since Lesson 16; Python: `Database.table_names()`, proven against multiple tables, an empty database (`[]`, not an error — a real, caught edge case in the naive `"".split(",")` approach), and a real reopen. Added because a real, external, different-shaped consumer — `pocket-studio`, a GUI client opening `.pdb` files it didn't create — surfaced the one real question no S00-S13 lesson ever needed to ask itself. **S14 complete.**) |
+| S15 | `Lesson-29` (No new C++. Python: `Cursor.description` — the real, standard DB-API 2.0 (PEP 249) attribute `dbapi.py`'s own `Cursor` never had, matching real `sqlite3` exactly (`None` before any query, a real 7-tuple per column after a `SELECT`, `None` again after an `INSERT`), reusing Lesson 18's already-real `schema` for the real column names. Added for the identical real reason as S14: `pocket-studio` needs to know a real query's own result column names without already knowing the table it queried — a real, honest completion of `dbapi.py`'s own already-stated Lesson 19 goal, not new scope. **S15 complete.**) |
 
-**The PocketDB curriculum (S00-S13) is complete.** Every slice above is
+**The PocketDB curriculum (S00-S13) is complete.** S14 and S15 are real,
+small, honest additions made afterward, each one a genuine, external
+consumer (`pocket-studio`) surfacing a real capability no S00-S13
+lesson ever needed for itself — the same real engineering judgment
+call, made twice. Every slice above is
 verified, checker-clean, and proven end-to-end in the real reference
 project at the path described in `CURRICULUM_NOTES.md`. See that file's
 own running log for the full, dated decision history behind every
