@@ -82,6 +82,7 @@ export const DOCS_MODULES = import.meta.glob("/src/docs/**/*.md", {
 
 const PREFIX = "/src/docs/";
 const LS_KEY = "markdownhub_personal";
+const NOTES_LS_KEY = "mdhub_notes";
 
 const LANG_EXT = {
   javascript: "js",
@@ -374,6 +375,29 @@ function loadPersonal() {
 
 function savePersonal(files) {
   localStorage.setItem(LS_KEY, JSON.stringify(files));
+}
+
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_LS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveNotes(notes) {
+  localStorage.setItem(NOTES_LS_KEY, JSON.stringify(notes));
+}
+
+// Notes group by the doc's immediate parent folder ("series") so a lesson
+// dropped anywhere under src/docs/ files itself sensibly without asking the
+// user to categorize it by hand.
+function seriesFromPath(path) {
+  if (!path) return "General";
+  const rel = path.startsWith(PREFIX) ? path.slice(PREFIX.length) : path;
+  const parts = rel.split("/");
+  parts.pop(); // filename
+  return parts.length ? displayName(parts[parts.length - 1]) : "General";
 }
 
 function getMdCss(md) {
@@ -1443,6 +1467,145 @@ function DocListItem({
   );
 }
 
+function NoteEditorItem({
+  note,
+  isActive,
+  onOpen,
+  onUpdate,
+  onDelete,
+  onOpenSource,
+  accentColor = "#0ea5e9",
+  ui = {},
+}) {
+  return (
+    <div className={`mx-2 mb-1.5 rounded-md border ${ui.border} overflow-hidden`}>
+      <div
+        onClick={onOpen}
+        className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors group ${ui.txt2} ${ui.hoverBg}`}
+      >
+        {isActive ? (
+          <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-70" />
+        ) : (
+          <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-70" />
+        )}
+        <div className="truncate flex-1">
+          <div className={`truncate font-medium ${ui.txt1}`}>
+            {note.title || "Untitled note"}
+          </div>
+          {!isActive && note.body && (
+            <div className={`truncate text-[10px] ${ui.txt2}`}>
+              {note.body.replace(/\s+/g, " ").trim()}
+            </div>
+          )}
+        </div>
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete();
+          }}
+          className={`p-1 ${ui.txt2} opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
+          title="Delete note"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      {isActive && (
+        <div className={`px-2 pb-2 pt-1 border-t ${ui.border} ${ui.bg1}`}>
+          <input
+            type="text"
+            value={note.title}
+            onChange={(e) => onUpdate({ title: e.target.value })}
+            placeholder="Note title"
+            className={`w-full mb-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} text-[12px] font-medium outline-none ${ui.txt1}`}
+          />
+          {note.docPath && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenSource(note.docPath);
+              }}
+              title="Open the lesson this note came from"
+              className={`w-full mb-1.5 flex items-center gap-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} ${ui.hoverBg} text-[11px] font-medium transition-colors truncate`}
+              style={{ color: accentColor }}
+            >
+              <File className="w-3 h-3 shrink-0" />
+              <span className="truncate">{note.docTitle || "Open source lesson"}</span>
+            </button>
+          )}
+          <label className={`block mb-0.5 text-[9px] font-bold uppercase tracking-widest ${ui.txt2}`}>
+            Series
+          </label>
+          <input
+            type="text"
+            value={note.series}
+            onChange={(e) => onUpdate({ series: e.target.value })}
+            placeholder="Series"
+            className={`w-full mb-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} text-[11px] outline-none ${ui.txt2}`}
+          />
+          <textarea
+            value={note.body}
+            onChange={(e) => onUpdate({ body: e.target.value })}
+            placeholder="Paste or type your note here…"
+            rows={6}
+            className={`w-full px-2 py-1.5 rounded border ${ui.border} ${ui.bg0} text-[12px] leading-relaxed outline-none resize-y ${ui.txt1}`}
+            style={{ "--tw-ring-color": accentColor }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotesSeriesGroup({
+  seriesName,
+  notes,
+  activeNoteId,
+  onOpen,
+  onUpdate,
+  onDelete,
+  onOpenSource,
+  accentColor = "#0ea5e9",
+  ui = {},
+}) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div>
+      <div
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer select-none ${ui.txt2} ${ui.hoverBg}`}
+      >
+        {open ? (
+          <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+        ) : (
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        )}
+        <span
+          className="text-[11px] font-bold tracking-wide"
+          style={{ color: accentColor }}
+        >
+          {seriesName}
+        </span>
+        <span className={`text-[10px] ${ui.txt2}`}>({notes.length})</span>
+      </div>
+      {open &&
+        notes.map((note) => (
+          <NoteEditorItem
+            key={note.id}
+            note={note}
+            isActive={note.id === activeNoteId}
+            onOpen={() => onOpen(note.id)}
+            onUpdate={(patch) => onUpdate(note.id, patch)}
+            onDelete={() => onDelete(note.id)}
+            onOpenSource={onOpenSource}
+            accentColor={accentColor}
+            ui={ui}
+          />
+        ))}
+    </div>
+  );
+}
+
 function createLocalDoc() {
   const id = Date.now().toString();
   return {
@@ -1847,8 +2010,74 @@ export default function MarkdownHub() {
     getTerminalOutput: () => "",
   });
   const isDark = useIsDark();
-  const [sidebarTab, setSidebarTab] = useState("docs"); // 'docs' | 'toc'
+  const [sidebarTab, setSidebarTab] = useState("docs"); // 'docs' | 'toc' | 'notes'
   const [docSearch, setDocSearch] = useState("");
+  const [notes, setNotes] = useState(loadNotes);
+  const [noteSearch, setNoteSearch] = useState("");
+  const [activeNoteId, setActiveNoteId] = useState(null);
+
+  const createNote = useCallback(() => {
+    const id = `note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const now = new Date().toISOString();
+    const newNote = {
+      id,
+      title: "Untitled note",
+      series: seriesFromPath(activeFile),
+      docPath: activeFile,
+      docTitle: activeFile ? displayName(activeFile.split("/").pop()) : "",
+      body: "",
+      createdAt: now,
+      updatedAt: now,
+    };
+    setNotes((prev) => {
+      const updated = [newNote, ...prev];
+      saveNotes(updated);
+      return updated;
+    });
+    setActiveNoteId(id);
+    setSidebarTab("notes");
+  }, [activeFile]);
+
+  const updateNote = useCallback((id, patch) => {
+    setNotes((prev) => {
+      const updated = prev.map((n) =>
+        n.id === id ? { ...n, ...patch, updatedAt: new Date().toISOString() } : n,
+      );
+      saveNotes(updated);
+      return updated;
+    });
+  }, []);
+
+  const deleteNote = useCallback((id) => {
+    setNotes((prev) => {
+      const updated = prev.filter((n) => n.id !== id);
+      saveNotes(updated);
+      return updated;
+    });
+    setActiveNoteId((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const filteredNotesBySeries = useMemo(() => {
+    const q = noteSearch.trim().toLowerCase();
+    const matches = q
+      ? notes.filter((n) =>
+          [n.title, n.series, n.body]
+            .join(" ")
+            .toLowerCase()
+            .includes(q),
+        )
+      : notes;
+    const groups = new Map();
+    for (const note of matches) {
+      const key = note.series || "General";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(note);
+    }
+    for (const list of groups.values()) {
+      list.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+    }
+    return [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  }, [notes, noteSearch]);
 
   // Flat list of all doc paths for search — derived once from the glob keys
   const allDocPaths = useMemo(() => Object.keys(DOCS_MODULES), []);
@@ -2129,6 +2358,15 @@ export default function MarkdownHub() {
       }
     },
     [backendReady],
+  );
+
+  const openNoteSource = useCallback(
+    (docPath) => {
+      if (!docPath) return;
+      selectTutorial(docPath);
+      setSidebarTab("docs");
+    },
+    [selectTutorial],
   );
 
   const docsCtxValue = useMemo(
@@ -2946,7 +3184,7 @@ export default function MarkdownHub() {
               style={{ width: codeAlongOpen ? Math.min(explorerWidth, 240) : explorerWidth }}
             >
               {/* ── Docs search bar ── */}
-              {tab === "tutorials" && (
+              {tab === "tutorials" && sidebarTab !== "notes" && (
                 <div className={`shrink-0 px-2 py-2 border-b ${ui.border}`}>
                   <div
                     className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} transition-colors focus-within:ring-1`}
@@ -2996,8 +3234,8 @@ export default function MarkdownHub() {
                 </div>
               )}
 
-              {/* Sidebar tab switcher — only in tutorials mode when doc has headings and not searching */}
-              {tab === "tutorials" && headings.length > 0 && !docSearch && (
+              {/* Sidebar tab switcher — tutorials mode, not searching. "On This Page" only shows once the active doc has headings; Notes is always reachable. */}
+              {tab === "tutorials" && !docSearch && (
                 <div className={`flex shrink-0 border-b ${ui.border}`}>
                   <button
                     onClick={() => setSidebarTab("docs")}
@@ -3010,16 +3248,29 @@ export default function MarkdownHub() {
                   >
                     Documents
                   </button>
+                  {headings.length > 0 && (
+                    <button
+                      onClick={() => setSidebarTab("toc")}
+                      className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "toc" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
+                      style={
+                        sidebarTab === "toc"
+                          ? { borderBottomColor: accentColor, color: accentColor }
+                          : {}
+                      }
+                    >
+                      On This Page
+                    </button>
+                  )}
                   <button
-                    onClick={() => setSidebarTab("toc")}
-                    className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "toc" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
+                    onClick={() => setSidebarTab("notes")}
+                    className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "notes" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
                     style={
-                      sidebarTab === "toc"
+                      sidebarTab === "notes"
                         ? { borderBottomColor: accentColor, color: accentColor }
                         : {}
                     }
                   >
-                    On This Page
+                    Notes
                   </button>
                 </div>
               )}
@@ -3084,7 +3335,8 @@ export default function MarkdownHub() {
               {!(tab === "tutorials" && docSearch.trim().length >= 2) && (
                 <div className="flex-1 overflow-y-auto overflow-x-auto py-3 custom-scrollbar min-h-0">
                   {tab === "tutorials" &&
-                    (sidebarTab === "docs" || !headings.length) &&
+                    (sidebarTab === "docs" ||
+                      (sidebarTab === "toc" && !headings.length)) &&
                     (tree.length === 0 ? (
                       <div className="p-4 text-xs text-slate-500 dark:text-slate-400">
                         No docs found.
@@ -3168,6 +3420,58 @@ export default function MarkdownHub() {
                         </div>
                       );
                     })()}
+
+                  {tab === "tutorials" && sidebarTab === "notes" && (
+                    <div>
+                      <div className="px-3 pb-2">
+                        <button
+                          onClick={createNote}
+                          className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] font-bold text-white transition-opacity hover:opacity-90"
+                          style={{ background: accentColor }}
+                        >
+                          <FilePlus className="w-3.5 h-3.5" /> New Note
+                        </button>
+                      </div>
+                      <div className="px-3 pb-2">
+                        <input
+                          type="text"
+                          value={noteSearch}
+                          onChange={(e) => setNoteSearch(e.target.value)}
+                          placeholder="Search notes…"
+                          className={`w-full px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
+                        />
+                      </div>
+                      {notes.length === 0 ? (
+                        <div className={`px-4 py-4 text-xs ${ui.txt2}`}>
+                          No notes yet. Select text in a doc, copy it, then
+                          create a note and paste it in.
+                        </div>
+                      ) : filteredNotesBySeries.length === 0 ? (
+                        <p
+                          className={`px-3 py-4 text-[11px] text-center ${ui.txt2}`}
+                        >
+                          No notes match "{noteSearch.trim()}"
+                        </p>
+                      ) : (
+                        filteredNotesBySeries.map(([seriesName, seriesNotes]) => (
+                          <NotesSeriesGroup
+                            key={seriesName}
+                            seriesName={seriesName}
+                            notes={seriesNotes}
+                            activeNoteId={activeNoteId}
+                            onOpen={(id) =>
+                              setActiveNoteId((prev) => (prev === id ? null : id))
+                            }
+                            onUpdate={updateNote}
+                            onDelete={deleteNote}
+                            onOpenSource={openNoteSource}
+                            accentColor={accentColor}
+                            ui={ui}
+                          />
+                        ))
+                      )}
+                    </div>
+                  )}
 
                   {tab === "editor" && (
                     <>
