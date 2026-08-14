@@ -420,3 +420,21 @@ Restore the attribute before moving on.
 
 Next: filling this container with the real title, username field,
 password field, and buttons the login screen needs.
+
+## FAQ
+
+**Q: `setContentView(int)` — what's the `int`?**
+
+That's the parameter type in the method's own reference-doc name, not
+part of what you type. The build tools compile every resource — every
+layout XML file, every string, every drawable — into an integer
+constant; `R.layout.activity_main` isn't the XML file itself or a path
+to it, it's literally just an `int` pointing at a slot in a generated
+lookup table (`R.java`, auto-generated, never hand-edited). `int` is the
+parameter type because that's genuinely all `setContentView` is handed:
+a number, which it uses to find and parse the matching compiled layout.
+A second overload, `setContentView(View)`, takes an already-built `View`
+object directly instead — not used in this lesson, but it's why the
+Android docs bother distinguishing "`setContentView(int)`" from plain
+"`setContentView`" at all: there are two versions, and the parameter
+type is how you tell them apart.
