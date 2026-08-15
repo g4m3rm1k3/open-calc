@@ -74,13 +74,50 @@ Code and Data," not "Getting Started").
   `gasket`), not the book's own example lists. Closes by pointing the
   reader at the book's own Chapter 1 questions, to work in the
   sandbox.
-- **Not yet written:** everything past Lesson 01. Per this platform's
-  usual pacing, don't write Lesson 02 until the user confirms they've
-  worked through Lesson 01 (and, presumably, made progress in the
-  book's own Chapter 1). When it's time: the book's next real
-  territory is `member?`'s cousins built the same recursive shape
-  (`rember`, list-building recursion that returns a new list instead
-  of `#t`/`#f`) — natural Lesson 02 material, but confirm against
-  the book itself before assuming that's exactly next, since chapter
-  boundaries in the book don't necessarily line up one-to-one with
-  this series' lesson boundaries.
+- **Lesson 02 (done):** maps to the book's Chapter 2's opening —
+  `rember`, `firsts`, `insertR`, `insertL`. New recursive shape:
+  list-*building* recursion (`cons` the kept/transformed item back
+  onto a recursive call), distinct from Lesson 01's yes/no-answering
+  shape.
+- **Lesson 03 (done):** maps to the rest of Chapter 2 — `subst`,
+  `multirember`, `multiinsertR`. New idea: separating "found a match"
+  from "stop searching" — the multi- procedures recurse past a match
+  instead of returning immediately.
+- **Lesson 04 (done):** maps to Chapter 3 — `rember*`, `occur*`. New
+  recursive shape: tree recursion — when `(car l)` is itself a list,
+  recurse into it *and* into `(cdr l)`, as two independent calls,
+  combined at the end (`cons` for building a list, `+` for counting).
+- **The user wants the whole series written up front**, not paced
+  against their own progress through the book — build straight
+  through, do not wait for confirmation between lessons.
+- **Not yet written:** Chapters 4 through 10 — a lot of ground left,
+  increasingly advanced:
+  - **Ch. 4 (Numbers):** arithmetic (`plus`/`minus`/`x`/`>`/`<`/`=`)
+    built from `add1`/`sub1`/`zero?` and recursion, not the engine's
+    native `+`/`-`/`*` — the book insists on building these from
+    scratch even though this dialect already has native versions;
+    lesson should use the from-scratch versions in its own examples to
+    match the book's actual point, while noting the native primitives
+    exist as an aside.
+  - **Ch. 5 (Collectors):** functions that take an extra function
+    argument to "carry" a result out of a recursion instead of
+    returning it directly — a real conceptual jump, worth extra room
+    per the schema rather than compressed to fit one Concept Unit.
+  - **Ch. 6 (Shadows):** representing arithmetic expressions as nested
+    lists and writing a `value`-style evaluator over them — the first
+    "interpreter for a tiny language" moment in the book.
+  - **Ch. 7 (Friends and Relations):** set operations (`set?`,
+    `makeset`, `subset?`, `intersect`, `union`) built from the list
+    primitives already taught — should move faster, mostly
+    reapplication of earlier shapes.
+  - **Ch. 8 (Lambda the Ultimate):** generalizing earlier procedures
+    (`rember-f`, `insertL-f`, etc.) to take the *comparison function*
+    itself as a parameter — functions built and returned by other
+    functions, not just passed around.
+  - **Ch. 9-10 (the Y combinator and closing synthesis):** the book's
+    real climax — recursion built without `define` at all, through
+    self-application. Genuinely advanced; will need its own careful,
+    unhurried treatment, likely spread across more than one lesson.
+  - Chapter boundaries in the book don't map one-to-one with this
+    series' lesson boundaries — check as each one gets written rather
+    than assuming.
