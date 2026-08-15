@@ -29,12 +29,16 @@ this curriculum.
 
 ## How the lessons are ordered
 
-Seven arcs. Nothing in a later arc is used before the earlier arc that
+Eight arcs. Nothing in a later arc is used before the earlier arc that
 teaches it. The same one SQLite file — a small hardware-store inventory
 database — is built up incrementally across Arcs 1–5; Arc 6 deliberately
 switches to a *second*, already-existing database this series did not
 design, because "hand it a schema you've never seen" is its own real
-skill that building your own schema from scratch cannot teach.
+skill that building your own schema from scratch cannot teach. Arc 8
+was added after the original seven-arc plan, built directly from a
+real, working desktop app's own production pain points, and reuses
+`pocket_hardware.db` and this project's own real backend and UI
+throughout rather than introducing a third database.
 
 ### Arc 1 — SQL and SQLite Foundations (the `sqlite3` CLI only, no app yet)
 
@@ -106,9 +110,17 @@ skill that building your own schema from scratch cannot teach.
 
 ### Arc 6 — Working With an Already-Created, Complex Database
 
+Unlike `pocket_hardware.db` (built up organically from Lesson 02
+onward), this arc's own database, `library_system.db` — a small public
+library's real book-lending system — is not something you build
+incrementally. [Lesson 44](lesson-44-handed-a-db-with-no-docs.md) opens
+with a real, complete, one-time setup script; run it once, then treat
+everything in it as genuinely unseen for the rest of the arc, exactly
+the way a real, inherited database would be.
+
 | # | Lesson | Covers |
 |---|---|---|
-| 44 | Handed a `.db` With No Docs | `.schema`, `.tables`, `sqlite_master`, `PRAGMA table_info`/`foreign_key_list` against a real, unfamiliar file |
+| 44 | Handed a `.db` With No Docs | a real, one-time setup script, then `.schema`, `.tables`, `sqlite_master`, `PRAGMA table_info`/`foreign_key_list` against the resulting, unfamiliar file |
 | 45 | Reverse-Engineering an ER Diagram From Schema Alone | recovering the real relationships with no prior documentation |
 | 46 | Reading Views and Triggers to Recover Business Rules | the schema as the only source of truth |
 | 47 | Messy Legacy Schema Realities | inconsistent naming, redundant columns, proven against a real query that returns *wrong* results until understood |
@@ -124,16 +136,46 @@ skill that building your own schema from scratch cannot teach.
 | 52 | Backup and Restore | `.backup`, `VACUUM INTO`, the online backup API |
 | 53 | Full-Text Search in the Real App | FTS5 wired live into the DataTables search box |
 | 54 | Encryption Overview | SQLCipher — what it changes, what it doesn't, and why this series' own database doesn't use it |
-| 55 | Series Complete | one trace connecting every arc, start to finish |
+
+### Arc 8 — Real-World Production Patterns
+
+Added after the original seven-arc plan, built directly from a real,
+working `pywebview` + FastAPI + DataTables desktop app's own actual
+production problems — a slow load with no feedback, data that looks
+stale, joining more than one live database, safely updating a local
+replica a user might already have open, and untangling a real,
+growing pile of hand-written joins.
+
+| # | Lesson | Covers |
+|---|---|---|
+| 56 | Loading States in `pywebview` | a real, visible loading page shown immediately, swapped for the real UI once slow, real startup work finishes — `webview.start(func)` and `Window.load_url()` |
+| 57 | Why Your Data Looks Stale | two real, distinct causes — HTTP/AJAX caching, and DataTables silently keeping an old configuration alive — each with its own real fix |
+| 58 | Serving Joined Data From Multiple Databases, Live | `ATTACH DATABASE` used live inside a FastAPI endpoint, replacing a batch JSON-export step entirely |
+| 59 | Safely Syncing and Live-Reloading a Local Read-Only Replica | never overwriting a file a user might have open — a real, version-file publishing pattern, a background watcher, and a live UI refresh with no restart |
+| 60 | Composing Dynamic, Safe Joins | a real, central allowlist replacing scattered, hand-written joins across a complex database, extending Lesson 40's column allowlist to whole join clauses |
+
+| # | Lesson | Covers |
+|---|---|---|
+| 61 | Series Complete | one trace connecting every arc, start to finish |
 
 ## Status
 
-In progress.
+Complete — all 61 lessons written: eight arcs, one continuous real
+database (`pocket_hardware.db`) carried through Arcs 1–5, 7, and 8,
+plus a second, deliberately unfamiliar real database
+(`library_system.db`) built for Arc 6. Every lesson follows the full
+[Lesson Schema](../../reference/LESSON%20SCHEMA.md): an isolated
+throwaway lab (or a real, deliberately caused failure where that's the
+clearer proof) before any construct is used for real, a full mechanical
+walkthrough sorting every token as first-appearance/reappearing/basic,
+CS/SE lenses, a real caused-failure section, exercises, and a
+Definition of Done.
 
-- [ ] Arc 1 — SQL and SQLite Foundations (01–16)
-- [ ] Arc 2 — Python and SQLite (17–24)
-- [ ] Arc 3 — The Same File, From Other Languages (25–27)
-- [ ] Arc 4 — The Python Backend (28–36)
-- [ ] Arc 5 — `pywebview` + jQuery DataTables (37–43)
-- [ ] Arc 6 — An Already-Created, Complex Database (44–49)
-- [ ] Arc 7 — Production and Mastery Topics (50–55)
+- [x] Arc 1 — SQL and SQLite Foundations (01–16)
+- [x] Arc 2 — Python and SQLite (17–24)
+- [x] Arc 3 — The Same File, From Other Languages (25–27)
+- [x] Arc 4 — The Python Backend (28–36)
+- [x] Arc 5 — `pywebview` + jQuery DataTables (37–43)
+- [x] Arc 6 — An Already-Created, Complex Database (44–49)
+- [x] Arc 7 — Production and Mastery Topics (50–54)
+- [x] Arc 8 — Real-World Production Patterns (56–61)
