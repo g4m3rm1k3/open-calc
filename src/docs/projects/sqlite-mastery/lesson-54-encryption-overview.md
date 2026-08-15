@@ -227,5 +227,7 @@ working desktop app's own production pain points: a slow load with no
 feedback, data that looks stale, joining more than one real database
 live, safely syncing a local replica out from under a user who might
 already have it open, and untangling a real, growing pile of
-hand-written joins. [Lesson 61 — Series Complete](lesson-61-series-complete.md)
-is this series' own true final lesson, after Arc 8.
+hand-written joins. [Arc 9](lesson-62-connecting-to-a-real-enterprise-server-database.md)
+extends it once more, past SQLite entirely. [Lesson 66 — Series
+Complete](lesson-66-series-complete.md) is this series' own true final
+lesson, after both.

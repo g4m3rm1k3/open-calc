@@ -307,5 +307,9 @@ entirely; a real, safe way to publish a new local replica without ever
 touching a file a real user might have open, wired to a live UI refresh
 with no restart; and one, real, central allowlist replacing however
 many scattered, hand-written joins a growing, complex database would
-otherwise accumulate. [Lesson 61 — Series Complete](lesson-61-series-complete.md)
-closes this series for real, tracing one thread through all eight arcs.
+otherwise accumulate. [Arc 9](lesson-62-connecting-to-a-real-enterprise-server-database.md)
+takes this project one real step further: past SQLite entirely, onto a
+real, IT-owned enterprise server database this project never designed
+and doesn't control, applying nearly everything this series has already
+proven — DB-API portability, schema reverse-engineering, the case for a
+real backend — to a real database that isn't SQLite at all.

@@ -1,11 +1,11 @@
-# Lesson 61: Series Complete
+# Lesson 66: Series Complete
 
 **What this lesson is:** not a new concept — every construct this
 series set out to teach already has full, isolated, proven treatment by
-the end of Lesson 60. This closing lesson does one thing: trace one
-real, concrete thread through all eight arcs, start to finish, the same
+the end of Lesson 65. This closing lesson does one thing: trace one
+real, concrete thread through all nine arcs, start to finish, the same
 way each individual lesson's own "Connect the pieces" section has done
-sixty times already, now at the scale of the whole series.
+sixty-five times already, now at the scale of the whole series.
 
 ## One real trace, start to finish
 
@@ -123,19 +123,40 @@ turned out to generalize cleanly into a whole, safe join composer,
 closing the exact, real "crazy joins scattered everywhere" problem that
 started this arc.
 
+**Arc 9**, the second real, unplanned addition, took this project past
+SQLite entirely: a real, working connection to a genuine, IT-owned
+enterprise SQL Server, proving Lesson 17's own original DB-API promise
+directly against a database this series never built. `INFORMATION_
+SCHEMA` gave Arc 6's own reverse-engineering discipline a real, portable
+form, unavailable through `PRAGMA` but identical in spirit. Lesson 28's
+own original case for a backend returned, considerably higher-stakes
+this time: a real, distributed credential, not merely a duplicated
+query, was the real cost of connecting every `pywebview` client
+directly — closed by one, real, additional `Depends`-based dependency
+on this project's own already-existing backend, the identical real
+shape `get_db` already used since Lesson 31. And `ATTACH DATABASE`'s
+own real limit — SQLite only — proved a join spanning a real, external
+engine needs a real, different tool: an application-level hash join for
+correctness, or a synced local copy, built on Lesson 59's own
+safe-publish pattern, for repeated speed — the real, same tradeoff this
+series had already named honestly, reached for one final time.
+
 ## What this series proved, as a whole
 
 Every one of the real things this series set out to teach — SQL and
 SQLite from zero, a Python backend, a real desktop UI backed by jQuery
 DataTables, the real skill of understanding a database you didn't
-build, and, in the end, the real production problems that only show up
-once an app like this is actually running for real users — turned out
-to be one continuous, real story rather than several separate ones. The
-same file, `pocket_hardware.db`, carried every arc's own real proof
-forward; the same recovered discipline from Arc 6 — trust the file, not
+build, the real production problems that only show up once an app like
+this is actually running for real users, and, in the end, a real
+database this series never controlled at all — turned out to be one
+continuous, real story rather than several separate ones. The same
+file, `pocket_hardware.db`, carried every arc's own real proof forward;
+the same recovered discipline from Arc 6 — trust the system, not
 assumption — was the identical discipline Arc 1 taught from its very
-first lesson, and it's the same discipline Arc 8 reached for again the
-moment a real, working app's own real bug reports demanded it.
+first lesson, the same discipline Arc 8 reached for the moment a real,
+working app's own bug reports demanded it, and the same discipline Arc
+9 needed most of all, the one time this series' own code was no longer
+the only real thing that mattered.
 
 ## Where to go from here
 
@@ -145,10 +166,12 @@ anyone who wants to keep building on it: a real, scheduled backup job
 using Lesson 52's own `run_backup` function, keyset pagination once
 `parts` genuinely outgrows `OFFSET`'s own real cost (Lesson 34), a real,
 structural fix for `library_system.db`'s own remaining trigger asymmetry
-(Lesson 47's and Lesson 49's own shared, still-open exercise), and a real
+(Lesson 47's and Lesson 49's own shared, still-open exercise), a real
 cleanup policy for old version files under Lesson 59's own publishing
-pattern. (Lesson 43's own original per-user database path gap is the
-one exception — Arc 8's own version-file pattern, Lesson 59, is a real,
+pattern, and a real, scheduled sync job for Lesson 65's own enterprise-
+data cache, using the identical real pattern Lesson 59 already proved.
+(Lesson 43's own original per-user database path gap is the one
+exception — Arc 8's own version-file pattern, Lesson 59, is a real,
 direct, more complete answer to it than a standalone fix ever would have
 been.) None of these are mysteries — every one of them is a real, direct
 extension of a concept this series already gave full, proven treatment

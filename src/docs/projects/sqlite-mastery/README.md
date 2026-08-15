@@ -154,16 +154,35 @@ growing pile of hand-written joins.
 | 59 | Safely Syncing and Live-Reloading a Local Read-Only Replica | never overwriting a file a user might have open — a real, version-file publishing pattern, a background watcher, and a live UI refresh with no restart |
 | 60 | Composing Dynamic, Safe Joins | a real, central allowlist replacing scattered, hand-written joins across a complex database, extending Lesson 40's column allowlist to whole join clauses |
 
+### Arc 9 — Beyond SQLite: a Real Enterprise Server Database
+
+Added after Arc 8, for the same real reason: a real, working project
+outgrowing what SQLite alone can answer, needing to pull data from a
+genuine, IT-owned SQL Server this project doesn't control. Proves DB-API
+portability (first promised in Lesson 17), Arc 6's own reverse-
+engineering discipline, and Lesson 28's own case for a backend all
+generalize past SQLite itself, rather than being SQLite-specific
+knowledge.
+
 | # | Lesson | Covers |
 |---|---|---|
-| 61 | Series Complete | one trace connecting every arc, start to finish |
+| 62 | Connecting to a Real Enterprise Server Database | `pyodbc`, real connection strings, Windows Authentication vs. a SQL login, keeping credentials out of source code with `.env` |
+| 63 | Discovering a Live Server's Schema | `INFORMATION_SCHEMA` as the real, portable counterpart to `PRAGMA`, plus SQL Server's own `sys.*` catalog views |
+| 64 | The Backend-in-the-Middle Architecture | why every `pywebview` client should never connect to the server directly — one real, central `Depends`-based dependency instead |
+| 65 | Joining Local SQLite Data With Remote Server Data | `ATTACH DATABASE`'s real limit, a real application-level hash join, and a synced local cache for when that join needs to happen often |
+
+| # | Lesson | Covers |
+|---|---|---|
+| 66 | Series Complete | one trace connecting every arc, start to finish |
 
 ## Status
 
-Complete — all 61 lessons written: eight arcs, one continuous real
-database (`pocket_hardware.db`) carried through Arcs 1–5, 7, and 8,
+Complete — all 66 lessons written: nine arcs, one continuous real
+database (`pocket_hardware.db`) carried through Arcs 1–5, 7, 8, and 9,
 plus a second, deliberately unfamiliar real database
-(`library_system.db`) built for Arc 6. Every lesson follows the full
+(`library_system.db`) built for Arc 6, and a real, external enterprise
+server database (never built by this series) reached in Arc 9. Every
+lesson follows the full
 [Lesson Schema](../../reference/LESSON%20SCHEMA.md): an isolated
 throwaway lab (or a real, deliberately caused failure where that's the
 clearer proof) before any construct is used for real, a full mechanical
@@ -178,4 +197,6 @@ Definition of Done.
 - [x] Arc 5 — `pywebview` + jQuery DataTables (37–43)
 - [x] Arc 6 — An Already-Created, Complex Database (44–49)
 - [x] Arc 7 — Production and Mastery Topics (50–54)
-- [x] Arc 8 — Real-World Production Patterns (56–61)
+- [x] Arc 8 — Real-World Production Patterns (56–60)
+- [x] Arc 9 — Beyond SQLite: a Real Enterprise Server Database (62–65)
+- [x] Lesson 66 — Series Complete

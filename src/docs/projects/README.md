@@ -325,3 +325,73 @@ pattern that actually solves the same problem correctly.
 generics (a hand-written generic grid), and unit testing with real `xUnit` —
 made possible specifically by the dependency-injection lesson that precedes
 it.
+
+---
+
+### 11. Vault — A Real PDM System, Rebuilt With Explicit Architecture
+**Folder:** `PDM/` — [Full BRD and lesson plan](PDM/pdm-brd-and-lesson-plan.md)
+
+Build Vault: a Product Data Management system — checkout/check-in with real,
+exclusive locking, WIP snapshots, permanent version history, and a real
+file tree — in Electron, React, Express, and PostgreSQL, with GitLab as the
+real file-storage backend. Written as the direct, explicit-architecture
+answer to a real failure mode: a hand-built, AI-grown system that reached a
+complexity threshold where it could no longer be read, debugged, or
+extended safely. The correct response, applied from lesson one, is not to
+patch that system further — it's to rebuild it with an enforced, four-layer
+architecture (presentation → API → domain → data) so that adding a feature
+later means one contained change per layer, never a scattered one.
+
+**Software engineering taught:** layered architecture and separation of
+concerns, the repository pattern, domain logic isolation, the open/closed
+principle applied as a real project goal, state machines for UI loading/
+error states, and the single responsibility principle in its most
+consequential real application — a business rule (file locking) that lives
+in exactly one place.
+
+**Computer science taught:** the client/server model, database transactions
+and ACID, row-level locking (`SELECT FOR UPDATE`), the TOCTOU race
+condition, tree data structures and recursive traversal, and upserts/
+idempotency.
+
+**Tools and security taught:** Electron's process model and context
+isolation, PostgreSQL and connection pooling, the GitLab REST API,
+`.env`/secret management, and OS-keychain-backed secure session storage.
+
+---
+
+### 12. Forge — The Same Real PDM Problem, in Your Own Real Stack
+**Folder:** `forge-pdm/` — [Full lesson plan](forge-pdm/README.md)
+
+The deliberate real-stack sibling to [`Vault`](PDM/pdm-brd-and-lesson-plan.md):
+the identical real problem — two people editing the same file, one silently
+overwriting the other, with no warning and no record — rebuilt in FastAPI,
+plain JavaScript, SQLite, and a single, canonical git repository driven
+safely by GitPython, rather than Electron, React, and PostgreSQL. Written
+for a real, working application already in this exact stack, currently
+broken by the precise anti-pattern this project exists to name and fix:
+independent git clones, each treated as if it were the database, silently
+diverging the moment two people touch the same file. Reuses
+[`sqlite-mastery`](sqlite-mastery/README.md)'s own already-taught
+foundations directly — the repository pattern, real transactions and
+locking, `Depends`-based dependency injection — rather than re-teaching
+them, and closes with a real, deliberate migration from SQLite to a
+production server database, using that same series' own Arc 9.
+
+**Software engineering taught:** the identical four-layer architecture
+Vault already proved, a real, enforced domain-layer boundary (no HTTP, no
+SQL inside business logic), configuration-as-data for file types and form
+requirements, and audit logging as a first-class concern rather than an
+afterthought.
+
+**Computer science taught:** real ACID transactions and row-level locking
+applied to SQLite specifically, the TOCTOU race condition reproduced and
+closed a second time in a second real engine, and safe, single-writer use
+of a version-control system as a real data store.
+
+**Tools and security taught:** GitPython, from isolated first use through
+driving the one real, canonical repository safely; real, salted password
+hashing; session-based authentication; a real, enforced role hierarchy
+(`super_admin` → `admin` → `user`); and packaging with PyInstaller
+(`--noconsole`) plus Python's own `webbrowser` module as a real,
+non-Electron desktop delivery mechanism.
