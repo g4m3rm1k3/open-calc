@@ -47,7 +47,14 @@ not full R7RS:
   case; don't teach string literals in this series, or fix the reader
   first), `call/cc`, macros, tail-call optimization, vectors,
   `let`/`let*`/`letrec` (not yet needed — add if a later book chapter
-  needs one rather than pre-building it).
+  needs one rather than pre-building it), **arity checking** — calling
+  a procedure with the wrong number of arguments does not error; extra
+  arguments are silently ignored, missing ones bind to `undefined`.
+  Real Scheme would raise an error here. Used deliberately as a "what
+  breaks" demonstration in Lesson 09 (calling a curried one-argument
+  procedure as if it still took three), but worth remembering as a
+  real gap, not just a teaching device, if it ever causes a confusing
+  result somewhere it wasn't intended to.
 - The REPL sandbox keeps one persistent environment per session (so
   `define`s accumulate); every inline lesson code block gets a fresh
   environment per Run click (so lesson examples stay self-contained
@@ -87,37 +94,83 @@ Code and Data," not "Getting Started").
   recursive shape: tree recursion — when `(car l)` is itself a list,
   recurse into it *and* into `(cdr l)`, as two independent calls,
   combined at the end (`cons` for building a list, `+` for counting).
-- **The user wants the whole series written up front**, not paced
-  against their own progress through the book — build straight
-  through, do not wait for confirmation between lessons.
-- **Not yet written:** Chapters 4 through 10 — a lot of ground left,
-  increasingly advanced:
-  - **Ch. 4 (Numbers):** arithmetic (`plus`/`minus`/`x`/`>`/`<`/`=`)
-    built from `add1`/`sub1`/`zero?` and recursion, not the engine's
-    native `+`/`-`/`*` — the book insists on building these from
-    scratch even though this dialect already has native versions;
-    lesson should use the from-scratch versions in its own examples to
-    match the book's actual point, while noting the native primitives
-    exist as an aside.
-  - **Ch. 5 (Collectors):** functions that take an extra function
-    argument to "carry" a result out of a recursion instead of
-    returning it directly — a real conceptual jump, worth extra room
-    per the schema rather than compressed to fit one Concept Unit.
-  - **Ch. 6 (Shadows):** representing arithmetic expressions as nested
-    lists and writing a `value`-style evaluator over them — the first
-    "interpreter for a tiny language" moment in the book.
-  - **Ch. 7 (Friends and Relations):** set operations (`set?`,
-    `makeset`, `subset?`, `intersect`, `union`) built from the list
-    primitives already taught — should move faster, mostly
-    reapplication of earlier shapes.
-  - **Ch. 8 (Lambda the Ultimate):** generalizing earlier procedures
-    (`rember-f`, `insertL-f`, etc.) to take the *comparison function*
-    itself as a parameter — functions built and returned by other
-    functions, not just passed around.
-  - **Ch. 9-10 (the Y combinator and closing synthesis):** the book's
-    real climax — recursion built without `define` at all, through
-    self-application. Genuinely advanced; will need its own careful,
-    unhurried treatment, likely spread across more than one lesson.
-  - Chapter boundaries in the book don't map one-to-one with this
-    series' lesson boundaries — check as each one gets written rather
-    than assuming.
+- **Lesson 05 (done):** maps to Chapter 4 — `plus`/`minus` built from
+  `add1`/`sub1`/`zero?` (not the engine's native `+`/`-`, deliberately
+  — the point is proving arithmetic reduces to the same recursive
+  shape as everything else), then `addtup` (reducing recursion,
+  reapplying Lesson 01/04's throwaways) and `tup+` (first appearance
+  of recursing on two list arguments in parallel).
+- **Lesson 06 (done):** maps to Chapter 5 (Collectors) — `split-nums`,
+  splitting a list into two piles in one pass via a **collector**: an
+  extra function argument standing in for "what to do with the
+  answer," rebuilt fresh (wrapped in a new `lambda`) on every
+  recursive call. Got a full execution trace on a minimal warm-up
+  (`report-length`) before the real branching procedure, per the
+  schema's allowance to give a hard concept extra room instead of
+  compressing it.
+- **Lesson 07 (done):** maps to Chapter 6 (Shadows) — `numbered?` and
+  `value`, a tiny evaluator for arithmetic expressions represented as
+  nested lists (`'(1 add (2 mul 3))`). Named accessors (`left-of`,
+  `op-of`, `right-of`) introduced to avoid raw nested `car`/`cdr`
+  chains. Core new idea: reading a piece of data (the operator symbol)
+  to decide which real procedure to call — the mechanism behind every
+  real interpreter.
+- **Lesson 08 (done):** maps to Chapter 7 (sets) — `set?`, `makeset`,
+  `subset?`, `intersect`. Deliberately lighter/faster than surrounding
+  lessons — almost entirely reapplication of `member?` (Lesson 01) and
+  `multirember` (Lesson 03), no new recursive shape.
+- **Lesson 09 (done):** maps to Chapter 8 (Lambda the Ultimate) —
+  `eq?-c` (currying warm-up) and `rember-f` (generalizing `rember` to
+  take its comparison test as a parameter, returning a specialized
+  procedure). The tricky part: the returned inner procedure has no
+  name of its own, so recursing means re-currying `(rember-f test?)`
+  on every call, not calling itself by name. Also documented, honestly,
+  a real interpreter gap this lesson's "what breaks" demo exposed: **no
+  arity checking** — see "The interpreter," above.
+- **Lesson 10 (done):** maps to the first half of Chapter 9 —
+  self-application (`mk-length`), proving recursion doesn't strictly
+  require `define` or a name: a procedure can recurse by being handed
+  a copy of itself as an argument. The hardest lesson in the series —
+  three Concept Units building up in very small steps, each with its
+  own execution trace.
+- **Lesson 11 (done):** maps to the rest of Chapter 9 and closes the
+  series — the `Y` combinator, factoring Lesson 10's hand-written
+  self-application machinery into one reusable tool. Shows the *naive*
+  version first (`(f (x x))` with no delaying `lambda`), a real,
+  verified crash (`Maximum call stack size exceeded` — the `define`
+  itself never completes), before the working eta-expanded version.
+  Proves reusability directly: the same unmodified `Y` builds both
+  `length` and `sum`. Closing "Connect the Pieces" surveys the entire
+  series, Lesson 00 through Lesson 11. Chapter 10 (the book's own
+  closing synthesis, mostly a revisit of `value` from Lesson 07) is
+  left as sandbox work per Lesson 11's own Exercise 4, rather than a
+  dedicated Lesson 12 — there wasn't enough new material to justify
+  one.
+- **The series is now complete: Lesson 00 through Lesson 11**, covering
+  the book's full syntax primer through Chapters 1–9. All 12 files
+  verified clean — every ` ```scheme ` block across every lesson
+  extracted and run standalone; the only errors that occur anywhere
+  are the intentional "what breaks" and "the problem" demonstrations,
+  matching each lesson's own documented output exactly.
+- **Known recurring mistake, hit constantly while writing this
+  series — treat as the default risk on every future lesson, not a
+  fluke:** a later Concept Unit's code block calling a procedure
+  `define`d in an *earlier* Concept Unit's own block, without
+  redefining it in the later block too. Every lesson code block runs
+  in a fresh environment per Run click (see "The interpreter," above)
+  — a block that doesn't redefine everything it calls gets "Unbound
+  variable" in the real Studio viewer, even though it looks fine on
+  the page. Hit and fixed at least once in nearly every lesson from 01
+  through 11. **Before considering any future lesson done, extract
+  every ` ```scheme ` block from the file and run each one standalone**
+  — read the file, regex out ` ```scheme\n...``` ` blocks, run each
+  through `evalSchemeSource` with a brand-new `createEnv()`, check for
+  unexpected `error`-type lines (cross-reference against each lesson's
+  own documented "what breaks"/"the problem" demos, which are supposed
+  to error).
+- **If more lessons ever get added** (deeper Chapter 10 material, or
+  material beyond the book entirely): the pattern to follow is
+  established across 00–11 — pick the real new concept, verify every
+  code sample against the actual interpreter before writing prose
+  around it, watch for the split-fence mistake above, and keep
+  examples original rather than transcribed from the book.
