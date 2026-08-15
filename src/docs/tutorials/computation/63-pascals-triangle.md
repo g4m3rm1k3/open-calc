@@ -37,7 +37,7 @@ Not applicable — this identity is verified directly against code in the next u
 
 This proof technique — split into cases based on whether one specific element is included, and count each case separately — is a genuinely different derivation method than Lesson 62's factorial-division argument, arriving at an equivalent result by an entirely different route, the same "two independent derivations agreeing" confidence Lesson 46 and Lesson 49 both already demonstrated for other formulas.
 
-### SE Lells
+### SE Lens
 
 A recurrence expressed purely in terms of *smaller instances of itself*, with no factorial computation anywhere, is exactly the shape Section II's entire recursive-function toolkit was built to implement directly — this identity translates into code with no new technique needed at all.
 
@@ -105,7 +105,7 @@ Skipped — no enclosing file exists yet.
 
 `pascal`'s evaluation tree has *exactly* the same overlapping-subproblems character Lesson 23 first found in `fib` — `pascal(2,1)`, for instance, gets recomputed independently many times while computing `pascal(5,2)` — meaning `pascal`, exactly like naive `fib`, is a strong candidate for Lesson 38's memoization, a direct, concrete connection between two sections' techniques.
 
-### SE Lells
+### SE Lens
 
 `pascal` trades `combination-count`'s three factorial computations (each itself costing real work, per Lesson 20) for repeated addition and — without memoization — genuinely more total calls for the same answer, an honest tradeoff rather than a strictly better replacement: `combination-count` is faster as written; `pascal` avoids factorials but reintroduces `fib`'s own exponential-redundancy risk.
 

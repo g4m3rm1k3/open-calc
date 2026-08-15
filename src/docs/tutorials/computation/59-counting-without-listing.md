@@ -40,7 +40,7 @@ Nothing about this argument depended on the specific numbers `2` and `3`, or on 
 
 This is exactly Lesson 10's Cartesian product, counted rather than listed — `A × B`'s size is `|A| × |B|`, the identical multiplication, now justified by direct enumeration rather than merely defined.
 
-### SE Lells
+### SE Lens
 
 Counting via this principle instead of generating every possibility is a real, practical difference: listing `1024` outfits to know there are `1024` of them is wasted work the moment the *count* alone, not the specific list, is what's actually needed.
 
@@ -99,7 +99,7 @@ Skipped — no enclosing file exists yet.
 
 A four-digit PIN having `10,000` possibilities, checkable by a single computer in well under a second, is why real PIN systems require additional protections (lockouts after failed attempts) — the counting principle is exactly what makes this vulnerability precisely quantifiable rather than vaguely "a lot of options."
 
-### SE Lells
+### SE Lens
 
 Counting without generating scales to numbers no computer could ever actually enumerate — a `128`-bit encryption key has `2^128` possibilities, a number `power` computes instantly and no computer could ever list one at a time, a direct, practical reason this principle matters far beyond small examples like a PIN.
 
@@ -133,7 +133,7 @@ The counting principle's "independent" requirement is really about each step's o
 
 Recognizing `power-set` and `permutation-count` as two applications of one shared principle — rather than two unrelated formulas — is the identical realization Lesson 27 had about `sum-to` and `factorial` sharing a recursive shape: the underlying idea existed before it had one name, and naming it makes the connection between separately-derived results visible.
 
-### SE Lells
+### SE Lens
 
 Once a counting problem is recognized as "independent choices, multiply the option counts," the actual count can usually be written down directly, without deriving a new formula from scratch each time — the same reuse benefit this series has argued for constantly, now applied to combinatorial reasoning itself.
 

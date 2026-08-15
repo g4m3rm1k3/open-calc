@@ -40,7 +40,7 @@ Not applicable — this is a formal, general proof, applied concretely in the ne
 
 This is the exact "assume the opposite, derive an impossibility" shape Lesson 17 first established, applied here to counting instead of a specific function's behavior — the identical proof technique, a completely different subject matter.
 
-### SE Lells
+### SE Lens
 
 An existence proof is often exactly what's needed in practice, without needing the stronger, harder claim of identifying a specific instance — knowing a system *will* eventually experience a hash collision is enough to justify designing collision-handling logic, whether or not the specific colliding inputs are known in advance.
 
@@ -98,7 +98,7 @@ Skipped — no enclosing file exists yet.
 
 This is exactly why real hash table implementations (Lesson 89) are designed *assuming* collisions will happen — the pigeonhole principle proves they're unavoidable once the number of items exceeds the number of buckets, making collision-handling a required feature, not a rare edge case to hope doesn't occur.
 
-### SE Lells
+### SE Lens
 
 Knowing a collision is *certain* beyond a specific threshold — rather than merely "increasingly likely" — is what justifies unconditionally building collision-handling logic into a hash-based system, rather than treating it as an optional safeguard for an unlikely event.
 

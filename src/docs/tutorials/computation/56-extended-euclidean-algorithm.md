@@ -31,7 +31,7 @@ Not applicable — this claim is what the next unit derives and proves construct
 
 Bézout's identity is what guarantees a **modular inverse** exists whenever `gcd(a, n) = 1` — Concept Unit 3 makes this connection concrete, but the existence guarantee itself comes directly from this theorem.
 
-### SE Lells
+### SE Lens
 
 Knowing a solution is *guaranteed* to exist (Bézout's theorem) is different from knowing *how to compute it* — exactly Lesson 12's distinction between a function existing abstractly and being genuinely, practically invertible. The next unit closes that gap.
 
@@ -67,7 +67,7 @@ Not applicable — this derivation is the direct basis for the next unit's code.
 
 This is the identical relationship Lesson 34's accumulator transformation used — a smaller problem's answer, carried forward and *transformed* (not just passed through unchanged) to produce the larger problem's answer — here applied to a pair of coefficients instead of a single running total.
 
-### SE Lells
+### SE Lens
 
 Deriving `x = y₁, y = x₁ - qy₁` algebraically, rather than looking it up, is what makes it trustworthy enough to implement directly in the next unit — the same standard this series has held every algorithm to since Lesson 20.
 
@@ -139,7 +139,7 @@ Skipped — no enclosing file exists yet.
 
 Calling the recursive function exactly once, and extracting every piece of its result from that single call via a separate combining function, is a real, general technique for avoiding redundant recomputation (the same concern Lesson 23 and Lesson 38 raised about `fib`) whenever a recursive call's result has more than one part that a caller needs.
 
-### SE Lells
+### SE Lens
 
 `extended-gcd`'s termination inherits directly from `my-gcd`'s already-proven termination (Lesson 55) — nothing about carrying the extra coefficients along changes which pair `(a, b)` shrinks toward the base case, only what additional information rides alongside that shrinking.
 
@@ -172,7 +172,7 @@ Not applicable — this is a genuine, verified modular inverse computation.
 
 Modular inverses are exactly how "division" is defined in modular arithmetic, where ordinary division has no direct meaning: "dividing by `3` mod `7`" means "multiplying by `3`'s modular inverse, `5`" — this exact operation is the mathematical foundation of RSA and several other public-key cryptography schemes this series' security branch covers in far greater depth, much later.
 
-### SE Lells
+### SE Lens
 
 The existence condition — `gcd(a, n) = 1` — is not a technicality: it's the exact, precise boundary of when a modular inverse exists at all, the same domain-awareness discipline Lesson 12's partial functions demanded. `extended-gcd`'s own returned `g` value is what a real implementation checks first, before trusting `x` as a genuine inverse.
 

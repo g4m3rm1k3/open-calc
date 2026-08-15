@@ -34,7 +34,7 @@ The identical reasoning applies to every term of `(x+y)ⁿ`'s expansion: the coe
 
 This is exactly why the formula is called the **binomial theorem** — "binomial" naming the two-term sum being raised to a power, and the theorem stating precisely which coefficients appear, derived here from the same counting-principle reasoning Lesson 59 established for entirely different-looking problems.
 
-### SE Lells
+### SE Lens
 
 Recognizing `(x+y)ⁿ`'s coefficients as binomial coefficients, rather than a pattern to memorize separately, means Pascal's Triangle (Lesson 63) and `combination-count` (Lesson 62) are both immediately available tools for polynomial expansion — no new machinery needed, only the recognition that this is the same underlying idea in a new setting.
 
@@ -101,7 +101,7 @@ Skipped — no enclosing file exists yet.
 
 This function is a direct, structural translation of Lesson 44's sigma notation applied to a list-building recursion instead of a numeric sum — `Σ (k=0 to n) C(n,k)` (a number) and `binomial-coefficients` (a list of those same values) are the identical index range and the identical per-term expression, differing only in whether the terms are summed or collected.
 
-### SE Lells
+### SE Lens
 
 Verifying a symbolic-algebra claim (the binomial theorem) numerically, by actually computing coefficients and checking a specific expansion, is the same discipline Lesson 41's `eval-expr` established: an algebraic identity is trustworthy once it's been checked against real, concrete computation, not merely asserted from a textbook formula.
 

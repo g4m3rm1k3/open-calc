@@ -35,7 +35,7 @@ An upper bound alone is genuinely useful (Lesson 51's proofs were real, valid cl
 
 This is exactly the gap Lesson 12's `total function` and `partial function` vocabulary would call a specification that's technically satisfiable in multiple, meaningfully different ways — `O(n²)` alone under-specifies `reverse-naive`'s actual behavior the same way an unstated domain under-specified a function's actual guarantees there.
 
-### SE Lells
+### SE Lens
 
 Casual use of Big-O in real engineering discussions sometimes drifts toward implying a tight bound even when only an upper bound has actually been shown — this unit's distinction is exactly what separates "I've proven this is no worse than quadratic" from the stronger, more useful "I've proven this is genuinely quadratic, not better."
 
@@ -72,7 +72,7 @@ Not applicable — this is a complete, formal proof, paired directly with Lesson
 
 Big-Omega is the exact tool Lesson 261's *halting problem*, much later, uses in spirit: proving a lower bound on a problem's inherent difficulty (not just describing one particular algorithm's cost) is a genuinely different, often harder kind of claim than proving an upper bound — showing *some* algorithm is fast is easier than showing *no* algorithm could possibly be faster.
 
-### SE Lells
+### SE Lens
 
 A real capacity-planning claim like "this will take at least a second" needs Big-Omega's shape of reasoning, not Big-O's — an upper bound alone ("no more than a second") says nothing about whether it might actually run in a millisecond, information that matters just as much for planning purposes.
 
@@ -104,7 +104,7 @@ Not applicable — this is a real, honest distinction this lesson's own vocabula
 
 This exact gap — worst case versus best case versus "typical" case — is why algorithm descriptions frequently specify *which* case a Big-O or Big-Theta claim refers to: "`bst-contains?` is `O(log n)` in the worst case" is a complete, honest statement; "`bst-contains?` is `Θ(log n)`," stated without qualification, would be overclaiming a tightness the function doesn't actually have across every possible input.
 
-### SE Lells
+### SE Lens
 
 Recognizing when a function genuinely has a single tight bound (`reverse-naive`, `Θ(n²)`, true for every input of a given size, not just some) versus when it doesn't (`bst-contains?`, wildly different behavior depending on the specific input, not just its size) is real, honest engineering communication — claiming a tight bound a function doesn't actually have is a specific, checkable overclaim, exactly the kind of imprecision this series has tried to eliminate since Lesson 1's very first insistence on stating things precisely.
 

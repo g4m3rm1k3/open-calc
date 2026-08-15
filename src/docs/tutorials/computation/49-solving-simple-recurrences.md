@@ -93,7 +93,7 @@ This is the actual payoff of Lessons 44 through 47's notation and series formula
 
 `T(n) = T(0) + n(n-1)/2` is **quadratic** growth — proportional to `n²` for large `n`, since `n(n-1)/2` is dominated by its `n²` term. This is the precise, now-derived reason `reverse-naive` costs roughly `n²/2` operations, exactly matching Lesson 28's own hand count, now produced by solving the recurrence rather than tracing execution directly.
 
-### SE Lells
+### SE Lens
 
 Recognizing a recurrence's "extra work" term as a known series (arithmetic, geometric, or otherwise) is the actual skill this lesson builds — not a new formula to memorize, but the habit of expanding a recurrence far enough to expose a familiar shape, then reaching for the tool already proven to solve it.
 
@@ -145,7 +145,7 @@ Not applicable — this bound is a real, useful conclusion, stated honestly as a
 
 This upper-bound argument is exactly what Lesson 23's evaluation tree already showed concretely: a tree that branches in two at every level has a size that doubles with depth, matching `2ⁿ` directly. Section IV's Big-O notation (Lesson 51) is built specifically to make bounds like this one — "at most exponential" — precise and comparable, without always needing an exact closed form, which real recurrences frequently don't have in a simple, elementary shape at all.
 
-### SE Lells
+### SE Lens
 
 Knowing when a technique reaches its limit is as important as knowing the technique — claiming to have "solved" `fib`'s recurrence exactly, using only simple expansion, would be a real overclaim; deriving a provable, honestly-labeled *bound* instead is both mathematically correct and practically sufficient for the purpose (knowing `fib` is exponential, not linear or quadratic) this series actually needs it for.
 

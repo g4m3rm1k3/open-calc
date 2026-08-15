@@ -41,7 +41,7 @@ Every one of these six categories was already present in this series before it h
 
 This ordered list — constant, logarithmic, linear, polynomial, exponential, factorial — is, not coincidentally, also an ordering from "grows slowest" to "grows fastest," a claim the next unit makes concrete with real numbers rather than asserting it abstractly.
 
-### SE Lells
+### SE Lens
 
 Having a name for a function's growth rate is what makes a design conversation precise: "this is logarithmic" or "this is quadratic" communicates, in one word, exactly how a cost will scale — information "this seems reasonably fast" never actually contains.
 
@@ -73,7 +73,7 @@ Not applicable — every number in this table is a directly, honestly computed v
 
 This table is the concrete evidence behind Section IV's formal treatment (Lesson 51's Big-O) of exactly this ordering — the categories aren't ranked by convention or intuition, they're ranked by what actually happens to the numbers as `n` grows, verified here directly rather than asserted.
 
-### SE Lells
+### SE Lens
 
 The gap between quadratic and exponential at `n = 20` (a few hundred versus over a million) is already dramatic; by `n = 40`, exponential cost is in the trillions and factorial cost is a number with more digits than most calculators display — the practical consequence being that an algorithm with exponential or factorial cost isn't merely "slower," it becomes completely unusable for real input sizes well before an algorithm with any polynomial cost would, a difference in *kind*, not just degree.
 
@@ -103,7 +103,7 @@ Not applicable — this reasoning is directly actionable, not illustrative only.
 
 This is exactly why Section VI's algorithm design spends real effort avoiding exponential and factorial costs whenever a problem allows it — Lesson 33's backtracking (pruning a search space rather than generating all of it) and Lesson 38's memoization (eliminating redundant exponential-shaped recomputation) are both, precisely, techniques for moving a computation from a worse growth-rate category into a better one, not just making it "somewhat faster."
 
-### SE Lells
+### SE Lens
 
 A team estimating whether a feature "will scale" is, whether or not they use this vocabulary, asking exactly this question — and answering it precisely, by identifying the actual growth-rate category (not by testing on today's small dataset and hoping), is what separates a real capacity plan from an optimistic guess.
 

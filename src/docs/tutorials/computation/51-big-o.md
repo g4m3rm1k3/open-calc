@@ -43,7 +43,7 @@ This is true of every closed form Lesson 49 derived: `T(0) + nc` is dominated by
 
 This is exactly why Lesson 50's table showed such dramatic gaps between categories, but comparatively modest differences *within* a category (a constant factor of `2` matters far less than the difference between `n²` and `n³`) — Big-O notation, derived next, is built specifically to capture this asymmetry precisely.
 
-### SE Lells
+### SE Lens
 
 Two algorithms, one costing `n²` operations and another costing `50n²` operations, are both "quadratic" in exactly the sense that matters most for predicting how they'll behave as input grows — the factor of `50` is a real, sometimes important difference in absolute speed, but it doesn't change *which* input sizes become impractical, the way the difference between quadratic and exponential does.
 
@@ -85,7 +85,7 @@ Not applicable — this is a complete, formal proof.
 
 This is precisely Lesson 49's honest upper-bound argument for `fib`, given its proper name: showing `T(n) ≤ 2^n T(0) + (2^n - 1)c` is exactly a Big-O argument — `T(n)` is `O(2ⁿ)`, proven by exhibiting constants that make the defining inequality hold, the identical technique this unit just formalized for `reverse-naive`.
 
-### SE Lells
+### SE Lens
 
 A Big-O claim is a genuine, checkable mathematical statement — "this algorithm is `O(n²)`" is either provable (by exhibiting `c` and `n₀`, the way this unit just did) or it isn't, which is a meaningfully stronger claim than "this algorithm seems to slow down a lot on bigger inputs," the kind of description this series has been careful to avoid relying on since Lesson 1.
 
@@ -118,7 +118,7 @@ Not applicable — every classification connects to an already-derived closed fo
 
 This is the actual, complete toolkit real algorithm analysis uses: derive a recurrence (Lesson 48), solve or bound it (Lesson 49), then state its Big-O classification (this lesson) — the exact sequence this series has now built, lesson by lesson, rather than presenting Big-O as an isolated symbol to memorize without the derivation behind it.
 
-### SE Lells
+### SE Lens
 
 Being able to derive a Big-O classification, rather than only recognizing one when told, is what makes it possible to classify genuinely *new* code — a function this series hasn't already analyzed — using the identical process: write its recurrence, solve or bound it, compare to a known growth-rate family.
 

@@ -68,7 +68,7 @@ Skipped — no enclosing file exists yet.
 
 This "coarser than equality, but still precise" idea is exactly Lesson 6's equality versus identity distinction, generalized: `=` asked "are these the exact same value"; congruence mod `n` asks a deliberately weaker, differently useful question, "do these behave the same way *for a specific purpose* (wrapping around every `n`)." Lesson 145 (*Equivalence Relations*), much later, formalizes exactly this pattern — a relation weaker than equality that still partitions a whole domain into well-defined, non-overlapping groups.
 
-### SE Lells
+### SE Lens
 
 Modular arithmetic is the exact mathematics behind array indices that "wrap around" (a circular buffer), a week's day-of-week calculation (`day mod 7`), and, as this lesson's closing unit shows directly, the basic idea behind hashing — reducing a huge space of possible values down to a small, fixed number of "buckets."
 
@@ -128,7 +128,7 @@ Skipped — no enclosing file exists yet.
 
 Well-definedness is what makes modular arithmetic an actual, self-consistent number *system* rather than just a convenient rounding trick — the same guarantee that lets `13:00` and `1:00` be freely interchanged on a twelve-hour clock without ever producing an inconsistent answer, no matter which representation a particular calculation happens to start from.
 
-### SE Lells
+### SE Lens
 
 This is exactly why a hash function (the next unit, and Lesson 89 fully) can safely reduce an enormous space of possible inputs down to a small number of buckets using `mod`: the arithmetic guarantees that congruent values behave identically under further modular operations, so nothing about the reduction process itself introduces inconsistency.
 

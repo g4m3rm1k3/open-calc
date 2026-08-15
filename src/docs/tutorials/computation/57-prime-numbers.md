@@ -84,7 +84,7 @@ Skipped — no enclosing file exists yet.
 
 Checking only up to `\sqrt{n}` instead of `n` is a real, substantial efficiency gain — `O(\sqrt{n})` candidate divisors instead of `O(n)` — a direct application of Lesson 51's Big-O vocabulary to a genuinely different problem than any this series has analyzed so far.
 
-### SE Lells
+### SE Lens
 
 The proof, not just the resulting code, is what makes this optimization trustworthy — a primality test that merely "seemed to work" on a few test cases wouldn't carry the same guarantee that no divisor could possibly exist beyond `\sqrt{n}`, the same "prove it, don't just observe it" discipline this series has insisted on since Lesson 20.
 
@@ -157,7 +157,7 @@ Skipped — no enclosing file exists yet.
 
 `prime-factors` demonstrates the Fundamental Theorem of Arithmetic directly, by construction — every number this function is given produces exactly one factorization (up to the order the factors are listed in), because the search always tries the smallest remaining candidate first, giving a canonical, reproducible ordering.
 
-### SE Lells
+### SE Lens
 
 Reusing `is-prime?`'s own `\sqrt{n}` bound inside `prime-factors-from` (the `(> (* d d) n)` check) means this function inherits the previous unit's efficiency gain automatically, rather than needing a separate optimization argument — recognizing a already-proven bound applies again in a new context, rather than re-deriving it from scratch.
 

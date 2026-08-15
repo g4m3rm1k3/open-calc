@@ -87,7 +87,7 @@ Not applicable — this general formula is what the rest of this lesson verifies
 
 This formula is what turns Lesson 44's `Σ (i=1 to n) (a + (i-1)d)` — a summation that would otherwise need every term computed and added individually — into a single, closed-form calculation, the identical speedup Lesson 15's formula already provided for `sum-to`, now available for an entire family of sequences rather than one specific one.
 
-### SE Lells
+### SE Lens
 
 Recognizing "this loop increases by a fixed amount every iteration" as an arithmetic series is what makes this closed-form shortcut available at all — a loop summing a range with a constant step size (common in scheduling, billing periods, and evenly-spaced measurements) can skip the loop entirely once recognized this way, the same category of optimization Lesson 39's dynamic programming pursued for a different kind of recurrence.
 

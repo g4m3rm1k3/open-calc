@@ -72,7 +72,7 @@ Skipped — no enclosing file exists yet.
 
 A worst-case-`O(log n)` claim about `increment-binary`, considered in isolation, is entirely accurate — Lesson 52's own vocabulary would call this its worst-case Big-O. But this claim, by itself, doesn't say anything about what happens if `increment-binary` is called *repeatedly*, in sequence, counting up from `0` — the actual, realistic way a counter gets used.
 
-### SE Lells
+### SE Lens
 
 If a system incremented this counter a million times and each increment genuinely cost `O(log n))` in the worst case, a naive estimate might multiply — a million increments times `log(million) ≈ 20` bit-flips each, roughly twenty million total operations. The next unit shows this estimate is wildly, provably too pessimistic.
 
@@ -113,7 +113,7 @@ Not applicable — this is the actual, complete proof, verified against the conc
 
 This is Lesson 47's geometric series doing genuinely new work: not counting a tree's nodes this time, but proving a real, useful bound on a sequence of operations — the identical formula, a different, equally valid application.
 
-### SE Lells
+### SE Lens
 
 The naive "worst case times count" estimate over-counts specifically because it assumes *every* increment triggers the full worst-case cascade, when in reality, most increments (bit `0` flipping alone) are extremely cheap, and only a rapidly-shrinking fraction of increments ever trigger a deep cascade — exactly the geometric shrinkage this unit's sum captures.
 
@@ -152,7 +152,7 @@ Not applicable — this conclusion is the direct, proven consequence of the prev
 
 This exact technique — occasional expensive operations, provably rare enough that the average stays cheap — is the standard justification behind a dynamic array's "doubling" resize strategy (each resize is expensive, but resizes become exponentially rarer as the array grows, giving `O(1)` amortized insertion) and several of Section V's more advanced data structures, all using the identical geometric-series-based argument this lesson just applied to a binary counter.
 
-### SE Lells
+### SE Lens
 
 Amortized analysis is what justifies choosing a data structure or algorithm based on its *typical, sustained* behavior rather than its worst single operation — a real, common engineering tradeoff: accepting an occasional slower operation in exchange for excellent average throughput across the realistic pattern of use a system will actually see.
 

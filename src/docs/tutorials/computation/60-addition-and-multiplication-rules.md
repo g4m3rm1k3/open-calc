@@ -38,7 +38,7 @@ Nothing about the snack example depended on its specific numbers or categories �
 
 This is precisely Lesson 10's set union, counted: if two sets share no members (Lesson 10's own vocabulary — their intersection is empty), `|A ∪ B| = |A| + |B|` — the addition rule is set union's counting consequence, the same relationship the previous lesson found between the multiplication rule and the Cartesian product.
 
-### SE Lells
+### SE Lens
 
 Recognizing when a real counting problem needs addition (alternatives) versus multiplication (sequential choices) is the actual skill — the next unit applies both together, and the closing unit shows exactly what goes wrong when the addition rule's non-overlap requirement is ignored.
 
@@ -96,7 +96,7 @@ Skipped — no enclosing file exists yet.
 
 This two-rule combination — multiply within a sequential choice, add across mutually exclusive alternatives — is the complete toolkit behind most elementary combinatorial counting, including every count this series has already computed: `power-set`'s `2ⁿ` (pure multiplication, previous lesson) and this lesson's password count (multiplication nested inside addition).
 
-### SE Lells
+### SE Lens
 
 Writing `password-count` as a direct formula, rather than actually generating every password and counting them, scales the same way every closed-form shortcut in this series has — instant for any length, where generation would become impractical almost immediately (Lesson 50's own growth-rate table applies directly: `26⁴` and `10⁴` are both easily computed, but generating and listing that many actual strings is a different, much more expensive task).
 
@@ -124,7 +124,7 @@ Not applicable — this is a genuine warning about a real, common mistake.
 
 This exact overlap problem is why Lesson 65 (*Inclusion-Exclusion*), later in this section, exists at all — it derives the precise correction needed (subtracting the overlap back out) for exactly the situation this unit just flagged as unsafe for the plain addition rule alone.
 
-### SE Lells
+### SE Lens
 
 The addition rule isn't wrong when cases overlap — it simply doesn't apply at all, the same way Lesson 51's Big-O proof technique doesn't apply to a claim it was never designed to answer. Recognizing *which* rule a given counting problem's structure actually calls for — checking the non-overlap condition explicitly, not assuming it — is the real discipline this lesson and the previous one both build toward.
 

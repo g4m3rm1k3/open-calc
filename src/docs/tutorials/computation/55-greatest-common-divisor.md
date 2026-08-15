@@ -42,7 +42,7 @@ This identity reduces the problem `gcd(a, b)` to the strictly smaller problem `g
 
 This proof technique — show two sets are identical by proving each is a subset of the other — is a standard mathematical move, here applied to sets of divisors specifically; the same "prove both directions" discipline Lesson 7's biconditional first required for logical claims, now applied to a claim about numbers.
 
-### SE Lells
+### SE Lens
 
 Deriving the identity from real algebraic reasoning, rather than accepting "this is how you compute GCD" as a given fact, is exactly this series' recurring insistence (since Lesson 20) that an algorithm should be *derivable*, not merely *known* — the entire reason this lesson proves the identity before writing any code at all.
 
@@ -106,7 +106,7 @@ Skipped — no enclosing file exists yet.
 
 **Euclid's algorithm**, described this way, appears in Euclid's *Elements*, written roughly 2,300 years ago — one of the oldest algorithms with a continuous, documented history, and still, today, essentially the fastest known general method for computing a GCD, not merely a historical curiosity. Also recognized in: reducing a fraction to lowest terms (dividing both numerator and denominator by their GCD, exactly what `my-gcd` computes), and Lesson 56's modular inverses, which extend this identical algorithm one step further.
 
-### SE Lells
+### SE Lens
 
 `my-gcd`'s termination is guaranteed by the exact same measure-based reasoning Lesson 22 formalized generally — `b` strictly decreases (since `a \bmod b < b` always, a direct consequence of `mod`'s own definition), bounded below by `0`, caught precisely by the base case — no new termination argument was needed, only the recognition that this lesson's proven identity already fits Section II's established framework.
 

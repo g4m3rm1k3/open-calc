@@ -34,7 +34,7 @@ Not applicable — this formula is verified directly against real sets in the ne
 
 "Add, then subtract back the double-counted part" is the exact correction Lesson 62's combination formula also performed, in spirit — dividing out an overcounted factor there, subtracting one here — both are instances of "count something easy to overcount directly, then correct precisely for the overcounting," rather than trying to count the right thing directly from the start.
 
-### SE Lells
+### SE Lens
 
 This formula turns Lesson 60's warning ("don't add overlapping cases") into an actual, usable tool: overlapping cases don't have to be avoided, they just need the correction applied — a real, practical difference between "this technique doesn't work here" and "this technique needs one more term here."
 
@@ -99,7 +99,7 @@ Skipped — no enclosing file exists yet.
 
 Verifying `inclusion-exclusion-2`'s formula against `set/union` computed and counted directly is the exact "prove the fast version against a slow, obviously-correct reference" habit this series has practiced since Lesson 20 — here, the "slow" version isn't slower in any meaningful sense, but it *is* more obviously correct, since it never risked the overcounting mistake at all.
 
-### SE Lells
+### SE Lens
 
 Real problems needing inclusion-exclusion frequently can't practically build the actual union to check directly — counting people who like tea *or* coffee from separate tea-drinker and coffee-drinker counts, without a master list of every person, is exactly the situation where the formula is genuinely necessary, not merely a shortcut over something equally easy to compute directly.
 

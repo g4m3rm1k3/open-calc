@@ -71,7 +71,7 @@ Any function making `k` recursive calls per non-base case produces a recurrence 
 
 `T(n) = T(n-1) + T(n-2) + c` is the recurrence behind **exponential** growth — Lesson 47's geometric series and this recurrence are closely related, and Lesson 49 derives exactly how. The connection to Lesson 23's evaluation tree is direct: every node in that tree corresponds to one "unit" of the `+ c` term, and the tree's total size *is* what `T(n)` computes.
 
-### SE Lells
+### SE Lens
 
 Recognizing a function's recurrence shape *before* running it on a large input is what lets a real cost problem be predicted rather than discovered the hard way — `T(n) = T(n-1) + T(n-2) + c`, once its growth is known (next lesson), immediately signals that naive `fib` will become impractically slow well before any specific input size needs to be tried and timed.
 
@@ -107,7 +107,7 @@ A recurrence's "surrounding work" term doesn't have to be a fixed constant — a
 
 `T(n) = T(n-1) + (n-1)` is the recurrence behind **quadratic** growth — the exact shape Lesson 28 discovered by direct counting, now given its precise algebraic form, connecting Lesson 28's hands-on arithmetic to Lesson 46's arithmetic series formula in a single equation.
 
-### SE Lells
+### SE Lens
 
 This is the recurrence for exactly the situation Lesson 28's SE Lens warned about: a function whose recursive case does non-constant work at every level, silently accumulating cost in a way invisible from reading any single line of code — the recurrence, once written down, makes that accumulation visible and precise, rather than something only a careful hand-count (like Lesson 28's) would reveal.
 

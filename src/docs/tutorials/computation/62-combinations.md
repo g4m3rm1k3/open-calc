@@ -37,7 +37,7 @@ Nothing about the `{A,B,C}` example depended on its specific size — for *any* 
 
 This "count with order, then divide out the internal orderings that shouldn't have mattered" technique recurs throughout combinatorics — it's the identical correction Lesson 65 (*Inclusion-Exclusion*) applies to a different kind of overcounting, and the same idea behind counting distinguishable arrangements of a word with repeated letters (each repeated letter's own internal orderings need dividing out too).
 
-### SE Lells
+### SE Lens
 
 Recognizing "does order matter here" as the deciding question between reaching for `permutation-count` or this lesson's combination formula is real, practical judgment — a five-card poker hand is a combination (the order the cards were dealt in doesn't change the hand); a race's first-second-third finishers is a permutation (the order is the entire point).
 
@@ -99,7 +99,7 @@ Skipped — no enclosing file exists yet.
 
 `combination-count(n, 0)` and `combination-count(n, n)` both equal `1` — there's exactly one way to choose nothing, and exactly one way to choose everything — a boundary check directly analogous to Lesson 61's `k=n` special case, worth verifying the same careful way.
 
-### SE Lells
+### SE Lens
 
 `combination-count` is dramatically smaller than `permutation-count` for the same `n` and `k` (the `k!` division shrinks it substantially once `k` grows) — a real, useful fact whenever a problem asks "how many distinct groups" rather than "how many distinct orderings," since a naive count that forgets to divide out order overcounts by a large, specific, avoidable factor.
 

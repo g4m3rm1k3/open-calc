@@ -45,7 +45,7 @@ Not applicable — this is a formal derivation, verified against code in the nex
 
 This is the identical "introduce a factor to reveal a hidden pattern" move a compiler's algebraic simplifier or a symbolic math system performs constantly — Lesson 41's `eval-expr` and Section VII's algebraic structures both eventually formalize the kind of manipulation this derivation just performed by hand.
 
-### SE Lells
+### SE Lens
 
 Having *both* forms available — the direct recursive product (Lesson 45, cheap to compute, no risk of an intermediate factorial overflowing) and this closed form (elegant, directly connects to already-trusted `factorial`) — is a real, practical choice: for large `n`, computing `n!` directly (this unit's formula) can produce an enormous intermediate number even when the final `permutation-count` result is comparatively modest, exactly the kind of tradeoff Lesson 42's Horner's method already illustrated between two provably-equal but differently-costed computations.
 
@@ -105,7 +105,7 @@ Skipped — no enclosing file exists yet.
 
 `0! = 1` isn't an arbitrary convention chosen to make this formula work — it's Lesson 20's own base case, chosen because "the number of ways to arrange zero items" genuinely is `1` (there's exactly one way to arrange nothing: do nothing), the identical "one way to choose nothing" logic Lesson 32's `power-set` and Lesson 45's own base case already relied on.
 
-### SE Lells
+### SE Lens
 
 Confirming a special case (`k = n`) reduces correctly to an already-trusted, independently-derived result (`factorial`) is real, valuable verification — not just a curiosity, but exactly the kind of cross-check Lesson 20's Connect the Pieces first modeled, catching an error in either derivation before it could go unnoticed.
 

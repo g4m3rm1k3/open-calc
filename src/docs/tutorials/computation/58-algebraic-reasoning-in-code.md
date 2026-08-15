@@ -37,7 +37,7 @@ Not applicable — the next unit applies this exact sequence, in order, to a new
 
 This is Section III's own version of Lesson 18's computational proof mindset and Lesson 40's recursive problem-solving method — the same underlying discipline (specify, recognize structure, prove, apply, verify), specialized here for algebraic simplification specifically.
 
-### SE Lells
+### SE Lens
 
 Step 3 is where this discipline earns its keep over ordinary pattern-matching: recognizing that two expressions "look similar" (step 1 and 2, easy) is not the same as proving they're actually, provably equal (step 3, the part that's easy to skip and dangerous to skip) — Lesson 42's `eval-poly-horner` and Lesson 55's `my-gcd` were both trustworthy specifically because step 3 was done in full, not assumed.
 
@@ -128,7 +128,7 @@ Skipped — no enclosing file exists yet.
 
 This derivation used four separate Section III techniques together: Lesson 57's prime factorization (to see *why* the identity holds), Lesson 13's rearrangement (to isolate `lcm` in the proven equation), Lesson 55's `my-gcd` (as a trusted building block), and this lesson's own five-step discipline (to organize the whole process) — direct, concrete proof that Section III's lessons compose, rather than standing as isolated topics.
 
-### SE Lells
+### SE Lens
 
 `lcm-efficient`'s cost is dominated entirely by `my-gcd`'s own cost — and Lesson 55 already established that Euclid's algorithm runs in very few steps even for large numbers, meaning `lcm-efficient` inherits that same efficiency, essentially for free, simply by being built on top of an already-analyzed, trusted piece rather than a fresh search.
 
