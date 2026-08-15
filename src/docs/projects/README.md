@@ -223,6 +223,36 @@ self-contained deployment).
 
 ---
 
+### 8. SQLite Mastery — SQL, Python, a Real Backend, and a Real Desktop App
+**Folder:** `sqlite-mastery/` — [Full lesson plan](sqlite-mastery/README.md)
+
+A from-zero database curriculum built around one real, growing SQLite
+file: no assumed database knowledge at all, ending in a working desktop
+app — a Python/FastAPI backend serving SQLite, and a `pywebview` shell
+rendering it through jQuery DataTables — then handed a *second*,
+already-existing, deliberately messy database it never designed, because
+reading an unfamiliar schema is its own real skill building your own
+cannot teach.
+
+**Software engineering taught:**
+The repository pattern over raw SQL, boundary validation via Pydantic,
+API design and HTTP status codes, CORS and same-origin policy, schema
+migrations, packaging a desktop distributable.
+
+**Computer science taught:**
+Relational algebra (joins, set operations), query planning and indexing,
+transactions and ACID, the observer-free polling model of a client
+requesting server-rendered pages of data, process lifecycle and
+concurrency, locking.
+
+**Database and web technologies taught:**
+SQL and SQLite's own dynamic type affinity, the Python `sqlite3`
+standard-library module, FastAPI and Pydantic, `pywebview`, jQuery and
+jQuery DataTables (including its server-side processing protocol),
+FTS5 full-text search, WAL-mode concurrency, backup/restore.
+
+---
+
 ### 9. The Bowling Game — Test-Driven Development in Java
 **Folder:** `bowling-game-tdd/` — [Full lesson plan](bowling-game-tdd/README.md)
 
