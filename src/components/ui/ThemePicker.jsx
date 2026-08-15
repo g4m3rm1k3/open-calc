@@ -25,6 +25,8 @@ const THEME_META = {
   cyberCyan:          { desc: 'Deep sea cyan — crisp and futuristic.',                  type: 'dynamic', group: 'Colorful',  emoji: '🌊' },
   paperTextbook:      { desc: 'Off-white paper with inky text — distraction-free.',    type: 'light',   group: 'Focus',     emoji: '📄' },
   sepiaTextbook:      { desc: 'Warm amber-sepia dark for late-night reading sessions.', type: 'dark',    group: 'Focus',     emoji: '📚' },
+  'gray-light':       { desc: 'Clean, neutral gray light theme with high contrast.',    type: 'light',   group: 'System',    emoji: '⚪' },
+  'gray-dark':        { desc: 'Deep, neutral gray dark theme with high contrast.',      type: 'dark',    group: 'System',    emoji: '⚫' },
 };
 
 const TYPE_BADGE = {
