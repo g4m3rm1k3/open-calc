@@ -395,3 +395,35 @@ hashing; session-based authentication; a real, enforced role hierarchy
 (`super_admin` → `admin` → `user`); and packaging with PyInstaller
 (`--noconsole`) plus Python's own `webbrowser` module as a real,
 non-Electron desktop delivery mechanism.
+
+---
+
+### 13. .NET API Quick Start — Interfaces, Discovery, and Add-in Basics
+**Folder:** `dotnet-api-quickstart/` — [Full lesson plan](dotnet-api-quickstart/README.md)
+
+A fast, condensed series — not this site's usual isolated-lab treatment
+— for one specific, real goal: reading and using an unfamiliar .NET/C#
+API (a host application's add-in SDK, in the real, motivating case)
+when you already know how to code but don't yet know C#'s own answers
+to "what's an interface," "how do I explore a class the way I'd use
+`dir()`/`help()` in Python," or "what is this WPF template a host
+application hands me." Deliberately generic and transferable: no
+specific third-party API's actual surface is taught or assumed.
+
+**C# and .NET taught:** interfaces vs. implementation and why real APIs
+return interface-typed values, reading an unfamiliar method's real
+signature (properties, overloads, generics, nullable types),
+`System.Reflection` as C#'s direct equivalent of Python's `dir()`,
+IntelliSense/Go To Definition/the Object Browser as the faster everyday
+alternative, Class Library projects and the general host-loads-a-plugin
+mechanism, `UserControl` vs. `Window`, NuGet (`PackageReference`,
+`dotnet add package`), `Microsoft.Extensions.Logging` and structured
+logging, reading settings from `appsettings.json`, solution/project
+structure, value vs. reference types and the other real syntax gaps
+from Python, `enum` as the built-in fix for a hand-maintained
+numeric-code-to-label dictionary, `try`/`catch`/`finally` and `using`,
+LINQ (`Where`/`Select`/`FirstOrDefault`), events and delegates as the
+real, other direction a host API talks back to your code, extension
+methods, the Immediate Window as the closest real equivalent to a
+Python REPL, and just enough `async`/`await` to read an unfamiliar
+signature.
