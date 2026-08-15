@@ -61,6 +61,7 @@ import {
   runRubyInline,
   runCInline,
   runBrainfuckInline,
+  runSchemeInline,
 } from "../../utils/inlineRunner.js";
 import { getThemeStyles, STUDIO_THEMES } from "../../utils/studioThemes.js";
 import { useGlobalTheme, FONT_OPTIONS } from "../../context/ThemeContext.jsx";
@@ -706,6 +707,13 @@ function MdCodeBlock({ language, code }) {
           error
             ? [{ text: error, type: "error" }]
             : [{ text: out, type: "output" }],
+        );
+      } else if (lang === "scheme" || lang === "scm") {
+        runSchemeInline(src, onLine);
+        setOutput(
+          streamLines.length
+            ? [...streamLines]
+            : [{ text: "(no output)", type: "dim" }],
         );
       } else {
         // javascript / js (fallback)

@@ -1,5 +1,6 @@
 import { getPyodide } from './pyodideRuntime.js'
 import { executeScript } from '../engines/openmat/openmatEngine.js'
+import { createEnv, evalSchemeSource } from '../engines/scheme/schemeEngine.js'
 
 function fmtVal(v) {
   if (typeof v === 'string') return v
@@ -224,6 +225,7 @@ export const RUNNABLE_LANGS = new Set([
   'ruby', 'rb',
   'c', 'cpp', 'c++',
   'brainfuck', 'bf',
+  'scheme', 'scm',
 ])
 
 /** Run JS inline. Returns { output: string, error: string|null } */
@@ -404,6 +406,17 @@ export function runBrainfuckInline(code) {
     ip++
   }
   return { output: out.join('') || '(no output)', error: null }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Scheme interpreter (see src/engines/scheme/schemeEngine.js)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Run Scheme inline in a fresh environment. onLine({ text, type }) called
+ * for each top-level result / display() output / error line. */
+export function runSchemeInline(code, onLine) {
+  const env = createEnv()
+  evalSchemeSource(code, env, onLine)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
