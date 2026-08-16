@@ -25,7 +25,11 @@ wrong.
 different format entirely (challenge → companion implementation with a
 planted bug → reveal) with no Terms/Objects Header at all, and introduces no
 genuinely new construct of its own — it's a deliberate, documented gap, not
-a missed extraction.
+a missed extraction. Lesson 230 (*Systems Design Problem-Solving*, Section
+X's own checkpoint) follows the identical format and the identical
+exception, for the identical reason — a distributed lock service built
+entirely from already-taught reused functions, with one planted
+idempotency bug, no new Clojure construct anywhere in it.
 
 ---
 
@@ -944,3 +948,141 @@ a missed extraction.
 - interleaving (term)
 - critical section (term)
 - lost update (term)
+
+### Lesson 213 - Locks and Mutual Exclusion
+- lock (term)
+- mutual exclusion (term)
+- acquire / release (term)
+- test-and-set (term)
+
+### Lesson 214 - Deadlocks
+- deadlock (term)
+- resource (term)
+- hold-and-wait (term)
+- no preemption (term)
+- circular wait (term)
+- wait-for graph (term)
+- sentinel value (term)
+
+### Lesson 215 - Semaphores
+- semaphore (term)
+- permit (term)
+- counting semaphore (term)
+- binary semaphore (term)
+- over-release (term)
+- signaling semaphore (term)
+(invariant was wrongly marked "new" here originally — it was already
+taught in full at Lesson 16, "Invariants." Caught 2026-08-16 by a direct
+grep-check the user asked for; Lesson 215's own header still correctly
+restates it in full per the Repetition Rule, this is only an index
+correction.)
+
+### Lesson 216 - Condition Variables
+- condition variable (term)
+- predicate (term)
+- wait (on a condition variable) (term)
+- signal / notify (term)
+- broadcast / notify-all (term)
+- spurious wakeup (term)
+- bounded buffer (term)
+
+### Lesson 217 - Atomics
+- atomic operation / indivisible operation (term)
+- compare-and-swap (CAS) (term)
+- retry (term)
+(test-and-set was named and deferred in Lesson 213; 217 is where it gets
+its real, executable first treatment, per the Repetition Rule — see
+217's own header for the full definition.)
+
+### Lesson 218 - Memory Models
+- sequential consistency (term)
+- memory model (term)
+- store buffer (term)
+- memory reordering (term)
+- memory fence / barrier (term)
+
+### Lesson 219 - Lock-Free Thinking
+- lock-free data structure (term)
+- progress guarantee (term)
+- obstruction-free (term)
+- lock-free (term)
+- wait-free (term)
+
+### Lesson 220 - Filesystems
+- filesystem (term)
+- name / directory entry (term)
+- inode (term)
+- block (term)
+- hard link (term)
+- link count (term)
+
+### Lesson 221 - Databases
+- database (term)
+- schema (term)
+- row / record (term)
+- table (term)
+- query (term)
+- update-in-place (term)
+
+### Lesson 222 - Transactions
+- transaction (term)
+- atomicity (term)
+- consistency (term)
+- rollback (term)
+- `>=` (object/method)
+
+### Lesson 223 - Indexes
+- index (database kind) (term)
+- sorted index (term)
+- hash index (term)
+- `declare` (object/method, reappearing — first full treatment was
+  Lesson 91's mutual recursion; restated fully here per the Repetition
+  Rule)
+- `quot` (object/method, reappearing from Lesson 94)
+- `mod` (object/method, new)
+(hash function and collision were wrongly marked "new" here originally —
+both already taught in full at Lesson 89, "Hash Tables," which also
+taught chaining, the exact collision-resolution technique Lesson 223's
+own hash-bucket-of-pairs structure actually builds — Lesson 223's own
+text never names "chaining" by that term, a real citation gap, not just
+an index one; flagged 2026-08-16 for a fix, see below.)
+
+### Lesson 224 - Logging and Recovery
+- crash (term)
+- durability (term)
+- write-ahead log (WAL) (term)
+- commit marker (term)
+- recovery / replay (term)
+- idempotent (term)
+
+### Lesson 225 - Networking Fundamentals
+- message (term)
+- unreliable channel (term)
+- message loss (term)
+- acknowledgment (ACK) (term)
+- timeout (term)
+- retransmission (term)
+- duplicate delivery (term)
+
+### Lesson 226 - Sockets
+- endpoint / address (term)
+- socket (term)
+- connection (term)
+- three-way handshake (term)
+- byte stream (term)
+- framing (term)
+
+### Lesson 227 - Protocols
+- protocol (term)
+- command (term)
+- protocol state (term)
+- protocol violation (term)
+
+### Lesson 228 - Distributed State
+- distributed state (term)
+- replica (term)
+- divergence (term)
+- distributed lock (term)
+- reconciliation (term)
+- last-write-wins (term)
+- clock skew (term)
