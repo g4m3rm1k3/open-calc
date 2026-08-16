@@ -71,6 +71,65 @@ This is precisely why aliasing is a real, common source of bugs in languages wit
 
 ---
 
+## Concept Unit: The Control Case — Separate Locations Stay Separate
+
+### The Problem
+
+Aliasing happens when two names share a location. Is that the *only* possible outcome of Lesson 167's model, or does mutation correctly leave unrelated variables alone when their locations genuinely differ?
+
+### Introduce the concept in isolation
+
+```
+user=> (def sep-env [["x" 0] ["y" 1]])
+user=> (def sep-store [100 100])
+user=> (def sep-store2 (set-var sep-env sep-store "x" 999))
+user=> (get-var sep-env sep-store "y")
+100
+user=> (get-var sep-env sep-store2 "y")
+100
+```
+
+`sep-env` binds `"x"` and `"y"` to *different* locations, `0` and `1`. Mutating `"x"` through `set-var` changes only location `0` — `"y"`, reading location `1`, reports the identical `100` both before and after, checked directly rather than assumed. This is the honest control case this lesson's first unit needed: aliasing isn't automatic just because two names exist in the same environment — it's a real, specific consequence of two names sharing one *location*, and this unit proves the converse holds too: distinct locations genuinely stay independent.
+
+### Discard the throwaway example
+
+Not applicable — real, verified proof that `"y"` is unaffected when `"x"`'s own, genuinely different location is mutated.
+
+### Project Change
+
+- **Reference Source**: Lesson 167's own `get-var`/`set-var`, reused entirely unchanged, run here against a non-aliased environment for direct contrast.
+- **Files affected**: None.
+- **Change type**: N/A.
+- **Location**: N/A.
+- **Dependencies**: Babashka, already installed.
+
+### The New Code — type it yourself
+
+Not applicable — this unit runs Lesson 167's own existing functions on a deliberately non-aliased environment rather than introducing new code.
+
+### The Updated Project
+
+Skipped — no enclosing file exists yet.
+
+### Mechanical walkthrough — how it works in isolation
+
+- **`[["x" 0] ["y" 1]]`** — first appearance of this specific contrast: two distinct entries, two genuinely *different* location numbers — the control case this lesson's first unit's aliased `[["x" 0] ["y" 0]]` needed to be checked against.
+- **`(get-var sep-env sep-store "y")`, `(get-var sep-env sep-store2 "y")`** — reappearing `get-var` (Lesson 167), called before and after `"x"`'s own mutation — both reads land on location `1`, which `set-var`'s own call never touched at all.
+
+### CS Lens
+
+This is the same "test the property in both directions" discipline Lesson 158's own checkpoint required for a monoid checker: proving aliasing happens when locations are shared is only half the claim; proving it *doesn't* happen when they aren't is the other half, and both need a real, checked example, not just one.
+
+### SE Lens
+
+A reader who only ever saw this lesson's first unit could reasonably wonder whether *every* variable in this store model risks silent aliasing — this unit's own real, contrasting result answers that directly: no, aliasing is exactly as narrow as "these two names happen to share a location," never broader than that.
+
+### Connection to the previous unit
+
+The previous unit proved shared locations alias; this unit proves the necessary converse — distinct locations don't — completing the real claim rather than leaving it only half demonstrated.
+
+---
+
 ## Connect the Pieces
 
 Two names, one location, one real mutation:

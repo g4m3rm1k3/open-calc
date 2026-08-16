@@ -702,6 +702,7 @@ a missed extraction.
 
 ### Lesson 164 - Environments
 - environment (term)
+- shadowing (term) — also where the canonical, corrected `lookup`/`lookup-at` now lives (fixes a latent first-match-wins bug in Lesson 154's original)
 
 ### Lesson 165 - Closures
 - closure (term)
@@ -769,3 +770,177 @@ a missed extraction.
 - compilation (term)
 - bytecode (term)
 - virtual machine (VM) (term)
+
+### Lesson 184 - Bits and Information
+- bit (term)
+- radix (base) (term)
+- positional notation (term)
+- digit-expansion reconstruction (Horner's method) (term)
+- bits of information (term)
+
+### Lesson 185 - Boolean Circuits
+- logic gate (term)
+- NAND gate (term)
+- functional completeness (universal gate) (term)
+- circuit (term)
+
+### Lesson 186 - Binary Arithmetic
+- half-adder (term)
+- carry (term)
+- full-adder (term)
+- ripple-carry addition (term)
+- half-subtractor (term)
+- borrow (term)
+
+### Lesson 187 - Integer Representation
+- word width (fixed-width representation) (term)
+- overflow (term)
+- unsigned integer (term)
+- sign-magnitude representation (term)
+
+### Lesson 188 - Two's Complement
+- ones' complement (term)
+- two's complement (term)
+
+### Lesson 189 - Floating-Point Representation
+- fractional binary expansion (term)
+- normalized form (term)
+- exponent (term)
+- mantissa (significand) (term)
+- implicit leading bit (term)
+- rounding error (approximation error) (term)
+
+### Lesson 190 - Text Encoding
+- code point (term)
+- fixed-width character encoding (term)
+- variable-width encoding (term)
+- continuation byte (term)
+- `int` (object/method)
+- `char` (object/method)
+- character literal (`\a`, `\space`) (object/method)
+
+### Lesson 191 - Memory as an Address Space
+- address (term)
+- byte (term)
+- endianness (big-endian / little-endian) (term)
+- contiguous allocation (term)
+
+### Lesson 192 - Pointers and References
+- pointer (term)
+- dereference (term)
+- null pointer (term)
+- pointer arithmetic (term)
+
+### Lesson 193 - Stack Frames
+- stack pointer (term)
+- stack frame (term)
+
+### Lesson 194 - Heap Allocation
+- heap (term)
+- free list (term)
+- first-fit (term)
+- external fragmentation (term)
+- coalescing (term)
+
+### Lesson 195 - Assembly
+- register (term)
+- instruction (term)
+- program counter (PC) (term)
+- jump (term)
+
+### Lesson 196 - Instruction Sets
+- addressing mode (term)
+- register-indirect addressing (term)
+- condition flag (term)
+
+### Lesson 197 - CPU Execution
+- fetch (term)
+- decode (term)
+- execute (term)
+- fetch-decode-execute cycle (term)
+
+### Lesson 198 - Caches
+- cache (term)
+- cache hit (term)
+- cache miss (term)
+- temporal locality (term)
+- spatial locality (term)
+- cache line (block) (term)
+- direct-mapped (term)
+- memory hierarchy (term)
+
+### Lesson 199 - Branch Prediction
+- branch (term)
+- taken / not-taken (term)
+- branch prediction (term)
+- misprediction (misprediction penalty) (term)
+
+### Lesson 200 - Pipelines
+- pipeline (term)
+- pipeline stage (term)
+- throughput (term)
+- pipeline flush (term)
+- control hazard (term)
+- data hazard (term)
+
+### Lesson 201 - Virtual Memory
+- virtual address (term)
+- physical address (term)
+- page / frame (term)
+- page table (term)
+- page fault (term)
+
+### Lesson 202 - Processes
+- process (term)
+- process control block (PCB) (term)
+- PID (process ID) (term)
+- process state (term)
+
+### Lesson 203 - System Calls
+- kernel (term)
+- user mode / kernel mode (term)
+- system call (syscall) (term)
+- trap (term)
+
+### Lesson 204 - Compilers and Optimization
+- compiler optimization (term)
+- constant folding (term)
+- dead code elimination (term)
+- common subexpression elimination (CSE) (term)
+
+### Lesson 205 - Undefined Behavior
+- undefined behavior (term)
+- well-defined behavior (term)
+
+### Lesson 206 - Performance Models
+- performance model (term)
+- cache thrashing (term)
+- memory footprint (term)
+
+### Lesson 208 - Operating-System Abstractions
+- abstraction (term)
+- file (term)
+- directory (term)
+- device (term)
+- leaky abstraction (term)
+
+### Lesson 209 - Processes vs Threads
+- thread (term)
+- thread control block (TCB) (term)
+
+### Lesson 210 - Scheduling
+- scheduling (term)
+- round-robin (term)
+- priority scheduling (term)
+- starvation (term)
+
+### Lesson 211 - Context Switching
+- context switch (term)
+- context-switch overhead (term)
+- cache pollution (term)
+
+### Lesson 212 - Race Conditions
+- race condition (term)
+- interleaving (term)
+- critical section (term)
+- lost update (term)

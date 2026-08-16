@@ -67,6 +67,70 @@ A function correctly inferred as polymorphic can be reused across every type a p
 
 ---
 
+## Concept Unit: Making Inference Report a Real Type Variable
+
+### The Problem
+
+Lesson 174's `infer-type` reported `"unconstrained"` for a parameter never used inside an `"add"` — an honest, but vague, answer. Can inference be extended to report the *actual* polymorphic type, `T`, instead of merely admitting it found no constraint?
+
+### Introduce the concept in isolation
+
+```clojure
+(defn infer-type-tv [name body]
+  (if (uses-as-number? name body) "number" ["type-var" name]))
+```
+
+```
+user=> (infer-type-tv "y" ["var" "y"])
+["type-var" "y"]
+user=> (infer-type-tv "y" ["add" ["var" "y"] 1])
+"number"
+```
+
+`infer-type-tv` still checks the identical constraint Lesson 174's `uses-as-number?` already established — but where the old version fell back to the vague string `"unconstrained"`, this version returns `["type-var" "y"]`: a real, structured type, naming *which* variable's own type is still open, rather than only admitting one wasn't found. `y` used inside an `"add"` still correctly infers `"number"` — the constrained case is unchanged; only the unconstrained case now carries real information instead of a shrug.
+
+### Discard the throwaway example
+
+Not applicable — `infer-type-tv` is real, reusable, and verified against both the constrained and unconstrained case from Lesson 174's own examples.
+
+### Project Change
+
+- **Reference Source**: Lesson 174's own `infer-type`/`uses-as-number?`, reused directly — only the unconstrained branch's own return value changes.
+- **Files affected**: None.
+- **Change type**: N/A.
+- **Location**: N/A.
+- **Dependencies**: Babashka, already installed.
+
+### The New Code — type it yourself
+
+```clojure
+(defn infer-type-tv [name body]
+  (if (uses-as-number? name body) "number" ["type-var" name]))
+```
+
+### The Updated Project
+
+Skipped — no enclosing file exists yet.
+
+### Mechanical walkthrough — how it works in isolation
+
+- **`(uses-as-number? name body)`** — reappearing (Lesson 174): the identical constraint check, unchanged.
+- **`["type-var" name]`** — first appearance of this specific idea: a real, structured **type variable** value, naming the specific unconstrained parameter, in place of a bare string admitting inference found nothing.
+
+### CS Lens
+
+This is the real, concrete difference between Lesson 174's honest "I couldn't determine a type" and this unit's own "I determined the type is genuinely generic" — the same underlying fact, `T \to T`, but now represented as data a type checker could actually use (compare two type variables, substitute a concrete type into one later) rather than a string with no further structure.
+
+### SE Lens
+
+A real type checker needs exactly this: not just knowing a parameter is unconstrained, but having a real, nameable placeholder for it, so that *two* uses of the same polymorphic function, with two different concrete argument types, can each substitute their own real type into the identical `T` without the two calls interfering with each other.
+
+### Connection to the previous unit
+
+The previous unit proved identity works correctly on any real value; this unit gives that fact a real, structured type inference can actually report, closing the gap Lesson 174 honestly left open rather than only describing how it might be closed.
+
+---
+
 ## Connect the Pieces
 
 The same closure, two genuinely different argument types, both correct:

@@ -2,13 +2,14 @@
 
 **What you will build**: By the end of this lesson you'll extend Lesson 163's `eval-ast` to handle a third AST shape — `["var" "x"]`, a variable reference — resolved by looking it up in a real **environment**: a mapping from names to values, reusing Lesson 154's own lookup table directly. `(eval-env ["add" ["var" "x"] ["add" ["var" "y"] 3]] [["x" 10] ["y" 20]])` correctly computes `33`, a real expression mixing variables and literals, evaluated against a real environment.
 
-**What you need to know first**: Lesson 163's `eval-ast`; Lesson 154's `lookup`/`lookup-at`, reused directly as this lesson's environment; Lesson 151's `cond`.
+**What you need to know first**: Lesson 163's `eval-ast`; Lesson 154's `lookup`/`lookup-at`, reused as this lesson's environment and corrected here; Lesson 151's `cond`.
 
 **Terms introduced in this lesson**:
 
 - **environment** — a mapping from variable names to their currently bound values, consulted during evaluation whenever a variable reference is encountered. *Why it matters*: an AST node like `["var" "x"]` names a variable but doesn't carry its value — the environment is where that value actually lives, separate from the AST itself.
+- **shadowing** — when a name is bound more than once, the most recently added binding is the one that resolves, temporarily hiding any earlier binding for the identical name. *Why it matters*: names precisely the correctness property this lesson's own corrected `lookup` has to guarantee — Lesson 154's original version got this backwards, resolving to the *oldest* binding instead.
 
-**Objects and methods used**: None new. This lesson reuses `lookup`/`lookup-at` (Lesson 154), `cond` (Lesson 151), and `number?` (Lesson 41), each already covered.
+**Objects and methods used**: None new. This lesson reuses `cond` (Lesson 151) and `number?` (Lesson 41), each already covered. This lesson's own `lookup`/`lookup-at`, corrected from Lesson 154's original, is now the canonical version to cite going forward.
 
 ---
 
@@ -77,6 +78,79 @@ This is `chain`'s own composition idea (Lesson 154), inverted: `chain` threaded 
 ### SE Lens
 
 Passing `env` as an explicit argument, rather than reaching for some global lookup table, means `eval-env` can be called with *different* environments for the identical AST — the same expression, `x + 5`, means `15` under one environment and something else entirely under another, a real flexibility a hardcoded lookup could never offer.
+
+---
+
+## Concept Unit: Shadowing — When a Name Is Bound Twice
+
+### The Problem
+
+Nothing so far has stopped the identical name from being added to `env` twice. If `"x"` is bound once, then bound again to a different value, which one should `lookup` actually find?
+
+### Introduce the concept in isolation
+
+```clojure
+(defn lookup [table key] (lookup-at table key 0 nil))
+(defn lookup-at [table key i best]
+  (if (>= i (count table))
+    best
+    (if (= (get (get table i) 0) key)
+      (lookup-at table key (+ i 1) (get (get table i) 1))
+      (lookup-at table key (+ i 1) best))))
+```
+
+```
+user=> (def shadow-env [["x" 1] ["x" 2]])
+user=> (lookup shadow-env "x")
+2
+```
+
+`shadow-env` binds `"x"` twice — first to `1`, then to `2`. `lookup` reports `2`: the *most recently added* binding, not the first one found. This matters for real correctness, not just tidiness — a variable bound again inside a nested scope (a function parameter reusing an outer name, for instance) has to **shadow** the outer one, not be silently overridden by it. Lesson 154's own `lookup-at` stopped at the *first* match it found scanning forward — correct only by coincidence, since no lesson before this one ever bound the same name twice. This version keeps scanning the *whole* table and remembers the last match, so the most recently added binding always wins, matching real shadowing semantics.
+
+### Discard the throwaway example
+
+Not applicable — `lookup`/`lookup-at` are real, reusable, and verified to correctly prefer the later of two bindings for the identical name.
+
+### Project Change
+
+- **Reference Source**: Lesson 154's own `lookup`/`lookup-at`, corrected here — the original stopped at the first match; this version keeps scanning and remembers the last one, so a repeated name resolves to its most recent binding.
+- **Files affected**: None.
+- **Change type**: N/A.
+- **Location**: N/A.
+- **Dependencies**: Babashka, already installed.
+
+### The New Code — type it yourself
+
+```clojure
+(defn lookup-at [table key i best]
+  (if (>= i (count table))
+    best
+    (if (= (get (get table i) 0) key)
+      (lookup-at table key (+ i 1) (get (get table i) 1))
+      (lookup-at table key (+ i 1) best))))
+```
+
+### The Updated Project
+
+Skipped — no enclosing file exists yet.
+
+### Mechanical walkthrough — how it works in isolation
+
+- **`best`**, a new fourth parameter — first appearance of this specific idea: instead of returning the moment a match is found, the scan remembers the *most recent* match seen so far, and keeps going.
+- **`(lookup-at table key (+ i 1) (get (get table i) 1))`** — on a match, `best` is *overwritten* with this entry's value, not kept — so a later match always replaces an earlier one.
+- **`(if (>= i (count table)) best ...)`** — only once the whole table has been scanned does the accumulated `best` — whichever match was most recent — actually get returned.
+
+### CS Lens
+
+This is the identical "scan everything, keep the best" shape Lesson 111's own brute-force minimum-finding used — here "best" means "most recent" instead of "smallest," but the accumulator discipline is the same: never stop early, because stopping early is exactly what returned the *wrong* match before this fix.
+
+### SE Lens
+
+This bug had been sitting, unnoticed, in `lookup` since Lesson 154 and reused by every lesson through this one — silent specifically because no earlier lesson's own example ever exercised the case that exposes it. A representative test case (shadowing, not just a fresh, never-reused name) is what surfaces a bug like this; a test suite that never tries the harder case can pass indefinitely on code that's still genuinely wrong.
+
+### Connection to the previous unit
+
+The previous unit trusted `lookup` to resolve any single, uniquely-named variable correctly; this unit finds and fixes the one real case — a repeated name — where the original version silently gave the wrong answer.
 
 ---
 

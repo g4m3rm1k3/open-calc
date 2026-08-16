@@ -79,6 +79,83 @@ Separating parsing (Lesson 161) from this AST-simplification step, rather than h
 
 ---
 
+## Concept Unit: Proving No Numbers Were Lost
+
+### The Problem
+
+`tree->ast` drops the literal `"plus"` token and drops the parse tree's own wrapping shape — but does it ever accidentally drop or duplicate one of the *numbers* the original expression actually contained? A transformation that silently lost data would be a real bug, not a simplification.
+
+### Introduce the concept in isolation
+
+```clojure
+(defn count-numbers-tree [tree]
+  (if (= (count tree) 1)
+    1
+    (+ 1 (count-numbers-tree (get tree 2)))))
+
+(defn count-numbers-ast [ast]
+  (if (number? ast)
+    1
+    (+ (count-numbers-ast (get ast 1)) (count-numbers-ast (get ast 2)))))
+```
+
+```
+user=> (count-numbers-tree [1 "plus" [2 "plus" [3]]])
+3
+user=> (count-numbers-ast (tree->ast [1 "plus" [2 "plus" [3]]]))
+3
+user=> (count-numbers-tree [1 "plus" [2 "plus" [3 "plus" [4]]]])
+4
+user=> (count-numbers-ast (tree->ast [1 "plus" [2 "plus" [3 "plus" [4]]]]))
+4
+```
+
+`count-numbers-tree` counts numbers the parse tree's own way — one per level, following the `"plus"`-nested chain. `count-numbers-ast` counts them the AST's own way — recursing into both operands of every `"add"` node. Both agree, on a three-number expression and, checked separately, a four-number one: `tree->ast` genuinely preserves every real number the original expression had, dropping only the redundant syntax around them, never the values themselves.
+
+### Discard the throwaway example
+
+Not applicable — both counting functions are real, and agreement was checked on two differently-sized real expressions, not assumed from one.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart — a from-scratch correctness check for this lesson's own `tree->ast`.
+- **Files affected**: None.
+- **Change type**: N/A.
+- **Location**: N/A.
+- **Dependencies**: Babashka, already installed.
+
+### The New Code — type it yourself
+
+```clojure
+(defn count-numbers-ast [ast]
+  (if (number? ast)
+    1
+    (+ (count-numbers-ast (get ast 1)) (count-numbers-ast (get ast 2)))))
+```
+
+### The Updated Project
+
+Skipped — no enclosing file exists yet.
+
+### Mechanical walkthrough — how it works in isolation
+
+- **`(if (number? ast) 1 ...)`**, in `count-numbers-ast` — reappearing `number?` (Lesson 41): a bare number is exactly one number, counted directly.
+- **`(+ (count-numbers-ast (get ast 1)) (count-numbers-ast (get ast 2)))`** — first appearance of this specific counting shape: an `"add"` node's own count is the *sum* of both operands' own counts, recursively — the AST's own analogue of `count-numbers-tree`'s chain-following recursion, shaped differently because the AST itself is shaped differently.
+
+### CS Lens
+
+This is a real **invariant** (Lesson 16): a property that must hold across a transformation for that transformation to be trusted at all — here, "the same real numbers exist before and after," checked directly rather than assumed from `tree->ast`'s own plausible-looking definition.
+
+### SE Lens
+
+A transformation this small feels too simple to need its own correctness check — exactly the assumption that let Lesson 108's `minmax-max` and Lesson 138's `via-waypoint-cost` both ship real bugs. Checking a genuine invariant, even on code that looks obviously right, is what turns "looks right" into "verified right."
+
+### Connection to the previous unit
+
+The previous unit showed `tree->ast` produces a cleaner shape; this unit proves that cleaner shape isn't cleaner by losing information — every number the parse tree had, the AST still has, checked on two real, differently-sized examples.
+
+---
+
 ## Connect the Pieces
 
 Parse, then simplify to an AST, in one real pipeline:

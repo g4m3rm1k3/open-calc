@@ -95,6 +95,74 @@ An **interpreter** — walking the AST directly, the way `eval-ast` does — is 
 
 ---
 
+## Concept Unit: A Second Operator — Proving This Is Genuinely Useful
+
+### The Problem
+
+An interpreter that only ever adds isn't much of a language. The BRD's own framing for this lesson calls for "the smallest *useful* interpreter" — can `eval-ast` handle a second, genuinely different operator, mixed freely with the first, without its own recursive shape changing at all?
+
+### Introduce the concept in isolation
+
+```clojure
+(defn eval-ast [ast]
+  (cond
+    (number? ast) ast
+    (= (get ast 0) "mul") (* (eval-ast (get ast 1)) (eval-ast (get ast 2)))
+    true (+ (eval-ast (get ast 1)) (eval-ast (get ast 2)))))
+```
+
+```
+user=> (eval-ast ["mul" 3 4])
+12
+user=> (eval-ast ["add" 2 ["mul" 3 4]])
+14
+user=> (eval-ast ["mul" ["add" 1 2] 4])
+12
+```
+
+`"mul"` reduces via `*` instead of `+`, checked with `cond` (Lesson 151) instead of the previous unit's plain `if` — everything else about `eval-ast`'s own shape is untouched. `["add" 2 ["mul" 3 4]]` mixes both operators in one real expression and reaches `14` — `2 + (3 \times 4)` — correctly: the nested `"mul"` node is evaluated by the identical recursive mechanism the previous unit already proved handles nesting, regardless of which operator happens to sit at any given node. `["mul" ["add" 1 2] 4]` proves the reverse nesting works too: `(1+2) \times 4 = 12`.
+
+### Discard the throwaway example
+
+Not applicable — `eval-ast` is real, reusable, and verified on a bare `"mul"`, a mixed `"add"`-containing-`"mul"`, and a mixed `"mul"`-containing-`"add"`.
+
+### Project Change
+
+- **Reference Source**: This lesson's own first-unit `eval-ast`, extended with one new `cond` branch — logic otherwise unchanged.
+- **Files affected**: None.
+- **Change type**: N/A.
+- **Location**: N/A.
+- **Dependencies**: Babashka, already installed.
+
+### The New Code — type it yourself
+
+```clojure
+(= (get ast 0) "mul") (* (eval-ast (get ast 1)) (eval-ast (get ast 2)))
+```
+
+### The Updated Project
+
+Skipped — no enclosing file exists yet.
+
+### Mechanical walkthrough — how it works in isolation
+
+- **`(cond (number? ast) ast (= (get ast 0) "mul") ... true ...)`** — reappearing `cond` (Lesson 151): the base case is unchanged; a new branch is inserted for `"mul"`, and the previous unit's `"add"` handling becomes the final, catch-all branch.
+- **`(* (eval-ast (get ast 1)) (eval-ast (get ast 2)))`** — reappearing `*` (Lesson 2) in the identical recursive shape the previous unit already established for `+`: both operands evaluated first, recursively, before combining.
+
+### CS Lens
+
+Nothing about the recursive *skeleton* changed to add a second operator — only one new `cond` branch, checking one new tag. This is exactly Lesson 151's own pattern-matching payoff: a sum type (Lesson 150) with a new alternative needs one new branch, not a redesign, and an AST is precisely such a sum type, one alternative per operator.
+
+### SE Lens
+
+Mixing `"add"` and `"mul"` freely, with neither needing to know the other exists, is only possible because both share the identical two-operand shape and both trust the same recursive evaluation of their own operands — a design decision (uniform node shape) made all the way back in Lesson 162, paying off directly here.
+
+### Connection to the previous unit
+
+The previous unit proved `eval-ast` correctly recurses on nested `"add"` nodes; this unit proves that same recursive mechanism is operator-agnostic — adding real second functionality cost one line, not a rewrite.
+
+---
+
 ## Connect the Pieces
 
 The complete pipeline, one concrete value, every stage from Lesson 160 through this lesson:
