@@ -1,9 +1,27 @@
 # Graphics Curriculum Build — Handoff
 
 Read this file first when resuming this task in a new session. Then read
-`LESSON SCHEMA.md`, `graphcs.brd.md`, and the most recent `Lesson-NN.md` to
-recalibrate voice/depth, then continue directly — no need to re-ask the
-user anything not covered below.
+`LESSON SCHEMA.md` and, only if the current section's title list isn't
+already captured below, the relevant slice of `graphcs.brd.md` — then
+continue directly, no need to re-ask the user anything not covered
+below. **Never open an old `Lesson-NN.md` file, for any reason** —
+stated directly by the user; this file's own function inventory, house
+style, and judgment-call record below are the complete carried-forward
+context a new lesson needs. (An earlier version of this line said to
+read the most recent lesson file to recalibrate voice/depth — that
+instruction is retracted, not just superseded; see the "Next after
+Lesson 47" section below and `feedback_stay_scoped_no_exploration.md` in
+the memory system.)
+
+**Note on this file's own size:** earlier versions of this handoff
+tracked every completed lesson with its own paragraph. That's no longer
+here on purpose — once a section is complete, its lesson-by-lesson detail
+lives in the lesson files themselves (`Lesson-01.md` through
+`Lesson-45.md`), not duplicated here. This file now only carries what a
+fresh session actually needs before writing the *next* lesson: ground
+rules, the reusable function/construct inventory, house style, and
+open judgment calls. Keep it this size going forward — summarize a
+section once it's done, don't append a paragraph per lesson forever.
 
 ## The task
 
@@ -16,516 +34,650 @@ depth — not an abbreviated or summarized version of the schema.
 
 ## Ground rules the user has stated directly (do not relitigate these)
 
-- **Only touch files the user explicitly points at.** Do not explore other
-  parts of the repo "to check something," verify a precedent, or follow a
-  cross-reference — even when something looks plausibly relevant (e.g. a
-  file the user happens to have open in their IDE). This was stated three
-  times in an early session, with real frustration by the third time.
-  Stay strictly scoped to `LESSON SCHEMA.md` and the Graphics folder.
-- The markdown lessons here are **not** the same system as the app's real
-  interactive lessons (`src/courses/*.js` — a totally different,
-  React-component-driven format). This is intentional and already
-  confirmed by the user: the JS format would take a month per lesson; this
-  markdown textbook series is the fast path. Don't raise this as a problem
-  again or attempt to convert anything.
+- **Only touch files the user explicitly points at.** Do not explore
+  other parts of the repo "to check something," verify a precedent, or
+  follow a cross-reference — even when something looks plausibly
+  relevant (e.g. a file the user happens to have open in their IDE).
+  Stated three times in an early session, with real frustration by the
+  third. Stay strictly scoped to `LESSON SCHEMA.md` and the Graphics
+  folder.
+- The markdown lessons here are **not** the same system as the app's
+  real interactive lessons (`src/courses/*.js`). Intentional and
+  confirmed — don't raise it again or attempt to convert anything.
 - **Keep going lesson-by-lesson with no check-in questions between
-  lessons.** The user explicitly chose this pacing. Only stop for a
-  genuine blocker (see "judgment calls" below for how those have been
-  handled so far).
-- **Minimize stopping/turns.** The user is watching session cost and
-  length directly and wants long, uninterrupted forward progress within a
-  session, then a clean handoff (like this file) to a fresh session rather
-  than one very long-running chat.
-- **Assumed reader background** (stated explicitly by the user) is *only*:
-  Python data types (`int`/`float`/`str`/`bool`/tuple/list), loops
-  (`for`/`while`), function definitions (`def`/params/`return`), and
-  baseline `print()` familiarity (justified in Lesson 1 as "what every
-  intro exercise uses before reaching those three topics"). **Not**
-  assumed: `if`/`else`, comprehensions, classes, `import`. Each of those
-  needs full first-appearance treatment (often an isolated throwaway lab)
-  the first time a lesson actually needs it. Loops being assumed has not
-  yet actually been used in any lesson's real project code through Lesson
-  16 — every multi-step computation so far (dot products, matrix
-  multiplication) has instead used small, explicitly unrolled helper
-  functions, matching the established style; this was a deliberate choice
-  each time, not an oversight, and loops remain available (already
-  assumed, no lab owed) whenever a future lesson's real input size makes
-  unrolling impractical.
+  lessons.** A "session" is a time-based usage window, not a chat and
+  not a lesson count — stated explicitly by the user, correcting an
+  earlier misreading where a prior run stopped after only 2–3 lessons
+  and called that a session's worth of work. Keep writing continuously
+  within the current chat; only a genuinely new chat, started after the
+  time-based session actually ends, needs this handoff read fresh.
+- **The single goal is the best possible lessons, faithful to the
+  schema** — stated directly by the user: this curriculum is how they
+  intend to learn to build software with Claude going forward. Quality
+  and fidelity to `LESSON SCHEMA.md` are the point, not pacing or
+  volume for their own sake.
+- **Assumed reader background** (stated explicitly by the user) is
+  *only*: Python data types (`int`/`float`/`str`/`bool`/tuple/list),
+  loops (`for`/`while`), function definitions (`def`/params/`return`),
+  and baseline `print()`. **Not** assumed at the start: `if`/`else`,
+  comprehensions, classes, `import`. See "Python constructs" below for
+  which of these have since been taught, and where.
 
 ## Source-of-truth files
 
 - `src/docs/reference/LESSON SCHEMA.md` — the mechanical production
-  template. Follow it literally, including the Concept Unit step order,
-  the Header's Terms-Introduced/Objects-and-methods format, the
-  Repetition Rule, and the self-check list at the bottom.
+  template. Follow it literally: Concept Unit step order, the Header's
+  Terms-Introduced/Objects-and-methods format, the Repetition Rule, the
+  self-check list at the bottom. Per the schema's own "for lessons
+  written from this point forward" note (adopted starting Lesson 14): an
+  isolated lab, when one is needed, is placed *after* Project
+  Change/New Code/Updated Project, not before, and names the concept in
+  bold right after the real output.
 - `src/docs/tutorials/Graphics/graphcs.brd.md` — the master 500-lesson
-  table of contents. Section I, "Geometric Thinking," is Lessons 1–20
-  (now complete). Section II, "2D Computational Geometry," is Lessons
-  21–45 (confirmed titles read directly from this file this session,
-  lines ~473–576): 21 Lines and Line Segments, 22 Rays, 23 Parametric
-  Geometry, 24 Line-Line Intersection, 25 Segment Intersection, 26
-  Orientation Tests, 27 Collinearity, 28 Distance to a Line, 29 Distance
-  to a Segment, 30 Circles, 31 Circle-Line Intersection, 32
-  Circle-Circle Intersection, 33 Polygons, 34 Polygon Orientation, 35
-  Point-in-Polygon, 36 Polygon-Polygon Intersection, 37 Convexity, 38
-  Convex Hulls, 39 Sweep-Line Algorithms, 40 Voronoi Diagrams, 41
-  Delaunay Triangulation, 42 Polygon Triangulation, 43 Spatial
-  Partitioning in 2D, 44 Robust 2D Geometry, 45 2D Geometry Workshop.
-  Section III, "3D Geometry and Transformations," starts at Lesson 46 —
-  titles not yet read/confirmed, do not guess them. Note: Lessons 26
-  (Orientation Tests) and 27 (Collinearity) will revisit ground Lessons
-  18–19 already broke (predicates, collinearity, tolerance) — expected,
-  intentional depth progression, not a duplicate to avoid.
+  table of contents.
+  - **Section I, "Geometric Thinking" (Lessons 1–20): complete.**
+  - **Section II, "2D Computational Geometry" (Lessons 21–45): complete.**
+    Full title list: 21 Lines and Line Segments, 22 Rays, 23 Parametric
+    Geometry, 24 Line-Line Intersection, 25 Segment Intersection, 26
+    Orientation Tests, 27 Collinearity, 28 Distance to a Line, 29
+    Distance to a Segment, 30 Circles, 31 Circle-Line Intersection, 32
+    Circle-Circle Intersection, 33 Polygons, 34 Polygon Orientation, 35
+    Point-in-Polygon, 36 Polygon-Polygon Intersection, 37 Convexity, 38
+    Convex Hulls, 39 Sweep-Line Algorithms, 40 Voronoi Diagrams, 41
+    Delaunay Triangulation, 42 Polygon Triangulation, 43 Spatial
+    Partitioning in 2D, 44 Robust 2D Geometry, 45 2D Geometry Workshop.
+  - **Section III, "3D Geometry and Transformations" (Lessons 46–75):**
+    confirmed title list, read directly from `graphcs.brd.md` this
+    session (lines ~579–701): 46 3D Coordinate Frames, 47 Rotations in
+    3D, 48 Rotation Matrices, 49 Euler Angles, 50 Gimbal Lock, 51
+    Axis-Angle Representation, 52 Quaternions, 53 Quaternion
+    Composition, 54 Quaternion Interpolation, 55 Rigid Transformations,
+    56 SE(2) and SE(3), 57 Transformation Hierarchies, 58 Cameras as
+    Coordinate Transformations, 59 Perspective Projection, 60
+    Orthographic Projection, 61 View Frustums, 62 Clipping Planes, 63 3D
+    Lines and Planes, 64 Ray-Plane Intersection, 65 Ray-Triangle
+    Intersection, 66 Sphere Geometry, 67 Box Geometry, 68 Bounding
+    Volumes, 69 Closest-Point Problems, 70 Distance Between Geometric
+    Objects, 71 Geometric Transform Pipelines, 72 Numerical Rotation
+    Problems, 73 Geometric Robustness in 3D, 74 Coordinate Frames in
+    Robotics, CAD, and Games, 75 3D Geometry Workshop. Section IV,
+    "Curves," starts at Lesson 76 — titles not yet read/confirmed.
+
+**Verification-caching rule:** the section title lists above (all of
+Section I, II, and III) were each captured with exactly one `Grep`/`Read`
+pass into this file, the first time that section was reached — not
+re-derived per lesson. This file *is* the verification document; when a
+new section starts, read its whole TOC slice from `graphcs.brd.md` once,
+paste the confirmed titles into the relevant bullet above, and every
+later lesson in that section just reads them from here. Don't re-grep
+`graphcs.brd.md` for a title already captured above.
 
 ## File convention
 
 `src/docs/tutorials/Graphics/Lesson-01.md`, `Lesson-02.md`, ...
 `Lesson-NN.md` — two-digit zero-padded, one file per lesson.
+`geometry_lesson_NN.py` is a scratch verification file per lesson,
+written to the session's own temp/scratchpad directory and run via Bash
+— it is never committed to the repo; only its real, run output gets
+pasted into the lesson markdown.
 
-## Progress: Lessons 1–38 of 500 complete — Section I finished, Section II underway
+**`src/docs/tutorials/Graphics/geometry_verified_library.py`** — note
+this lives *in the project*, not the session scratchpad (the scratchpad
+is tied to one session's own random ID and isn't reachable from a future
+session at all, which defeats the point of a cross-session library). It
+is a standing, accumulated copy of every reusable function from Lessons
+1–46, organized by originating lesson, with a self-check block at the
+bottom that re-confirms ~15 known-correct values (`python
+geometry_verified_library.py` — last run: all passed). This exists so a
+new lesson's own scratch script can copy already-correct code from one
+trusted source instead of retyping 15–20 functions from memory each
+time. **This does not replace per-lesson verification** — the schema's
+own rule still holds: a lesson's actual new code, and its real
+interaction with anything it reuses, still has to be run via Bash this
+session before going into that lesson's markdown. What it removes is the
+transcription risk and effort of rebuilding the "already proven" half of
+each scratch script from memory or from prose summaries. Append each new
+lesson's own reusable functions to this file as it's written, plus one
+new self-check line confirming a known value from that lesson. It's a
+working tool for building the curriculum, not a lesson and not something
+a learner needs — don't reference it from lesson content.
 
-1. What Is a Geometric Problem? — the 6-word taxonomy (object,
-   relationship, measurement, query, constraint, transformation);
-   `distance` (1D).
-2. Points, Vectors, and Directions — affine-space rules; tuple `+`
-   silently concatenates instead of adding (verified gotcha);
-   `add_vector_to_point`, `subtract_points`.
-3. Scalars and Geometric Quantities — `scale_vector`; tuple `*` silently
-   repeats/empties instead of scaling (verified gotcha, including the
-   `()` empty-tuple case from a negative repeat count).
-4. Coordinate Systems — machine vs. work origin; translation invariance
-   of vectors under origin change (proved).
-5. Local and Global Coordinates — chained (3-level) coordinate
-   conversion; proved link-by-link walking equals combining offsets
-   first.
-6. Basis Vectors — `from_components`; same numeric components through a
-   different basis land on a different point (verified); screen-space
-   Y-flip gotcha.
-7. Dot Products — `dot_product`; sign meaning (positive/negative/zero =
-   aligned/opposed/perpendicular); projection onto a unit vector recovers
-   a component (ties to Lesson 6).
-8. Cross Products (2D scalar form) — `cross_product`; anticommutativity
-   proved; turn-direction (winding) sign reading.
-9. Norms and Distance — first `import math`/`math.sqrt` (full isolated
-   lab); `norm`, general 2D `distance`; closes the loop on why Lesson 7's
-   stretched-axis projection came out wrong (norm ≠ 1).
-10. Normalization — `normalize`; real floating-point rounding shown
-    honestly (`0.6000000000000001`, not clean `0.6`, forward-refs Lesson
-    17); real `ZeroDivisionError` crash on the zero vector (actually run,
-    real traceback).
-11. Orientation — orientation of a whole basis (handedness) vs. Lesson 8's
-    per-corner winding; reflected basis produces a genuinely mirrored
-    point (verified CAD-mistake scenario).
-12. Coordinate Transformations — `transform_to_global` unifies Lessons
-    4/5 (origin) and 6 (basis) into one function; proved it collapses to
-    each earlier lesson's own answer under the right inputs.
-13. Affine Transformations — same `transform_to_global`, four different
-    inputs = translation/rotation/scaling (all reused, zero new code) plus
-    shear (genuinely new); shear preserves orientation but not distance
-    (verified against Lesson 5's invariance claim).
-14. Homogeneous Coordinates — bundles Lesson 12's origin+basis into a 3×3
-    `transform_matrix` (nested-tuple lab); pads a 2D point to `(x, y, 1)`;
-    `dot3`/`apply_matrix` reproduce `transform_to_global`'s own `(46,
-    23)` exactly; padding with `0` instead of `1` turns a point into a
-    direction (translation ignored) — ties directly to Lesson 2's
-    point-vs-vector distinction.
-15. Transformation Composition — two chained frames (fixture→table→
-    machine), applied link-by-link two different ways; `get_column`
-    (reading a row-major matrix the other way) and `multiply_matrices`
-    (new); one combined matrix reproduces the two-call chain's result
-    exactly; matrix multiplication proved non-commutative (swapped
-    argument order silently gives a different, wrong point).
-16. Inverse Transformations — confirms Lesson 6's fixture basis is
-    orthonormal (unit length + perpendicular, via `norm`/`dot_product`);
-    builds `table_to_fixture_matrix` via the transpose trick; proved
-    correct two ways (product is the identity matrix; a point round-trips
-    exactly); the same trick applied to a non-orthonormal (scaled) basis
-    silently produces a wrong "identity" (`((4,0,0),(0,4,0),(0,0,1))`,
-    not `1`s) — real limitation, not a bug.
-17. Numerical Error in Geometry — delivers on Lesson 10's forward-reference
-    debt: `3 / 5.0` prints `0.6` but `3 * (1 / 5.0)` prints
-    `0.6000000000000001` (two roundings vs. one, real mechanism, not
-    hand-waved); explains why Lesson 16's `math.sqrt(1)` was guaranteed
-    exact (correctly-rounded, perfect-square input) while `math.sqrt(2)`
-    never can be; builds `nearly_equal(a, b, tolerance)` (new, reusable);
-    proves `norm(normalize((1, 2))) == 1.0` is `False`
-    (`0.9999999999999999`) even though the vector is a genuinely correct
-    unit vector.
-18. Exact vs. Approximate Geometry — builds `is_point_on_line` from
-    `subtract_points`/`cross_product`; a point built via
-    `normalize`/`scale_vector` that is mathematically on the line (the
-    curriculum's own `(3, 4)` direction) gets a **false negative** from
-    plain `==`; fixed with a tolerant version using `nearly_equal`; closing
-    proves the flip side too — too loose a tolerance (`1.0`) produces a
-    **false positive** on a genuinely off-line point.
-19. Geometric Predicates — **`if`/`elif`/`else` introduced here, full
-    first-appearance treatment** (previously not-assumed per the ground
-    rules; this is the first lesson that genuinely needed 3-way branching
-    instead of a single boolean expression); builds `classify_turn`
-    (left/right/straight, reusing `cross_product`); names the general
-    pattern **geometric predicate**, tying together Lessons 8, 11, and
-    18's own sign-reading tests; `classify_turn_tolerant` reuses
-    `nearly_equal`, checked *before* either sign — closing proves checking
-    order matters (a tolerance check placed after a strict sign check
-    never runs, using a one-line `if/else` *expression* only inside the
-    counter-example, not taught as new material).
-20. Geometric Problem-Solving — Section I's closing workshop, **zero new
-    terms/concepts**, entirely reuse: transforms a 3-corner pocket
-    (fixture→table via `apply_matrix`), verifies orientation survived
-    with `classify_turn`, verifies non-degenerate area via
-    `cross_product`/2 + `nearly_equal`; closing shows a genuinely
-    collinear "pocket" (data-entry-mistake shaped, not float noise)
-    correctly caught by the area check.
-21. Lines and Line Segments — `point_on_line(line_point, line_direction,
-    t)`, the parametric-line formula (reused L2/L3, zero new arithmetic);
-    `is_t_on_segment(t)` = `0 <= t <= 1` (chained comparison); proves a
-    point genuinely on the *infinite* line (Lesson 18's own predicate)
-    can still fail a *segment* bounds check — a distinction nothing
-    before this lesson could make; `find_t_for_point` (projection, via
-    `dot_product`) recovers `t` from a plain point; combined
-    `is_point_on_segment` checks collinearity before computing `t`
-    (order matters — closing proves a wrong-order version silently
-    accepts a point that's merely *near* the line).
-22. Rays — `is_t_on_ray(t)` = `t >= 0` (one-sided, vs. L21's two-sided
-    `is_t_on_segment`); `is_point_on_ray` mirrors L21's
-    `is_point_on_segment` exactly except for that one bounds-check
-    function; closing swaps in the wrong bounds check on purpose to prove
-    the swap is the entire difference between the two primitives.
-23. Parametric Geometry — names "parameter"/"parametric function"
-    formally (L21/22 already used the pattern without naming it); proves
-    it's not secretly "straight line only" by building
-    `parabola_point(t) = (t, t*t)` and *measuring* that equal `t` steps
-    give constant spacing on a line (`5.0` three times) but growing
-    spacing on the parabola (`1.41`, `3.16`, `5.10`) — real, run, not
-    asserted.
-24. Line-Line Intersection — derives `line_intersection` from
-    `cross_product` by crossing both sides of `t*dir1 - s*dir2 = diff`
-    with `dir2` (using `cross_product(v,v)=0`) to isolate `t`; verifies
-    against an independently-solved `s` on the *other* line, using
-    `nearly_equal` since the two results differ in the last float digit;
-    proves parallel directions always zero the denominator
-    algebraically, then reproduces a real `ZeroDivisionError` in the
-    closing (not hedged/caught — deliberately shown as a real, understood
-    crash, matching this curriculum's established `ZeroDivisionError`
-    pattern from L10).
-25. Segment Intersection — reuses L24's `t`/`s` cross-product derivation
-    unchanged, wrapped in three **guard clauses** (new term/pattern):
-    parallel (`denominator == 0`, handled with `"no intersection"`
-    instead of L24's deliberate crash — segments hit this constantly as
-    normal input, lines don't), `t` out of `is_t_on_segment` bounds, `s`
-    out of bounds. Closing proves both bound checks are independently
-    required — removing just the `s` check produces a real, silent false
-    positive (`(2.0, 2.0)` returned as "intersecting" for two segments
-    that don't actually meet).
-26. Orientation Tests — names **signed area** formally (L20 computed it
-    without naming it); builds numeric `orientation(a,b,c)` returning
-    `1`/`-1`/`0`, a twin of L19's `classify_turn` that returns a number
-    instead of a string, specifically so it can be used arithmetically;
-    closing proves the point — multiplying two `orientation` results
-    tests whether two points are on the same side of a line, something
-    `classify_turn`'s strings structurally cannot do.
-27. Collinearity — **this curriculum's first real `for` loop in project
-    code** (loops were always assumed background per the ground rules,
-    just never yet well-motivated — an arbitrary-length batch of points
-    finally is); `are_points_collinear(points)` loops with a guard-clause
-    early return, reusing L18's `is_point_on_line` unchanged; a tolerant
-    version inherits L18's own floating-point weakness "for free" by
-    construction; closing shows a 1-point batch crashing with a real
-    `IndexError` on `points[1]` (`len(points) >= 2` was never checked).
-28. Distance to a Line — `distance_to_line` reuses L21's
-    `find_t_for_point` + `point_on_line` + L9's `norm` with zero new
-    arithmetic; second unit *proves* (doesn't just assert) the closest
-    point is perpendicular via `dot_product`, and the check itself needs
-    `nearly_equal` — the "obviously exactly zero" dot product actually
-    computes to `-1.776e-15`, a fresh, real instance of L17's whole
-    lesson showing up in a place that looks like it shouldn't need it.
-29. Distance to a Segment — `distance_to_segment` reuses L28 unchanged
-    when `find_t_for_point`'s `t` is in `is_t_on_segment` bounds;
-    otherwise clamps to whichever endpoint is nearer (compares both
-    distances explicitly, never assumes which one wins); closing proves
-    both comparisons are required with a point where `segment_start`,
-    not `segment_end`, is the correct answer.
-30. Circles — first shape represented by a *rule* instead of named
-    points: `circle = (center, radius)`. `distance_from_center` (reuses
-    L2/L9 unchanged) + `classify_point_vs_circle` (3-way "inside"/"on"/
-    "outside", **built tolerant from its first version** — deliberately
-    not "strict first, then fix it" like L18/19, since that lesson (and
-    reason) is already taught; closing still proves the tolerance is
-    load-bearing with a real computed boundary point,
-    `norm(normalize((1,1))*4)` = `3.9999999999999996` ≠ `4`).
-31. Circle-Line Intersection — substitutes `point_on_line` into the
-    circle condition to get a quadratic `a*t²+b*t+c=0`
-    (`a=dot(dir,dir)`, `b=2*dot(d,dir)`, `c=dot(d,d)-r²`); **this
-    curriculum's first quadratic formula and first `ValueError`**
-    (`math.sqrt` of a negative discriminant, guarded against);
-    discriminant's 3 cases (two hits/tangent/miss) branch with the
-    **tolerant (`nearly_equal`) check first**, strict `< 0` second —
-    proven necessary, not just tidy: a genuinely-tangent discriminant can
-    round to a tiny *negative* float, which a `< 0`-first check would
-    misclassify as a miss.
-32. Circle-Circle Intersection — derives the **radical line** (subtract
-    one circle's condition from the other's, quadratic terms cancel
-    exactly, leaves a plain line) via a new `perpendicular(v) =
-    (-v[1],v[0])` function (secretly the same rotation as
-    `fixture_y_axis_in_table` since L14, named explicitly here for the
-    first time); the actual intersection is found by hand-off to L31's
-    `circle_line_intersection` **completely unchanged** — every classic
-    case (2 hits, tangent, too-far, nested) falls out of L31's own
-    discriminant logic for free; only 1 new guard clause needed
-    (concentric centers, `d==0`, real `ZeroDivisionError` if skipped).
-33. Polygons — polygon = `list` of vertices (first real polygon
-    representation); **`len`, `range`, and `%` (modulo) all get full
-    first-appearance treatment here** (none used before in this
-    curriculum, `len`/`range` given proper "Objects and methods used"
-    entries), combined in `get_edge(polygon, i)` = `polygon[i]`,
-    `polygon[(i+1) % len(polygon)]` for wraparound closing the shape;
-    `polygon_perimeter` introduces the **accumulator loop pattern**
-    (`total = total + x`), this curriculum's first loop shape other than
-    L27's early-exit search; closing shows a real `IndexError` from
-    `polygon[i+1]` without the modulo on the last edge.
-34. Polygon Orientation — **shoelace formula** (new term): sum
-    `cross_product(v1,v2)` over every edge via `get_edge` +
-    accumulator, halved = `polygon_signed_area` — direct generalization
-    of L26's 3-point `signed_area`, verified to reduce to it for a
-    triangle; `polygon_orientation` reuses the L19/26 sign-reading
-    if/elif/else pattern (restated as hard-concept-reappearing, not
-    re-derived); closing shows a real, honest limitation — a
-    self-intersecting "bowtie" ordering of the *same 4 corners* reports
-    `"degenerate"` (signed contributions of the two crossed lobes cancel
-    exactly), not a bug, a real property of the shoelace formula assuming
-    a simple (non-self-intersecting) polygon.
-35. Point-in-Polygon — **ray casting** (new term): reuses L25's
-    `segment_intersection` **completely unchanged**, treating a "ray" as
-    an ordinary long segment (`point` to `point + (1000, 0)`ish) —
-    counts crossings against every edge via `get_edge`, then
-    **crossing-number parity** (`crossings % 2 == 1`) decides
-    inside/outside. Closing is an honestly-disclosed, deliberately
-    unfixed limitation (matching L16's "orthonormal-only" pattern): a
-    ray passing exactly through a polygon vertex where two edges meet
-    gets double-counted by `segment_intersection`'s own inclusive
-    `0<=t<=1` bounds, verified with a concrete notch-polygon case where a
-    genuinely-inside point (`(1,2)`) gets reported `False` (2 crossings,
-    even) — explicitly deferred to L44 Robust 2D Geometry, not fixed
-    here.
-36. Polygon-Polygon Intersection — **this curriculum's first nested `for`
-    loop** (both loops already fully taught individually, only their
-    combination is new — no isolated lab needed, just an execution trace
-    showing iteration order); `count_boundary_intersections` checks every
-    edge of A against every edge of B via `segment_intersection`
-    unchanged; discovers `0` crossings is genuinely **ambiguous**
-    (separate shapes vs. one fully nested inside the other with room to
-    spare) and resolves it with `is_point_in_polygon` (L35) as a fallback
-    on one vertex from each polygon; closing proves a
-    boundary-crossings-only version silently returns `False` for the
-    nested case, which is unmistakably, visibly overlapping.
-37. Convexity — `get_vertex(polygon, i) = polygon[i % len(polygon)]`
-    (wraparound in *either* direction via `%`'s negative-index behavior,
-    e.g. `-1 % 4 == 3` — proven, not just asserted); `is_polygon_convex`
-    compares every vertex's local `classify_turn` (L19) against the
-    polygon's own overall `polygon_orientation` (L34) — **derived, not
-    assumed** — a fixed-assumption version ("any right turn = non-convex")
-    is proven wrong in the closing on a genuinely convex but
-    clockwise-wound square. No `list.append()` needed — turns are
-    checked one at a time with early-exit guard clauses, not collected.
-38. Convex Hulls — **`list.append` and a real `while` loop, both full
-    first-appearance treatment here for the first time** (`while` was
-    always assumed background per the ground rules, like `for` before
-    L27, just never yet well-motivated — building a result whose final
-    size isn't known in advance finally is). Gift-wrapping algorithm:
-    `find_leftmost_point` (new "running-best" accumulator sub-pattern,
-    distinct from L33's running-sum), `find_next_hull_point` (reuses
-    L26's `orientation` unchanged as the entire comparison rule),
-    `convex_hull` collects vertices via `hull.append(...)` inside
-    `while next_point != start`. Verified two ways: against L37's
-    `is_polygon_convex` (independent check, both hulls pass), and a
-    closing that swaps the `while` for a plausible `for i in
-    range(len(points))` — produces a *silently corrupted* hull with
-    duplicated vertices (not a crash), because a hull's vertex count has
-    no fixed relationship to the input point count.
+## Progress: Lessons 1–67 of 500 complete
+
+**Section I (1–20):** the full 2D affine-geometry foundation — points,
+vectors, dot/cross products, coordinate systems, basis vectors,
+orientation, matrices, homogeneous coordinates, transformation
+composition and inversion, numerical error, tolerant predicates —
+closing with Lesson 20's pure-synthesis CAD/CAM workshop.
+
+**Section II (21–45):** 2D computational geometry — parametric lines,
+rays, segments and their intersections; circles and circle intersection
+(the quadratic formula, first real `ValueError`); polygons (winding,
+point-in-polygon via ray casting, polygon-polygon intersection,
+convexity, convex hulls via gift wrapping, ear-clipping triangulation);
+Voronoi diagrams and their Delaunay dual; sweep-line and uniform-grid
+spatial pruning; closing with Lesson 44 (a real, resolved robustness fix
+for Lesson 35's own disclosed ray-casting bug) and Lesson 45's
+pure-synthesis workshop.
+
+For what any specific lesson actually built, read that lesson's own file
+— this handoff doesn't duplicate it. What follows is what's still
+load-bearing for lessons not yet written.
+
+## Python constructs — full first-appearance treatment, in order
+
+The curriculum's own ground rule is that `if`/`else`, comprehensions,
+classes, and `import` are *not* assumed at Lesson 1, and each needs a
+real first-appearance treatment (often an isolated lab) the first time a
+lesson's own problem genuinely needs it — not before. So far:
+
+| Construct | Lesson | Notes |
+| --- | --- | --- |
+| `import` / `math.sqrt` | 9 | first isolated lab in the curriculum |
+| `if`/`elif`/`else` | 19 | first genuine 3-way branch (`classify_turn`) |
+| `for` loop (real use) | 27 | first arbitrary-length input (`are_points_collinear`) |
+| `len`, `range`, `%` (modulo) | 33 | wraparound polygon indexing |
+| `list.append`, `while` loop | 38 | convex hull, result size unknown in advance |
+| `sorted`, `break` | 39 | sweep-line pruning |
+| `//` (floor division) | 43 | grid-cell bucketing |
+| `math.radians`, `math.sin`, `math.cos` | 47 | principal-axis rotation |
+| `math.acos`, `max`, `min` | 54 | slerp angle recovery + domain clamping |
+| `math.tan` | 61 | view-frustum field-of-view boundary |
+
+`for`/`while` loops were always *assumed* background per the ground
+rules (the user's own stated list) — the lessons above are where each
+first became *well-motivated* in real project code, not where it was
+first legal to use. Comparison operators (`==`, `<`, `>`, `!=`, `>=`,
+`<=`) have been used freely since ~Lesson 5 without their own dedicated
+treatment — judged adjacent to assumed background since `bool` is
+assumed and every comparison's whole observable behavior is "produces a
+`bool`." Classes have still never been used — no lesson so far has
+needed one.
+
+## Running function cast — reused verbatim, no re-explanation owed
+
+Per the Repetition Rule, every function below is retyped unchanged
+wherever a later lesson needs it, with no re-explanation owed:
+
+- **Vectors/points (L1–3):** `distance` (1D), `add_vector_to_point`,
+  `subtract_points`, `scale_vector`.
+- **Products (L7–8):** `dot_product`, `cross_product`.
+- **Length (L9–10):** `norm`, 2D `distance`, `normalize`.
+- **Transforms (L6, L12):** `from_components`, `transform_to_global`.
+- **Matrices (L14–16):** `dot3`/`apply_matrix` (3-component/homogeneous),
+  `get_column`/`multiply_matrices`, matrix inverse via the transpose
+  trick.
+- **Tolerance (L17):** `nearly_equal(a, b, tolerance)` — the default way
+  to compare any computed float from Lesson 17 forward; build predicates
+  tolerant from their first version now, no need to re-demonstrate
+  strict-then-fixed each time.
+- **Predicates (L18–19, L26):** `is_point_on_line`/`_tolerant`,
+  `classify_turn`/`_tolerant` (returns `"left"`/`"right"`/`"straight"`),
+  `orientation(a,b,c)` (numeric `1`/`-1`/`0` twin of `classify_turn`,
+  usable arithmetically — e.g. same-side tests via multiplication).
+- **Lines/rays/segments (L21–22, L24–25):** `point_on_line(line_point,
+  line_direction, t)` (the parametric-line base every later primitive
+  builds on), `is_t_on_segment`/`is_t_on_ray` (swappable bounds checks),
+  `find_t_for_point`, `is_point_on_segment`/`is_point_on_ray`,
+  `line_intersection`, `segment_intersection` (guard-clause version,
+  handles parallel input without crashing).
+- **Distance (L28–29):** `distance_to_line`, `distance_to_segment`.
+- **Circles (L30–32):** `(center, radius)` representation,
+  `classify_point_vs_circle`, `circle_line_intersection` (quadratic
+  formula), `circle_circle_intersection` (radical line via
+  `perpendicular(v) = (-v[1], v[0])`).
+- **Polygons (L33–38, L42):** `polygon` = `list` of vertex tuples,
+  `get_edge`/`get_vertex` (wraparound), `polygon_perimeter`
+  (accumulator-loop template), `polygon_signed_area`/
+  `polygon_orientation` (shoelace formula), `is_polygon_convex`/
+  `is_convex_vertex`, `convex_hull` (gift wrapping), `triangulate`
+  (ear clipping via `is_ear`).
+- **Point-in-polygon (L35, superseded by L44):** use
+  `count_ray_crossings_robust`/`is_point_in_polygon_robust` (L44) for
+  any new work — the half-open-interval fix for the shared-vertex
+  double-count bug. Not `is_point_in_polygon` (L35's original), which is
+  still genuinely buggy on that one case.
+- **Polygon-polygon (L36):** `count_boundary_intersections`,
+  `polygons_intersect` (nested-loop template; resolves the "zero
+  crossings" ambiguity — separate vs. fully-nested — via a containment
+  fallback).
+- **Sweep/grid (L39, L43):** sort-and-`break` pruning template;
+  `cell_of`/`cells_adjacent` (uniform-grid pruning; cell size must be
+  chosen relative to the search threshold or it silently misses close
+  pairs).
+- **Voronoi/Delaunay (L40–41):** `closest_seed` (running-best-distance
+  search), `bisector`, `circumcenter`, `is_delaunay_triangle`
+  (empty-circumcircle property).
+- **3D extension (L46):** `add_vector_to_point_3d`, `subtract_points_3d`,
+  `scale_vector_3d`, `from_components_3d`.
+- **Principal-axis rotation (L47):** `rotate_z`, `rotate_x`, `rotate_y` —
+  matched cyclic set (each fixes one axis, rotates the next pair in the
+  `x → y → z → x` cycle), built from `math.radians`/`math.sin`/`math.cos`.
+  Rotation around an arbitrary (non-principal) axis is a real, disclosed
+  gap — not yet possible with these three alone; naive composition of two
+  of them does not equal true rotation about the diagonal axis their
+  composition might suggest (verified in L47's own closing). Lesson 51
+  (Axis-Angle Representation) is where that gets solved directly.
+- **Rotation matrices (L48):** `rotation_matrix_z`, `rotation_matrix_x`,
+  `rotation_matrix_y` — 3×3 matrices, each verified to reproduce its L47
+  formula counterpart exactly via the unchanged `apply_matrix`. Compose
+  with `multiply_matrices` (Repetition-Rule reuse, unchanged since L15);
+  the multiplication order `multiply_matrices(A, B)` applies `B` first,
+  matching nested-call order `A(B(p))`. Same-axis rotations commute;
+  different-axis rotations do not (verified both ways in L48's closing)
+  — this non-commutativity is the real reason Lesson 49 (Euler Angles)
+  has to fix a specific rotation order on purpose.
+- **Euler angles (L49):** `euler_to_matrix(yaw_z, pitch_y, roll_x)` —
+  composes L48's three rotation matrices via `multiply_matrices`, twice
+  nested, in a fixed **ZYX convention** (roll applied first, then pitch,
+  then yaw — right to left in the code, matching L48's confirmed
+  right-argument-applies-first rule). Verified against nested
+  `rotate_z(rotate_y(rotate_x(...)))` calls across 6 angle triples, and
+  confirmed to collapse to a single L47 formula call whenever the other
+  two angles are zero. Closing proved the identical `(30, 20, 10)` angle
+  triple gives a genuinely different result under ZYX vs. XYZ order —
+  three bare numbers are not a complete rotation spec without also
+  stating the convention. Gimbal lock (loss of a degree of freedom at a
+  specific pitch angle, even under one fixed convention) is explicitly
+  *not* covered here — that is Lesson 50's own dedicated subject.
+- **Gimbal lock (L50):** `is_near_gimbal_lock(pitch_degrees,
+  tolerance_degrees)` — real verified proof that L49's ZYX
+  `euler_to_matrix` loses one degree of freedom at `pitch = ±90°`: any
+  `(yaw, roll)` pair sharing the same `yaw - roll` produces the
+  identical matrix at `pitch = 90°` (confirmed across 5 pairs; the same
+  shifts at `pitch = 45°` produce genuinely different matrices, isolating
+  the effect to `±90°` specifically). Mechanism, proved via L48's
+  columns-are-basis-images result: `rotation_matrix_y(90)` sends the
+  original `x`-axis onto the `z`-axis, so roll (about `x`, applied
+  first) and yaw (about `z`, applied last) end up rotating around the
+  same physical axis. Honestly disclosed, deliberately unfixed — no
+  3-angle Euler scheme avoids this entirely (only the locked pitch value
+  moves under a different convention). Lesson 51 (Axis-Angle) and 52–54
+  (Quaternions) are the forward-referenced real fix; that promise must
+  be kept under those exact names.
+- **Axis-angle rotation (L51):** `cross_product_3d` (genuine 3D
+  first-appearance, per the Repetition Rule's own exception — vector-
+  valued and anti-commutative, not the 2D scalar `cross_product`),
+  `norm_3d`/`normalize_3d` (Repetition-Rule 3D extension of L9/10,
+  reusing `dot3` unchanged as the 3D dot product — same "already fits"
+  reuse L48 found for `apply_matrix`), and `rotate_by_axis_angle(point,
+  axis, theta_degrees)` — Rodrigues' rotation formula. Verified to
+  reproduce `rotate_x`/`rotate_y`/`rotate_z` exactly when `axis` is a
+  standard basis vector. **Closes L47's own disclosed gap by name:**
+  re-ran L47's exact diagonal axis `(1, 1, 0)` and its fixed-point test
+  — `rotate_by_axis_angle` now leaves a point on that axis completely
+  unmoved, where L47's naive `rotate_z(rotate_x(...))` composition did
+  not. Internally normalizes its own `axis` argument; closing proved
+  skipping that step silently distorts the result's norm (5 → 30 on a
+  length-`2√2` axis) with no error raised.
+- **Quaternions (L52):** `quaternion_from_axis_angle`,
+  `quaternion_norm`, `quaternion_multiply` (Hamilton product),
+  `quaternion_conjugate`, `rotate_by_quaternion` (sandwich product
+  `q * p * conjugate(q)`, point wrapped as a pure quaternion
+  `(0,x,y,z)`). Built from **half** the requested angle — verified
+  load-bearing directly: building from the full angle instead doubles
+  the effective rotation (`90°` request → an actual `180°` result).
+  Cross-validated against L51's `rotate_by_axis_angle` on a
+  non-principal axis `(1,1,1)`, and re-ran L47's own diagonal-axis
+  `(1,1,0)` fixed-point test a third independent way — still passes.
+  Closing: a non-unit quaternion (norm `2`) doesn't rotate at all, it
+  scales by norm² (a length-5 point came back length-`≈29.4`, i.e. ×4)
+  — same silent-wrong-input risk pattern as L46/L48/L51.
+- **Quaternion composition (L53):** no new function — proved
+  `quaternion_multiply` (L52) already *is* rotation composition
+  (matches nested `rotate_by_quaternion` calls; same
+  right-argument-applies-first order as `multiply_matrices`); proved it
+  **associative** (new term — grouping-independent, distinct from
+  commutative) across three quaternions, both as bare quaternions and
+  applied to a real point; reconfirmed L48's commute-on-same-axis /
+  don't-commute-on-different-axis finding in quaternion form; proved the
+  product of two unit quaternions is always unit length. Closing: naive
+  component-wise quaternion *addition* (then renormalizing to unit
+  length) produces a plausible-looking but completely wrong composed
+  rotation — quaternions are not a vector space for this purpose.
+- **Quaternion interpolation (L54):** `quaternion_dot`/`quaternion_scale`/
+  `quaternion_add` (plain Repetition-Rule 4-tuple extensions) and
+  `slerp(q1, q2, t)` — spherical linear interpolation, using `math.acos`
+  (new) and `max`/`min` (new, clamp the dot product into `[-1,1]` before
+  `math.acos`, which really does crash on `1.0000000000000002` —
+  triggered and shown for real). Verified: exact endpoints, exact
+  same-axis midpoint match against direct construction, and provably
+  **constant angular velocity** (new term) across 5 even `t` steps on
+  both a principal and non-principal axis. SE Lens: contrasted against
+  `nlerp` (cheaper, real technique, but not constant-velocity — real
+  numbers shown: 33.02°/41.98° steps vs slerp's even 37.5°). Closing:
+  the **double cover** fact (`q` and `-q` are the same rotation, new
+  term) — `slerp` checks `quaternion_dot < 0` and negates `q2` to take
+  the short path; removing that check sends a `20°` interpolation the
+  *long way* around (measured `170°` instead of `10°` at the midpoint),
+  the most dramatic instance yet of this curriculum's recurring
+  silent-wrong-input pattern (L46/48/50/51/52/53). **Closes the L47–54
+  rotation-representation block** — Lesson 55 moves to rigid
+  transformations (rotation + translation together).
+- **Rigid transformations (L55):** `dot4`/`apply_matrix4`/
+  `to_homogeneous_3d`/`build_rigid_transform`/`get_column4`/
+  `multiply_matrices4` — 4×4 homogeneous matrices, direct 3D extension
+  of L14–16's own 2D pattern. **Opens with the opposite finding from
+  L48:** the existing 3-component `apply_matrix`/`dot3` does *not* fit a
+  4×4 rigid transform for free — it silently drops the translation
+  entirely (a 90°-rotate-then-translate call returned the rotation-only
+  answer, no error). New 4-component functions fix it, verified exact.
+  `build_rigid_transform`'s two special cases (zero rotation → pure
+  translation; zero translation → matches L48's `rotation_matrix_z`
+  exactly) both confirmed. Closing extends L14's own fixture scenario
+  into genuine 3D (`fixture_origin_in_table` at height `15`) and
+  reproduces L12/L14's own `(46, 23)` result exactly in `x`/`y` — the
+  2D scenario really was the `z=0` special case, five sections later.
+  Second closing failure (a real crash, not silent): `apply_matrix4` on
+  a bare 3-tuple (missing the homogeneous `1`) raises `IndexError`.
+- **SE(2)/SE(3) (L56):** `transpose3` (Lesson 16's transpose-inverse
+  trick, first time persisted to the library) and
+  `invert_rigid_transform`. Named the **group** concept (closure,
+  associativity, identity, inverse) and verified all four for rigid
+  transforms with real numbers: closure (composed transform keeps the
+  `(0,0,0,1)` bottom row *and* preserves distance between two points),
+  identity (zero-rotation/zero-translation transform leaves a point
+  unchanged), associativity (cited from L53, not re-derived), inverse
+  (a real round trip: `T` then `T⁻¹` returns the exact original point;
+  `T⁻¹ * T` is the identity matrix). **Key subtlety, verified not just
+  stated:** the inverse translation is `−R⁻¹·t`, *not* `−t` alone —
+  closing showed the naive `−t` version produces a plausible-looking
+  but wrong "inverse" (fails the round trip completely, off by more
+  than 5 units) despite still satisfying closure.
+- **Transformation hierarchies (L57):** `find_node`, `get_world_transform`
+  — a hierarchy is a plain `list` of `(name, local_transform,
+  parent_name)` node tuples (no class — checked against this
+  curriculum's own tracked judgment call and found unnecessary),
+  `parent_name` chained by string match, `None` marking the root. Walks
+  the chain with a `while` loop (depth unknown in advance), composes
+  root-to-child using L56's confirmed `multiply_matrices4` order.
+  Verified two ways: reproduces L55's own already-known
+  tool/fixture/table result exactly via a general chain-walk instead of
+  one hand-written call, then extends to a real 4th level (**machine**,
+  the level this handoff's own conventions have named since L14–16
+  without building until now) with zero changes to the function itself.
+  Closing: composing in the wrong order gives a *close-but-wrong*
+  result (`51` vs correct `49`, with two of three components matching
+  by coincidence) — flagged explicitly as more dangerous than an
+  obviously-wrong result, since it could pass a loose test.
+- **Cameras (L58):** `world_to_camera(camera_world_transform,
+  point_world)` — no new representation (a camera **is** a rigid
+  transform, Repetition Rule, matching L55). The real content: **view
+  transform = the camera's own world transform, inverted** (L56's
+  `invert_rigid_transform` reused for a brand-new purpose). Verified
+  the camera's own position always maps to `(0,0,0)` in its own camera
+  space; verified a tilted-camera result matches raw trigonometry
+  (`20·sin(30°)=10`, `20·cos(30°)≈17.32`). Closing: using the camera's
+  *forward* transform instead of its inverse is flagged explicitly as
+  one of the most common real mistakes in actual graphics programming,
+  not a contrived error — gives a plausible-looking but completely
+  wrong point (the camera's own world position, not the target's
+  camera-relative position).
+- **Perspective projection (L59):** `build_perspective_matrix`,
+  `perspective_divide`, `project_point`. First 4×4 matrix in this
+  curriculum to produce `w ≠ 1` (`w = -z`, positive for anything in
+  front of the camera per L58's own sign convention). **Perspective
+  division** (new term) — dividing `x,y,z` by that `w` — is the first
+  genuinely non-linear step in the whole pipeline (no matrix can divide
+  one output by another). Verified exactly: a point twice as far
+  projects to exactly half the screen-`x` (ratio `2.0`, not
+  approximate). Closing: skipping the divide doesn't error, it silently
+  produces an accidental (named, legitimate-elsewhere) *orthographic*
+  projection — both points land at identical screen coords regardless
+  of depth. Second failure: a point at camera-space `z=0` gives `w=0`,
+  a real triggered `ZeroDivisionError`.
+- **Orthographic projection (L60):** `build_orthographic_matrix`,
+  `project_point_orthographic` — deliberately the exact matrix shape
+  L59's own closing produced *by accident* (`w` fixed at `1`, no depth
+  tracking); reuses `perspective_divide` unchanged (inert when `w=1`,
+  not rewritten). Verified: near/far ratio is exactly `1.0` (vs L59's
+  `2.0`) and equal real-world sizes at different depths project to
+  identical measured spans (`10.0 == 10.0`) — the actual reason CAD
+  drawings use this on purpose. Named honestly as a real tradeoff, not
+  fixed: no depth can be recovered from projected size under this
+  projection, unlike L59's own perspective ratio trick.
+- **View frustums (L61):** `is_in_frustum(point_camera, near, far,
+  vertical_half_fov_degrees, aspect_ratio)`, new `math.tan`. Near/far
+  bound depth (`depth = -z`, L58's convention); side bounds compare
+  `abs(x_or_y / depth)` against `tan(half_fov)` (vertical) and
+  `tan(half_fov) * aspect_ratio` (horizontal) — reuses L59's own
+  ratio-of-depth idea as a boundary test instead of a scale factor.
+  Verified each of the 4 boundaries independently, plus an exact
+  cutoff (`±0.01` flips the result). Closing: dropping just the
+  near-plane check doesn't merely admit "too close" points — it admits
+  a point genuinely *behind* the camera (negative depth passes every
+  other check), a real, well-known class of rendering bug, not a minor
+  edge case.
+- **Clipping planes (L62):** `point_on_segment_3d` (Lesson 21's
+  `point_on_line` rebuilt from L46's 3D pieces — the 2D original
+  silently drops the 3rd component on a 3D input, verified: returns a
+  2-tuple, no crash) and `clip_segment_to_near(p1, p2, near)`. Verified:
+  new endpoint lands at exactly `depth = near`, on-axis and off-axis;
+  both "nothing to clip" cases (fully inside → unchanged, fully
+  outside → `None`) confirmed. Explicitly scoped to the near plane
+  only — closing ran a segment that's near/far-valid but outside the
+  horizontal FOV and showed `clip_segment_to_near` correctly reports
+  nothing to do, since it only ever looks at depth (honest boundary,
+  not a bug: 5 more boundary-specific clip functions would be needed
+  for a complete system, none built here).
+- **3D lines and planes (L63):** `point_on_line_3d` (L21's own
+  point+direction formula, rebuilt from L46's 3D pieces — the direct
+  counterpart to L62's two-point `point_on_segment_3d`, confirmed to
+  agree exactly), `is_point_on_plane`, `signed_distance_to_plane`.
+  **Plane** representation: `(point_on_plane, normal)`, a real new
+  concept — tested via `dot3(normal, offset)` (perpendicularity),
+  distance via dividing by `norm_3d(normal)` (correctly independent of
+  the normal's own length — verified, not just claimed). **Key
+  connecting proof:** L61/62's own ad-hoc near-plane depth check is
+  exactly one instance of this general representation —
+  `signed_distance_to_plane` on a plane built from `((0,0,-near),
+  (0,0,1))` lands at precisely `0.0` at the boundary, confirming
+  `near - depth` was the same quantity both ways. Closing: a plane
+  built with an anchor point that isn't actually on the intended
+  surface gives consistently, silently wrong results, off by exactly
+  the anchor's own error (`-5.0` for a `z=5` anchor on the true `z=0`
+  surface) — nothing checks the anchor is valid.
+- **Ray-plane intersection (L64):** `ray_plane_intersection(ray_origin,
+  ray_direction, plane)` — solves L22's ray equation against L63's
+  plane test for `t` (`t = dot3(normal, point_on_plane − ray_origin) /
+  dot3(normal, ray_direction)`); two guard clauses, same pattern as
+  L25's `segment_intersection` (parallel-ray denominator≈0 →
+  `"no intersection"`; `is_t_on_ray(t)==False` → plane sits behind the
+  ray's own origin). **Key connecting proof:** re-derived L62's own
+  near-plane crossing through this general formula (on-axis and
+  off-axis) and got the exact same point both ways — the general
+  formula subsumes L62's hand-derived arithmetic, not merely resembles
+  it. Both guards triggered on real inputs, not just described.
+- **Ray-triangle intersection (L65):** `is_point_in_triangle_3d(point,
+  v0, v1, v2, normal)` (same-side test: `dot3(cross_product_3d(edge,
+  to_point), normal) < 0` rejects, checked per edge — reuses L51
+  `cross_product_3d` + L63 `dot3`) and `ray_triangle_intersection`
+  (computes the triangle's own normal from `v1-v0` × `v2-v0`, reuses
+  L64's `ray_plane_intersection` unchanged, then the same-side test).
+  Verified all 3 outcomes (hits inside / hits plane but misses triangle
+  / misses plane entirely) plus edge-boundary and near-vertex cases.
+  Closing: computing the normal with reversed vertex winding flips
+  `True`→`False` for the *identical* point — a real, silent mismatch
+  risk; `ray_triangle_intersection` avoids it by always deriving the
+  normal from the same two edges itself, never accepting it as a
+  separate argument that could disagree.
+- **Sphere geometry (L66):** `classify_point_vs_sphere`,
+  `sphere_line_intersection` — direct 3D extension of L30–31's own
+  circle work, same quadratic-formula shape rebuilt from L63's 3D
+  `dot3`/`norm_3d`/`point_on_line_3d`. Opening found the 2D
+  `circle_line_intersection` fails 3D input *two different ways*
+  depending on the specific direction: a z-only direction gives
+  `a=0` → real `ZeroDivisionError`; a `(1,1,1)` direction gives a
+  plausible-looking but numerically wrong 2-tuple (solves for the
+  wrong implicit circle in the xy-plane, not the true sphere) — both
+  triggered and shown, not just described. Verified tangent/miss/
+  through-center/off-axis cases; off-axis result independently
+  confirmed at exactly `radius` distance from center.
 
 ## Conventions established — maintain these exactly
 
-- **Verify everything for real.** Every code block and every output shown
-  in every lesson has been actually executed via the Bash tool this
-  session before being written into the markdown — never written from
-  memory or assumed. Continue this without exception, including for
-  tracebacks (real crash output, not a guessed one).
-- **File-per-lesson code convention:** each lesson's Python code lives in
-  its own fresh scratch file (`geometry_lesson_NN.py`) used only for
-  verification — it is never actually committed to the repo, only its
-  real, run output gets pasted into the lesson markdown. Within one
-  lesson, later Concept Units *modify* that same file (Project Change:
-  "modified"); only a new *lesson* starts a new file (Project Change:
-  "created"). Scratch verification files are written under the session's
-  own temp/scratchpad directory, never inside the repo.
-- **Running function cast**, reused verbatim (per the Repetition Rule —
-  "retyped unchanged, no re-explanation owed") across later lessons as
-  needed: `distance` (1D, L1), `add_vector_to_point`/`subtract_points`
-  (L2), `scale_vector` (L3), `dot_product` (L7, 2D), `cross_product` (L8),
-  `norm`/2D `distance` (L9), `normalize` (L10), `from_components` (L6),
-  `transform_to_global` (L12), `dot3`/`apply_matrix` (L14, 3-component/
-  homogeneous versions), `get_column`/`multiply_matrices` (L15),
-  `nearly_equal(a, b, tolerance)` (L17 — the standard tolerance-comparison
-  helper, expect this to be needed constantly through Section II),
-  `is_point_on_line`/`is_point_on_line_tolerant` (L18),
-  `classify_turn`/`classify_turn_tolerant` (L19, returns `"left"`/
-  `"right"`/`"straight"` — the first function in the curriculum to use
-  `if`/`elif`/`else`), `point_on_line(line_point, line_direction, t)`
-  (L21 — the parametric-line formula, expect this to be the base every
-  future line/ray/curve-shaped primitive builds on), `is_t_on_segment(t)`
-  = `0<=t<=1` / `is_t_on_ray(t)` = `t>=0` (L21/22, swappable bounds
-  checks), `find_t_for_point`/`is_point_on_segment`/`is_point_on_ray`
-  (L21/22), `line_intersection(point1, dir1, point2, dir2)` (L24 — raises
-  a real `ZeroDivisionError` on parallel input, deliberately not
-  caught/hedged there), `segment_intersection` (L25, guard-clause version
-  of L24), `signed_area(a,b,c)`/`orientation(a,b,c)` (L26, numeric
-  `1`/`-1`/`0` twin of `classify_turn`), `are_points_collinear(points)`/
-  `are_points_collinear_tolerant(points, tolerance)` (L27, first real
-  `for` loop), `distance_to_line`/`distance_to_segment` (L28/29).
-- **Running example universe is CAD/CAM-flavored** (robot positions, CNC
-  machine/work coordinates, cutting tools, rotary-table fixtures), not
-  generic math — matches the BRD's actual stated purpose (learner wants to
-  build a CAD/CAM system). Keep using this flavor for new examples. Since
-  Lesson 14, a running fixture→table(→machine) scenario with concrete
-  fixed numbers has recurred across Lessons 14–16 specifically
-  (`fixture_x_axis_in_table = (0, 1)`, `fixture_y_axis_in_table = (-1,
-  0)`, `fixture_origin_in_table = (50, 20)`, `feature_in_fixture(_h) =
-  (3, 4[, 1])`, with a second level `table_to_machine_matrix` from Lesson
-  15 using origin `(100, 200)`, no rotation) — reuse these exact numbers
-  again in any lesson that naturally extends this same chain (e.g. a
-  future lesson revisiting numerical error or a third chained frame), so
-  results stay directly comparable across lessons without re-deriving.
+- **Verify everything for real.** Every code block and every output
+  shown in every lesson has actually been executed via the Bash tool
+  this session before being written into the markdown — never written
+  from memory. This includes tracebacks (real crash output, not a
+  guessed one) and includes re-verifying a fix's own before/after
+  numbers, not just the fix itself.
+- **CAD/CAM-flavored examples**, not generic math — matches the BRD's
+  own stated purpose. The fixture→table(→machine) scenario from Lessons
+  14–16 (`fixture_x_axis_in_table = (0, 1)`, `fixture_y_axis_in_table =
+  (-1, 0)`, `fixture_origin_in_table = (50, 20)`, `feature_in_fixture =
+  (3, 4)`) and the `(3, 4)`/`(0, 0)` running direction/point recur
+  throughout — reuse exact numbers when extending an existing scenario
+  so results stay directly comparable without re-deriving.
 - **Isolated throwaway labs** (Concept Isolation Rule) are given in full
-  only when a lesson introduces a genuinely new *Python construct* —
-  `abs()` (L1), `import`/`math.sqrt()` (L9), nested-tuple indexing (L14).
-  Most lessons' new material is conceptual/mathematical (built entirely
-  from already-covered syntax), in which case the schema's isolation step
-  is explicitly and explicitly *noted* as skipped (a one-line "note on
-  method" callout), never silently omitted.
-- **"Objects and methods used" is often "None."** Most lessons build
-  purely from earlier lessons' own functions plus already-covered basic
-  syntax — that's expected and correctly documented as "None" each time,
-  not a gap. Clarified explicitly starting Lesson 14: this field is
-  reserved for *real external* classes/methods (like `math.sqrt`, given
-  full treatment in L9) — this curriculum's own hand-authored functions
-  (`dot3`, `apply_matrix`, `get_column`, `multiply_matrices`, etc.) are
-  never listed here; they get full/reuse treatment in each Concept Unit's
-  own Mechanical Walkthrough instead, per the Repetition Rule.
-- **Every lesson's "What Breaks Without This" closing uses a real, verified
-  failure**, deliberately varied in kind across lessons so far: silent
-  wrong tuple (several), a real crash with full traceback
-  (`ZeroDivisionError`), a silently mirrored/wrong geometric result, a
-  negated/backwards vector, an empty-tuple disaster from negative
-  sequence-repetition, a homogeneous-`0` direction vs. a homogeneous-`1`
-  point (L14), a silently wrong matrix-multiplication order (L15), and a
-  silently wrong "identity" from applying an inverse-building shortcut
-  outside the property it depends on (L16).
-- **Forward references** always cite the exact lesson number *and* title
-  from `graphcs.brd.md`'s own TOC — never a guessed or approximate one.
-- **Step ordering within a Concept Unit, starting Lesson 14**: per
-  `LESSON SCHEMA.md`'s own "for lessons written from this point forward"
-  guidance, the isolated lab (when one is needed) is now placed *after*
-  Project Change/New Code/Updated Project, not before — see the real
-  project code first, then relate the isolated lab back to it explicitly
-  ("this is exactly what `X` above is doing, isolated"). When a lab is
-  given, the concept's name is stated in bold plainly, right after the
-  real output. Lessons 1–13 used the older isolate-before-build order and
-  are correctly left as-is (the schema explicitly says not to revise
-  them). Apply the new order to every lesson from here forward.
-
-## Next after Lesson 38
-
-Lesson 39, Sweep-Line Algorithms, is next (confirmed title from
-`graphcs.brd.md`, see Section II list above). No lesson is currently
-in-flight — Lesson 38 is fully written and verified, and Lesson 39 has
-not been started or designed yet.
-
-Lesson 39 is likely a real inflection point in this curriculum's own
-style: every algorithm since Lesson 24 has been either a closed-form
-formula or an exhaustive "check every pairing" approach (L36's nested
-loop is the clearest example, `O(edges_a × edges_b)`). A genuine
-sweep-line algorithm processes events in *sorted* order — which means
-this is a very plausible place for `sorted()` or `list.sort()` to need
-first-appearance treatment (neither used yet), the same way `.append`
-and `while` got real treatment in L38. Don't assume this without
-confirming against `graphcs.brd.md`'s own one-line description for L39
-first. Reuse candidates once sorting exists: `segment_intersection`
-(L25) is still the right per-pair test; the new material is *which
-pairs* get checked (only ones currently active in the sweep), not the
-geometry itself.
-
-Full running polygon/hull toolkit, all reusable verbatim: `polygon` =
-`list` of vertex tuples; `get_edge`/`get_vertex` (wraparound, via
-`%`/`len`, L33/37); `polygon_perimeter` (accumulator-loop template);
-`polygon_signed_area`/`polygon_orientation` (L34, shoelace formula);
-`count_ray_crossings`/`is_point_in_polygon` (L35);
-`count_boundary_intersections`/`polygons_intersect` (L36, nested-loop
-template); `is_polygon_convex` (L37); `find_leftmost_point`/
-`find_next_hull_point`/`convex_hull` (L38, gift wrapping, `.append`/
-`while` now fully taught and reusable without re-explanation).
+  only for a genuinely new *Python construct* (see table above). Most
+  lessons' new material is conceptual/mathematical, built from
+  already-covered syntax — in that case the schema's isolation step is
+  explicitly *noted* as skipped ("a note on method"), never silently
+  omitted.
+- **"Objects and methods used" is often "None."** This field is
+  reserved for *real external* classes/methods (`math.sqrt`, `len`,
+  `range`, `sorted`, `list.append`) — this curriculum's own hand-authored
+  functions are never listed here; they get Repetition-Rule treatment in
+  each Concept Unit's own Mechanical Walkthrough instead.
+- **"What Breaks Without This" always uses a real, verified failure**,
+  deliberately varied in kind: silent wrong values, real crashes with
+  full tracebacks (`ZeroDivisionError`, `IndexError`, `ValueError`),
+  silently wrong geometric results, and — since Lesson 16 — several
+  *honestly disclosed, deliberately unfixed* limitations (documented as
+  real scope boundaries, not bugs) alongside lessons that *do* fix a
+  previously-disclosed limitation outright (Lesson 44 fixing Lesson 35).
+  Both are legitimate closings; don't feel obligated to fix everything
+  immediately just because a gap was found.
+- **Forward references** always cite the exact lesson number *and*
+  title from `graphcs.brd.md`'s own TOC — never guessed.
+- **Workshop lessons** (Lesson 20, Lesson 45, and presumably later
+  section closers) introduce **zero new terms/concepts** — pure
+  synthesis, entirely reused functions, tied into one or more worked
+  problems. Don't treat a workshop lesson as incomplete for lacking new
+  Terms; that's the intended shape.
 
 ## Judgment calls made so far (for consistency, not re-litigation)
 
-- Kept the whole curriculum in 2D throughout Section I even though the BRD
-  doesn't explicitly say so — 3D doesn't start until Section III (Lesson
-  46, "3D Coordinate Frames"). This has been consistent and shouldn't
-  change until Lesson 46 actually arrives.
-- When a Concept Unit's new material is a modeling idea rather than a
-  language construct, the Concept Isolation Rule's throwaway-lab step is
-  explicitly noted as not applicable (a one-line callout), rather than a
-  lab being invented just to satisfy the letter of the rule.
-- Deliberately avoided `if`/`else`, comprehensions, and classes throughout
-  Lessons 1–16, treating them as still "not yet assumed" — if a lesson
-  ahead genuinely needs one of these, it must get full first-appearance
-  treatment (possibly its own Concept Unit) the way `import` did in
-  Lesson 9, not a silent shortcut.
-- Matrices are represented throughout as plain nested tuples of ints (row-
-  major: `matrix[i]` is a whole row), never any dedicated matrix type or
-  library (no NumPy) — matches the curriculum's whole-program pattern of
-  building every operation from scratch on plain tuples, and keeps
-  `apply_matrix`'s row-based indexing and `get_column`'s cross-row
-  reading both teachable as plain tuple mechanics.
-- Lessons 14–16 chose small, explicit, unrolled helper functions
-  (`dot3` called 3 or 9 times by hand) over `for` loops for matrix
-  operations, even though loops are assumed background — a style choice
-  for consistency with Lessons 1–13's own established pattern, not a
-  claim that loops are unavailable. A future lesson facing a genuinely
-  large or variable-sized input (unlike this fixed 3×3 case) is free to
-  introduce a `for` loop in real project code without owing it a lab
-  (already assumed) — just enumerate it in that lesson's Mechanical
-  Walkthrough and sort it as (c), same as any other assumed construct.
-  Lesson 20 stayed with unrolled explicit calls again (3 fixed corners),
-  same reasoning; Section II will likely have its actual first
-  well-motivated loop case once a lesson handles a variable-length
-  polygon (Lesson 33 onward) rather than a fixed small count.
-- Comparison operators (`==`, `<`, `>`) have been used freely since
-  roughly Lesson 5 without ever being given their own dedicated
-  first-appearance Concept Unit, and this session continued that
-  practice through Lessons 14–20 rather than retroactively "fixing" it.
-  Reasoning: `bool` is explicitly assumed background, and a comparison
-  operator's entire observable behavior is "produces a `bool`" — treated
-  as adjacent to assumed baseline knowledge, not a missed concept under
-  the Repetition Rule's stricter reading. `if`/`elif`/`else` itself is
-  different and *was* explicitly not-assumed, so it received full
-  treatment at its first real use, Lesson 19 — see that lesson's own
-  Concept Unit 1.
-- `if`/`elif`/`else` first appears in real project code in Lesson 19
-  (`classify_turn`), the first lesson whose job genuinely couldn't be
-  done with a single boolean expression (a 3-way classification, not a
-  yes/no). Full first-appearance treatment given there, including an
-  isolated lab run three separate times (once per branch) to prove each
-  one actually fires and the others don't. Lessons 1–18 all managed
-  without it on purpose, not by accident — don't read that as evidence
-  branching should keep being avoided now that it's taught; use it
-  whenever a lesson's own logic genuinely calls for more than two
-  outcomes from one expression.
-- Lesson 20, as a closing "workshop" lesson, deliberately introduced zero
-  new terms/concepts and zero new Objects/methods — every Concept Unit
-  used the schema's "no new construct, note on method" skip and was built
-  entirely from reused functions across five earlier lessons, tied
-  together into one worked CAD/CAM problem (transform a pocket, verify
-  orientation, verify area). If future section-closing "Workshop" lessons
-  in the BRD (Lesson 45, 2D Geometry Workshop; likely others) follow the
-  same shape, treat pure-synthesis-no-new-concept as the correct,
-  intentional pattern for those specifically — not a lesson that's
-  somehow incomplete for lacking new Terms.
+- Kept the whole curriculum in 2D throughout Sections I and II, even
+  though the BRD doesn't explicitly say so for Section I — 3D doesn't
+  start until Section III (Lesson 46). Consistent throughout; changes
+  starting Lesson 46.
+- Matrices are plain nested tuples of numbers (row-major: `matrix[i]` is
+  a whole row), never a dedicated matrix type or library (no NumPy) —
+  matches the whole-program pattern of building every operation from
+  scratch on plain tuples.
+- Unrolling a small, fixed-size operation by hand (e.g. `dot3` called 3
+  or 9 times) vs. reaching for a loop is a **deliberate per-lesson style
+  choice**, not a hard rule — used for genuinely small, fixed counts
+  (a 3×3 matrix, 3 fixed corners) even after loops became well-motivated
+  elsewhere (L27+). A loop is the right call once a count is genuinely
+  unknown in advance or large.
+- Boolean operators `and`/`or`/`not` have never been used — every
+  multi-condition check so far has been restructured as nested `if`s or
+  separate guard clauses instead. Continue this pattern rather than
+  introducing `and`/`or` casually; if a lesson genuinely needs them,
+  give them the same first-appearance treatment as any other new
+  construct.
+- Concept file reuse (`src/docs/concepts/`) has not yet come up in
+  practice — no lesson so far has factored a term out to a shared
+  concept file. Keep checking the self-check's own prompt about this
+  each lesson; it just hasn't been triggered yet.
+
+## Next after Lesson 66 — Section III underway
+
+Lesson 67, "Box Geometry," is next (full Section III title list already
+captured above — no need to re-grep `graphcs.brd.md`). No lesson is
+currently in-flight; Lesson 66 is fully written and verified.
+
+Lesson 66 ("Sphere Geometry") built `classify_point_vs_sphere` and
+`sphere_line_intersection` as a direct 3D extension of Lesson 30–31's
+own circle work, rebuilt from Lesson 63's 3D `dot3`/`norm_3d`/
+`point_on_line_3d`. Opening found the 2D `circle_line_intersection`
+fails on 3D input two genuinely different ways depending on the
+specific direction vector: a `z`-only direction makes the 2D dot
+product's own `a` term exactly `0`, triggering a real
+`ZeroDivisionError`; a `(1, 1, 1)` direction instead returns a
+plausible-looking but numerically wrong 2-tuple, having silently solved
+for the wrong implicit circle in the `x`/`y` plane rather than the true
+3D sphere — both triggered and shown with real output, not just
+described as a risk. Verified tangent, miss, straight-through, and
+off-axis cases; the off-axis result was independently confirmed to sit
+at exactly `radius` distance from the sphere's own center.
+
+Lesson 67 should build box geometry (likely an axis-aligned bounding
+box, min/max corners per axis — a natural, minimal representation,
+matching this curriculum's own "plain tuples" house style) — check
+whether point-in-box and box-line/box-ray intersection reuse existing
+per-axis range-check patterns (similar in spirit to Lesson 61's own
+near/far depth bounds) rather than needing a fundamentally new
+technique, and whether Lesson 68 ("Bounding Volumes") immediately after
+is where boxes and spheres get unified under one shared purpose
+(bounding a more complex shape cheaply) rather than that synthesis
+belonging here.
+
+**Note to self, stated directly by the user 2026-08-16: do not narrate
+progress in chat between lessons — no recaps, no batch summaries, no
+"here's what I built" text. Just keep writing lessons back-to-back.**
+This handoff file is still updated every lesson as the real safety
+checkpoint; the chat itself should carry no narration beyond genuine
+blockers.
+
+**Self-correction, 2026-08-16:** an earlier edit pass in this same
+session accidentally duplicated the L55/L56/L57 entries in the "Running
+function cast" list above (inserted once in the correct chronological
+position, once more by mistake right after L46). Found and fixed by
+re-reading this file's own actual current content before editing it
+further — a reminder to verify the exact surrounding text of a match
+rather than assuming an anchor phrase is unique, especially in a file
+this long. The list above is now L46 → L47…L60, single copy each,
+correct order.
+
+Lesson 60 ("Orthographic Projection") built the deliberate version of
+the projection Lesson 59's own closing had already produced by
+accident — same matrix shape, `w` fixed at `1` instead of tracking
+depth, `perspective_divide` reused unchanged (inert on `w=1`, not
+rewritten). Verified near/far ratio is exactly `1.0` (vs. Lesson 59's
+`2.0`), and that equal real-world sizes at different depths project to
+identical measured spans — the actual, honest reason CAD/engineering
+drawings use this deliberately. Named the real tradeoff directly: no
+depth is recoverable from projected size under this projection, unlike
+Lesson 59's own perspective-ratio trick.
+
+Lesson 61 should build the **view frustum** — the truncated-pyramid
+volume of space a camera can actually see, bounded by near/far planes
+and the field of view. Likely ties Lesson 58's camera transform and
+Lesson 59's perspective matrix together into one bounded volume, and
+probably needs a genuinely new idea: a point can now be *outside* what
+the camera sees entirely (behind the near plane, beyond the far plane,
+or outside the side planes), which nothing built through Lesson 60 has
+had a way to detect — check whether this connects back to Lesson 62,
+"Clipping Planes," immediately next, rather than front-loading clipping
+logic into Lesson 61 itself.
+
+**Ground-rule addition, stated directly by the user in the session that
+produced Lesson 47:** never open an old `Lesson-NN.md` file for any
+reason — not to recalibrate voice, not to spot-check quality, not to
+verify a prior session's work happened. This overrides this file's own
+former instruction (removed) to read the most recent lesson file at the
+start of a session. Build every lesson directly from `LESSON SCHEMA.md`
+plus this handoff's own carried-forward conventions (the function
+inventory, house style, and judgment calls already recorded here are
+sufficient) — see `feedback_stay_scoped_no_exploration.md` in the memory
+system for the full rationale.
+
+Expect the rest of Section III to revisit a lot of Section I's own 2D groundwork
+(coordinate systems, basis vectors, transformations, matrices) in 3D —
+watch for genuine new content (a third basis vector, cross product's
+real 3D vector form vs. Section I's 2D scalar shortcut, homogeneous
+coordinates as 4×4 instead of 3×3) versus material that's a
+straightforward dimensional extension of what Lessons 4–16 already
+proved. The Repetition Rule's own exception clause matters here: 2D
+versions of ideas that get a genuinely different 3D treatment (e.g.
+cross product) are a real first appearance in 3D, not just a reappearance
+to cite. Lesson 49 ("Euler Angles") should compose all three principal
+rotations (via `multiply_matrices`, now that L48 built it) in one fixed
+order to represent an arbitrary orientation — frame it as directly
+building on L48's own closing (order is not free to ignore) rather than
+re-deriving that point from scratch. Lesson 50 (Gimbal Lock) is where a
+real failure of that fixed-order scheme gets demonstrated.
