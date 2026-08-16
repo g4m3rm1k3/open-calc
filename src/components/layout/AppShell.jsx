@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
+import { motion } from "framer-motion";
 import AuthButton from "../ui/AuthButton.jsx";
+import CubeIconButton from "../ui/CubeIconButton.jsx";
 import {
   Link,
   Outlet,
@@ -98,19 +100,18 @@ function MobileLocationBadge() {
 }
 
 function ToolButton({ tool }) {
-  const Icon = tool.icon;
   return (
-    <button
+    <CubeIconButton
+      icon={tool.icon}
+      glyph={tool.glyph}
+      title={tool.label}
+      colorClass={tool.colorClass ?? "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"}
       onClick={() =>
         window.dispatchEvent(
           new CustomEvent("oc-open-tool", { detail: { tool: tool.eventTool } }),
         )
       }
-      className={`nav-tool-btn ${tool.colorClass ?? "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"}`}
-      title={tool.label}
-    >
-      {Icon ? <Icon className="w-[18px] h-[18px]" /> : <span className="text-[13px] leading-none font-semibold">{tool.glyph}</span>}
-    </button>
+    />
   );
 }
 
@@ -209,13 +210,14 @@ function TopBar() {
 
         <NavSep className="hidden lg:block" />
 
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
-          className="hidden lg:flex nav-tool-btn text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
-          title="Video Player"
-        >
-          <PlayCircle className="w-[18px] h-[18px]" />
-        </button>
+        <div className="hidden lg:flex">
+          <CubeIconButton
+            icon={PlayCircle}
+            title="Video Player"
+            colorClass="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
+          />
+        </div>
         <ThemePicker />
 
         <div className="hidden lg:block">
@@ -229,14 +231,14 @@ function TopBar() {
             report a bug or leave a suggestion. It used to have its own
             icon here plus one in the Taskbar plus a Start Menu entry —
             three doors to the same room. One door now. */}
-        <button
-          data-tour="report-bug"
-          onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
-          className="nav-tool-btn text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300"
-          title="Contributor Docs"
-        >
-          <span className="text-[15px] font-black leading-none">?</span>
-        </button>
+        <div data-tour="report-bug">
+          <CubeIconButton
+            glyph="?"
+            title="Contributor Docs"
+            colorClass="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 text-[15px] font-black"
+            onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
+          />
+        </div>
 
         <NavSep className="hidden lg:block" />
 

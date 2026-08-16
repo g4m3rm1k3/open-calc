@@ -11,7 +11,9 @@ Do not read sibling project folders, other tutorial series, or unrelated docs un
 
 ## Current status
 
-**Lessons 1–108 are complete — Section V (Data Structures) is fully done.** Written to `src/docs/tutorials/computation/NN-title-slug.md` (two-digit zero-padded, matching the site's auto-discovery convention). **Lesson 109 (What Makes an Algorithm?) is next, opening Section VI.**
+**Lessons 1–125 are complete.** Written to `src/docs/tutorials/computation/NN-title-slug.md` (two-digit zero-padded, matching the site's auto-discovery convention). **Lesson 126 (DFS Invariants and Timestamps) is next.** Graph cluster so far: 123 (representations, adjacency list/matrix), 124 (BFS via Lesson 87's queue), 125 (DFS via recursion) — both traversals verified against the identical 5-vertex graph, producing genuinely different, both-correct orders.
+
+**Quality note (2026-08-15):** Lessons 106, 107, and 109 originally drifted from the schema (Concept Units missing New Code/Mechanical Walkthrough — 107 had zero code blocks) and were caught by the user and fully rewritten with real, run-verified code. Lesson 114 separately had two real logic bugs in a first draft (partition's `i` needed to start at `low-1`; the pivot's final index wasn't threaded through the recursion) caught during re-verification before publishing. See `feedback_schema_discipline_is_the_point` in memory — both incidents are logged there with the corrected discipline.
 
 Section progress against the BRD:
 
@@ -22,7 +24,7 @@ Section progress against the BRD:
 | III — Algebra for Programmers | 41–58 | Done |
 | IV — Combinatorics and Discrete Mathematics | 59–82 | Done |
 | V — Data Structures | 83–108 | Done |
-| VI — Algorithms and Algorithmic Problem Solving | 109–138 | In progress (109 next) |
+| VI — Algorithms and Algorithmic Problem Solving | 109–138 | In progress (109–125 done; 126–138 remain) |
 | VII — Mathematical Structures Behind Programming | 139–158 | Not started |
 | VIII — Programming Languages and Semantics | 159–183 | Not started |
 | IX — Computer Architecture and Representation | 184–207 | Not started |
@@ -39,7 +41,7 @@ Section progress against the BRD:
 These were decided deliberately, some after real mistakes. Do not silently relitigate them.
 
 - **Language 1 is Clojure, taught from zero.** Only basic Python-level constructs (variables, loops, functions) are assumed of the reader. Every Clojure construct — `if`, `defn`, `map`, `shuffle`, `rand-int`, vector literals, `assoc`, `declare`, everything — gets its own isolated "New Code" introduction before first real use. Never use a construct before its own lesson (or an earlier one) has taught it.
-- **No `let`, anywhere, ever.** This is deliberate. Work around it with helper functions that take an already-computed value as an argument (e.g. Lesson 56's `combine-egcd`, Lesson 87's `dequeue-from-ready`) rather than introducing a binding.
+- **No `let`, anywhere, ever.** This is deliberate. Work around it with helper functions that take an already-computed value as an argument (e.g. Lesson 56's `combine-egcd`, Lesson 87's `dequeue-from-ready`) rather than introducing a binding. **This includes `loop`** — its binding vector is structurally a `let`. Lesson 39 (Section II, written before this convention was locked in) used `loop`/`recur` for bottom-up DP; that lesson is frozen and not being revised, but Lesson 119 (Section VI) deliberately did *not* reuse that pattern, using recursion-with-an-accumulator instead, and says so explicitly in its own text. Treat `loop`/`recur` as off-limits going forward, the same as bare `let`.
 - **No vector/array indexing until Lesson 84.** Before that lesson, "position in a list" is built via recursive accessor functions (e.g. Lesson 81's `value-at`), never `nth`/`get`. From Lesson 84 onward, vectors and `get`/`assoc` are fair game and are this section's array representation.
 - **Dependency ordering is strict.** A lesson may only use constructs and results taught in itself or an earlier lesson. Check this before finalizing any lesson — it has been violated and caught before (Lesson 4 draft originally).
 - **Repetition Rule / citation style:** when a lesson reuses an earlier concept, name it directly in prose ("Lesson 75's linearity of expectation") rather than a bare parenthetical. Restate briefly, don't just cite silently.

@@ -93,21 +93,47 @@ export default function TopicFilterHeader({
             const isActive = activeSubtopicId === id;
             
             return (
-              <button
+              <motion.button
                 key={id}
                 type="button"
                 onClick={() => onSelectSubtopic(id)}
-                className={`relative rounded-full border px-4 py-1.5 text-xs font-bold transition-all duration-300 backdrop-blur-md ${
+                className={`relative border px-4 py-1.5 text-xs font-bold transition-colors duration-300 backdrop-blur-md ${
                   isActive
-                    ? `${subMeta.border.replace('/30', '')} bg-slate-100/20 dark:bg-[#080A11]/80 ${subMeta.text} scale-105`
-                    : `border-slate-300/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-[#080A11]/50 ${subMeta.text} opacity-60 hover:opacity-100 hover:scale-105`
+                    ? `${subMeta.border.replace('/30', '')} bg-slate-100/20 dark:bg-[#080A11]/80 ${subMeta.text}`
+                    : `border-slate-300/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-[#080A11]/50 ${subMeta.text} opacity-60 hover:opacity-100`
                 }`}
-                style={isActive ? { boxShadow: subMeta.glow.replace('0.50', '0.4') } : {}}
+                style={{
+                  transformStyle: "preserve-3d",
+                  perspective: "1000px",
+                  ...(isActive ? { boxShadow: subMeta.glow.replace('0.50', '0.4') } : {})
+                }}
+                initial={{ borderRadius: "9999px", scale: isActive ? 1.05 : 1 }}
+                animate={{ scale: isActive ? 1.05 : 1 }}
+                whileHover={{
+                  borderRadius: "12px",
+                  y: -5,
+                  rotateX: 15,
+                  rotateY: -15,
+                  scale: 1.1,
+                  boxShadow: "8px 8px 0px rgba(0,0,0,0.2), inset 2px 2px 10px rgba(255,255,255,0.2)",
+                  transition: {
+                    y: { duration: 1, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" },
+                    default: { type: "spring", stiffness: 300, damping: 20 }
+                  }
+                }}
+                whileTap={{
+                  rotateY: 360,
+                  rotateX: 180,
+                  scale: 0.9,
+                  borderRadius: "12px",
+                  transition: { duration: 0.5, ease: "easeInOut" }
+                }}
               >
                 {isActive && (
                   <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" style={{ filter: 'drop-shadow(0 0 2px currentColor) drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor)' }}>
                     <motion.rect
-                      x="0" y="0" width="100%" height="100%" rx="14"
+                      x="0" y="0" width="100%" height="100%"
+                      rx="9999"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2.5"
@@ -119,8 +145,8 @@ export default function TopicFilterHeader({
                     />
                   </svg>
                 )}
-                <span className="relative z-10">{sub.label}</span>
-              </button>
+                <span className="relative z-10" style={{ display: 'block', transform: 'translateZ(10px)' }}>{sub.label}</span>
+              </motion.button>
             )
           })}
         </div>
