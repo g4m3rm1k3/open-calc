@@ -1,0 +1,973 @@
+; Section VI (Lessons 109-138) real, reusable code, extracted in lesson order.
+; Generated from each lesson's own fenced `clojure` blocks containing a defn/def form -
+; Section VI's own convention is that such blocks are always real/kept, never a discarded
+; throwaway (throwaways are shown as bare REPL output, never as a `clojure defn block).
+;
+; PURPOSE: grep this file to find and copy a prior lesson's real code when a new lesson
+; reuses it - instead of opening the old lesson's markdown file. This is what ate real
+; session time before this file existed (Lesson 130's dijkstra and Lesson 136's
+; assignment-consistent? both had to be hunted down and copied by hand this session).
+;
+; NOT GUARANTEED TO LOAD STANDALONE END-TO-END: a few early-Section-VI blocks (e.g.
+; Lesson 109's worked examples) reference functions from Sections I-V (bst-search,
+; Lesson 92) that aren't captured here. When you copy a function out for real reuse,
+; also grab its own transitive dependencies the same way this session did - don't
+; assume `bb`-ing this whole file will just work.
+
+;; ---- Lesson 109 : 109-what-makes-an-algorithm.md ----
+(defn same-output-twice? [tree target]
+  (= (bst-search tree target) (bst-search tree target)))
+
+(defn same-output-twice? [tree target]
+  (= (bst-search tree target) (bst-search tree target)))
+
+(defn satisfies-search-spec? [tree present-value absent-value]
+  (and (= (bst-search tree present-value) present-value)
+       (= (bst-search tree absent-value) nil)))
+
+(defn satisfies-search-spec? [tree present-value absent-value]
+  (and (= (bst-search tree present-value) present-value)
+       (= (bst-search tree absent-value) nil)))
+
+(defn count-new-nodes [old-tree new-tree]
+  (if (identical? old-tree new-tree)
+    0
+    (if (nil? new-tree)
+      0
+      (+ 1 (count-new-nodes (bst-left old-tree) (bst-left new-tree)) (count-new-nodes (bst-right old-tree) (bst-right new-tree))))))
+
+(defn count-new-nodes [old-tree new-tree]
+  (if (identical? old-tree new-tree)
+    0
+    (if (nil? new-tree)
+      0
+      (+ 1 (count-new-nodes (bst-left old-tree) (bst-left new-tree)) (count-new-nodes (bst-right old-tree) (bst-right new-tree))))))
+
+(defn incomplete-spec? [tree present-value]
+  (= (bst-search tree present-value) present-value))
+
+;; ---- Lesson 110 : 110-specifications-before-algorithms.md ----
+(defn valid-input? [values]
+  (> (count values) 0))
+
+(defn valid-input? [values]
+  (> (count values) 0))
+
+(defn is-member? [values result i]
+  (if (>= i (count values))
+    false
+    (if (= (get values i) result)
+      true
+      (is-member? values result (+ i 1)))))
+
+(defn all-at-most? [values result i]
+  (if (>= i (count values))
+    true
+    (if (> (get values i) result)
+      false
+      (all-at-most? values result (+ i 1)))))
+
+(defn is-largest? [values result]
+  (and (is-member? values result 0) (all-at-most? values result 0)))
+
+(defn is-largest? [values result]
+  (and (is-member? values result 0) (all-at-most? values result 0)))
+
+(defn buggy-find-largest [values]
+  (get values 0))
+
+(defn find-largest [values i best]
+  (if (>= i (count values))
+    best
+    (if (> (get values i) best)
+      (find-largest values (+ i 1) (get values i))
+      (find-largest values (+ i 1) best))))
+
+(defn find-largest-from [values]
+  (find-largest values 1 (get values 0)))
+
+(defn find-largest-from [values]
+  (find-largest values 1 (get values 0)))
+
+;; ---- Lesson 111 : 111-brute-force.md ----
+(defn max-index-from [values i best-i]
+  (if (>= i (count values))
+    best-i
+    (if (> (get values i) (get values best-i))
+      (max-index-from values (+ i 1) i)
+      (max-index-from values (+ i 1) best-i))))
+
+(defn max-index-from [values i best-i]
+  (if (>= i (count values))
+    best-i
+    (if (> (get values i) (get values best-i))
+      (max-index-from values (+ i 1) i)
+      (max-index-from values (+ i 1) best-i))))
+
+(defn brute-force-sort-from [values i]
+  (if (>= i (count values))
+    values
+    (brute-force-sort-from (heap-swap values i (max-index-from values i i)) (+ i 1))))
+
+(defn brute-force-sort [values]
+  (brute-force-sort-from values 0))
+
+(defn brute-force-sort [values]
+  (brute-force-sort-from values 0))
+
+(defn broken-sort-from [values i]
+  (if (>= i (count values))
+    values
+    (broken-sort-from (heap-swap values i (max-index-from values 0 0)) (+ i 1))))
+
+;; ---- Lesson 112 : 112-divide-and-conquer.md ----
+(declare dc-max)
+
+(defn dc-max-combine [values low high mid]
+  (max (dc-max values low mid) (dc-max values (+ mid 1) high)))
+
+(defn dc-max [values low high]
+  (if (= low high)
+    (get values low)
+    (dc-max-combine values low high (quot (+ low high) 2))))
+
+(defn dc-max [values low high]
+  (if (= low high)
+    (get values low)
+    (dc-max-combine values low high (quot (+ low high) 2))))
+
+;; ---- Lesson 113 : 113-merge-sort.md ----
+(defn merge-drain [values src-i src-end k result]
+  (if (> src-i src-end)
+    result
+    (merge-drain values (+ src-i 1) src-end (+ k 1) (assoc result k (get values src-i)))))
+
+(declare merge-from)
+
+(defn merge-take-left [values i mid j high k result]
+  (merge-from values (+ i 1) mid j high (+ k 1) (assoc result k (get values i))))
+
+(defn merge-take-right [values i mid j high k result]
+  (merge-from values i mid (+ j 1) high (+ k 1) (assoc result k (get values j))))
+
+(defn merge-from [values i mid j high k result]
+  (if (> i mid)
+    (merge-drain values j high k result)
+    (if (> j high)
+      (merge-drain values i mid k result)
+      (if (<= (get values i) (get values j))
+        (merge-take-left values i mid j high k result)
+        (merge-take-right values i mid j high k result)))))
+
+(defn merge-ranges [values low mid high]
+  (merge-from values low mid (+ mid 1) high low values))
+
+(defn merge-ranges [values low mid high]
+  (merge-from values low mid (+ mid 1) high low values))
+
+(declare merge-sort)
+
+(defn merge-sort-combine [values low high mid]
+  (merge-ranges (merge-sort (merge-sort values low mid) (+ mid 1) high) low mid high))
+
+(defn merge-sort [values low high]
+  (if (>= low high)
+    values
+    (merge-sort-combine values low high (quot (+ low high) 2))))
+
+(defn merge-sort [values low high]
+  (if (>= low high)
+    values
+    (merge-sort-combine values low high (quot (+ low high) 2))))
+
+(defn broken-combine [values low high mid]
+  (merge-ranges values low mid high))
+
+;; ---- Lesson 114 : 114-quick-sort.md ----
+(declare partition-from)
+
+(defn partition-step [values pivot-value i j high]
+  (if (<= (get values j) pivot-value)
+    (partition-from (heap-swap values (+ i 1) j) pivot-value (+ i 1) (+ j 1) high)
+    (partition-from values pivot-value i (+ j 1) high)))
+
+(defn partition-from [values pivot-value i j high]
+  (if (>= j high)
+    [(heap-swap values (+ i 1) high) (+ i 1)]
+    (partition-step values pivot-value i j high)))
+
+(defn partition-range [values low high]
+  (partition-from values (get values high) (- low 1) low high))
+
+(defn partition-range [values low high]
+  (partition-from values (get values high) (- low 1) low high))
+
+(declare quick-sort)
+
+(defn quick-sort-around [partitioned low high]
+  (quick-sort (quick-sort (get partitioned 0) low (- (get partitioned 1) 1)) (+ (get partitioned 1) 1) high))
+
+(defn quick-sort [values low high]
+  (if (>= low high)
+    values
+    (quick-sort-around (partition-range values low high) low high)))
+
+(defn quick-sort [values low high]
+  (if (>= low high)
+    values
+    (quick-sort-around (partition-range values low high) low high)))
+
+;; ---- Lesson 115 : 115-selection-algorithms.md ----
+(declare quick-select)
+
+(defn quick-select-around [partitioned low high k]
+  (if (= (get partitioned 1) k)
+    (get (get partitioned 0) k)
+    (if (< k (get partitioned 1))
+      (quick-select (get partitioned 0) low (- (get partitioned 1) 1) k)
+      (quick-select (get partitioned 0) (+ (get partitioned 1) 1) high k))))
+
+(defn quick-select [values low high k]
+  (if (= low high)
+    (get values low)
+    (quick-select-around (partition-range values low high) low high k)))
+
+(defn quick-select [values low high k]
+  (if (= low high)
+    (get values low)
+    (quick-select-around (partition-range values low high) low high k)))
+
+(defn broken-select-around [partitioned low high k]
+  (get (quick-sort-around partitioned low high) k))
+
+;; ---- Lesson 117 : 117-greedy-algorithms.md ----
+(defn greedy-coins-from [amount denominations i count]
+  (if (= amount 0)
+    count
+    (if (<= (get denominations i) amount)
+      (greedy-coins-from (- amount (get denominations i)) denominations i (+ count 1))
+      (greedy-coins-from amount denominations (+ i 1) count))))
+
+(defn greedy-coins [amount denominations]
+  (greedy-coins-from amount denominations 0 0))
+
+(defn greedy-coins [amount denominations]
+  (greedy-coins-from amount denominations 0 0))
+
+;; ---- Lesson 118 : 118-exchange-arguments.md ----
+(defn activities-compatible? [prev-end activity]
+  (>= (get activity 0) prev-end))
+
+(defn select-activities-from [activities i prev-end selected]
+  (if (>= i (count activities))
+    selected
+    (if (activities-compatible? prev-end (get activities i))
+      (select-activities-from activities (+ i 1) (get (get activities i) 1) (+ selected 1))
+      (select-activities-from activities (+ i 1) prev-end selected))))
+
+(defn select-activities [activities]
+  (select-activities-from activities 1 (get (get activities 0) 1) 1))
+
+(defn select-activities [activities]
+  (select-activities-from activities 1 (get (get activities 0) 1) 1))
+
+;; ---- Lesson 119 : 119-dynamic-programming.md ----
+(defn min-of-two [a b] (if (< a b) a b))
+
+(defn dp-best-for-amount [dp denominations a i best]
+  (if (>= i (count denominations))
+    best
+    (if (<= (get denominations i) a)
+      (dp-best-for-amount dp denominations a (+ i 1) (min-of-two best (+ 1 (get dp (- a (get denominations i))))))
+      (dp-best-for-amount dp denominations a (+ i 1) best))))
+
+(defn dp-fill-from [dp denominations a target]
+  (if (> a target)
+    dp
+    (dp-fill-from (assoc dp a (dp-best-for-amount dp denominations a 0 (+ a 1))) denominations (+ a 1) target)))
+
+(defn dp-coins [target denominations]
+  (get (dp-fill-from [0] denominations 1 target) target))
+
+(defn dp-coins [target denominations]
+  (get (dp-fill-from [0] denominations 1 target) target))
+
+(defn broken-dp-best [dp denominations a]
+  (+ 1 (get dp (- a (get denominations 0)))))
+
+;; ---- Lesson 120 : 120-longest-common-subsequence.md ----
+(defn zero-row [width j row]
+  (if (> j width)
+    row
+    (zero-row width (+ j 1) (assoc row j 0))))
+
+(defn zero-row [width j row]
+  (if (> j width)
+    row
+    (zero-row width (+ j 1) (assoc row j 0))))
+
+(defn max-of-two [a b] (if (> a b) a b))
+
+(defn lcs-cell [dp row x y i j]
+  (if (= (get x (- i 1)) (get y (- j 1)))
+    (+ 1 (get (get dp (- i 1)) (- j 1)))
+    (max-of-two (get (get dp (- i 1)) j) (get row (- j 1)))))
+
+(defn lcs-cell [dp row x y i j]
+  (if (= (get x (- i 1)) (get y (- j 1)))
+    (+ 1 (get (get dp (- i 1)) (- j 1)))
+    (max-of-two (get (get dp (- i 1)) j) (get row (- j 1)))))
+
+(defn lcs-fill-row [dp x y i j width row]
+  (if (> j width)
+    (assoc dp i row)
+    (lcs-fill-row dp x y i (+ j 1) width (assoc row j (lcs-cell dp row x y i j)))))
+
+(defn lcs-fill-rows [dp x y i height width]
+  (if (> i height)
+    dp
+    (lcs-fill-rows (lcs-fill-row dp x y i 1 width [0]) x y (+ i 1) height width)))
+
+(defn lcs-length [x y]
+  (get (get (lcs-fill-rows [(zero-row (count y) 1 [0])] x y 1 (count x) (count y)) (count x)) (count y)))
+
+(defn lcs-length [x y]
+  (get (get (lcs-fill-rows [(zero-row (count y) 1 [0])] x y 1 (count x) (count y)) (count x)) (count y)))
+
+(defn broken-lcs-cell [dp row x y i j]
+  (if (= (get x (- i 1)) (get y (- j 1)))
+    (+ 1 (get (get dp (- i 1)) (- j 1)))
+    (get (get dp (- i 1)) j)))
+
+;; ---- Lesson 121 : 121-knapsack.md ----
+(defn max-of-two [a b] (if (> a b) a b))
+
+(defn knap-cell [dp weights values i w]
+  (if (> (get weights (- i 1)) w)
+    (get (get dp (- i 1)) w)
+    (max-of-two (get (get dp (- i 1)) w) (+ (get values (- i 1)) (get (get dp (- i 1)) (- w (get weights (- i 1))))))))
+
+(defn knap-cell [dp weights values i w]
+  (if (> (get weights (- i 1)) w)
+    (get (get dp (- i 1)) w)
+    (max-of-two (get (get dp (- i 1)) w) (+ (get values (- i 1)) (get (get dp (- i 1)) (- w (get weights (- i 1))))))))
+
+(defn unbounded-cell [dp weights values w i best]
+  (if (>= i (count weights))
+    best
+    (if (<= (get weights i) w)
+      (unbounded-cell dp weights values w (+ i 1) (max-of-two best (+ (get values i) (get dp (- w (get weights i))))))
+      (unbounded-cell dp weights values w (+ i 1) best))))
+
+(defn unbounded-fill [dp weights values w capacity]
+  (if (> w capacity)
+    dp
+    (unbounded-fill (assoc dp w (unbounded-cell dp weights values w 0 0)) weights values (+ w 1) capacity)))
+
+(defn unbounded-knapsack [weights values capacity]
+  (get (unbounded-fill [0] weights values 1 capacity) capacity))
+
+(defn unbounded-knapsack [weights values capacity]
+  (get (unbounded-fill [0] weights values 1 capacity) capacity))
+
+;; ---- Lesson 122 : 122-interval-problems.md ----
+(defn intervals-overlap? [current next-interval]
+  (<= (get next-interval 0) (get current 1)))
+
+(defn merge-into [current next-interval]
+  [(get current 0) (max (get current 1) (get next-interval 1))])
+
+(defn merge-from [intervals i current merged]
+  (if (>= i (count intervals))
+    (assoc merged (count merged) current)
+    (if (intervals-overlap? current (get intervals i))
+      (merge-from intervals (+ i 1) (merge-into current (get intervals i)) merged)
+      (merge-from intervals (+ i 1) (get intervals i) (assoc merged (count merged) current)))))
+
+(defn merge-intervals [intervals]
+  (merge-from intervals 1 (get intervals 0) []))
+
+(defn merge-intervals [intervals]
+  (merge-from intervals 1 (get intervals 0) []))
+
+(defn rooms-needed-step [intervals i room-ends max-rooms]
+  (if (and (> (count room-ends) 0) (<= (heap-peek room-ends) (get (get intervals i) 0)))
+    (rooms-needed-from intervals (+ i 1) (heap-insert (get (heap-extract-min room-ends) 1) (get (get intervals i) 1)) max-rooms)
+    (rooms-needed-from intervals (+ i 1) (heap-insert room-ends (get (get intervals i) 1)) (max max-rooms (+ (count room-ends) 1)))))
+
+(defn rooms-needed-from [intervals i room-ends max-rooms]
+  (if (>= i (count intervals))
+    max-rooms
+    (rooms-needed-step intervals i room-ends max-rooms)))
+
+(defn rooms-needed [intervals]
+  (rooms-needed-from intervals 0 [] 0))
+
+(defn rooms-needed [intervals]
+  (rooms-needed-from intervals 0 [] 0))
+
+(defn broken-rooms-step [intervals i room-ends max-rooms]
+  (if (<= (heap-peek room-ends) (get (get intervals i) 0))
+    (rooms-needed-from intervals (+ i 1) (heap-insert (get (heap-extract-min room-ends) 1) (get (get intervals i) 1)) max-rooms)
+    (rooms-needed-from intervals (+ i 1) (heap-insert room-ends (get (get intervals i) 1)) (max max-rooms (+ (count room-ends) 1)))))
+
+;; ---- Lesson 123 : 123-graphs-as-computational-objects.md ----
+(defn empty-adj-at [n i adj]
+  (if (>= i n)
+    adj
+    (empty-adj-at n (+ i 1) (assoc adj i []))))
+
+(defn add-edge-to-adj [adj edge]
+  (assoc adj (get edge 0) (assoc (get adj (get edge 0)) (count (get adj (get edge 0))) (get edge 1))))
+
+(defn build-adj-from [adj edges i]
+  (if (>= i (count edges))
+    adj
+    (build-adj-from (add-edge-to-adj adj (get edges i)) edges (+ i 1))))
+
+(defn build-adj [n edges]
+  (build-adj-from (empty-adj-at n 0 []) edges 0))
+
+(defn build-adj [n edges]
+  (build-adj-from (empty-adj-at n 0 []) edges 0))
+
+(defn empty-matrix-row [n j row]
+  (if (>= j n)
+    row
+    (empty-matrix-row n (+ j 1) (assoc row j 0))))
+
+(defn empty-matrix [n i matrix]
+  (if (>= i n)
+    matrix
+    (empty-matrix n (+ i 1) (assoc matrix i (empty-matrix-row n 0 [])))))
+
+(defn add-weighted-edge [matrix edge]
+  (assoc matrix (get edge 0) (assoc (get matrix (get edge 0)) (get edge 1) (get edge 2))))
+
+(defn build-matrix [n edges]
+  (build-matrix-from (empty-matrix n 0 []) edges 0))
+
+(defn build-matrix-from [matrix edges i]
+  (if (>= i (count edges))
+    matrix
+    (build-matrix-from (add-weighted-edge matrix (get edges i)) edges (+ i 1))))
+
+(defn build-matrix [n edges]
+  (build-matrix-from (empty-matrix n 0 []) edges 0))
+
+(defn broken-build-adj [edges]
+  (build-adj-from [] edges 0))
+
+;; ---- Lesson 124 : 124-breadth-first-search.md ----
+(defn all-false [n i v]
+  (if (>= i n)
+    v
+    (all-false n (+ i 1) (assoc v i false))))
+
+(defn bfs-continue-step [adj visited q order neighbors i]
+  (if (get visited (get neighbors i))
+    (bfs-continue adj visited q order neighbors (+ i 1))
+    (bfs-continue adj (assoc visited (get neighbors i) true) (enqueue q (get neighbors i)) order neighbors (+ i 1))))
+
+(defn bfs-continue [adj visited q order neighbors i]
+  (if (>= i (count neighbors))
+    (bfs-loop adj visited q order)
+    (bfs-continue-step adj visited q order neighbors i)))
+
+(defn bfs-continue-step [adj visited q order neighbors i]
+  (if (get visited (get neighbors i))
+    (bfs-continue adj visited q order neighbors (+ i 1))
+    (bfs-continue adj (assoc visited (get neighbors i) true) (enqueue q (get neighbors i)) order neighbors (+ i 1))))
+
+(defn bfs-visit [adj visited q order current]
+  (bfs-continue adj visited (dequeue q) (assoc order (count order) current) (get adj current) 0))
+
+(defn bfs-loop [adj visited q order]
+  (if (and (empty? (queue-in q)) (empty? (queue-out q)))
+    order
+    (bfs-visit adj visited q order (queue-peek q))))
+
+(defn bfs [adj start n]
+  (bfs-loop adj (assoc (all-false n 0 []) start true) (enqueue (make-queue) start) []))
+
+(defn bfs [adj start n]
+  (bfs-loop adj (assoc (all-false n 0 []) start true) (enqueue (make-queue) start) []))
+
+(defn broken-continue-step [adj visited q order neighbors i]
+  (bfs-continue adj visited (enqueue q (get neighbors i)) order neighbors (+ i 1)))
+
+;; ---- Lesson 125 : 125-depth-first-search.md ----
+(defn dfs-visit [adj visited order current]
+  (dfs-explore adj (assoc visited current true) (assoc order (count order) current) (get adj current) 0))
+
+(defn dfs-explore [adj visited order neighbors i]
+  (if (>= i (count neighbors))
+    [visited order]
+    (dfs-explore-step adj visited order neighbors i)))
+
+(defn dfs-explore-step [adj visited order neighbors i]
+  (if (get visited (get neighbors i))
+    (dfs-explore adj visited order neighbors (+ i 1))
+    (dfs-continue-after adj (dfs-visit adj visited order (get neighbors i)) neighbors i)))
+
+(defn dfs-continue-after [adj visited-and-order neighbors i]
+  (dfs-explore adj (get visited-and-order 0) (get visited-and-order 1) neighbors (+ i 1)))
+
+(defn dfs-explore-step [adj visited order neighbors i]
+  (if (get visited (get neighbors i))
+    (dfs-explore adj visited order neighbors (+ i 1))
+    (dfs-continue-after adj (dfs-visit adj visited order (get neighbors i)) neighbors i)))
+
+(defn dfs [adj start n]
+  (get (dfs-visit adj (all-false n 0 []) [] start) 1))
+
+(defn dfs [adj start n]
+  (get (dfs-visit adj (all-false n 0 []) [] start) 1))
+
+(defn broken-explore-step [adj visited order neighbors i]
+  (dfs-continue-after adj (dfs-visit adj visited order (get neighbors i)) neighbors i))
+
+;; ---- Lesson 126 : 126-dfs-invariants-and-timestamps.md ----
+(declare dfsx-visit)
+
+(defn dfsx-explore-step [adj state neighbors i current]
+  (if (get (get state 0) (get neighbors i))
+    (dfsx-explore adj state neighbors (+ i 1) current)
+    (dfsx-explore adj (dfsx-visit adj state (get neighbors i)) neighbors (+ i 1) current)))
+
+(defn dfsx-explore [adj state neighbors i current]
+  (if (>= i (count neighbors))
+    [(get state 0) (assoc (get state 1) current (get state 2)) (+ (get state 2) 1)]
+    (dfsx-explore-step adj state neighbors i current)))
+
+(defn dfsx-visit [adj state current]
+  (dfsx-explore adj [(assoc (get state 0) current (get state 2)) (get state 1) (+ (get state 2) 1)] (get adj current) 0 current))
+
+(defn dfsx-visit [adj state current]
+  (dfsx-explore adj [(assoc (get state 0) current (get state 2)) (get state 1) (+ (get state 2) 1)] (get adj current) 0 current))
+
+(declare cycle-visit)
+
+(defn cycle-explore-step [adj state neighbors i current]
+  (if (get (get state 1) (get neighbors i))
+    (cycle-explore adj [(get state 0) (get state 1) true] neighbors (+ i 1) current)
+    (if (get (get state 0) (get neighbors i))
+      (cycle-explore adj state neighbors (+ i 1) current)
+      (cycle-explore adj (cycle-visit adj state (get neighbors i)) neighbors (+ i 1) current))))
+
+(defn cycle-explore [adj state neighbors i current]
+  (if (>= i (count neighbors))
+    state
+    (cycle-explore-step adj state neighbors i current)))
+
+(defn cycle-finish [state current]
+  [(get state 0) (assoc (get state 1) current false) (get state 2)])
+
+(defn cycle-visit [adj state current]
+  (cycle-finish (cycle-explore adj [(assoc (get state 0) current true) (assoc (get state 1) current true) (get state 2)] (get adj current) 0 current) current))
+
+(defn has-cycle? [adj n]
+  (get (cycle-visit adj [(all-false n 0 []) (all-false n 0 []) false] 0) 2))
+
+(defn has-cycle? [adj n]
+  (get (cycle-visit adj [(all-false n 0 []) (all-false n 0 []) false] 0) 2))
+
+(defn broken-explore-step [adj state neighbors i current]
+  (if (get (get state 0) (get neighbors i))
+    [(get state 0) (get state 1) true]
+    (cycle-explore adj (cycle-visit adj state (get neighbors i)) neighbors (+ i 1) current)))
+
+;; ---- Lesson 127 : 127-topological-sorting.md ----
+(defn reverse-vec-from [v i result]
+  (if (< i 0)
+    result
+    (reverse-vec-from v (- i 1) (assoc result (count result) (get v i)))))
+
+(defn reverse-vec [v]
+  (reverse-vec-from v (- (count v) 1) []))
+
+(declare topo-visit)
+
+(defn topo-explore-step [adj state neighbors i current]
+  (if (get (get state 0) (get neighbors i))
+    (topo-explore adj state neighbors (+ i 1) current)
+    (topo-explore adj (topo-visit adj state (get neighbors i)) neighbors (+ i 1) current)))
+
+(defn topo-explore [adj state neighbors i current]
+  (if (>= i (count neighbors))
+    [(get state 0) (assoc (get state 1) (count (get state 1)) current)]
+    (topo-explore-step adj state neighbors i current)))
+
+(defn topo-visit [adj state current]
+  (topo-explore adj [(assoc (get state 0) current true) (get state 1)] (get adj current) 0 current))
+
+(defn topo-sort [adj n]
+  (reverse-vec (get (topo-visit adj [(all-false n 0 []) []] 0) 1)))
+
+(defn topo-sort [adj n]
+  (reverse-vec (get (topo-visit adj [(all-false n 0 []) []] 0) 1)))
+
+;; ---- Lesson 128 : 128-connected-components.md ----
+(declare comp-visit)
+
+(defn comp-explore-step [adj comp-id state neighbors i current]
+  (if (get (get state 0) (get neighbors i))
+    (comp-explore adj comp-id state neighbors (+ i 1) current)
+    (comp-explore adj comp-id (comp-visit adj comp-id state (get neighbors i)) neighbors (+ i 1) current)))
+
+(defn comp-explore [adj comp-id state neighbors i current]
+  (if (>= i (count neighbors))
+    state
+    (comp-explore-step adj comp-id state neighbors i current)))
+
+(defn comp-visit [adj comp-id state current]
+  (comp-explore adj comp-id [(assoc (get state 0) current true) (assoc (get state 1) current comp-id)] (get adj current) 0 current))
+
+(defn comp-find-from [adj state comp-id v n]
+  (if (>= v n)
+    (get state 1)
+    (if (get (get state 0) v)
+      (comp-find-from adj state comp-id (+ v 1) n)
+      (comp-find-from adj (comp-visit adj comp-id state v) (+ comp-id 1) (+ v 1) n))))
+
+(defn components [adj n]
+  (comp-find-from adj [(all-false n 0 []) (all-false n 0 [])] 0 0 n))
+
+(defn components [adj n]
+  (comp-find-from adj [(all-false n 0 []) (all-false n 0 [])] 0 0 n))
+
+(defn uf-components-from [parents edges i]
+  (if (>= i (count edges))
+    parents
+    (uf-components-from (uf-union parents (get (get edges i) 0) (get (get edges i) 1)) edges (+ i 1))))
+
+(defn uf-components [n edges]
+  (uf-components-from (uf-make n) edges 0))
+
+(defn uf-components [n edges]
+  (uf-components-from (uf-make n) edges 0))
+
+;; ---- Lesson 129 : 129-shortest-paths.md ----
+(defn path-weight [matrix path i total]
+  (if (>= (+ i 1) (count path))
+    total
+    (path-weight matrix path (+ i 1) (+ total (get (get matrix (get path i)) (get path (+ i 1)))))))
+
+(defn path-weight [matrix path i total]
+  (if (>= (+ i 1) (count path))
+    total
+    (path-weight matrix path (+ i 1) (+ total (get (get matrix (get path i)) (get path (+ i 1)))))))
+
+;; ---- Lesson 130 : 130-dijkstras-algorithm.md ----
+(defn min-unvisited [dist finalized v best]
+  (if (>= v (count dist))
+    best
+    (if (get finalized v)
+      (min-unvisited dist finalized (+ v 1) best)
+      (if (or (= best -1) (< (get dist v) (get dist best)))
+        (min-unvisited dist finalized (+ v 1) v)
+        (min-unvisited dist finalized (+ v 1) best)))))
+
+(defn relax [matrix dist u v]
+  (if (= (get (get matrix u) v) 0)
+    dist
+    (if (< (+ (get dist u) (get (get matrix u) v)) (get dist v))
+      (assoc dist v (+ (get dist u) (get (get matrix u) v)))
+      dist)))
+
+(defn relax-all [matrix dist u v n]
+  (if (>= v n)
+    dist
+    (relax-all matrix (relax matrix dist u v) u (+ v 1) n)))
+
+(defn relax [matrix dist u v]
+  (if (= (get (get matrix u) v) 0)
+    dist
+    (if (< (+ (get dist u) (get (get matrix u) v)) (get dist v))
+      (assoc dist v (+ (get dist u) (get (get matrix u) v)))
+      dist)))
+
+(defn all-infinity [n i v]
+  (if (>= i n) v (all-infinity n (+ i 1) (assoc v i 999999))))
+
+(defn dijkstra-extract [matrix dist finalized u n]
+  (if (= u -1)
+    dist
+    (dijkstra-step matrix (relax-all matrix dist u 0 n) (assoc finalized u true) n)))
+
+(defn dijkstra-step [matrix dist finalized n]
+  (dijkstra-extract matrix dist finalized (min-unvisited dist finalized 0 -1) n))
+
+(defn dijkstra [matrix source n]
+  (dijkstra-step matrix (assoc (all-infinity n 0 []) source 0) (all-false n 0 []) n))
+
+(defn dijkstra [matrix source n]
+  (dijkstra-step matrix (assoc (all-infinity n 0 []) source 0) (all-false n 0 []) n))
+
+(defn broken-relax [matrix dist u v discovered)
+  (if (or (get discovered v) (= (get (get matrix u) v) 0))
+    dist
+    (assoc dist v (+ (get dist u) (get (get matrix u) v)))))
+
+;; ---- Lesson 131 : 131-bellman-ford.md ----
+(defn bellman-round [matrix dist u n]
+  (if (>= u n)
+    dist
+    (bellman-round matrix (relax-all matrix dist u 0 n) (+ u 1) n)))
+
+(defn bellman-rounds [matrix dist round n]
+  (if (>= round (- n 1))
+    dist
+    (bellman-rounds matrix (bellman-round matrix dist 0 n) (+ round 1) n)))
+
+(defn bellman-ford [matrix source n]
+  (bellman-rounds matrix (assoc (all-infinity n 0 []) source 0) 0 n))
+
+(defn bellman-ford [matrix source n]
+  (bellman-rounds matrix (assoc (all-infinity n 0 []) source 0) 0 n))
+
+(defn has-negative-cycle? [matrix dist n]
+  (not (= dist (bellman-round matrix dist 0 n))))
+
+(defn has-negative-cycle? [matrix dist n]
+  (not (= dist (bellman-round matrix dist 0 n))))
+
+;; ---- Lesson 133 : 133-kruskal-and-prim.md ----
+(defn kruskal-consider [parents edges i mst]
+  (if (uf-connected? parents (get (get edges i) 0) (get (get edges i) 1))
+    (kruskal-step parents edges (+ i 1) mst)
+    (kruskal-step (uf-union parents (get (get edges i) 0) (get (get edges i) 1)) edges (+ i 1) (assoc mst (count mst) (get edges i)))))
+
+(defn kruskal-step [parents edges i mst]
+  (if (>= i (count edges))
+    mst
+    (kruskal-consider parents edges i mst)))
+
+(defn kruskal [n sorted-edges]
+  (kruskal-step (uf-make n) sorted-edges 0 []))
+
+(defn kruskal [n sorted-edges]
+  (kruskal-step (uf-make n) sorted-edges 0 []))
+
+(defn prim-min-frontier [key in-tree v best]
+  (if (>= v (count key))
+    best
+    (if (get in-tree v)
+      (prim-min-frontier key in-tree (+ v 1) best)
+      (if (or (= best -1) (< (get key v) (get key best)))
+        (prim-min-frontier key in-tree (+ v 1) v)
+        (prim-min-frontier key in-tree (+ v 1) best)))))
+
+(defn prim-update [matrix state in-tree u v]
+  (if (= (get (get matrix u) v) 0)
+    state
+    (if (and (not (get in-tree v)) (< (get (get matrix u) v) (get (get state 0) v)))
+      [(assoc (get state 0) v (get (get matrix u) v)) (assoc (get state 1) v u)]
+      state)))
+
+(defn prim-update-all [matrix state in-tree u v n]
+  (if (>= v n)
+    state
+    (prim-update-all matrix (prim-update matrix state in-tree u v) in-tree u (+ v 1) n)))
+
+(defn prim [matrix start n]
+  (prim-step matrix [(assoc (all-infinity n 0 []) start 0) (all-false n 0 [])] (all-false n 0 []) n))
+
+(defn broken-consider [visited edges i mst]
+  (if (and (get visited (get (get edges i) 0)) (get visited (get (get edges i) 1)))
+    (kruskal-step visited edges (+ i 1) mst)
+    (kruskal-step (assoc (assoc visited (get (get edges i) 0) true) (get (get edges i) 1) true) edges (+ i 1) (assoc mst (count mst) (get edges i)))))
+
+;; ---- Lesson 134 : 134-network-flow.md ----
+(defn capacity-ok? [capacity flow u v]
+  (<= (get (get flow u) v) (get (get capacity u) v)))
+
+(defn all-capacity-ok? [capacity flow u v n]
+  (if (>= u n)
+    true
+    (if (>= v n)
+      (all-capacity-ok? capacity flow (+ u 1) 0 n)
+      (if (capacity-ok? capacity flow u v)
+        (all-capacity-ok? capacity flow u (+ v 1) n)
+        false))))
+
+(defn capacity-ok? [capacity flow u v]
+  (<= (get (get flow u) v) (get (get capacity u) v)))
+
+(defn flow-in [flow v u total n]
+  (if (>= u n)
+    total
+    (flow-in flow v (+ u 1) (+ total (get (get flow u) v)) n)))
+
+(defn flow-out [flow v u total n]
+  (if (>= u n)
+    total
+    (flow-out flow v (+ u 1) (+ total (get (get flow v) u)) n)))
+
+(defn conserved? [flow v n]
+  (= (flow-in flow v 0 0 n) (flow-out flow v 0 0 n)))
+
+(defn conserved? [flow v n]
+  (= (flow-in flow v 0 0 n) (flow-out flow v 0 0 n)))
+
+(defn is-valid-flow? [capacity flow source sink n]
+  (and (all-capacity-ok? capacity flow 0 0 n) (all-conserved? flow source sink 0 n)))
+
+;; ---- Lesson 135 : 135-matching.md ----
+(def capacity (build-matrix 8 [[6 0 1] [6 1 1] [6 2 1] [0 3 1] [0 4 1] [1 4 1] [2 4 1] [2 5 1] [3 7 1] [4 7 1] [5 7 1]]))
+(def flow (build-matrix 8 [[6 0 1] [6 1 1] [6 2 1] [0 3 1] [1 4 1] [2 5 1] [3 7 1] [4 7 1] [5 7 1]]))
+
+(def flow (build-matrix 8 [[6 0 1] [6 1 1] [6 2 1] [0 3 1] [1 4 1] [2 5 1] [3 7 1] [4 7 1] [5 7 1]]))
+
+;; ---- Lesson 136 : 136-constraint-satisfaction.md ----
+(def domains [["red" "green" "blue"] ["red" "green" "blue"] ["red" "green" "blue"] ["red" "green" "blue"]])
+
+(def domains [["red" "green" "blue"] ["red" "green" "blue"] ["red" "green" "blue"] ["red" "green" "blue"]])
+
+(def constraints [[0 1] [0 2] [1 2] [1 3] [2 3]])
+
+(defn constraint-satisfied? [assignment pair]
+  (not= (get assignment (get pair 0)) (get assignment (get pair 1))))
+
+(defn all-constraints-satisfied? [assignment constraints i]
+  (if (>= i (count constraints))
+    true
+    (if (constraint-satisfied? assignment (get constraints i))
+      (all-constraints-satisfied? assignment constraints (+ i 1))
+      false)))
+
+(defn constraint-satisfied? [assignment pair]
+  (not= (get assignment (get pair 0)) (get assignment (get pair 1))))
+
+(defn pair-consistent? [assignment pair]
+  (if (nil? (get assignment (get pair 0)))
+    true
+    (if (nil? (get assignment (get pair 1)))
+      true
+      (not= (get assignment (get pair 0)) (get assignment (get pair 1))))))
+
+(defn assignment-consistent? [assignment constraints i]
+  (if (>= i (count constraints))
+    true
+    (if (pair-consistent? assignment (get constraints i))
+      (assignment-consistent? assignment constraints (+ i 1))
+      false)))
+
+(defn pair-consistent? [assignment pair]
+  (if (nil? (get assignment (get pair 0)))
+    true
+    (if (nil? (get assignment (get pair 1)))
+      true
+      (not= (get assignment (get pair 0)) (get assignment (get pair 1))))))
+
+;; ---- Lesson 137 : 137-search-pruning-and-heuristics.md ----
+(declare solve-from try-candidate try-recursion-result)
+
+(defn try-value [var-index domains constraints assignment value-index]
+  (if (>= value-index (count (get domains var-index)))
+    nil
+    (try-candidate var-index domains constraints assignment value-index
+      (assoc assignment var-index (get (get domains var-index) value-index)))))
+
+(defn try-candidate [var-index domains constraints assignment value-index candidate]
+  (if (assignment-consistent? candidate constraints 0)
+    (try-recursion-result var-index domains constraints assignment value-index
+      (solve-from (+ var-index 1) domains constraints candidate))
+    (try-value var-index domains constraints assignment (+ value-index 1))))
+
+(defn try-recursion-result [var-index domains constraints assignment value-index result]
+  (if (nil? result)
+    (try-value var-index domains constraints assignment (+ value-index 1))
+    result))
+
+(defn solve-from [var-index domains constraints assignment]
+  (if (>= var-index (count domains))
+    assignment
+    (try-value var-index domains constraints assignment 0)))
+
+(defn solve [domains constraints]
+  (solve-from 0 domains constraints [nil nil nil nil]))
+
+(defn solve-from [var-index domains constraints assignment]
+  (if (>= var-index (count domains))
+    assignment
+    (try-value var-index domains constraints assignment 0)))
+
+(declare csolve-from ctry-candidate ctry-recursion-result)
+
+(defn ctry-value [var-index domains constraints assignment value-index visits]
+  (if (>= value-index (count (get domains var-index)))
+    [nil visits]
+    (ctry-candidate var-index domains constraints assignment value-index
+      (assoc assignment var-index (get (get domains var-index) value-index)) visits)))
+
+(defn ctry-candidate [var-index domains constraints assignment value-index candidate visits]
+  (if (assignment-consistent? candidate constraints 0)
+    (ctry-recursion-result var-index domains constraints assignment value-index
+      (csolve-from (+ var-index 1) domains constraints candidate (+ visits 1)))
+    (ctry-value var-index domains constraints assignment (+ value-index 1) (+ visits 1))))
+
+(defn ctry-recursion-result [var-index domains constraints assignment value-index result-pair]
+  (if (nil? (get result-pair 0))
+    (ctry-value var-index domains constraints assignment (+ value-index 1) (get result-pair 1))
+    result-pair))
+
+(defn csolve-from [var-index domains constraints assignment visits]
+  (if (>= var-index (count domains))
+    [assignment visits]
+    (ctry-value var-index domains constraints assignment 0 visits)))
+
+(defn csolve [domains constraints]
+  (csolve-from 0 domains constraints [nil nil nil nil] 0))
+
+(def domains2 [["red" "blue"] ["red" "blue"] ["red" "blue"] ["red" "blue"]])
+
+(defn csolve [domains constraints]
+  (csolve-from 0 domains constraints [nil nil nil nil] 0))
+
+(def domains5 [["red" "blue"] ["red" "blue"] ["red" "blue"] ["red" "blue"] ["red" "blue"]])
+(def constraints5 [[0 4] [1 4] [2 4] [3 4] [0 1]])
+
+(declare osolve-from otry-candidate otry-recursion-result)
+
+(defn variable-at-depth [var-order depth] (get var-order depth))
+
+(defn otry-value [depth var-order domains constraints assignment value-index visits]
+  (if (>= value-index (count (get domains (variable-at-depth var-order depth))))
+    [nil visits]
+    (otry-candidate depth var-order domains constraints assignment value-index
+      (assoc assignment (variable-at-depth var-order depth)
+        (get (get domains (variable-at-depth var-order depth)) value-index)) visits)))
+
+(defn otry-candidate [depth var-order domains constraints assignment value-index candidate visits]
+  (if (assignment-consistent? candidate constraints 0)
+    (otry-recursion-result depth var-order domains constraints assignment value-index
+      (osolve-from (+ depth 1) var-order domains constraints candidate (+ visits 1)))
+    (otry-value depth var-order domains constraints assignment (+ value-index 1) (+ visits 1))))
+
+(defn otry-recursion-result [depth var-order domains constraints assignment value-index result-pair]
+  (if (nil? (get result-pair 0))
+    (otry-value depth var-order domains constraints assignment (+ value-index 1) (get result-pair 1))
+    result-pair))
+
+(defn osolve-from [depth var-order domains constraints assignment visits]
+  (if (>= depth (count domains))
+    [assignment visits]
+    (otry-value depth var-order domains constraints assignment 0 visits)))
+
+(defn osolve [var-order domains constraints]
+  (osolve-from 0 var-order domains constraints [nil nil nil nil nil] 0))
+
+(defn variable-at-depth [var-order depth] (get var-order depth))
+
+;; ---- Lesson 138 : 138-algorithm-design-workshop.md ----
+(defn via-waypoint-cost [matrix source waypoint destination n]
+  (+ (get (dijkstra matrix source n) waypoint)
+     (get (dijkstra matrix source n) destination)))
+
+(def matrix [[0 1 2 0] [0 0 0 1] [0 0 0 4] [0 0 0 0]])
+
+(defn via-waypoint-cost [matrix source waypoint destination n]
+  (+ (get (dijkstra matrix source n) waypoint)
+     (get (dijkstra matrix waypoint n) destination)))
+
