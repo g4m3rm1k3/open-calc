@@ -1896,24 +1896,38 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         .dark .curled-shadow-wrapper::before, .dark .curled-shadow-wrapper::after {
           box-shadow: 0 15px 15px rgba(0,0,0,0.4);
         }
+        .md-body h1, .md-body h2, .md-body h3, .md-body h4 {
+          position: relative;
+          padding: 0.6rem 1rem;
+          margin-top: 2rem;
+          margin-bottom: 1rem;
+          font-weight: 800;
+          background: linear-gradient(90deg, ${accentColor}, ${accentColor}aa);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          z-index: 1;
+        }
+        .md-body h1::before, .md-body h2::before, .md-body h3::before, .md-body h4::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          background: linear-gradient(90deg, ${accentColor}15 0%, transparent 80%);
+          border: 1px solid ${accentColor}33;
+          border-left: 4px solid ${accentColor};
+          box-shadow: 0 4px 15px -3px ${accentColor}30;
+          border-radius: 6px;
+        }
+        .md-body h1 code, .md-body h2 code, .md-body h3 code, .md-body h4 code {
+          -webkit-text-fill-color: initial;
+        }
+        
         .intro-page-content h1 {
           font-size: 2.5rem;
           line-height: 1.1;
           font-weight: 900;
           letter-spacing: -0.025em;
-          background: linear-gradient(135deg, ${accentColor}, ${accentColor}80);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           margin-bottom: 1.5rem;
-        }
-        /* The gradient text-fill above is inherited by every descendant,
-           including an inline \`code\` span — its own background pill still
-           paints (background-clip isn't inherited), but its text goes
-           transparent along with the heading's, leaving an empty box. Reset
-           the fill back to the code span's own themed color so it's visible
-           again on its own background. */
-        .intro-page-content h1 code {
-          -webkit-text-fill-color: initial;
         }
         @media (min-width: 640px) {
           .intro-page-content h1 {
