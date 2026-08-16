@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } fro
 import { motion } from "framer-motion";
 import AuthButton from "../ui/AuthButton.jsx";
 import CubeIconButton from "../ui/CubeIconButton.jsx";
+import LogoCube from "../ui/LogoCube.jsx";
 import {
   Link,
   Outlet,
@@ -153,33 +154,7 @@ function TopBar() {
       {/* LEFT — logo + app name + auth */}
       <div className="flex items-center gap-3 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2 group select-none" aria-label="Home">
-          <svg
-            viewBox="0 0 256 256"
-            className="w-8 h-8 rounded-[7px] transition-all duration-300 group-hover:scale-105"
-            style={{ filter: `drop-shadow(${activeMeta.glow})` }}
-          >
-            <defs>
-              <linearGradient id="logoBgGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" className={activeMeta.text || "text-brand-500"} stopColor="currentColor" />
-                <stop offset="100%" className={activeMeta.stop2 || "text-slate-800 dark:text-slate-100"} stopColor="currentColor" />
-              </linearGradient>
-              <linearGradient id="logoCaretGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" className="text-white" stopColor="currentColor" />
-                <stop offset="100%" className="text-slate-200" stopColor="currentColor" />
-              </linearGradient>
-            </defs>
-            <rect width="256" height="256" rx="56" fill="url(#logoBgGrad)" />
-            <g transform="matrix(4.8069 0 0 3.7957 126.0017 180)">
-              <text
-                fontFamily="'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif"
-                fontSize="75"
-                fontWeight="900"
-                fill="url(#logoCaretGrad)"
-              >
-                <tspan x="-24.7559" y="23.5605">^</tspan>
-              </text>
-            </g>
-          </svg>
+          <LogoCube activeMeta={activeMeta} className="transition-all duration-300 group-hover:scale-105" />
           <span className={`text-[17px] font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${activeMeta.header} hidden sm:block filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]`}>
             UpSkillOS
           </span>
