@@ -1348,7 +1348,10 @@ function TreeNode({
   if (node.type === "dir") {
     // FOLDER UI
     return (
-      <div className="mb-2 relative">
+      <div 
+        className={`mb-2 relative transition-all duration-500 rounded-xl ${open ? 'py-1' : ''}`}
+        style={open ? { backgroundColor: `${accentColor}0A` } : {}}
+      >
         {/* Vertical tree line connecting folder to its children */}
         {open && node.children.length > 0 && (
           <div 
@@ -1358,8 +1361,20 @@ function TreeNode({
         )}
         <div
           onClick={() => setOpen((value) => !value)}
-          className={`flex items-center gap-2 px-3 py-2 mx-2 mb-1 cursor-pointer transition-all select-none group border rounded-lg ${ui.txt1} bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-sm`}
-          style={{ marginLeft: 8 + indent }}
+          className={`relative flex items-center gap-2 px-3 py-2 mx-2 mb-1 cursor-pointer transition-all duration-300 select-none group border rounded-lg ${ui.txt1} ${
+            open 
+              ? 'z-10' 
+              : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-sm hover:-translate-y-0.5'
+          }`}
+          style={{ 
+            marginLeft: 8 + indent,
+            ...(open ? {
+              backgroundColor: `${accentColor}15`,
+              borderColor: `${accentColor}80`,
+              boxShadow: `3px 3px 0px ${accentColor}60, 0 0 15px ${accentColor}25`,
+              transform: `translateY(-2px)`
+            } : {})
+          }}
         >
           {open ? (
             <ChevronDown className="w-4 h-4 opacity-70 transition-transform shrink-0" />
@@ -1404,22 +1419,24 @@ function TreeNode({
   return (
     <div
       onClick={() => onSelect(node.path)}
-      className={`relative overflow-hidden flex items-center gap-2 px-3 py-2 mb-1 mx-2 cursor-pointer text-xs transition-all rounded-md border shadow-sm ${
+      className={`relative overflow-hidden flex items-center gap-2 px-3 py-2 mb-1 mx-2 cursor-pointer text-xs transition-all duration-300 rounded-md border ${
         isActive
-          ? `${ui.txt1} font-medium border-transparent ring-1`
-          : `${ui.txt2} border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:border-black/10 dark:hover:border-white/10 hover:shadow-md`
+          ? `${ui.txt1} font-medium z-10`
+          : `${ui.txt2} border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:border-black/10 dark:hover:border-white/10 hover:-translate-y-0.5`
       }`}
       style={{
         marginLeft: 28 + indent,
         ...(isActive
           ? {
-              borderColor: accentColor,
+              borderColor: `${accentColor}80`,
               backgroundColor: `${accentColor}1A`,
               color: accentColor,
-              boxShadow: `0 0 10px ${accentColor}15`,
-              ringColor: `${accentColor}50`
+              boxShadow: `3px 3px 0px ${accentColor}60, 0 0 10px ${accentColor}15`,
+              transform: `translateY(-2px)`
             }
-          : {}),
+          : {
+              boxShadow: `0 1px 2px rgba(0,0,0,0.05)`
+            }),
       }}
     >
       {/* Progress background fill */}
@@ -1854,6 +1871,31 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
     <div className="space-y-6 sm:space-y-8 pb-24">
       {/* Dynamic style for the H1 in the intro page so we can use the accentColor */}
       <style>{`
+        .curled-shadow-wrapper {
+          position: relative;
+          z-index: 1;
+        }
+        .curled-shadow-wrapper::before, .curled-shadow-wrapper::after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          bottom: 15px;
+          left: 10px;
+          width: 50%;
+          height: 20%;
+          max-width: 300px;
+          box-shadow: 0 15px 15px rgba(0,0,0,0.12);
+          transform: rotate(-3deg);
+          background: transparent;
+        }
+        .curled-shadow-wrapper::after {
+          right: 10px;
+          left: auto;
+          transform: rotate(3deg);
+        }
+        .dark .curled-shadow-wrapper::before, .dark .curled-shadow-wrapper::after {
+          box-shadow: 0 15px 15px rgba(0,0,0,0.4);
+        }
         .intro-page-content h1 {
           font-size: 2.5rem;
           line-height: 1.1;
@@ -1896,9 +1938,24 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         // Embedded content skips the page card's own border/shadow/background/
         // padding entirely — the parent box (ConceptEmbed's card) already
         // provides all of that, so this is bare content, not a second card.
+        const wrapperClasses = embedded
+          ? "w-full"
+          : `relative w-full ${widthClass} curled-shadow-wrapper mt-4`;
+
         const pageClasses = embedded
           ? "w-full"
-          : `bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border ${ui?.border || "border-slate-200 dark:border-slate-800"} w-full ${widthClass}`;
+          : `relative bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 border ${ui?.border || "border-slate-200 dark:border-slate-800"} w-full h-full`;
+
+        // We use a pseudo-random fold size and corner based on pageIdx
+        const hasFold = !embedded && (pageIdx * 17) % 5 === 0; // ~20% chance
+        const foldSize = hasFold ? 30 + ((pageIdx * 7) % 3) * 10 : 0; // 30, 40, or 50
+        const isFoldRight = pageIdx % 2 === 0;
+        
+        const clipPathStyle = embedded || !hasFold ? {} : {
+           clipPath: isFoldRight 
+             ? `polygon(0 0, calc(100% - ${foldSize}px) 0, 100% ${foldSize}px, 100% 100%, 0 100%)`
+             : `polygon(${foldSize}px 0, 100% 0, 100% 100%, 0 100%, 0 ${foldSize}px)`
+        };
 
         const getFontFamily = (f) => {
           switch (f) {
@@ -1945,9 +2002,27 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         };
 
         return (
-          <div key={pageIdx} className={pageClasses}>
-            <div
-              className={`md-body ${isIntro ? "intro-page-content" : ""}`}
+          <div key={pageIdx} className={wrapperClasses}>
+            {!embedded && hasFold && (
+              <div 
+                className={`absolute top-0 pointer-events-none z-10 filter ${isFoldRight ? 'drop-shadow-[-2px_2px_3px_rgba(0,0,0,0.15)] dark:drop-shadow-[-2px_2px_3px_rgba(0,0,0,0.4)]' : 'drop-shadow-[2px_2px_3px_rgba(0,0,0,0.15)] dark:drop-shadow-[2px_2px_3px_rgba(0,0,0,0.4)]'}`}
+                style={isFoldRight ? { right: 0 } : { left: 0 }}
+              >
+                <div 
+                  className="bg-slate-100 dark:bg-slate-800"
+                  style={{
+                     width: foldSize,
+                     height: foldSize,
+                     clipPath: isFoldRight ? 'polygon(0 0, 0 100%, 100% 100%)' : 'polygon(100% 0, 0 100%, 100% 100%)',
+                     borderBottomLeftRadius: isFoldRight ? '6px' : '0',
+                     borderBottomRightRadius: !isFoldRight ? '6px' : '0'
+                  }}
+                />
+              </div>
+            )}
+            <div className={pageClasses} style={clipPathStyle}>
+              <div
+                className={`md-body ${isIntro ? "intro-page-content" : ""}`}
               style={{
                 fontFamily: getFontFamily(font),
                 lineHeight:
@@ -2012,6 +2087,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
               })}
             </div>
           </div>
+        </div>
         );
       })}
     </div>
@@ -3705,13 +3781,20 @@ export default function MarkdownHub() {
             )}
 
             <div
-              className={`flex-1 min-w-0 flex flex-col overflow-hidden ${ui.bg0}`}
+              className={`flex-1 min-w-0 flex flex-col overflow-hidden ${ui.bg0} relative`}
             >
+              {/* Subtle ambient theme gradient in the corners */}
+              <div 
+                className="absolute inset-0 pointer-events-none z-0"
+                style={{
+                  background: `radial-gradient(circle at 100% 0%, ${accentColor}1A 0%, transparent 40%), radial-gradient(circle at 0% 100%, ${accentColor}1A 0%, transparent 40%)`
+                }}
+              />
               {tab === "tutorials" && (
                 <div
                   ref={contentScrollRef}
                   onScroll={handleContentScroll}
-                  className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar"
+                  className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar relative z-10"
                 >
                   {loading ? (
                     <div className="text-slate-500 text-sm animate-pulse">
@@ -3763,7 +3846,7 @@ export default function MarkdownHub() {
               )}
 
               {tab === "editor" && !activeDocType && (
-                <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-400 dark:text-slate-500">
+                <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-400 dark:text-slate-500 relative z-10">
                   <FilePenLine className="w-16 h-16 opacity-30" />
                   <p className="text-sm">
                     Select a document, create one, or open a tutorial to
@@ -3780,7 +3863,7 @@ export default function MarkdownHub() {
 
               {tab === "editor" && activeDocType && previewMode && (
                 <div
-                  className="flex-1 overflow-y-auto px-2 sm:px-4 lg:px-6 py-8 custom-scrollbar"
+                  className="flex-1 overflow-y-auto px-2 sm:px-4 lg:px-6 py-8 custom-scrollbar relative z-10"
                   style={{
                     background: isDark
                       ? themeStyles.md.preBg + "80"
@@ -3803,7 +3886,7 @@ export default function MarkdownHub() {
 
               {tab === "editor" && activeDocType && !previewMode && (
                 <div
-                  className={`flex-1 flex flex-col overflow-hidden ${ui.bg0}`}
+                  className={`flex-1 flex flex-col overflow-hidden ${ui.bg0} relative z-10`}
                 >
                   <div
                     className={`flex items-center gap-3 px-6 py-2 border-b ${ui.border}`}
