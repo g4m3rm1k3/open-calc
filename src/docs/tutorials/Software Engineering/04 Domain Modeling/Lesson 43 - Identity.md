@@ -1,0 +1,263 @@
+# Lesson 43: Identity
+
+**What you will build.** A product catalog keyed by supplier SKU — a
+real, existing identifier, already unique, already sitting right there in
+the data, exactly the kind of shortcut Lesson 40's email-as-identity
+already warned about taking too quickly. Two completely different
+products, from two different suppliers who each independently chose
+`"A-1001"` for their own catalog, collide the instant both are added: the
+second one silently erases the first. You'll fix it not by picking a
+*different* existing attribute, but by generating an identifier that
+belongs to nothing except this system's own need for one.
+
+**What you need to know first.** Lesson 40's domain model and Lesson
+41's entity — this lesson asks the question both of those left open:
+once you know an entity needs a stable identity, where does that
+identity actually come from, and what makes one choice of identifier
+safe versus dangerous?
+
+**Terms introduced in this lesson**
+
+- **natural key** — an identifier built from an attribute that already
+  exists in the real world and is assumed to be unique — a SKU, an ISBN,
+  a Social Security number, an email address. Convenient, because nothing
+  new has to be invented or generated; only as safe as the real-world
+  uniqueness assumption actually is, which is frequently narrower than it
+  looks — a supplier's SKU is unique *within that supplier's own
+  catalog*, not across every supplier who might independently choose the
+  identical code.
+- **surrogate key** — an identifier generated specifically for a system's
+  own internal purposes, with no meaning or existence outside it — an
+  auto-incrementing number, a generated ID. Guaranteed unique because it
+  was invented for exactly that purpose and nothing else, at the real
+  cost of having to actually generate, store, and manage it.
+
+**Objects and methods used.** None new — this lesson's code uses only
+already-assumed syntax: the `global` statement, given full treatment in
+Lesson 10, and string concatenation.
+
+Pipeline: this lesson continues in the *Domain model* stage, restated per
+Lesson 40's convention:
+
+```text
+Problem → Requirements → Domain model → Specification → Architecture →
+Design → Implementation → Verification → Integration → Release →
+Deployment → Operations → Observation → Change → Migration → Evolution →
+Retirement
+```
+
+---
+
+## Concept Unit: An Identifier That Looks Safely Unique
+
+### The Problem
+
+Build a product catalog. Every product arrives with a SKU from its
+supplier — a real, already-unique-looking code. Use it directly as the
+catalog's key.
+
+### The Code, Run for Real
+
+```python
+products = {}
+
+def add_product(sku, name, supplier):
+    products[sku] = {"name": name, "supplier": supplier}
+```
+
+Add two real products from two different, real suppliers, who each
+independently assigned their own product the code `"A-1001"`:
+
+```python
+add_product("A-1001", "Wireless Mouse", "Acme Supplies")
+add_product("A-1001", "Ceramic Mug", "BrightHome Goods")
+
+print(products)
+print("total distinct products stored:", len(products))
+```
+
+Running it:
+
+```text
+$ python catalog.py
+{'A-1001': {'name': 'Ceramic Mug', 'supplier': 'BrightHome Goods'}}
+total distinct products stored: 1
+```
+
+Two genuinely different products — a wireless mouse from one supplier, a
+ceramic mug from a completely unrelated one — collapse into a single
+catalog entry. The wireless mouse isn't in `products` at all anymore; the
+second `add_product` call silently overwrote it, because both suppliers,
+with no way of knowing about each other, happened to reuse the identical
+code for their own, entirely unrelated products.
+
+### Mechanical Walkthrough
+
+- `products[sku] = {...}` — already-assumed dict assignment; the entire
+  bug lives in this one line, which assumes `sku` alone is enough to tell
+  every product in the system apart.
+
+### CS Lens
+
+This is Lesson 41's entity-identity distinction, encountered from a new
+angle: `"A-1001"` was treated as if it uniquely named an entity, the way
+`customer_id` correctly did in Lesson 40. The difference is that
+`customer_id` was invented by this system specifically to be globally
+unique, while `"A-1001"` was invented by one supplier, for their own
+catalog alone, with no promise it means anything — let alone anything
+unique — outside it.
+
+### SE Lens
+
+This is exactly the same **natural key** trap Lesson 40 already
+demonstrated with email, at one remove: it's tempting to assume any
+existing, unique-looking identifier is safe to reuse as a system's real
+identity, and the assumption fails the same way both times — not because
+the attribute is poorly chosen in its own original context, but because
+its uniqueness was only ever promised within a narrower scope than the
+system now needs.
+
+---
+
+## Concept Unit: An Identifier Invented for Exactly This Purpose
+
+### The Problem
+
+Give every product a real identity that belongs to this catalog alone —
+generated by the system itself, meaning nothing outside it — and keep
+the supplier's own SKU as what it actually is: a useful fact about the
+product, not its identity.
+
+### The New Code
+
+```python
+products = {}
+_next_product_id = 1
+
+def add_product(supplier_sku, name, supplier):
+    global _next_product_id
+    product_id = "prod-" + str(_next_product_id)
+    _next_product_id += 1
+    products[product_id] = {"supplier_sku": supplier_sku, "name": name, "supplier": supplier}
+    return product_id
+```
+
+Add the identical two products, both still carrying SKU `"A-1001"`:
+
+```python
+id1 = add_product("A-1001", "Wireless Mouse", "Acme Supplies")
+id2 = add_product("A-1001", "Ceramic Mug", "BrightHome Goods")
+
+print(products)
+print("total distinct products stored:", len(products))
+```
+
+Running it:
+
+```text
+$ python catalog.py
+{'prod-1': {'supplier_sku': 'A-1001', 'name': 'Wireless Mouse', 'supplier': 'Acme Supplies'}, 'prod-2': {'supplier_sku': 'A-1001', 'name': 'Ceramic Mug', 'supplier': 'BrightHome Goods'}}
+total distinct products stored: 2
+```
+
+Both products survive, correctly distinct — `prod-1` and `prod-2` — with
+`"A-1001"` preserved on both as a real, useful fact (`supplier_sku`)
+about where each one came from, no longer mistaken for the one fact that
+tells them apart.
+
+### Mechanical Walkthrough
+
+- `product_id = "prod-" + str(_next_product_id)` — already-assumed string
+  concatenation and `str()` conversion; generates a new identity from a
+  simple counter, already-assumed `global`-based mutation from Lesson 10,
+  incremented on every call so no two products ever receive the same one.
+- `products[product_id] = {"supplier_sku": supplier_sku, ...}` —
+  `supplier_sku` moved from being the dict's own key to being a plain
+  field stored *inside* the value — the exact same demotion Lesson 40
+  gave email, from identity to attribute.
+
+### The Concept
+
+This is the real tradeoff between a **natural key** and a **surrogate
+key**, demonstrated rather than asserted: `"A-1001"` cost nothing to use
+directly and broke the moment two independent suppliers happened to
+collide. `"prod-1"`/`"prod-2"` cost a few lines — a counter, a naming
+scheme — and can't collide, because nothing outside this system's own
+`add_product` function has ever had a chance to assign one. A surrogate
+key trades a small, one-time implementation cost for a guarantee a
+natural key can only ever promise conditionally: unique *according to
+whichever real-world process assigned it*, which is frequently a
+narrower promise than a growing system actually needs.
+
+### CS Lens
+
+This is Lesson 5's `float`-versus-integer-cents tradeoff, applied to
+identity instead of arithmetic: a representation chosen for convenience
+(reusing an existing attribute) works until a real, ordinary event (a
+second supplier, a second currency operation) reveals it was never
+actually safe, while a representation chosen deliberately for the
+property that actually matters (uniqueness, precision) survives it.
+
+### SE Lens
+
+Natural keys aren't always the wrong choice — a real, closed system with
+a single supplier, or a genuinely globally-unique real-world identifier
+(an ISBN, assigned by a single global authority specifically to avoid
+this exact collision), can make a natural key perfectly safe. The
+discipline this lesson teaches is checking that safety explicitly — who
+actually guarantees this identifier is unique, and across how wide a
+scope — rather than assuming any existing, unique-looking value is safe
+to reuse as a system's real identity, the assumption that silently erased
+a real product in this lesson's own first unit.
+
+---
+
+## Connect the Pieces
+
+One catalog, one collision, one invented identity:
+
+1. **The natural key, and its hidden scope** — `"A-1001"`, unique within
+   one supplier's own catalog, silently collides the moment a second
+   supplier's product arrives.
+2. **A real, silent loss** — the wireless mouse disappears entirely,
+   overwritten with no error, the instant the ceramic mug is added.
+3. **The surrogate key, invented for exactly this system** — `"prod-1"`
+   and `"prod-2"`, generated by `add_product` itself, keep both products
+   distinct, with the original SKU preserved as a fact, not an identity.
+
+## What Breaks Without This
+
+Launch a real product catalog keyed by supplier SKU, reasoning that SKUs
+are "obviously" unique — true, within any one supplier's own systems,
+and never actually promised across suppliers who've never coordinated
+with each other. Onboard a second supplier, and real products start
+silently vanishing from the catalog the moment their SKU happens to match
+an existing one — not a rare edge case, but a near-certainty once enough
+suppliers, each choosing SKUs independently, are in the same system long
+enough.
+
+## Exercises
+
+1. Add a third product from a third supplier, also using SKU `"A-1001"`,
+   to the surrogate-key version, and confirm all three products survive
+   as distinct catalog entries.
+2. Write a function `find_by_supplier_sku(sku, supplier)` that looks up a
+   product by its *natural* key, scoped correctly this time — both SKU
+   and supplier together, since that's the actual scope SKU uniqueness
+   was ever promised within.
+3. Look back at Lesson 41's `Customer` and its `customer_id`. Was
+   `customer_id` a natural key or a surrogate key in this lesson's precise
+   sense? If Lesson 40 never said how it was generated, what would you
+   need to know to be sure it's actually safe?
+
+## Definition of Done
+
+- [ ] You can define natural key and surrogate key in your own words, and
+      explain the real tradeoff between them.
+- [ ] You've reproduced the real product-loss bug and confirmed the
+      surrogate-key version keeps both products distinct.
+- [ ] You've completed all three exercises.
+- [ ] Commit the surrogate-key `add_product`. Commit message should
+      explain *why*: for example, `Lesson 43 — products now keyed by a
+      generated product_id instead of supplier SKU, which was only ever
+      unique within one supplier's own catalog.`
