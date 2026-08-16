@@ -19,40 +19,32 @@ from the Concept Unit sequence below is missing between them.
 Referenced throughout this document; defined here, once, so it's
 self-contained.
 
-A concept, construct, method, or term that already received full
-treatment earlier in the curriculum does not get full treatment again
-on reappearance. A **hard concept** (a design pattern, an SE principle,
-a CS idea, a named architectural decision) gets a real restatement of
-what it *is*, by name, in a clause — never silence, and never a bare
-"see Lesson N" citation with nothing else. A **basic, already-taught
-construct** (ordinary syntax, a previously-explained method signature)
-is silently reusable — no restatement owed at all.
+**Every concept, construct, method, or term gets full, real treatment
+at every single use it appears in — first appearance or the fiftieth.**
+There is no reduced tier for reappearance. A **hard concept** (a design
+pattern, an SE principle, a CS idea, a named architectural decision)
+gets its real, full explanation — what it *is*, why it exists, what it
+does — written out again, by name, every time it appears: never a brief
+reminder, and never a bare "see Lesson N" citation. A **basic,
+already-taught construct** (ordinary syntax, a previously-explained
+method signature) gets the identical treatment: explained again, in
+full, at this use — not silently passed over because it appeared
+before.
 
-**The condition this depends on, stated explicitly because it has
-already failed once:** this rule only applies when the earlier
-appearance *actually gave the thing full treatment*. It does not apply
-— and the current lesson must give full, first-appearance treatment
-instead of a reminder — whenever the true earlier appearance:
+This is a deliberate reversal of treating "already explained somewhere
+earlier" as a reason to write less here. This schema used to require an
+author to determine, while writing a lesson, whether some earlier
+lesson already gave a thing full treatment, how well it did so, and
+whether that earlier lesson was still usable as a citation target — a
+real, recurring judgment call that failed in practice more than once.
+That judgment call is gone: every lesson is self-contained and defines
+everything it depends on, in full, inside itself, regardless of what
+any other lesson does or doesn't say about the same thing, and without
+needing to consult any other lesson to decide how much to write.
 
-- predates this schema, or predates this schema's Header requirements
-  for "Terms introduced" / "Objects and methods used," and so was
-  never actually explained anywhere;
-- is in a lesson now frozen (already worked through by the student,
-  per this schema's own real-time delivery norms) and cannot be
-  retroactively edited to add the missing explanation; or
-- simply missed it — the Recursive Concept Extraction Rule's
-  enumeration is supposed to catch every new concept, but a miss is a
-  miss, and "it appeared before" does not un-miss it.
-
-A reminder that points back to an explanation that was never actually
-given leaves the reader with nothing to find — worse than either
-repeating the explanation or never mentioning the gap at all. When this
-condition is met, whichever not-yet-frozen lesson is being written is
-the *real* first appearance for teaching purposes, regardless of which
-lesson's code used the thing first, and must treat it that way: full
-entry in Terms Introduced or Objects and Methods, full treatment
-wherever step 7's enumeration meets it, not a citation to a prior
-lesson that never said anything.
+The one place a lesson number still belongs is the header's "What you
+need to know first" list and the closing "next lesson" pointer — never
+as a substitute for an explanation inside a Concept Unit's own prose.
 
 ---
 
@@ -129,14 +121,12 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
   far — not just the stage this lesson adds. A lesson that only shows
   its own new stage in isolation leaves the reader unable to place it in
   the whole system.
-- **Terms introduced in this lesson** — a short glossary, immediately
-  after "What you need to know first." One line per term, new in this
-  lesson only (a term reappearing from an earlier lesson does not get a
-  second entry — per the Repetition Rule, above, a brief reminder where
-  it's used is enough, *provided that earlier lesson actually explained
-  it* — see the Repetition Rule's own stated exception before assuming
-  a prior appearance means it's covered). Format: the term, bolded, an
-  em-dash, a plain
+- **Terms used in this lesson** — a short glossary, immediately after
+  "What you need to know first." One line per term this lesson's code
+  actually depends on — new and reappearing alike; per the Repetition
+  Rule, above, a term used again gets its own full entry here again,
+  the same as a genuinely new one, never a second-tier reminder.
+  Format: the term, bolded, an em-dash, a plain
   definition — and, same as everywhere else in this schema, *why* the
   term or thing exists or what problem it solves, not just what it
   means. A reader who has never worked in this lesson's language or
@@ -178,10 +168,11 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
   framework contract or an XML tag, a diagnostic tool used to prove a
   claim — goes under a trailing heading, verbatim: **"Everything else
   in the file, not this lesson's subject but still explained."** A
-  reappearing item's *Implementation* line cites the lesson that gave
-  it full treatment instead of re-deriving it; it still gets all three
-  labels, never a bare citation with nothing else (this is the
-  Repetition Rule applied at the level of this section's own format).
+  reappearing item's *Implementation* line states its real, concrete
+  shape again in full, the same as a first appearance would — never a
+  citation to the lesson that gave it full treatment instead of
+  re-deriving it (this is the Repetition Rule applied at the level of
+  this section's own format).
 
   **A tag, declaration, or file is its own artifact, separate from
   whatever class or concept it names or wires to.** An XML `<activity>`
@@ -231,8 +222,11 @@ not on the list doesn't count.
 
 If a piece of code introduces more than one new concept, split it at the
 seam between those concepts into separate Concept Units and repeat the
-question on each half. A previously-taught concept reappearing gets a
-brief reminder, never a full re-explanation. The goal is the smallest
+question on each half. Per the Repetition Rule, above, a previously-
+taught concept reappearing still gets its own full, real explanation
+here, not a brief reminder — "new concept" versus "reappearing concept"
+governs how a lesson is *split into units*, not how much either one
+gets explained once it has a unit. The goal is the smallest
 _meaningful teaching sequence_ — not the smallest syntax tree.
 
 **Worked example.** On first appearance,
@@ -277,9 +271,9 @@ specific syntax and behavior is not, and those are different knowledge.
 This schema has, in practice, sometimes explained a new construct
 directly inside a real function's Mechanical Walkthrough instead of
 isolating it first — that is a violation of this rule even when the
-explanation itself is accurate and complete. Skip the lab only when the
-exact construct has already received one earlier in this curriculum,
-per the Repetition Rule.
+explanation itself is accurate and complete. Per the Repetition Rule,
+above, there is no "already lab'd earlier in the curriculum" skip
+condition — see this rule's own restatement of that, right below.
 
 Throwaway code must:
 
@@ -298,6 +292,16 @@ tell whether they've learned a transferable concept or just copied an
 implementation detail. Discarding the throwaway example on purpose is
 what keeps that line clear — _this existed only to teach; the project
 never depended on it._
+
+**Per the Repetition Rule, above: a lab is not something a construct
+earns once and is done with.** A construct gets an isolated throwaway
+lab at every appearance that introduces it into a new lesson's own
+Concept Unit sequence — this rule does not carry an "already lab'd
+earlier in the curriculum, skip it" exception. Whether a specific
+Concept Unit needs one is governed entirely by whether *this lesson's*
+own Recursive Concept Extraction Rule enumeration (below) surfaces the
+construct as something this Concept Unit is built around — not by
+whether some earlier lesson already ran a lab for it.
 
 ---
 
@@ -320,9 +324,10 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    right now, specifically?
 
 2. **Introduce the concept in isolation** (Concept Isolation Rule) —
-   throwaway code, run, real output shown, what the output proves. Skip
-   this step only when reusing a concept already lab'd earlier in the
-   curriculum — say so explicitly instead of silently skipping.
+   throwaway code, run, real output shown, what the output proves. Per
+   the Repetition Rule, above, this step is not skipped because the
+   concept was lab'd in an earlier lesson — every Concept Unit built
+   around this construct gets its own real, executed lab.
    **When the real project input this construct will face is genuinely
    complex** (a full G-code line, a real multi-field form), don't jump
    straight from a minimal lab to that full complexity — run the real
@@ -434,23 +439,22 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    holistically and write about "what seems worth mentioning"; that
    is exactly the failure mode this step exists to prevent, and it has
    failed silently before under this schema, more than once, in exactly
-   this way. For each item on that enumeration, decide one of three
-   things, explicitly: **(a) first appearance** — full treatment, what it
-   is, what it does, what it returns, regardless of how basic it looks;
-   **(b) a hard concept reappearing** (per the Repetition Rule — a
-   pattern, a principle, a named CS idea) — a real restatement of what
-   the concept or pattern *is*, by name, never silence and never a bare
-   lesson-number citation, even if it's "only" a
-   clause; **(c) genuinely basic, already-established syntax** (a
-   variable read, a already-taught operator) — silently reusable, no
-   restatement owed. The failure this enumeration exists to catch is
-   quietly sorting something into (c) that actually belongs in (a) or
-   (b) because explaining it felt unnecessary in the moment — the
-   enumeration step exists specifically so that sorting is checked
-   against the actual code, item by item, rather than trusted to memory.
+   this way. **Per the Repetition Rule, above, every item on that
+   enumeration gets full treatment** — what it is, what it does, what it
+   returns, and, when it's a hard concept (a pattern, a principle, a
+   named CS idea), a real restatement of what the concept *is*, by name.
+   There is no "genuinely basic, already-established syntax, silently
+   reusable" exit anymore: a variable read or an already-taught operator
+   still gets its own real sentence here, every time it appears, not a
+   silent pass. The failure this enumeration exists to catch is treating
+   something as too basic or too familiar to explain because it felt
+   unnecessary in the moment — the enumeration step exists specifically
+   so every item is checked against the actual code, one by one, rather
+   than silently waved through on the assumption the reader already
+   has it.
 
    > **Objects and methods used, not extended — show the shape, not just
-   > prose, once treatment (a) applies.** The Parent Contract Rule
+   > prose, once full treatment applies.** The Parent Contract Rule
    > (below) already requires showing a framework type's real declared
    > shape when a lesson has the reader `extend` or `implement` it. The
    > same failure happens on the *usage* side, without any
@@ -556,8 +560,9 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    > lying around to reuse; every other visible row reuses an existing
    > `ViewHolder` instead of coming back through here, which is the entire
    > performance idea this class exists for."* Same fact, plus the reason
-   > it's true and why it matters. This applies to every item sorted into
-   > (a) or (b) above — not just the ones that feel conceptually hard.
+   > it's true and why it matters. This applies to every item in the
+   > enumeration above, new or reappearing alike — not just the ones
+   > that feel conceptually hard.
    > A whole walkthrough of accurate, well-written descriptions, with
    > zero reasoning anywhere in it, fails this schema completely, even
    > with nothing factually wrong in it.
@@ -574,21 +579,22 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    > on bullet four of fourteen has not been taught, no matter how
    > correct bullets one through three were.
    >
-   > **Cite the concept, not the lesson, for lessons written from this
-   > point forward:** when (b) applies, name the concept or pattern and
-   > restate briefly what it does — "the same Observer pattern
-   > `Doorbell`/`Chime` already proved," not "reappearing from Lesson
-   > 2c." A parenthetical lesson citation with nothing else ("—
-   > reappearing (Lesson 2c)") is not a restatement; it's an assertion
-   > the reader has to go verify by opening another file, and it fails
-   > this rule exactly like silence does. Never hyperlink to the
-   > earlier lesson either — the site's search finds where a concept
-   > was introduced and everywhere else it's used; that's the lookup
-   > path, not an in-body citation. The one place a lesson number
-   > belongs is the header's "What you need to know first" list and the
-   > closing "next lesson" pointer — never inside a Concept Unit's own
-   > prose. This is a preference for **new** lessons only, same as the
-   > two callouts above.
+   > **Explain the concept, don't cite the lesson:** per the Repetition
+   > Rule, above, a hard concept reappearing gets its real, full
+   > explanation restated here, in this lesson's own prose — not a
+   > citation to where it was explained before. "The same Observer
+   > pattern `Doorbell`/`Chime` already proved: a subject holds a list
+   > of listeners and calls each one back when its own state changes,"
+   > not "reappearing from Lesson 2c." A parenthetical lesson citation
+   > with nothing else ("— reappearing (Lesson 2c)") is not an
+   > explanation; it's an assertion the reader has to go verify by
+   > opening another file, and it fails this rule exactly like silence
+   > does. Never hyperlink to the earlier lesson either — the site's
+   > search finds where a concept was introduced and everywhere else
+   > it's used; that's the lookup path, not an in-body citation. The one
+   > place a lesson number belongs is the header's "What you need to
+   > know first" list and the closing "next lesson" pointer — never
+   > inside a Concept Unit's own prose.
 
    **Execution trace, if this code carries a loop, recursion, or state
    across steps.** A prose description of what a loop "generally does"
@@ -738,21 +744,23 @@ for every unit; connection is not deferred to the end.
 
 Read the draft top to bottom and answer honestly:
 
-- [ ] For every construct in this lesson's code that also appeared in
-      an earlier lesson, did that earlier lesson actually explain it —
-      or are you assuming it's covered because it's not new? Per the
-      Repetition Rule's stated exception: if the true earlier
-      appearance predates this schema, is now frozen, or was simply
-      missed, this lesson owes it full first-appearance treatment, not
-      a citation to an explanation that was never given.
-- [ ] Does the Header have both a "Terms introduced in this lesson"
-      glossary and an "Objects and methods used" section, each entry
-      stating *why* the thing exists or what problem it solves, not
-      just what it means or does? A term or object left as a bare
-      description ("X is a Y that does Z," nothing more) fails this
-      exactly like an undescribed one would — the fix is the same
-      "explain, don't just describe" standard applied here, in the
-      Header, not only inside Concept Units.
+- [ ] Per the Repetition Rule, does every construct in this lesson's
+      code — new or reappearing from any earlier lesson — get its own
+      full, real explanation written out inside *this* lesson? Check
+      specifically for anything left unexplained because it's "not new"
+      or "already covered" — that reasoning is exactly what the
+      Repetition Rule now forbids; nothing here is skipped or
+      abbreviated on the grounds that an earlier lesson already said it.
+- [ ] Does the Header have both a "Terms used in this lesson" glossary
+      and an "Objects and methods used" section, each entry stating
+      *why* the thing exists or what problem it solves, not just what
+      it means or does — and does the glossary include every term this
+      lesson's code depends on, reappearing terms included, not only
+      genuinely new ones? A term or object left as a bare description
+      ("X is a Y that does Z," nothing more) fails this exactly like an
+      undescribed one would — the fix is the same "explain, don't just
+      describe" standard applied here, in the Header, not only inside
+      Concept Units.
 - [ ] Does any code block sit immediately next to another code block with
       no prose in between? If yes: split, interleave.
 - [ ] Does any paragraph explain what a specific method, class, or
@@ -780,15 +788,16 @@ Read the draft top to bottom and answer honestly:
       failure this check exists to catch.
 - [ ] For every "The New Code" block, did you actually write out the
       literal enumeration required by step 7 — every method call, every
-      property access, every operator, in order — and sort each one into
-      (a) first appearance, (b) hard concept reappearing, or (c) already
-      basic? Or did you read the block once and write about whatever
-      caught your attention? The second one is the exact failure that has
-      already happened more than once: real omissions (`.value` on a new
-      element type, `JSON.stringify` going unmentioned on reappearance)
-      survived an earlier version of this exact check because it was
-      applied as a skim, not a literal pass. If you cannot point to the
-      enumeration, redo the walkthrough from one.
+      property access, every operator, in order — and give every single
+      one of them full, real treatment, per the Repetition Rule? Or did
+      you read the block once and write about whatever caught your
+      attention, silently passing over anything that felt too basic or
+      too familiar to explain? The second one is the exact failure that
+      has already happened more than once: real omissions (`.value` on a
+      new element type, `JSON.stringify` going unmentioned on
+      reappearance) survived an earlier version of this exact check
+      because it was applied as a skim, not a literal pass. If you
+      cannot point to the enumeration, redo the walkthrough from one.
 - [ ] Does any "Updated Project" block contain `{ ... }`, a
       `// ...unchanged` comment, or any other placeholder standing in for
       real code? This has already happened once — a just-shown function
@@ -845,13 +854,16 @@ Read the draft top to bottom and answer honestly:
       bolded run-in phrase? A lesson with `**The Problem.**` buried inside
       a paragraph instead of `### The Problem` as its own heading hasn't
       applied the current formatting convention.
-- [ ] Does every new language construct — not just the dense or
-      unfamiliar-looking ones — get its own throwaway lab before it
-      appears in real project code, per the Concept Isolation Rule's
-      "familiar-sounding is a trap" clause? Check specifically for a
-      construct explained only inline, inside a real function's
-      Mechanical Walkthrough, with no prior isolated example — that is a
-      violation even when the explanation is accurate.
+- [ ] Does every language construct this lesson's Concept Units are
+      built around — not just the dense, unfamiliar, or genuinely-new
+      ones — get its own throwaway lab before it appears in real project
+      code, per the Concept Isolation Rule's "familiar-sounding is a
+      trap" clause and the Repetition Rule's "no already-lab'd-earlier
+      skip" clause? Check specifically for a construct explained only
+      inline, inside a real function's Mechanical Walkthrough, with no
+      prior isolated example — that is a violation even when the
+      explanation is accurate, and even when this exact construct was
+      already lab'd in an earlier lesson.
 - [ ] Does any loop, recursion, or carried-state code have a real
       execution trace — concrete values, step by step — rather than a
       prose paraphrase of what it "generally does"? And for each step in
