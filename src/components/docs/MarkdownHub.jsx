@@ -1334,6 +1334,7 @@ function TreeNode({
   overriddenPaths = new Set(),
   accentColor = "#0ea5e9",
   ui = {},
+  docProgress = {},
 }) {
   const [open, setOpen] = useState(
     () => node.open !== false || nodeContainsFile(node, activeFile),
@@ -1345,21 +1346,32 @@ function TreeNode({
   }, [activeFile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (node.type === "dir") {
+    // FOLDER UI
     return (
-      <div>
+      <div className="mb-2 relative">
+        {/* Vertical tree line connecting folder to its children */}
+        {open && node.children.length > 0 && (
+          <div 
+            className="absolute top-10 bottom-2 border-l border-black/5 dark:border-white/5"
+            style={{ left: 18 + indent }}
+          />
+        )}
         <div
           onClick={() => setOpen((value) => !value)}
-          className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer transition-colors select-none group ${ui.txt2} ${ui.bgHover}`}
-          style={{ paddingLeft: 8 + indent }}
+          className={`flex items-center gap-2 px-3 py-2 mx-2 mb-1 cursor-pointer transition-all select-none group border rounded-lg ${ui.txt1} bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-sm`}
+          style={{ marginLeft: 8 + indent }}
         >
           {open ? (
-            <ChevronDown className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+            <ChevronDown className="w-4 h-4 opacity-70 transition-transform shrink-0" />
           ) : (
-            <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+            <ChevronRight className="w-4 h-4 opacity-70 group-hover:scale-110 transition-transform shrink-0" />
           )}
-          <Folder className="w-3.5 h-3.5" style={{ color: accentColor }} />
+          <Folder 
+            className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" 
+            style={{ color: accentColor, fill: `${accentColor}40` }} 
+          />
           <span
-            className="text-[11px] font-bold tracking-wide mt-0.5 whitespace-nowrap shrink-0"
+            className="text-[12px] font-bold tracking-wide truncate min-w-0 flex-1 drop-shadow-sm"
             style={{ color: accentColor }}
           >
             {displayName(node.name)}
@@ -1376,40 +1388,66 @@ function TreeNode({
               overriddenPaths={overriddenPaths}
               accentColor={accentColor}
               ui={ui}
+              docProgress={docProgress}
             />
           ))}
       </div>
     );
   }
 
+  // FILE UI
   const isActive = activeFile === node.path;
   const isOverridden = overriddenPaths.has(node.path);
+  const progress = docProgress[node.path] || 0;
+  const isDone = progress === 100;
+  
   return (
     <div
       onClick={() => onSelect(node.path)}
-      className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-[3px] ${
+      className={`relative overflow-hidden flex items-center gap-2 px-3 py-2 mb-1 mx-2 cursor-pointer text-xs transition-all rounded-md border shadow-sm ${
         isActive
-          ? `${ui.txt1} font-medium`
-          : `${ui.txt2} border-transparent ${ui.bgHover}`
+          ? `${ui.txt1} font-medium border-transparent ring-1`
+          : `${ui.txt2} border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:border-black/10 dark:hover:border-white/10 hover:shadow-md`
       }`}
       style={{
-        paddingLeft: 12 + indent,
+        marginLeft: 28 + indent,
         ...(isActive
           ? {
-              borderLeftColor: accentColor,
+              borderColor: accentColor,
               backgroundColor: `${accentColor}1A`,
               color: accentColor,
+              boxShadow: `0 0 10px ${accentColor}15`,
+              ringColor: `${accentColor}50`
             }
           : {}),
       }}
     >
+      {/* Progress background fill */}
+      <div 
+        id={`progress-${node.path.replace(/[^a-zA-Z0-9-]/g, '-')}`}
+        className="absolute top-0 left-0 h-full transition-all duration-300 pointer-events-none" 
+        style={{ 
+          width: `${progress}%`,
+          backgroundColor: isDone ? `${accentColor}25` : `${accentColor}10`,
+          ...(isDone ? { backgroundImage: `linear-gradient(90deg, ${accentColor}10, ${accentColor}30)` } : {})
+        }} 
+      />
+      
       <File
-        className={`w-3.5 h-3.5 ${isActive ? "opacity-100" : "opacity-70"}`}
+        className={`w-3.5 h-3.5 shrink-0 relative z-10 transition-transform ${isActive ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100"}`}
         style={isActive ? { color: accentColor } : {}}
       />
-      <span className="whitespace-nowrap shrink-0">{displayName(node.name)}</span>
+      <span className="truncate min-w-0 flex-1 relative z-10">{displayName(node.name)}</span>
+      
+      {isDone && (
+        <Check 
+          className="w-3.5 h-3.5 shrink-0 relative z-10 opacity-75" 
+          style={{ color: accentColor }} 
+        />
+      )}
+      
       {isOverridden && (
-        <span className="ml-auto text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+        <span className="ml-auto text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 relative z-10 shrink-0">
           Override
         </span>
       )}
@@ -1418,6 +1456,7 @@ function TreeNode({
 }
 
 function DocListItem({
+  itemId,
   label,
   subtitle,
   isActive,
@@ -1426,37 +1465,61 @@ function DocListItem({
   kind,
   accentColor = "#0ea5e9",
   ui = {},
+  progress = 0,
 }) {
+  const isDone = progress === 100;
+  
   return (
-    <div className="flex items-center group">
+    <div className="flex items-center group mb-1 mx-2">
       <div
         onClick={onSelect}
-        className={`flex-1 flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-[3px] ml-2 ${
+        className={`relative overflow-hidden flex-1 flex items-center gap-2 px-3 py-2 cursor-pointer text-xs transition-all rounded-md border shadow-sm ${
           isActive
-            ? `${ui.txt1} font-medium`
-            : `${ui.txt2} border-transparent ${ui.bgHover}`
+            ? `${ui.txt1} font-medium border-transparent ring-1`
+            : `${ui.txt2} border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:border-black/10 dark:hover:border-white/10 hover:shadow-md`
         }`}
         style={
           isActive
             ? {
-                borderLeftColor: accentColor,
+                borderColor: accentColor,
                 backgroundColor: `${accentColor}1A`,
                 color: accentColor,
+                boxShadow: `0 0 10px ${accentColor}15`,
+                ringColor: `${accentColor}50`
               }
             : undefined
         }
       >
-        <FilePenLine
-          className={`w-3.5 h-3.5 ${isActive ? "opacity-100" : "opacity-70"}`}
+        {/* Progress background fill */}
+        <div 
+          id={itemId ? `progress-${itemId.replace(/[^a-zA-Z0-9-]/g, '-')}` : undefined}
+          className="absolute top-0 left-0 h-full transition-all duration-300 pointer-events-none" 
+          style={{ 
+            width: `${progress}%`,
+            backgroundColor: isDone ? `${accentColor}25` : `${accentColor}10`,
+            ...(isDone ? { backgroundImage: `linear-gradient(90deg, ${accentColor}10, ${accentColor}30)` } : {})
+          }} 
         />
-        <div className="truncate flex-1">
-          <div className="truncate">{label || "Untitled"}</div>
+      
+        <FilePenLine
+          className={`w-4 h-4 shrink-0 relative z-10 transition-transform ${isActive ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100"}`}
+        />
+        <div className="truncate min-w-0 flex-1 relative z-10">
+          <div className="truncate drop-shadow-sm">{label || "Untitled"}</div>
           {subtitle && (
             <div className={`truncate text-[10px] ${ui.txt3}`}>{subtitle}</div>
           )}
         </div>
+        
+        {isDone && (
+          <Check 
+            className="w-3.5 h-3.5 shrink-0 relative z-10 opacity-75" 
+            style={{ color: accentColor }} 
+          />
+        )}
+        
         <span
-          className={`text-[9px] uppercase tracking-widest ${kind === "override" ? "text-emerald-600 dark:text-emerald-400" : "text-indigo-500 dark:text-indigo-300"}`}
+          className={`text-[9px] uppercase tracking-widest relative z-10 shrink-0 px-1.5 py-0.5 rounded-full ${kind === "override" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-indigo-500/10 text-indigo-500 dark:text-indigo-300"}`}
         >
           {kind}
         </span>
@@ -1466,7 +1529,7 @@ function DocListItem({
           event.stopPropagation();
           onDelete();
         }}
-        className={`p-1 ${ui.txt3} opacity-0 group-hover:opacity-100 transition-opacity mr-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
+        className={`p-1.5 shrink-0 ${ui.txt3} opacity-0 group-hover:opacity-100 transition-opacity ml-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
         title={kind === "override" ? "Restore built-in doc" : "Delete document"}
       >
         <X className="w-3.5 h-3.5" />
@@ -1486,22 +1549,29 @@ function NoteEditorItem({
   ui = {},
 }) {
   return (
-    <div className={`mx-2 mb-1.5 rounded-md border ${ui.border} overflow-hidden`}>
+    <div 
+      className={`mx-2 mb-2 rounded-lg border transition-all duration-300 overflow-hidden ${
+        isActive 
+          ? `shadow-md ring-1 bg-white/50 dark:bg-black/20` 
+          : `${ui.border} shadow-sm hover:shadow-md hover:border-black/10 dark:hover:border-white/10`
+      }`}
+      style={isActive ? { borderColor: accentColor, boxShadow: `0 0 15px ${accentColor}20`, ringColor: `${accentColor}50` } : {}}
+    >
       <div
         onClick={onOpen}
-        className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer text-xs transition-colors group ${ui.txt2} ${ui.hoverBg}`}
+        className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-xs transition-colors group ${isActive ? "bg-white/40 dark:bg-black/40" : `${ui.txt2} ${ui.hoverBg}`}`}
       >
         {isActive ? (
-          <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-70" />
+          <ChevronDown className="w-4 h-4 shrink-0" style={{ color: accentColor }} />
         ) : (
-          <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-70" />
+          <ChevronRight className="w-4 h-4 shrink-0 opacity-70 group-hover:scale-110 transition-transform" />
         )}
         <div className="truncate flex-1">
-          <div className={`truncate font-medium ${ui.txt1}`}>
+          <div className={`truncate font-medium transition-colors ${isActive ? "" : ui.txt1}`} style={isActive ? { color: accentColor } : {}}>
             {note.title || "Untitled note"}
           </div>
           {!isActive && note.body && (
-            <div className={`truncate text-[10px] ${ui.txt2}`}>
+            <div className={`truncate text-[10px] mt-0.5 ${ui.txt2}`}>
               {note.body.replace(/\s+/g, " ").trim()}
             </div>
           )}
@@ -1511,20 +1581,21 @@ function NoteEditorItem({
             event.stopPropagation();
             onDelete();
           }}
-          className={`p-1 ${ui.txt2} opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
+          className={`p-1.5 ${ui.txt2} opacity-0 group-hover:opacity-100 transition-all rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500`}
           title="Delete note"
         >
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
       {isActive && (
-        <div className={`px-2 pb-2 pt-1 border-t ${ui.border} ${ui.bg1}`}>
+        <div className={`px-3 pb-3 pt-2 border-t border-black/5 dark:border-white/5`}>
           <input
             type="text"
             value={note.title}
             onChange={(e) => onUpdate({ title: e.target.value })}
             placeholder="Note title"
-            className={`w-full mb-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} text-[12px] font-medium outline-none ${ui.txt1}`}
+            className={`w-full mb-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[12px] font-medium outline-none transition-colors`}
+            style={{ outlineColor: accentColor }}
           />
           {note.docPath && (
             <button
@@ -1534,14 +1605,14 @@ function NoteEditorItem({
                 onOpenSource(note.docPath);
               }}
               title="Open the lesson this note came from"
-              className={`w-full mb-1.5 flex items-center gap-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} ${ui.hoverBg} text-[11px] font-medium transition-colors truncate`}
+              className={`w-full mb-2 flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} ${ui.hoverBg} text-[11px] font-medium transition-colors truncate`}
               style={{ color: accentColor }}
             >
-              <File className="w-3 h-3 shrink-0" />
+              <File className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{note.docTitle || "Open source lesson"}</span>
             </button>
           )}
-          <label className={`block mb-0.5 text-[9px] font-bold uppercase tracking-widest ${ui.txt2}`}>
+          <label className={`block mb-1 text-[9px] font-bold uppercase tracking-widest ${ui.txt2}`}>
             Series
           </label>
           <input
@@ -1549,15 +1620,16 @@ function NoteEditorItem({
             value={note.series}
             onChange={(e) => onUpdate({ series: e.target.value })}
             placeholder="Series"
-            className={`w-full mb-1.5 px-2 py-1 rounded border ${ui.border} ${ui.bg0} text-[11px] outline-none ${ui.txt2}`}
+            className={`w-full mb-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[11px] outline-none transition-colors ${ui.txt2}`}
+            style={{ outlineColor: accentColor }}
           />
           <textarea
             value={note.body}
             onChange={(e) => onUpdate({ body: e.target.value })}
             placeholder="Paste or type your note here…"
             rows={6}
-            className={`w-full px-2 py-1.5 rounded border ${ui.border} ${ui.bg0} text-[12px] leading-relaxed outline-none resize-y ${ui.txt1}`}
-            style={{ "--tw-ring-color": accentColor }}
+            className={`w-full px-2.5 py-2 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[12px] leading-relaxed outline-none resize-y transition-colors ${ui.txt1}`}
+            style={{ outlineColor: accentColor }}
           />
         </div>
       )}
@@ -1578,23 +1650,25 @@ function NotesSeriesGroup({
 }) {
   const [open, setOpen] = useState(true);
   return (
-    <div>
+    <div className="mb-2">
       <div
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer select-none ${ui.txt2} ${ui.hoverBg}`}
+        className={`flex items-center gap-2 px-3 py-2 mb-1 mx-1 rounded-lg cursor-pointer select-none transition-colors hover:bg-black/5 dark:hover:bg-white/5 border border-transparent`}
       >
         {open ? (
-          <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+          <ChevronDown className="w-4 h-4 opacity-70 transition-transform" />
         ) : (
-          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+          <ChevronRight className="w-4 h-4 opacity-70 transition-transform group-hover:scale-110" />
         )}
         <span
-          className="text-[11px] font-bold tracking-wide"
+          className="text-[12px] font-bold tracking-wide drop-shadow-sm flex-1 truncate"
           style={{ color: accentColor }}
         >
           {seriesName}
         </span>
-        <span className={`text-[10px] ${ui.txt2}`}>({notes.length})</span>
+        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${ui.bg2} ${ui.txt2}`}>
+          {notes.length}
+        </span>
       </div>
       {open &&
         notes.map((note) => (
@@ -2023,6 +2097,60 @@ export default function MarkdownHub() {
   const [notes, setNotes] = useState(loadNotes);
   const [noteSearch, setNoteSearch] = useState("");
   const [activeNoteId, setActiveNoteId] = useState(null);
+
+  const [docProgress, setDocProgress] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("mdhub_doc_progress") || "{}");
+    } catch {
+      return {};
+    }
+  });
+  const scrollPercentageRef = useRef(0);
+  const prevActiveFileRef = useRef(activeFile);
+
+  useEffect(() => {
+    if (prevActiveFileRef.current && prevActiveFileRef.current !== activeFile) {
+      const prevPath = prevActiveFileRef.current;
+      const percentage = scrollPercentageRef.current;
+      setDocProgress((prev) => {
+        const next = { ...prev, [prevPath]: percentage };
+        try {
+          localStorage.setItem("mdhub_doc_progress", JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+    }
+    prevActiveFileRef.current = activeFile;
+    scrollPercentageRef.current = 0;
+  }, [activeFile]);
+
+  const handleContentScroll = useCallback(() => {
+    const el = contentScrollRef.current;
+    if (!el) return;
+    const scrollHeight = el.scrollHeight;
+    const clientHeight = el.clientHeight;
+    const scrollTop = el.scrollTop;
+    
+    let percentage = 0;
+    if (scrollHeight <= clientHeight) {
+      percentage = 100;
+    } else {
+      percentage = Math.max(0, Math.min(100, (scrollTop / (scrollHeight - clientHeight)) * 100));
+    }
+    scrollPercentageRef.current = percentage;
+    
+    // Direct DOM manipulation for real-time 60fps progress bar updates
+    if (prevActiveFileRef.current) {
+      const safeId = prevActiveFileRef.current.replace(/[^a-zA-Z0-9-]/g, '-');
+      const progressEl = document.getElementById(`progress-${safeId}`);
+      if (progressEl) {
+        progressEl.style.width = `${percentage}%`;
+        // Optionally update color if reaching 100% (done via state on tab switch, but we can fake it here)
+        // Usually, users don't mind the color snapping when they leave, but the width update is crucial.
+      }
+    }
+  }, []);
+
 
   const createNote = useCallback(() => {
     const id = `note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -3244,13 +3372,13 @@ export default function MarkdownHub() {
 
               {/* Sidebar tab switcher — tutorials mode, not searching. "On This Page" only shows once the active doc has headings; Notes is always reachable. */}
               {tab === "tutorials" && !docSearch && (
-                <div className={`flex shrink-0 border-b ${ui.border}`}>
+                <div className={`flex shrink-0 p-2 gap-1 border-b ${ui.border} sticky top-0 z-20 ${ui.bg0}`}>
                   <button
                     onClick={() => setSidebarTab("docs")}
-                    className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "docs" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
+                    className={`flex-1 py-1.5 px-2 rounded-md text-[11px] font-bold transition-all duration-300 ${sidebarTab === "docs" ? "shadow-sm ring-1 ring-black/5 dark:ring-white/10" : "opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5"}`}
                     style={
                       sidebarTab === "docs"
-                        ? { borderBottomColor: accentColor, color: accentColor }
+                        ? { backgroundColor: `${accentColor}1A`, color: accentColor, boxShadow: `0 0 10px ${accentColor}15` }
                         : {}
                     }
                   >
@@ -3259,10 +3387,10 @@ export default function MarkdownHub() {
                   {headings.length > 0 && (
                     <button
                       onClick={() => setSidebarTab("toc")}
-                      className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "toc" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
+                      className={`flex-1 py-1.5 px-2 rounded-md text-[11px] font-bold transition-all duration-300 ${sidebarTab === "toc" ? "shadow-sm ring-1 ring-black/5 dark:ring-white/10" : "opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5"}`}
                       style={
                         sidebarTab === "toc"
-                          ? { borderBottomColor: accentColor, color: accentColor }
+                          ? { backgroundColor: `${accentColor}1A`, color: accentColor, boxShadow: `0 0 10px ${accentColor}15` }
                           : {}
                       }
                     >
@@ -3271,10 +3399,10 @@ export default function MarkdownHub() {
                   )}
                   <button
                     onClick={() => setSidebarTab("notes")}
-                    className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === "notes" ? "" : "border-transparent " + ui.txt2 + " " + ui.hoverBg}`}
+                    className={`flex-1 py-1.5 px-2 rounded-md text-[11px] font-bold transition-all duration-300 ${sidebarTab === "notes" ? "shadow-sm ring-1 ring-black/5 dark:ring-white/10" : "opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5"}`}
                     style={
                       sidebarTab === "notes"
-                        ? { borderBottomColor: accentColor, color: accentColor }
+                        ? { backgroundColor: `${accentColor}1A`, color: accentColor, boxShadow: `0 0 10px ${accentColor}15` }
                         : {}
                     }
                   >
@@ -3307,29 +3435,32 @@ export default function MarkdownHub() {
                             selectTutorial(r.path);
                             setDocSearch("");
                           }}
-                          className={`flex flex-col gap-0.5 px-3 py-2 cursor-pointer border-l-2 transition-colors ${
+                          className={`flex flex-col gap-1 px-3 py-2 mx-2 mb-1 rounded-md cursor-pointer transition-colors border ${
                             activeFile === r.path
-                              ? `${ui.txt1} bg-slate-100 dark:bg-slate-800/60`
-                              : `border-transparent ${ui.txt2} hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:${ui.txt1}`
+                              ? `${ui.txt1} font-medium border-transparent shadow-sm`
+                              : `${ui.txt2} border-transparent ${ui.hoverBg}`
                           }`}
                           style={
                             activeFile === r.path
-                              ? { borderLeftColor: accentColor }
+                              ? { backgroundColor: `${accentColor}1A`, borderColor: accentColor, color: accentColor }
                               : {}
                           }
                         >
-                          <span
-                            className="text-[12px] font-medium truncate"
-                            style={
-                              activeFile === r.path
-                                ? { color: accentColor }
-                                : {}
-                            }
-                          >
-                            {r.fileName}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <File className={`w-3.5 h-3.5 shrink-0 ${activeFile === r.path ? "opacity-100" : "opacity-70"}`} />
+                            <span
+                              className="text-[12px] font-medium truncate flex-1"
+                              style={
+                                activeFile === r.path
+                                  ? { color: accentColor }
+                                  : {}
+                              }
+                            >
+                              {r.fileName}
+                            </span>
+                          </div>
                           {r.folder && (
-                            <span className={`text-[10px] truncate ${ui.txt2}`}>
+                            <span className={`text-[10px] truncate ml-[22px] ${ui.txt3}`}>
                               {r.folder}
                             </span>
                           )}
@@ -3364,6 +3495,7 @@ export default function MarkdownHub() {
                           overriddenPaths={overriddenPaths}
                           accentColor={accentColor}
                           ui={ui}
+                          docProgress={docProgress}
                         />
                       ))
                     ))}
@@ -3382,47 +3514,54 @@ export default function MarkdownHub() {
                             const isActive = i === activeIdx;
                             const isPassed = activeIdx !== -1 && i < activeIdx;
                             return (
-                              <button
-                                key={i}
-                                // Stay on "On This Page" after jumping — this
-                                // is a reading-progress view, not a one-shot
-                                // navigation menu, so it shouldn't bounce
-                                // back to Documents.
-                                onClick={() => scrollToHeading(h.id)}
-                                className={`w-full flex items-center gap-1.5 text-left py-1 text-[12px] transition-colors truncate ${
-                                  isActive
-                                    ? "font-semibold"
-                                    : `${ui.txt2} ${ui.hoverBg}`
-                                }`}
-                                style={{
-                                  paddingLeft: 10 + (h.level - 1) * 12,
-                                  paddingRight: 8,
-                                  color: isActive ? accentColor : undefined,
-                                }}
-                                title={h.text}
-                              >
-                                <span className="shrink-0 w-3 h-3 flex items-center justify-center">
-                                  {isPassed ? (
-                                    <Check
-                                      className="w-3 h-3 opacity-50"
-                                      style={{ color: accentColor }}
-                                    />
-                                  ) : (
-                                    <span
-                                      className={`block rounded-full ${isActive ? "w-1.5 h-1.5" : "w-1 h-1 opacity-30 bg-current"}`}
-                                      style={isActive ? { background: accentColor } : {}}
-                                    />
-                                  )}
-                                </span>
+                              <div key={i} className="relative group mx-2">
+                                {/* Vertical Indentation Guide */}
                                 {h.level > 1 && (
-                                  <span className="opacity-25">
-                                    {"–".repeat(h.level - 1)}
-                                  </span>
+                                  <div 
+                                    className="absolute left-0 top-0 bottom-0 border-l border-black/5 dark:border-white/5 group-hover:border-black/20 dark:group-hover:border-white/20 transition-colors"
+                                    style={{ left: (h.level - 1) * 12 + 4 }}
+                                  />
                                 )}
-                                <span className={isPassed ? "opacity-60" : ""}>
-                                  {h.text}
-                                </span>
-                              </button>
+                                <button
+                                  // Stay on "On This Page" after jumping — this
+                                  // is a reading-progress view, not a one-shot
+                                  // navigation menu, so it shouldn't bounce
+                                  // back to Documents.
+                                  onClick={() => scrollToHeading(h.id)}
+                                  className={`relative w-full flex items-center gap-2 text-left py-1.5 my-0.5 rounded-md text-[12px] transition-all truncate border border-transparent ${
+                                    isActive
+                                      ? "font-semibold shadow-sm"
+                                      : `${ui.txt2} hover:bg-black/5 dark:hover:bg-white/5`
+                                  }`}
+                                  style={{
+                                    paddingLeft: 10 + (h.level - 1) * 12,
+                                    paddingRight: 8,
+                                    ...(isActive ? {
+                                      color: accentColor,
+                                      backgroundColor: `${accentColor}10`,
+                                      boxShadow: `0 0 12px ${accentColor}15`
+                                    } : {})
+                                  }}
+                                  title={h.text}
+                                >
+                                  <span className="shrink-0 w-4 h-4 flex items-center justify-center relative z-10">
+                                    {isPassed ? (
+                                      <Check
+                                        className="w-3.5 h-3.5 opacity-60"
+                                        style={{ color: accentColor }}
+                                      />
+                                    ) : (
+                                      <span
+                                        className={`block rounded-full transition-all ${isActive ? "w-2 h-2 ring-2 ring-white dark:ring-black" : "w-1 h-1 opacity-30 bg-current"}`}
+                                        style={isActive ? { background: accentColor, boxShadow: `0 0 8px ${accentColor}80` } : {}}
+                                      />
+                                    )}
+                                  </span>
+                                  <span className={`truncate ${isPassed ? "opacity-60" : ""} ${isActive ? "drop-shadow-sm" : ""}`}>
+                                    {h.text}
+                                  </span>
+                                </button>
+                              </div>
                             );
                           })}
                         </div>
@@ -3489,6 +3628,7 @@ export default function MarkdownHub() {
                       {userDocs.map((doc) => (
                         <DocListItem
                           key={doc.id}
+                          itemId={doc.id}
                           label={doc.name}
                           subtitle={
                             backendReady
@@ -3503,6 +3643,7 @@ export default function MarkdownHub() {
                           onDelete={() => deleteUserDoc(doc.id)}
                           accentColor={accentColor}
                           ui={ui}
+                          progress={docProgress[doc.id] || 0}
                         />
                       ))}
                       {userDocs.length === 0 && (
@@ -3517,6 +3658,7 @@ export default function MarkdownHub() {
                       {overrideDocs.map((doc) => (
                         <DocListItem
                           key={doc.path}
+                          itemId={doc.path}
                           label={doc.name}
                           subtitle={doc.path.replace("/src/docs/", "")}
                           kind="override"
@@ -3528,6 +3670,7 @@ export default function MarkdownHub() {
                           onDelete={() => deleteOverrideDoc(doc.path)}
                           accentColor={accentColor}
                           ui={ui}
+                          progress={docProgress[doc.path] || 0}
                         />
                       ))}
                       {overrideDocs.length === 0 && (
@@ -3567,6 +3710,7 @@ export default function MarkdownHub() {
               {tab === "tutorials" && (
                 <div
                   ref={contentScrollRef}
+                  onScroll={handleContentScroll}
                   className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar"
                 >
                   {loading ? (

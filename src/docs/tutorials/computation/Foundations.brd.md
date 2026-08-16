@@ -640,7 +640,7 @@ Teach selection by operations, workload, constraints, and invariants.
 
 ### 108. Designing a Data Structure
 
-Have the learner derive a new data structure from required operations.
+Have the learner derive a new data structure from required operations, built with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion implementation for the learner to find before it's revealed.
 
 ---
 
@@ -766,7 +766,7 @@ Derive ways to shrink enormous search spaces.
 
 ### 138. Algorithm Design Workshop
 
-Teach a repeatable process for inventing algorithms for unfamiliar problems.
+Teach a repeatable process for inventing algorithms for unfamiliar problems, applied by the learner with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion algorithm for the learner to find before it's revealed.
 
 ---
 
@@ -852,7 +852,7 @@ Introduce the Curry-Howard correspondence conceptually.
 
 ### 158. Abstraction as a Problem-Solving Tool
 
-Teach when mathematical abstraction reduces complexity instead of adding it.
+Teach when mathematical abstraction reduces complexity instead of adding it, then have the learner apply it with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion abstraction for the learner to find before it's revealed.
 
 ---
 
@@ -958,7 +958,7 @@ Explain the spectrum from direct execution to translation.
 
 ### 183. Build a Small Language
 
-Integrate lexer, parser, AST, evaluator, environments, functions, and types.
+Integrate lexer, parser, AST, evaluator, environments, functions, and types, built by the learner with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion interpreter for the learner to find before it's revealed.
 
 ---
 
@@ -1060,7 +1060,7 @@ Build realistic mental models for runtime and memory.
 
 ### 207. Systems-Level Debugging
 
-Teach the learner to reason across source, runtime, memory, assembly, and hardware.
+Teach the learner to reason across source, runtime, memory, assembly, and hardware, working with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency for the learner to find before it's revealed.
 
 ---
 
@@ -1158,7 +1158,7 @@ Introduce timeouts, retries, duplication, and lost messages.
 
 ### 230. Systems Design Problem-Solving
 
-Teach decomposition of large systems into state, interfaces, invariants, failure modes, and resource constraints.
+Teach decomposition of large systems into state, interfaces, invariants, failure modes, and resource constraints, applied by the learner with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion system design for the learner to find before it's revealed.
 
 ---
 
@@ -1252,7 +1252,7 @@ Apply geometric reasoning to intersections, distances, hulls, and spatial struct
 
 ### 252. Mathematics of Simulation
 
-Connect differential equations, numerical approximation, state updates, and computational models.
+Connect differential equations, numerical approximation, state updates, and computational models, built by the learner with minimal scaffolding from this section's tools alone; includes a deliberately planted inconsistency in a companion simulation for the learner to find before it's revealed.
 
 ---
 
@@ -1344,6 +1344,8 @@ Teach the crucial distinction between:
 * “we haven't found an efficient solution,” and
 * “no general algorithm can solve this.”
 
+Then have the learner classify a set of unfamiliar problems into these three categories, including one a collaborator has deliberately mis-classified for the learner to catch.
+
 ---
 
 # Section XIII — Software Engineering as Applied Computer Science
@@ -1428,7 +1430,7 @@ Identify which assumptions are likely to change and isolate them.
 
 ### 292. Engineering Judgment
 
-Learn when simplicity, correctness, performance, flexibility, or reliability should dominate.
+Learn when simplicity, correctness, performance, flexibility, or reliability should dominate, then evaluate a design a collaborator has already made — including one deliberately poor tradeoff — and identify and justify the fix.
 
 ---
 
