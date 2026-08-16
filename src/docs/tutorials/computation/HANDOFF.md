@@ -11,7 +11,7 @@ Do not read sibling project folders, other tutorial series, or unrelated docs un
 
 ## Current status
 
-**Lessons 1–125 are complete.** Written to `src/docs/tutorials/computation/NN-title-slug.md` (two-digit zero-padded, matching the site's auto-discovery convention). **Lesson 126 (DFS Invariants and Timestamps) is next.** Graph cluster so far: 123 (representations, adjacency list/matrix), 124 (BFS via Lesson 87's queue), 125 (DFS via recursion) — both traversals verified against the identical 5-vertex graph, producing genuinely different, both-correct orders.
+**Lessons 1–133 are complete — the graph-algorithms cluster (123–133) is essentially done.** Written to `src/docs/tutorials/computation/NN-title-slug.md` (two-digit zero-padded, matching the site's auto-discovery convention). **Lesson 134 (Network Flow) is next.** Remaining in Section VI: 134 (Network Flow), 135 (Matching), 136 (Constraint Satisfaction), 137 (Search, Pruning, and Heuristics), 138 (Algorithm Design Workshop — this section's checkpoint lesson per the section-ending-lesson convention above).
 
 **Quality note (2026-08-15):** Lessons 106, 107, and 109 originally drifted from the schema (Concept Units missing New Code/Mechanical Walkthrough — 107 had zero code blocks) and were caught by the user and fully rewritten with real, run-verified code. Lesson 114 separately had two real logic bugs in a first draft (partition's `i` needed to start at `low-1`; the pivot's final index wasn't threaded through the recursion) caught during re-verification before publishing. See `feedback_schema_discipline_is_the_point` in memory — both incidents are logged there with the corrected discipline.
 
@@ -24,7 +24,7 @@ Section progress against the BRD:
 | III — Algebra for Programmers | 41–58 | Done |
 | IV — Combinatorics and Discrete Mathematics | 59–82 | Done |
 | V — Data Structures | 83–108 | Done |
-| VI — Algorithms and Algorithmic Problem Solving | 109–138 | In progress (109–125 done; 126–138 remain) |
+| VI — Algorithms and Algorithmic Problem Solving | 109–138 | In progress (109–133 done; 134–138 remain) |
 | VII — Mathematical Structures Behind Programming | 139–158 | Not started |
 | VIII — Programming Languages and Semantics | 159–183 | Not started |
 | IX — Computer Architecture and Representation | 184–207 | Not started |
