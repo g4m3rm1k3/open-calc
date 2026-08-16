@@ -1896,7 +1896,55 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         .dark .curled-shadow-wrapper::before, .dark .curled-shadow-wrapper::after {
           box-shadow: 0 15px 15px rgba(0,0,0,0.4);
         }
-        .md-body h1, .md-body h2, .md-body h3, .md-body h4 {
+        .md-body h1 {
+          position: relative;
+          z-index: 1;
+          font-weight: 900;
+          background: linear-gradient(90deg, ${accentColor}, ${accentColor}aa);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-size: 2.25rem;
+          margin-top: -1rem;
+          margin-bottom: 1.5rem;
+          margin-left: -1rem;
+          margin-right: -1rem;
+          padding: 1.5rem 1rem;
+        }
+        @media (min-width: 640px) {
+          .md-body h1 {
+            font-size: 2.75rem;
+            margin-top: -1.5rem;
+            margin-left: -1.5rem;
+            margin-right: -1.5rem;
+            padding: 2rem 1.5rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .md-body h1 {
+            font-size: 3rem;
+            margin-top: -2.5rem;
+            margin-left: -2.5rem;
+            margin-right: -2.5rem;
+            padding: 2.5rem 2.5rem;
+          }
+        }
+        .md-body h1::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          background: linear-gradient(90deg, ${accentColor}1A 0%, ${accentColor}05 60%, transparent 100%);
+          border: none;
+          box-shadow: 0 10px 40px -10px ${accentColor}60;
+          border-radius: 8px 8px 0 0;
+        }
+        @media (min-width: 640px) {
+          .md-body h1::before {
+            border-radius: 12px 12px 0 0;
+          }
+        }
+
+        .md-body h2, .md-body h3, .md-body h4 {
           position: relative;
           padding: 0.6rem 1rem;
           margin-top: 2rem;
@@ -1907,7 +1955,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
           -webkit-text-fill-color: transparent;
           z-index: 1;
         }
-        .md-body h1::before, .md-body h2::before, .md-body h3::before, .md-body h4::before {
+        .md-body h2::before, .md-body h3::before, .md-body h4::before {
           content: "";
           position: absolute;
           inset: 0;
@@ -1932,6 +1980,11 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         @media (min-width: 640px) {
           .intro-page-content h1 {
             font-size: 3.5rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .intro-page-content h1 {
+            font-size: 4rem;
           }
         }
       `}</style>
@@ -2065,7 +2118,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                 }
                 const isPlaying = playingIdx === globalIdx;
                 return (
-                  <div key={globalIdx} className="relative group mt-4">
+                  <div key={globalIdx} className={`relative group ${secIdx === 0 ? "" : "mt-4"}`}>
                     <button
                       onClick={() => handlePlay(globalIdx, section.content)}
                       title={isPlaying ? "Stop reading" : "Read aloud"}
