@@ -1340,3 +1340,198 @@
       elapsed-steps
       (simulate-fall-from (fall-step state g dt) g dt (+ elapsed-steps 1) (- max-steps 1)))))
 
+; ============================================================================
+; Section XII (Lessons 253+) VERIFIED CORE - added Lesson 262, 2026-08-17.
+;
+; DIFFERENT PURPOSE than the rest of this file. Section VI/XI code above is
+; cached so a LATER section can reuse it without re-deriving it. This block
+; is cached so THIS SAME lesson's own restated core doesn't get re-verified
+; via `bb` from scratch every time - because the Repetition Rule requires
+; every lesson to restate this interpreter in full in its OWN PROSE, but
+; that does not mean the code itself needs a fresh bb run every time it's
+; identical to what's already been verified here.
+;
+; This exact TM interpreter (pad-tape through run-tm) was independently
+; built AND independently re-verified via real bb runs in FOUR separate
+; sessions - Lessons 259, 260, 261, and 262 - before this cache existed.
+; That's real, avoidable session cost the user flagged directly, 2026-08-17:
+; "is there a way we can be more efficient verifying? Are you possibly
+; verifying the same thing other sessions verified." This block is the fix.
+;
+; CONVENTION GOING FORWARD: before re-running `bb` on a lesson's restated
+; version of this interpreter, diff it against the block below by eye. If
+; it's the same logic (function names/internals may legitimately vary
+; slightly lesson to lesson), trust the verified outputs recorded below
+; instead of re-running bb on the restated portion - spend the real bb run
+; on whatever NEW code that lesson actually adds. If the restated version
+; is genuinely different (a new field threaded through, different helper
+; split), it needs its own fresh bb run - this cache doesn't excuse
+; verifying real changes, only re-verifying unchanged code.
+;
+; Verified test cases (real bb output, Lesson 262 session):
+;   Parity machine (states "even"/"odd", start "even", accept ["even"]),
+;   transitions [["even" "0" "even" "0" "R"] ["even" "1" "odd" "1" "R"]
+;                ["odd" "0" "odd" "0" "R"] ["odd" "1" "even" "1" "R"]],
+;   run on tape ["1" "1"], position 0, fuel 20
+;     => ["accept" "even" ["1" "1"]]
+;
+;   Ping-pong machine (states "ping"/"pong", start "ping", accept ["ping"]),
+;   transitions [["ping" "_" "pong" "_" "R"] ["pong" "_" "ping" "_" "R"]],
+;   run on tape [], position 0, fuel 20
+;     => ["exhausted" "ping" [twenty blank cells]]
+; ============================================================================
+
+(defn pad-tape [tape length]
+  (if (>= (count tape) length)
+    tape
+    (pad-tape (conj tape "_") length)))
+
+(defn read-tape [tape position]
+  (if (< position (count tape))
+    (get tape position)
+    "_"))
+
+(defn write-tape [tape position symbol]
+  (assoc (pad-tape tape (inc position)) position symbol))
+
+(defn member? [item collection]
+  (if (empty? collection)
+    false
+    (if (= (first collection) item)
+      true
+      (member? item (rest collection)))))
+
+(defn matches-transition? [transition state symbol]
+  (and (= (get transition 0) state)
+       (= (get transition 1) symbol)))
+
+(defn find-transition [transitions state symbol]
+  (if (empty? transitions)
+    nil
+    (if (matches-transition? (first transitions) state symbol)
+      (first transitions)
+      (find-transition (rest transitions) state symbol))))
+
+(defn verdict-for [state accept-states]
+  (if (member? state accept-states)
+    "accept"
+    "reject"))
+
+(declare run-tm)
+
+(defn run-tm-with-transition [transitions state accept-states tape position fuel transition]
+  (if (nil? transition)
+    [(verdict-for state accept-states) state tape]
+    (run-tm transitions
+            (get transition 2)
+            (write-tape tape position (get transition 3))
+            (if (= (get transition 4) "R") (inc position) (dec position))
+            accept-states
+            (dec fuel))))
+
+(defn run-tm [transitions state tape position accept-states fuel]
+  (if (= fuel 0)
+    ["exhausted" state tape]
+    (run-tm-with-transition transitions state accept-states tape position fuel
+                             (find-transition transitions state (read-tape tape position)))))
+
+; ---- Lesson 262 ----
+; add-print-x-catchall: the reduction's own transformation. Verified this
+; session: appended to the parity machine's table, transformed run on
+; ["1" "1"] ends ["reject" "PRINTED-X" ["1" "1" "X"]]; appended to the
+; ping-pong table, transformed run on [] still exhausts fuel with no "X"
+; ever written (append order matters - see Lesson 262's own "What Breaks").
+
+(defn transition-for-state [state]
+  [state "_" "PRINTED-X" "X" "R"])
+
+(defn add-print-x-catchall [transitions states]
+  (if (empty? states)
+    transitions
+    (add-print-x-catchall (conj transitions (transition-for-state (first states)))
+                           (rest states))))
+
+; ---- Lesson 263 ----
+; run-tm-counted/run-tm-spaced: time/space instrumentation on top of the
+; cached interpreter above. Verified this session: parity machine, inputs
+; of length 2/3/4/6, steps and max tape length both come out equal to
+; input length exactly. memo-fib: verified n=10/15/20 -> 11/16/21 real
+; computations (n+1 exactly), vs naive fib-counted's 177/1973/21891 calls.
+
+(defn run-tm-counted [transitions state tape position accept-states fuel steps]
+  (if (= fuel 0)
+    ["exhausted" state tape steps]
+    (run-tm-counted-with-transition transitions state accept-states tape position fuel steps
+                                     (find-transition transitions state (read-tape tape position)))))
+
+(defn run-tm-counted-with-transition [transitions state accept-states tape position fuel steps transition]
+  (if (nil? transition)
+    [(verdict-for state accept-states) state tape steps]
+    (run-tm-counted transitions
+                     (get transition 2)
+                     (write-tape tape position (get transition 3))
+                     (if (= (get transition 4) "R") (inc position) (dec position))
+                     accept-states
+                     (dec fuel)
+                     (inc steps))))
+
+(defn max-of [a b] (if (> a b) a b))
+
+(defn run-tm-spaced [transitions state tape position accept-states fuel max-len]
+  (if (= fuel 0)
+    ["exhausted" state tape max-len]
+    (run-tm-spaced-with-transition transitions state accept-states tape position fuel max-len
+                                    (find-transition transitions state (read-tape tape position)))))
+
+(defn run-tm-spaced-with-transition [transitions state accept-states tape position fuel max-len transition]
+  (if (nil? transition)
+    [(verdict-for state accept-states) state tape max-len]
+    (run-tm-spaced-step transitions transition state accept-states position fuel max-len
+                         (write-tape tape position (get transition 3)))))
+
+(defn run-tm-spaced-step [transitions transition state accept-states position fuel max-len new-tape]
+  (run-tm-spaced transitions
+                  (get transition 2)
+                  new-tape
+                  (if (= (get transition 4) "R") (inc position) (dec position))
+                  accept-states
+                  (dec fuel)
+                  (max-of max-len (count new-tape))))
+
+(defn memo-lookup [memo n]
+  (if (empty? memo)
+    nil
+    (if (= (get (first memo) 0) n)
+      (get (first memo) 1)
+      (memo-lookup (rest memo) n))))
+
+(defn memo-fib-store [n value memo steps]
+  [value (conj memo [n value]) steps])
+
+(defn memo-fib-finish [n left-value right-result]
+  (memo-fib-store n (+ left-value (get right-result 0)) (get right-result 1) (get right-result 2)))
+
+(declare memo-fib)
+
+(defn memo-fib-combine [n left-result]
+  (memo-fib-finish n (get left-result 0) (memo-fib (- n 2) (get left-result 1) (get left-result 2))))
+
+(defn memo-fib-base [n memo steps]
+  [n (conj memo [n n]) steps])
+
+(defn memo-fib-compute-branch [n memo steps]
+  (if (< n 2)
+    (memo-fib-base n memo steps)
+    (memo-fib-combine n (memo-fib (- n 1) memo steps))))
+
+(defn memo-fib-compute [n memo steps]
+  (memo-fib-compute-branch n memo (inc steps)))
+
+(defn memo-fib-lookup-or-compute [n memo steps cached]
+  (if (nil? cached)
+    (memo-fib-compute n memo steps)
+    [cached memo steps]))
+
+(defn memo-fib [n memo steps]
+  (memo-fib-lookup-or-compute n memo steps (memo-lookup memo n)))
+
