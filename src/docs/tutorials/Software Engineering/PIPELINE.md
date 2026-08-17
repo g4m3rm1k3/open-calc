@@ -82,6 +82,62 @@ related cluster of stages, not a strict one-to-one:
   to the socio-technical theme at full scale rather than owning one more
   pipeline stage.
 
+## The concrete worked example carried through the diagram
+
+Extracted verbatim (paraphrased facts, not copied prose) from Lesson 12's
+own first Concept Unit on 2026-08-17, opened once under the same
+one-time-exception pattern as the diagram extraction above, specifically
+to recover the concrete literal value the "carry one concrete literal
+value through every stage built so far" rule (schema, Header section)
+requires — needed starting with Domain 8, the first domain to touch a
+pipeline stage since this file was created. Not previously recorded here
+because no session between L45 and L104 needed it recorded (Domains 5–7
+apparently extended it directly from L12 or didn't need this level of
+cross-domain carry-through; their own lesson files aren't in scope to
+confirm which). This is the account current as of L12 itself only —
+Domains 4–7's own further extensions of it, if any, are not reflected
+here and were not reopened to check, per this curriculum's own no-
+reopen-old-lessons constraint.
+
+L12 walked `is_username_available` (Lesson 2's own function, testing the
+literal usernames `"dave"` and `"alice"`) across the stages it could
+concretely place it on, using only what Domain 1 (Lessons 1–11) itself
+had already built — honestly stopping at the stages that domain's own
+work didn't reach:
+
+- **Problem** — "can two people register conflicting accounts," never
+  stated outright in Lesson 2 but implied by the task existing at all.
+- **Requirements** — Lesson 2's own opening line, "say whether it's
+  available," an informal requirement.
+- **Specification** — Lesson 2's second unit finding the case-
+  sensitivity gap: "what does 'the same username' mean, precisely" —
+  i.e., is `"Dave"` the same username as `"dave"`?
+- **Implementation** — Lesson 2's three-line function itself.
+- **Verification** — running it by hand against the literal inputs
+  `"dave"` and `"alice"`, one hand-checked example each.
+- **Architecture / Design** — Lesson 3 placing that same code inside
+  `accounts.py`, owned by a team, with a formal boundary to
+  `growth_signup.py`.
+- **Operations / Observation** — Lesson 3's on-call engineer, paged at
+  3 a.m., keeping the system running and knowing how it's actually
+  behaving.
+- **Change** — Lesson 9's internal `_accounts` restructuring, absorbed
+  safely by `get_account_status` (L12 itself calls this a *Migration*
+  example reused for the Change stage — its own words: "a small, real
+  Migration — moving from one internal representation to another
+  without breaking what depended on it").
+
+L12 explicitly and honestly declined to place this example (or any
+Domain-1 example) on **Domain model, Integration, Release, Deployment,
+Migration** (as its own separate stage — L9's restructuring above covers
+it only as reused evidence, not a dedicated placement), **Evolution**, or
+**Retirement** — its own words: "Retirement is the one stage without a
+real analog anywhere in this domain's own eleven lessons — nothing built
+so far has been deliberately ended — and that's honest." A later domain
+extending this same value onto one of those still-unplaced stages is
+extending L12's own worked example forward, in the same honest spirit —
+not reconstructing something L12 already claimed and hiding a gap.
+
 ## The one thing this file does not replace
 
 Lesson 12 itself still carries real teaching content beyond the diagram —

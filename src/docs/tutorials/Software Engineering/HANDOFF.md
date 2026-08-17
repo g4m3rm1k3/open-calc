@@ -14,20 +14,39 @@ Source of truth for lesson *format*: the schema (now fully read at least
 once — see "Format conventions confirmed this session," below, for the
 real, verified structure). Nothing else is in scope — per explicit user
 instruction, this build does not read or reference other curricula/folders
-in this repo (Graphics, etc.) for style or content.
+in this repo (Graphics, etc.) for style or content, and — restated,
+narrowed, and made explicit again this session — does not open any
+prior *lesson* file either. The only three files a session should read
+before writing anything: this handoff, `LESSON SCHEMA.md`, and
+`Software Engineering.brd.md`. The one standing exception: `../
+inventory-report/` (see "The `inventory-report/` project is now real
+and persistent," below) may be opened — read directly, not
+reconstructed from prose — **only when actually needed** to see the
+current, exact state of code a new lesson is about to extend, not as
+routine background reading.
 
-**Working style — confirmed and sharpened across this session:**
-continuous building, lesson after lesson, with **no pauses of any kind**
-between lessons — no status updates, no "here's what's done" recaps, no
-"should I continue" framing, not even a brief one-line summary. The user
-has stated this explicitly, multiple times, including after a *brief,
-non-question* end-of-turn line still drew a correction. Default to zero
-narration between lessons; just keep building. The **only** time to update
-this handoff file is when the session is actually ending (context running
-low, or the user explicitly says to wrap up / write the handoff) — **not**
-after each lesson, and not at every domain boundary either, unless the user
-says so. A new session should read this file, then start building forward
-from the first "not started" row without waiting to be told again.
+**Working style — changed this session, supersedes the old rule below.**
+Earlier sessions (through the Domain 8/9 build spanning L45–133) built
+continuously, many lessons per session, with zero narration between
+them, on explicit instruction. **That pace is over.** This session's own
+explicit instruction, replacing it: **one lesson per session, then
+stop.** Finish whatever single lesson is in progress, move any newly
+verified code into the real, persistent `inventory-report/` folder (see
+below — no longer an ephemeral scratchpad), update this handoff, and
+end the session there — do not continue building the next lesson
+without the user explicitly restarting the build in a new turn. The
+old zero-narration-*during*-a-build-in-progress habit is still correct
+(no status updates or "should I continue" framing while actually
+writing the one lesson a session is building) — what changed is that a
+session no longer keeps going lesson after lesson on its own momentum
+once that one lesson is done. Update this handoff file at the end of
+*every* session now, not only when context is running low.
+
+**Original rule, for historical context (no longer in force as
+written):** continuous building, lesson after lesson, with no pauses of
+any kind between lessons, zero narration, building until context forced
+a stop. Still true: the user's own reason underneath both versions of
+this rule hasn't changed (see next paragraph) — only the pace has.
 
 The user's own stated reason for all of this, repeated several times: they
 are working through this curriculum themselves, as homework, specifically
@@ -178,9 +197,14 @@ prior lesson file for a fact a new lesson needs.
 - **Domain-closing synthesis lessons** (L12, L27, L39, L51, L71, L92) are
   lighter on new code, heavier on tying the domain's own running examples
   together and handing off to the next domain by name (never by lesson
-  number). Confirmed pattern across six domains now — very likely holds
-  for L104, L128 (Testing & Verification's own close, if it follows the
-  same per-domain pattern), etc.
+  number). Confirmed pattern across six domains now, and L104 as well.
+  **Correction, this session: L128 is not Domain 9's own close** — an
+  earlier guess in this file was wrong. Domain 9 spans L115–141;
+  Property-Based Testing (L128), Generative Testing (L129), and every
+  lesson through L133 (Test Isolation) were built this session as full,
+  ordinary content lessons, each with real Concept Units, not
+  domain-closing syntheses. L141 (Formal Verification) is Domain 9's
+  real close.
 - **Non-Python-code lesson types, introduced this session, both real
   precedent for future domains**: L88 (Architecture Decision Records) is
   a documentation-artifact lesson — its "New Code" is a markdown ADR
@@ -191,6 +215,29 @@ prior lesson file for a fact a new lesson needs.
   executing it — genuinely new territory, likely to recur in Domain 8
   (Version Control & Collaboration) or Domain 12 (Build & Dependency
   Engineering).
+- **Domain 7's own running example is a from-scratch addition, not a
+  continuation of Domain 5/6's `order_lifecycle.py`/`customer_activity.py`
+  or `checkout`/`arch_order` code** — a deliberate choice, not an
+  oversight: reconstructing those files' exact byte-for-byte current
+  state from prose summaries alone (without reopening every lesson that
+  touched them, which conflicts with this curriculum's own "don't open
+  prior lesson files freely" constraint) risked fabricating code that
+  was never actually verified. Every Domain 7 lesson's own Reference
+  Source field says so explicitly: "no reference counterpart — this is
+  a from-scratch addition." `pricing.py` (later split into
+  `pricing_calculations.py`/`pricing_batch.py`, L102) is the resulting
+  new running example; see the Domain 7 summary below for its own
+  accumulated history. This precedent — starting a fresh, self-contained
+  running example rather than reconstructing an unseen prior one from
+  summary — is available to future sessions facing the identical
+  constraint at any future domain boundary.
+- **New-construct throwaway labs, continued in Domain 7**:
+  `@dataclass(frozen=True)` (L103, `OrderRequest`) is a genuinely new
+  construct, not previously introduced anywhere in this curriculum —
+  added to the running list started in Domain 5 (`Enum` L45, `@property`
+  L48, keyword-only `*` parameters L55, `ABC`/`@abstractmethod` L70,
+  `threading.Thread` L81, `async`/`await`/`asyncio` L85, `ast.parse`/
+  `ast.walk` L90).
 
 ## Progress
 
@@ -445,21 +492,343 @@ bug) → L92 closes the domain: every decision in it was justified by real
 evidence at the time, revisited only when new evidence — gathered with
 the identical discipline — says to.
 
-| 93–280 | ... | not started |
+| 93 | Readable Code | **Done** |
+| 94 | Naming | **Done** |
+| 95 | Function and Method Design | **Done** |
+| 96 | State Management | **Done** |
+| 97 | Error Handling | **Done** |
+| 98 | Failure Semantics | **Done** |
+| 99 | Side Effects | **Done** |
+| 100 | Input Validation | **Done** |
+| 101 | Configuration | **Done** |
+| 102 | Code Organization | **Done** |
+| 103 | Code Smells | **Done** |
+| 104 | Engineering Conventions | **Done** |
 
-**Next up: Lesson 93, Readable Code — Domain 7 (Implementation
-Engineering), 12 lessons (93–104).** Per the BRD: 93 Readable Code, 94
-Naming, 95 Function and Method Design, 96 State Management, 97 Error
-Handling, 98 Failure Semantics, 99 Side Effects, 100 Input Validation,
-101 Configuration, 102 Code Organization, 103 Code Smells, 104
-Engineering Conventions. Note L99 ("Side Effects") is a **second** lesson
-with this exact title — Domain 5's L67 already covered side effects at
-the function-purity level (`.sort()` vs. `sorted()`); per the Repetition
-Rule, L99 still needs its own full, real treatment, but should find a
-genuinely different angle (Domain 7's own Implementation Engineering
-scope, likely something closer to "where should a side effect be allowed
-to happen in a function's own body" rather than repeating L67's own
-pure-vs-impure distinction verbatim).
+**Domain 7 (Implementation Engineering) — complete, all 12 lessons
+(93–104).** Running example: a single evolving order-pricing codebase,
+`pricing.py` through L101, split into `pricing_calculations.py` (pure)
+and `pricing_batch.py` (side-effecting) at L102 along the exact
+functional-core/imperative-shell line L99 already drew. Real bugs found
+and fixed, in order: a nested, duplicated gold-tier discount check
+silently skipping the discount for orders under $50 (L93, fixed with
+guard clauses — the same restructuring that fixed it also exposed it)
+→ `s`/`n`/`t`/`d`/`sh`/`bf` renamed to intention-revealing names,
+`calc_order_total` → `calculate_order_total` (L94) → the function's four
+rules extracted into named helpers; a keyword-only signature closing a
+real `subtotal`/`item_count` positional swap that silently returned
+`$11.34` instead of the correct `$45.89` (L95) → `calculate_subtotal`'s
+own accumulator, plus a real mutable-default-argument leak in
+`build_order_summary`'s `notes` list, fixed with `notes=None` (L96) →
+an unrecognized loyalty tier (a `"glod"` typo) now raises a specific
+`ValueError`; `process_orders` catches it by type, proven against a
+bare `except:` that silently swallowed an unrelated `NameError` from a
+real typo (L97) → `process_order_and_log`'s own audit-log increment
+reordered to only count genuine successes; a real retry-futility
+demonstration proved this `ValueError` is deterministic, not transient,
+so no retry logic was added (L98) → `record_attempt`/`record_success`
+extracted as side-effect-only functions; `preview_order_total` reuses
+the now-fully-isolated-effects `calculate_order_total` to quote a total
+with zero audit-log risk (L99) → `validate_order_lines` (element-wise,
+naming the exact bad index) and a single `item_count` check at
+`calculate_order_total`'s own boundary, deliberately *not* repeated
+inside `calculate_bulk_handling_fee` — a real, counted 2x validation-cost
+reduction shown in the isolated lab (L100) → `GOLD_TIER_DISCOUNT_RATE`
+made configurable via environment variable with correct `str`→`Decimal`
+coercion; a real configuration-drift bug shown (`5.00%` advertised vs.
+`10%` actually applied) and fixed by reusing the one loaded constant
+instead of a second independent read (L101) → the file split in two
+along the pure/side-effecting line, with a real circular-import
+`ImportError` demonstrated and reverted, establishing a one-way
+dependency rule (L102) → `OrderRequest`, a frozen `@dataclass`,
+replacing three primitive parameters repeated across three identical
+signatures (primitive obsession); adding a `gift_wrap` field afterward
+touched zero function signatures, proving the shotgun-surgery fix (L103)
+→ L104 closes the domain, naming **engineering conventions** —
+consistent, deliberate, honestly-tradeoffed, revisable choices — as the
+one throughline underneath all eleven prior lessons' otherwise
+different-sounding subjects.
+
+| 105 | Why Version Control Exists | **Done** |
+| 106 | Versioned State | **Done** |
+| 107 | Commits | **Done** |
+| 108 | Branches | **Done** |
+| 109 | Merging | **Done** |
+| 110 | Rebasing | **Done** |
+| 111 | Conflict Resolution | **Done** |
+| 112 | Pull Requests | **Done** |
+| 113 | Code Review | **Done** |
+| 114 | Collaborative Ownership | **Done** |
+
+**Domain 8 (Version Control & Collaboration) — complete, all 10 lessons
+(105–114).** Running example: `inventory-report/`, a from-scratch
+project (a real reference source, not reconstructed from summary,
+because this session actually built and verified it — see "The
+`inventory-report/` project is now real and persistent," below). Real,
+verified sequence: manual-copy diffing
+pain fixed by `diff -u`, then `git init`/`git status` (L105) →
+`git add`/`git diff`/`git diff --staged`/`.gitignore`, proving staging
+is a snapshot, not a live link (L106) → first commit, then `git log` and
+`git cat-file -p` opening the real commit→tree→blob object graph (L107)
+→ `git branch`/`git switch`, with `.git/refs/heads/*` and `.git/HEAD`
+opened directly to prove a branch is just a file holding a hash (L108)
+→ fast-forward vs. real two-parent merge commits, both proven with
+`git cat-file` (L109) → `git rebase` proven to create new commit objects
+(new hash, same message, new parent), plus a real bare-repo +
+second-clone demonstration of the duplicate-commit mess rebasing
+already-pushed history causes (L110) → real merge and rebase conflicts,
+constructed on purpose (same line, two branches, two different values),
+resolved by hand, including the label-flip between merge-conflict and
+rebase-conflict markers (L111) → `git remote add`/`git push -u`, and a
+real, run proof that a pull request's diff view has to be triple-dot
+(`main...branch`), not two-dot, using a docstring `main` gained
+independently as the concrete misleading-diff case (L112) → `git blame`
+tracing a specific line to its own commit, plus a real `CODEOWNERS` file
+reusing `.gitignore`'s own pattern syntax (L113) → L114 closes the
+domain, walking `is_username_available`'s own two-engineer story (from
+Lesson 12) across all ten lessons at once and naming **collaborative
+ownership** — visibility and review, not exclusive access — as the
+throughline, plus **bus factor** as the named risk every mechanism in
+the domain keeps low.
+
+## The `inventory-report/` project is now real and persistent
+
+This changed this session, permanently, going forward. Every prior
+session verified `inventory-report/` in an ephemeral scratch directory
+(a session temp folder) and this handoff file carried its current state
+forward as *prose* — a full-file dump of what the scratch directory
+held as of the end of whichever lesson last touched it. That pattern is
+retired. **`inventory-report/` (sibling folder to this handoff file,
+`../inventory-report/`) is now a real, physically persisted directory
+in this repository**, containing every file described as verified, run,
+and committed across Lessons 105 through 133 — copied there directly
+from this session's own scratch verification work, not reconstructed
+from memory or summary.
+
+**What a future session should do instead of reading a prose dump
+here:** open `../inventory-report/` directly — only when a new lesson
+is actually about to extend code that lives there, per the "only when
+actually needed" rule above — and read the real files. `inventory_
+report.py` and `inventory_cli.py` hold every function; every `check_
+*.py` file is a real, currently-passing check; `inventory.json`,
+`inventory_bad.json`, `inventory_zero.json`, and `inventory_negative.
+json` are the real fixture files Lessons 121, 122, and 126 built.
+Running `python3 check_<name>.py` for any of them, or `python3 -m
+mypy inventory_report.py`, from inside that folder, works today,
+directly — nothing needs to be recreated first. Two packages are
+installed into this machine's own Python environment (not vendored
+into the folder itself) and would need `pip install mypy hypothesis`
+again on a different machine: `mypy` (Lesson 116) and `hypothesis`
+(Lesson 128).
+
+**This folder has no `.git` of its own.** The real, commit-by-commit
+git history this session built during verification (used to demonstrate
+real `git log`/`git diff`/`git show` behavior in Lesson 132
+specifically) was scratch-only, the same way it always has been for
+this curriculum's own repo-internal git demonstrations — it is not
+preserved, and Lesson 132's own real commit hashes quoted in its lesson
+text (`246f86b`, etc.) belong to that now-gone scratch history, not to
+this repository's own git. A future session needing to reproduce a
+similar git-history demonstration should build a fresh scratch `git
+init` the way every session already has, using `../inventory-report/`'s
+real current file content as the starting point instead of
+reconstructing it from a prose summary.
+
+A future session extending Domain 9 (L134 onward) should treat `../
+inventory-report/` exactly like an already-cloned, already-working
+project — read what's there, extend it, keep it passing — the same
+posture a real engineer would have joining a real, existing codebase,
+which is closer to this curriculum's own point than reconstructing
+files from a changelog ever was.
+
+## Verification gotchas discovered this session (save a future session real time)
+
+- **On Windows/Git Bash, use Python for in-place file edits during
+  verification, never `sed -i`.** `sed -i 's/x/y/'` on this platform, at
+  least once this session, silently rewrote *every* line's own line
+  endings, not just the targeted line — producing a diff with every line
+  shown as removed-and-re-added (e.g., "12 insertions, 12 deletions" for
+  what should have been a genuine one-line change) instead of a clean,
+  single-line diff. Caught by checking `git show --stat` after an edit
+  that should have been trivial and finding a suspiciously large change
+  count. Fix used throughout the rest of this session:
+  `python3 -c "p='file'; t=open(p).read(); t=t.replace('old','new');
+  open(p,'w').write(t)"` — never touches line endings it isn't told to.
+- **`git config core.autocrlf false` once per scratch repo**, set
+  immediately after `git init`, avoids a separate, related
+  `warning: LF will be replaced by CRLF` noise on every `git add` — real
+  Git behavior, not a bug, but irrelevant noise this curriculum's own
+  lessons don't need cluttering verified output.
+- **The L52 "never let an uncaught traceback leak this machine's own
+  absolute path" rule extends to *every* real, run output containing a
+  path, not just Python tracebacks** — `git init`'s own confirmation
+  message (`Initialized empty Git repository in <path>`) and every
+  Python traceback's own `File "<path>"` line both needed the same
+  fix: keep the real, verified command and the real shape of its output,
+  replace only the machine-specific path segment with a generic
+  `/path/to/...` placeholder, and say so honestly in-lesson (this is
+  *not* the same as the L52 case itself, which was about catching an
+  exception that shouldn't have been allowed to propagate at all —
+  Lesson 115 deliberately *does* let an `AssertionError` propagate
+  uncaught, since that's correct, intended test-failure behavior; only
+  the path inside that intentional traceback needed sanitizing, not the
+  traceback itself).
+- **A lesson borrowing a future lesson's own mechanism, briefly, to
+  prove one real point early, is a legitimate pattern — used twice this
+  session, both real precedent for later domains.** Lesson 110
+  (Rebasing) used `git init --bare`, a second clone, and `git push
+  --force` — all Lesson 112 (Pull Requests)'s own real subject — solely
+  inside its own "What Breaks Without This" section, to prove the
+  shared-history-rebase danger concretely instead of only asserting it,
+  explicitly flagging that full treatment of remotes was still Lesson
+  112's job. Lesson 112 then delivered on that flag in full. Available
+  to any future lesson facing the identical tradeoff: assert a real
+  danger honestly, or borrow just enough of a not-yet-taught mechanism
+  to prove it now, as long as the borrow is explicit and the real
+  lesson still delivers full treatment later.
+- **`mutmut` (the standard Python mutation-testing tool) refuses to run
+  natively on this session's own Windows environment** — it explicitly
+  detects Windows and tells you to use WSL, which wasn't available this
+  session. L131 (Mutation Testing) was built entirely by hand as a
+  result (manually editing real code into a "mutant," running the real
+  suite against it, reverting) — a real, honestly-flagged environment
+  limitation, not a design choice. A future session with WSL access
+  could redo L131 using the real tool, but the hand-built version is
+  itself real, run, verified content, not a placeholder.
+- **`mypy` and `hypothesis` were both installed via `pip install` into
+  this machine's own global Python environment, not into `inventory-
+  report/` itself** (no virtual environment or lockfile — Domain 12,
+  Build & Dependency Engineering, is where that gets real treatment).
+  A future session on a different machine needs to reinstall both
+  before Lessons 116 and 128 onward will actually run.
+- **Python caches its own compiled bytecode (`__pycache__/`) and can
+  serve a stale cached version of a file that was just edited on disk**,
+  at least once this session, when two edits happened in quick
+  succession — caught by a check that should have failed still passing,
+  traced to a stale `.pyc`. Fix: `rm -rf __pycache__` (and, for
+  `hypothesis`/`mypy` specifically, their own `.hypothesis/` and `.
+  mypy_cache/` directories) before rerunning anything after a hand-edit
+  during verification, and always before copying the project anywhere
+  — none of these three directories belong in `inventory-report/`
+  itself and were stripped out before this session moved it into the
+  real repo.
+
+| 115 | Why Test? | **Done** |
+| 116 | Testing vs Verification | **Done** |
+| 117 | Test Oracles | **Done** |
+| 118 | Unit Tests | **Done** |
+| 119 | Integration Tests | **Done** |
+| 120 | System Tests | **Done** |
+| 121 | End-to-End Tests | **Done** |
+| 122 | Test Boundaries | **Done** |
+| 123 | Test Doubles | **Done** |
+| 124 | Mocks | **Done** |
+| 125 | Stubs | **Done** |
+| 126 | Fakes | **Done** |
+| 127 | Contract Tests | **Done** |
+| 128 | Property-Based Testing | **Done** |
+| 129 | Generative Testing | **Done** |
+| 130 | Fuzz Testing | **Done** |
+| 131 | Mutation Testing | **Done** |
+| 132 | Regression Testing | **Done** |
+| 133 | Test Isolation | **Done** |
+| 134 | Determinism | Not started |
+| 135 | Flaky Tests | Not started |
+| 136 | Test Data | Not started |
+| 137 | Test Environments | Not started |
+| 138 | Coverage | Not started |
+| 139 | Testing Strategy | Not started |
+| 140 | Verification Strategies | Not started |
+| 141 | Formal Verification | Not started |
+
+**Domain 9 (Testing & Verification) — in progress, 19 of 27 lessons done
+(115–133).** Running example: `inventory-report/`, continued directly
+from Domain 8, **now a real, persistent project folder** (see the
+section above) instead of a scratch directory reconstructed each
+session. Real, verified sequence, each arrow a real bug found and
+fixed unless noted otherwise: L115 revisited the Verification stage
+Lesson 12 first placed, replacing a fragile one-off hand-check with a
+real, automated `check_low_stock_items` → L116 drew the actual
+testing/verification distinction using real `mypy` static type
+checking, catching a missing `str()` conversion in an untested branch
+that dynamic testing alone never exercised → L117 introduced test
+oracles, building a derived-oracle second implementation of `reorder_
+suggestion` that surfaced a real, pre-existing docstring-vs-behavior
+mismatch on `low_stock_items` (fixed by correcting the docstring, not
+the code) → L118 named unit tests and proved `check_restock_alert`
+wasn't actually isolated from `low_stock_items`, via a real, reverted
+regression → L119 combined `reorder_suggestion` and `format_reorder_
+line` into `build_reorder_report`, finding a real negative-reorder-
+quantity bug at their seam, fixed with an explicit precondition →
+L120 gave the project its first real external interface, `inventory_
+cli.py`, and a system test (`subprocess.run`) that caught a missing
+`int()` on a CLI argument no unit/integration check could reach → L121
+gave the project its first real file I/O, `load_inventory` reading
+`inventory.json`, and an end-to-end test that caught a hand-edited
+JSON data-quality mistake (a quoted number) real unit tests never
+would → L122 named boundary value analysis and found `load_inventory`
+silently accepted negative counts, closing the gap with a new,
+deliberately-chosen-boundary check → L123 built a real monkey-patched
+test double, finally isolating `restock_alert` from `low_stock_items`
+the way L118 named but couldn't yet achieve → L124 added call-recording
+to that same double (a mock), catching a swapped-argument bug the
+plain stub from L123 couldn't see → L125 used deliberately unsorted
+stub data to find a real ordering inconsistency between `restock_
+alert` and `build_reorder_report`, fixed with one `sorted()` call →
+L126 split `load_inventory` into `parse_inventory`/`load_inventory` so
+`io.StringIO` fakes could test real parsing logic without touching
+disk → L127 wrote `load_inventory`'s contract down explicitly as a
+docstring and proved the same test passes unmodified against two
+genuinely different real implementations of it → L128 introduced real
+`hypothesis` property-based testing, finding and shrinking a real
+counterexample that led to moving `build_reorder_report`'s own
+precondition down into `reorder_suggestion` itself → L129 replaced
+`assume()`-based filtering with a constructed-by-design strategy,
+proven necessary by a real `hypothesis` `FailedHealthCheck` under a
+deliberately narrow constraint → L130 used `hypothesis` fuzzing across
+mixed JSON shapes to find a real `AttributeError` (a bare `null` file)
+that ten prior lessons' worth of checks never tried → L131 introduced
+mutation testing by hand (no tool available; `mutmut` doesn't run
+natively on this session's own Windows environment) and found the
+project's *entire* test suite — every check across sixteen lessons —
+never actually verified `low_stock_items`'s own `sorted()` call did
+anything → L132 named regression testing explicitly, added comments
+tying two existing checks to their real, specific historical bugs, and
+reproduced a real historical regression against the current project
+using real `git log`/`git diff`/`git checkout` → L133 introduced the
+first function in the project that mutates its own input,
+`apply_reorder`, and found a real order-dependent test failure caused
+by two checks sharing one mutable dictionary, fixed by giving each
+check its own fresh data.
+
+## Next up: Lesson 134 — Determinism, continuing Domain 9
+
+Domain 9 spans **L115–141 (27 lessons)**, per the BRD's own words, "one
+of the largest domains." Remaining: 134 Determinism, 135 Flaky Tests,
+136 Test Data, 137 Test Environments, 138 Coverage, 139 Testing
+Strategy, 140 Verification Strategies, 141 Formal Verification. The BRD
+additionally names one learner-understanding progression for this
+domain: `Example-based testing → Property-based testing → Generative
+testing → Model-based testing → Formal verification`, "as increasingly
+different ways of producing evidence about system behavior" — L128 and
+L129 already delivered the first two steps of this progression in full;
+"model-based testing" specifically has not been used by name by any
+lesson yet and is worth checking against when L140 (Verification
+Strategies) or L141 (Formal Verification) are eventually built.
+
+A forward-reference debt worth knowing about, not yet paid: Lesson
+119's own Exercise 3 and Lesson 130's own Exercise 2 both explicitly
+named **Lesson 139 (Testing Strategy)** as the future lesson responsible
+for running the project's entire check suite as one coordinated command,
+instead of one `python3 check_X.py` invocation per file — seventeen
+separate check files, twenty-five individual check functions across
+them, plus a separate `python3 -m mypy` call, as of the end of L133.
+That promise has not been delivered yet and must be, by name, when
+L139 is built.
 
 Full lesson list/titles for all 18 domains: see the BRD, section 8
-(Domain 1) through section 25 (Domain 18).
+(Domain 1) through section 25 (Domain 18). Domain 7's own list, for
+reference: 93 Readable Code, 94 Naming, 95 Function and Method Design,
+96 State Management, 97 Error Handling, 98 Failure Semantics, 99 Side
+Effects, 100 Input Validation, 101 Configuration, 102 Code Organization,
+103 Code Smells, 104 Engineering Conventions.
