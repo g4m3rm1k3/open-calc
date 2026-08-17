@@ -971,3 +971,372 @@
   (+ (get (dijkstra matrix source n) waypoint)
      (get (dijkstra matrix waypoint n) destination)))
 
+;; ---- Section XI backfill (Lessons 231 [partial], 232-235, 238-251) ----
+;; Partial, on-demand backfill, not a full re-derivation of 231-239 - added
+;; 2026-08-17 while writing Lessons 240-251, which needed matrix-vector-multiply,
+;; parallelogram-area, matrix-inverse, and (for 251) point-x/point-y/make-point
+;; for real, and they weren't here yet. Only lessons actually opened and read
+;; this session are included below. Lesson 231 is PARTIAL - only make-point/
+;; point-x/point-y were pulled (251 needed them via vector-from-points);
+;; translate-point and the rest of 231 were not copied. Lessons 236, 237 are
+;; NOT here at all - not read this session, per this project's zero-old-
+;; lesson-file-reads default; don't assume their functions are covered just
+;; because neighboring lessons are.
+
+;; ---- Lesson 231 (partial) : 231-coordinate-systems.md ----
+(defn make-point [x y] [x y])
+(defn point-x [point] (get point 0))
+(defn point-y [point] (get point 1))
+
+;; ---- Lesson 232 : 232-vectors.md ----
+(defn make-vector [dx dy]
+  [dx dy])
+
+(defn vector-dx [v] (get v 0))
+(defn vector-dy [v] (get v 1))
+
+(defn vector-from-points [p1 p2]
+  (make-vector (- (point-x p2) (point-x p1)) (- (point-y p2) (point-y p1))))
+
+(defn vector-magnitude-squared [v]
+  (+ (* (vector-dx v) (vector-dx v)) (* (vector-dy v) (vector-dy v))))
+
+(defn vector-magnitude [v]
+  (Math/sqrt (vector-magnitude-squared v)))
+
+;; ---- Lesson 233 : 233-vector-operations.md ----
+(defn vector-add [v1 v2]
+  (make-vector (+ (vector-dx v1) (vector-dx v2)) (+ (vector-dy v1) (vector-dy v2))))
+
+(defn vector-scale [v k]
+  (make-vector (* (vector-dx v) k) (* (vector-dy v) k)))
+
+(defn dot-product [v1 v2]
+  (+ (* (vector-dx v1) (vector-dx v2)) (* (vector-dy v1) (vector-dy v2))))
+
+(defn vector-projection [a b]
+  (vector-scale b (/ (dot-product a b) (dot-product b b))))
+
+;; ---- Lesson 234 : 234-matrices.md ----
+(defn make-matrix [row0 row1]
+  [row0 row1])
+
+(defn matrix-row [m index] (get m index))
+
+(defn matrix-vector-multiply [m v]
+  (make-vector (dot-product (matrix-row m 0) v) (dot-product (matrix-row m 1) v)))
+
+;; ---- Lesson 235 : 235-matrix-multiplication.md ----
+(defn apply-two-transformations [second-matrix first-matrix v]
+  (matrix-vector-multiply second-matrix (matrix-vector-multiply first-matrix v)))
+
+(defn matrix-column [m index]
+  (make-vector (get (matrix-row m 0) index) (get (matrix-row m 1) index)))
+
+(defn matrix-multiply-row [m2-row m1]
+  (make-vector (dot-product m2-row (matrix-column m1 0)) (dot-product m2-row (matrix-column m1 1))))
+
+(defn matrix-multiply [m2 m1]
+  (make-matrix (matrix-multiply-row (matrix-row m2 0) m1) (matrix-multiply-row (matrix-row m2 1) m1)))
+
+;; ---- Lesson 238 : 238-determinants.md ----
+(defn determinant [m]
+  (- (* (get (matrix-row m 0) 0) (get (matrix-row m 1) 1))
+     (* (get (matrix-row m 0) 1) (get (matrix-row m 1) 0))))
+
+(defn parallelogram-area [v1 v2]
+  (- (* (vector-dx v1) (vector-dy v2)) (* (vector-dx v2) (vector-dy v1))))
+
+;; ---- Lesson 239 : 239-inverses.md ----
+(defn matrix-inverse-with-det [m det]
+  (make-matrix
+    (make-vector (/ (get (matrix-row m 1) 1) det) (/ (- (get (matrix-row m 0) 1)) det))
+    (make-vector (/ (- (get (matrix-row m 1) 0)) det) (/ (get (matrix-row m 0) 0) det))))
+
+(defn matrix-inverse [m]
+  (matrix-inverse-with-det m (determinant m)))
+
+;; ---- Lesson 240 : 240-eigenvalues-and-eigenvectors.md ----
+(defn vectors-parallel? [v1 v2]
+  (= (parallelogram-area v1 v2) 0))
+
+(defn zero-vector? [v]
+  (= v (make-vector 0 0)))
+
+(defn eigenvector-of? [m v]
+  (if (zero-vector? v)
+    false
+    (vectors-parallel? v (matrix-vector-multiply m v))))
+
+(defn eigenvalue-from-x [v w]
+  (/ (vector-dx w) (vector-dx v)))
+
+(defn eigenvalue-from-y [v w]
+  (/ (vector-dy w) (vector-dy v)))
+
+(defn eigenvalue-for [m v]
+  (if (= (vector-dx v) 0)
+    (eigenvalue-from-y v (matrix-vector-multiply m v))
+    (eigenvalue-from-x v (matrix-vector-multiply m v))))
+
+;; ---- Lesson 241 : 241-systems-of-linear-equations.md ----
+(defn elimination-factor [m]
+  (/ (get (matrix-row m 1) 0) (get (matrix-row m 0) 0)))
+
+(defn eliminate [m]
+  (make-matrix
+    (matrix-row m 0)
+    (vector-add (matrix-row m 1) (vector-scale (matrix-row m 0) (- (elimination-factor m))))))
+
+(defn eliminate-b [m b]
+  (make-vector
+    (vector-dx b)
+    (- (vector-dy b) (* (elimination-factor m) (vector-dx b)))))
+
+(defn back-substitute-y [triangular-m eliminated-b]
+  (/ (vector-dy eliminated-b) (get (matrix-row triangular-m 1) 1)))
+
+(defn back-substitute-x [m b y]
+  (/ (- (vector-dx b) (* (get (matrix-row m 0) 1) y)) (get (matrix-row m 0) 0)))
+
+(defn solve-with-y [m b y]
+  (make-vector (back-substitute-x m b y) y))
+
+(defn solve-system [m b]
+  (solve-with-y m b (back-substitute-y (eliminate m) (eliminate-b m b))))
+
+;; ---- Lesson 242 : 242-numerical-stability.md ----
+(defn relative-error [approx exact]
+  (/ (Math/abs (- approx exact)) (Math/abs exact)))
+
+(defn swap-rows [m]
+  (make-matrix (matrix-row m 1) (matrix-row m 0)))
+
+(defn swap-b [b]
+  (make-vector (vector-dy b) (vector-dx b)))
+
+(defn needs-pivot? [m]
+  (> (Math/abs (get (matrix-row m 1) 0)) (Math/abs (get (matrix-row m 0) 0))))
+
+(defn solve-system-pivoted [m b]
+  (if (needs-pivot? m)
+    (solve-system (swap-rows m) (swap-b b))
+    (solve-system m b)))
+
+;; ---- Lesson 243 : 243-affine-geometry.md ----
+(defn make-hpoint [x y] [x y 1])
+(defn make-hvector [dx dy] [dx dy 0])
+
+(defn hx [h] (get h 0))
+(defn hy [h] (get h 1))
+(defn hw [h] (get h 2))
+
+(defn make-affine [row0 row1 row2] [row0 row1 row2])
+(defn affine-row [a index] (get a index))
+
+(defn dot-product3 [v1 v2]
+  (+ (* (get v1 0) (get v2 0)) (* (get v1 1) (get v2 1)) (* (get v1 2) (get v2 2))))
+
+(defn affine-transform [a h]
+  [(dot-product3 (affine-row a 0) h) (dot-product3 (affine-row a 1) h) (dot-product3 (affine-row a 2) h)])
+
+(defn translation-matrix [tx ty]
+  (make-affine [1 0 tx] [0 1 ty] [0 0 1]))
+
+(defn embed-linear [m]
+  (make-affine
+    [(get (matrix-row m 0) 0) (get (matrix-row m 0) 1) 0]
+    [(get (matrix-row m 1) 0) (get (matrix-row m 1) 1) 0]
+    [0 0 1]))
+
+;; ---- Lesson 244 : 244-2d-transformations.md ----
+(defn affine-column [a index]
+  [(get (affine-row a 0) index) (get (affine-row a 1) index) (get (affine-row a 2) index)])
+
+(defn affine-multiply-row [a2-row a1]
+  [(dot-product3 a2-row (affine-column a1 0)) (dot-product3 a2-row (affine-column a1 1)) (dot-product3 a2-row (affine-column a1 2))])
+
+(defn affine-multiply [a2 a1]
+  (make-affine
+    (affine-multiply-row (affine-row a2 0) a1)
+    (affine-multiply-row (affine-row a2 1) a1)
+    (affine-multiply-row (affine-row a2 2) a1)))
+
+(defn make-triangle [p1 p2 p3] [p1 p2 p3])
+(defn triangle-p1 [tri] (get tri 0))
+(defn triangle-p2 [tri] (get tri 1))
+(defn triangle-p3 [tri] (get tri 2))
+
+(defn transform-triangle [a tri]
+  (make-triangle
+    (affine-transform a (triangle-p1 tri))
+    (affine-transform a (triangle-p2 tri))
+    (affine-transform a (triangle-p3 tri))))
+
+(defn rotate-around-pivot [rotation px py]
+  (affine-multiply (translation-matrix px py) (affine-multiply rotation (translation-matrix (- px) (- py)))))
+
+;; ---- Lesson 245 : 245-3d-transformations.md ----
+(defn make-hpoint3 [x y z] [x y z 1])
+(defn make-hvector3 [dx dy dz] [dx dy dz 0])
+
+(defn hx3 [h] (get h 0))
+(defn hy3 [h] (get h 1))
+(defn hz3 [h] (get h 2))
+(defn hw3 [h] (get h 3))
+
+(defn make-affine3 [row0 row1 row2 row3] [row0 row1 row2 row3])
+(defn affine3-row [a index] (get a index))
+
+(defn dot-product4 [v1 v2]
+  (+ (* (get v1 0) (get v2 0)) (* (get v1 1) (get v2 1)) (* (get v1 2) (get v2 2)) (* (get v1 3) (get v2 3))))
+
+(defn affine3-transform [a h]
+  [(dot-product4 (affine3-row a 0) h) (dot-product4 (affine3-row a 1) h) (dot-product4 (affine3-row a 2) h) (dot-product4 (affine3-row a 3) h)])
+
+(defn translation-matrix3 [tx ty tz]
+  (make-affine3 [1 0 0 tx] [0 1 0 ty] [0 0 1 tz] [0 0 0 1]))
+
+(def rotate-z-90 (make-affine3 [0 -1 0 0] [1 0 0 0] [0 0 1 0] [0 0 0 1]))
+
+(defn affine3-column [a index]
+  [(get (affine3-row a 0) index) (get (affine3-row a 1) index) (get (affine3-row a 2) index) (get (affine3-row a 3) index)])
+
+(defn affine3-multiply-row [a2-row a1]
+  [(dot-product4 a2-row (affine3-column a1 0)) (dot-product4 a2-row (affine3-column a1 1)) (dot-product4 a2-row (affine3-column a1 2)) (dot-product4 a2-row (affine3-column a1 3))])
+
+(defn affine3-multiply [a2 a1]
+  (make-affine3
+    (affine3-multiply-row (affine3-row a2 0) a1)
+    (affine3-multiply-row (affine3-row a2 1) a1)
+    (affine3-multiply-row (affine3-row a2 2) a1)
+    (affine3-multiply-row (affine3-row a2 3) a1)))
+
+;; ---- Lesson 246 : 246-derivatives.md ----
+(defn square [x] (* x x))
+
+(defn average-rate-of-change [f x1 x2]
+  (/ (- (f x2) (f x1)) (- x2 x1)))
+
+(defn numerical-derivative [f x h]
+  (average-rate-of-change f x (+ x h)))
+
+(defn position [t] (* t t))
+
+;; ---- Lesson 247 : 247-gradients.md ----
+(defn bowl [x y] (+ (* x x) (* y y)))
+
+(defn partial-derivative-x [f x y h]
+  (/ (- (f (+ x h) y) (f x y)) h))
+
+(defn partial-derivative-y [f x y h]
+  (/ (- (f x (+ y h)) (f x y)) h))
+
+(defn gradient [f x y h]
+  (make-vector (partial-derivative-x f x y h) (partial-derivative-y f x y h)))
+
+;; ---- Lesson 248 : 248-integrals.md ----
+;; riemann-sum-from is real, non-tail recursion: n must stay under ~2000
+;; on this machine/bb or it raises a real StackOverflowError (verified
+;; 2026-08-17, n=1000 safe, n=2000 crashes). This is documented, not a bug.
+(defn identity-fn [x] x)
+
+(declare riemann-sum-from)
+(defn riemann-sum [f a b n]
+  (riemann-sum-from f a (/ (- b a) n) n 0))
+
+(defn riemann-sum-from [f a dx remaining index]
+  (if (= remaining 0)
+    0
+    (+ (* (f (+ a (* index dx))) dx) (riemann-sum-from f a dx (- remaining 1) (+ index 1)))))
+
+(defn double-x [x] (* 2 x))
+(defn velocity [t] (* 2 t))
+
+;; ---- Lesson 249 : 249-optimization.md ----
+(defn gradient-descent-step [x y g step-size]
+  (make-vector
+    (- x (* step-size (vector-dx g)))
+    (- y (* step-size (vector-dy g)))))
+
+(defn gradient-descent-step-at [f x y h step-size]
+  (gradient-descent-step x y (gradient f x y h) step-size))
+
+(declare gradient-descent-from)
+(defn gradient-descent [f x y h step-size iterations]
+  (gradient-descent-from f x y h step-size iterations))
+
+(defn gradient-descent-recur [f new-point h step-size remaining]
+  (gradient-descent-from f (vector-dx new-point) (vector-dy new-point) h step-size remaining))
+
+(defn gradient-descent-from [f x y h step-size remaining]
+  (if (= remaining 0)
+    (make-vector x y)
+    (gradient-descent-recur f (gradient-descent-step-at f x y h step-size) h step-size (- remaining 1))))
+
+;; ---- Lesson 250 : 250-numerical-optimization.md ----
+(defn converged? [f x y h tolerance]
+  (< (vector-magnitude (gradient f x y h)) tolerance))
+
+(defn make-descent-result [point did-converge] [point did-converge])
+(defn descent-result-point [r] (get r 0))
+(defn descent-result-converged? [r] (get r 1))
+
+(declare gradient-descent-until-from)
+(defn gradient-descent-until-converged [f x y h step-size tolerance max-iterations]
+  (gradient-descent-until-from f x y h step-size tolerance max-iterations))
+
+(defn gradient-descent-until-recur [f new-point h step-size tolerance remaining]
+  (gradient-descent-until-from f (vector-dx new-point) (vector-dy new-point) h step-size tolerance remaining))
+
+(defn gradient-descent-until-from [f x y h step-size tolerance remaining]
+  (if (converged? f x y h tolerance)
+    (make-descent-result (make-vector x y) true)
+    (if (= remaining 0)
+      (make-descent-result (make-vector x y) false)
+      (gradient-descent-until-recur f (gradient-descent-step-at f x y h step-size) h step-size tolerance (- remaining 1)))))
+
+;; ---- Lesson 251 : 251-computational-geometry.md ----
+(defn orientation [a b c]
+  (parallelogram-area (vector-from-points a b) (vector-from-points a c)))
+
+(defn segments-straddle? [p1 p2 q1 q2]
+  (< (* (orientation p1 p2 q1) (orientation p1 p2 q2)) 0))
+
+(defn segments-intersect? [p1 p2 q1 q2]
+  (and (segments-straddle? p1 p2 q1 q2) (segments-straddle? q1 q2 p1 p2)))
+
+(defn clamp01 [t]
+  (if (< t 0) 0 (if (> t 1) 1 t)))
+
+(defn closest-point-on-segment [a b p]
+  (vector-add a (vector-scale (vector-from-points a b) (clamp01 (/ (dot-product (vector-from-points a p) (vector-from-points a b)) (dot-product (vector-from-points a b) (vector-from-points a b)))))))
+
+(defn point-segment-distance [a b p]
+  (vector-magnitude (vector-from-points (closest-point-on-segment a b p) p)))
+
+(defn point-in-quad? [q1 q2 q3 q4 p]
+  (and
+    (>= (orientation q1 q2 p) 0)
+    (>= (orientation q2 q3 p) 0)
+    (>= (orientation q3 q4 p) 0)
+    (>= (orientation q4 q1 p) 0)))
+
+;; ---- Lesson 252 : 252-mathematics-of-simulation.md (Section XI checkpoint) ----
+;; [position velocity] state pair, not a spatial vector - Euler-step simulation.
+(defn fall-step [state g dt]
+  (make-vector
+    (+ (vector-dx state) (* (- (vector-dy state) (* g dt)) dt))
+    (- (vector-dy state) (* g dt))))
+
+(declare simulate-fall-from)
+(defn simulate-fall [height g dt max-steps]
+  (simulate-fall-from (make-vector height 0) g dt 0 max-steps))
+
+(defn simulate-fall-from [state g dt elapsed-steps max-steps]
+  (if (<= (vector-dx state) 0)
+    elapsed-steps
+    (if (= max-steps 0)
+      elapsed-steps
+      (simulate-fall-from (fall-step state g dt) g dt (+ elapsed-steps 1) (- max-steps 1)))))
+
