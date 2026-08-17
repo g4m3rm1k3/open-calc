@@ -1,0 +1,3 @@
+[run]
+source = inventory_report, inventory_cli
+parallel = true

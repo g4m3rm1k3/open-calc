@@ -31,3 +31,12 @@ def apply_reorder(inventory, suggestions):
     for name, qty in suggestions.items():
         inventory[name] = inventory.get(name, 0) + qty
     return inventory
+
+def low_stock_across_stores(store_inventories, threshold=3):
+    seen = {}
+    for inventory in store_inventories:
+        for name in low_stock_items(inventory, threshold):
+            key = name.casefold()
+            if key not in seen:
+                seen[key] = name
+    return sorted(seen.values())

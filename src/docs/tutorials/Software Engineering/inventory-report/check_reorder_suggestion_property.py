@@ -1,4 +1,4 @@
-from hypothesis import given, strategies as st
+from hypothesis import given, seed, strategies as st
 from inventory_report import reorder_suggestion
 
 def combine_threshold_and_gap(threshold_and_gap):
@@ -10,6 +10,7 @@ valid_threshold_target_pairs = st.tuples(
     st.integers(min_value=1, max_value=100),
 ).map(combine_threshold_and_gap)
 
+@seed(20260817)
 @given(
     inventory=st.dictionaries(
         st.text(alphabet="abcdefghij", min_size=1, max_size=8),
