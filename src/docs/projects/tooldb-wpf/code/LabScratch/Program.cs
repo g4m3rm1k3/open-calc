@@ -1,38 +1,15 @@
 using Microsoft.Data.Sqlite;
 
-if (File.Exists("lab1.db"))
-{
-    File.Delete("lab1.db");
-}
-
-using var connection = new SqliteConnection("Data Source=lab1.db");
+using var connection = new SqliteConnection("Data Source=../ToolDB/tools.db");
 connection.Open();
 
-Console.WriteLine($"File exists before CREATE TABLE: {File.Exists("lab1.db")}");
-Console.WriteLine($"File size before CREATE TABLE: {new FileInfo("lab1.db").Length} bytes");
-
-using var createTableCommand = new SqliteCommand("CREATE TABLE tools (name)", connection);
-int rowsAffected = createTableCommand.ExecuteNonQuery();
-Console.WriteLine($"ExecuteNonQuery() returned: {rowsAffected}");
-
-Console.WriteLine($"File exists after CREATE TABLE: {File.Exists("lab1.db")}");
-Console.WriteLine($"File size after CREATE TABLE: {new FileInfo("lab1.db").Length} bytes");
-
-using var lookupCommand = new SqliteCommand(
-    "SELECT sql FROM sqlite_schema WHERE type = 'table' AND name = 'tools'",
+using var readBackCommand = new SqliteCommand(
+    "SELECT name, manufacturer, overall_diameter, typeof(overall_diameter), overall_length, typeof(overall_length), flute_count, typeof(flute_count) FROM tools WHERE id = 1",
     connection);
-object? storedSql = lookupCommand.ExecuteScalar();
-Console.WriteLine($"sqlite_schema's stored SQL for 'tools': {storedSql}");
-
-using var missingLookupCommand = new SqliteCommand(
-    "SELECT sql FROM sqlite_schema WHERE type = 'table' AND name = 'nonexistent'",
-    connection);
-object? missingResult = missingLookupCommand.ExecuteScalar();
-if (missingResult is null)
-{
-    Console.WriteLine("sqlite_schema's stored SQL for 'nonexistent': null");
-}
-else
-{
-    Console.WriteLine($"sqlite_schema's stored SQL for 'nonexistent': {missingResult}");
-}
+using var reader = readBackCommand.ExecuteReader();
+reader.Read();
+Console.WriteLine($"name: {reader.GetString(0)}");
+Console.WriteLine($"manufacturer: {reader.GetString(1)}");
+Console.WriteLine($"overall_diameter: {reader.GetDouble(2)} (typeof: {reader.GetString(3)})");
+Console.WriteLine($"overall_length: {reader.GetDouble(4)} (typeof: {reader.GetString(5)})");
+Console.WriteLine($"flute_count: {reader.GetInt32(6)} (typeof: {reader.GetString(7)})");

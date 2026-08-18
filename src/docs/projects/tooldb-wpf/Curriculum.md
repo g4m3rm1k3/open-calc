@@ -118,7 +118,7 @@ view replacing today's):
 | 0 | Environment & Project Setup (.NET SDK, creating the initial project, installing a NuGet package) | — | SDK, project file, package manager (NuGet), package restore | written |
 | 1 | Connecting to a Database File (`Microsoft.Data.Sqlite`, connection strings) | — | database, SQLite, connection, connection string, resource lifetime | written |
 | 2 | Schema Design (`CREATE TABLE`, type affinity, `PRIMARY KEY`) | 1 | table, column, row, type affinity, primary key | written |
-| 3 | Inserting Safely (parameterized queries, `SqliteParameter`) | 1–2 | SQL parameters, parameter binding, SQL injection | not written |
+| 3 | Inserting Safely (parameterized queries, `SqliteParameter`) | 1–2 | SQL parameters, parameter binding, SQL injection | written |
 | 4 | Querying Back (`SELECT`, `ExecuteReader`, row→object mapping; write your first automated test against it) | 1–3 | `SELECT`, reader, iteration, row→object mapping, automated test | not written |
 | 5 | WPF Basics (`App.xaml`, `MainWindow.xaml`, code-behind, window lifecycle) | — | application, window, XAML, code-behind, lifecycle | not written |
 | 6 | Hosting WebView2 in a WPF Window (`CoreWebView2` init, loading local HTML; includes diagnosing a broken/failed initialization) | 5 | control, browser process, initialization, navigation | not written |
@@ -233,4 +233,4 @@ curriculum is deliberately structured to revisit at increasing depth:
 | Live/concurrent state | 27–28 | 30–32 |
 | Presentation layer (JS) | 10–11 | 33–34 |
 
-Lesson 3 is next.
+Lesson 4 is next.

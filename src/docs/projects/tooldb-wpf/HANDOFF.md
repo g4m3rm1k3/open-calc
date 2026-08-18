@@ -5,15 +5,40 @@ Read this first when resuming. Roadmap and lesson status live in
 
 ## Status
 
-- **Next lesson:** 3 — Inserting Safely
+- **Next lesson:** 4 — Querying Back
 - **Lessons written:** 0 — Environment & Project Setup
   (`lessons/lesson-00-environment-and-project-setup.md`); 1 — Static
   Types, Connection Strings, and a Resource's Lifetime
   (`lessons/lesson-01-connecting-to-a-database-file.md`); 2 — What a
   Schema Promises vs. What SQLite Enforces
-  (`lessons/lesson-02-schema-design.md`)
+  (`lessons/lesson-02-schema-design.md`); 3 — Never Let Data Become Code
+  (`lessons/lesson-03-inserting-safely.md`)
 - Update the "Next lesson" line above after every lesson, not just at
   session boundaries.
+- **Lesson 3 notes (this session):** `tools.db` now holds its first real
+  row (a real endmill; manufacturer `"O'Brien Carbide Tools"`, chosen
+  deliberately for its apostrophe). Lesson 2's `CREATE TABLE`/verification
+  block was *removed* from `Program.cs` (not kept and reconditionally
+  skipped) — the schema now exists permanently on disk, so nothing
+  reverifies it every run; don't re-add a `CREATE TABLE` call in a future
+  lesson without deleting `tools.db` first, same reasoning as Lesson 2's
+  own manual-delete steps. The naive/unsafe string-concatenation `INSERT`
+  technique was deliberately **never** written into `ToolDB` at any point,
+  even temporarily — only into throwaway `LabScratch` labs and one
+  temporary Closing edit (immediately reverted) — per this project's own
+  "don't write insecure code into the real project" instinct.
+  A genuinely surprising, fully-verified fact came out of this session's
+  injection lab: `Microsoft.Data.Sqlite`'s `ExecuteNonQuery()`, when a
+  `CommandText` contains multiple `;`-separated statements, sums
+  `sqlite3_changes()` once per statement — and since SQLite's own
+  `sqlite3_changes()` is left stale (unchanged) by any non-INSERT/UPDATE/
+  DELETE statement, a `DROP TABLE` following a real `INSERT` in the same
+  batch double-counts the `INSERT`'s own change, returning `2` for what
+  was really one row. This is traced to real fetched source
+  (`SqliteCommand.ExecuteNonQuery()` → `SqliteDataReader.NextResult()`/
+  `AddChanges()`) and to sqlite.org's own `sqlite3_changes()` docs, both
+  cited in the lesson itself — don't re-derive this from scratch if it
+  resurfaces; it's fully explained in Lesson 3's second Concept Unit.
 - **The runnable `ToolDB`/`LabScratch` projects are now persisted in-repo,
   at `code/ToolDB/` and `code/LabScratch/` (with a `.gitignore` for
   `bin/`, `obj/`, `*.db`) — not recreated from scratch each session.**
