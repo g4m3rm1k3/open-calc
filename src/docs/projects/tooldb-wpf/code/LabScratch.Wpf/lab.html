@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Lab</title></head>
+<body>
+    <h1>Hello from a local file.</h1>
+    <p id="output">Waiting for a message from C#...</p>
+    <script>
+        window.chrome.webview.addEventListener('message', event => {
+            document.getElementById('output').textContent = `Received: ${event.data}`;
+        });
+    </script>
+</body>
+</html>

@@ -121,8 +121,8 @@ view replacing today's):
 | 3 | Inserting Safely (parameterized queries, `SqliteParameter`) | 1–2 | SQL parameters, parameter binding, SQL injection | written |
 | 4 | Querying Back (`SELECT`, `ExecuteReader`, row→object mapping; write your first automated test against it) | 1–3 | `SELECT`, reader, iteration, row→object mapping, automated test | written |
 | 5 | WPF Basics (`App.xaml`, `MainWindow.xaml`, code-behind, window lifecycle) | — | application, window, XAML, code-behind, lifecycle | written |
-| 6 | Hosting WebView2 in a WPF Window (`CoreWebView2` init, loading local HTML; includes diagnosing a broken/failed initialization) | 5 | control, browser process, initialization, navigation | not written |
-| 7 | Passing C# Data to HTML (`postMessage` + `WebMessageReceived` — the JS↔host messaging channel; first real data on screen) | 4, 6 | IPC, serialization, JSON, message passing | not written |
+| 6 | Hosting WebView2 in a WPF Window (`CoreWebView2` init, loading local HTML; includes diagnosing a broken/failed initialization) | 5 | control, browser process, initialization, navigation | written |
+| 7 | Passing C# Data to HTML (`PostWebMessageAsJson` + JS-side `addEventListener('message')` — the host→JS half of the messaging channel; first real data on screen. The reverse direction, JS→host via the real `WebMessageReceived` event, is deliberately deferred to Lesson 18, where full two-way wiring is that lesson's own subject) | 4, 6 | IPC, serialization, JSON, message passing | written |
 
 ### Slice 2 — A Table You Can Actually Use
 *Capabilities established:*
@@ -250,4 +250,4 @@ curriculum is deliberately structured to revisit at increasing depth:
 | Live/concurrent state | 27–28 | 30–32 |
 | Presentation layer (JS) | 10–11 | 33–34 |
 
-Lesson 6 is next.
+Lesson 8 is next.

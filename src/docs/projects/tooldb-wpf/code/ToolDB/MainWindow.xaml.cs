@@ -1,17 +1,25 @@
 using System.ComponentModel;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 using Microsoft.Data.Sqlite;
+using Microsoft.Web.WebView2.Core;
 
 namespace ToolDB;
 
 public partial class MainWindow : Window
 {
+    private string _toolsJson = "[]";
+
     public MainWindow()
     {
         InitializeComponent();
 
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
+
+        Browser.CoreWebView2InitializationCompleted += Browser_CoreWebView2InitializationCompleted;
+        Browser.NavigationCompleted += Browser_NavigationCompleted;
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -24,25 +32,49 @@ public partial class MainWindow : Window
             connection);
         using var reader = selectCommand.ExecuteReader();
 
-        int toolCount = 0;
-        Tool? firstTool = null;
+        List<Tool> tools = new List<Tool>();
         while (reader.Read())
         {
-            Tool tool = Tool.FromReader(reader);
-            toolCount++;
-            if (firstTool == null)
-            {
-                firstTool = tool;
-            }
+            tools.Add(Tool.FromReader(reader));
         }
 
-        if (firstTool != null)
+        if (tools.Count > 0)
         {
-            StatusText.Text = $"Loaded {toolCount} tool(s). First: {firstTool.Name} ({firstTool.Manufacturer})";
+            Title = $"ToolDB — Loaded {tools.Count} tool(s). First: {tools[0].Name} ({tools[0].Manufacturer})";
         }
         else
         {
-            StatusText.Text = "Loaded 0 tools.";
+            Title = "ToolDB — Loaded 0 tools.";
+        }
+
+        _toolsJson = JsonSerializer.Serialize(tools);
+
+        string htmlPath = Path.Combine(AppContext.BaseDirectory, "local.html");
+        Browser.Source = new Uri(htmlPath);
+    }
+
+    private void Browser_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
+    {
+        if (e.IsSuccess)
+        {
+            Console.WriteLine("CoreWebView2 initialized successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"CoreWebView2 failed to initialize: {e.InitializationException}");
+        }
+    }
+
+    private void Browser_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
+    {
+        if (e.IsSuccess)
+        {
+            Console.WriteLine("Navigation completed successfully.");
+            Browser.CoreWebView2.PostWebMessageAsJson(_toolsJson);
+        }
+        else
+        {
+            Console.WriteLine($"Navigation failed. WebErrorStatus={e.WebErrorStatus}");
         }
     }
 

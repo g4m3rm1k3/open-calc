@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>ToolDB</title></head>
+<body>
+    <h1>ToolDB</h1>
+    <p id="output">Waiting for tool data from C#...</p>
+    <script>
+        window.chrome.webview.addEventListener('message', event => {
+            const tools = event.data;
+            document.getElementById('output').textContent =
+                `Loaded ${tools.length} tool(s) from tools.db. First: ${tools[0].Name} (${tools[0].Manufacturer})`;
+        });
+    </script>
+</body>
+</html>

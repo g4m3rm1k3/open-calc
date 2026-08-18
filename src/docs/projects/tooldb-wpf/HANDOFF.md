@@ -5,7 +5,7 @@ Read this first when resuming. Roadmap and lesson status live in
 
 ## Status
 
-- **Next lesson:** 6 — Hosting WebView2 in a WPF Window
+- **Next lesson:** 8 — Records & Strong Types
 - **Lessons written:** 0 — Environment & Project Setup
   (`lessons/lesson-00-environment-and-project-setup.md`); 1 — Static
   Types, Connection Strings, and a Resource's Lifetime
@@ -15,9 +15,151 @@ Read this first when resuming. Roadmap and lesson status live in
   (`lessons/lesson-03-inserting-safely.md`); 4 — Turning Rows Into Objects,
   and Making "Still Correct" Automatic
   (`lessons/lesson-04-querying-back.md`); 5 — The Framework Calls You Now
-  (WPF Basics) (`lessons/lesson-05-wpf-basics.md`)
+  (WPF Basics) (`lessons/lesson-05-wpf-basics.md`); 6 — The Control Isn't
+  the Browser (Hosting WebView2 in a WPF Window)
+  (`lessons/lesson-06-hosting-webview2.md`); 7 — A Shared Language Across
+  the Boundary (Passing C# Data to HTML)
+  (`lessons/lesson-07-passing-csharp-data-to-html.md`)
 - Update the "Next lesson" line above after every lesson, not just at
   session boundaries.
+- **Lesson 7 notes (this session):** `ToolDB`'s two Lesson 6 pipelines are
+  connected now — the browser pane shows real `tools.db` data instead of
+  `local.html`'s old static placeholder. `MainWindow_Loaded`'s own
+  `toolCount`/`firstTool` tracking (Lesson 5–6) was replaced with a real
+  `List<Tool>`; a new private field, `_toolsJson` (initialized to `"[]"`),
+  carries `JsonSerializer.Serialize(tools)`'s own result from
+  `MainWindow_Loaded` across to `Browser_NavigationCompleted`, where
+  `Browser.CoreWebView2.PostWebMessageAsJson(_toolsJson)` sends it —
+  deliberately inside `NavigationCompleted`, not `Loaded`, per
+  `PostWebMessageAsJson`'s own real, fetched Remarks ("If a navigation
+  occurs before the message is posted to the page, the message is not be
+  sent"). `local.html` gained this project's first-ever JavaScript: a
+  `<script>` block calling `window.chrome.webview.addEventListener(
+  'message', event => { ... })`, reading `event.data` (already parsed by
+  WebView2, no `JSON.parse` needed — also confirmed via real fetched
+  docs) and writing real tool data into a `<p id="output">` via
+  `textContent`. **A genuinely surprising, fully-verified fact surfaced
+  this session, worth knowing before touching `JsonSerializer` again in
+  this project:** `System.Text.Json`'s default encoder escapes the
+  apostrophe (among other HTML-sensitive characters) as a Unicode escape
+  sequence by default — proven by actually running
+  `JsonSerializer.Serialize` against this project's own real
+  apostrophe-bearing manufacturer name, `"O'Brien Carbide Tools"` (Lesson
+  3), in `LabScratch/Program.cs` this session; real, fetched Microsoft
+  documentation on `System.Text.Json` character encoding confirms this is
+  deliberate defense-in-depth against script injection when JSON is
+  embedded in HTML — directly relevant here since this project's own JSON
+  is headed straight into an HTML/JS environment via WebView2. The escape
+  is invisible once JavaScript parses it back (a real apostrophe again),
+  so nothing about the rendered page changes. **A tooling note, not a
+  project decision, worth flagging for future sessions:** this session hit
+  repeated difficulty getting the literal six-character escape sequence
+  (backslash + `u0027`) to actually land in the lesson file via the Edit
+  tool — every direct attempt silently turned it into a literal apostrophe
+  instead, and a `sed`-based workaround mangled it differently. The lesson
+  file resolves this by showing the JSON code blocks with a literal
+  apostrophe (for readability) plus an adjacent prose caveat stating what
+  the real captured terminal text actually contains — an honest, accurate
+  compromise, but if a future session needs to write this exact escape
+  sequence literally into a file, expect the same difficulty and budget
+  for it (or use a different method than direct Edit-tool text
+  composition). **A schema-following decision made this session, not
+  requested by the user:** `LESSON SCHEMA.md`'s own Concept Unit sequence
+  includes a note that reordering Project Change/New Code/Updated Project
+  *before* the isolated lab (rather than after, Lesson 6's own order) is
+  the preferred structure "for lessons written from this point forward";
+  Lesson 7 adopts that reordering (real code shown first, isolated lab
+  second, explicitly relating back to the real code) since it is a new
+  lesson being written now — Lesson 6 was **not** revised to match, per
+  the same schema note's own instruction not to retrofit existing lessons.
+  Future lessons should default to this newer order too, unless a reason
+  emerges to reconsider. **A scope decision worth knowing before touching
+  Lesson 18:** the roadmap's own concept-list cell for Lesson 7 named both
+  `postMessage` and `WebMessageReceived`; this lesson only implements the
+  host→JS half (`PostWebMessageAsJson` + JS-side `addEventListener`) —
+  the reverse direction (JS→host, the real C# `WebMessageReceived` event)
+  is deliberately deferred to Lesson 18 ("Two-Way Communication Across the
+  Split"), which is where the roadmap already puts full bidirectional
+  wiring; `Curriculum.md`'s own Lesson 7 row was updated to reflect this.
+  **Same live-window constraint as Lessons 5–6, not retested this
+  session:** no `dotnet run` against `ToolDB` or `LabScratch.Wpf` was
+  attempted; verification rested on real `dotnet build`/`dotnet test`
+  output (all captured this session, all clean), a real read of the
+  compiler-generated `ToolDB.GlobalUsings.g.cs` (proving `List<Tool>`
+  needs no new `using`), and genuine Microsoft Learn/MDN documentation for
+  every new API cited (fetched fresh this session — `List<T>` and its
+  `Add`/`Count`/indexer, `JsonSerializer.Serialize<TValue>`, `WebView2
+  .CoreWebView2`, `CoreWebView2.PostWebMessageAsJson`, auto-implemented
+  properties' backing-field behavior, plus MDN's `addEventListener`,
+  arrow functions, template literals, `document.getElementById`, and
+  `Node.textContent`). **A real, deliberately-reproduced timing-mistake
+  lab exists in `LabScratch.Wpf/`'s own git history within this
+  session** (built clean, then reverted, not run) — calling
+  `Browser.CoreWebView2.PostWebMessageAsJson(...)` immediately after
+  `Browser.Source = new Uri(...)`, before initialization has had time to
+  finish; the lesson predicts a real `NullReferenceException` from this
+  (`Browser.CoreWebView2` is still `null` at that point, per its own real,
+  fetched documentation), not the "message not sent" failure
+  `PostWebMessageAsJson`'s own Remarks describe (a different mistake —
+  racing a *subsequent* navigation, not applicable to a first send). Don't
+  conflate these two failure modes if this resurfaces in a future lesson.
+- **Lesson 6 notes (previous session):** `ToolDB` hosts a second UI surface now
+  — `Microsoft.Web.WebView2` (real package version `1.0.4129.50`, added via
+  real `dotnet add package` to both `ToolDB` and `LabScratch.Wpf`) —
+  `MainWindow.xaml` gained `xmlns:wv2="clr-namespace:Microsoft.Web.WebView2
+  .Wpf;assembly=Microsoft.Web.WebView2.Wpf"` and replaced Lesson 5's own
+  `TextBlock` with `<wv2:WebView2 x:Name="Browser" />`; the tool-count
+  summary Lesson 5 wrote into that `TextBlock` moved to `Window.Title`
+  instead (set dynamically in `MainWindow_Loaded`, same `Title` property
+  Lesson 5 set statically). `MainWindow.xaml.cs` now attaches
+  `CoreWebView2InitializationCompleted` and `NavigationCompleted` in the
+  constructor and sets `Browser.Source` to a real `file://` `Uri` (built via
+  `AppContext.BaseDirectory`/`Path.Combine`) pointing at a new
+  `ToolDB/local.html`, copied into the build output via a new `<Content
+  Include="local.html" CopyToOutputDirectory="PreserveNewest" />` item in
+  `ToolDB.csproj` — real, confirmed via directory listing both with and
+  without that line present (the lesson's own "what breaks" demo). This
+  lesson's own local.html is deliberately static — no `tools.db` data
+  reaches it yet; that's Lesson 7's entire job, which the lesson's own
+  Header pipeline diagram states explicitly. **Same live-window constraint
+  as Lesson 5, reconfirmed directly by the user this session (not
+  retested/re-derived):** no `dotnet run` was attempted, foreground or
+  background — the user opened this session by repeating the same
+  instruction from Lesson 5's own retrospective ("don't run any commands
+  that need permission, I am not on this screen"). Verification instead
+  rested on real `dotnet build`/`dotnet test` output (all captured this
+  session, all clean), a real generated-code read out of `LabScratch.Wpf`'s
+  own `obj/MainWindow.g.cs` proving `x:Name="Browser"` generates a field the
+  identical way Lesson 5's `StatusText` did, and genuine Microsoft Learn
+  documentation for every WebView2 event/property/exception cited (fetched
+  fresh this session — `WebView2`, `Source`, `CoreWebView2InitializationCompleted`,
+  `CoreWebView2InitializationCompletedEventArgs`, `CoreWebView2CreationProperties`/
+  `UserDataFolder`, `NavigationCompleted`, `CoreWebView2NavigationCompletedEventArgs`,
+  `HwndHost`, `EventHandler<TEventArgs>`, and `WebView2RuntimeNotFoundException`
+  named but not demonstrated). **A real, deliberately-reproduced initialization
+  failure lab exists in `LabScratch.Wpf/` (never in `ToolDB`)** — a
+  guaranteed-invalid `CoreWebView2CreationProperties.UserDataFolder`
+  (`"C:\\Invalid|UserData"`, using the illegal `|` character so it fails the
+  same way on any machine) — built and proven to compile clean, but not run;
+  the lesson's own first Exercise asks the reader to run it and read the
+  real `InitializationException` text themselves. **A real, load-bearing
+  scope decision made this session, worth knowing before touching this
+  lesson again:** `Grid.RowDefinitions`/attached-property row layout was
+  deliberately avoided so `Browser` could stay the `Grid`'s only child
+  (mirroring Lesson 5's own single-child-`Grid` shape exactly) — the
+  roadmap's own Lesson 6 concept list is `control, browser process,
+  initialization, navigation` only, and Grid/attached-property layout isn't
+  on it; that topic belongs to a future lesson (Slice 2's "Styling &
+  Layout," or "Your First Native XAML Screen") instead. Don't add
+  multi-child `Grid` layout to `ToolDB`'s `MainWindow.xaml` before that
+  lesson exists. **`EventHandler<TEventArgs>` is this curriculum's first
+  appearance of a generic type anywhere** — real Microsoft documentation
+  (`EventHandler<TEventArgs>`'s own Remarks) was used to explain *why*
+  generics exist, folded into Concept Unit 2's own Header entry and
+  Mechanical Walkthrough rather than given a full separate Concept Unit —
+  full generics coverage (the reader's own OOP-from-zero requirement) is
+  still owed in full whenever `TEventArgs`-shaped code reappears; don't
+  treat this lesson's light treatment as "already covered."
 - **Lesson 5 notes (this session):** `ToolDB` is a WPF application now —
   `ToolDB.csproj` gained `<OutputType>WinExe</OutputType>` (was `Exe`),
   `<TargetFramework>net10.0-windows</TargetFramework>` (was `net10.0`),

@@ -1,4 +1,5 @@
-using System.ComponentModel;
+using Microsoft.Web.WebView2.Core;
+using System.IO;
 using System.Windows;
 
 namespace LabScratch.Wpf;
@@ -9,17 +10,35 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        Loaded += MainWindow_Loaded;
-        Closing += MainWindow_Closing;
+        Browser.CoreWebView2InitializationCompleted += Browser_CoreWebView2InitializationCompleted;
+        Browser.NavigationCompleted += Browser_NavigationCompleted;
+
+        string htmlPath = Path.Combine(AppContext.BaseDirectory, "lab.html");
+        Browser.Source = new Uri(htmlPath);
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private void Browser_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
     {
-        StatusText.Text = "Loaded event fired!";
+        if (e.IsSuccess)
+        {
+            Console.WriteLine("CoreWebView2 initialized successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"CoreWebView2 failed to initialize: {e.InitializationException}");
+        }
     }
 
-    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    private void Browser_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
     {
-        Console.WriteLine("Closing event fired.");
+        if (e.IsSuccess)
+        {
+            Console.WriteLine("Navigation completed successfully.");
+            Browser.CoreWebView2.PostWebMessageAsJson("\"hello from C#\"");
+        }
+        else
+        {
+            Console.WriteLine($"Navigation failed. WebErrorStatus={e.WebErrorStatus}");
+        }
     }
 }

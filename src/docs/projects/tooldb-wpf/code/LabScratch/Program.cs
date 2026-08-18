@@ -1,4 +1,13 @@
 using Microsoft.Data.Sqlite;
+using System.Text.Json;
+
+Widget single = new Widget { Name = "O'Brien Carbide Tools", Count = 1 };
+Console.WriteLine(JsonSerializer.Serialize(single));
+
+List<Widget> many = new List<Widget>();
+many.Add(new Widget { Name = "O'Brien Carbide Tools", Count = 1 });
+many.Add(new Widget { Name = "Kennametal", Count = 40 });
+Console.WriteLine(JsonSerializer.Serialize(many));
 
 using var connection = new SqliteConnection("Data Source=../ToolDB/tools.db");
 connection.Open();
@@ -8,20 +17,19 @@ using var selectCommand = new SqliteCommand(
     connection);
 using var reader = selectCommand.ExecuteReader();
 
-int toolCount = 0;
-Tool? firstTool = null;
+List<Tool> tools = new List<Tool>();
 while (reader.Read())
 {
-    Tool tool = Tool.FromReader(reader);
-    toolCount++;
-    if (firstTool == null)
-    {
-        firstTool = tool;
-    }
+    tools.Add(Tool.FromReader(reader));
 }
 
-string statusText = $"Loaded {toolCount} tool(s). First: {firstTool?.Name} ({firstTool?.Manufacturer})";
-Console.WriteLine(statusText);
+Console.WriteLine(JsonSerializer.Serialize(tools));
+
+class Widget
+{
+    public string Name { get; set; } = "";
+    public int Count { get; set; }
+}
 
 class Tool
 {
