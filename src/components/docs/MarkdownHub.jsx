@@ -1830,10 +1830,31 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   const [playingIdx, setPlayingIdx] = useState(null);
   const playingIdxRef = useRef(null);
 
+  const [collapsedPages, setCollapsedPages] = useState({});
+
+  const togglePage = useCallback((idx) => {
+    setCollapsedPages((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  }, []);
+
   const pages = useMemo(() => {
-    return splitIntoPages(content).map((pageContent) =>
-      splitMarkdownSections(pageContent),
-    );
+    return splitIntoPages(content).map((pageContent) => {
+      let title = "";
+      let body = pageContent;
+      if (pageContent.startsWith("## ")) {
+        const newlineIdx = pageContent.indexOf("\n");
+        if (newlineIdx !== -1) {
+          title = pageContent.slice(0, newlineIdx).trim();
+          body = pageContent.slice(newlineIdx + 1);
+        } else {
+          title = pageContent.trim();
+          body = "";
+        }
+      }
+      return {
+        title,
+        sections: splitMarkdownSections(body),
+      };
+    });
   }, [content]);
 
   useEffect(
@@ -1989,8 +2010,9 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         }
       `}</style>
 
-      {pages.map((sections, pageIdx) => {
+      {pages.map(({ title, sections }, pageIdx) => {
         const isIntro = pageIdx === 0;
+        const isCollapsed = collapsedPages[pageIdx];
         // Embedded content keeps no width constraint of its own — it already
         // lives inside the parent card's content area, and re-centering it
         // to a narrower max-width here would shrink it again inside that
@@ -2088,6 +2110,26 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
               </div>
             )}
             <div className={pageClasses} style={clipPathStyle}>
+              {title && (
+                <div 
+                  className="group flex items-center justify-between cursor-pointer"
+                  onClick={() => togglePage(pageIdx)}
+                >
+                  <div className="md-body flex-1">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={MD_COMPONENTS}
+                    >
+                      {title}
+                    </ReactMarkdown>
+                  </div>
+                  <button className="ml-4 flex-shrink-0 p-2 rounded-md text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-all">
+                    {isCollapsed ? <ChevronRight className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                  </button>
+                </div>
+              )}
+              {!isCollapsed && (
               <div
                 className={`md-body ${isIntro ? "intro-page-content" : ""}`}
               style={{
@@ -2153,6 +2195,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                 );
               })}
             </div>
+            )}
           </div>
         </div>
         );
