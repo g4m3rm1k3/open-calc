@@ -444,6 +444,15 @@ function getMdCss(md) {
 .md-body p:has(> strong:only-child):has(> strong code):has(+ ul) { border: 1px solid ${md.tdBorder}; border-bottom: none; border-radius: 10px 10px 0 0; background: color-mix(in srgb, ${md.strong} 8%, ${md.codeBg}); padding: 10px 16px; margin: 1.6em 0 0; box-shadow: var(--card-glow); }
 .md-body p:has(> strong:only-child):has(> strong code):has(+ ul) > strong > code { font-size: 1.05em; background: none; border: none; padding: 0; color: ${md.strong}; }
 .md-body p:has(> strong:only-child):has(> strong code) + ul { border: 1px solid ${md.tdBorder}; border-top: none; border-radius: 0 0 10px 10px; margin: 0 0 1.4em; padding: 10px 18px 12px 36px; box-shadow: var(--card-glow); }
+/* Same "object/method used" convention, written as one bullet with its
+   What-it-is/Implementation/Its-use breakdown nested inside it instead of
+   as a sibling list after a standalone paragraph — actually the more
+   common of the two shapes across the corpus (1.2k+ vs ~200), so it gets
+   the same card, just built from one <li> instead of a p+ul pair. */
+.md-body ul:has(> li > strong code):has(> li > ul > li > em:first-child) { margin-left: 0; }
+.md-body li:has(> strong code):has(> ul > li > em:first-child) { list-style: none; border: 1px solid ${md.tdBorder}; border-radius: 10px; padding: 14px 18px; margin: 0 0 1em; box-shadow: var(--card-glow); }
+.md-body li:has(> strong code):has(> ul > li > em:first-child) > strong > code { font-size: 1.05em; background: none; border: none; padding: 0; color: ${md.strong}; }
+.md-body li:has(> strong code):has(> ul > li > em:first-child) > ul { margin: 10px 0 0 1.2em; }
 .md-body table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: 0.9em; }
 .md-body th { background: ${md.thBg}; border: 1px solid ${md.tdBorder}; padding: 8px 12px; text-align: left; color: ${md.quoteText}; font-weight: 600; }
 .md-body td { border: 1px solid ${md.tdBorder}; padding: 7px 12px; }
@@ -516,24 +525,18 @@ const DocsCtx = createContext({
   scrollToHeading: null,
 });
 
-// A lesson repeats the same heading text constantly ("### The Problem",
-// "### CS Lens" ...) across many Concept Units. headingId() alone collides on
-// every repeat, so the browser's [id="..."] lookup always finds the FIRST
-// occurrence — every ToC entry past the first one jumped to the same wrong
-// spot. This context hands every h1-h4 renderer a shared, per-render counter
-// so repeats get "-2", "-3", etc., matching the same disambiguation the ToC
-// list below applies while parsing the raw text.
-const HeadingIdCtx = createContext(null);
-
-function makeHeadingIdGenerator() {
-  const counts = new Map();
-  return (text) => {
-    const base = headingId(text);
-    const n = (counts.get(base) || 0) + 1;
-    counts.set(base, n);
-    return n === 1 ? base : `${base}-${n}`;
-  };
-}
+// SectionedMarkdown splits one document into many independent <ReactMarkdown>
+// calls (one per page title, one per prose/code chunk within a page), each
+// parsing a standalone slice of the original text — so each call's own
+// node.position.start.line always starts back at 1 for THAT slice, not the
+// real line in the source document. This context carries "what line of the
+// full document does this slice's line 1 correspond to" so headingId (below)
+// can recover a true, globally-unique line number. A plain number set once
+// per render (never mutated), so — unlike the counter this replaced — it's
+// unaffected by React StrictMode's double-invoke. Defaults to 0 (i.e. "this
+// slice already starts at the real line 1") for every other call site in
+// this file that renders a whole, unsliced document directly.
+const ChunkLineOffsetCtx = createContext(0);
 
 // ── "Open With" helpers ───────────────────────────────────────────────────────
 
@@ -1272,17 +1275,33 @@ function MdImage({ src, alt, title }) {
   );
 }
 
-function useHeadingId(children) {
-  const getUniqueId = useContext(HeadingIdCtx);
-  const text = extractText(children);
-  return getUniqueId ? getUniqueId(text) : headingId(text);
+// A lesson repeats the same heading text constantly ("### The Problem",
+// "### CS Lens" ...) across many Concept Units, so the visible text alone
+// isn't a unique id. This used to be disambiguated with a shared counter
+// that incremented on every h1-h4 render — but that counter mutated during
+// render, inside components react-markdown mounts, which React 18
+// StrictMode double-invokes in dev to catch exactly this kind of impurity:
+// the counter advanced twice per heading, corrupting every id (even
+// unique ones) and permanently desyncing it from the ToC's own single-pass
+// computation (headings, below), so "On This Page" clicks silently found no
+// matching element. A heading's source line number is unique with no
+// counting at all — pure, StrictMode-proof, and computable identically by
+// both this render-time id and the ToC's own text scan, PROVIDED it's
+// translated back to a real document line via ChunkLineOffsetCtx (a document
+// rendered as one single <ReactMarkdown> call needs no translation, hence
+// the context's default of 0).
+function useHeadingId(node, children) {
+  const offset = useContext(ChunkLineOffsetCtx);
+  const base = headingId(extractText(children));
+  const line = node?.position?.start?.line;
+  return line != null ? `${base}-${offset + line - 1}` : base;
 }
 
 const MD_COMPONENTS = {
-  h1: ({ children }) => <h1 id={useHeadingId(children)}>{children}</h1>,
-  h2: ({ children }) => <h2 id={useHeadingId(children)}>{children}</h2>,
-  h3: ({ children }) => <h3 id={useHeadingId(children)}>{children}</h3>,
-  h4: ({ children }) => <h4 id={useHeadingId(children)}>{children}</h4>,
+  h1: ({ node, children }) => <h1 id={useHeadingId(node, children)}>{children}</h1>,
+  h2: ({ node, children }) => <h2 id={useHeadingId(node, children)}>{children}</h2>,
+  h3: ({ node, children }) => <h3 id={useHeadingId(node, children)}>{children}</h3>,
+  h4: ({ node, children }) => <h4 id={useHeadingId(node, children)}>{children}</h4>,
   p({ node, children }) {
     if (paragraphContainsConceptEmbed(node)) {
       // See paragraphContainsConceptEmbed's own comment: this paragraph
@@ -1344,26 +1363,56 @@ const MD_COMPONENTS = {
     // exact shape (strong, then a text node starting with " — ") targets
     // only the glossary convention itself, so every other list — in every
     // lesson, with no markdown edits — is untouched.
+    //
+    // A term that's *reappearing* from an earlier lesson carries a short
+    // parenthetical first — "**static** (reappearing, Lesson 0) — a
+    // member...", 309 of these across the corpus — which pushes the real
+    // em dash a few children later instead of starting kids[1] directly,
+    // and past instances have shown the annotation itself can contain
+    // inline code ("(`{...}` syntax) — ..."). Gating the broadened scan on
+    // kids[1] starting with "(" keeps this from also matching an unrelated
+    // "**Label:** value — aside" bullet, since those start with a space or
+    // inline code, never an opening paren, right after the bold run.
     const kids = node?.children ?? [];
-    const isTermBullet =
-      kids[0]?.type === "element" &&
-      kids[0].tagName === "strong" &&
-      kids[1]?.type === "text" &&
-      /^\s*—\s+/.test(kids[1].value ?? "");
+    const isBoldLed =
+      kids[0]?.type === "element" && kids[0].tagName === "strong";
+    const second = kids[1];
+    const simpleDash =
+      isBoldLed && second?.type === "text" && /^\s*—\s+/.test(second.value ?? "");
+    const hasAnnotation =
+      isBoldLed && second?.type === "text" && /^\s*\(/.test(second.value ?? "");
 
-    if (isTermBullet) {
-      const rest = [...children];
-      const term = rest.shift();
-      if (typeof rest[0] === "string") {
-        rest[0] = rest[0].replace(/^\s*—\s+/, "");
+    if (simpleDash || hasAnnotation) {
+      let dashKidIdx = -1;
+      let dashCharIdx = -1;
+      for (let i = 1; i < kids.length; i++) {
+        const k = kids[i];
+        if (k.type === "text" && k.value.includes("—")) {
+          dashKidIdx = i;
+          dashCharIdx = k.value.indexOf("—");
+          break;
+        }
       }
-      return (
-        <li>
-          {term}
-          <br />
-          {rest}
-        </li>
-      );
+      if (dashKidIdx !== -1) {
+        const term = children[0];
+        const annotation = children.slice(1, dashKidIdx);
+        const dashText = children[dashKidIdx];
+        const beforeDash = dashText.slice(0, dashCharIdx).replace(/\s+$/, "");
+        const afterDash = dashText.slice(dashCharIdx + 1).replace(/^\s+/, "");
+        const rest = children.slice(dashKidIdx + 1);
+        return (
+          <li>
+            <strong>
+              {term.props.children}
+              {annotation}
+              {beforeDash}
+            </strong>
+            <br />
+            {afterDash}
+            {rest}
+          </li>
+        );
+      }
     }
     return <li>{children}</li>;
   },
@@ -1813,46 +1862,62 @@ function normalizeDisplayMath(text) {
     .join("\n");
 }
 
+// Each returned page also carries startLine (1-indexed, in the ORIGINAL
+// document) — SectionedMarkdown renders each page's title and body through
+// their own separate <ReactMarkdown> calls, so headingId's line-based ids
+// (see useHeadingId, above) need this to translate a slice-relative line
+// back to a real document line.
 function splitIntoPages(markdown) {
   const lines = markdown.split("\n");
   const pages = [];
   let currentPage = [];
+  let currentStartLine = 1;
   let inCodeBlock = false;
 
-  for (const line of lines) {
+  lines.forEach((line, idx) => {
     if (line.trim().startsWith("```")) {
       inCodeBlock = !inCodeBlock;
     }
 
     if (line.startsWith("## ") && !inCodeBlock) {
       if (currentPage.length > 0) {
-        pages.push(currentPage.join("\n"));
+        pages.push({ content: currentPage.join("\n"), startLine: currentStartLine });
       }
       currentPage = [line];
+      currentStartLine = idx + 1;
     } else {
       currentPage.push(line);
     }
-  }
+  });
   if (currentPage.length > 0) {
-    pages.push(currentPage.join("\n"));
+    pages.push({ content: currentPage.join("\n"), startLine: currentStartLine });
   }
 
   return pages;
 }
 
-function splitMarkdownSections(markdown) {
+// startLine is this markdown slice's own 1-indexed line number in the
+// original document (see splitIntoPages above for why) — each returned
+// section carries its own startLine, computed by counting newlines up to
+// that point, so a heading buried in, say, the 4th prose chunk of a page
+// still resolves to its true document line rather than restarting at 1.
+function splitMarkdownSections(markdown, startLine = 1) {
   const sections = [];
   const fenceRe = /^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm;
+  const lineAt = (charIdx) =>
+    startLine + (markdown.slice(0, charIdx).match(/\n/g) || []).length;
   let lastIdx = 0;
   let match;
   while ((match = fenceRe.exec(markdown)) !== null) {
     const before = markdown.slice(lastIdx, match.index);
-    if (before.trim()) sections.push({ type: "prose", content: before });
-    sections.push({ type: "code", content: match[0] });
+    if (before.trim())
+      sections.push({ type: "prose", content: before, startLine: lineAt(lastIdx) });
+    sections.push({ type: "code", content: match[0], startLine: lineAt(match.index) });
     lastIdx = match.index + match[0].length;
   }
   const after = markdown.slice(lastIdx);
-  if (after.trim()) sections.push({ type: "prose", content: after });
+  if (after.trim())
+    sections.push({ type: "prose", content: after, startLine: lineAt(lastIdx) });
   return sections;
 }
 
@@ -1897,9 +1962,10 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   }, []);
 
   const pages = useMemo(() => {
-    return splitIntoPages(content).map((pageContent) => {
+    return splitIntoPages(content).map(({ content: pageContent, startLine }) => {
       let title = "";
       let body = pageContent;
+      let bodyStartLine = startLine;
       if (pageContent.startsWith("## ")) {
         const newlineIdx = pageContent.indexOf("\n");
         if (newlineIdx !== -1) {
@@ -1909,10 +1975,12 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
           title = pageContent.trim();
           body = "";
         }
+        bodyStartLine = startLine + 1;
       }
       return {
         title,
-        sections: splitMarkdownSections(body),
+        titleLine: startLine,
+        sections: splitMarkdownSections(body, bodyStartLine),
       };
     });
   }, [content]);
@@ -1944,11 +2012,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
     [speak, stop],
   );
 
-  // Fresh every render (not memoized) so the count sequence always starts
-  // at zero for a full top-to-bottom pass — content that hasn't changed
-  // must still produce the exact same ids it did last render.
   return (
-    <HeadingIdCtx.Provider value={makeHeadingIdGenerator()}>
     <div className="space-y-6 sm:space-y-8 pb-24">
       {/* Dynamic style for the H1 in the intro page so we can use the accentColor */}
       <style>{`
@@ -2070,7 +2134,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         }
       `}</style>
 
-      {pages.map(({ title, sections }, pageIdx) => {
+      {pages.map(({ title, titleLine, sections }, pageIdx) => {
         const isIntro = pageIdx === 0;
         const isCollapsed = collapsedPages[pageIdx];
         // Embedded content keeps no width constraint of its own — it already
@@ -2176,13 +2240,15 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                   onClick={() => togglePage(pageIdx)}
                 >
                   <div className="md-body flex-1">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm, remarkMath]}
-                      rehypePlugins={[rehypeRaw, rehypeKatex]}
-                      components={MD_COMPONENTS}
-                    >
-                      {title}
-                    </ReactMarkdown>
+                    <ChunkLineOffsetCtx.Provider value={titleLine}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        components={MD_COMPONENTS}
+                      >
+                        {title}
+                      </ReactMarkdown>
+                    </ChunkLineOffsetCtx.Provider>
                   </div>
                   <button className="ml-4 flex-shrink-0 p-2 rounded-md text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-all">
                     {isCollapsed ? <ChevronRight className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
@@ -2242,15 +2308,17 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                         </>
                       )}
                     </button>
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm, remarkMath]}
-                      rehypePlugins={[rehypeRaw, rehypeKatex]}
-                      components={MD_COMPONENTS}
-                    >
-                      {normalizeDisplayMath(
-                        convertTexDelimiters(section.content),
-                      )}
-                    </ReactMarkdown>
+                    <ChunkLineOffsetCtx.Provider value={section.startLine}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        components={MD_COMPONENTS}
+                      >
+                        {normalizeDisplayMath(
+                          convertTexDelimiters(section.content),
+                        )}
+                      </ReactMarkdown>
+                    </ChunkLineOffsetCtx.Provider>
                   </div>
                 );
               })}
@@ -2261,7 +2329,6 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         );
       })}
     </div>
-    </HeadingIdCtx.Provider>
   );
 });
 
@@ -2535,28 +2602,47 @@ export default function MarkdownHub() {
   const contentScrollRef = useRef(null);
   const headings = useMemo(() => {
     if (!content) return [];
-    // Same disambiguation as the actual rendered h1-h4 ids (HeadingIdCtx,
-    // above) — a lesson's "### The Problem" repeats once per Concept Unit,
-    // so a bare headingId() collision here would send every ToC entry past
-    // the first "The Problem" to that same first occurrence instead of its
-    // own. Both this parse and the real render walk the doc top to bottom
-    // in the same order, so an identical fresh counter produces matching ids.
-    const getUniqueId = makeHeadingIdGenerator();
-    return content
-      .split("\n")
-      .filter((line) => /^#{1,4} /.test(line))
-      .map((line) => {
-        const m = line.match(/^(#{1,4}) (.+)/);
-        if (!m) return null;
-        const text = m[2]
-          .replace(/\*\*/g, "")
-          .replace(/`/g, "")
-          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-          .trim();
-        return { level: m[1].length, text, id: getUniqueId(text) };
-      })
-      .filter(Boolean);
+    // Id scheme matches headingIdFromNode's, above: text slug + 1-indexed
+    // source line number, since a line number is unique with no counting
+    // needed. Fenced code blocks are the catch for the scan itself: a
+    // shell/Python sample's `# comment` line matches the bare heading regex
+    // but is never rendered as a real <h1-4>, so a naive per-line scan
+    // invents phantom ToC entries with no matching DOM id (click does
+    // nothing) — skip anything between fence markers.
+    const result = [];
+    let inFence = false;
+    let fenceMarker = null;
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const fenceMatch = line.match(/^\s*(`{3,}|~{3,})/);
+      if (fenceMatch) {
+        const marker = fenceMatch[1][0].repeat(3);
+        if (!inFence) {
+          inFence = true;
+          fenceMarker = marker;
+        } else if (line.trim().startsWith(fenceMarker)) {
+          inFence = false;
+        }
+        continue;
+      }
+      if (inFence) continue;
+      const m = line.match(/^(#{1,4}) (.+)/);
+      if (!m) continue;
+      const text = m[2]
+        .replace(/\*\*/g, "")
+        .replace(/`/g, "")
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+        .trim();
+      result.push({ level: m[1].length, text, id: `${headingId(text)}-${i + 1}` });
+    }
+    return result;
   }, [content]);
+  const visibleHeadings = useMemo(() => {
+    const q = docSearch.trim().toLowerCase();
+    if (sidebarTab !== "toc" || !q) return headings;
+    return headings.filter((h) => h.text.toLowerCase().includes(q));
+  }, [headings, docSearch, sidebarTab]);
   const scrollToHeading = useCallback((id) => {
     const el = contentScrollRef.current?.querySelector(
       `[id="${CSS.escape(id)}"]`,
@@ -3653,7 +3739,7 @@ export default function MarkdownHub() {
                       type="text"
                       value={sidebarTab === "notes" ? noteSearch : docSearch}
                       onChange={(e) => sidebarTab === "notes" ? setNoteSearch(e.target.value) : setDocSearch(e.target.value)}
-                      placeholder={sidebarTab === "notes" ? "Search notes…" : "Search docs…"}
+                      placeholder={sidebarTab === "notes" ? "Search notes…" : sidebarTab === "toc" ? "Filter this page…" : "Search docs…"}
                       className={`flex-1 bg-transparent text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
                     />
                     {(sidebarTab === "notes" ? noteSearch : docSearch) && (
@@ -3680,8 +3766,11 @@ export default function MarkdownHub() {
                 </div>
               )}
 
-              {/* Sidebar tab switcher — tutorials mode, not searching. "On This Page" only shows once the active doc has headings; Notes is always reachable. */}
-              {tab === "tutorials" && (!docSearch || sidebarTab === "notes") && (
+              {/* Sidebar tab switcher — stays visible while searching too, so a
+                  query in one tab (e.g. "On This Page") doesn't hide the way
+                  back to another. "On This Page" only shows once the active
+                  doc has headings; Notes is always reachable. */}
+              {tab === "tutorials" && (
                 <div className={`flex shrink-0 p-2 gap-1 border-b ${ui.border} sticky top-0 z-20 ${ui.bg0}`}>
                   <button
                     onClick={() => setSidebarTab("docs")}
@@ -3721,8 +3810,10 @@ export default function MarkdownHub() {
                 </div>
               )}
 
-              {/* ── Search results ── */}
-              {tab === "tutorials" && sidebarTab !== "notes" && docSearch.trim().length >= 2 && (
+              {/* ── Search results (Documents tab only — "On This Page" gets
+                  its own filtered list below instead of these doc-path
+                  results) ── */}
+              {tab === "tutorials" && sidebarTab === "docs" && docSearch.trim().length >= 2 && (
                 <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
                   {searchResults.length === 0 ? (
                     <p
@@ -3780,8 +3871,8 @@ export default function MarkdownHub() {
                   )}
                 </div>
               )}
-              {/* ── Normal tree (hidden while searching) ── */}
-              {!(tab === "tutorials" && sidebarTab !== "notes" && docSearch.trim().length >= 2) && (
+              {/* ── Normal tree (hidden only while showing Documents search results) ── */}
+              {!(tab === "tutorials" && sidebarTab === "docs" && docSearch.trim().length >= 2) && (
                 <div className="flex-1 overflow-y-auto overflow-x-auto py-3 custom-scrollbar min-h-0">
                   {tab === "tutorials" &&
                     (sidebarTab === "docs" ||
@@ -3811,16 +3902,19 @@ export default function MarkdownHub() {
                     ))}
 
                   {tab === "tutorials" &&
-                    !docSearch &&
                     sidebarTab === "toc" &&
                     headings.length > 0 &&
-                    (() => {
-                      const activeIdx = headings.findIndex(
+                    (visibleHeadings.length === 0 ? (
+                      <p className={`px-3 py-4 text-[11px] text-center ${ui.txt2}`}>
+                        No headings match "{docSearch.trim()}"
+                      </p>
+                    ) : (() => {
+                      const activeIdx = visibleHeadings.findIndex(
                         (h) => h.id === activeHeadingId,
                       );
                       return (
                         <div className="py-1">
-                          {headings.map((h, i) => {
+                          {visibleHeadings.map((h, i) => {
                             const isActive = i === activeIdx;
                             const isPassed = activeIdx !== -1 && i < activeIdx;
                             return (
@@ -3876,7 +3970,7 @@ export default function MarkdownHub() {
                           })}
                         </div>
                       );
-                    })()}
+                    })())}
 
                   {tab === "tutorials" && sidebarTab === "notes" && (
                     <div>
