@@ -2280,6 +2280,23 @@ export default function MarkdownHub() {
   const [docsNavOpen, setDocsNavOpen] = useState(
     () => typeof window !== "undefined" && window.innerWidth >= 640,
   );
+  // Tracks the Studio panel's own rendered width, not the viewport's — when
+  // code-along is docked, the panel is squeezed to 50vw of the window while
+  // window.innerWidth stays desktop-sized, so a `sm:` media query alone
+  // can't tell the sidebar to stop shoving that already-narrow content over.
+  const panelRef = useRef(null);
+  const [panelWidth, setPanelWidth] = useState(
+    () => (typeof window !== "undefined" ? window.innerWidth : 1024),
+  );
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      setPanelWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const [pendingRun, setPendingRun] = useState(null);
   const [codeAlongPx, setCodeAlongPx] = useState(560);
   const [splitterDragging, setSplitterDragging] = useState(false);
@@ -2290,6 +2307,15 @@ export default function MarkdownHub() {
       return 300;
     }
   });
+  // "Narrow" means there isn't room for the sidebar's current width plus a
+  // reasonably readable content column beside it — true on phones, and also
+  // on a desktop once this panel itself gets docked/squeezed down (e.g.
+  // sharing the screen with a code-along window), even though the browser
+  // window itself is nowhere near mobile-sized.
+  const effectiveSidebarWidth = codeAlongOpen
+    ? Math.min(explorerWidth, 240)
+    : explorerWidth;
+  const isNarrowPanel = panelWidth < effectiveSidebarWidth + 480;
   const [explorerSplitterDragging, setExplorerSplitterDragging] = useState(false);
   const [adaOpen, setAdaOpen] = useState(false);
   const [workspaceSnap, setWorkspaceSnap] = useState({
@@ -2677,6 +2703,11 @@ export default function MarkdownHub() {
 
   const selectTutorial = useCallback(
     async (modulePath, { resetScroll = false } = {}) => {
+      // On a narrow panel the sidebar is a full-width overlay covering the
+      // reading pane — picking a doc should dismiss it like a mobile drawer,
+      // same as tapping a link in any off-canvas nav. Desktop's inline
+      // sidebar stays open, unaffected.
+      if (isNarrowPanel) setDocsNavOpen(false);
       setActiveFile(modulePath);
       setLoading(true);
       setTutorialOverrideActive(false);
@@ -3191,6 +3222,7 @@ export default function MarkdownHub() {
       />
 
       <div
+        ref={panelRef}
         className={`flex flex-col h-[100vh] top-0 bottom-0 ${ui.bg0} ${ui.txt1} font-sans overflow-hidden fixed z-[1650] transition-[left,right,width] duration-200`}
         style={
           dockedEdge === "right"
@@ -3550,8 +3582,14 @@ export default function MarkdownHub() {
             className={`flex flex-1 min-h-0 overflow-hidden w-full relative ${codeAlongOpen ? "min-w-0" : ""}`}
           >
             <div
-              className={`${docsNavOpen ? "hidden sm:flex" : "hidden"} ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}
-              style={{ width: codeAlongOpen ? Math.min(explorerWidth, 240) : explorerWidth }}
+              className={`${
+                !docsNavOpen
+                  ? "hidden"
+                  : isNarrowPanel
+                    ? "flex absolute inset-y-0 left-0 z-30 shadow-2xl"
+                    : "flex"
+              } ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}
+              style={{ width: isNarrowPanel ? "100%" : effectiveSidebarWidth }}
             >
               {/* ── Search bar ── */}
               {tab === "tutorials" && (
@@ -3921,9 +3959,9 @@ export default function MarkdownHub() {
               )}
             </div>
 
-            {docsNavOpen && (
+            {docsNavOpen && !isNarrowPanel && (
               <div
-                className={`md-splitter hidden sm:block${explorerSplitterDragging ? " dragging" : ""}`}
+                className={`md-splitter${explorerSplitterDragging ? " dragging" : ""}`}
                 onMouseDown={handleExplorerSplitterDrag}
                 title="Drag to resize"
               />
