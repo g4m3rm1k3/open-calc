@@ -10,6 +10,7 @@ import { useDesktop } from './DesktopProvider.jsx'
 import { usePins } from '../../context/PinsContext.jsx'
 import { usePinLauncher } from '../../hooks/usePinLauncher.js'
 import { GLASS_META } from '../../styles/courseColors.js'
+import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 
 const SECTIONS = [
   { id: 'all',         label: 'All' },
@@ -81,6 +82,7 @@ function toPin(item, type) {
 }
 
 export default function StartMenu({ onClose }) {
+  const { taskbarStyle } = useGlobalTheme()
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
   const [contextMenu, setContextMenu] = useState(null) // { x, y, pin }
@@ -243,15 +245,25 @@ export default function StartMenu({ onClose }) {
     )
   }
 
+  // win10 flies out from the corner above the (left-aligned) Start button.
+  // win11 centers above the taskbar to match its centered Start button.
+  // mac has no taskbar-anchored menu at all — Launchpad-style, it opens as
+  // a floating window centered on the whole screen.
+  const wrapperPosition =
+    taskbarStyle === 'mac' ? 'inset-0 items-center justify-center'
+    : taskbarStyle === 'win11' ? 'bottom-14 left-0 right-0 justify-center'
+    : 'bottom-14 left-3'
+
   return (
     <>
+      <div className={`fixed z-[1900] flex pointer-events-none ${wrapperPosition}`}>
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
         ref={menuRef}
-        className="fixed bottom-14 left-3 z-[1900] w-[620px] max-h-[75vh] flex flex-col rounded-[28px] overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.3)] border border-white/60 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[48px] saturate-[180%] ring-1 ring-white/50 dark:ring-white/5 text-slate-800 dark:text-slate-100"
+        className="pointer-events-auto w-[620px] max-h-[75vh] flex flex-col rounded-[28px] overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.3)] border border-white/60 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[48px] saturate-[180%] ring-1 ring-white/50 dark:ring-white/5 text-slate-800 dark:text-slate-100"
       >
         {/* Ambient background glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[28px]">
@@ -466,6 +478,7 @@ export default function StartMenu({ onClose }) {
           )}
         </div>
       </motion.div>
+      </div>
 
       {/* Right-click context menu */}
       <AnimatePresence>

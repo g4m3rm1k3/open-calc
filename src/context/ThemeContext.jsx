@@ -7,7 +7,7 @@ const ThemeContext = createContext({
   setStudioTheme: () => {},
   isDarkGlobal: true, // We'll assume true since it's mainly for dark mode
   themeStyles: {},
-  taskbarStyle: 'win10',
+  taskbarStyle: 'mac',
   setTaskbarStyle: () => {}
 });
 
@@ -217,7 +217,7 @@ export function ThemeProvider({ children }) {
   }, []);
 
   const [taskbarStyle, setTaskbarStyleState] = useState(() => {
-    return localStorage.getItem('oc-taskbar-style') || 'win10';
+    return localStorage.getItem('oc-taskbar-style') || 'mac';
   });
 
   const setTaskbarStyle = useCallback((newStyle) => {
