@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { EXAMPLE_PROJECT } from '../../utils/exampleProject.js'
 import Editor from '@monaco-editor/react'
-import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, ExternalLink, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Columns2, Download, ExternalLink, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { executeScript } from '../../engines/openmat/openmatEngine.js'
 import WorkspaceTerminal from './WorkspaceTerminal.jsx'
 import { useIsDark } from '../../utils/useIsDark.js'
+import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { getCodeFontFamily, getCodeFontSize } from '../ui/CodeSettingsModal.jsx'
+
+
 
 // ── Tree item helpers ─────────────────────────────────────────────────────────
 const EXT_LANG = {
@@ -25,7 +29,38 @@ const LANG_DEFAULT_NAME = {
   php: 'index.php', brainfuck: 'program.bf', rust: 'main.rs', go: 'main.go',
   java: 'Main.java', kotlin: 'Main.kt', swift: 'main.swift', csharp: 'Program.cs',
   yaml: 'config.yaml', xml: 'data.xml',
+  json: 'data.json', markdown: 'README.md', scheme: 'main.scm',
 }
+
+/**
+ * Returns the next available auto-generated filename for a language.
+ * - First send: uses LANG_DEFAULT_NAME exactly (e.g. "Main.java")
+ * - Subsequent sends: appends _2, _3, … for each file whose name still
+ *   matches the default base pattern (renamed files are excluded from count).
+ * Example: Main.java exists → Main_2.java; rename that → next is Main_2.java again.
+ */
+function nextAutoName(lang, items) {
+  const defaultName = LANG_DEFAULT_NAME[lang] || 'file.txt'
+  const dotIdx = defaultName.lastIndexOf('.')
+  const stem = dotIdx >= 0 ? defaultName.slice(0, dotIdx) : defaultName
+  const ext  = dotIdx >= 0 ? defaultName.slice(dotIdx) : ''           // e.g. ".java"
+
+  // Collect names already taken by auto-named files (stem or stem_N pattern)
+  const autoPattern = new RegExp(`^${stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(_\\d+)?${ext.replace('.', '\\.')}$`, 'i')
+  const existingFiles = items.filter(i => i.type === 'file')
+  const taken = new Set(existingFiles.filter(f => autoPattern.test(f.name)).map(f => f.name.toLowerCase()))
+
+  if (!taken.has(defaultName.toLowerCase())) return defaultName
+
+  let n = 2
+  while (true) {
+    const candidate = `${stem}_${n}${ext}`
+    if (!taken.has(candidate.toLowerCase())) return candidate
+    n++
+  }
+}
+
+
 const LANG_DOT = {
   html: '#e34c26', css: '#264de4', javascript: '#f0c000',
   typescript: '#3178c6', python: '#4B8BBE', json: '#6b7280',
@@ -134,11 +169,13 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const [previewFullscreen, setPreviewFullscreen] = useState(false)
   const [bottomTab, setBottomTab] = useState('terminal')  // 'terminal' | 'preview'
   const [outputMode, setOutputMode] = useState('split')
+  const [bottomCollapsed, setBottomCollapsed] = useState(false)
   const addInputRef = useRef(null)
   const terminalRef = useRef(null)
   const importFileRef = useRef(null)
   const monacoRef = useRef(null)  // holds the live Monaco editor instance
   const isDark = useIsDark()
+  const { codeTypography } = useGlobalTheme()
 
   // Stable refs so effects never go stale
   const itemsRef = useRef(items)
@@ -186,7 +223,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
       : allFiles.find(f => f.language === lang) ?? null
 
     if (!target) {
-      const newFile = makeFile(LANG_DEFAULT_NAME[lang] || 'file.txt', code)
+      const newFile = makeFile(nextAutoName(lang, itemsRef.current), code)
       setItems(prev => [...prev, newFile])
       setActiveId(newFile.id)
       terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
@@ -608,8 +645,9 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
               }}
               options={{
                 minimap: { enabled: false },
-                fontSize: 13,
-                fontFamily: "'JetBrains Mono', Consolas, monospace",
+                fontSize: parseInt(getCodeFontSize(codeTypography.fontSize), 10),
+                fontFamily: getCodeFontFamily(codeTypography.font),
+                fontLigatures: codeTypography.ligatures,
                 wordWrap: 'off',
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
@@ -620,13 +658,13 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
           </div>
 
           {/* ── Bottom pane: Terminal | Preview ── */}
-          <div className={`${outputIsFull ? 'flex-1' : 'flex-[2]'} min-h-0 border-t ${border} flex flex-col`}>
+          <div className={`${outputIsFull ? 'flex-1' : bottomCollapsed ? 'shrink-0' : 'flex-[2]'} min-h-0 border-t ${border} flex flex-col`}>
             {/* Tab bar */}
             <div className={`h-7 shrink-0 flex items-center border-b ${border} ${bg2} px-1 gap-0.5`}>
               {['terminal', 'preview'].map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setBottomTab(tab)}
+                  onClick={() => { setBottomTab(tab); if (bottomCollapsed) setBottomCollapsed(false) }}
                   className={`px-3 h-6 text-[10px] font-bold rounded transition-colors capitalize ${
                     bottomTab === tab
                       ? D ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-900'
@@ -636,6 +674,14 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
                   {tab === 'terminal' ? '⌨ Terminal' : '🖼 Preview'}
                 </button>
               ))}
+              {/* Collapse / expand toggle */}
+              <button
+                onClick={() => setBottomCollapsed(c => !c)}
+                className={`w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg}`}
+                title={bottomCollapsed ? 'Expand terminal' : 'Collapse terminal'}
+              >
+                {bottomCollapsed ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
               <button
                 onClick={() => setOutputMode(m => m === 'split' ? 'full' : 'split')}
                 className={`ml-auto w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg}`}
@@ -645,7 +691,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             </div>
 
             {/* Terminal */}
-            <div className={`flex-1 min-h-0 ${bottomTab === 'terminal' ? 'flex flex-col' : 'hidden'}`}>
+            <div className={`flex-1 min-h-0 ${!bottomCollapsed && bottomTab === 'terminal' ? 'flex flex-col' : 'hidden'}`}>
               <WorkspaceTerminal
                 ref={terminalRef}
                 files={files}
@@ -657,7 +703,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             </div>
 
             {/* Preview */}
-            <div className={`flex-1 min-h-0 ${bottomTab === 'preview' ? 'flex flex-col' : 'hidden'}`}>
+            <div className={`flex-1 min-h-0 ${!bottomCollapsed && bottomTab === 'preview' ? 'flex flex-col' : 'hidden'}`}>
               {previewDoc
                 ? <iframe title="preview" srcDoc={previewDoc} sandbox="allow-scripts allow-same-origin" className="flex-1 w-full bg-white" />
                 : <div className={`flex-1 flex items-center justify-center text-xs ${txt2}`}>
