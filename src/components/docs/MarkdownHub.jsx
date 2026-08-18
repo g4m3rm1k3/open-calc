@@ -2250,6 +2250,9 @@ export default function MarkdownHub() {
   });
   const scrollPercentageRef = useRef(0);
   const prevActiveFileRef = useRef(activeFile);
+  const [hideTopBar, setHideTopBar] = useState(false);
+  const lastScrollTopRef = useRef(0);
+  const hideTopBarRef = useRef(false);
 
   useEffect(() => {
     if (prevActiveFileRef.current && prevActiveFileRef.current !== activeFile) {
@@ -2281,7 +2284,25 @@ export default function MarkdownHub() {
       percentage = Math.max(0, Math.min(100, (scrollTop / (scrollHeight - clientHeight)) * 100));
     }
     scrollPercentageRef.current = percentage;
-    
+
+    // Auto-hide the top bar on scroll-down, bring it back on scroll-up, so
+    // the sticky lesson heading takes over that space while reading — only
+    // once past a small threshold so the bar doesn't flicker right at the top.
+    const delta = scrollTop - lastScrollTopRef.current;
+    lastScrollTopRef.current = scrollTop;
+    if (scrollTop < 40) {
+      if (hideTopBarRef.current) {
+        hideTopBarRef.current = false;
+        setHideTopBar(false);
+      }
+    } else if (delta > 4 && !hideTopBarRef.current) {
+      hideTopBarRef.current = true;
+      setHideTopBar(true);
+    } else if (delta < -4 && hideTopBarRef.current) {
+      hideTopBarRef.current = false;
+      setHideTopBar(false);
+    }
+
     // Direct DOM manipulation for real-time 60fps progress bar updates
     if (prevActiveFileRef.current) {
       const safeId = prevActiveFileRef.current.replace(/[^a-zA-Z0-9-]/g, '-');
@@ -3115,7 +3136,12 @@ export default function MarkdownHub() {
         }
       >
         <div
-          className={`h-16 ${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 w-full gap-4 transition-all duration-300 overflow-visible`}
+          className={`${ui.bg1} bg-opacity-80 backdrop-blur-xl border-b ${ui.border} flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 w-full gap-4 transition-all duration-300`}
+          style={{
+            height: hideTopBar ? 0 : "4rem",
+            borderBottomWidth: hideTopBar ? 0 : undefined,
+            overflow: hideTopBar ? "hidden" : "visible",
+          }}
         >
           {/* ── LEFT SECTION: Navigation & Context ── */}
           <div className="flex items-center gap-3 shrink-0">
