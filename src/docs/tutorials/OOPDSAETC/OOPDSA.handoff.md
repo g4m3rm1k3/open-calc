@@ -93,32 +93,32 @@ lab, every incremental snapshot, every deliberate failure, B5's real
 session's own scratchpad. See working rule 8 and
 `verification/README.md`.
 
-**Track C — Search & Lookup: in progress (1 of 6).** `C1` is written,
-taken through the full `LESSON SCHEMA.md` sequence, every code sample
-actually compiled and run this session.
+**Track C — Search & Lookup: in progress (2 of 6).** `C1` and `C2` are
+both written, each taken through the full `LESSON SCHEMA.md` sequence,
+every code sample actually compiled and run this session.
 
 | File | Vehicle | Concept |
 | --- | --- | --- |
 | `C1-finding-it-instantly-by-key.md` | scanning every record for a match gets slow as data grows | hash map: DJB2 hashing, chaining, load-factor-triggered rehashing |
+| `C2-more-than-one-right-answer.md` | typing a few letters should suggest matches — exact-match lookup can't do that | trie: fixed-size children array indexed directly by character code, on-demand node creation during insert, recursive prefix-subtree collection for autocomplete |
 
-Both of the open questions the old "Starting Track C" section (now
-"Starting C2," below, updated for what comes next) originally posed are
-now resolved, decided while writing C1: the domain is the existing
-catalog (`Product`/`CatalogItem`/`TagPool`, reused verbatim from B4/B5,
-Reference Source `verification/B5/step_tagged_products.cpp` lines 5–43)
-— `ProductIndex` finds a real `Product*` by its real `label`, not a
-lookup over a fresh, unrelated domain. And per the "near-certain"
-prediction, Track C's project file is new: `catalog_lookup.cpp`
-(referenced as such throughout C1's own prose, though no literal copy
-of the file was written outside the lesson itself and
-`verification/C1/` — see working rule 5's own precedent, followed
-here: Track A's and Track B's evolving project files are likewise never
-persisted anywhere outside their lessons' own code blocks and
-`verification/`). It is not an extension of `catalog_tree.cpp` or
-`catalog_composite.cpp` — a bucket array plus chaining shares no
-structure with a binary tree or a composite hierarchy, the same
-"genuinely different in kind" reasoning Track B itself already used
-twice.
+Both of the open questions the old "Starting Track C" section
+originally posed were resolved while writing C1: the domain is the
+existing catalog (`Product`/`CatalogItem`/`TagPool`, reused verbatim
+from B4/B5, Reference Source `verification/B5/step_tagged_products.cpp`
+lines 5–43) — `ProductIndex` finds a real `Product*` by its real
+`label`, not a lookup over a fresh, unrelated domain. And per the
+"near-certain" prediction, Track C's project file is new:
+`catalog_lookup.cpp` (referenced as such throughout C1's own prose,
+though no literal copy of the file was written outside the lesson
+itself and `verification/C1/` — see working rule 5's own precedent,
+followed here: Track A's and Track B's evolving project files are
+likewise never persisted anywhere outside their lessons' own code
+blocks and `verification/`). It is not an extension of
+`catalog_tree.cpp` or `catalog_composite.cpp` — a bucket array plus
+chaining shares no structure with a binary tree or a composite
+hierarchy, the same "genuinely different in kind" reasoning Track B
+itself already used twice.
 
 C1 also delivered the handoff's own "strong recommendation": a real
 `/usr/bin/time`-measured comparison (not just an asserted big-O claim)
@@ -134,6 +134,35 @@ Every real, compiled proof behind C1 — both isolated labs, all three
 incremental project-file snapshots, the deliberate `BrokenProductIndex`
 failure, and both scale-comparison programs — is preserved in
 `verification/C1/`, per working rule 8.
+
+C2 built a `ProductTrie` on top of the same reused B4/B5 catalog
+domain, in a new project file, `catalog_lookup.cpp`'s trie counterpart
+— referred to throughout C2's own prose as `catalog_autocomplete.cpp`
+(same "no literal copy outside the lesson and `verification/`"
+precedent C1 set; not written anywhere else). Per working rule 5's
+"genuinely different in kind" exception, restated explicitly in C2's
+own Project Change: a `TrieNode`'s fixed 128-slot children array,
+indexed directly by character code, shares no structure with C1's
+hash-bucket-plus-chaining layout. The catalog itself grew from C1's
+four products (`Apple`, `Banana`, `Cheese`, `Bread`) to seven —
+`Cherry` (added to prove `"Ch"`/`"Che"` both resolve to a
+multi-product, shared-prefix subtree) and `Pea`/`Peach` (added
+specifically because `Pea` is a strict prefix of `Peach` — the exact
+shape that exposes why `isEnd` has to be a real, explicit marker rather
+than an inferred "no children means it's a word" shortcut; C2's own
+Closing deliberately breaks and restores exactly this). No scale
+measurement was added to C2's Closing — per the handoff's own prior
+note (preserved below in "Starting C3"), C1's own hash-vs-linear-scan
+measurement already discharged working rule 9's "at least once per
+track" bar, and C2's own vehicle (autocomplete) had no natural
+single-alternative timing comparison to make.
+
+Every real, compiled proof behind C2 — all three isolated labs
+(`lab1_trie_node.cpp`, `lab2_insert.cpp`, `lab3_autocomplete.cpp`), all
+three incremental project-file snapshots (`step1_trie_node_only.cpp`,
+`step2_insert.cpp`, `step3_full_producttrie.cpp`), and the deliberate
+`break_no_isend.cpp` failure — is preserved in `verification/C2/`, per
+working rule 8.
 
 ---
 
@@ -250,49 +279,72 @@ them from old lesson files (which you're not reading).
    this time, a timing one) in its own Closing. Keep doing this in
    Track C where a lesson has a natural head-to-head comparison to make
    — Track C's whole premise is speed, not a one-off concern for C1
-   alone — but see "Starting C2," below, for why this isn't a rule to
+   alone — but see "Starting C3," below, for why this isn't a rule to
    force onto every remaining C-lesson regardless of fit.
 
 ---
 
-## Starting C2
+## Starting C3
 
 Track C's BRD framing: *"Language: C++. 'Find this fast' is the excuse;
 the data structure that makes it fast is the point."* The six rows (C1
-hash map — done, C2 trie, C3 Bloom filter, C4 BST, C5 self-balancing
-tree, C6 skip list) are all straight DSA — no pattern-vs-parsing scoping
-ambiguity the way Track B's JSON/XML framing needed resolving; nothing
-here needs a scope confirmation the way B1 did.
+hash map — done, C2 trie — done, C3 Bloom filter, C4 BST, C5
+self-balancing tree, C6 skip list) are all straight DSA — no
+pattern-vs-parsing scoping ambiguity the way Track B's JSON/XML framing
+needed resolving; nothing here needs a scope confirmation the way B1
+did.
 
-**Resolved by C1, not still open:** both questions this section
-previously posed before C1 was written. Domain — C1 reused the existing
-catalog (`Product`/`CatalogItem`/`TagPool`, verbatim from B4/B5),
-indexing real products by their real `label`, and it worked well: real
-continuity, a built-in reason the structure exists, no forced or
-contrived example data. Default to the same choice for C2 (a trie
-autocompleting real product names, per this section's own original
-framing) unless C2's own vehicle turns out not to fit the catalog
-naturally — this is still a per-lesson judgment call, not a hard rule,
-the same status Track B's own `Array<T>`-vs-`vector` question had.
-Project file — C1 confirmed the prediction that Track C needs new file(s):
-`catalog_lookup.cpp`, referenced throughout C1's own prose (not an
-extension of `catalog_tree.cpp` or `catalog_composite.cpp`, per working
-rule 5's "genuinely different in kind" exception, stated explicitly in
-C1's own Project Change). A trie is, in the same way, genuinely
-different in kind from a hash map's bucket-array-plus-chaining layout —
-expect C2 to need its own new file too, and state that reasoning
-explicitly in C2's own Project Change per working rule 5, the same as
-C1 just did; don't skip restating it because the pattern is now
-established.
+**Resolved by C1 and C2, not still open:** the domain question this
+section originally posed. Both lessons reused the existing catalog
+(`Product`/`CatalogItem`/`TagPool`, verbatim from B4/B5), indexing real
+products by their real `label` (C1) or full path of characters (C2),
+and it worked well both times: real continuity, a built-in reason each
+structure exists, no forced or contrived example data. Default to the
+same choice for C3 (a Bloom filter giving a cheap "definitely not in
+the catalog" pre-check, per the BRD's own C3 framing) unless C3's own
+vehicle turns out not to fit the catalog naturally — still a
+per-lesson judgment call, not a hard rule, the same status Track B's
+own `Array<T>`-vs-`vector` question had. Project file — both C1 and C2
+confirmed the prediction that Track C needs a new file per lesson
+whose structure is genuinely different in kind from what came before:
+`catalog_lookup.cpp` (C1's hash map) and `catalog_autocomplete.cpp`
+(C2's trie), neither an extension of the other or of
+`catalog_tree.cpp`/`catalog_composite.cpp`, each stating that reasoning
+explicitly in its own Project Change per working rule 5. A Bloom
+filter — a bit array plus several hash functions, no nodes, no
+buckets, no chains — is, in the same way, genuinely different in kind
+from both a hash map's bucket-and-chain layout and a trie's
+character-indexed node tree; expect C3 to need its own new file too,
+and state that reasoning explicitly in C3's own Project Change, the
+same as C1 and C2 both did — don't skip restating it because the
+pattern is now well established.
 
-**Delivered by C1, carry forward:** working rule 9 (added this session)
-— a real quantitative measurement belongs in a lesson's Closing, not a
-separate Concept Unit. C1 measured `ProductIndex` against a linear scan
-with plain `/usr/bin/time`, confirming the handoff's own prior
-recommendation that Track C shouldn't assert a big-O claim without
-measuring it for real at least once. C2's own vehicle (autocomplete
-suggesting matches as a user types a prefix) is less naturally a
-head-to-head timing comparison against a single obvious alternative the
-way C1's hash-map-vs-linear-scan was — don't force one if C2 doesn't
-have a natural "measure this against that" moment; C1's own Closing
-already discharged the handoff's "at least once in the track" bar.
+**Delivered by C1, carried forward by C2, still open for C3:** working
+rule 9 (added while writing C1) — a real quantitative measurement
+belongs in a lesson's Closing, not a separate Concept Unit, and Track C
+should demonstrate this "at least once in the track," not on every
+single lesson regardless of fit. C1 discharged that bar already,
+measuring `ProductIndex` against a linear scan with plain
+`/usr/bin/time`. C2 correctly did not force one — autocomplete had no
+single obvious head-to-head alternative worth measuring. A Bloom
+filter's own natural claim is different in kind from either: not "is
+this faster," but "how much memory does a maybe-check cost compared to
+actually storing every key" — if C3's own vehicle surfaces a real,
+natural memory comparison to make (a Bloom filter's bit array vs. the
+trie's or hash map's real, actually-storing-every-key footprint), that
+would be a legitimate second real measurement for the track, in C3's
+own Closing, following B5's and C1's own `/usr/bin/time`/`-l`
+precedent — still a per-lesson judgment call based on actual fit, not
+a rule requiring one every time.
+
+**C2's own catalog-growth precedent, carry forward if useful:** C2
+grew the shared catalog from C1's four products to seven, adding
+products specifically chosen to expose its own concept (`Cherry` for a
+shared-prefix, multiple-match case; `Pea`/`Peach` for the
+one-label-is-a-strict-prefix-of-another case). If C3's own vehicle
+benefits from catalog entries chosen the same deliberate way — not
+arbitrary padding, but specific data shaped to make the Bloom filter's
+own behavior (a real false positive, a real true negative) actually
+observable — that's a legitimate move, the same judgment call C2 just
+made, not a special case requiring justification beyond what Project
+Change already asks for.

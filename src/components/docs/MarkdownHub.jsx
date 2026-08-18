@@ -422,7 +422,7 @@ function seriesFromPath(path) {
 
 function getMdCss(md) {
   return `
-.md-body { line-height: 1.75; font-size: 15px; color: ${md.text}; }
+.md-body { line-height: 1.75; font-size: 15px; color: ${md.text}; --card-glow: 0 4px 20px -5px color-mix(in srgb, ${md.strong} 30%, transparent), inset 0 0 0 1px color-mix(in srgb, ${md.strong} 15%, transparent); }
 .md-body h1 { font-size: 2em; font-weight: 700; margin: 0 0 0.5em; color: ${md.h1}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.3em; }
 .md-body h2 { font-size: 1.4em; font-weight: 700; margin: 1.8em 0 0.5em; color: ${md.h2}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.2em; }
 .md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: ${md.h3}; }
@@ -438,6 +438,12 @@ function getMdCss(md) {
 .md-body blockquote { border-left: 3px solid ${md.quoteBorder}; margin: 0 0 1em; padding: 8px 16px; background: ${md.quoteBg}; border-radius: 0 4px 4px 0; color: ${md.quoteText}; }
 .md-body ul, .md-body ol { margin: 0 0 1em 1.4em; }
 .md-body li { margin-bottom: 0.3em; }
+.md-body ul:has(> li > strong + br) { margin-left: 0; }
+.md-body li:has(> strong + br) { list-style: none; border: 1px solid ${md.tdBorder}; border-radius: 10px; padding: 14px 18px; margin: 0 0 1em; box-shadow: var(--card-glow); }
+.md-body li > strong:has(+ br) { display: inline-block; font-size: 1.08em; padding: 3px 10px; border-radius: 6px; background: color-mix(in srgb, ${md.strong} 16%, transparent); border: 1px solid color-mix(in srgb, ${md.strong} 35%, transparent); margin-bottom: 4px; }
+.md-body p:has(> strong:only-child):has(> strong code):has(+ ul) { border: 1px solid ${md.tdBorder}; border-bottom: none; border-radius: 10px 10px 0 0; background: color-mix(in srgb, ${md.strong} 8%, ${md.codeBg}); padding: 10px 16px; margin: 1.6em 0 0; box-shadow: var(--card-glow); }
+.md-body p:has(> strong:only-child):has(> strong code):has(+ ul) > strong > code { font-size: 1.05em; background: none; border: none; padding: 0; color: ${md.strong}; }
+.md-body p:has(> strong:only-child):has(> strong code) + ul { border: 1px solid ${md.tdBorder}; border-top: none; border-radius: 0 0 10px 10px; margin: 0 0 1.4em; padding: 10px 18px 12px 36px; box-shadow: var(--card-glow); }
 .md-body table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: 0.9em; }
 .md-body th { background: ${md.thBg}; border: 1px solid ${md.tdBorder}; padding: 8px 12px; text-align: left; color: ${md.quoteText}; font-weight: 600; }
 .md-body td { border: 1px solid ${md.tdBorder}; padding: 7px 12px; }
@@ -1328,6 +1334,38 @@ const MD_COMPONENTS = {
   code({ children }) {
     // Only inline code reaches here; block code is handled entirely by `pre` via node prop
     return <MdInlineCode>{children}</MdInlineCode>;
+  },
+  li({ node, children }) {
+    // Glossary-style bullets ("- **Term** — definition...") are one of this
+    // corpus's most common list shapes (11k+ occurrences across every
+    // curriculum), but list items with a leading bold run are NOT all
+    // glossary terms — "- **Files affected:** ..." and plain mid-sentence
+    // emphasis also start with `<strong>`. Matching on the hast node's
+    // exact shape (strong, then a text node starting with " — ") targets
+    // only the glossary convention itself, so every other list — in every
+    // lesson, with no markdown edits — is untouched.
+    const kids = node?.children ?? [];
+    const isTermBullet =
+      kids[0]?.type === "element" &&
+      kids[0].tagName === "strong" &&
+      kids[1]?.type === "text" &&
+      /^\s*—\s+/.test(kids[1].value ?? "");
+
+    if (isTermBullet) {
+      const rest = [...children];
+      const term = rest.shift();
+      if (typeof rest[0] === "string") {
+        rest[0] = rest[0].replace(/^\s*—\s+/, "");
+      }
+      return (
+        <li>
+          {term}
+          <br />
+          {rest}
+        </li>
+      );
+    }
+    return <li>{children}</li>;
   },
   a({ href, children }) {
     return <MdLink href={href}>{children}</MdLink>;
