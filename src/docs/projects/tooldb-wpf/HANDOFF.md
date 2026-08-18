@@ -5,9 +5,11 @@ Read this first when resuming. Roadmap and lesson status live in
 
 ## Status
 
-- **Next lesson:** 1 — Connecting to a Database File
+- **Next lesson:** 2 — Schema Design
 - **Lessons written:** 0 — Environment & Project Setup
-  (`lessons/lesson-00-environment-and-project-setup.md`)
+  (`lessons/lesson-00-environment-and-project-setup.md`); 1 — Static
+  Types, Connection Strings, and a Resource's Lifetime
+  (`lessons/lesson-01-connecting-to-a-database-file.md`)
 - Update the "Next lesson" line above after every lesson, not just at
   session boundaries.
 - `LessonContract` and `Guide.md`, referenced in the Schema section below,
@@ -25,6 +27,22 @@ Read this first when resuming. Roadmap and lesson status live in
   exercise instead of an executed-and-pasted trace, to avoid an extra
   permission-gated shell command — safe to redo for real and tighten if a
   future session has approval available and wants to.
+- Lesson 1's code (connection string, `SqliteConnection`/`Open()`, the
+  `using` declaration, the connection-pooling file-lock proof, the
+  `CS0029`/`CS0219`/`CS8602` compiler diagnostics, and the final
+  `SqliteException` "what breaks" trace) was all actually run in a scratch
+  directory this session — no invented output anywhere in it. The
+  `SqliteConnection`/connection-string/`IDisposable`/`using` API facts cited
+  were fetched fresh from Microsoft Learn this session (not from memory);
+  see the lesson file's own citations for the exact pages.
+- **Do not go looking for a "real" reference app to port from** — not
+  react-studio/frontend-client-style siblings in this repo, and not some
+  other project elsewhere on disk that looks like it might be "the
+  original ToolDB." Confirmed explicitly this session: this curriculum's
+  own Reference Source fields say "no reference counterpart consulted"
+  rather than searching one out. See the memory rule this produced,
+  `feedback_no_cross_project_audits`, if this needs re-explaining to a
+  future session.
 
 ## Stack decisions (locked in before Lesson 1)
 
