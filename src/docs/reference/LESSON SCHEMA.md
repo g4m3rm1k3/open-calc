@@ -205,6 +205,54 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
 
 ---
 
+## The Vocabulary Extraction Rule
+
+Every Header failure this schema has caught in practice traces back to
+the same root cause: Terms and Objects/methods got assembled from memory
+or feel while drafting, and a technical word — an annotation quoted
+inside a signature, a keyword reappearing from an earlier lesson, a named
+exception mentioned only to explain a consequence — slipped into later
+prose without ever getting its own entry above it. Catching that after
+the fact means re-reading the entire finished draft looking for anything
+that feels unexplained, which is expensive, unreliable, and gets more
+expensive the longer the draft already is.
+
+**The fix is ordering, not vigilance: extract every token before writing
+any prose, then compose the prose from that fixed list, never the
+reverse.**
+
+1. Before drafting Terms or Objects and methods, collect every code span
+   this Concept Unit will show anywhere — the New Code block, any
+   isolated lab code, and any real signature quoted inside an Objects and
+   methods *Implementation* bullet. An annotation like `@NonNull`
+   appearing only inside a quoted signature still counts; it does not get
+   a pass for sitting one level removed from the main code block.
+2. Tokenize each span into its distinct pieces: every keyword, annotation,
+   operator, type name, method name, and named constant.
+3. Every token gets a slot — a Terms entry (a keyword, annotation,
+   operator, or reappearing language concept) or an Objects and methods
+   entry (a real class, interface, or method) — decided by the category
+   rule already given above, never by which section "feels right" in the
+   moment. Fill every slot before writing a single word of the Concept
+   Unit's own prose.
+4. Once the Header is assembled this way, it becomes a closed vocabulary:
+   no later section — Mechanical Walkthrough, CS Lens, SE Lens, Connect
+   the Pieces, Commands Needed — may introduce a technical word that
+   doesn't already have a slot. If writing a sentence in one of those
+   sections turns out to need a word with no slot, that is the signal a
+   token was missed in step 2 — stop, add the slot to the Header, then
+   finish the sentence. This is cheap the moment it's caught (one slot,
+   added immediately, in place) and expensive the moment it isn't (a full
+   re-read of an already-finished draft, hunting for whatever else
+   slipped through the same way).
+
+This does not replace the closing self-check's own vocabulary-related
+items — it is what makes passing them the default outcome of writing a
+lesson once, instead of the result of a second, separate pass over an
+already-finished one.
+
+---
+
 ## The Recursive Concept Extraction Rule
 
 Before writing a lesson, recursively analyze the project code being added
@@ -542,6 +590,33 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    > introduces new unexplained names has traded one mystery for
    > another instead of removing one.
 
+   > **Naming the kind once is not enough — the whole bullet has to
+   > stay in real vocabulary, not revert to paraphrase.** "Get its
+   > actual kind right," above, is not satisfied by a single passing
+   > word like "static" followed by plain-English paraphrase for
+   > everything else in the bullet. The item's real declaring type
+   > (`java.lang.String`, not "a helper"), its real parameter and return
+   > types when they carry any of the reasoning (`CharSequence` vs.
+   > `String`, `Editable` vs. either, a primitive `int` vs. a boxed
+   > `Integer`), and the specific conversion or contract actually at
+   > play have to appear in the bullet's own sentences — the effect on
+   > the user is explained *in addition to* the mechanism, never as a
+   > replacement for it. *"`quantityInput.setText(...)` pre-fills the
+   > field with the item's current quantity"* names an effect and no
+   > mechanism at all — a reader still can't say what type `setText`
+   > actually takes, or why the raw `int` sitting right next to it
+   > couldn't be passed directly. Naming the mechanism: *"`setText` is
+   > an instance call on `EditText` accepting a `CharSequence`;
+   > `String.valueOf` is a separate, static call on `java.lang.String`
+   > converting the primitive `int` `getQuantity()` returns into that
+   > required type, because `setText` has no overload accepting a raw
+   > `int` — Java does not implicitly convert numbers to text the way
+   > some scripting languages do."* This failure survives correct
+   > decomposition: a walkthrough can isolate every call into its own
+   > bullet, per the enumeration rule above, and still fail this if each
+   > individual bullet drifts back into behavior-only paraphrase instead
+   > of naming its own real mechanism.
+
    > **Explain, don't just describe — for every item, not only hard
    > concepts:** "explain" and "describe" are not interchangeable, and
    > this schema means the stronger one. To *describe* something is to
@@ -761,6 +836,16 @@ Read the draft top to bottom and answer honestly:
       undescribed one would — the fix is the same "explain, don't just
       describe" standard applied here, in the Header, not only inside
       Concept Units.
+- [ ] Was the Header assembled by literally tokenizing every code span in
+      the unit first — including annotations sitting inside a quoted
+      signature, not only the main New Code block — and filling a Terms
+      or Objects/methods slot for each token before any prose was
+      written? Or does a technical word appear anywhere in the
+      Mechanical Walkthrough, a Lens, Connect the Pieces, or Commands
+      Needed that traces back to no entry in the Header at all? The
+      second is the Vocabulary Extraction Rule's failure mode, and it is
+      cheap to fix by adding the missed slot now — expensive to find by
+      re-reading the whole draft looking for it later.
 - [ ] Does any code block sit immediately next to another code block with
       no prose in between? If yes: split, interleave.
 - [ ] Does any paragraph explain what a specific method, class, or
