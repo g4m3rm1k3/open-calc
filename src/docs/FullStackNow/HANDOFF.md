@@ -1,6 +1,6 @@
 # Full-Stack Playground Curriculum — HANDOFF
 
-Read this file, `references/lesson-schema.md`, and `full.brd.md` before starting a session. Nothing else. Do not open previous lesson folders for reference or context — each session works from these three documents, not from accumulated lesson content.
+Read this file, `full.brd.md`, and `../reference/LESSON SCHEMA.md` before starting a session. Nothing else. Do not open previous lesson folders for reference or context — each session works from these three documents, not from accumulated lesson content.
 
 ## Why this curriculum exists
 
@@ -10,12 +10,12 @@ This is not a content-generation task — it's the user building the vocabulary 
 
 ## How to work a session
 
-- Read only: this HANDOFF, `references/lesson-schema.md`, `full.brd.md`. Do not read old lesson folders.
+- Read only: this HANDOFF, `full.brd.md`, `../reference/LESSON SCHEMA.md`. Do not read old lesson folders.
+- A lesson is a written document the user works through themselves, built per `LESSON SCHEMA.md` exactly — Concept Units, isolated throwaway labs, mechanical walkthroughs, real executed output. Producing a lesson means writing that document, not silently doing the lesson's work for the user.
 - Build one lesson per session, in order, per `full.brd.md`'s numbering.
-- Follow `references/lesson-schema.md` exactly for folder layout and README structure — don't reconstruct the format from memory or from old lessons.
-- When the lesson is done: verify it (install/build/lint/run as applicable), add one entry to the Session Log below, and stop. Don't start the next lesson in the same session.
-- Keep log entries minimal — what was built and its status, not a recap of the lesson content (that lives in the lesson's own README).
+- When the lesson is done: add one entry to the Session Log below, and stop. Don't start the next lesson in the same session.
+- Keep log entries minimal — what was built and its status, not a recap of the lesson content (that lives in the lesson's own file).
 
 ## Session log
 
-- **Lesson 0 — Startup** (2026-08-17): Scaffolded `fullstack-playground/` per BRD §1 — Vite + React 19 + TypeScript, ESLint flat config (`eslint.config.js`, swapped in for the create-vite default of oxlint to match the BRD), `src/shared/{db,http,testing,ui}/` (empty, infra-only per the shared-code rule), `src/app/Playground.tsx` (dynamically mounts whichever lesson is selected via `import.meta.glob`), `src/lessons/` (empty, ready for 001), and `scripts/run-lesson.ts` / `scripts/reset-lesson.ts`. Verified: `npm install`, `npm run build`, `npm run lint`, dev server boot, and both scripts' no-lessons-yet error paths all pass clean. Isolated the project from the parent `open-calc` repo's root Tailwind/PostCSS config with a local empty `postcss.config.js` (was leaking in via upward config resolution). Status: done. Next: Lesson 001 — Make a Number Change.
+- **Lesson 0 — Startup** (2026-08-17): Written to `lessons/000-startup.md`, per `../reference/LESSON SCHEMA.md` — 7 Concept Units (Vite scaffold, package.json, TS project references, ESLint flat config, the shared/app/lessons folder boundary, dynamic lesson loading, the run/reset scripts), each with an isolated lab and real executed output. The project itself (`fullstack-playground/`) is not built in the repo — the lesson exists for the user to work through and build it themselves. Status: lesson written, not yet worked through. Next: work through Lesson 0, then Lesson 001 — Make a Number Change.
