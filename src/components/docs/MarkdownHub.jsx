@@ -3943,7 +3943,9 @@ export default function MarkdownHub() {
                 <div
                   ref={contentScrollRef}
                   onScroll={handleContentScroll}
-                  className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar relative z-10"
+                  className={`flex-1 overflow-y-auto py-8 custom-scrollbar relative z-10 ${
+                    typography.width === "wide" ? "px-2 sm:px-3" : "px-6 sm:px-10 lg:px-16"
+                  }`}
                 >
                   {loading ? (
                     <div className="text-slate-500 text-sm animate-pulse">
