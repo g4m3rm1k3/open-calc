@@ -1569,10 +1569,10 @@ function NoteEditorItem({
     <div 
       className={`mx-2 mb-2 rounded-lg border transition-all duration-300 overflow-hidden ${
         isActive 
-          ? `shadow-md ring-1 bg-white/50 dark:bg-black/20` 
-          : `${ui.border} shadow-sm hover:shadow-md hover:border-black/10 dark:hover:border-white/10`
+          ? `shadow-sm ring-1 bg-white dark:bg-[#0c1520]` 
+          : `border-transparent bg-black/[0.03] dark:bg-white/[0.03] hover:bg-black/[0.06] dark:hover:bg-white/[0.06]`
       }`}
-      style={isActive ? { borderColor: accentColor, boxShadow: `0 0 15px ${accentColor}20`, ringColor: `${accentColor}50` } : {}}
+      style={isActive ? { borderColor: accentColor, boxShadow: `0 4px 20px ${accentColor}15`, ringColor: `${accentColor}30` } : {}}
     >
       <div
         onClick={onOpen}
@@ -1606,13 +1606,18 @@ function NoteEditorItem({
       </div>
       {isActive && (
         <div className={`px-3 pb-3 pt-2 border-t border-black/5 dark:border-white/5`}>
+          <style>{`
+            .note-field-${note.id}:focus {
+              box-shadow: 0 0 0 1px ${accentColor} !important;
+              border-color: ${accentColor} !important;
+            }
+          `}</style>
           <input
             type="text"
             value={note.title}
             onChange={(e) => onUpdate({ title: e.target.value })}
             placeholder="Note title"
-            className={`w-full mb-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[12px] font-medium outline-none transition-colors`}
-            style={{ outlineColor: accentColor }}
+            className={`note-field-${note.id} w-full mb-2 px-2.5 py-1.5 rounded-md border border-transparent bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 focus:bg-transparent text-[12px] font-medium outline-none focus:outline-none transition-all`}
           />
           {note.docPath && (
             <button
@@ -1622,7 +1627,7 @@ function NoteEditorItem({
                 onOpenSource(note.docPath);
               }}
               title="Open the lesson this note came from"
-              className={`w-full mb-2 flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} ${ui.hoverBg} text-[11px] font-medium transition-colors truncate`}
+              className={`note-field-${note.id} w-full mb-2 flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-transparent bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[11px] font-medium transition-all truncate outline-none focus:outline-none`}
               style={{ color: accentColor }}
             >
               <File className="w-3.5 h-3.5 shrink-0" />
@@ -1637,16 +1642,14 @@ function NoteEditorItem({
             value={note.series}
             onChange={(e) => onUpdate({ series: e.target.value })}
             placeholder="Series"
-            className={`w-full mb-2 px-2.5 py-1.5 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[11px] outline-none transition-colors ${ui.txt2}`}
-            style={{ outlineColor: accentColor }}
+            className={`note-field-${note.id} w-full mb-2 px-2.5 py-1.5 rounded-md border border-transparent bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 focus:bg-transparent text-[11px] outline-none focus:outline-none transition-all ${ui.txt2}`}
           />
           <textarea
             value={note.body}
             onChange={(e) => onUpdate({ body: e.target.value })}
             placeholder="Paste or type your note here…"
             rows={6}
-            className={`w-full px-2.5 py-2 rounded-md border border-black/10 dark:border-white/10 ${ui.bg0} text-[12px] leading-relaxed outline-none resize-y transition-colors ${ui.txt1}`}
-            style={{ outlineColor: accentColor }}
+            className={`note-field-${note.id} w-full px-2.5 py-2 rounded-md border border-transparent bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 focus:bg-transparent text-[12px] leading-relaxed outline-none focus:outline-none resize-y transition-all ${ui.txt1}`}
           />
         </div>
       )}
@@ -3531,8 +3534,8 @@ export default function MarkdownHub() {
               className={`${docsNavOpen ? "hidden sm:flex" : "hidden"} ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}
               style={{ width: codeAlongOpen ? Math.min(explorerWidth, 240) : explorerWidth }}
             >
-              {/* ── Docs search bar ── */}
-              {tab === "tutorials" && sidebarTab !== "notes" && (
+              {/* ── Search bar ── */}
+              {tab === "tutorials" && (
                 <div className={`shrink-0 px-2 py-2 border-b ${ui.border}`}>
                   <div
                     className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} transition-colors focus-within:ring-1`}
@@ -3553,14 +3556,14 @@ export default function MarkdownHub() {
                     </svg>
                     <input
                       type="text"
-                      value={docSearch}
-                      onChange={(e) => setDocSearch(e.target.value)}
-                      placeholder="Search docs…"
+                      value={sidebarTab === "notes" ? noteSearch : docSearch}
+                      onChange={(e) => sidebarTab === "notes" ? setNoteSearch(e.target.value) : setDocSearch(e.target.value)}
+                      placeholder={sidebarTab === "notes" ? "Search notes…" : "Search docs…"}
                       className={`flex-1 bg-transparent text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
                     />
-                    {docSearch && (
+                    {(sidebarTab === "notes" ? noteSearch : docSearch) && (
                       <button
-                        onClick={() => setDocSearch("")}
+                        onClick={() => sidebarTab === "notes" ? setNoteSearch("") : setDocSearch("")}
                         className="opacity-40 hover:opacity-70 transition-opacity"
                       >
                         <svg
@@ -3583,7 +3586,7 @@ export default function MarkdownHub() {
               )}
 
               {/* Sidebar tab switcher — tutorials mode, not searching. "On This Page" only shows once the active doc has headings; Notes is always reachable. */}
-              {tab === "tutorials" && !docSearch && (
+              {tab === "tutorials" && (!docSearch || sidebarTab === "notes") && (
                 <div className={`flex shrink-0 p-2 gap-1 border-b ${ui.border} sticky top-0 z-20 ${ui.bg0}`}>
                   <button
                     onClick={() => setSidebarTab("docs")}
@@ -3624,7 +3627,7 @@ export default function MarkdownHub() {
               )}
 
               {/* ── Search results ── */}
-              {tab === "tutorials" && docSearch.trim().length >= 2 && (
+              {tab === "tutorials" && sidebarTab !== "notes" && docSearch.trim().length >= 2 && (
                 <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
                   {searchResults.length === 0 ? (
                     <p
@@ -3683,7 +3686,7 @@ export default function MarkdownHub() {
                 </div>
               )}
               {/* ── Normal tree (hidden while searching) ── */}
-              {!(tab === "tutorials" && docSearch.trim().length >= 2) && (
+              {!(tab === "tutorials" && sidebarTab !== "notes" && docSearch.trim().length >= 2) && (
                 <div className="flex-1 overflow-y-auto overflow-x-auto py-3 custom-scrollbar min-h-0">
                   {tab === "tutorials" &&
                     (sidebarTab === "docs" ||
@@ -3790,15 +3793,6 @@ export default function MarkdownHub() {
                         >
                           <FilePlus className="w-3.5 h-3.5" /> New Note
                         </button>
-                      </div>
-                      <div className="px-3 pb-2">
-                        <input
-                          type="text"
-                          value={noteSearch}
-                          onChange={(e) => setNoteSearch(e.target.value)}
-                          placeholder="Search notes…"
-                          className={`w-full px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
-                        />
                       </div>
                       {notes.length === 0 ? (
                         <div className={`px-4 py-4 text-xs ${ui.txt2}`}>
