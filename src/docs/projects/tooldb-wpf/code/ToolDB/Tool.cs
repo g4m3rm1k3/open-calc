@@ -1,29 +1,6 @@
 using Microsoft.Data.Sqlite;
 
-using var connection = new SqliteConnection("Data Source=../ToolDB/tools.db");
-connection.Open();
-
-using var selectCommand = new SqliteCommand(
-    "SELECT id, name, manufacturer, overall_diameter, overall_length, flute_count FROM tools",
-    connection);
-using var reader = selectCommand.ExecuteReader();
-
-int toolCount = 0;
-Tool? firstTool = null;
-while (reader.Read())
-{
-    Tool tool = Tool.FromReader(reader);
-    toolCount++;
-    if (firstTool == null)
-    {
-        firstTool = tool;
-    }
-}
-
-string statusText = $"Loaded {toolCount} tool(s). First: {firstTool?.Name} ({firstTool?.Manufacturer})";
-Console.WriteLine(statusText);
-
-class Tool
+public class Tool
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";

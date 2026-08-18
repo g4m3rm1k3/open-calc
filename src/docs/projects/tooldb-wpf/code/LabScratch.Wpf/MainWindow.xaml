@@ -1,0 +1,8 @@
+﻿<Window x:Class="LabScratch.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TextBlock x:Name="StatusText" Text="Not loaded yet" FontSize="24" Margin="20" />
+    </Grid>
+</Window>

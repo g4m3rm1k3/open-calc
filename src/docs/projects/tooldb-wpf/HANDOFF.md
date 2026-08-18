@@ -5,16 +5,109 @@ Read this first when resuming. Roadmap and lesson status live in
 
 ## Status
 
-- **Next lesson:** 4 — Querying Back
+- **Next lesson:** 6 — Hosting WebView2 in a WPF Window
 - **Lessons written:** 0 — Environment & Project Setup
   (`lessons/lesson-00-environment-and-project-setup.md`); 1 — Static
   Types, Connection Strings, and a Resource's Lifetime
   (`lessons/lesson-01-connecting-to-a-database-file.md`); 2 — What a
   Schema Promises vs. What SQLite Enforces
   (`lessons/lesson-02-schema-design.md`); 3 — Never Let Data Become Code
-  (`lessons/lesson-03-inserting-safely.md`)
+  (`lessons/lesson-03-inserting-safely.md`); 4 — Turning Rows Into Objects,
+  and Making "Still Correct" Automatic
+  (`lessons/lesson-04-querying-back.md`); 5 — The Framework Calls You Now
+  (WPF Basics) (`lessons/lesson-05-wpf-basics.md`)
 - Update the "Next lesson" line above after every lesson, not just at
   session boundaries.
+- **Lesson 5 notes (this session):** `ToolDB` is a WPF application now —
+  `ToolDB.csproj` gained `<OutputType>WinExe</OutputType>` (was `Exe`),
+  `<TargetFramework>net10.0-windows</TargetFramework>` (was `net10.0`),
+  and `<UseWPF>true</UseWPF>`; `App.xaml`/`App.xaml.cs`/`MainWindow.xaml`/
+  `MainWindow.xaml.cs` are new; `Program.cs` is emptied (not deleted —
+  same rm-avoidance convention as always) since WPF's own generated
+  `Main()` (from `App.xaml`'s `StartupUri`) is the real entry point now.
+  Lesson 4's own query-and-mapping logic (`SqliteConnection`/
+  `SqliteCommand`/`SqliteDataReader`/`Tool.FromReader`) moved, unchanged,
+  from `Program.cs`'s top-level statements into `MainWindow`'s own
+  `Loaded` event handler, writing its result into a named `TextBlock`
+  (`StatusText`) instead of `Console.WriteLine`. A second, genuinely new
+  project now exists at `code/LabScratch.Wpf/` (via `dotnet new wpf`),
+  sibling to `LabScratch/`, `ToolDB/`, and `ToolDB.Tests/` — this
+  lesson's own throwaway lab for every WPF-specific concept (an
+  entry-point conflict, plain XAML compiling into real objects, `x:Name`
+  generating a real field, `Loaded`/`Closing` lifecycle events),
+  overwritten and evolved across the lesson's own four units exactly the
+  way `LabScratch/Program.cs` already was in Lesson 4. **A real,
+  fully-verified discovery, not asserted:** a top-level-statements
+  `Program.cs` coexisting with a WPF project's own `App.xaml` does *not*
+  fail the build — it produces a real `CS7022` warning ("ignoring
+  'App.Main()' entry point") and the build still reports `Build
+  succeeded`, but the WPF `Application`/window never actually runs at
+  all; the top-level code silently wins, prints, and exits. Proven twice
+  this session: once in isolation in `LabScratch.Wpf/`, and a second time
+  against the real, finished `ToolDB` project itself (this lesson's own
+  Closing "what breaks" section), both via real `dotnet build`/`dotnet
+  run` output, both reverted afterward. **A second real, unplanned
+  discovery:** converting `ToolDB` to `net10.0-windows` broke
+  `ToolDB.Tests` (still plain `net10.0`) with a real `NU1201` restore
+  error ("Project ToolDB is not compatible with net10.0... Project ToolDB
+  supports: net10.0-windows7.0") — fixed by updating `ToolDB.Tests.csproj`
+  to `net10.0-windows` too; `dotnet test` passes again afterward,
+  unchanged assertion, same as Lesson 4 left it. **A real permission
+  constraint hit and worked around this session:** launching an actual
+  WPF window (via `dotnet run`, foregrounded or backgrounded) is not
+  something this session could execute — the user explicitly stopped a
+  `run_in_background` attempt, citing permission-prompt overhead/session
+  length, the same category of concern as the established rm-avoidance
+  rule. Every claim in Lesson 5 that would normally come from watching a
+  live window instead comes from `dotnet build`'s own clean output (0
+  Warnings/0 Errors, always real, always captured) plus the real
+  markup-compiler-generated C# read directly out of `obj/` (`App.g.cs`,
+  `MainWindow.g.cs`, fetched fresh this session, both before and after
+  adding `x:Name`, to prove exactly what it generates) — genuine
+  Microsoft Learn documentation (`Application`, `Window`,
+  `FrameworkElement.Loaded`, `Window.Closing`, `STAThreadAttribute`, all
+  fetched fresh this session) fills in what a build alone can't prove
+  (event firing order, `Closing`'s cancelability). The lesson's own
+  Header states this tradeoff plainly and asks the reader to actually run
+  `dotnet run` themselves for the one thing a transcript can't
+  substitute for — watching the window itself. **Don't attempt to launch
+  a live WPF window via Bash/PowerShell (foreground or background) in a
+  future session without first checking whether this constraint still
+  holds** — retest before assuming it, but treat it as the default going
+  in.
+- **Lesson 4 notes (this session):** `code/ToolDB/` gained its first
+  user-defined type, `Tool.cs` (`public class Tool`, five properties plus a
+  `static Tool FromReader(SqliteDataReader reader)` factory method) — the
+  first OOP construct this curriculum has ever introduced. `Program.cs`'s
+  Lesson 3 `INSERT` checkpoint was *removed* (same reasoning as Lesson 3
+  removing Lesson 2's `CREATE TABLE` — the row already exists permanently on
+  disk) and replaced with a `SELECT` + `ExecuteReader()` + `while
+  (reader.Read())` loop that maps every row through `Tool.FromReader`.
+  `tools.db` still holds exactly one row, unchanged, confirmed by a real
+  read-only check both before and after this session's work.
+  A second project, `code/ToolDB.Tests/` (via `dotnet new xunit`, project
+  reference to `ToolDB`, own `Microsoft.Data.Sqlite` package reference),
+  now exists with one real, passing `[Fact]` (`ToolTests.cs`) — this
+  project's first automated test. Two genuinely real discoveries came out
+  of writing it, both fully proven (not asserted) and written into the
+  lesson: (1) `class Widget { ... }` placed *before* top-level statements in
+  the same file produces a real `CS8803` compiler error — type declarations
+  must follow top-level statements in one file; the real project sidesteps
+  this entirely by giving `Tool` its own file. (2) A test that calls
+  `connection.Close()` then immediately `File.Delete()`s that same SQLite
+  file fails with a real `IOException` ("being used by another process") —
+  connection pooling (Lesson 1's own file-lock proof) holds the native
+  handle open past `Close()`; the fix, matching this curriculum's own
+  established "delete before, not after" pattern, is to drop the trailing
+  cleanup and rely on the next run's own leading `File.Exists`/`File.Delete`
+  guard. The Closing's "what breaks" demo deliberately swapped
+  `Tool.FromReader`'s `Name`/`Manufacturer` ordinals and captured **both**
+  real outcomes: `dotnet run` prints a deceptively plausible-looking line
+  (two real strings, just transposed — easy for a human to miss), while
+  `dotnet test` fails precisely and immediately with an exact expected/
+  actual diff — the actual point of this lesson's second half. All output
+  in the lesson is real, captured this session; no invented output anywhere
+  in it, including both the red and green test runs.
 - **Lesson 3 notes (this session):** `tools.db` now holds its first real
   row (a real endmill; manufacturer `"O'Brien Carbide Tools"`, chosen
   deliberately for its apostrophe). Lesson 2's `CREATE TABLE`/verification
@@ -107,6 +200,18 @@ Read this first when resuming. Roadmap and lesson status live in
   `SqliteConnection`/connection-string/`IDisposable`/`using` API facts cited
   were fetched fresh from Microsoft Learn this session (not from memory);
   see the lesson file's own citations for the exact pages.
+- **`Untitled.TOOLDB`, in this same project folder, is a real Mastercam
+  tool-library SQLite file** (confirmed via `sqlite3_version 3046001`; 79
+  tables, GUID primary keys, `BLOB` columns, `DEFERRABLE` FK constraints —
+  e.g. `TlTool`, `TlHolder`, `TlAssembly`; `TlTool` holds 4 real rows). It's
+  already accounted for in `Curriculum.md` under **Slice 10 — 3D Tool
+  Visualization** as that slice's real data source (paired with
+  `reference-tool-geometry.md`), not something newly discovered this
+  session. Its 79-table normalized shape is far past this curriculum's
+  beginner pace — it is **not** a schema or data source for Lesson 4 or any
+  earlier lesson; `tools.db`'s own single `tools` table stays what those
+  lessons build on. Don't re-investigate this file's contents in an early-
+  lesson session; it's Slice 10's concern only.
 - **Do not go looking for a "real" reference app to port from** — not
   react-studio/frontend-client-style siblings in this repo, and not some
   other project elsewhere on disk that looks like it might be "the

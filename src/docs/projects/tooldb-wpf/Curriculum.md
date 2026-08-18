@@ -119,8 +119,8 @@ view replacing today's):
 | 1 | Connecting to a Database File (`Microsoft.Data.Sqlite`, connection strings) | — | database, SQLite, connection, connection string, resource lifetime | written |
 | 2 | Schema Design (`CREATE TABLE`, type affinity, `PRIMARY KEY`) | 1 | table, column, row, type affinity, primary key | written |
 | 3 | Inserting Safely (parameterized queries, `SqliteParameter`) | 1–2 | SQL parameters, parameter binding, SQL injection | written |
-| 4 | Querying Back (`SELECT`, `ExecuteReader`, row→object mapping; write your first automated test against it) | 1–3 | `SELECT`, reader, iteration, row→object mapping, automated test | not written |
-| 5 | WPF Basics (`App.xaml`, `MainWindow.xaml`, code-behind, window lifecycle) | — | application, window, XAML, code-behind, lifecycle | not written |
+| 4 | Querying Back (`SELECT`, `ExecuteReader`, row→object mapping; write your first automated test against it) | 1–3 | `SELECT`, reader, iteration, row→object mapping, automated test | written |
+| 5 | WPF Basics (`App.xaml`, `MainWindow.xaml`, code-behind, window lifecycle) | — | application, window, XAML, code-behind, lifecycle | written |
 | 6 | Hosting WebView2 in a WPF Window (`CoreWebView2` init, loading local HTML; includes diagnosing a broken/failed initialization) | 5 | control, browser process, initialization, navigation | not written |
 | 7 | Passing C# Data to HTML (`postMessage` + `WebMessageReceived` — the JS↔host messaging channel; first real data on screen) | 4, 6 | IPC, serialization, JSON, message passing | not written |
 
@@ -216,6 +216,23 @@ view replacing today's):
 | 36 | Backup, `VACUUM`, Integrity Checks, In-Memory DBs for Testing | 1–4 | `VACUUM`, `integrity_check`, in-memory DB, test isolation | not written |
 | 37 | Final Integration & Review | all preceding | system review, acceptance review | not written |
 
+### Slice 10 — 3D Tool Visualization (Three.js)
+*Capabilities established:*
+- *A real tool database is the data source — `Untitled.TOOLDB` (a Mastercam
+  tool-library SQLite file, pasted into this project's folder), not sample/
+  invented rows.*
+- *Rendering happens in WebView2 — the same browser-rendered surface this
+  project already uses for HTML/CSS/JS content (per the Architecture section
+  above), not a new host surface. Three.js is JS, so it's more content in
+  the existing WebView2 layer, following the same C#↔JS bridge already
+  established in Slice 1.*
+
+Not yet broken into individual lessons/prereqs/concepts (no build spec
+written yet) — see `reference-tool-geometry.md` for the pulled-in technique
+(`TlProfileData`'s `x`=radius/`y`=axial convention, `THREE.LatheGeometry`
+revolve, and the inch/mm unit-conversion gotcha) and `Untitled.TOOLDB` in
+this folder for the real data source.
+
 ## Concept recurrence (cross-cutting only)
 
 Not every concept needs tracking here — the per-lesson columns above
@@ -233,4 +250,4 @@ curriculum is deliberately structured to revisit at increasing depth:
 | Live/concurrent state | 27–28 | 30–32 |
 | Presentation layer (JS) | 10–11 | 33–34 |
 
-Lesson 4 is next.
+Lesson 6 is next.
