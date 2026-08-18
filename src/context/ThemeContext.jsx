@@ -6,7 +6,9 @@ const ThemeContext = createContext({
   studioTheme: 'default',
   setStudioTheme: () => {},
   isDarkGlobal: true, // We'll assume true since it's mainly for dark mode
-  themeStyles: {}
+  themeStyles: {},
+  taskbarStyle: 'win10',
+  setTaskbarStyle: () => {}
 });
 
 export const FONT_OPTIONS = [
@@ -214,9 +216,18 @@ export function ThemeProvider({ children }) {
     });
   }, []);
 
+  const [taskbarStyle, setTaskbarStyleState] = useState(() => {
+    return localStorage.getItem('oc-taskbar-style') || 'win10';
+  });
+
+  const setTaskbarStyle = useCallback((newStyle) => {
+    setTaskbarStyleState(newStyle);
+    localStorage.setItem('oc-taskbar-style', newStyle);
+  }, []);
+
   const value = useMemo(
-    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography }),
-    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography]
+    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle]
   );
 
   return (

@@ -188,8 +188,8 @@ function ThemeCard({ theme, isActive, onClick }) {
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 function ThemeModal({ onClose }) {
-  const { studioTheme, setStudioTheme, typography, setTypography } = useGlobalTheme();
-  const [activeTab, setActiveTab] = useState('themes'); // 'themes' | 'typography'
+  const { studioTheme, setStudioTheme, typography, setTypography, taskbarStyle, setTaskbarStyle } = useGlobalTheme();
+  const [activeTab, setActiveTab] = useState('themes'); // 'themes' | 'typography' | 'interface'
   const [activeGroup, setActiveGroup] = useState(() => {
     for (const g of GROUPS) {
       if (g.themes.some(t => t.id === studioTheme)) return g.name;
@@ -303,6 +303,16 @@ function ThemeModal({ onClose }) {
               }`}
             >
               Typography
+            </button>
+            <button
+              onClick={() => setActiveTab('interface')}
+              className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+                activeTab === 'interface' 
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' 
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+              }`}
+            >
+              Interface
             </button>
           </div>
 
@@ -517,6 +527,52 @@ function ThemeModal({ onClose }) {
                       </button>
                     ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'interface' && (
+            <div className="flex-1 overflow-y-auto px-8 py-6 min-h-0 text-slate-800 dark:text-slate-200 space-y-8">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center gap-2 mb-6">
+                  <Monitor className="w-5 h-5 text-indigo-500" />
+                  <h3 className="text-xl font-bold">Taskbar Layout</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { id: 'win10', name: 'Classic (Windows 10)', desc: 'Left-aligned Start button and icons.', icon: '🖥️' },
+                    { id: 'win11', name: 'Modern (Windows 11)', desc: 'Centered Start button and icons.', icon: '🪟' },
+                    { id: 'mac', name: 'Dock (macOS)', desc: 'Centered 3D icons that expand on hover.', icon: '🍏' },
+                  ].map(style => {
+                    const isActive = taskbarStyle === style.id;
+                    return (
+                      <button
+                        key={style.id}
+                        onClick={() => setTaskbarStyle(style.id)}
+                        className={`relative flex flex-col text-left p-6 rounded-2xl border-2 transition-all group focus:outline-none ${
+                          isActive
+                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 shadow-md'
+                            : 'border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg bg-white dark:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="text-3xl mb-4 group-hover:scale-110 transition-transform origin-bottom-left">{style.icon}</div>
+                        <div className={`font-bold mb-2 ${isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-900 dark:text-slate-100'}`}>
+                          {style.name}
+                        </div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                          {style.desc}
+                        </div>
+                        
+                        {isActive && (
+                          <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center shadow-md">
+                            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             </div>
