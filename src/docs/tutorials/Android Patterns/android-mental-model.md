@@ -298,6 +298,8 @@ That symmetry — not the list itself — is the thing to actually remember.
 2. What is `onPause()` actually notifying you about — the state you're leaving, or the state you're entering, or the transition itself?
 3. If you start a location listener in `onResume()`, which method are you now implicitly obligated to stop it in, and why that one specifically?
 
+**Pattern reference:** `activity-fragment-lifecycle.md`, in this same folder, has the full standalone reference — real callback signatures, mechanics, and where it breaks.
+
 ---
 
 _Next up: Lesson 5 — Who decides when your Activity dies, and why is that decision not yours?_
@@ -361,6 +363,8 @@ Tie this back to Lesson 1 directly: your process can be killed by Android for me
 1. Name the two fundamentally different _reasons_ `onDestroy()` can fire, and which one triggers `onSaveInstanceState()` first.
 2. If the user presses Back, should you expect `onSaveInstanceState()` to be called before it? Why or why not?
 3. When your Activity is "recreated" after a rotation, is it literally the same object with the same memory, or a new object give old data? Why does that distinction matter?
+
+**Pattern reference:** `savedinstancestate-memento.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
 
 ---
 
@@ -615,6 +619,8 @@ Notice what this really shows: **your click listener code is just another task r
 2. What is "dispatch," specifically, in terms of the View tree?
 3. Why does a slow `onClickListener` cause the exact same freezing behavior described in Lesson 7, rather than some separate input-specific freeze?
 
+**Pattern reference:** `command-clicklistener-runnable.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 _Next up: Lesson 9 — How do two components talk to each other if you can't just call `new SecondActivity()`? (Intents, the system as broker.)_
@@ -698,6 +704,8 @@ An Intent usually also carries data — the thing that eventually becomes a `Bun
 1. Why can't Activity A just directly construct and hold a reference to Activity B?
 2. What's actually inside an Intent, if not a reference to the target component?
 3. What's the real difference between an explicit and an implicit Intent, and why does an implicit one sometimes show the user a chooser?
+
+**Pattern reference:** `intent-messaging.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
 
 ---
 
@@ -843,6 +851,8 @@ Tie this back to Lesson 4 and Lesson 2 directly. The Activity's entire job is li
 2. In order, what does `setContentView()` do — starting from reading the XML file to attaching the result?
 3. Why does keeping Window and View tree separate from the Activity make sense given that Activities can be destroyed and recreated so often?
 
+**Pattern reference:** `view-viewgroup-composite.md`, in this same folder, has the full standalone reference on the View/ViewGroup tree structure — real code, mechanics, and where it breaks.
+
 ---
 
 _Next up: Lesson 12 — How does a View tree decide size and position for itself? (Measure/layout/draw, briefly, conceptually.)_
@@ -979,6 +989,8 @@ Context
 1. Why can't your app just directly read the battery level the way it reads a local variable?
 2. What is IPC, in one sentence, and name one other mechanism from this course that also has to cross a process boundary.
 3. Why does it make sense that Context — the same object that gives you resources — is also what gives you system services?
+
+**Pattern reference:** `getsystemservice-facade.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
 
 ---
 
@@ -1211,6 +1223,8 @@ Answering Q3: nothing happens automatically. RecyclerView has no way to know you
 2. Why does `onBindViewHolder` run so much more often than `onCreateViewHolder`?
 3. If you add an item to your Adapter's `List` but forget to call `notifyItemInserted`, what will the user actually see?
 
+**Pattern reference:** `recyclerview-adapter-viewholder.md`, in this same folder, has the full standalone reference for ViewHolder + Adapter together — real code, mechanics, and where it breaks.
+
 ---
 
 # Lesson 18: Why `getBindingAdapterPosition()` Exists — the Stale Position Problem
@@ -1257,6 +1271,8 @@ The pattern `int currentPosition = holder.getBindingAdapterPosition(); if (curre
 2. What does `getBindingAdapterPosition()` actually ask, and when — at registration time or fire time?
 3. Give a real scenario where a ViewHolder would have `NO_POSITION`.
 
+**Pattern reference:** `getbindingadapterposition-freshness.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 # Lesson 19: What Is a Repository, and Why Put It Between Your UI and the Database?
@@ -1297,6 +1313,8 @@ Answering Q3: with a Repository, swapping storage mechanisms ideally means rewri
 1. Is `Repository` an Android framework class, or a pattern the app's authors chose to use?
 2. What specifically does putting a Repository in the middle prevent, that direct database access from both Adapter and Activity would risk?
 3. If storage changed entirely, what should ideally _not_ need to change in the Adapter or Activity?
+
+**Pattern reference:** `repository-pattern.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
 
 ---
 
@@ -1487,6 +1505,8 @@ A device jumping from 1 straight to 3 runs _both_ blocks, in order, catching up 
 2. What real, physical thing is the version number compared against?
 3. Why does real migration code use a series of independent `if (oldVersion < N)` checks instead of one direct "old version → new version" transformation?
 
+**Pattern reference:** `sqliteopenhelper-migration.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 # Lesson 23: Why a Plain Hash Isn't Enough — Salting, Explained From the Threat
@@ -1631,6 +1651,8 @@ Field initializer (BEFORE onCreate, BEFORE STARTED)
 2. In your own words, why does the STARTED boundary specifically matter, rather than any arbitrary earlier point being fine?
 3. If you moved registration into a button's click listener, what real structural problem would that create — not just "it might not run early enough," but specifically why Android's delivery machinery would be broken by it?
 
+**Pattern reference:** `runtime-permission-request.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 _This closes Part 9. The permission system's real distinction — declared vs. granted, checked vs. requested, remembered vs. re-verified — and the registration-timing rule are both now named. The async trace itself (request sent, control returns immediately, callback fires later on the OS's own schedule) is exactly Lesson 7's Looper/MessageQueue model and Lesson 9's Intent-as-request model, arriving at the same shape a third time — worth noticing that it's the third time, not a new mechanism each time._
@@ -1706,6 +1728,8 @@ Nothing here is a new mechanism — it's Lesson 9's Intent model, extended with 
 2. Structurally, what does a "contract" actually specify, in terms of what goes in and what comes back?
 3. Why is a result code a general `int` rather than a `boolean`, given this specific lesson only ever produces two outcomes?
 
+**Pattern reference:** `activityresultcontract-strategy.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 _This closes Part 10. Lesson 9's Intent model and Lesson 25's registration machinery now have their missing link: launching an Activity specifically to learn how it ended, not just to start it. The next time you see `registerForActivityResult` paired with a new, unfamiliar contract name, the pattern to reach for is exactly this one — a different in/out shape, the same underlying registration-and-later-delivery mechanism underneath._
@@ -1774,6 +1798,8 @@ Tie this directly back to Lesson 19's Repository lesson: a `ViewModel` typically
 2. Why is a `ViewModel` generally a better fit than a `Bundle` for something like a large loaded list?
 3. In terms of lifetime, is `ViewModel` closer to Lesson 3's Application scope or Lesson 4's Activity scope — and why?
 
+**Pattern reference:** `viewmodel-survival.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
+
 ---
 
 # Lesson 28: Why Building a `ViewModel` Needs a `Factory` at All
@@ -1831,6 +1857,8 @@ The framework shown alongside the manual `Factory` — `Hilt` — is doing the i
 1. Why can't `ViewModelProvider` construct `InventoryViewModel` automatically once its constructor requires an `ItemRepository` parameter?
 2. What's the one job a `Factory` object exists to do, in one sentence?
 3. Why does the `Factory`'s existence not prevent a test from constructing `InventoryViewModel` directly with a fake `Repository`?
+
+**Pattern reference:** `viewmodelprovider-factory.md`, in this same folder, has the full standalone reference — real code, mechanics, and where it breaks.
 
 ---
 
