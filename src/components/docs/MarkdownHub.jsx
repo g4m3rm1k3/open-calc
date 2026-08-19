@@ -1093,6 +1093,21 @@ function extractHeaderListSection(content, patterns) {
 // itself, applied one level down: after that function's own dedent, every
 // entry (a term bullet, an object's name-plus-shape bullet, the trailing
 // "Everything else..." label) starts flush left again.
+//
+// Each block keeps its own ORIGINAL trailing blank line(s) (if any) rather
+// than being trimmed, and the caller rejoins surviving blocks with "" —
+// not a fixed separator. This one broke the panel's styling once already:
+// joining with a fixed "\n\n" inserted a blank line between every sibling
+// term/object that previously had none, and in CommonMark a blank line
+// between list items makes the whole list "loose" — which wraps every
+// item's content in a <p>, breaking the exact `<strong>`-then-`<br>` (and
+// `<strong><code>` / nested `<ul>`) shape the term-bullet and object-card
+// CSS `:has()` selectors depend on. Preserving each block's real original
+// gap (one "\n" for an originally-tight pair, "\n\n" for an
+// originally-loose one, nothing if the block was last) keeps every
+// surviving subset byte-identical to how that stretch of the real
+// document was already formatted — including the unfiltered case, which
+// must reproduce the source exactly.
 function splitTopLevelBlocks(text) {
   if (!text) return [];
   const lines = text.split("\n");
@@ -1100,14 +1115,14 @@ function splitTopLevelBlocks(text) {
   let current = [];
   for (const line of lines) {
     if (/^\S/.test(line) && current.length) {
-      blocks.push(current.join("\n").trim());
+      blocks.push(current.join("\n") + "\n");
       current = [line];
     } else {
       current.push(line);
     }
   }
-  if (current.length) blocks.push(current.join("\n").trim());
-  return blocks.filter(Boolean);
+  if (current.length) blocks.push(current.join("\n"));
+  return blocks.filter((b) => b.trim());
 }
 
 // Wraps every match of `query` in <mark> so rehypeRaw renders it as a real
@@ -2797,14 +2812,14 @@ export default function MarkdownHub() {
     const kept = referenceQuery
       ? blocks.filter((b) => b.toLowerCase().includes(referenceQuery))
       : blocks;
-    return highlightMatches(kept.join("\n\n"), referenceQuery);
+    return highlightMatches(kept.join(""), referenceQuery);
   }, [termsSection, referenceQuery]);
   const filteredObjectsMd = useMemo(() => {
     const blocks = splitTopLevelBlocks(objectsSection);
     const kept = referenceQuery
       ? blocks.filter((b) => b.toLowerCase().includes(referenceQuery))
       : blocks;
-    return highlightMatches(kept.join("\n\n"), referenceQuery);
+    return highlightMatches(kept.join(""), referenceQuery);
   }, [objectsSection, referenceQuery]);
   const scrollToHeading = useCallback((id) => {
     const el = contentScrollRef.current?.querySelector(
