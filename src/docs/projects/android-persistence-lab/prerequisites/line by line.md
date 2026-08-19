@@ -17,54 +17,124 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+// WHAT: a new class, InventoryAdapter, extending RecyclerView.Adapter<InventoryViewHolder>
+//       (RecyclerView.Adapter is a generic ABSTRACT class from the AndroidX library —
+//       "abstract" is exactly why Android Studio forces you to implement its 3
+//       unfinished methods the moment you type "extends" and hit save)
+// DOES: this class's whole job is being the bridge RecyclerView talks to — RecyclerView
+//       itself knows nothing about InventoryItem; this class is what connects
+//       "my actual data" to "RecyclerView's generic slot-filling machinery"
 class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder> {
+
+    // WHAT: field, type ItemRepository (your own class elsewhere in the project)
+    // DOES: gives this adapter a way to actually save changes to the database —
+    //       without this field, onBindViewHolder's edit dialog would have no way
+    //       to persist a quantity change anywhere
     private final ItemRepository itemRepository;
 
+    // WHAT: field, type List<InventoryItem> (java.util.List, an interface)
+    // DOES: this IS the data — the single source of truth this whole adapter reads
+    //       from and writes to. Every position number RecyclerView ever hands you
+    //       is really just "an index into this exact list"
     private final List<InventoryItem> items;
 
+    // WHAT: constructor — same name as the class, no return type, runs once when
+    //       something (e.g. your Activity) writes `new InventoryAdapter(...)`
+    // DOES: hands this adapter the two things it needs to do its job at all — the
+    //       real data list, and the means to save changes — WITHOUT this adapter
+    //       ever constructing either one itself (that's dependency injection,
+    //       covered in your other docs)
     InventoryAdapter(List<InventoryItem> items, ItemRepository itemRepository) {
+        // WHAT: this.items refers to the FIELD above; items (no "this.") refers to
+        //       the PARAMETER just above in the constructor signature
+        // DOES: stores a reference to the caller's actual list object — no copy —
+        //       so any later mutation of `items` (add/remove) is visible everywhere
         this.items = items;
         this.itemRepository = itemRepository;
     }
 
-    private void showEditQuantityDialog(Context context, int position) {
-        InventoryItem item = items.get(position);
-        EditText quantityInput = new EditText(context);
-        quantityInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-        quantityInput.setText(String.valueOf(item.getQuantity()));
+    // ============================================================
+    // ANDROID STUDIO'S "IMPLEMENT METHODS" PROMPT GENERATES THESE 3
+    // ============================================================
 
-        new AlertDialog.Builder(context)
-                .setTitle("Update Quantity")
-                .setView(quantityInput)
-                .setPositiveButton("Save", (dialog, which) -> {
-            int newQuantity = Integer.parseInt(quantityInput.getText().toString());
-            itemRepository.updateQuantity(item.getId(), newQuantity);
-            item.setQuantity(newQuantity);
-            notifyItemChanged(position);
-        }).setNegativeButton("Cancel", null).show();
-    }
-
-
+    // WHAT: 1st of 3 required overrides. @NonNull/@Override are annotations, not
+    //       code — @Override makes the compiler verify this really matches a
+    //       method RecyclerView.Adapter declared as abstract
+    // DOES: this is the "build one physical row" step. RecyclerView calls this
+    //       ONLY when it needs a brand-new row-slot — not once per data item, only
+    //       enough times to fill what's visible on screen (~10-12 times total,
+    //       ever, no matter how long your list is)
     @NonNull
     @Override
     public InventoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // WHAT: parent.getContext() returns a Context; LayoutInflater.from(Context)
+        //       is a STATIC call returning a LayoutInflater instance
+        // DOES: gets the one tool capable of turning your item_inventory.xml file
+        //       into real, live View objects sitting in memory
+        // WHAT: .inflate(layoutId, parent, false) — instance method, 3 args
+        // DOES: actually performs that XML→objects conversion right now. `false`
+        //       means "build it, but don't attach it to the screen yet" — RecyclerView
+        //       decides exactly when/where this row gets placed, not us
         View rowView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_inventory, parent, false);
+
+        // WHAT: new InventoryViewHolder(rowView) — constructs your own nested class
+        // DOES: wraps the freshly-built row in the caching object below, running
+        //       findViewById ONCE, right now, for this specific physical row-slot —
+        //       this return value is what gets reused over and over as the user scrolls
         return new InventoryViewHolder(rowView);
     }
 
+    // WHAT: 2nd required override
+    // DOES: this is the "put THIS item's data into an EXISTING row-slot" step —
+    //       runs constantly, every single time any row (new or reused) needs to
+    //       show something, which is the exact opposite frequency of the method above
     @Override
     public void onBindViewHolder(@NonNull InventoryViewHolder holder, int position) {
+        // WHAT: items.get(position) — List interface method, returns InventoryItem
+        // DOES: looks up which real piece of data belongs at this row-slot right now
         InventoryItem item = items.get(position);
+
+        // WHAT: holder.nameText — direct field read on the holder object (type TextView)
+        // DOES: pushes this item's name onto the ALREADY-FOUND view — no findViewById
+        //       call happens here, that already happened once, back in onCreateViewHolder
         holder.nameText.setText(item.getName());
         holder.quantityText.setText(String.valueOf(item.getQuantity()));
+
+        // WHAT: setOnClickListener — View's own instance method, takes a lambda
+        //       satisfying the one-method View.OnClickListener interface
+        // DOES: REGISTERS what should happen on tap — nothing in this lambda body
+        //       runs now, only later, if and when the user actually taps delete
         holder.deleteButton.setOnClickListener((view) -> {
+            // WHAT: holder.getBindingAdapterPosition() — method INHERITED from
+            //       RecyclerView.ViewHolder, called fresh, right now, at tap-time
+            // DOES: asks RecyclerView "what position are you ACTUALLY showing me
+            //       at, right this second" — deliberately NOT using the outer
+            //       `position` parameter, because that value could be stale by the
+            //       time this tap actually happens (rows get recycled/reused for
+            //       different data as the user scrolls)
             int currentPosition = holder.getBindingAdapterPosition();
+
+            // WHAT: RecyclerView.NO_POSITION — static constant, value -1
+            // DOES: guards against acting on a row that's mid-animation / not
+            //       currently tied to any real position — without this check,
+            //       items.remove(-1) below would crash
             if (currentPosition != RecyclerView.NO_POSITION) {
+                // WHAT: items.remove(int) — List interface, index-based overload
+                // DOES: actually deletes the data first...
                 items.remove(currentPosition);
+                // WHAT: inherited from RecyclerView.Adapter, called implicitly on `this`
+                // DOES: ...then tells RecyclerView "position X is gone" — this is
+                //       the required, explicit signal; mutating the list alone is
+                //       invisible to RecyclerView on its own
                 notifyItemRemoved(currentPosition);
             }
         });
+
+        // WHAT: holder.itemView — field INHERITED from RecyclerView.ViewHolder,
+        //       populated by super(rowView) in the constructor below
+        // DOES: same registration pattern, but for "tap anywhere on the row" —
+        //       opens the edit-quantity dialog instead of deleting
         holder.itemView.setOnClickListener((view) -> {
             int currentPosition = holder.getBindingAdapterPosition();
             if (currentPosition != RecyclerView.NO_POSITION) {
@@ -73,25 +143,127 @@ class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryVi
         });
     }
 
+    // WHAT: 3rd and final required override — single expression, no branching
+    // DOES: tells RecyclerView the total number of logical items that exist —
+    //       this is the ONE number RecyclerView uses to know how far scrolling
+    //       can go and when a `position` value stops being valid
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    static class InventoryViewHolder extends RecyclerView.ViewHolder {
-        final Button deleteButton;
+    // ============================================================
+    // THE STATIC NESTED CLASS ANDROID FORCES YOU TO SUPPLY
+    // (because Adapter<VH> demands SOME real ViewHolder subclass)
+    // ============================================================
 
+    // WHAT: static nested class extending RecyclerView.ViewHolder — "static" means
+    //       it does NOT implicitly hold a reference back to any InventoryAdapter
+    //       instance, unlike a plain inner class would
+    // DOES: this object's entire reason to exist is CACHING — holding onto the
+    //       three child views of one row so findViewById never has to run again
+    //       for that row, no matter how many different items later get bound to it
+    static class InventoryViewHolder extends RecyclerView.ViewHolder {
+        // WHAT: three fields, types Button/TextView/TextView, all `final`
+        // DOES: `final` here is a real guarantee — once found, these can never be
+        //       silently swapped for different views by a bug elsewhere in the file
+        final Button deleteButton;
         final TextView nameText;
         final TextView quantityText;
 
+        // WHAT: constructor, one parameter of type View (the already-inflated row
+        //       built back in onCreateViewHolder)
+        // DOES: runs ONCE per row-slot, ever — this is where the one-time expensive
+        //       work (finding the child views) actually happens
         InventoryViewHolder(View rowView) {
+            // WHAT: super(rowView) — calls RecyclerView.ViewHolder's OWN constructor
+            // DOES: must be the first line — this is what populates the inherited
+            //       `itemView` field used up in onBindViewHolder's second listener.
+            //       Without this call, itemView would never exist at all.
             super(rowView);
+
+            // WHAT: rowView.findViewById(int) — View's own method, inherited by
+            //       every View subclass; return type inferred from the field
+            //       it's assigned to (TextView, TextView, Button)
+            // DOES: walks rowView's tree looking for a child tagged with this exact
+            //       android:id, and stores the result — this is the ONE TIME this
+            //       search ever happens for this physical row object
             nameText = rowView.findViewById(R.id.itemNameText);
             quantityText = rowView.findViewById(R.id.itemQuantityText);
             deleteButton = rowView.findViewById(R.id.deleteButton);
         }
     }
+
+    // ============================================================
+    // YOUR OWN HELPER METHOD — not required by Android at all,
+    // called from inside onBindViewHolder's itemView click listener
+    // ============================================================
+
+    // WHAT: private method, your own — Android never calls this directly
+    // DOES: builds and displays the "enter a new quantity" popup, and wires up
+    //       what happens when the user actually confirms it
+    private void showEditQuantityDialog(Context context, int position) {
+        InventoryItem item = items.get(position);
+
+        // WHAT: new EditText(context) — constructs a real, brand-new input field
+        // DOES: this is the box the user will actually type a new number into
+        EditText quantityInput = new EditText(context);
+        // WHAT: InputType.TYPE_CLASS_NUMBER — static int constant on InputType
+        // DOES: switches the on-screen keyboard to numeric-only, matching that
+        //       a quantity is a number
+        quantityInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        // DOES: pre-fills the box with the CURRENT quantity, so the user is
+        //       editing an existing number, not starting from blank
+        quantityInput.setText(String.valueOf(item.getQuantity()));
+
+        // WHAT: new AlertDialog.Builder(context) — Builder pattern: this line only
+        //       constructs a CONFIGURATION object, not the dialog itself yet
+        // DOES: every chained .setXxx(...) call below returns this SAME builder
+        //       object back (`return this;`, inside AlertDialog's own code) —
+        //       that's the only reason chaining five calls on one line is legal
+        new AlertDialog.Builder(context)
+            .setTitle("Update Quantity")
+            .setView(quantityInput)
+            // WHAT: (dialog, which) -> {...} — lambda satisfying
+            //       DialogInterface.OnClickListener's one method
+            // DOES: REGISTERS what happens on "Save" tap — nothing inside runs
+            //       until the user actually taps that button
+            .setPositiveButton("Save", (dialog, which) -> {
+                // WHAT: quantityInput.getText() returns Editable, .toString()
+                //       converts it to String, Integer.parseInt converts to int
+                // DOES: reads whatever the user actually typed, right now, and
+                //       turns it into a real number to work with
+                int newQuantity = Integer.parseInt(quantityInput.getText().toString());
+
+                // DOES: saves the change to the actual database
+                itemRepository.updateQuantity(item.getId(), newQuantity);
+                // DOES: ALSO updates the in-memory object directly — item here is
+                //       literally the same object sitting inside `items`, since
+                //       items.get(position) at the top of this method returned a
+                //       reference, not a copy — so this line keeps memory and disk
+                //       in agreement without re-querying the whole database
+                item.setQuantity(newQuantity);
+                // WHAT: notifyItemChanged — inherited from RecyclerView.Adapter,
+                //       called implicitly on `this` (the outer InventoryAdapter,
+                //       captured by this lambda)
+                // DOES: tells RecyclerView "redraw position X" — triggers
+                //       onBindViewHolder to run AGAIN for this row, this time
+                //       reading the now-updated quantity
+                notifyItemChanged(position);
+            })
+            // DOES: "Cancel" button with `null` for its listener — valid shorthand
+            //       meaning "just close the dialog, do nothing else"
+            .setNegativeButton("Cancel", null)
+            // WHAT: .show() — the ONLY call in this whole chain that does NOT
+            //       return the same Builder object
+            // DOES: this is the actual moment a real AlertDialog gets built from
+            //       everything configured above, AND physically appears on screen.
+            //       Every line before this one was configuration only.
+            .show();
+    }
 }
+
+
 ```
 
 ## Package and imports
