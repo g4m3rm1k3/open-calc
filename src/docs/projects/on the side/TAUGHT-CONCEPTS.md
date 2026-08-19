@@ -17,7 +17,23 @@ past entries except to fix an error.
 
 ## Series 1 — Python Application Foundations
 
-_(empty — populated after Lesson 1.1 is written)_
+- `class` keyword — introduced Lesson 1.1
+- instance — introduced Lesson 1.1
+- `pass` statement — introduced Lesson 1.1
+- `self` — introduced Lesson 1.1
+- instance attribute — introduced Lesson 1.1
+- method — introduced Lesson 1.1
+- `is` (identity operator) — introduced Lesson 1.1
+- `==` default (identity-based) equality — introduced Lesson 1.1
+- implicit inheritance from `object` — introduced Lesson 1.1
+- dunder method — introduced Lesson 1.1
+- `__init__` (constructor) — introduced Lesson 1.1
+- `object` (built-in base class) — introduced Lesson 1.1
+- `__bases__` — introduced Lesson 1.1
+- `type()` builtin — introduced Lesson 1.1
+- `AttributeError` — introduced Lesson 1.1
+- `Asset.__init__` — introduced Lesson 1.1
+- `Asset.describe` — introduced Lesson 1.1
 
 ## Series 2 — PySide6: Desktop Application Development
 

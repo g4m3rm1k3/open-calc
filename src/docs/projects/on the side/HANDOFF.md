@@ -43,14 +43,17 @@ everything required is either here or in the two files it points to.
    opted this curriculum out of execution entirely to control cost; that
    blanket opt-out is retired. `LESSON SCHEMA.md` now carries its own
    Verification Rule with three parts — Necessity (run only code whose
-   output a careful reader couldn't already predict by inspection: a
-   plain `print` of a literal, a simple class or function with no
-   computed logic, instantiating a class with no constructor logic all
-   qualify as exempt; real computation, iteration, branching, error
-   text, or any real PySide/Qt call does not), Batching (collect
-   everything a lesson actually needs to run and execute it together,
-   not one snippet at a time), and Persistence (save every real run to
-   `verification/`, check there before re-running anything already
+   exact output, or at minimum its shape, Claude can't already state
+   with real confidence; a plain `print` of a literal, a constructor with
+   no logic, and any well-known/well-documented call whose output Claude
+   already knows cold — even one that computes something, like ordinary
+   arithmetic or a stdlib function's documented return shape — all
+   qualify as exempt; any PySide/Qt call or other library/framework
+   behavior not already known firsthand, iteration or branching over
+   data whose actual values matter, and error text do not), Batching
+   (collect everything a lesson actually needs to run and execute it
+   together, not one snippet at a time), and Persistence (save every real
+   run to `verification/`, check there before re-running anything already
    verified). Follow it as written — do not re-derive a stricter or
    looser local version of it here.
 2. **No shared concept-file catalog.** `src/docs/concepts/` is out of
@@ -77,16 +80,26 @@ everything required is either here or in the two files it points to.
 
 ## Current position
 
-**Next lesson to write:** `1.1 — Classes and Objects` (Series 1, Core)
+**Next lesson to write:** `1.2 — Object State` (Series 1, Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 1 —
-Python Application Foundations" → "## 1.1 — Classes and Objects."
+Python Application Foundations" → "## 1.2 — Object State." Learn:
+changing object state, methods that modify state, invariants. Add
+`asset.mark_retired()`.
 
-**Project state:** none yet. This is the first lesson in the curriculum —
-`snapshot/` does not exist yet. This lesson creates it, starting with the
-first `Asset` class.
+**Project state:** `snapshot/asset.py` holds the `Asset` class as built
+by Lesson 1.1 — `__init__(self, name, serial_number, category)` storing
+all three as instance attributes, plus one read-only method,
+`describe()`. No `is_retired` (or any other state) exists yet — Lesson
+1.1 deliberately left `Asset` with no mutable state, so 1.2 can
+introduce a state-changing method and the attribute it flips together,
+as one coherent unit. Read `snapshot/asset.py` before writing 1.2.
 
-**Taught concepts so far:** none — `TAUGHT-CONCEPTS.md` is seeded empty.
+**Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section now
+lists everything Lesson 1.1 introduced: `class`, instance, `pass`,
+`self`, instance attribute, method, `is`, default `==`, implicit
+inheritance from `object`, dunder methods, `__init__`, `object`,
+`type()`, `AttributeError`, `Asset.__init__`, `Asset.describe`.
 
 ## Piloting schema changes here
 

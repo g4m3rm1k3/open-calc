@@ -351,27 +351,40 @@ failure mode, not a safer default.
 Referenced from the Concept Isolation Rule, Concept Unit steps 2 and 11,
 and the closing self-check, below; defined here, once, in three parts.
 
-**1. Necessity — not everything gets run.** Execution exists to catch
-the gap between what a careful reader would predict and what the code
-actually does. Run it when that gap is real: any computation, any call
-into a library/framework/runtime whose exact behavior isn't fully
-visible in the code shown, any iteration or branching that produces a
-value the reader must trace to know, any error/exception text, any
-default or implicit output (an object's default string representation,
-a compiler- or runtime-generated artifact) — anything already covered
-by this schema's "hidden or invisible behavior needs proof" standard,
-above. **Do not run code whose entire observable effect is a literal
-echo of values already visible in the code itself** — a `print`
-statement whose argument is a literal string already shown; a function
-or class with no computed logic beyond plain attribute assignment from
-its own parameters; instantiating a class (`new Foo()`, `Foo()`) with no
-constructor logic beyond storing what was passed in. State the output
-for these directly, without a code fence styled as a real run, and say
-plainly that it's a literal echo, not an executed result. This exemption
-is narrow and named, not a general "looks obvious" judgment call — when
-in doubt, run it. Widening it into a broad judgment call is exactly the
-failure mode the Repetition Rule, above, already removed once for a
-different reason; it is not being reopened here.
+**1. Necessity — not everything gets run.** Execution exists to produce
+real output for whatever Claude — writing the lesson — can't already
+predict, not to prove a point to the reader. The reader is going to run
+this code on their own machine regardless; a lesson-time execution only
+exists so a wrong prediction doesn't silently make it into the lesson as
+if it were real output. So the test is Claude's own predictive
+confidence, not the reader's: can Claude state, right now, what this
+will produce — either the exact value, or, when the exact formatting
+isn't certain but the pattern is, the shape of it ("a dict with keys
+`id`, `name`, `price`, in insertion order"; "five floats, increasing")?
+If yes, don't run it. If there's real doubt, run it.
+
+This reaches further than a literal echo of values already on the page.
+It covers any call whose output is well-known or obvious enough that
+Claude already knows it cold — a stdlib function's documented return
+shape, a common idiom with deterministic behavior, ordinary arithmetic —
+even when real computation happens, not only cases with zero
+computation. It does **not** cover anything touching a
+library/framework/runtime whose exact behavior isn't already fully known
+firsthand (a PySide/Qt call, anything with platform- or
+environment-dependent output), any iteration or branching over data
+whose actual values matter, error/exception text, or any default/implicit
+output (an object's default string representation, a compiler- or
+runtime-generated artifact) whose precise form Claude hasn't already
+seen for real — anything already covered by this schema's "hidden or
+invisible behavior needs proof" standard, above. State the output for an
+exempt case directly — the exact value, or the predicted shape when
+that's all that's certain — without a code fence styled as a real run,
+and say plainly that it's stated from confidence, not executed.
+
+A wrong prediction that makes it into a lesson is a defect, not a
+shortcut that failed safely. This exemption is bounded by actual
+certainty, not by "this looks like it's probably fine" — when that
+certainty isn't solid, run it.
 
 **2. Batching — one pass, not one execution per snippet.** Before
 running anything, collect every piece of code in the lesson (or across
@@ -428,12 +441,12 @@ Throwaway code must:
   needed to run it — no unrelated project code, no second new concept
   riding along;
 - actually be executed per the Verification Rule (above), with its real
-  output shown — or, when that rule's narrow exemption applies, its
-  literal output stated directly and marked as such, never dressed up as
-  a real run;
+  output shown — or, when that rule's exemption applies, the predicted
+  output (exact value or shape) stated directly and marked as such,
+  never dressed up as a real run;
 - when executed, state what that output _proves_ about the concept, not
   just what the code does; when exempt, state instead what makes the
-  output a direct, literal echo requiring no run;
+  output confidently predictable without a run;
 - be explicitly discarded once understood — it never appears in the
   project again.
 
@@ -500,7 +513,7 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    skipped because the concept was lab'd in an earlier lesson — every
    Concept Unit built around this construct gets its own fresh, isolated
    lab, regardless of whether that exact construct also happens to
-   qualify for the Verification Rule's narrow exemption this time.
+   qualify for the Verification Rule's exemption this time.
    **When the real project input this construct will face is genuinely
    complex** (a full G-code line, a real multi-field form), don't jump
    straight from a minimal lab to that full complexity — run the real
@@ -915,10 +928,12 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
 
 11. **Run it, per the Verification Rule (above). Show the real output.**
     Not "this will print X" — actually run it and paste what came back,
-    unless the Verification Rule's narrow exemption applies, in which
-    case state the literal output directly and say why no run was
-    needed. If it can't run standalone yet (a fragment mid-way through a
-    multi-unit feature), say so and say what it will connect to.
+    unless the Verification Rule's exemption applies, in which case
+    state the predicted output (exact value or shape) directly and say
+    why no run was needed — what makes it confidently predictable, not
+    just plausible. If it can't run standalone yet (a fragment mid-way
+    through a multi-unit feature), say so and say what it will connect
+    to.
 
 12. **One sentence connecting this unit to what came immediately before.**
 
@@ -1079,11 +1094,15 @@ Read the draft top to bottom and answer honestly:
       past run, rather than the actual saved file, still fails this:
       rerun it or pull the real saved output.
 - [ ] For every place execution was skipped under the Verification
-      Rule's Necessity exemption, is the skipped code actually a literal
-      echo of values already visible in it — nothing computed, formatted,
-      iterated, branched on, or delegated to a library/framework/runtime?
-      A skip where any of those is present has misapplied the exemption;
-      run it for real.
+      Rule's Necessity exemption, could Claude actually state the exact
+      output or its shape with real confidence — not "this is probably
+      what it does"? Anything touching a library/framework/runtime whose
+      exact behavior isn't already known firsthand (any PySide/Qt call,
+      anything platform- or environment-dependent), any iteration or
+      branching over data whose actual values matter, any error/exception
+      text, or any default/implicit output not already seen for real has
+      misapplied the exemption regardless of how obvious it seemed; run
+      it for real.
 - [ ] Were this lesson's required executions actually batched — run
       together in as few passes as the language's tooling allows —
       rather than one throwaway execution per snippet?
