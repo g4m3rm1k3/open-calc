@@ -346,6 +346,60 @@ failure mode, not a safer default.
 
 ---
 
+## The Verification Rule
+
+Referenced from the Concept Isolation Rule, Concept Unit steps 2 and 11,
+and the closing self-check, below; defined here, once, in three parts.
+
+**1. Necessity — not everything gets run.** Execution exists to catch
+the gap between what a careful reader would predict and what the code
+actually does. Run it when that gap is real: any computation, any call
+into a library/framework/runtime whose exact behavior isn't fully
+visible in the code shown, any iteration or branching that produces a
+value the reader must trace to know, any error/exception text, any
+default or implicit output (an object's default string representation,
+a compiler- or runtime-generated artifact) — anything already covered
+by this schema's "hidden or invisible behavior needs proof" standard,
+above. **Do not run code whose entire observable effect is a literal
+echo of values already visible in the code itself** — a `print`
+statement whose argument is a literal string already shown; a function
+or class with no computed logic beyond plain attribute assignment from
+its own parameters; instantiating a class (`new Foo()`, `Foo()`) with no
+constructor logic beyond storing what was passed in. State the output
+for these directly, without a code fence styled as a real run, and say
+plainly that it's a literal echo, not an executed result. This exemption
+is narrow and named, not a general "looks obvious" judgment call — when
+in doubt, run it. Widening it into a broad judgment call is exactly the
+failure mode the Repetition Rule, above, already removed once for a
+different reason; it is not being reopened here.
+
+**2. Batching — one pass, not one execution per snippet.** Before
+running anything, collect every piece of code in the lesson (or across
+several lessons being written in the same session) that part 1 above
+actually requires running. Execute them together — one script, one test
+file, one compiled binary covering multiple entry points, whatever the
+language's tooling allows — instead of one throwaway execution per
+Concept Unit. Only split a batch when two pieces would interfere with
+each other (shared mutable state, colliding names, one depending on the
+other's absence).
+
+**3. Persistence — verified code lives in the project, not the
+session.** Every piece of code actually executed under part 1 is saved
+into this curriculum's own persistent verification folder — real
+source, real pasted output, not reconstructed afterward — so a later
+session can reuse it instead of re-deriving and re-running the same
+throwaway code from scratch. Check that folder before running anything:
+if the exact code already has a real, saved run on file, reuse that
+output instead of re-executing it. If this curriculum doesn't have a
+verification folder yet, create one the first time this rule requires
+running something, following the convention documented in
+`src/docs/tutorials/OOPDSAETC/verification/README.md` (folder-per-lesson,
+`lab*`/`step*`/`break*`/`scale*` naming) — adapted to this curriculum's
+own language and lesson-ID scheme, and recorded in this curriculum's own
+HANDOFF so the location isn't rediscovered by search next session.
+
+---
+
 ## The Concept Isolation Rule
 
 The first appearance of every new concept is taught using **throwaway
@@ -373,9 +427,13 @@ Throwaway code must:
 - demonstrate only the one new concept, with the minimum surrounding code
   needed to run it — no unrelated project code, no second new concept
   riding along;
-- actually be executed, with its real output shown;
-- state what that output _proves_ about the concept, not just what the
-  code does;
+- actually be executed per the Verification Rule (above), with its real
+  output shown — or, when that rule's narrow exemption applies, its
+  literal output stated directly and marked as such, never dressed up as
+  a real run;
+- when executed, state what that output _proves_ about the concept, not
+  just what the code does; when exempt, state instead what makes the
+  output a direct, literal echo requiring no run;
 - be explicitly discarded once understood — it never appears in the
   project again.
 
@@ -416,11 +474,33 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
 1. **The Problem, in prose, no code yet.** What are we trying to solve,
    right now, specifically?
 
+   > **Socratic prompt, for lessons written from this point forward:**
+   > after stating the problem above, and before step 2 reveals the
+   > concept, ask 2-4 real questions that put the reader in the position
+   > of trying to solve the problem themselves first — the same pause a
+   > learner takes with a video tutorial, stopping it to attempt the
+   > thing before watching the instructor's solution. Questions must be
+   > answerable, or at least genuinely attemptable, using only what
+   > earlier lessons already taught — never asking the reader to guess
+   > syntax or an API they've never seen; that's a trivia question, not
+   > a Socratic one. Good shapes: "given what `X` already does, what
+   > would you try here first?"; "what happens if this step is just
+   > skipped?"; "look at the name `Y` — what does it suggest this does,
+   > before you're told?" Explicitly invite the reader to pause and
+   > attempt something concrete — write a guess, sketch pseudocode,
+   > predict what a run would print — before reading on into step 2's
+   > real answer. This is a preference for **new** lessons only, same as
+   > the two callouts inside step 3, below; existing lessons are not
+   > being revised to add this retroactively.
+
 2. **Introduce the concept in isolation** (Concept Isolation Rule) —
-   throwaway code, run, real output shown, what the output proves. Per
-   the Repetition Rule, above, this step is not skipped because the
-   concept was lab'd in an earlier lesson — every Concept Unit built
-   around this construct gets its own real, executed lab.
+   throwaway code, run per the Verification Rule (above), real output
+   shown or literal output stated per that rule's exemption, and what
+   the output proves. Per the Repetition Rule, above, this step is not
+   skipped because the concept was lab'd in an earlier lesson — every
+   Concept Unit built around this construct gets its own fresh, isolated
+   lab, regardless of whether that exact construct also happens to
+   qualify for the Verification Rule's narrow exemption this time.
    **When the real project input this construct will face is genuinely
    complex** (a full G-code line, a real multi-field form), don't jump
    straight from a minimal lab to that full complexity — run the real
@@ -833,10 +913,12 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
     package-management concept gets the same treatment at the point it's
     first needed, not batched elsewhere.
 
-11. **Run it. Show the real output.** Not "this will print X" — actually
-    run it and paste what came back. If it can't run standalone yet (a
-    fragment mid-way through a multi-unit feature), say so and say what it
-    will connect to.
+11. **Run it, per the Verification Rule (above). Show the real output.**
+    Not "this will print X" — actually run it and paste what came back,
+    unless the Verification Rule's narrow exemption applies, in which
+    case state the literal output directly and say why no run was
+    needed. If it can't run standalone yet (a fragment mid-way through a
+    multi-unit feature), say so and say what it will connect to.
 
 12. **One sentence connecting this unit to what came immediately before.**
 
@@ -852,11 +934,16 @@ for every unit; connection is not deferred to the end.
 
 - **Connect the pieces** — a full trace, one concrete value or action
   moving through every unit built in this lesson, start to finish.
-- **What breaks without this** — cause a real failure on purpose (delete
-  a check, remove an argument), show the actual error, restore it.
-- **Exercises** — small variations the student runs themselves.
-- **Definition of done** — a checklist, ending in a git commit with a
-  message explaining _why_, not what.
+
+**Retired, for lessons written from this point forward:** "What breaks
+without this," "Exercises," and "Definition of done" used to be required
+here. Dropped, not replaced one-for-one — in practice they added cost
+(more code to write and, per the Verification Rule, potentially run)
+without adding learning; the real teach-yourself-first moment now
+happens per Concept Unit, at the Socratic prompt in step 1, above, not
+bolted on once at the very end. This is a preference for **new** lessons
+only; existing lessons are not being revised to strip these sections out
+retroactively.
 
 ---
 
@@ -985,13 +1072,37 @@ Read the draft top to bottom and answer honestly:
 - [ ] Does every SE lens state an alternative and a real tradeoff, or does
       it just define a vocabulary word and move on? If the latter: it's a
       description, not teaching — go deeper.
-- [ ] Was everything marked "verified" actually run, this session, with
-      real output pasted in? If it was written from memory of a similar
-      past run: rerun it.
+- [ ] Was everything marked "verified" actually run — this session, or
+      reused from a real saved run in this curriculum's verification
+      folder per the Verification Rule's Persistence part — with real
+      output pasted in? Output recalled from unaided memory of a similar
+      past run, rather than the actual saved file, still fails this:
+      rerun it or pull the real saved output.
+- [ ] For every place execution was skipped under the Verification
+      Rule's Necessity exemption, is the skipped code actually a literal
+      echo of values already visible in it — nothing computed, formatted,
+      iterated, branched on, or delegated to a library/framework/runtime?
+      A skip where any of those is present has misapplied the exemption;
+      run it for real.
+- [ ] Were this lesson's required executions actually batched — run
+      together in as few passes as the language's tooling allows —
+      rather than one throwaway execution per snippet?
+- [ ] Was every piece of code actually executed this session saved into
+      this curriculum's persistent verification folder (real source,
+      real output), rather than left only in session-local scratch for
+      the next session to rebuild from nothing?
 - [ ] Does every Concept Unit step use a `###` heading rather than a
       bolded run-in phrase? A lesson with `**The Problem.**` buried inside
       a paragraph instead of `### The Problem` as its own heading hasn't
       applied the current formatting convention.
+- [ ] Does every Concept Unit carry its own Socratic prompt (step 1) —
+      2-4 real questions, answerable from what's already been taught, that
+      invite the reader to pause and attempt something before step 2
+      reveals the concept? A unit that jumps straight from stating the
+      problem to showing the answer has skipped it. Check the questions
+      themselves too: do they require reasoning the reader can actually
+      do, or do they quietly demand knowledge of syntax/an API not yet
+      taught — that's a trivia question wearing a Socratic one's shape.
 - [ ] Does every language construct this lesson's Concept Units are
       built around — not just the dense, unfamiliar, or genuinely-new
       ones — get its own throwaway lab before it appears in real project
