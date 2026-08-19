@@ -432,6 +432,7 @@ function getMdCss(md) {
 .md-body em, .md-body i { color: ${md.em}; }
 .md-body li::marker { color: ${md.listMarker}; font-weight: 700; }
 .md-body a { color: ${md.a}; text-decoration: underline; }
+.md-body mark { background: color-mix(in srgb, ${md.strong} 45%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
 .md-body code { background: ${md.codeBg}; border: 1px solid ${md.tdBorder}; border-radius: 4px; padding: 2px 6px; font-size: 0.85em; font-family: 'JetBrains Mono', monospace; color: ${md.codeText}; }
 .md-body pre { background: ${md.preBg}; border: 1px solid ${md.preBorder}; border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 1.2em; }
 .md-body pre code { background: none; border: none; padding: 0; color: ${md.text}; }
@@ -1082,6 +1083,49 @@ function extractHeaderListSection(content, patterns) {
   }
   const text = body.join("\n").trim();
   return text || null;
+}
+
+// Splits an extracted Terms/Objects section back into its individual
+// entries — one per top-level (column-0) block — so the Reference panel's
+// search can filter down to just the entries that actually match, rather
+// than scrolling to one hit and leaving everything else in the way. Same
+// "next column-0 line starts a new block" rule as extractHeaderListSection
+// itself, applied one level down: after that function's own dedent, every
+// entry (a term bullet, an object's name-plus-shape bullet, the trailing
+// "Everything else..." label) starts flush left again.
+function splitTopLevelBlocks(text) {
+  if (!text) return [];
+  const lines = text.split("\n");
+  const blocks = [];
+  let current = [];
+  for (const line of lines) {
+    if (/^\S/.test(line) && current.length) {
+      blocks.push(current.join("\n").trim());
+      current = [line];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.length) blocks.push(current.join("\n").trim());
+  return blocks.filter(Boolean);
+}
+
+// Wraps every match of `query` in <mark> so rehypeRaw renders it as a real
+// highlighted span, matching against the term/object's full text — name
+// AND definition — not just its bolded name. Skips backtick code spans:
+// text inside `` `...` `` isn't reparsed as markdown OR raw HTML, so a
+// <mark> tag landing inside one would show up as literal, unrendered text
+// instead of a highlight.
+function highlightMatches(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(escaped, "gi");
+  return text
+    .split(/(`[^`]*`)/g)
+    .map((segment) =>
+      segment.startsWith("`") ? segment : segment.replace(re, (m) => `<mark>${m}</mark>`),
+    )
+    .join("");
 }
 
 // Persisted "where was I" state, so a Vite full reload (or a manual browser
@@ -2739,6 +2783,29 @@ export default function MarkdownHub() {
     () => extractHeaderListSection(content, OBJECTS_LABEL_PATTERNS),
     [content],
   );
+  // The shared doc-search box doubles as the Reference tab's own filter —
+  // typing there narrows Terms/Objects down to entries that actually
+  // match (name or definition, either one) instead of leaving every
+  // non-matching card in the way, with the surviving matches highlighted
+  // in place. Scoped to only fire while Reference is the active tab so
+  // leftover text from a Documents/On-This-Page search doesn't silently
+  // filter this list before it's even been looked at.
+  const referenceQuery =
+    sidebarTab === "reference" ? docSearch.trim().toLowerCase() : "";
+  const filteredTermsMd = useMemo(() => {
+    const blocks = splitTopLevelBlocks(termsSection);
+    const kept = referenceQuery
+      ? blocks.filter((b) => b.toLowerCase().includes(referenceQuery))
+      : blocks;
+    return highlightMatches(kept.join("\n\n"), referenceQuery);
+  }, [termsSection, referenceQuery]);
+  const filteredObjectsMd = useMemo(() => {
+    const blocks = splitTopLevelBlocks(objectsSection);
+    const kept = referenceQuery
+      ? blocks.filter((b) => b.toLowerCase().includes(referenceQuery))
+      : blocks;
+    return highlightMatches(kept.join("\n\n"), referenceQuery);
+  }, [objectsSection, referenceQuery]);
   const scrollToHeading = useCallback((id) => {
     const el = contentScrollRef.current?.querySelector(
       `[id="${CSS.escape(id)}"]`,
@@ -3811,8 +3878,8 @@ export default function MarkdownHub() {
               } ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}
               style={{ width: isNarrowPanel ? "100%" : effectiveSidebarWidth }}
             >
-              {/* ── Search bar (not on Reference — nothing there to filter) ── */}
-              {tab === "tutorials" && sidebarTab !== "reference" && (
+              {/* ── Search bar ── */}
+              {tab === "tutorials" && (
                 <div className={`shrink-0 px-2 py-2 border-b ${ui.border}`}>
                   <div
                     className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} transition-colors focus-within:ring-1`}
@@ -3835,7 +3902,7 @@ export default function MarkdownHub() {
                       type="text"
                       value={sidebarTab === "notes" ? noteSearch : docSearch}
                       onChange={(e) => sidebarTab === "notes" ? setNoteSearch(e.target.value) : setDocSearch(e.target.value)}
-                      placeholder={sidebarTab === "notes" ? "Search notes…" : sidebarTab === "toc" ? "Filter this page…" : "Search docs…"}
+                      placeholder={sidebarTab === "notes" ? "Search notes…" : sidebarTab === "toc" ? "Filter this page…" : sidebarTab === "reference" ? "Filter terms & objects…" : "Search docs…"}
                       className={`flex-1 bg-transparent text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
                     />
                     {(sidebarTab === "notes" ? noteSearch : docSearch) && (
@@ -4137,15 +4204,21 @@ export default function MarkdownHub() {
                               <p className={`px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>
                                 Terms
                               </p>
-                              <div className="md-body">
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkGfm, remarkMath]}
-                                  rehypePlugins={[rehypeRaw, rehypeKatex]}
-                                  components={MD_COMPONENTS}
-                                >
-                                  {termsSection}
-                                </ReactMarkdown>
-                              </div>
+                              {filteredTermsMd ? (
+                                <div className="md-body">
+                                  <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkMath]}
+                                    rehypePlugins={[rehypeRaw, rehypeKatex]}
+                                    components={MD_COMPONENTS}
+                                  >
+                                    {filteredTermsMd}
+                                  </ReactMarkdown>
+                                </div>
+                              ) : (
+                                <p className={`px-1 py-2 text-[11px] ${ui.txt2}`}>
+                                  No terms match "{docSearch.trim()}"
+                                </p>
+                              )}
                             </div>
                           )}
                           {objectsSection && (
@@ -4153,15 +4226,21 @@ export default function MarkdownHub() {
                               <p className={`px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>
                                 Objects &amp; Methods
                               </p>
-                              <div className="md-body">
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkGfm, remarkMath]}
-                                  rehypePlugins={[rehypeRaw, rehypeKatex]}
-                                  components={MD_COMPONENTS}
-                                >
-                                  {objectsSection}
-                                </ReactMarkdown>
-                              </div>
+                              {filteredObjectsMd ? (
+                                <div className="md-body">
+                                  <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkMath]}
+                                    rehypePlugins={[rehypeRaw, rehypeKatex]}
+                                    components={MD_COMPONENTS}
+                                  >
+                                    {filteredObjectsMd}
+                                  </ReactMarkdown>
+                                </div>
+                              ) : (
+                                <p className={`px-1 py-2 text-[11px] ${ui.txt2}`}>
+                                  No objects match "{docSearch.trim()}"
+                                </p>
+                              )}
                             </div>
                           )}
                         </>
