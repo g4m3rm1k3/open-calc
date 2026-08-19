@@ -7,7 +7,16 @@ breakdowns in Objects and methods, no Concept Isolation labs, and no
 executed/verified run output (code is believed correct from language
 knowledge but was not run this session).
 
-**Why Perl, specifically:** the user's stated motivation was reading
+**2026-08-19 update — deprioritized:** the user decided they don't need
+a Perl-fundamentals on-ramp after all — they're repurposing this folder
+for *Programming Pearls* directly later, and all remaining session
+usage was redirected to expanding `pascal-getting-started/` instead.
+The real book source (26 `.c`/`.cpp` files) is sitting in
+`from the book examples/` inside this same folder — see the note further
+down. **Do not resume writing Perl lessons 3+ without checking with the
+user first** — this pivot was explicit, not a pause.
+
+**Why Perl, specifically (context for the 3 lessons that already exist):** the user's stated motivation was reading
 *Programming Pearls* (Jon Bentley), but that book does not actually use
 Perl — its examples are C-like pseudocode. The user asked for "pearl"
 as a language to get running in, so this series teaches Perl as a

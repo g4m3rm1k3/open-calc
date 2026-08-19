@@ -168,6 +168,4 @@ computes a value from that same `i` and hands it back into the chosen
 `writeln` call — one value, `i`, flowing through the loop control, the
 branch decision, and the function call, once per iteration.
 
-**Next:** the series continues once expanded — see `HANDOFF.md` in this
-folder for what's planned (working toward the kind of small text-
-processing utility programs *Software Tools in Pascal* itself builds).
+**Next:** `lesson-3-arrays-and-the-accumulator-pattern.md`

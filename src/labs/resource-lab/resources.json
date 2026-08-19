@@ -35,6 +35,12 @@
     "url": "https://www.tutorialspoint.com/",
     "tags": ["CS", "Tutorials"]
   },
+      {
+    "title": "CodePath",
+    "description": "Code Path Guides",
+    "url": "https://guides.codepath.org/",
+    "tags": ["Android Development", "CS", "IOS", "Web Dev", "Tutorials"]
+  },
     {
     "title": "W3Schools",
     "description": "Learn to Code",
