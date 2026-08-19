@@ -158,6 +158,51 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
   rule below — the reader needs the three facts visually separable, not
   just present somewhere in the text.
 
+  **CRC breakdown — added to every entry, alongside the three facts
+  above, never replacing them.** Immediately after *What it is* /
+  *Implementation* / *Its use*, every Objects and methods entry also
+  carries five more labeled sub-bullets, in this exact order and under
+  these exact labels — a Class/Responsibility/Collaborator card (a real,
+  decades-old OOP design technique), extended with a fifth field for
+  where the thing sits architecturally. "Class" here means whatever
+  structural unit the language or paradigm actually uses for this
+  entry — a class, a struct, a standalone function, a module — not
+  literally a class in every case.
+
+  - *Type:* the exact class/method/function signature — its structural
+    shape, restated here even when *Implementation*, above, already gave
+    it; this field names *what kind of thing* this is (a class, a
+    `static` method, an instance method, an interface, a free function),
+    not just its signature in isolation.
+  - *Responsibility:* its full job description, stated as a charter —
+    the complete scope of what this thing is answerable for, never one
+    benefit or side-effect dressed up as the whole job. "Manages the
+    list of registered listeners and notifies each one, in order,
+    whenever the subject's state changes" is a responsibility; "lets you
+    add a listener" names one thing it happens to let you do, not the
+    job.
+  - *Depends on:* what has to be handed to it — constructor arguments,
+    method parameters, an object it's called on, an ambient resource —
+    for it to be able to do that job at all.
+  - *Connects to:* who calls it, what it calls in turn, and what data or
+    control actually flows across each of those edges — not just a list
+    of neighboring names with no stated direction.
+  - *Shape:* where this sits in the lesson's or project's architecture —
+    which seam, layer, or boundary it represents (a public API surface,
+    an internal implementation detail, a callback boundary between
+    framework and app code, a data-transfer boundary between two
+    subsystems).
+
+  Every entry ends up with eight sub-bullets total, not three and not
+  five — the original three explain the thing in isolation; the CRC
+  breakdown explains it as a piece of a system: what it's on the hook
+  for, what it needs from its surroundings, and who it talks to.
+  Skipping the CRC breakdown because the original three already "cover
+  it" is exactly the omission this addition exists to prevent: *Its
+  use* states why this lesson's code reaches for it, which is not the
+  same claim as *Responsibility*'s full charter, and *Implementation*'s
+  signature is not the same claim as *Connects to*'s actual call graph.
+
   **Primary vs. supporting cast is about placement, not treatment.**
   Every entry gets the full three-part format regardless of category.
   Items that *are* this lesson's own subject go first, in the order the
@@ -836,6 +881,14 @@ Read the draft top to bottom and answer honestly:
       undescribed one would — the fix is the same "explain, don't just
       describe" standard applied here, in the Header, not only inside
       Concept Units.
+- [ ] Does every Objects and methods entry carry its full CRC
+      breakdown — Type, Responsibility, Depends On, Connects To,
+      Shape — in addition to, not instead of, What it is / Implementation
+      / Its use? Check *Responsibility* specifically: is it stated as
+      the thing's full charter, or has it been narrowed down to the one
+      benefit *Its use* already named? And check *Connects To*: does it
+      actually name callers, callees, and what flows between them, or
+      is it a bare list of neighboring names with no stated direction?
 - [ ] Was the Header assembled by literally tokenizing every code span in
       the unit first — including annotations sitting inside a quoted
       signature, not only the main New Code block — and filling a Terms

@@ -1001,6 +1001,89 @@ function headingId(text) {
     .trim();
 }
 
+// Pulls a Header field's own body out as a standalone markdown fragment —
+// e.g. everything under a lesson's Terms or Objects-and-methods label — so
+// it can be rendered a second time in the Reference side panel, styled
+// identically to its inline copy since it's re-parsed through the same
+// MD_COMPONENTS/getMdCss pipeline. LESSON SCHEMA.md's own wording for these
+// two fields has drifted across the life of this corpus, so a single fixed
+// pattern misses most existing lessons; four label shapes are recognized
+// (checked against the real corpus, 2026-08-19 — a plain regex census
+// found only 37 files matching the current bulleted-list shape alone, vs.
+// ~1,385 once all four were recognized):
+//   "list"    — "- **Terms used in this lesson**" (current schema; body is
+//               a nested list, indented 2sp under the bullet by CommonMark's
+//               own list-continuation rule)
+//   "flat"    — "**Terms introduced in this lesson:**" as its own bold
+//               paragraph (colon inside or outside the closing **), body is
+//               an ordinary top-level list right below it
+//   "heading" — "## Terms used in this lesson" as a real heading
+//   "plain"   — "Terms used in this lesson" with no markup at all
+// Each style's body ends at a different boundary (see STYLE below), so the
+// matched style — not just whether a label matched — has to drive where
+// extraction stops. A style that produced no body (e.g. "**Terms
+// introduced in this lesson:** none new — ...", content inline on the
+// label's own line rather than a body underneath) returns null, same as
+// finding no label at all — nothing to show is the honest result, not a
+// guess at what "none new" might have meant structurally.
+const TERMS_LABEL_PATTERNS = [
+  { style: "list", re: /^- \*\*Terms (?:used|introduced) in this lesson\*\*\s*$/ },
+  { style: "flat", re: /^\*\*Terms (?:used|introduced) in this lesson:?\*\*:?\s*$/ },
+  { style: "heading", re: /^#{1,6}\s+Terms (?:used|introduced) in this lesson\s*$/ },
+  { style: "plain", re: /^Terms (?:used|introduced) in this lesson:?\s*$/ },
+];
+const OBJECTS_LABEL_PATTERNS = [
+  { style: "list", re: /^- \*\*Objects and methods used\*\*\s*$/ },
+  { style: "flat", re: /^\*\*Objects and methods used:?\*\*:?\s*$/ },
+  { style: "heading", re: /^#{1,6}\s+Objects and methods used\s*$/ },
+  { style: "plain", re: /^Objects and methods used:?\s*$/ },
+];
+const ALL_HEADER_LABEL_PATTERNS = [...TERMS_LABEL_PATTERNS, ...OBJECTS_LABEL_PATTERNS];
+function isHeaderLabelLine(line) {
+  return ALL_HEADER_LABEL_PATTERNS.some((p) => p.re.test(line));
+}
+
+function extractHeaderListSection(content, patterns) {
+  if (!content) return null;
+  const lines = content.split("\n");
+  let startIdx = -1;
+  let style = null;
+  for (let i = 0; i < lines.length; i++) {
+    const hit = patterns.find((p) => p.re.test(lines[i]));
+    if (hit) {
+      startIdx = i;
+      style = hit.style;
+      break;
+    }
+  }
+  if (startIdx === -1) return null;
+  let endIdx = lines.length;
+  for (let i = startIdx + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim() === "") continue;
+    // "list" content is always indented under its bullet, so any column-0
+    // line — the next Header field, a heading, or the closing "---" — ends
+    // it. The other three styles sit at column 0 themselves, so their own
+    // boundary is only a real heading, an "---" rule, or the next known
+    // Header label (an object's own bare-bold name paragraph, e.g.
+    // "**`SQLiteOpenHelper`**", looks identical in shape but isn't one of
+    // the four known labels, so it's correctly kept as section content).
+    const structuralBoundary =
+      /^#{1,6}\s/.test(line) || /^-{3,}\s*$/.test(line) || isHeaderLabelLine(line);
+    const listBoundary = style === "list" && /^\S/.test(line);
+    if (structuralBoundary || listBoundary) {
+      endIdx = i;
+      break;
+    }
+  }
+  let body = lines.slice(startIdx + 1, endIdx);
+  if (style === "list") {
+    body = body.map((line) => (line.startsWith("  ") ? line.slice(2) : line));
+  }
+  const text = body.join("\n").trim();
+  return text || null;
+}
+
 // Persisted "where was I" state, so a Vite full reload (or a manual browser
 // refresh) restores the same tab, the same doc, and the same scroll/cursor
 // position instead of always snapping back to a blank Editor tab.
@@ -2643,6 +2726,19 @@ export default function MarkdownHub() {
     if (sidebarTab !== "toc" || !q) return headings;
     return headings.filter((h) => h.text.toLowerCase().includes(q));
   }, [headings, docSearch, sidebarTab]);
+  // Duplicated into the Reference tab so a reader mid-way through a
+  // lesson's code can look a term or an object/method (What it is /
+  // Implementation / Its use / CRC breakdown) back up without scrolling to
+  // the Header — see extractHeaderListSection's own comment for the exact
+  // format this matches.
+  const termsSection = useMemo(
+    () => extractHeaderListSection(content, TERMS_LABEL_PATTERNS),
+    [content],
+  );
+  const objectsSection = useMemo(
+    () => extractHeaderListSection(content, OBJECTS_LABEL_PATTERNS),
+    [content],
+  );
   const scrollToHeading = useCallback((id) => {
     const el = contentScrollRef.current?.querySelector(
       `[id="${CSS.escape(id)}"]`,
@@ -3715,8 +3811,8 @@ export default function MarkdownHub() {
               } ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}
               style={{ width: isNarrowPanel ? "100%" : effectiveSidebarWidth }}
             >
-              {/* ── Search bar ── */}
-              {tab === "tutorials" && (
+              {/* ── Search bar (not on Reference — nothing there to filter) ── */}
+              {tab === "tutorials" && sidebarTab !== "reference" && (
                 <div className={`shrink-0 px-2 py-2 border-b ${ui.border}`}>
                   <div
                     className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} transition-colors focus-within:ring-1`}
@@ -3783,6 +3879,19 @@ export default function MarkdownHub() {
                   >
                     Documents
                   </button>
+                  {(termsSection || objectsSection) && (
+                    <button
+                      onClick={() => setSidebarTab("reference")}
+                      className={`flex-1 py-1.5 px-2 rounded-md text-[11px] font-bold transition-all duration-300 ${sidebarTab === "reference" ? "shadow-sm ring-1 ring-black/5 dark:ring-white/10" : "opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5"}`}
+                      style={
+                        sidebarTab === "reference"
+                          ? { backgroundColor: `${accentColor}1A`, color: accentColor, boxShadow: `0 0 10px ${accentColor}15` }
+                          : {}
+                      }
+                    >
+                      Reference
+                    </button>
+                  )}
                   {headings.length > 0 && (
                     <button
                       onClick={() => setSidebarTab("toc")}
@@ -4011,6 +4120,51 @@ export default function MarkdownHub() {
                             ui={ui}
                           />
                         ))
+                      )}
+                    </div>
+                  )}
+
+                  {tab === "tutorials" && sidebarTab === "reference" && (
+                    <div className="px-3 py-2 space-y-5">
+                      {!termsSection && !objectsSection ? (
+                        <p className={`px-1 py-4 text-[11px] text-center ${ui.txt2}`}>
+                          No Terms or Objects section found for this lesson.
+                        </p>
+                      ) : (
+                        <>
+                          {termsSection && (
+                            <div>
+                              <p className={`px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>
+                                Terms
+                              </p>
+                              <div className="md-body">
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm, remarkMath]}
+                                  rehypePlugins={[rehypeRaw, rehypeKatex]}
+                                  components={MD_COMPONENTS}
+                                >
+                                  {termsSection}
+                                </ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
+                          {objectsSection && (
+                            <div>
+                              <p className={`px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>
+                                Objects &amp; Methods
+                              </p>
+                              <div className="md-body">
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm, remarkMath]}
+                                  rehypePlugins={[rehypeRaw, rehypeKatex]}
+                                  components={MD_COMPONENTS}
+                                >
+                                  {objectsSection}
+                                </ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
