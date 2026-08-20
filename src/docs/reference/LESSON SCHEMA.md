@@ -612,6 +612,34 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    Project Change already covers that case ("a brand-new file has nothing
    to locate a position within").
 
+   **Number the lines of the shown enclosing structure.** A `// ← new`
+   marker tells a reader _which_ lines are new; it doesn't tell them
+   _where_ those lines fall once the structure has grown past a glance —
+   line 4 of an 8-line method reads differently than line 40 of an
+   80-line one. Number only the snippet actually shown here (starting
+   from 1, or from the enclosing structure's own real line if that's
+   already known) — never the whole file; this step already scopes to
+   the smallest enclosing structure, and that scope doesn't change. This
+   matters most exactly when it's easiest to skip: a short `__init__` or
+   a three-line function doesn't need it, but the payoff compounds as
+   the same structure keeps growing across later lessons in the same
+   curriculum, which is precisely when a bare `← new` marker stops being
+   enough to say where something landed.
+
+   **When step 5's code doesn't modify the tracked project file at all**
+   (a call site proving something against a class already defined,
+   verification code exercising already-shipped project code) but still
+   depends on code an earlier unit or lesson already established, show
+   that dependency alongside it — the minimal already-established piece
+   it actually runs against, not the whole file it came from — rather
+   than showing step 5's code floating with nothing establishing its
+   relationship to what came before. Bare new code sitting right after a
+   previous unit's code block reads as _replacing_ it unless something
+   shows otherwise; per this schema's own opening rule, two code blocks
+   with nothing tying them together is exactly the shape this schema
+   exists to prevent, and "no file was modified" is not an exemption
+   from that.
+
 7. **Mechanical walkthrough — how it works in isolation.** Before writing
    a word of prose, literally enumerate every distinct syntactic element
    in step 5's code block, in the order it appears — every method call,
@@ -1044,6 +1072,14 @@ Read the draft top to bottom and answer honestly:
       was elided instead of repeated in context, defeating the step's
       entire purpose. If found: show the real code, or split the unit if
       showing it whole would make the block too large.
+- [ ] Is every "Updated Project" block's shown code numbered? And for
+      any unit whose New Code doesn't modify the tracked project file but
+      depends on already-established code, is that dependency shown
+      alongside it — not the whole file it came from, just the minimal
+      piece it actually runs against — rather than left floating with
+      nothing anchoring where or against what it actually runs? Code
+      shown with nothing establishing its relationship to what came
+      before reads as replacing it, even when nothing was replaced.
 - [ ] For every code block, did you actually apply the Recursive Concept
       Extraction Rule — ask whether it bundles more than one
       previously-untaught concept — or did you just describe the block as
