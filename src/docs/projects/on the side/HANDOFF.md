@@ -80,26 +80,67 @@ everything required is either here or in the two files it points to.
 
 ## Current position
 
-**Next lesson to write:** `1.2 — Object State` (Series 1, Core)
+**Next lesson to write:** `1.6 — Type Hints` (Series 1, Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 1 —
-Python Application Foundations" → "## 1.2 — Object State." Learn:
-changing object state, methods that modify state, invariants. Add
-`asset.mark_retired()`.
+Python Application Foundations" → "## 1.6 — Type Hints." Learn:
+annotations, `list[Asset]`, `Optional`, unions, return types. Apply them
+to the project. **Survives: yes.** Unlike 1.3/1.5, this is a full Core
+lesson landing real, permanent changes across `asset.py` and
+`owner.py` — annotate `Asset.__init__`, `Owner.__init__`,
+`Asset.describe`/`mark_retired`'s return types, and likely introduce
+the first genuinely optional/collection-shaped signature the project
+has had (`Optional` and `list[Asset]` are both named explicitly in the
+blueprint, so at least one Concept Unit needs a real use for each, not
+just `Asset`/`Owner`'s existing scalar parameters). No new domain
+behavior — this lesson changes *signatures*, not what the code does at
+runtime (type hints are not enforced by Python itself; that's worth its
+own explicit Concept Unit moment, likely early, since it cuts against
+what a reader might assume "type" means coming from a statically-typed
+language).
 
-**Project state:** `snapshot/asset.py` holds the `Asset` class as built
-by Lesson 1.1 — `__init__(self, name, serial_number, category)` storing
-all three as instance attributes, plus one read-only method,
-`describe()`. No `is_retired` (or any other state) exists yet — Lesson
-1.1 deliberately left `Asset` with no mutable state, so 1.2 can
-introduce a state-changing method and the attribute it flips together,
-as one coherent unit. Read `snapshot/asset.py` before writing 1.2.
+**Project state:** `snapshot/asset.py` — `Asset.__init__(self, name,
+serial_number, category, owner)` stores all four; `describe()` (1.1,
+read-only); `mark_retired()` (1.2, guarded: `if self.is_retired: return
+False`, else sets `True` and returns `True`). `snapshot/owner.py` —
+`Owner.__init__(self, name, email)` stores both (1.4). No type
+annotations anywhere yet in either file — 1.6 is what adds the first
+ones. Read both files before writing 1.6.
 
-**Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section now
-lists everything Lesson 1.1 introduced: `class`, instance, `pass`,
-`self`, instance attribute, method, `is`, default `==`, implicit
-inheritance from `object`, dunder methods, `__init__`, `object`,
-`type()`, `AttributeError`, `Asset.__init__`, `Asset.describe`.
+**Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section
+lists everything introduced through Lesson 1.5: (1.1) `class`, instance,
+`pass`, `self`, instance attribute, method, `is`, default `==`,
+implicit inheritance from `object`, dunder methods, `__init__`,
+`object`, `__bases__`, `type()`, `AttributeError`, `return`,
+`Asset.__init__`, `Asset.describe`; (1.2) `bool`, default attribute
+value, state-changing method (mutator), invariant, guard clause, `if`
+conditional, `Asset.mark_retired`; (1.3, Lab) class attribute,
+mutable/immutable, attribute shadowing, attribute lookup, `__dict__`,
+`list`/`.append()` (baseline), the mutable-class-attribute trap; (1.4)
+composition, HAS-A relationship, `Owner.__init__`, `Asset.__init__`'s
+`owner` parameter; (1.5, Support/throwaway) subclass, parent class,
+IS-A relationship, overriding, `super()`. Note for 1.6: `list` was
+already added to the assumed baseline in Lesson 1.3 (`[]`/`.append()`
+as runtime syntax) — `list[Asset]` as a *type annotation* is a distinct,
+new concept from that (a generic subscript in annotation position, never
+evaluated at runtime the way `[]` is), not a restatement; say so
+explicitly rather than assuming the reader auto-generalizes from 1.3's
+own baseline note.
+
+## Session note (2026-08-19 night → 2026-08-20 morning)
+
+Lessons 1.1–1.5 were written in one extended session while the user
+slept, at their explicit request ("build a few lessons... I'll check
+them out in the morning"). All five follow the Verification Rule and
+Lesson Schema in full — every real run in `verification/1.1/` through
+`verification/1.5/` was actually executed this session, not predicted.
+Two deliberate scope calls worth flagging for review: (1) Lesson 1.4's
+blueprint hedge ("Survives: potentially") was resolved to "yes, `Owner`
+survives" — reasoned in the lesson's own HANDOFF note at the time, not
+silently defaulted. (2) Lessons 1.3 and 1.5 are structurally lighter
+than 1.1/1.2/1.4 by design (both are throwaway — no Project Change
+lands in any tracked file) — this is the correct shape per their own
+blueprint entries, not a shortfall in effort.
 
 ## Piloting schema changes here
 

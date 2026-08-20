@@ -34,6 +34,29 @@ past entries except to fix an error.
 - `AttributeError` — introduced Lesson 1.1
 - `Asset.__init__` — introduced Lesson 1.1
 - `Asset.describe` — introduced Lesson 1.1
+- `return` keyword — introduced Lesson 1.1
+- `bool` (boolean type/literal) — introduced Lesson 1.2
+- default attribute value (not from a constructor parameter) — introduced Lesson 1.2
+- state-changing method (mutator) — introduced Lesson 1.2
+- invariant — introduced Lesson 1.2
+- guard clause — introduced Lesson 1.2
+- `if` conditional — introduced Lesson 1.2 (added to assumed baseline scope)
+- `Asset.mark_retired` — introduced Lesson 1.2
+- class attribute — introduced Lesson 1.3
+- mutable / immutable — introduced Lesson 1.3
+- attribute shadowing — introduced Lesson 1.3
+- attribute lookup (instance-then-class fallback) — introduced Lesson 1.3
+- `__dict__` — introduced Lesson 1.3
+- `list` literal (`[]`) / `.append()` — introduced Lesson 1.3 (added to assumed baseline scope)
+- mutable-class-attribute trap — introduced Lesson 1.3 (Lab, throwaway — no project code)
+- composition — introduced Lesson 1.4
+- HAS-A relationship — introduced Lesson 1.4
+- `Owner.__init__` — introduced Lesson 1.4
+- `Asset.__init__` — owner param — introduced Lesson 1.4 (Asset.__init__ itself first introduced 1.1)
+- subclass / parent class (base class) — introduced Lesson 1.5 (Support, throwaway — no project code)
+- IS-A relationship — introduced Lesson 1.5 (throwaway)
+- overriding — introduced Lesson 1.5 (throwaway)
+- `super()` — introduced Lesson 1.5 (throwaway)
 
 ## Series 2 — PySide6: Desktop Application Development
 
