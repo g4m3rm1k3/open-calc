@@ -57,6 +57,19 @@ past entries except to fix an error.
 - IS-A relationship — introduced Lesson 1.5 (throwaway)
 - overriding — introduced Lesson 1.5 (throwaway)
 - `super()` — introduced Lesson 1.5 (throwaway)
+- `for` loop / `in` (iteration) — introduced Lesson 1.6 (added to assumed baseline scope, same as `if` in 1.2 and list literals/`.append()` in 1.3 — general Python fluency below the level of classes, not re-taught)
+- Python `import` statement — introduced Lesson 1.6 (added to assumed baseline scope — the mechanism itself is general Python fluency; its first real appearance connecting two project files, via `from owner import Owner`, is the lesson's own new architectural fact, not the syntax)
+- type annotation (parameter position) — introduced Lesson 1.6
+- return type annotation (`->`) — introduced Lesson 1.6
+- `__annotations__` — introduced Lesson 1.6
+- `NameError` — introduced Lesson 1.6
+- `None` as a type (inside `Union`/`Optional`, distinct from `None` the value) — introduced Lesson 1.6
+- `Union` (`typing.Union`) — introduced Lesson 1.6
+- `Optional` (`typing.Optional`) — introduced Lesson 1.6
+- generic type annotation (`list[X]`) — introduced Lesson 1.6, explicitly distinguished from `[]`/`.append()`'s own runtime list-building (Lesson 1.3)
+- `bool` as a type name in annotation position — introduced Lesson 1.6 (value form introduced Lesson 1.2)
+- `Owner.__init__` / `Asset.__init__` / `Asset.describe` / `Asset.mark_retired` — parameter and return annotations added Lesson 1.6 (methods themselves introduced 1.1/1.2/1.4)
+- `find_by_serial` (free function, first non-method function in this project) — introduced Lesson 1.6
 
 ## Series 2 — PySide6: Desktop Application Development
 

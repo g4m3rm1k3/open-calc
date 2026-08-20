@@ -1,6 +1,7 @@
-from typing import Optional
-
-from owner import Owner
+class Owner:
+    def __init__(self, name: str, email: str) -> None:
+        self.name = name
+        self.email = email
 
 
 class Asset:
@@ -21,8 +22,11 @@ class Asset:
         return True
 
 
-def find_by_serial(assets: list[Asset], serial_number: str) -> Optional[Asset]:
-    for asset in assets:
-        if asset.serial_number == serial_number:
-            return asset
-    return None
+jane = Owner("Jane Doe", "jane.doe@example.com")
+laptop = Asset("ThinkPad X1", "SN-48213", "Laptop", jane)
+
+print(laptop.describe())
+print(laptop.mark_retired())
+print(Asset.__init__.__annotations__)
+print(Asset.describe.__annotations__)
+print(Asset.mark_retired.__annotations__)

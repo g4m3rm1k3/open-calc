@@ -80,35 +80,37 @@ everything required is either here or in the two files it points to.
 
 ## Current position
 
-**Next lesson to write:** `1.6 — Type Hints` (Series 1, Core)
+**Next lesson to write:** `1.7 — Dataclasses` (Series 1, Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 1 —
-Python Application Foundations" → "## 1.6 — Type Hints." Learn:
-annotations, `list[Asset]`, `Optional`, unions, return types. Apply them
-to the project. **Survives: yes.** Unlike 1.3/1.5, this is a full Core
-lesson landing real, permanent changes across `asset.py` and
-`owner.py` — annotate `Asset.__init__`, `Owner.__init__`,
-`Asset.describe`/`mark_retired`'s return types, and likely introduce
-the first genuinely optional/collection-shaped signature the project
-has had (`Optional` and `list[Asset]` are both named explicitly in the
-blueprint, so at least one Concept Unit needs a real use for each, not
-just `Asset`/`Owner`'s existing scalar parameters). No new domain
-behavior — this lesson changes *signatures*, not what the code does at
-runtime (type hints are not enforced by Python itself; that's worth its
-own explicit Concept Unit moment, likely early, since it cuts against
-what a reader might assume "type" means coming from a statically-typed
-language).
+Python Application Foundations" → "## 1.7 — Dataclasses." Convert
+appropriate domain objects to `@dataclass`. Learn: generated `__init__`,
+`repr`, equality. **Survives: yes.** `Asset` and `Owner` both already
+have hand-written `__init__` methods that do nothing but assign
+parameters to matching attributes — exactly the shape `@dataclass`
+generates automatically — so this lesson's real work is likely
+replacing that hand-written boilerplate and showing what's gained
+(generated `__repr__`, generated `__eq__`) and what changes about
+identity-vs-equality (Lesson 1.1 taught `==` as identity-based by
+default for plain classes; a dataclass's generated `__eq__` compares
+field values instead — a real, load-bearing contrast worth its own
+Concept Unit, not a footnote). `find_by_serial` (added in 1.6) is a free
+function, not a class, and is unaffected either way.
 
-**Project state:** `snapshot/asset.py` — `Asset.__init__(self, name,
-serial_number, category, owner)` stores all four; `describe()` (1.1,
-read-only); `mark_retired()` (1.2, guarded: `if self.is_retired: return
-False`, else sets `True` and returns `True`). `snapshot/owner.py` —
-`Owner.__init__(self, name, email)` stores both (1.4). No type
-annotations anywhere yet in either file — 1.6 is what adds the first
-ones. Read both files before writing 1.6.
+**Project state:** `snapshot/asset.py` — `Asset.__init__(self, name:
+str, serial_number: str, category: str, owner: Owner) -> None` stores
+all four (`owner` typed via `from owner import Owner`); `describe(self)
+-> str` (1.1, read-only); `mark_retired(self) -> bool` (1.2, guarded).
+Also now has a module-level free function, `find_by_serial(assets:
+list[Asset], serial_number: str) -> Optional[Asset]` (1.6, imports
+`Optional` from `typing`), appended after the class. `snapshot/owner.py`
+— `Owner.__init__(self, name: str, email: str) -> None` stores both
+(1.4). Every parameter and return value in both files is now annotated
+(1.6) — the first lesson to touch every existing method's signature
+without changing any method's body. Read both files before writing 1.7.
 
 **Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section
-lists everything introduced through Lesson 1.5: (1.1) `class`, instance,
+lists everything introduced through Lesson 1.6: (1.1) `class`, instance,
 `pass`, `self`, instance attribute, method, `is`, default `==`,
 implicit inheritance from `object`, dunder methods, `__init__`,
 `object`, `__bases__`, `type()`, `AttributeError`, `return`,
@@ -119,13 +121,17 @@ mutable/immutable, attribute shadowing, attribute lookup, `__dict__`,
 `list`/`.append()` (baseline), the mutable-class-attribute trap; (1.4)
 composition, HAS-A relationship, `Owner.__init__`, `Asset.__init__`'s
 `owner` parameter; (1.5, Support/throwaway) subclass, parent class,
-IS-A relationship, overriding, `super()`. Note for 1.6: `list` was
-already added to the assumed baseline in Lesson 1.3 (`[]`/`.append()`
-as runtime syntax) — `list[Asset]` as a *type annotation* is a distinct,
-new concept from that (a generic subscript in annotation position, never
-evaluated at runtime the way `[]` is), not a restatement; say so
-explicitly rather than assuming the reader auto-generalizes from 1.3's
-own baseline note.
+IS-A relationship, overriding, `super()`; (1.6) `for`/`import` (added to
+baseline), type annotation (parameter and return position),
+`__annotations__`, `NameError`, `None` as a type vs. a value, `Union`,
+`Optional`, generic type annotation (`list[X]`), `bool` as a type name,
+and `find_by_serial` (the project's first free function). Note for 1.7:
+Lesson 1.1 taught `==` as identity-based *default* equality for plain
+classes with no `__eq__` of their own — `@dataclass`'s generated
+`__eq__` is exactly the case where that default no longer applies, so
+1.7 needs to state plainly that dataclass equality is a genuinely
+different mechanism from every `==` this curriculum has shown so far,
+not an extension of it.
 
 ## Session note (2026-08-19 night → 2026-08-20 morning)
 
@@ -142,6 +148,51 @@ than 1.1/1.2/1.4 by design (both are throwaway — no Project Change
 lands in any tracked file) — this is the correct shape per their own
 blueprint entries, not a shortfall in effort.
 
+## Session note (2026-08-20)
+
+Lesson 1.6 — Type Hints was written this session, full Core lesson, five
+Concept Units (parameter annotations + non-enforcement, return
+annotations, `Union`, `Optional`, `list[Asset]`), all following the
+Verification Rule for real — every run in `verification/1.6/` was
+actually executed this session (Python 3.14.3), including one
+deliberately failing run (`break_unresolved_annotation.py`, a real
+`NameError`) proving an annotation naming an unresolved class fails at
+class-definition time in this Python version specifically (checked
+directly rather than assumed, since PEP 649 changed annotation-
+evaluation timing in recent Python versions and the old assumption could
+easily have been wrong here).
+
+Two judgment calls worth flagging for review, since neither was fully
+dictated by the blueprint or this handoff:
+
+1. **`find_by_serial` as the real landing site for `list[Asset]` and
+   `Optional[Asset]`.** Neither `Asset` nor `Owner` had any field that
+   could plausibly become list- or optional-shaped without changing
+   actual domain behavior (which the blueprint's own note ruled out) —
+   so this lesson adds one new, permanent, module-level free function,
+   `find_by_serial(assets: list[Asset], serial_number: str) ->
+   Optional[Asset])`, appended to `asset.py` after the `Asset` class,
+   existing specifically to give both constructs a genuine project use.
+   It's a pure query utility — no mutation, no new invariant, nothing
+   about `Asset`/`Owner`'s own behavior changed — which is the read of
+   "no new domain behavior" this call rests on, but it *is* new,
+   permanent, real code, and it's this project's first function that
+   isn't a class or a method of one. Worth a second look before 1.7
+   builds anything on top of it.
+2. **Adopted two `LESSON SCHEMA.md` preferences this curriculum hadn't
+   used before**, beyond the two already being piloted here (see below):
+   the reordered Concept Unit sequence (real Project Change/New
+   Code/Updated Project shown *before* the isolated lab, with the lab
+   explicitly anchored back to the real code just shown, per the
+   schema's own "for lessons written from this point forward" note) and
+   explicitly bold-naming each concept right after its real output.
+   Lessons 1.1–1.5 all used the original isolate-before-build order;
+   1.6 uses the new one throughout, since the schema frames it as the
+   current default for any lesson written from now on, not something
+   requiring separate curriculum opt-in. Flagging in case that reading
+   is wrong and this curriculum was meant to keep the original order
+   until told otherwise.
+
 ## Piloting schema changes here
 
 This curriculum is the first to write lessons under two `LESSON
@@ -157,6 +208,17 @@ leaves anything out you'd have wanted back. Report that in the session
 rather than silently deciding a fix — adjusting `LESSON SCHEMA.md` again
 based on that feedback is expected, and lessons written here so far are
 not a fixed target other lessons need to match.
+
+Lesson 1.6 report: the Socratic prompts kept earning their place through
+all five Concept Units this time, specifically the ones that asked for a
+prediction the reader could actually be wrong about (e.g. "would Python
+refuse to run `Owner(42, True)`?" — a genuine guess with a non-obvious
+answer for anyone coming from a statically-typed language) rather than
+ones that just restated the upcoming section title as a question. The
+trimmed Closing continues to feel complete for a lesson this dense — one
+concrete trace through five units was enough; nothing about the retired
+"What breaks without this" or "Exercises" sections was missed while
+writing or re-reading.
 
 ## After finishing a lesson (do this before handing off / before clearing)
 
