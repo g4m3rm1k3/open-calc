@@ -1,15 +1,20 @@
+from dataclasses import dataclass
 from typing import Optional
 
-from owner import Owner
+
+@dataclass
+class Owner:
+    name: str
+    email: str
 
 
+@dataclass
 class Asset:
-    def __init__(self, name: str, serial_number: str, category: str, owner: Owner) -> None:
-        self.name = name
-        self.serial_number = serial_number
-        self.category = category
-        self.is_retired = False
-        self.owner = owner
+    name: str
+    serial_number: str
+    category: str
+    owner: Owner
+    is_retired: bool = False
 
     def describe(self) -> str:
         return f"{self.name} — {self.category} (S/N {self.serial_number})"
@@ -26,3 +31,16 @@ def find_by_serial(assets: list[Asset], serial_number: str) -> Optional[Asset]:
         if asset.serial_number == serial_number:
             return asset
     return None
+
+
+jane = Owner("Jane Doe", "jane.doe@example.com")
+laptop = Asset("ThinkPad X1", "SN-48213", "Laptop", jane)
+
+print(repr(jane))
+print(repr(laptop))
+
+print(laptop.describe())
+print(laptop.mark_retired())
+
+inventory = [laptop]
+print(find_by_serial(inventory, "SN-48213") is laptop)
