@@ -25,3 +25,13 @@ src/data/codebaseGraph.js
 src/concepts/manifest.ts
 src/practice/manifest.ts
 src/posts/manifest.ts
+
+# Android/Gradle projects (android_kotlin curriculum, e.g. AndroidCalculator/)
+.gradle/
+local.properties
+*.iml
+.idea/
+captures/
+.cxx/
+.externalNativeBuild/
+src/docs/projects/android_kotlin/**/build/

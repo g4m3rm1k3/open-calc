@@ -77,12 +77,44 @@ factual accuracy, not curriculum precedent.
   project file at one specific point), `break*.kt` (a deliberate
   failure — some expected to fail to compile, that's the point). This
   is this curriculum's own self-contained record of the convention now
-  — no external file needs consulting to continue it.
+  — no external file needs consulting to continue it. **Adapted for
+  Stage 1's multi-file Android projects (starting Lesson 1.1):** a
+  single-file `lab*.kt`/`step*.kt` doesn't fit a real Gradle project, so
+  the "project state" for Stage 1+ is the living project directory
+  itself (`AndroidCalculator/`, see below), and `verification/<lesson-id>/`
+  instead holds real, saved **command transcripts** (`stepN_*.txt`,
+  `breakN_*.txt`) — the exact real command run and its exact real
+  output, captured by temporarily staging files in/out of the real
+  project to reproduce each lesson stage, never reconstructed from
+  memory afterward.
+- **`AndroidCalculator/` real project, Stage 1+:** lives at
+  `src/docs/projects/android_kotlin/AndroidCalculator/`, a real, working
+  Android Gradle project — separate from `Calculator.kt`, per the BRD's
+  own "The First Android Calculator" framing for Stage 1. Package
+  `com.example.calculator` (both `namespace` and `applicationId`);
+  `compileSdk`/`targetSdk` 34, `minSdk` 24; AGP `8.5.2`, Kotlin Gradle
+  plugin `1.9.24`, Gradle wrapper pinned to `8.7`.
+  **`sourceCompatibility`/`targetCompatibility`/`jvmTarget` must all be
+  set to `17` explicitly** in `app/build.gradle.kts` — confirmed by a
+  real failed build this session without it ("Inconsistent JVM-target
+  compatibility... (1.8) and ...(21)"): this machine's own default JDK
+  is 21 (see Lesson 0.1), which disagrees with AGP's own older default
+  (1.8) unless overridden. `local.properties` (machine-specific SDK
+  path) and all `build/`/`.gradle/` output are gitignored (see the repo
+  root `.gitignore`, updated this session) — never assume they're
+  absent if reasoning about "what files exist," check for real.
 
 ## Progress
 
-- Stage 0 (Kotlin Foundations), Slice 0 (Console Calculator): in
-  progress. Lesson-by-lesson status below, updated as lessons complete.
+- **Stage 0 (Kotlin Foundations), Slice 0 (Console Calculator): complete —
+  all 10 lessons shipped.** Lesson-by-lesson status below.
+- **Stage 1 (Android Fundamentals), Slice 1 (The First Android
+  Calculator): in progress.** Lesson 1.1 complete (see the standing
+  decision above for the real `AndroidCalculator/` project it
+  established). Lessons 1.2–1.6 not yet started: 1.2 Jetpack Compose,
+  1.3 Layout, 1.4 State, 1.5 Events, 1.6 Connect UI to Domain Logic
+  (this is where `Calculator.kt`'s own Stage-0 arithmetic logic and
+  `AndroidCalculator`'s own UI actually meet — per the BRD).
 
 | Lesson | Title | Status |
 |---|---|---|
@@ -91,23 +123,128 @@ factual accuracy, not curriculum precedent.
 | 0.3 | Choosing What Runs | complete |
 | 0.4 | Holding Many Values at Once | complete |
 | 0.5 | The Value That Might Not Be There | complete |
-| 0.6 | (Classes & Objects) | not started |
-| 0.7 | (Interfaces & Polymorphism) | not started |
-| 0.8 | (Data Classes & Enums) | not started |
-| 0.9 | (Lambdas) | not started |
-| 0.10 | (Idiomatic Kotlin) | not started |
+| 0.6 | A Blueprint and Its Real Things | complete |
+| 0.7 | One Shape, Many Behaviors | complete |
+| 0.8 | A Fixed Set of Choices and a Record of What Happened | complete |
+| 0.9 | Functions as Values | complete |
+| 0.10 | Reading Kotlin the Way Kotlin Is Actually Written | complete |
+| 1.1 | How an Android Project Actually Fits Together | complete |
+
+**🟢 Slice 0 (Console Calculator) shipped**, per Lesson 0.10's own
+Closing. `Calculator.kt`'s final Slice-0 state: a `fun interface
+Operation` implemented by `Addition`/`Subtraction`/`Multiplication`/
+`Division`; `Calculator(var displayValue: Int)` with one `perform`
+method; `enum class Operator` carrying its own `Operation` per
+constant; `data class Calculation` with an `describe()` extension
+function; `main` built with `apply`/`let`/`also`. Real final output:
+`Calculator initialized with displayValue = 6` /
+`Recorded: 6 PLUS 0 = 6`.
+
+**Stage 1, Lesson 1.1 complete.** A real, ongoing Android Gradle
+project now exists at
+`src/docs/projects/android_kotlin/AndroidCalculator/` — separate from
+`Calculator.kt`, per the BRD's own Stage 1 framing ("The First Android
+Calculator"). Real, verified via an actual `./gradlew :app:assembleDebug`
+build (`BUILD SUCCESSFUL`, real `.apk` produced, inspected with real
+`aapt2` output): `settings.gradle.kts`, root `build.gradle.kts`,
+`app/build.gradle.kts` (namespace `com.example.calculator`, compileSdk/
+minSdk/targetSdk 34/24/34, JVM target 17 — see the "Standing decisions"
+note below on why 17 was needed), `app/src/main/AndroidManifest.xml`,
+and `app/src/main/java/com/example/calculator/MainActivity.kt`
+(extends `android.app.Activity`, overrides `onCreate`). Gradle wrapper
+committed (`./gradlew`, pinned to Gradle 8.7) so the project builds
+reproducibly without depending on whatever Gradle happens to be
+installed system-wide.
+**Real finding worth knowing for later lessons:** overriding
+`Activity.onCreate` is optional, not compiler-required (confirmed by
+actually compiling a second `Activity` subclass with zero overrides —
+real exit code 0) — a genuine, verified contrast with Lesson 0.7's own
+proof that implementing an interface's method *is* compiler-required.
+Caught and fixed a real factual error in this lesson's own first draft
+that had claimed the opposite; corrected before finalizing.
 
 Stages 1–16 not yet started; see `brd.md` for the full map.
+
+**Stage 1 tooling: resolved.** The blocker below was hit, the user
+was unreachable to decide between options (push notification didn't
+land), and explicitly said to make the call myself, in whatever way
+produces the best lesson series for them as the learner — see the
+"Autonomous judgment calls" note under Methodology, below, which is now
+a standing instruction, not a one-off. The call made: install real
+Android SDK tooling rather than downgrade Stage 1+ to unverified
+claims, since verified-real-output is this curriculum's whole
+differentiator and Stages 1–16 are ~90% of it.
+
+- **Installed and confirmed working:** Android SDK command-line tools,
+  platform-tools, `platforms;android-34` (real `android.jar`),
+  `build-tools;34.0.0` (all via `brew install --cask
+  android-commandlinetools` + `sdkmanager`, `ANDROID_HOME=
+  /opt/homebrew/share/android-commandlinetools`), and Gradle 9.7.1
+  (`brew install gradle`). Verified for real this session: compiled a
+  Kotlin `Activity` subclass (`onCreate`, `Bundle`, `TextView`) against
+  the genuine `android.jar` with `kotlinc -classpath
+  "$ANDROID_HOME/platforms/android-34/android.jar" ...`, exit 0, and
+  inspected the real generated class with `javap`. This means Stage 1+
+  lessons can get the same real-compiler-error / real-generated-code
+  proof Stage 0 used, for anything that only needs to *compile*
+  correctly (project structure, Activities, Views, most Compose
+  composable declarations, layouts).
+- **Not available: a working emulator or physical device.** This
+  machine's disk was 95% full (11GB free; a minimal AVD needs 12GB+
+  contiguous for its userdata partition) — confirmed by actually
+  creating an AVD and trying to boot it (`emulator -avd calc_test
+  -no-window ...`), which failed with a real, specific error
+  ("Not enough space to create userdata partition"). Rather than leave
+  a non-functional 5GB+ emulator + system-image sitting on an
+  already-tight real disk, both were removed after the failure (disk
+  is back to 17GB free). `adb` also showed one already-`unauthorized`
+  device (serial `ZY22KN6L89`) of unknown origin — not reachable from
+  this sandbox (no matching USB device found via `system_profiler`),
+  not investigated further since it would need physical
+  authorization on a real screen regardless.
+- **Practical consequence for lesson-writing:** anything needing actual
+  on-device behavior — real rendering, recomposition timing, gesture/
+  sensor data, animations (concentrated in later Stage 1 lessons like
+  "State"/"Events", and Stages 9–11) — cannot be verified by an actual
+  run here. For those specific claims, apply the schema's own
+  Verification Rule Necessity exemption honestly: state predicted
+  output/shape only where genuinely confident from well-documented,
+  stable framework behavior, say plainly that it's stated from
+  confidence not executed, and never dress up a prediction as a real
+  run. Everything that only needs to *compile* — which is most of early
+  Stage 1 — still gets the full real-verification treatment via
+  `kotlinc`/`javap` against the real SDK, exactly like Stage 0.
+- If disk space frees up later and an emulator becomes worth
+  revisiting (e.g. once a lesson genuinely needs it), the system image
+  package name is `system-images;android-34;google_apis;arm64-v8a` —
+  reinstall via `sdkmanager` rather than reasoning from memory of this
+  note, since availability can change.
 
 ## Outstanding forward-reference promises (must be fulfilled, under these exact names)
 
 Per the schema's "every Lesson N forward-reference is a promise" rule —
 track these until each is actually delivered:
 
-- **Lesson 0.9 (Lambdas)** must cover `list.map { ... }` and
-  `list.filter { ... }` for real — Lesson 0.4 deliberately did not use
-  them (they need lambda syntax, not taught until 0.9) and said so
-  explicitly in its own Closing.
+- ~~Lesson 0.9 (Lambdas) must cover `list.map { ... }` and
+  `list.filter { ... }` for real~~ — **fulfilled** by Lesson 0.9:
+  `numbers.map { n -> n * 2 }` and `numbers.filter { n -> n > 3 }`,
+  both real, verified, with real stdlib source quoted for both. (Note:
+  this also introduced `>`/`Int.compareTo` with its first full
+  treatment anywhere in this curriculum — Lesson 0.3 listed "Comparison
+  operators," plural, as a concept but only ever fully implemented
+  `==`; `>` never got its own treatment until 0.9 needed it for a
+  `filter` predicate. Not a broken promise — 0.3 never named `>`
+  specifically — but worth knowing if a future session wonders why `>`
+  wasn't covered earlier.)
+- **Lesson 0.9 also retrofitted `Operation` to `fun interface`**
+  (SAM conversion) as a real project change, beyond what its own BRD
+  concept list strictly required — motivated by "Transfer: critical for
+  idiomatic Kotlin and Compose." `Addition`/`Subtraction`/
+  `Multiplication`/`Division` were deliberately left as named classes,
+  not rewritten as lambdas (Lesson 0.9's own SE Lens states why:
+  permanent names remain valuable once Stage 6 adds many more
+  operations) — a design call worth knowing about if Stage 6 revisits
+  this.
 - **A lesson covering `Map`'s key-lookup operator** (`somemap[key]`,
   which returns a nullable `V?`) is still owed — Lesson 0.4's SE Lens
   explicitly deferred it to "Lesson 0.5, on nullability," but Lesson
@@ -122,9 +259,74 @@ track these until each is actually delivered:
   acknowledged gap rather than fixed on the spot.
 - **`divide`'s unhandled `0` divisor** (Lesson 0.2) is still open,
   explicitly deferred to Stage 2 ("Errors").
+- ~~Lesson 0.7 (Interfaces & Polymorphism) must give `Calculator`'s
+  four operations one common shape, through an interface~~ — **fulfilled**
+  by Lesson 0.7: `Operation` interface, `Addition`/`Subtraction`/
+  `Multiplication`/`Division` implementing it, `Calculator.perform`
+  calling through it polymorphically, `Calculator`'s own four original
+  methods removed.
+- ~~Lesson 0.8 (Data Classes & Enums) must give `Calculator`'s own data
+  a cleaner, more idiomatic shape~~ — **fulfilled** by Lesson 0.8:
+  `operatorSymbol` became `enum class Operator(val operation:
+  Operation)` (each constant carrying its own `Operation`, eliminating
+  the old `when`-based lookup entirely), and a new `data class
+  Calculation(operator, operandA, operandB, result)` now records every
+  completed calculation, with real, verified structural equality and
+  `copy()` (both proven with real `javap` output showing the actual
+  compiler-generated members).
+- **`copy()`'s "stale result" gap** — Lesson 0.8's own SE Lens flagged
+  that `calculation.copy(operandB = 4)` does not recompute `result`
+  (a generated `copy()` has no concept of a relationship between
+  properties); left as a deliberate, acknowledged limitation, not
+  fixed on the spot. No specific future lesson is committed to closing
+  this one — flag it if a later lesson's own design would naturally
+  address it.
+- ~~Lesson 0.10 (Idiomatic Kotlin) must review and tighten
+  `Calculator.kt`'s idioms before Slice 0 ships~~ — **fulfilled** by
+  Lesson 0.10: `Calculation.describe()` (extension function + string
+  templates), `Calculator(6).apply { ... }`, `operandB?.let { ... }`,
+  `Calculation(...).also { ... }` all real, verified project changes;
+  `run` covered in isolation only (deliberately — didn't fit
+  `Calculator.kt`'s own real code, same judgment call Lesson 0.7 made
+  for `!!`). Slice 0 marked shipped in the Progress section above.
+- **Lesson 1.2 (Jetpack Compose)** must give `MainActivity` "its first
+  real, visible UI, through Jetpack Compose" — Lesson 1.1's own Closing
+  states this exact framing, picking `AndroidCalculator/` back up
+  exactly where 1.1 left it (a real, building, but UI-less `Activity`).
 
 ## Methodology notes for future sessions
 
+- **Framework "requirement" claims need an actual negative-case
+  compile, not just analogy to an already-proven pattern.** Lesson
+  1.1's own first draft claimed overriding `Activity.onCreate` was
+  "required... for the identical reason" Lesson 0.7 proved interface
+  methods are required — plausible-sounding, wrong. A real compile of a
+  second `Activity` subclass with zero overrides succeeded (exit `0`),
+  proving it's optional; a further real compile with an empty override
+  that never calls `super.onCreate` also succeeded, proving that's not
+  compiler-enforced either — the real requirement is the Android
+  runtime's own contract, not something `kotlinc` checks. Caught only
+  by actually testing the negative case, not by re-reading the original
+  claim more carefully. For Stage 1+: any claim that extending a real
+  framework class "requires" overriding or calling something needs an
+  actual compile of the version that skips it, before asserting the
+  requirement is real — analogy to an already-proven Kotlin-language
+  pattern (like interface implementation) is not itself proof once the
+  underlying mechanism (a class's own real default vs. an interface's
+  lack of one) is genuinely different.
+- **Autonomous judgment calls when the user is unreachable.** If a
+  loop/session hits a real blocker that would normally warrant asking
+  the user, and a push notification doesn't reach them (or they're
+  otherwise not there to answer), don't just idle waiting for a reply
+  that may not come — make the call yourself, choosing whichever option
+  actually produces the best lesson series for them as the learner, and
+  keep going. This was stated explicitly and generally ("I can't make a
+  call if I'm not here... make the call") after exactly this situation
+  happened once already (the missing-Android-SDK blocker, below) — it's
+  a standing instruction for this curriculum, not a one-time exception.
+  Record the decision made and why, the same way every other design
+  call in this file is recorded, so it's reviewable after the fact even
+  though it wasn't approved beforehand.
 - **Socratic-prompt self-check false positives:** counting raw `?`
   characters in a Concept Unit's Problem section to verify the
   "2–4 questions" rule breaks the moment the lesson's own subject uses
