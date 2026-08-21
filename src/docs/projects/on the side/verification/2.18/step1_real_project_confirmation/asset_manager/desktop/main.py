@@ -9,7 +9,6 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
-    QTableView,
     QVBoxLayout,
     QWidget,
 )
@@ -18,7 +17,6 @@ from asset_manager.domain.asset import Asset, InvalidAssetError
 from asset_manager.domain.owner import Owner
 
 from .asset_editor import AssetEditor
-from .asset_table_model import AssetTableModel
 
 PLACEHOLDER_OWNER = Owner("Unassigned", "unassigned@example.com")
 
@@ -64,15 +62,9 @@ class MainWindow(QMainWindow):
         search_row.addWidget(self.search_box)
         search_row.addWidget(self.category_box)
 
-        self.submitted_assets = []
-        self.assets_model = AssetTableModel(self.submitted_assets, self)
-        self.assets_table = QTableView()
-        self.assets_table.setModel(self.assets_model)
-
         main_layout = QVBoxLayout()
         main_layout.addLayout(search_row)
         main_layout.addWidget(self.button)
-        main_layout.addWidget(self.assets_table)
 
         central = QWidget()
         central.setLayout(main_layout)
@@ -80,6 +72,7 @@ class MainWindow(QMainWindow):
 
         self.editor = None
         self.current_search_text = ""
+        self.submitted_assets = []
         self.validation_errors = []
 
     def open_asset_editor(self) -> None:
@@ -97,7 +90,7 @@ class MainWindow(QMainWindow):
             self.validation_errors.append(error)
             QMessageBox.warning(self.editor, "Invalid Asset", str(error))
             return
-        self.assets_model.add_asset(asset)
+        self.submitted_assets.append(asset)
         self.editor.accept()
 
 

@@ -96,100 +96,165 @@ section has a finished lesson file under `lessons/
 series-1-python-foundations/`, matching that series' own stated
 outcome: a tested Python domain (`Asset`, `Owner`), no Qt, no SQL.
 
-**Next lesson to write:** `2.15 — Input Validation` (Series 2, Core)
+**Next lesson to write:** `2.22 — Editing Models` (Series 2, Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 2 —
-PySide6: Desktop Application Development" → "## 2.15 — Input
-Validation." Learn: validators, UI-level validation, domain-level
-validation. Important distinction: "UI validation ≠ business
-validation." **Survives.** Real scope this lesson has to resolve:
-`AssetEditor.on_save_clicked` (2.14) currently emits whatever raw text
-sits in `name_field`/`serial_number_field`, unvalidated — that's this
-lesson's own real starting gap, named honestly in 2.14's own closing.
-Two real, separate things the blueprint's own distinction implies need
-landing: (1) UI-level validation — likely a real `QValidator` (or
-similar Qt-level mechanism) on `AssetEditor`'s own `QLineEdit` fields,
-catching obviously-malformed input before it's ever submitted at all;
-(2) domain-level validation — `MainWindow.on_asset_submitted` (2.14)
-currently just appends a raw tuple to `self.submitted_assets`; this is
-the real, natural moment to construct an actual `Asset` (1.7) from that
-tuple and let `Asset.__init__`'s own real `InvalidAssetError` (1.11)
-fire on bad input, catching it explicitly rather than letting it
-crash. Real, open structural question for next session: `QDialog`
-(2.16, several lessons away) doesn't exist yet, so there's no real
-"show the user an error" UI to reach for yet — decide plainly what
-`on_asset_submitted` does with a caught `InvalidAssetError` right now
-(store it somewhere inspectable, print it, a new `self.validation
-_errors` list) versus what's honestly deferred to 2.16, the same
-"selected patterns" honesty 2.14 itself already modeled.
+PySide6: Desktop Application Development" → "## 2.22 — Editing Models."
+Learn: `setData`, `flags`, `dataChanged`. **Survives.** Real, direct
+continuation of 2.21's own real, stated gap: `AssetTableModel.data`
+already implements `EditRole` correctly (reading plain `asset.name`,
+not `display_name`), but `AssetTableModel` still doesn't override
+`flags()`, so `QTableView` (2.19) never treats any cell as editable —
+2.21's own SE Lens named this exact gap plainly ("the plumbing,
+correctly built and verified, for a feature Lesson 2.22 still has to
+switch on"). This lesson's own real job: override `flags(index)` to
+return a real, combined `Qt.ItemFlag` value including `Qt.ItemFlag
+.ItemIsEditable` (at least for the `Name` column, matching 2.21's own
+already-implemented `EditRole`/`DisplayRole` split — real, open
+question whether `Serial Number`/`Category` should also become editable
+now, or whether editing stays scoped to `Name` alone this lesson,
+mirroring how 2.17 scoped `Edit`/`Delete` down rather than building
+everything at once); implement `setData(index, value, role)`, actually
+writing a new value back into the right `Asset` field when `role ==
+Qt.ItemDataRole.EditRole`; and emit `dataChanged` (a real signal,
+distinct from `rowsInserted`, 2.20) after a successful write, so
+`QTableView` knows to redraw that specific cell. Real, open question:
+does `setData` mutate `Asset` directly (`Asset` is a plain `@dataclass`,
+1.7, not frozen — real, confirmed-checkable before assuming it's
+mutable) or does editing a name need to go through validation (2.15's
+own `InvalidAssetError`) the identical way a new submission already
+does — a real, meaningful design call given this project's own
+established domain-validation discipline.
 
-**Note on 2.14, now resolved:** landed per blueprint's own "selected
-patterns survive" hedge — three Concept Units (declaring a custom
-signal in isolation; the Asset editor becoming a class; MainWindow
-listening). Real, structural decision made and executed:
-`asset_editor.py`'s own `build_asset_editor()` free function (2.9)
-became a real `AssetEditor(QWidget)` class — required because `Signal`
-can only be declared at class level — carrying a new `asset_submitted
-= Signal(str, str, str)`, a new "Save" `QPushButton`, and a new
-`on_save_clicked` slot emitting all three field values together; every
-field `build_asset_editor()` built as a local variable became a real
-`self.` instance attribute, the identical fix Lesson 2.11 already
-proved necessary, now needed for the identical reason (a separate
-method reading them later). `MainWindow.open_asset_editor` (2.11) now
-connects `self.editor.asset_submitted` to a new `on_asset_submitted`
-slot, which appends the three raw strings as a plain tuple to a new
-`self.submitted_assets` list — deliberately *not* a real `Asset`, and
-deliberately unvalidated, both explicitly left as this lesson's own
-open gap for 2.15 to close, stated plainly in 2.14's own closing rather
-than hidden. A genuine vocabulary gap caught mid-draft, not on
-self-check: `QLineEdit.text`/`setText` and `QComboBox.currentText`
-appeared in the isolated-proof code with no Header entry on the first
-pass — fixed by adding full CRC entries for all three, and by removing
-an unverified, unnecessary `QComboBox.setCurrentText` call entirely
-once `currentText()`'s own already-proven real default (`"Laptop"`,
-2.7) made it redundant. `QFormLayout.addRow`'s own single-argument
-overload (no label, spanning the full row) — genuinely new to this
-project — was verified for real (`labelForField` returns `None` for
-it) before being explained, and given its own Header entry alongside
-its already-taught two-argument form (2.9).
+**Note on 2.21, now resolved:** landed per blueprint's own type note,
+**Survives**, cleanly, no hedge. Three Concept Units (`DisplayRole` and
+`EditRole` answer different questions, isolated; `TextAlignmentRole`
+and combinable flags, isolated; real formatting and alignment in
+`AssetTableModel`). Real, structural rewrite: `AssetTableModel.data`
+(2.20) went from a single `if role != Qt.ItemDataRole.DisplayRole:
+return None` check to a real, three-way `role` dispatch —
+`DisplayRole` for column `0` now reads `asset.display_name` (1.10,
+reused here for the first time from `asset_manager/desktop/`) instead
+of plain `asset.name`; `EditRole` reads plain `asset.name` directly;
+`TextAlignmentRole` right-aligns the `Serial Number` column via
+`Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter` (a real,
+combinable flag enum, confirmed via `|`/`&` to combine and decompose
+correctly, `130` on this platform). Real, load-bearing, end-to-end
+proof, not just a working demo: calling `Asset.mark_retired()` (1.2)
+directly on the exact same live `Asset` object `AssetTableModel` already
+holds made `DisplayRole` for that cell change to `"ThinkPad X1
+(Retired)"` on the very next read, with **no** new code anywhere
+telling the model to refresh — while `EditRole` for the identical cell,
+read again, stayed plain `"ThinkPad X1"`, confirming `EditRole` and
+`DisplayRole` genuinely diverge exactly when they should. Real, honest
+gap named plainly in this lesson's own SE Lens, not hidden: `EditRole`
+is implemented correctly, but `AssetTableModel` still has no
+`flags()` override, so `QTableView` never actually offers to edit
+anything yet — explicitly Lesson 2.22's own job ("Editing Models") to
+switch on.
 
 **Project state:** `asset_manager/desktop/__init__.py` and
-`asset_manager/desktop/main.py` (2.1, restructured 2.11, extended 2.14)
-— a real, permanent PySide6 entry point. `main.py` now defines
-`MainWindow(QMainWindow)`: `__init__` calls `super().__init__()`, sets
-the window title, builds `self.button`/`self.search_box`/
-`self.category_box` (all real instance attributes, not local
-variables), connects `self.button.clicked.connect
+`asset_manager/desktop/main.py` (2.1, restructured 2.11, extended 2.14,
+2.17, 2.19, rewritten 2.20) — a real, permanent PySide6 entry point.
+`main.py` now defines `MainWindow(QMainWindow)`: `__init__` calls
+`super().__init__()`, sets the window title, builds a real menu bar
+(`self.menuBar().addMenu("&File")`, 2.17) holding four local, un-stored
+`QAction` objects (`new_action`/`edit_action`/`delete_action`/
+`exit_action`, each constructed `QAction(text, self)` — surviving via
+Lesson 2.3's own parent/child ownership, not a `self.` attribute):
+`new_action.triggered` connects to `self.open_asset_editor`, and
+`new_action.setShortcut(QKeySequence(QKeySequence.StandardKey.New))`
+(2.18) — real, confirmed `"Ctrl+N"` on this platform; `edit_action`/
+`delete_action` are both `setEnabled(False)`, still with no shortcut of
+their own; a real separator sits before `exit_action`, whose
+`triggered` connects to `self.close`, and `exit_action.setShortcut
+(QKeySequence("Ctrl+Q"))` (2.18) — a literal string, not `QKeySequence
+.StandardKey.Quit`, since that standard key was confirmed *not* to
+resolve to `Ctrl+Q` on this platform. Builds `self.button`/
+`self.search_box`/`self.category_box` (all real instance attributes,
+not local variables), connects `self.button.clicked.connect
 (self.open_asset_editor)` and `self.search_box.textChanged.connect
-(self.on_search_text_changed)`, builds the same `search_row`/
-`main_layout`/`central` structure Lesson 2.8 landed, sets
-`self.editor = None`, `self.current_search_text = ""`, and, new in
-2.14, `self.submitted_assets = []`; `open_asset_editor(self)` builds a
-real `AssetEditor()` (2.9, converted to a class in 2.14; import changed
-from `build_asset_editor` to `AssetEditor`), connects
-`self.editor.asset_submitted.connect(self.on_asset_submitted)`, then
-shows it; `on_asset_submitted(self, name, serial_number, category)`
-(new, 2.14) appends the three raw strings as a plain tuple to
-`self.submitted_assets` — deliberately not a real `Asset`, deliberately
-unvalidated, both explicitly 2.15's own job. `main()` itself is still
-three lines: build `MainWindow()`, show it, run `app.exec()`. 2.2, 2.3,
-and 2.4 were all conceptual/throwaway, nothing landed from any of them.
-`category_box` still doesn't feed into anything; `search_box`/
-`category_box` still don't feed into any real search/filter behavior
-yet — no connection to `asset_manager.domain` at all.
-`asset_manager/desktop/asset_editor.py` (2.9, rewritten 2.14) — no
-longer a free function: `AssetEditor(QWidget)` is a real class.
-`__init__` calls `super().__init__()`, sets the window title, builds
-`self.name_field`/`self.serial_number_field` (`QLineEdit`),
-`self.category_field` (`QComboBox`, same five-item list), and a new
-`self.save_button` (`QPushButton("Save")`, connected to
-`self.on_save_clicked`), arranges all four via `QFormLayout(self)`
-(three labeled rows via the two-argument `addRow`, plus
-`form.addRow(self.save_button)` — the single-argument form, no label).
-Declares `asset_submitted = Signal(str, str, str)` at class level;
-`on_save_clicked(self)` emits it with `self.name_field.text()`,
-`self.serial_number_field.text()`, `self.category_field.currentText()`.
-Genuinely imported and called by `main.py`. `asset_manager/domain/asset.py` and
+(self.on_search_text_changed)`. **Rewritten 2.20:** `self
+.submitted_assets = []` now built immediately after `search_row`
+(moved up from the bottom of `__init__`, its own position since 2.14),
+followed immediately by `self.assets_model = AssetTableModel(self
+.submitted_assets, self)` — a real, custom model (2.20's own new file,
+`asset_table_model.py`), reading `self.submitted_assets` directly, no
+copy — and `self.assets_table = QTableView()` (2.19), `setModel`-
+connected to it; added to `main_layout` as a third item below `self
+.button` (2.8's own automatic stacking). `open_asset_editor(self)`
+builds a real `AssetEditor()` (2.9, converted to a class in 2.14),
+connects `self.editor.asset_submitted.connect(self.on_asset_submitted)`,
+then shows it; `on_asset_submitted(self, name, serial_number,
+category)` (2.14, rewritten 2.15, 2.20) constructs a real `Asset`
+(`asset_manager.domain.asset`, imported since 2.15, alongside
+`InvalidAssetError` and `asset_manager.domain.owner.Owner`) inside
+`try`/`except InvalidAssetError as error:`, using a module-level
+`PLACEHOLDER_OWNER = Owner("Unassigned", "unassigned@example.com")`
+constant (2.15) — success now calls just `self.assets_model.add_asset
+(asset)` (2.20; replaces 2.19's own two separate lines — `self
+.submitted_assets.append(...)` plus a `QStandardItem`-building
+`appendRow` call — since `add_asset` already appends to the one, shared
+list internally), then `self.editor.accept()` (2.16), closing the
+dialog; a caught error appends to `self.validation_errors` (set at the
+bottom of `__init__`, alongside `self.editor = None`/`self
+.current_search_text = ""`) and calls `QMessageBox.warning(self.editor,
+"Invalid Asset", str(error))` (2.16) — no `accept`/`reject` follows, so
+the dialog stays open, and `add_asset` is never reached. **Import and
+execution, unchanged since 2.15:** `from .asset_editor import
+AssetEditor` and, new in 2.20, `from .asset_table_model import
+AssetTableModel` (both package-relative) — `main.py` **must** be run as
+`python -m asset_manager.desktop.main` from the project's own root; the
+old `python main.py` from inside `desktop/` still fails immediately
+with `ModuleNotFoundError: No module named 'asset_manager'`. `main()`
+itself is still three lines: build `MainWindow()`, show it, run `app
+.exec()`. 2.2, 2.3, and 2.4 were all conceptual/throwaway, nothing
+landed from any of them. `category_box` still doesn't feed into
+anything; `search_box`/`category_box` still don't feed into any real
+search/filter behavior yet.
+`asset_manager/desktop/asset_table_model.py` (new 2.20, `data`
+rewritten 2.21) — `AssetTableModel(QAbstractTableModel)`, this
+project's first custom Qt model. `COLUMN_HEADERS = ["Name", "Serial
+Number", "Category"]` (class-level). `__init__(self, assets:
+list[Asset], parent=None)` stores `self._assets = assets` — a real
+reference, never copied. `rowCount`/`columnCount` return `len
+(self._assets)`/`len(self.COLUMN_HEADERS)`, computed live, every call.
+`data(self, index, role=Qt.ItemDataRole.DisplayRole)` — real,
+three-way dispatch: `asset`/`column` computed once, up front; for
+`DisplayRole`, column `0` returns `asset.display_name` (1.10; columns
+`1`/`2` unchanged, `asset.serial_number`/`.category`); for `EditRole`,
+column `0` returns plain `asset.name` instead (columns `1`/`2`
+identical to `DisplayRole`); for `TextAlignmentRole`, column `1`
+returns `Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter`,
+every other column/role returns `None`. `headerData` unchanged — still
+`DisplayRole`-only. `add_asset(self, asset)` — the one, real mutation
+method: `beginInsertRows(QModelIndex(), row, row)`, `self._assets
+.append(asset)`, `endInsertRows()`, confirmed to genuinely emit
+`rowsInserted`. Imports `asset_manager.domain.asset.Asset` directly —
+the first file inside `desktop/` other than `main.py` to import from
+`domain` on its own. **Real, still-open gap:** no `flags()` override
+anywhere — every cell is still non-editable by default, despite
+`EditRole` now being correctly implemented; Lesson 2.22's own job.
+`asset_manager/desktop/asset_editor.py` (2.9, rewritten 2.14, extended
+2.15, extended 2.16) — `AssetEditor(QDialog)` (2.16; was `QWidget`) is
+a real class. `__init__` calls `super().__init__()`, sets the window
+title, builds `self.name_field`/`self.serial_number_field` (`QLineEdit`)
+— the latter carries a real `QRegularExpressionValidator
+(QRegularExpression("[A-Za-z0-9-]*"))` via `setValidator` (2.15;
+`name_field` deliberately has none), `self.category_field` (`QComboBox`,
+same five-item list), `self.save_button` (`QPushButton("Save")`,
+connected to `self.on_save_clicked`), and, new in 2.16,
+`self.cancel_button` (`QPushButton("Cancel")`, connected to `self
+.reject`); arranges all five via `QFormLayout(self)` (three labeled
+rows via the two-argument `addRow`, plus `form.addRow(self.save_button)`
+and `form.addRow(self.cancel_button)` — both the single-argument form,
+no label). Declares `asset_submitted = Signal(str, str, str)` at class
+level; `on_save_clicked(self)` emits it with `self.name_field.text()`,
+`self.serial_number_field.text()`, `self.category_field.currentText()`
+— unchanged by 2.16; `on_save_clicked` itself never calls `accept`/
+`reject` — that's `MainWindow`'s own job now, from outside. Genuinely
+imported and called by `main.py`.
+`asset_manager/domain/asset.py` and
 `asset_manager/domain/owner.py` — a real package (1.15). `Asset` is a
 `@dataclass` (1.7): `name: str`, `serial_number: str`, `category:
 str`, `owner: Owner`, `is_retired: bool = False`. `__init__`/
@@ -205,16 +270,19 @@ passing `pytest` tests covering creation, both `mark_retired` branches,
 and both validation-exception facts. `asset_manager/__init__.py` and
 `asset_manager/domain/__init__.py` both exist, empty (1.15). `snapshot/`
 mirrors this exact layout, `asset_manager/desktop/` (2.1, 2.5–2.9,
-restructured 2.11, 2.12, 2.14) included — see **Files in this set**
-above. Read `snapshot/asset_manager/desktop/main.py` and `snapshot/
-asset_manager/desktop/asset_editor.py` before writing 2.15 — both
-already carry `submitted_assets`/`on_asset_submitted` and
-`AssetEditor`'s own real shape, exactly what 2.15's own domain-level
-validation needs to build on.
+restructured 2.11, 2.12, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, rewritten
+2.20, `data` rewritten again 2.21) included — see **Files in this set**
+above. `main.py` genuinely imports from `asset_manager.domain` (2.15)
+— the desktop and domain layers are connected for real, and, since
+2.20, so does `asset_table_model.py` directly. Read `snapshot/
+asset_manager/desktop/asset_table_model.py` before writing 2.22 —
+`EditRole` is already correctly implemented in `data`, but no
+`flags()` override exists anywhere yet, exactly the real gap 2.22's own
+"Editing Models" material needs to close.
 
 **Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section
 lists everything introduced through Lesson 1.16 — all of Series 1 — and
-its new Series 2 section lists Lessons 2.1–2.14: (1.1) `class`, instance,
+its new Series 2 section lists Lessons 2.1–2.21: (1.1) `class`, instance,
 `pass`, `self`, instance attribute, method, `is`, default `==`,
 implicit inheritance from `object`, dunder methods, `__init__`,
 `object`, `__bases__`, `type()`, `AttributeError`, `return`,
@@ -1054,6 +1122,257 @@ Verification reorganized into `verification/2.14/lab1_custom_signal.py`
 proof), and `step2_real_project_confirmation/` (full `main.py` +
 `asset_editor.py` integration, plus the standing `timeout 3` sanity run
 on the real `main.py`, exit code `124`, no crash).
+
+Lesson 2.15 — Input Validation followed next, Core per its own
+blueprint entry, landed cleanly under **Survives**, no hedge. Three
+Concept Units: restricting what can be typed (isolated
+`QRegularExpressionValidator` lab, proving real `Acceptable`/
+`Intermediate`/`Invalid` states via `QValidator.validate` called
+directly, since a headless run has no real keyboard); landing UI-level
+validation for real (`serial_number_field.setValidator(...)`,
+deliberately not applied to `name_field` — a real, named design choice,
+not an oversight); domain-level validation and crossing the boundary
+(`MainWindow.on_asset_submitted` now constructs a real `Asset` inside
+`try`/`except InvalidAssetError`, `asset_manager.domain` imported by
+the desktop layer for the first time ever). Real, load-bearing judgment
+call: `Asset` requires a real `Owner`, and this project has no
+owner-selection UI — resolved with an explicitly-named
+`PLACEHOLDER_OWNER = Owner("Unassigned", "unassigned@example.com")`
+module constant, the gap stated plainly in the lesson's own SE Lens
+rather than hidden behind a plausible-looking default. Real,
+unavoidable mechanical problem discovered *during* verification, not
+predicted in advance: the first attempt to run the real, updated
+`main.py` the old way (`cd desktop && python main.py`) failed with
+`ModuleNotFoundError: No module named 'asset_manager'`, because an
+absolute import of `asset_manager.domain` only resolves when the
+project's own root is on `sys.path`, which running a script directly
+never puts there. Root-caused and fixed for real, not worked around:
+`main.py` must now be run as `python -m asset_manager.desktop.main`
+from the project root, which in turn broke the *existing* `from
+asset_editor import AssetEditor` line (since `-m` execution no longer
+puts `desktop/` itself on `sys.path` either) — fixed by making that
+import package-relative (`from .asset_editor import AssetEditor`,
+reapplying Lesson 1.15's own syntax), confirmed working both ways
+(old invocation now fails for real; new invocation now succeeds for
+real, exit code `124` under a timeout). This forced a real change to
+this lesson's own verification convention: `verification/2.15
+/step2_real_project_confirmation/` is laid out as a full, real,
+mirrored `asset_manager` package (not a flat folder) so `confirm.py`
+can import `asset_manager.desktop.main` the same way the real project
+now has to be run — the new standing pattern for any future lesson
+whose verification needs to cross the `desktop`/`domain` boundary. No
+vocabulary gaps found on self-check; `QValidator.State`'s real declared
+shape (`Invalid = 0`, `Intermediate = 1`, `Acceptable = 2`) was shown
+in full even though this lesson's own real pattern never actually
+produces an `Intermediate` result, since a reader needs to know that
+third state exists to understand the type completely.
+
+Lesson 2.16 — Dialogs followed next, Core per its own blueprint entry,
+landed cleanly under **Survives**, no hedge. Four Concept Units: modal
+execution and dialog result (isolated `ConfirmDialog` lab, proving
+`QDialog.exec()` genuinely blocks via `QTimer.singleShot` scheduled
+*before* calling it — the identical technique used since Lesson 2.1 for
+`app.exec()` itself); `AssetEditor` becomes a dialog (`QWidget` → real
+`QDialog`, gaining a "Cancel" button wired to `self.reject`, confirmed
+via `isVisible()` dropping from `True` to `False` on a simulated
+click); showing a real message (isolated `QMessageBox.warning` lab);
+`MainWindow` controls the dialog's lifecycle (`on_asset_submitted`
+calling `self.editor.accept()` on success, `QMessageBox.warning(self
+.editor, ...)` with no `accept`/`reject` on failure). Real, deliberate
+design call, stated plainly rather than defaulted into: `open_asset
+_editor` keeps calling `.show()`, not `.exec()` — a true modal call
+would block the calling code until the dialog closes, breaking this
+project's own established verification pattern (fill in and submit a
+still-open editor's fields from separately-running code, load-bearing
+since Lesson 2.9); `AssetEditor` stays genuinely non-modal, a real,
+named tradeoff, not an oversight. Real, non-obvious verification
+technique, discovered and proven necessary, not assumed: `QMessageBox
+.warning(...)` never hands back a reference to the `QMessageBox` it
+builds internally, so `QApplication.activeModalWidget()`, combined with
+the same pre-scheduled `QTimer.singleShot` technique, is what let a
+headless script find and dismiss it — proven by actually clicking the
+real `OK` button (`box.button(QMessageBox.StandardButton.Ok).click()`),
+not just calling `.accept()` directly, since a first attempt at that
+returned the wrong result value (`0`, not `1024`/`StandardButton.Ok`) —
+caught by checking the real returned value against a real prediction,
+not assumed correct. A vocabulary gap caught mid-draft, not on
+self-check: an early version of the `QMessageBox` isolated lab also
+printed the found button's own `.text()`, which would have needed a
+further, not-very-valuable `QPushButton.text` Header entry — trimmed
+instead of added, keeping `QMessageBox.text` (the message itself,
+genuinely worth confirming) but dropping the button-label check.
+
+Lesson 2.17 — Actions and Menus followed next, Core per its own
+blueprint entry, landed cleanly under **Survives**, no hedge. Three
+Concept Units: `QAction` and the Command pattern (isolated, `lab1
+_qaction_menu.py`); closing the window for real (isolated, `lab2
+_exit_via_close.py`); the real File menu (landing). Real, load-bearing
+design decision, verified before being relied on: none of the four
+`QAction` objects (`New`/`Edit`/`Delete`/`Exit`) became `self.`
+attributes — each is constructed `QAction(text, self)`, meaning
+Lesson 2.3's own parent/child ownership already keeps it alive, proven
+by reapplying Lesson 2.11's own exact `weakref`/`del`/`gc.collect()`
+technique and getting the *opposite*, safe result this time (the
+action survives). `Edit`/`Delete` land as real, visible, genuinely
+`setEnabled(False)` menu entries — the honest answer to this project
+having no selectable asset list yet, a real design call named plainly
+in the lesson's own SE Lens rather than narrowing scope to skip them.
+`Exit` reuses `self.close()`, confirmed in isolation first to genuinely
+dispatch `closeEvent` (2.2) and, since `MainWindow` is this project's
+only top-level window, genuinely end `app.exec()` via Qt's own default
+`quitOnLastWindowClosed` policy — no explicit `app.quit()` written
+anywhere. Two real, non-obvious PySide6 facts discovered during
+verification, not assumed in advance: (1) `QAction` lives in
+`PySide6.QtGui`, not `QtWidgets` — confirmed by an actual failed
+import before writing anything else, a genuine Qt5→Qt6 relocation;
+(2) chaining `menu_bar.actions()[0].menu()` in one expression, with no
+intermediate variable, raises a real `RuntimeError: libshiboken:
+Internal C++ object (QMenu) already deleted` — a genuine Shiboken
+object-lifetime quirk, reproduced, isolated to the exact chained form,
+and worked around (assign the intermediate `QAction` to a real
+variable first) — kept entirely inside the verification script, since
+`main.py` itself never performs this navigation; not written into the
+lesson's own teaching content, since it's a verification-only concern,
+not part of what this lesson is actually about.
+
+Lesson 2.18 — Keyboard Shortcuts followed next, Support per its own
+blueprint entry, landed under the blueprint's own "survives
+selectively" hedge — given a real, concrete meaning rather than left
+vague: the shortcut mechanism itself survives completely; only two of
+2.17's own four actions actually receive one. Three Concept Units:
+`QKeySequence` and a real shortcut (isolated, `lab1_qaction_shortcut
+.py`); proving a shortcut actually fires (isolated, `lab2_shortcut
+_actually_fires.py`); real shortcuts for `New` and `Exit` (landing).
+Real, checked-not-assumed finding, the lesson's own central honesty
+moment: `QKeySequence.StandardKey.Quit` does **not** resolve to
+`"Ctrl+Q"` on this project's own real, current platform — it resolves
+to a special `Key_Exit` virtual key most physical keyboards don't have,
+confirmed via `.toString()` reading `"Exit"` and `.isEmpty()` reading
+`False` (bound to something real, just not something useful); `New`'s
+own `StandardKey.New` was separately confirmed to resolve correctly
+(`"Ctrl+N"`) before being relied on. This project's own real choice:
+`New` uses `QKeySequence(QKeySequence.StandardKey.New)`, `Exit` uses a
+literal `QKeySequence("Ctrl+Q")` — two different real approaches,
+each chosen for a stated, verified reason, not by default. Real,
+non-obvious verification problem, discovered and solved, not assumed:
+`QTest.keyClick` (from `PySide6.QtTest`, this project's first use of
+it) alone did not make a simulated `Ctrl+N` fire the connected slot in
+headless/offscreen mode on the first attempt — `window.isActiveWindow()`
+read `False`, since an offscreen run has no real window manager to
+activate anything on its own; fixed by calling the deprecated
+`QApplication.setActiveWindow(window)` first, confirmed reliable
+afterward, kept strictly inside verification code (never in `main.py`,
+since a real user's own OS handles this for real windows). Real,
+load-bearing fact confirmed for the actual, complete project, not
+assumed from the simpler isolated lab: a `QAction` reachable only
+through `file_menu` (2.17), with no separate `window.addAction(...)`
+call anywhere in `main.py`, still has its own shortcut fire window-wide
+— proven directly (`Ctrl+N` genuinely opening the real editor, `Ctrl+Q`
+genuinely closing the real `MainWindow`, via `QTest.keyClick` against
+the actual project). A vocabulary gap caught mid-draft, not on
+self-check: `QWidget.addAction`, used in the second unit's own isolated
+lab and explained inline in prose, had no Header entry on the first
+pass — fixed by adding a full CRC entry, distinguishing it clearly from
+`QAction`'s own separate `QObject` parent (2.17), a real, easy
+conflation this lesson's own content made worth stating precisely.
+
+Lesson 2.19 — QTableView followed next. No explicit Survives/throwaway
+note in the blueprint itself — resolved by reading 2.20's own blueprint
+entry first, confirming the real, natural split: 2.19 lands the View
+half (a real, working `QTableView`) using a real, honest, temporary
+`QStandardItemModel` stand-in; 2.20 owns the real, custom, `Asset`-
+connected Model half. Two Concept Units (the Model/View split,
+isolated; a real table of submitted assets). Real, structural
+addition: `self.assets_model` (`QStandardItemModel`, three columns) and
+`self.assets_table` (`QTableView`) land inside `MainWindow`, the table
+added as a third item in `main_layout`, below `self.button` — `QVBoxLayout`
+(2.8) simply stacks it, no new layout concept needed. `on_asset
+_submitted` gains one new real line on success: mirroring the just-
+validated `Asset`'s own three fields into the model via `appendRow`,
+placed after `self.submitted_assets.append(asset)` and before `self
+.editor.accept()` — confirmed for real, end-to-end, that the table
+grows on a valid submission and stays unchanged on a rejected one
+(`rowCount()` 0 → 1 → 1, not 0 → 1 → 2). Real, central, honestly-
+named judgment call, not hidden: `self.assets_model` and `self
+.submitted_assets` are now two separate, real copies of the same data,
+synchronized only by hand inside `on_asset_submitted` — named plainly
+in this lesson's own SE Lens as a real, temporary cost, explicitly
+Lesson 2.20's own job to remove by teaching a real `QAbstractTableModel`
+to read `self.submitted_assets` directly, with no `QStandardItem`
+duplication at all. `QTableWidget` (the blueprint's own explicitly-
+named alternative not to build toward) was described from confidence
+in the SE Lens, not built and executed, since its own real,
+well-documented behavior (self-contained item storage, no external
+model) didn't need a fresh run to state accurately — a legitimate
+Necessity-exemption call, not a shortcut taken carelessly.
+
+Lesson 2.20 — QAbstractTableModel followed next, Core, **Major
+concept**, per its own blueprint entry, landed cleanly under
+**Survives**, no hedge — genuinely one of the more architecturally
+significant lessons this session has written. Three Concept Units
+(reading data live, not storing a copy; notifying the view; a real
+`AssetTableModel`). Real, structural addition: a brand-new file,
+`asset_manager/desktop/asset_table_model.py`, defines `AssetTableModel
+(QAbstractTableModel)` — replacing 2.19's own `QStandardItemModel`
+stand-in entirely, and, more importantly, genuinely removing 2.19's own
+honestly-named data duplication rather than just relocating it:
+`AssetTableModel.__init__` stores the *exact same* list object handed
+to it, confirmed for real (`window.submitted_assets is window
+.assets_model._assets` reads `True`), so `self.submitted_assets` on
+`MainWindow` and `self._assets` inside the model are, from construction
+on, one single real object. `rowCount`/`columnCount`/`data`/
+`headerData` all compute their own answers live, every call, with
+nothing cached or duplicated — proven directly: appending straight to
+the underlying list, with no model method called at all, immediately
+changed what `rowCount()`/`data()` reported. Real, load-bearing,
+deliberately-broken proof, not just a working demo: `beginInsertRows`/
+`endInsertRows`, wrapped around `add_asset`'s own real append, was
+shown to genuinely emit `rowsInserted`; a second, intentionally silent
+version, mutating the identical list with neither call made, left
+`rowCount()` still correct but `rowsInserted` never firing at all — a
+real, concrete proof that "the data is right" and "a view was ever
+told" are two separate real facts, not one. `on_asset_submitted`'s own
+two old lines (2.19) collapsed into one real call, `self.assets_model
+.add_asset(asset)`, confirmed end-to-end against the actual project.
+Real, structural judgment calls, both resolved and executed, not left
+open: `AssetTableModel` became its own new file (mirroring
+`asset_editor.py`'s own precedent, 2.9), and `self.submitted_assets = []`
+moved up from the bottom of `MainWindow.__init__` to immediately before
+`self.assets_model` is built, since the model now needs that real list
+handed to it directly at construction time rather than assembled
+after the fact.
+
+Lesson 2.21 — Model Roles followed next, Core per its own blueprint
+entry, landed cleanly under **Survives**, no hedge. Three Concept Units
+(`DisplayRole`/`EditRole` answer different questions, isolated;
+`TextAlignmentRole` and combinable flags, isolated; real formatting and
+alignment in `AssetTableModel`). Real, structural rewrite:
+`AssetTableModel.data` (2.20) went from a single `role != DisplayRole`
+check to a genuine three-way dispatch. Real, meaningful design choice,
+tied directly to existing project data rather than an invented
+analogy: `DisplayRole` for the `Name` column now reads `asset
+.display_name` (1.10) instead of plain `asset.name` — reused from the
+desktop layer for the first time — while `EditRole` for the identical
+cell reads plain `asset.name`; `TextAlignmentRole` right-aligns
+`Serial Number` via `Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag
+.AlignVCenter`, confirmed a real, combinable flag (`130` combined,
+decomposable with `&`). Real, load-bearing, end-to-end proof, not
+just a working demo: calling `Asset.mark_retired()` (1.2) directly on
+the live `Asset` object `AssetTableModel` already holds made
+`DisplayRole` change to `"...( Retired)"` on the very next read with
+zero new refresh code anywhere, while `EditRole` for the same cell
+stayed unaffected — real, concrete proof the two roles genuinely
+diverge exactly when they should, not just in theory. A real,
+practical gotcha caught and fixed during verification, not shipped:
+an early version of the isolated `DisplayRole`/`EditRole` lab used a
+literal `°` (degree) character in an f-string, which printed as garbled
+`�` bytes in this Windows terminal's own encoding — fixed by switching
+to a plain ASCII `"C"` label instead, avoiding a real, saved verification
+artifact with corrupted-looking output. Real, honest gap named plainly
+in this lesson's own SE Lens, not hidden: `EditRole` is implemented
+correctly, but `AssetTableModel` still has no `flags()` override, so
+`QTableView` never actually offers to edit anything yet — explicitly
+Lesson 2.22's own job.
 
 ## After finishing a lesson (do this before handing off / before clearing)
 
