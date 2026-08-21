@@ -96,28 +96,100 @@ section has a finished lesson file under `lessons/
 series-1-python-foundations/`, matching that series' own stated
 outcome: a tested Python domain (`Asset`, `Owner`), no Qt, no SQL.
 
-**Next lesson to write:** `2.4 — QLabel` (Series 2, Lab)
+**Next lesson to write:** `2.15 — Input Validation` (Series 2, Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 2 —
-PySide6: Desktop Application Development" → "## 2.4 — QLabel." Simple
-display widget. **Throw away.** The first lesson to add a real, visible
-*widget* to a window (2.1's own window has always been bare) — even
-throwaway, this is a natural candidate to finally use the `run` skill's
-screenshot capability flagged as deferred in 2.1's own session note,
-since "a label with real text is visible on screen" is exactly the kind
-of claim console output alone can't fully prove. Keep scope minimal per
-blueprint (`QLabel`, its own text, adding it to a window) — no layouts
-yet (2.8/2.9), no real domain data shown yet.
+PySide6: Desktop Application Development" → "## 2.15 — Input
+Validation." Learn: validators, UI-level validation, domain-level
+validation. Important distinction: "UI validation ≠ business
+validation." **Survives.** Real scope this lesson has to resolve:
+`AssetEditor.on_save_clicked` (2.14) currently emits whatever raw text
+sits in `name_field`/`serial_number_field`, unvalidated — that's this
+lesson's own real starting gap, named honestly in 2.14's own closing.
+Two real, separate things the blueprint's own distinction implies need
+landing: (1) UI-level validation — likely a real `QValidator` (or
+similar Qt-level mechanism) on `AssetEditor`'s own `QLineEdit` fields,
+catching obviously-malformed input before it's ever submitted at all;
+(2) domain-level validation — `MainWindow.on_asset_submitted` (2.14)
+currently just appends a raw tuple to `self.submitted_assets`; this is
+the real, natural moment to construct an actual `Asset` (1.7) from that
+tuple and let `Asset.__init__`'s own real `InvalidAssetError` (1.11)
+fire on bad input, catching it explicitly rather than letting it
+crash. Real, open structural question for next session: `QDialog`
+(2.16, several lessons away) doesn't exist yet, so there's no real
+"show the user an error" UI to reach for yet — decide plainly what
+`on_asset_submitted` does with a caught `InvalidAssetError` right now
+(store it somewhere inspectable, print it, a new `self.validation
+_errors` list) versus what's honestly deferred to 2.16, the same
+"selected patterns" honesty 2.14 itself already modeled.
 
-**Project state:** unchanged since 2.1 — 2.2 and 2.3 were both
-conceptual/throwaway per their own blueprint entries, nothing landed in
-either. `asset_manager/desktop/__init__.py` and `asset_manager/desktop/
-main.py` (2.1) — a real, permanent PySide6 entry point: `main() -> int`
-creates a `QApplication(sys.argv)`, a bare `QMainWindow` titled `"Asset
-Manager"`, shows it, and returns `app.exec()`; guarded by `if __name__
-== "__main__": sys.exit(main())`. No widgets beyond the bare window
-yet; no connection to `asset_manager.domain` at all — still true.
-`asset_manager/domain/asset.py` and
+**Note on 2.14, now resolved:** landed per blueprint's own "selected
+patterns survive" hedge — three Concept Units (declaring a custom
+signal in isolation; the Asset editor becoming a class; MainWindow
+listening). Real, structural decision made and executed:
+`asset_editor.py`'s own `build_asset_editor()` free function (2.9)
+became a real `AssetEditor(QWidget)` class — required because `Signal`
+can only be declared at class level — carrying a new `asset_submitted
+= Signal(str, str, str)`, a new "Save" `QPushButton`, and a new
+`on_save_clicked` slot emitting all three field values together; every
+field `build_asset_editor()` built as a local variable became a real
+`self.` instance attribute, the identical fix Lesson 2.11 already
+proved necessary, now needed for the identical reason (a separate
+method reading them later). `MainWindow.open_asset_editor` (2.11) now
+connects `self.editor.asset_submitted` to a new `on_asset_submitted`
+slot, which appends the three raw strings as a plain tuple to a new
+`self.submitted_assets` list — deliberately *not* a real `Asset`, and
+deliberately unvalidated, both explicitly left as this lesson's own
+open gap for 2.15 to close, stated plainly in 2.14's own closing rather
+than hidden. A genuine vocabulary gap caught mid-draft, not on
+self-check: `QLineEdit.text`/`setText` and `QComboBox.currentText`
+appeared in the isolated-proof code with no Header entry on the first
+pass — fixed by adding full CRC entries for all three, and by removing
+an unverified, unnecessary `QComboBox.setCurrentText` call entirely
+once `currentText()`'s own already-proven real default (`"Laptop"`,
+2.7) made it redundant. `QFormLayout.addRow`'s own single-argument
+overload (no label, spanning the full row) — genuinely new to this
+project — was verified for real (`labelForField` returns `None` for
+it) before being explained, and given its own Header entry alongside
+its already-taught two-argument form (2.9).
+
+**Project state:** `asset_manager/desktop/__init__.py` and
+`asset_manager/desktop/main.py` (2.1, restructured 2.11, extended 2.14)
+— a real, permanent PySide6 entry point. `main.py` now defines
+`MainWindow(QMainWindow)`: `__init__` calls `super().__init__()`, sets
+the window title, builds `self.button`/`self.search_box`/
+`self.category_box` (all real instance attributes, not local
+variables), connects `self.button.clicked.connect
+(self.open_asset_editor)` and `self.search_box.textChanged.connect
+(self.on_search_text_changed)`, builds the same `search_row`/
+`main_layout`/`central` structure Lesson 2.8 landed, sets
+`self.editor = None`, `self.current_search_text = ""`, and, new in
+2.14, `self.submitted_assets = []`; `open_asset_editor(self)` builds a
+real `AssetEditor()` (2.9, converted to a class in 2.14; import changed
+from `build_asset_editor` to `AssetEditor`), connects
+`self.editor.asset_submitted.connect(self.on_asset_submitted)`, then
+shows it; `on_asset_submitted(self, name, serial_number, category)`
+(new, 2.14) appends the three raw strings as a plain tuple to
+`self.submitted_assets` — deliberately not a real `Asset`, deliberately
+unvalidated, both explicitly 2.15's own job. `main()` itself is still
+three lines: build `MainWindow()`, show it, run `app.exec()`. 2.2, 2.3,
+and 2.4 were all conceptual/throwaway, nothing landed from any of them.
+`category_box` still doesn't feed into anything; `search_box`/
+`category_box` still don't feed into any real search/filter behavior
+yet — no connection to `asset_manager.domain` at all.
+`asset_manager/desktop/asset_editor.py` (2.9, rewritten 2.14) — no
+longer a free function: `AssetEditor(QWidget)` is a real class.
+`__init__` calls `super().__init__()`, sets the window title, builds
+`self.name_field`/`self.serial_number_field` (`QLineEdit`),
+`self.category_field` (`QComboBox`, same five-item list), and a new
+`self.save_button` (`QPushButton("Save")`, connected to
+`self.on_save_clicked`), arranges all four via `QFormLayout(self)`
+(three labeled rows via the two-argument `addRow`, plus
+`form.addRow(self.save_button)` — the single-argument form, no label).
+Declares `asset_submitted = Signal(str, str, str)` at class level;
+`on_save_clicked(self)` emits it with `self.name_field.text()`,
+`self.serial_number_field.text()`, `self.category_field.currentText()`.
+Genuinely imported and called by `main.py`. `asset_manager/domain/asset.py` and
 `asset_manager/domain/owner.py` — a real package (1.15). `Asset` is a
 `@dataclass` (1.7): `name: str`, `serial_number: str`, `category:
 str`, `owner: Owner`, `is_retired: bool = False`. `__init__`/
@@ -132,13 +204,17 @@ deliberate scope boundary). `tests/test_asset.py` (1.16) — five real,
 passing `pytest` tests covering creation, both `mark_retired` branches,
 and both validation-exception facts. `asset_manager/__init__.py` and
 `asset_manager/domain/__init__.py` both exist, empty (1.15). `snapshot/`
-mirrors this exact layout, `asset_manager/desktop/` (2.1) included —
-see **Files in this set** above. Read `snapshot/asset_manager/desktop/
-main.py` before writing 2.4.
+mirrors this exact layout, `asset_manager/desktop/` (2.1, 2.5–2.9,
+restructured 2.11, 2.12, 2.14) included — see **Files in this set**
+above. Read `snapshot/asset_manager/desktop/main.py` and `snapshot/
+asset_manager/desktop/asset_editor.py` before writing 2.15 — both
+already carry `submitted_assets`/`on_asset_submitted` and
+`AssetEditor`'s own real shape, exactly what 2.15's own domain-level
+validation needs to build on.
 
 **Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section
 lists everything introduced through Lesson 1.16 — all of Series 1 — and
-its new Series 2 section lists Lessons 2.1–2.3: (1.1) `class`, instance,
+its new Series 2 section lists Lessons 2.1–2.14: (1.1) `class`, instance,
 `pass`, `self`, instance attribute, method, `is`, default `==`,
 implicit inheritance from `object`, dunder methods, `__init__`,
 `object`, `__bases__`, `type()`, `AttributeError`, `return`,
@@ -224,10 +300,89 @@ that `QApplication`/`QMainWindow` both already secretly are one),
 confirmed proof that deleting a `QObject` parent cascades to destroy
 its children independent of Python's own reference counting (a real
 `RuntimeError` — "libshiboken: Internal C++ object... already
-deleted" — the moment the child is touched afterward). Note for 2.4:
-this is the first lesson to add a real, visible widget to a window —
-consider the `run` skill's screenshot capability now, per 2.1's own
-deferred note.
+deleted" — the moment the child is touched afterward). (2.4, Lab,
+throwaway — nothing landed) `QLabel` — this project's first real,
+visible widget, real, confirmed proof that a child widget's own
+`isVisible()` depends on its parent's shown state, not only its own.
+(2.5, Core, real landing) `QPushButton`, `hasattr` — real, confirmed
+proof that a fresh `QPushButton` already carries a real `clicked`
+attribute a `QLabel` doesn't, checked without connecting or explaining
+it — `asset_manager/desktop/main.py` gained its first widget since
+2.1, still inert. (2.6, Core, real landing) `QLineEdit`,
+`setPlaceholderText`/`placeholderText` — real, confirmed proof that
+placeholder text and real text are tracked as genuinely separate
+facts, neither ever containing the other, even after real text is set.
+Resolved the open "is reading QLineEdit's text still 2.11's territory"
+question by generalizing the boundary: *no* widget's signals get
+connected before 2.11, regardless of which specific widget or which
+specific signal — not a button-only rule. (2.7, Core, real landing)
+`QComboBox`, `addItems`, `currentText`/`itemText`/`count`/
+`setCurrentIndex` — real, confirmed proof a `QComboBox` with any items
+always has a current selection (`"Laptop"`, the first item, with
+nothing explicitly selected), the enumerated/closed-choice contrast
+against `Asset.category`'s own open `str` field named directly in
+prose rather than resolved by importing the domain layer early. (2.8,
+Core, real landing — structural refactor) layout, central widget,
+`QVBoxLayout`, `QHBoxLayout`, `QWidget.setLayout`, `QMainWindow
+.setCentralWidget` — real, confirmed proof that `layout.addWidget(...)`
+silently reparents a widget to the layout's own owning widget, even
+through nested layouts (`search_box`, two levels deep, still ends up
+parented directly to `central`). `button`/`search_box`/`category_box`
+no longer parented directly to `window` in their own constructors —
+final ownership now comes entirely from the layout structure. The
+`run`-skill screenshot question, deferred five times since 2.1, was
+finally closed with reasoning rather than deferred again: this lesson's
+own claims are structural, already fully proven by property checks, so
+no screenshot was needed. (2.9, Core, real landing — new file)
+`QFormLayout`, `.addRow`, `.labelForField`, `.rowCount`, form — real,
+confirmed proof `addRow("Name:", field)` builds a genuine,
+independently retrievable `QLabel` from a plain string, distinct from
+`QVBoxLayout`/`QHBoxLayout`'s own behavior. `asset_manager/desktop/
+asset_editor.py` — this project's second real module inside
+`desktop/`, `build_asset_editor() -> QWidget`, a standalone, unconnected
+Asset editor (three fields: name, serial number, category) reapplying
+1.15's own module-splitting reasoning for the first time in the desktop
+layer. (2.10, Lab, throwaway — nothing landed) `QGridLayout`,
+`.addWidget(widget, row, column)`, `.itemAtPosition`, `QCheckBox` —
+real, confirmed proof `QGridLayout` silently accepts two widgets
+claiming the identical position, with no error or warning, tracking
+both (`count()`) while a position query resolves only to whichever was
+added first. (2.11, Core, real landing — major structural refactor)
+signal, slot, `QPushButton.clicked` (fully explained, reapplying 2.5's
+own bare-existence proof), `Signal.connect`, `QPushButton.click`
+(headless click simulation), `weakref.ref`, `MainWindow(QMainWindow)`
+— this project's first subclass of an external framework class in
+*permanent* code — `super().__init__()` reapplying 1.5's own material
+against real Qt for the first time. Real, load-bearing, genuinely
+surprising proof: a widget opened inside a plain slot function with no
+persistent reference is silently garbage-collected the instant the
+function returns (proven via `weakref` + `gc.collect()`), fixed by
+storing it as `self.editor` on the persistent `MainWindow` instance.
+Every widget from `button` through `category_box` is now a real
+`self.<name>` instance attribute; `main.py` finally imports and calls
+`build_asset_editor()` (2.9), closing the gap that lesson's own SE Lens
+named directly. (2.12, Core, real landing) signal argument,
+`QLineEdit.textChanged` (fully explained) — real, confirmed proof a
+slot may accept fewer parameters than a signal provides (extras
+silently dropped) but never more (a real `TypeError`, same kind as
+Lesson 1.7's first appearance of it) — and, genuinely surprising, that
+a slot's own exception doesn't crash the whole application, unlike
+every uncaught exception elsewhere in this curriculum since Lesson
+1.6. `self.search_box.textChanged.connect(self.on_search_text_changed)`
+landed for real, `self.current_search_text` kept live across multiple
+changes. (2.13, Lab, throwaway — nothing landed) `lambda` (reapplied
+in full against Qt's own `connect(...)`), closure — real, confirmed
+proof of the classic loop-variable-closure bug (three buttons all
+reporting the same, final loop value) and its real, two-part fix: a
+default-argument binding (`name=name`) alone isn't enough, since
+`QPushButton.clicked`'s own real `checked: bool` argument (2.12's own
+material, never actually read before now) silently lands in whatever
+parameter position comes first unless `checked=False` is deliberately
+placed there ahead of the loop-bound value. Note for 2.14: "selected
+patterns survive," genuinely different from every prior lesson's own
+type note — see Current position above for the real, open structural
+question (does `asset_editor.py` need a real class now, to have
+somewhere to declare a class-level `Signal`).
 
 ## Session note (2026-08-19 night → 2026-08-20 morning)
 
@@ -661,6 +816,244 @@ pattern twice more (`RuntimeError`, and `QObject.objectName` — the
 latter used only as an arbitrary probe to trigger the failure, not
 itself the lesson's subject, but still real, executed code needing its
 own slot) — fixed the same way as every prior instance.
+
+Lesson 2.4 — QLabel followed next, Lab/throwaway per its own blueprint
+entry, one Concept Unit (a real, visible widget). Real, notable finding
+worth the lesson's own core proof: a `QLabel` parented to a not-yet-
+shown `QMainWindow` reports `isVisible()` as `False` even though
+nothing told the label itself to hide — only `False` → `True` once the
+*parent* window's own `show()` runs, confirmed live
+(`verification/2.4/lab1_qlabel.py`). Considered the `run` skill's
+screenshot capability again, per 2.1's own deferred note — deferred a
+second time, judged unnecessary for a throwaway lesson whose entire
+proof is already real, checkable properties (text, parent identity,
+conditional visibility), not appearance itself. No vocabulary or
+fidelity gaps found on self-check.
+
+Lesson 2.5 — QPushButton followed next, Series 2's first real,
+permanent landing since 2.1. One Concept Unit (a real, interactive
+widget), landing `QPushButton("Add Asset", window)` in `main()`. Two
+real, deliberate scope decisions, both reconsidered from the previous
+handoff's own open questions and resolved differently than first
+suggested: (1) no `MainWindow` subclass introduced — a plain local
+variable was sufficient, since nothing yet needs cross-method widget
+access; (2) `button.clicked` deliberately left unconnected, confirmed
+against 2.11's own blueprint wording ("Connect buttons to application
+behavior") before concluding this is genuinely 2.11's own scope, not
+an oversight — proved the real, structural difference between
+`QPushButton` and `QLabel` instead (`hasattr(button, "clicked")`)
+without touching signal/slot mechanics at all. Both required executions
+run for real, headless (`verification/2.5/lab1_qpushbutton.py`,
+`step1_real_project_confirmation/main.py` under an external timeout,
+identical pattern to 2.1's own). `snapshot/asset_manager/desktop/
+main.py` updated to match. No vocabulary or fidelity gaps found on
+self-check.
+
+Lesson 2.6 — QLineEdit followed next, one Concept Unit (editable,
+placeholder-backed text), landing `QLineEdit(window)` with a real
+placeholder in `main()`, continuing 2.5's own "no subclass, no signal
+connections yet" discipline without re-litigating it. Real, load-bearing
+proof: `search_box.text()` starts as `''`, not the placeholder text
+itself, and setting real text afterward leaves `placeholderText()`
+completely unchanged — the two facts genuinely never collide, confirmed
+live rather than assumed from how placeholders "usually work." Both
+required executions run for real, headless
+(`verification/2.6/lab1_qlineedit.py`, `step1_real_project_
+confirmation/main.py` under a timeout). `snapshot/asset_manager/
+desktop/main.py` updated to match. No vocabulary or fidelity gaps found
+on self-check.
+
+Lesson 2.7 — QComboBox followed next, one Concept Unit (a fixed set of
+choices), landing `QComboBox(window)` populated with a hard-coded
+category list in `main()`. Named the real, honest tension between
+`Asset.category`'s own open `str` field and this widget's closed,
+enumerated one directly in the lesson's own prose, resolved by keeping
+the widget's own list plain and hard-coded rather than importing
+`asset_manager.domain` early — consistent with every widget since 2.5.
+Real, load-bearing proof: `currentText()` already reports `"Laptop"`
+the instant real items exist, with no "nothing selected" state
+`QLineEdit.text()` had — a `QComboBox` with any items always has a
+current selection, confirmed live rather than assumed. Both required
+executions run for real, headless (`verification/2.7/
+lab1_qcombobox.py`, `step1_real_project_confirmation/main.py` under a
+timeout). `snapshot/asset_manager/desktop/main.py` updated to match. No
+vocabulary or fidelity gaps found on self-check.
+
+Lesson 2.8 — Layouts followed next: the first structural refactor since
+2.1, not just additive content. Two Concept Units (adding a widget to a
+layout reparents it; a real, nested layout), landing a complete
+restructuring of `main()` — `search_row`/`main_layout`/`central`,
+`window.setCentralWidget(central)`, every existing widget's own
+constructor call losing its `window` parent argument since final
+ownership now comes from the layout itself. Real, load-bearing proof,
+confirmed live rather than assumed: `layout.addWidget(...)` silently
+reparents a widget to the layout's own owning widget, verified through
+two nesting levels (a widget inside an inner `QHBoxLayout` inside an
+outer `QVBoxLayout` still ends up parented directly to the real
+top-level widget, not to either intermediate layout object). Made a
+final, reasoned decision on the `run`-skill screenshot question,
+deferred five times since 2.1: declined again, explicitly, since this
+lesson's own claims are structural (parenting, layout membership),
+already fully proven by property checks — no claim was made about
+visual appearance needing a screenshot to back it up. This closes that
+recurring open question rather than leaving it to keep re-surfacing.
+Both required executions run for real, headless (`verification/2.8/
+lab1_layout_reparenting.py`, `lab2_nested_layouts.py`,
+`step1_real_project_confirmation/main.py` under a timeout). `snapshot/
+asset_manager/desktop/main.py` updated to match. No vocabulary or
+fidelity gaps found on self-check.
+
+Lesson 2.9 — Form Layout followed next, landing this project's second
+real module inside `desktop/`: `asset_manager/desktop/
+asset_editor.py`, a standalone `build_asset_editor()` function, not yet
+connected to `main.py` or the "Add Asset" button. Two Concept Units (a
+real, automatic label; the Asset editor itself). Real, load-bearing
+proof: `QFormLayout.addRow("Name:", field)` genuinely builds a real,
+independently retrievable `QLabel` — `labelForField(field).text()`
+reading back the exact string — something neither `QVBoxLayout` nor
+`QHBoxLayout` (2.8) has ever done. Both required executions run for
+real, headless (`verification/2.9/lab1_qformlayout.py`,
+`step1_real_project_confirmation/confirm.py`). Caught one genuinely new
+kind of self-check issue: the saved verification file initially printed
+more lines than the lesson's own shown output (a leftover, more
+convoluted label-checking approach using `itemAt`/`FieldRole`) — fixed
+by trimming the saved file to match the lesson exactly, since those
+extra checks were already redundant with Concept Unit 1's own proof,
+rather than padding the lesson's own shown output to match the file.
+`snapshot/asset_manager/desktop/asset_editor.py` created to match. No
+other vocabulary or fidelity gaps found on self-check.
+
+Lesson 2.10 — Grid Layout followed next, Lab/throwaway per its own
+blueprint entry, confirmed before writing (its own "you don't need
+mastery" note), kept genuinely small. Two Concept Units (explicit
+row/column positioning; position collisions). Real, notable finding:
+`QGridLayout` does not guard against two widgets claiming the identical
+row/column at all — both are silently tracked (`grid.count()` reports
+`2`), no error or warning either time, with only a position query
+(`itemAtPosition`) revealing that the first one added is the one
+actually resolved at that cell — confirmed live rather than assumed.
+Both required executions run for real, headless
+(`verification/2.10/lab1_qgridlayout.py`, `lab2_collision.py`). One
+script was revised mid-verification: an initial `first.isVisible()`
+check in the collision lab was dropped after running it, since it was
+only re-testing Lesson 2.4's own already-established ancestor-visibility
+fact rather than telling the reader anything new about the collision
+itself — cut for focus, not because it failed. Self-check caught the
+now-standard gap pattern once more (`QCheckBox`, real executed code
+used only as incidental content, no slot on the first draft) — fixed
+the same way as every prior instance.
+
+Lesson 2.11 — Signals and Slots followed next: the largest, most
+significant lesson of this Series 2 batch so far, "one of the major Qt
+lessons" per its own blueprint entry. Three Concept Units (connecting a
+signal to a slot; the garbage collection gotcha; a real `MainWindow`
+and the real connection). Deliberately kept the first two units'
+isolated labs free of any `Asset`/`Owner` flavor, per the plan, so the
+mechanism itself stayed the visible subject rather than blending into
+already-familiar domain shapes. The real, central finding — verified,
+not assumed — is a genuine, silent PySide6 gotcha: a widget opened
+inside a plain slot function, shown successfully (`isVisible()` reads
+`True` *inside* the slot), is nonetheless garbage-collected the instant
+that function returns if nothing outside it holds a reference,
+confirmed via `weakref.ref` resolving to `None` after a forced
+`gc.collect()`. This is also this project's first subclass of an
+external, real PySide6 class landing in *permanent* code — Lesson
+2.2's own subclass was explicitly throwaway, and the subclass question
+itself had been deliberately deferred three separate times (2.1, 2.2,
+2.5) before this lesson gave a real, concrete reason it was finally
+needed. Landed the complete restructuring: every widget now a real
+`self.<name>` attribute, `self.button.clicked` finally connected,
+`asset_editor.py` (2.9) finally imported and called. All required
+executions run for real, headless (`verification/2.11/
+lab1_signal_slot_basics.py`, `lab2_gc_gotcha.py`, `lab3_gc_fix.py`,
+`step1_real_project_confirmation/confirm.py` and `main.py` under a
+timeout). `snapshot/asset_manager/desktop/main.py` updated to match.
+Re-verified real-output fidelity carefully given this lesson's own
+size (a real risk area per 1.11's own earlier session note) — no
+transcription mismatches found. No vocabulary gaps found on self-check
+either.
+
+Lesson 2.12 — Arguments in Signals followed next: three Concept Units
+(a signal handing its slot a real value; slot signature flexibility;
+storing the real search text), landing `self.search_box.textChanged
+.connect(self.on_search_text_changed)` and `self.current_search_text`.
+Verified, rather than assumed, both directions of slot-signature
+flexibility — a slot may take fewer parameters than a signal provides
+(silently dropped) but not more (real `TypeError`) — and a genuinely
+surprising, real finding: an exception raised inside a slot does not
+crash the whole PySide6 application, unlike every uncaught exception
+elsewhere in this curriculum since Lesson 1.6, since PySide6 catches it
+internally and keeps running. All required executions run for real,
+headless (`verification/2.12/lab1_signal_argument.py`,
+`lab2_mismatched_slot.py`, `break_too_many_params.py`, `step1_real_
+project_confirmation/confirm.py` and `main.py` under a timeout).
+`snapshot/asset_manager/desktop/main.py` updated to match. Self-check
+caught the now-standard gap once more (`TypeError`, reapplied from 1.7
+but no fresh Terms entry on the first draft) — fixed the same way as
+every prior instance.
+
+Lesson 2.13 — Lambda Callbacks followed next, Lab/throwaway per its own
+blueprint entry. Three Concept Units (a lambda carrying extra context;
+the loop variable trap; binding the value, correctly). The real payoff
+here was verifying a two-layered real bug rather than just warning
+about "lambda soup" in the abstract: first, the classic loop-variable-
+closure trap, proven live (three buttons built in a loop, each
+connected to a lambda referencing the loop variable directly, all
+reporting the *same*, final value when clicked); second, once the
+standard `name=name` default-argument fix was applied on its own, a
+*second*, genuinely surprising real bug appeared — `QPushButton
+.clicked`'s own always-carried `checked: bool` argument (established
+back in 2.12 but never actually read until this lesson) silently fills
+whatever parameter position comes first, quietly overwriting the very
+default the fix depends on unless `checked=False` is placed ahead of
+it deliberately. Caught this by actually running the "almost-fixed"
+version and observing it print `[False, False, False]` rather than
+assuming the standard fix alone would work. All required executions
+run for real, headless (`verification/2.13/lab1_lambda_connect.py`,
+`break_loop_variable_capture.py`, `lab3_without_checked_param.py`,
+`lab2_default_arg_fix.py`). No vocabulary or fidelity gaps found on
+self-check.
+
+Lesson 2.14 — Custom Signals followed next, Support per its own
+blueprint entry, landed under the blueprint's own "selected patterns
+survive" hedge rather than a clean Survives/Throw-away. Three Concept
+Units: declaring a custom signal in isolation (`Doorbell(QObject)`,
+`pressed = Signal(str)`, connect/emit proven exactly like a built-in
+signal, plus `type(doorbell.pressed)` proving the real, load-bearing
+distinction between the class-level `Signal` and the per-instance
+`SignalInstance` it actually becomes once accessed through a real
+object); the Asset editor becoming a class (`build_asset_editor()`,
+2.9's free function, rewritten into `AssetEditor(QWidget)` — required
+because `Signal` can only be declared on a class — carrying a new
+`asset_submitted = Signal(str, str, str)`, a new "Save" `QPushButton`,
+and `on_save_clicked` emitting all three field values); MainWindow
+listening (`self.editor.asset_submitted.connect(self
+.on_asset_submitted)`, added to `open_asset_editor`, with the new slot
+appending a plain tuple to a new `self.submitted_assets` list). Real
+judgment call, made and stated plainly in the lesson itself: the
+submitted data does *not* become a real `Asset` (1.7) in this lesson —
+`Asset.__init__`'s own real validation (1.11) means treating raw,
+unchecked GUI strings as trustworthy domain data would be exactly the
+UI-validation/business-validation conflation Lesson 2.15's own
+blueprint entry exists to name and fix; 2.14's own closing says this
+explicitly rather than leaving it implicit. Two real vocabulary/
+verification catches during drafting, not just on self-check: (1) the
+isolated-proof code called `QLineEdit.text`/`setText` and `QComboBox
+.currentText` with no Header entry on the first pass — fixed with full
+CRC entries for all three, reapplied from Lessons 2.6/2.7; (2) a first
+draft called `QComboBox.setCurrentText("Laptop")` in the verification
+scripts to explicitly select the category — caught as redundant and
+removed once `currentText()`'s own already-proven real default (2.7)
+made it unnecessary, avoiding introducing an unverified method with no
+real teaching value here. `QFormLayout.addRow`'s single-argument
+overload (no label, spanning the full row) was verified for real
+(`labelForField` returns `None`) before being explained, and given its
+own Header entry alongside the already-taught two-argument form.
+Verification reorganized into `verification/2.14/lab1_custom_signal.py`
+(throwaway), `step1_asset_editor_confirmation/` (real `asset_editor.py`
+proof), and `step2_real_project_confirmation/` (full `main.py` +
+`asset_editor.py` integration, plus the standing `timeout 3` sanity run
+on the real `main.py`, exit code `124`, no crash).
 
 ## After finishing a lesson (do this before handing off / before clearing)
 

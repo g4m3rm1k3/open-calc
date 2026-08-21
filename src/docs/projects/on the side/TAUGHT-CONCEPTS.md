@@ -146,6 +146,44 @@ past entries except to fix an error.
 - `QObject`, `.parent`, `.children`, `.objectName` — introduced Lesson 2.3 (throwaway)
 - `RuntimeError` — introduced Lesson 2.3 (throwaway)
 - real, confirmed proof that deleting a `QObject` parent cascades to destroy its children independent of Python's own reference counting (real `RuntimeError` via `del` + forced `gc.collect()`) — Lesson 2.3 (throwaway)
+- `QLabel` — this project's first real, visible widget — introduced Lesson 2.4 (Lab, throwaway)
+- real, confirmed proof that a child widget's own `isVisible()` depends on its parent's shown state, not only itself (`False` before parent `show()`, `True` after) — Lesson 2.4 (throwaway)
+- `QPushButton` — this project's first real, permanent, interactive widget (`hasattr(button, "clicked")` is `True`; identical check on `QLabel` is `False`) — introduced Lesson 2.5; landed in `asset_manager/desktop/main.py`, not connected to anything yet (deliberately deferred to Lesson 2.11)
+- `hasattr` — introduced Lesson 2.5
+- `QLineEdit`, `.setPlaceholderText`/`.placeholderText` — this project's first widget holding real, caller-editable content; real, confirmed proof placeholder text and real text are tracked as genuinely separate facts, neither containing the other — introduced Lesson 2.6; landed in `asset_manager/desktop/main.py`, not connected to anything yet (deliberately deferred to Lesson 2.11, same boundary generalized to every widget's signals, not just `QPushButton`'s)
+- `QComboBox`, `.addItems`, `.currentText`/`.itemText`/`.count`/`.setCurrentIndex` — this project's first closed/enumerated-choice widget, contrasted against `Asset.category`'s own open `str` field; real, confirmed proof a `QComboBox` with any items always has a current selection — introduced Lesson 2.7; landed in `asset_manager/desktop/main.py`, populated with a hard-coded category list, not connected to anything yet
+- layout, central widget — introduced Lesson 2.8
+- `QVBoxLayout`, `QHBoxLayout`, `.addWidget`, `.addLayout`, `.count`, `QWidget.setLayout`, `QMainWindow.setCentralWidget` — introduced Lesson 2.8
+- real, confirmed proof that `layout.addWidget(...)` silently reparents a widget to the layout's own owning widget, even through nested layouts — Lesson 2.8
+- `asset_manager/desktop/main.py` restructured for real: `button`/`search_box`/`category_box` moved from direct `window` parenting into a real nested layout (`search_row` inside `main_layout` inside `central`), `window.setCentralWidget(central)` — Lesson 2.8 (first structural refactor of this file since 2.1)
+- form (a UI arrangement pairing each field with its own caption) — introduced Lesson 2.9
+- `QFormLayout`, `.addRow`, `.labelForField`, `.rowCount` — real, confirmed proof `addRow` builds a genuine, independently retrievable `QLabel` from a plain string — introduced Lesson 2.9
+- `asset_manager/desktop/asset_editor.py` — this project's second real module inside `desktop/`; `build_asset_editor() -> QWidget` returns a standalone, unconnected Asset editor (name/serial number/category fields) — introduced Lesson 2.9; not imported by `main.py`, not connected to the "Add Asset" button
+- `QGridLayout`, `.addWidget(widget, row, column)`, `.itemAtPosition`, `.rowCount`/`.columnCount` — introduced Lesson 2.10 (Lab, throwaway — no project code)
+- `QCheckBox` — introduced Lesson 2.10 (Lab, throwaway)
+- real, confirmed proof `QGridLayout` silently accepts two widgets claiming the identical position, tracking both but resolving position queries to whichever was added first — Lesson 2.10 (throwaway)
+- signal, slot (Observer pattern; distinct from "event"/"event handler," Lesson 2.2) — introduced Lesson 2.11
+- `QPushButton.clicked` (fully explained; bare existence first proven Lesson 2.5), `Signal.connect`, `QPushButton.click` (headless click simulation) — introduced Lesson 2.11
+- `weakref.ref` — introduced Lesson 2.11
+- real, confirmed proof (via `weakref` + forced `gc.collect()`) that a widget opened inside a plain slot function with no persistent reference is silently garbage-collected the instant the function returns, even though it was shown successfully — Lesson 2.11
+- `MainWindow(QMainWindow)` — this project's first subclass of an external framework class in permanent code (Lesson 2.2's own subclass was throwaway); `super().__init__()` reapplied against real Qt for the first time — introduced Lesson 2.11
+- `asset_manager/desktop/main.py` restructured for real: every widget now a real `self.<name>` instance attribute, `self.button.clicked` connected to `self.open_asset_editor`, `self.editor` storing the opened editor (the real fix for the GC gotcha above), `asset_editor.py` (2.9) finally imported and called — Lesson 2.11
+- signal argument (a real value a signal hands its slot alongside the bare fact it fired) — introduced Lesson 2.12
+- `QLineEdit.textChanged` (fully explained) — introduced Lesson 2.12
+- real, confirmed proof a slot may accept fewer parameters than a signal provides (extras silently dropped) but never more (real `TypeError`) — Lesson 2.12
+- real, confirmed proof a slot's own exception does not crash the whole PySide6 application (caught internally, printed, execution continues) — Lesson 2.12
+- `self.search_box.textChanged.connect(self.on_search_text_changed)`, `self.current_search_text` — landed for real in `asset_manager/desktop/main.py` — Lesson 2.12
+- `lambda` (reapplied in full against Qt's own `connect(...)` calls), closure — introduced Lesson 2.13 (Lab, throwaway — no project code)
+- real, confirmed proof of the classic loop-variable-closure bug (lambdas built in a loop, referencing the loop variable directly, all report the same, final value once the loop finishes) — Lesson 2.13 (throwaway)
+- real, confirmed proof that fixing the above with a default-argument binding alone isn't enough — `QPushButton.clicked`'s own always-carried `checked: bool` argument silently fills whatever parameter position comes first, requiring `checked=False` to be placed ahead of the loop-bound default deliberately — Lesson 2.13 (throwaway)
+- `Signal` (from `PySide6.QtCore`), custom signal declaration as a class-level attribute (`asset_submitted = Signal(str, str, str)`), on a `QObject`-derived class — introduced Lesson 2.14 (throwaway proof: `Doorbell(QObject)`); landed for real in `asset_manager/desktop/asset_editor.py`
+- `SignalInstance` — the real, distinct object a class-level `Signal` becomes once accessed through an instance rather than the class itself, confirmed via `type(doorbell.pressed)` — introduced Lesson 2.14
+- `Signal.emit` — introduced Lesson 2.14; landed for real via `AssetEditor.on_save_clicked`
+- subclassing `QObject` directly, with no widget behavior at all — introduced Lesson 2.14 (throwaway, `Doorbell(QObject)`)
+- `asset_editor.py`'s `build_asset_editor()` free function rewritten into a real `AssetEditor(QWidget)` class (required for `Signal` to be declarable at all); every field becomes a `self.` instance attribute — landed for real Lesson 2.14
+- `QFormLayout.addRow`'s single-argument overload (`addRow(widget)`, no label, spans the full row) — introduced and landed for real Lesson 2.14, alongside the already-taught two-argument form (2.9)
+- `QLineEdit.text`/`QLineEdit.setText`, `QComboBox.currentText` — full CRC treatment Lesson 2.14 (all three reapplied from 2.6/2.7)
+- `MainWindow.on_asset_submitted`, `self.submitted_assets` — landed for real in `asset_manager/desktop/main.py` — Lesson 2.14; deliberately raw, unvalidated tuples, not real `Asset` objects — closed by Lesson 2.15
 
 ## Series 3 — SQL and Persistence
 

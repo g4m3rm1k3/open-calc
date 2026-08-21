@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from asset_editor import AssetEditor
+from asset_editor import build_asset_editor
 
 
 class MainWindow(QMainWindow):
@@ -42,18 +42,13 @@ class MainWindow(QMainWindow):
 
         self.editor = None
         self.current_search_text = ""
-        self.submitted_assets = []
 
     def open_asset_editor(self) -> None:
-        self.editor = AssetEditor()
-        self.editor.asset_submitted.connect(self.on_asset_submitted)
+        self.editor = build_asset_editor()
         self.editor.show()
 
     def on_search_text_changed(self, new_text: str) -> None:
         self.current_search_text = new_text
-
-    def on_asset_submitted(self, name: str, serial_number: str, category: str) -> None:
-        self.submitted_assets.append((name, serial_number, category))
 
 
 def main() -> int:
