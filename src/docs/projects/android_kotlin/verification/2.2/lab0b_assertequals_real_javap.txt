@@ -1,0 +1,12 @@
+  public static void assertEquals(java.lang.String, java.lang.Object, java.lang.Object);
+  public static void assertEquals(java.lang.Object, java.lang.Object);
+  public static void assertEquals(java.lang.String, double, double, double);
+  public static void assertEquals(java.lang.String, float, float, float);
+  public static void assertEquals(long, long);
+  public static void assertEquals(java.lang.String, long, long);
+  public static void assertEquals(double, double);
+  public static void assertEquals(java.lang.String, double, double);
+  public static void assertEquals(double, double, double);
+  public static void assertEquals(float, float, float);
+  public static void assertEquals(java.lang.String, java.lang.Object[], java.lang.Object[]);
+  public static void assertEquals(java.lang.Object[], java.lang.Object[]);

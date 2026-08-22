@@ -1,0 +1,2 @@
+Checking left
+Result: true

@@ -1,0 +1,19 @@
+      24: invokestatic  #40                 // Method org/junit/Assert.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V
+      27: return
+
+  public final void subtractionAppliesRealArithmetic();
+--
+      26: invokestatic  #40                 // Method org/junit/Assert.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V
+      29: return
+
+  public final void multiplicationAppliesRealArithmetic();
+--
+      26: invokestatic  #40                 // Method org/junit/Assert.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V
+      29: return
+
+  public final void divisionAppliesRealArithmetic();
+--
+      25: invokestatic  #40                 // Method org/junit/Assert.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V
+      28: return
+
+  static {};

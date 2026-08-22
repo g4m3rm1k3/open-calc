@@ -1,0 +1,10 @@
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///Users/michaelmclean/Testing/open-calc/src/docs/projects/android_kotlin/AndroidCalculator/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 3s
+27 actionable tasks: 2 executed, 25 up-to-date
