@@ -6,6 +6,12 @@
     "tags": ["Web Dev", "Learning"]
   },
   {
+    "title": "Game Math Book",
+    "description": "3D Math Primer for Graphics and Game Development – Dunn & Parberry",
+    "url": "https://gamemath.com/book/intro.html",
+    "tags": ["quaternions", "Euler Angles", "Transfromations"]
+  },
+  {
     "title": "Objectos Blog",
     "description": "Tech blog with web development articles",
     "url": "https://www.objectos.com.br/blog/index.html",
@@ -35,13 +41,13 @@
     "url": "https://www.tutorialspoint.com/",
     "tags": ["CS", "Tutorials"]
   },
-      {
+  {
     "title": "CodePath",
     "description": "Code Path Guides",
     "url": "https://guides.codepath.org/",
     "tags": ["Android Development", "CS", "IOS", "Web Dev", "Tutorials"]
   },
-    {
+  {
     "title": "W3Schools",
     "description": "Learn to Code",
     "url": "https://www.w3schools.com/",
