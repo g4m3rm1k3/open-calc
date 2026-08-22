@@ -96,70 +96,72 @@ section has a finished lesson file under `lessons/
 series-1-python-foundations/`, matching that series' own stated
 outcome: a tested Python domain (`Asset`, `Owner`), no Qt, no SQL.
 
-**Next lesson to write:** `2.22 — Editing Models` (Series 2, Core)
+**Next lesson to write:** `2.27 — Architecture Boundary` (Series 2,
+Core)
 
 **Blueprint entry:** `pyside.brd.curriclum.md`, section "SERIES 2 —
-PySide6: Desktop Application Development" → "## 2.22 — Editing Models."
-Learn: `setData`, `flags`, `dataChanged`. **Survives.** Real, direct
-continuation of 2.21's own real, stated gap: `AssetTableModel.data`
-already implements `EditRole` correctly (reading plain `asset.name`,
-not `display_name`), but `AssetTableModel` still doesn't override
-`flags()`, so `QTableView` (2.19) never treats any cell as editable —
-2.21's own SE Lens named this exact gap plainly ("the plumbing,
-correctly built and verified, for a feature Lesson 2.22 still has to
-switch on"). This lesson's own real job: override `flags(index)` to
-return a real, combined `Qt.ItemFlag` value including `Qt.ItemFlag
-.ItemIsEditable` (at least for the `Name` column, matching 2.21's own
-already-implemented `EditRole`/`DisplayRole` split — real, open
-question whether `Serial Number`/`Category` should also become editable
-now, or whether editing stays scoped to `Name` alone this lesson,
-mirroring how 2.17 scoped `Edit`/`Delete` down rather than building
-everything at once); implement `setData(index, value, role)`, actually
-writing a new value back into the right `Asset` field when `role ==
-Qt.ItemDataRole.EditRole`; and emit `dataChanged` (a real signal,
-distinct from `rowsInserted`, 2.20) after a successful write, so
-`QTableView` knows to redraw that specific cell. Real, open question:
-does `setData` mutate `Asset` directly (`Asset` is a plain `@dataclass`,
-1.7, not frozen — real, confirmed-checkable before assuming it's
-mutable) or does editing a name need to go through validation (2.15's
-own `InvalidAssetError`) the identical way a new submission already
-does — a real, meaningful design call given this project's own
-established domain-validation discipline.
+PySide6: Desktop Application Development" → "## 2.27 — Architecture
+Boundary." Introduce: `View → Application logic → Domain`. "No
+database yet." Real, open scope question for next session: this
+project already has a real, two-layer shape in practice — `MainWindow`
+(View, 2.1 onward) and `asset_manager.domain` (`Asset`/`Owner`, Series
+1) — but no real, named "Application logic" layer sits between them
+yet. `ApplicationState` (2.26) is a plausible candidate to formally be,
+or anchor, that middle layer, but as built in 2.26 it's a pure data
+container (two lists, no methods, no behavior) — genuinely closer to a
+data-transfer object than "logic." Real, natural fit for this lesson's
+own real distinction: does 2.27 simply *name* the boundary already
+implicit in this project's existing structure (View = `MainWindow`,
+Application logic = a role `ApplicationState` and/or `MainWindow`'s own
+methods informally already play, Domain = `asset_manager.domain`), or
+does it require actually *moving* real behavior — `on_asset_submitted`'s
+own real `try`/`except InvalidAssetError` construction logic (2.15),
+currently living directly on `MainWindow` (View), is the most obvious
+real candidate — out of the View and into a real, separate
+Application-logic method or class for the first time? Read `2.27`'s
+own full blueprint entry fresh before deciding; "No database yet"
+suggests this lesson scopes the boundary conceptually, not by building
+persistence behind it.
 
-**Note on 2.21, now resolved:** landed per blueprint's own type note,
-**Survives**, cleanly, no hedge. Three Concept Units (`DisplayRole` and
-`EditRole` answer different questions, isolated; `TextAlignmentRole`
-and combinable flags, isolated; real formatting and alignment in
-`AssetTableModel`). Real, structural rewrite: `AssetTableModel.data`
-(2.20) went from a single `if role != Qt.ItemDataRole.DisplayRole:
-return None` check to a real, three-way `role` dispatch —
-`DisplayRole` for column `0` now reads `asset.display_name` (1.10,
-reused here for the first time from `asset_manager/desktop/`) instead
-of plain `asset.name`; `EditRole` reads plain `asset.name` directly;
-`TextAlignmentRole` right-aligns the `Serial Number` column via
-`Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter` (a real,
-combinable flag enum, confirmed via `|`/`&` to combine and decompose
-correctly, `130` on this platform). Real, load-bearing, end-to-end
-proof, not just a working demo: calling `Asset.mark_retired()` (1.2)
-directly on the exact same live `Asset` object `AssetTableModel` already
-holds made `DisplayRole` for that cell change to `"ThinkPad X1
-(Retired)"` on the very next read, with **no** new code anywhere
-telling the model to refresh — while `EditRole` for the identical cell,
-read again, stayed plain `"ThinkPad X1"`, confirming `EditRole` and
-`DisplayRole` genuinely diverge exactly when they should. Real, honest
-gap named plainly in this lesson's own SE Lens, not hidden: `EditRole`
-is implemented correctly, but `AssetTableModel` still has no
-`flags()` override, so `QTableView` never actually offers to edit
-anything yet — explicitly Lesson 2.22's own job ("Editing Models") to
-switch on.
+**Note on 2.26, now resolved:** landed per blueprint's own explicit
+framing — separate `domain state ↓ UI state`, "stop widgets from
+becoming the application's database," **major transferable concept.**
+Two Concept Units (deleting redundant state; a dedicated application
+state object). Real, structural removal: `self.current_search_text`
+(2.6, 2.12) — confirmed, before deleting it, that no real code anywhere
+read it back, and that `AssetFilterProxyModel.self._search_text` (2.24)
+was already the real, sole, authoritative owner of the search text —
+deleted outright from `MainWindow.__init__` and `on_search_text_changed`,
+with zero change to the search box's own real, observable behavior.
+Real, structural addition: a brand-new, small file, `asset_manager/
+desktop/application_state.py`, defines a plain (non-`QObject`)
+`ApplicationState` class — `self.assets: list[Asset] = []` and `self
+.validation_errors: list[InvalidAssetError] = []`. `MainWindow.__init__`
+now builds exactly one `self.state = ApplicationState()`, replacing the
+old bare `self.submitted_assets = []` and the old bare
+`self.validation_errors = []` (deleted from `__init__`'s own tail,
+alongside `self.current_search_text`) — `MainWindow` now holds exactly
+one real attribute for genuine UI-lifetime state (`self.editor`, 2.11)
+and one real reference to everything domain-adjacent (`self.state`).
+Real, confirmed, load-bearing proof: `AssetTableModel`'s own real,
+single-reference contract (2.20) still holds, now reached one attribute
+hop further — `window.state.assets is window.assets_model._assets`
+confirmed `True` — and both a valid and an invalid real submission were
+confirmed, end-to-end, to behave exactly as they did before this
+lesson, just reaching through `self.state` instead of bare attributes.
+Real, deliberately-left-open question, explicitly not decided here:
+whether `ApplicationState` itself becomes (or anchors) 2.27's own
+"Application logic" layer, or whether that layer still needs real
+behavior moved into it beyond what `ApplicationState` currently holds —
+see **Next lesson to write**, above.
 
 **Project state:** `asset_manager/desktop/__init__.py` and
 `asset_manager/desktop/main.py` (2.1, restructured 2.11, extended 2.14,
-2.17, 2.19, rewritten 2.20) — a real, permanent PySide6 entry point.
-`main.py` now defines `MainWindow(QMainWindow)`: `__init__` calls
-`super().__init__()`, sets the window title, builds a real menu bar
-(`self.menuBar().addMenu("&File")`, 2.17) holding four local, un-stored
-`QAction` objects (`new_action`/`edit_action`/`delete_action`/
+2.17, 2.19, rewritten 2.20, extended 2.23, 2.26) — a real, permanent
+PySide6 entry point. `main.py` now defines `MainWindow(QMainWindow)`: `__init__`
+calls `super().__init__()`, sets the window title, builds a real menu
+bar (`self.menuBar().addMenu("&File")`, 2.17) holding four local,
+un-stored `QAction` objects (`new_action`/`edit_action`/`delete_action`/
 `exit_action`, each constructed `QAction(text, self)` — surviving via
 Lesson 2.3's own parent/child ownership, not a `self.` attribute):
 `new_action.triggered` connects to `self.open_asset_editor`, and
@@ -174,44 +176,106 @@ resolve to `Ctrl+Q` on this platform. Builds `self.button`/
 `self.search_box`/`self.category_box` (all real instance attributes,
 not local variables), connects `self.button.clicked.connect
 (self.open_asset_editor)` and `self.search_box.textChanged.connect
-(self.on_search_text_changed)`. **Rewritten 2.20:** `self
-.submitted_assets = []` now built immediately after `search_row`
-(moved up from the bottom of `__init__`, its own position since 2.14),
-followed immediately by `self.assets_model = AssetTableModel(self
-.submitted_assets, self)` — a real, custom model (2.20's own new file,
-`asset_table_model.py`), reading `self.submitted_assets` directly, no
-copy — and `self.assets_table = QTableView()` (2.19), `setModel`-
-connected to it; added to `main_layout` as a third item below `self
-.button` (2.8's own automatic stacking). `open_asset_editor(self)`
-builds a real `AssetEditor()` (2.9, converted to a class in 2.14),
-connects `self.editor.asset_submitted.connect(self.on_asset_submitted)`,
-then shows it; `on_asset_submitted(self, name, serial_number,
-category)` (2.14, rewritten 2.15, 2.20) constructs a real `Asset`
-(`asset_manager.domain.asset`, imported since 2.15, alongside
-`InvalidAssetError` and `asset_manager.domain.owner.Owner`) inside
-`try`/`except InvalidAssetError as error:`, using a module-level
-`PLACEHOLDER_OWNER = Owner("Unassigned", "unassigned@example.com")`
-constant (2.15) — success now calls just `self.assets_model.add_asset
-(asset)` (2.20; replaces 2.19's own two separate lines — `self
-.submitted_assets.append(...)` plus a `QStandardItem`-building
-`appendRow` call — since `add_asset` already appends to the one, shared
-list internally), then `self.editor.accept()` (2.16), closing the
-dialog; a caught error appends to `self.validation_errors` (set at the
-bottom of `__init__`, alongside `self.editor = None`/`self
-.current_search_text = ""`) and calls `QMessageBox.warning(self.editor,
-"Invalid Asset", str(error))` (2.16) — no `accept`/`reject` follows, so
-the dialog stays open, and `add_asset` is never reached. **Import and
-execution, unchanged since 2.15:** `from .asset_editor import
-AssetEditor` and, new in 2.20, `from .asset_table_model import
-AssetTableModel` (both package-relative) — `main.py` **must** be run as
-`python -m asset_manager.desktop.main` from the project's own root; the
-old `python main.py` from inside `desktop/` still fails immediately
-with `ModuleNotFoundError: No module named 'asset_manager'`. `main()`
-itself is still three lines: build `MainWindow()`, show it, run `app
-.exec()`. 2.2, 2.3, and 2.4 were all conceptual/throwaway, nothing
-landed from any of them. `category_box` still doesn't feed into
-anything; `search_box`/`category_box` still don't feed into any real
-search/filter behavior yet.
+(self.on_search_text_changed)`. **New in 2.24:** `self.category_box
+.addItems(["All Categories", "Laptop", "Monitor", "Keyboard", "Mouse",
+"Other"])` — `"All Categories"` prepended, its first non-category real
+item — and `self.category_box.currentTextChanged.connect(self
+.on_category_filter_changed)` — its first-ever signal connection,
+unconnected since Lesson 2.7. **Rewritten 2.20, extended 2.24, 2.26:**
+`self.state = ApplicationState()` (2.26's own new file, `application
+_state.py`) built immediately after `search_row`, followed by `self
+.assets_model = AssetTableModel(self.state.assets, self)` (2.20's own
+real, single-reference contract, still holding, now reached one
+attribute hop through `self.state`; was `AssetTableModel(self
+.submitted_assets, self)` before 2.26); new in 2.24, `self.proxy_model
+= AssetFilterProxyModel
+(self)` then `self.proxy_model.setSourceModel(self.assets_model)` — a
+real proxy (2.24's own new file, `asset_filter_proxy_model.py`) sitting
+between the two; `self.assets_table = QTableView()` (2.19), `setModel`-
+connected to **`self.proxy_model`**, not `self.assets_model` directly
+(changed 2.24). Immediately after, `self.assets_table
+.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)`
+and `self.assets_table.selectionModel().currentRowChanged.connect
+(self.on_current_row_changed)` (2.23); new in 2.25, `self
+.category_delegate = CategoryDelegate(self)` then `self.assets_table
+.setItemDelegateForColumn(2, self.category_delegate)` — `Category`'s
+own editable cells now open a real `QComboBox` (2.9's own identical
+item list, duplicated, not shared) instead of `QTableView`'s own
+default free-text editor; five real `QLabel` instance
+attributes (`self.detail_name_label`/`_serial_label`/`_category_label`/
+`_owner_label`/`_status_label`, all `QLabel("")`), arranged in a
+`QFormLayout` (`detail_layout`, 2.23); `main_layout` adds, in order:
+`search_row`, `self.button`, `self.assets_table`, `detail_layout`
+(2.8's own automatic stacking). `open_asset_editor(self)` builds a
+real `AssetEditor()` (2.9, converted to a class in 2.14), connects
+`self.editor.asset_submitted.connect(self.on_asset_submitted)`, then
+shows it. `on_search_text_changed(self, new_text)` (2.6, simplified
+2.26) calls `self.proxy_model.set_search_text(new_text)` directly —
+no longer also sets a now-deleted `self.current_search_text`, confirmed
+dead (no real code anywhere read it back) before removing it. New in
+2.24, `on_category_filter_changed(self, category)` calls `self
+.proxy_model.set_category_filter(category)`. `on_current_row_changed
+(self, current, previous)` (2.23, rewritten 2.24, 2.26) — if `not
+current.isValid()`, clears all five detail labels and returns;
+otherwise, new in 2.24, `source_index = self.proxy_model.mapToSource
+(current)`, then reads `asset = self.state.assets[source_index.row()]`
+(2.26; was `self.submitted_assets[source_index.row()]` before 2.26,
+`self.submitted_assets[current.row()]` before 2.24) and sets each label
+(`Name`→plain
+`asset.name`, not `display_name`; `Serial Number`; `Category`;
+`Owner`→`f"{asset.owner.name} ({asset.owner.email})"`; `Status`→
+`"Retired"`/`"Active"` from `asset.is_retired`). `on_asset_submitted
+(self, name, serial_number, category)` (2.14, rewritten 2.15, 2.20)
+constructs a real `Asset` (`asset_manager.domain.asset`, imported since
+2.15, alongside `InvalidAssetError` and `asset_manager.domain.owner
+.Owner`) inside `try`/`except InvalidAssetError as error:`, using a
+module-level `PLACEHOLDER_OWNER = Owner("Unassigned",
+"unassigned@example.com")` constant (2.15) — success calls `self
+.assets_model.add_asset(asset)` (2.20; still targets `self.assets_model`
+directly, unaffected by the proxy sitting in front of it for viewing
+purposes only), then `self.editor.accept()` (2.16), closing the
+dialog; a caught error appends to `self.state.validation_errors` (2.26;
+was a bare `self.validation_errors`, set at the bottom of `__init__`,
+before 2.26 — now lives on `ApplicationState` instead) and calls
+`QMessageBox.warning(self.editor, "Invalid Asset", str(error))` (2.16)
+— no `accept`/`reject` follows, so the dialog stays open, and
+`add_asset` is never reached. **Import and execution, unchanged since
+2.15:** `from .asset_editor import AssetEditor`, `from
+.asset_filter_proxy_model import AssetFilterProxyModel` (new 2.24), and
+`from .asset_table_model import AssetTableModel` (all package-relative)
+— `main.py` **must** be run as `python -m asset_manager.desktop.main`
+from the project's own root; the old `python main.py` from inside
+`desktop/` still fails immediately with `ModuleNotFoundError: No
+module named 'asset_manager'`. `main()` itself is still three lines:
+build `MainWindow()`, show it, run `app.exec()`. 2.2, 2.3, and 2.4 were
+all conceptual/throwaway, nothing landed from any of them.
+`asset_manager/desktop/application_state.py` (new, 2.26) — a real,
+plain Python class, deliberately not a `QObject` subclass, unlike
+almost everything else in `desktop/`. `ApplicationState.__init__(self)
+-> None` sets `self.assets: list[Asset] = []` and `self
+.validation_errors: list[InvalidAssetError] = []`, nothing else — no
+methods beyond `__init__`, no Qt import at all. Imports `Asset`,
+`InvalidAssetError` from `asset_manager.domain.asset`. Real, deliberate
+scope boundary, not yet resolved: whether this class gains real
+behavior of its own (beyond holding two lists) is explicitly deferred
+to `2.27 — Architecture Boundary`, per that lesson's own open scope
+question above.
+`asset_manager/desktop/asset_filter_proxy_model.py` (new, 2.24) —
+`AssetFilterProxyModel(QSortFilterProxyModel)`. `__init__(self,
+parent=None)` sets `self._search_text = ""`, `self._category_filter =
+"All Categories"`. `set_search_text(self, text)`/`set_category_filter
+(self, category)` — each updates its own real state, then calls
+`self.invalidate()` (confirmed the correct, non-deprecated method;
+`invalidateFilter`/`invalidateRowsFilter` are both real but deprecated
+in this project's own installed PySide6). `filterAcceptsRow(self,
+source_row, source_parent)` — reads `Name` (column `0`) and `Category`
+(column `2`) via `self.sourceModel().index(...).data(Qt.ItemDataRole
+.DisplayRole)`; rejects the row if `self._category_filter` is set and
+doesn't match, or if `self._search_text` is set and isn't a
+case-insensitive substring of the row's own real name; otherwise
+accepts it. No `setData` override anywhere — `QSortFilterProxyModel`'s
+own real, inherited implementation already forwards writes to `self
+.assets_model` correctly, confirmed before relying on it.
 `asset_manager/desktop/asset_table_model.py` (new 2.20, `data`
 rewritten 2.21) — `AssetTableModel(QAbstractTableModel)`, this
 project's first custom Qt model. `COLUMN_HEADERS = ["Name", "Serial
@@ -226,15 +290,27 @@ three-way dispatch: `asset`/`column` computed once, up front; for
 column `0` returns plain `asset.name` instead (columns `1`/`2`
 identical to `DisplayRole`); for `TextAlignmentRole`, column `1`
 returns `Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter`,
-every other column/role returns `None`. `headerData` unchanged — still
-`DisplayRole`-only. `add_asset(self, asset)` — the one, real mutation
-method: `beginInsertRows(QModelIndex(), row, row)`, `self._assets
-.append(asset)`, `endInsertRows()`, confirmed to genuinely emit
-`rowsInserted`. Imports `asset_manager.domain.asset.Asset` directly —
-the first file inside `desktop/` other than `main.py` to import from
-`domain` on its own. **Real, still-open gap:** no `flags()` override
-anywhere — every cell is still non-editable by default, despite
-`EditRole` now being correctly implemented; Lesson 2.22's own job.
+every other column/role returns `None`. **New in 2.22:** `flags(self,
+index)` returns `super().flags(index) | Qt.ItemFlag.ItemIsEditable` —
+every cell, every column, genuinely editable. `setData(self, index,
+value, role=Qt.ItemDataRole.EditRole) -> bool` — returns `False`
+immediately if `role != EditRole`; otherwise builds `new_asset` via
+`dataclasses.replace(asset, name=value)` (column `0`), `serial_number=`
+(column `1`), or `category=` (column `2`) inside a `try`/`except
+InvalidAssetError: return False`; on success, `self._assets[index
+.row()] = new_asset` (replacing the shared list's own entry by index)
+and `self.dataChanged.emit(index, index, [role])`, then returns `True`.
+`headerData` unchanged — still `DisplayRole`-only. `add_asset(self,
+asset)` — the one, real *insertion* method: `beginInsertRows
+(QModelIndex(), row, row)`, `self._assets.append(asset)`,
+`endInsertRows()`, confirmed to genuinely emit `rowsInserted` — a
+second real notification signal, `dataChanged`, now also exists for
+*edits* to existing rows. Imports `dataclasses` (Python's own standard
+library) and `InvalidAssetError` (alongside `Asset`, both from
+`asset_manager.domain.asset`) — the first file inside `desktop/` other
+than `main.py` to import from `domain` on its own. **No remaining
+editing gap:** `EditRole`, `flags`, and `setData` are all now correctly
+implemented and confirmed working, across all three columns.
 `asset_manager/desktop/asset_editor.py` (2.9, rewritten 2.14, extended
 2.15, extended 2.16) — `AssetEditor(QDialog)` (2.16; was `QWidget`) is
 a real class. `__init__` calls `super().__init__()`, sets the window
@@ -271,18 +347,21 @@ and both validation-exception facts. `asset_manager/__init__.py` and
 `asset_manager/domain/__init__.py` both exist, empty (1.15). `snapshot/`
 mirrors this exact layout, `asset_manager/desktop/` (2.1, 2.5–2.9,
 restructured 2.11, 2.12, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, rewritten
-2.20, `data` rewritten again 2.21) included — see **Files in this set**
-above. `main.py` genuinely imports from `asset_manager.domain` (2.15)
-— the desktop and domain layers are connected for real, and, since
-2.20, so does `asset_table_model.py` directly. Read `snapshot/
-asset_manager/desktop/asset_table_model.py` before writing 2.22 —
-`EditRole` is already correctly implemented in `data`, but no
-`flags()` override exists anywhere yet, exactly the real gap 2.22's own
-"Editing Models" material needs to close.
+2.20, `data` rewritten again 2.21, `flags`/`setData` added 2.22,
+selection + detail panel added 2.23, plus new `asset_filter_proxy
+_model.py` and `assets_table` re-pointed at it, 2.24, plus new
+`category_delegate.py` and `assets_table`'s own `Category` column
+re-pointed at it, 2.25, plus new `application_state.py` and `self.state`
+replacing bare `submitted_assets`/`validation_errors`/`current_search
+_text` attributes, 2.26) included — see **Files in this set** above.
+`main.py` genuinely imports from `asset_manager.domain` (2.15) — the
+desktop and domain layers are connected for real, and, since 2.20, so
+does `asset_table_model.py` directly, and, since 2.26, so does
+`application_state.py` directly.
 
 **Taught concepts so far:** `TAUGHT-CONCEPTS.md`'s Series 1 section
 lists everything introduced through Lesson 1.16 — all of Series 1 — and
-its new Series 2 section lists Lessons 2.1–2.21: (1.1) `class`, instance,
+its new Series 2 section lists Lessons 2.1–2.26: (1.1) `class`, instance,
 `pass`, `self`, instance attribute, method, `is`, default `==`,
 implicit inheritance from `object`, dunder methods, `__init__`,
 `object`, `__bases__`, `type()`, `AttributeError`, `return`,
@@ -1373,6 +1452,218 @@ in this lesson's own SE Lens, not hidden: `EditRole` is implemented
 correctly, but `AssetTableModel` still has no `flags()` override, so
 `QTableView` never actually offers to edit anything yet — explicitly
 Lesson 2.22's own job.
+
+Lesson 2.22 — Editing Models followed next, Core per its own blueprint
+entry, landed cleanly under **Survives**, no hedge. Three Concept Units
+(making a cell editable, the naive way; reusing domain validation with
+`dataclasses.replace`; real editing in `AssetTableModel`). Real,
+structural addition: `flags(index)` now returns `super().flags(index)
+| Qt.ItemFlag.ItemIsEditable` — every cell, every column, genuinely
+editable; `setData(index, value, role)` writes a real value back via
+`dataclasses.replace(asset, name=value)` (or `serial_number=`/
+`category=`), never by mutating `Asset` directly. Real, deliberately-
+broken proof, the lesson's own central finding, mirroring 2.20's own
+`beginInsertRows`-vs-silent-mutation contrast: a first, naive `setData`
+that wrote `asset.name = value` directly (bypassing the constructor
+entirely) was shown to silently accept a blank name, since `Asset
+.__post_init__`'s own real validation (1.9, 1.11) only ever runs during
+construction — confirmed for real (`setData(index, "   ")` returned
+`True`, and the blank value was genuinely stored and displayed).
+`dataclasses.replace` fixes this by rerunning `Asset.__init__`/
+`__post_init__` for real on every edit, reusing existing validation
+with zero duplicated rules; a blank edit now raises the identical real
+`InvalidAssetError` a bad construction already would, caught in
+`setData` and turned into an honest `False`, confirmed to leave the
+stored value completely unchanged. On success, `self._assets[index
+.row()] = new_asset` replaces the shared list's own entry (2.20's own
+single-copy design still holding — confirmed the change is visible
+from `window.submitted_assets` itself, not just inside the model), and
+`self.dataChanged.emit(index, index, [role])` — a second real
+notification signal, distinct from `rowsInserted` (2.20) — tells the
+view to redraw. Real, deliberate scope choice, named plainly rather
+than left implicit: editing landed uniformly across all three columns,
+not scoped down to just `Name`, since — unlike 2.17's own honestly-
+disabled `Edit`/`Delete` menu items — no real structural blocker
+existed for `Serial Number`/`Category`; both already had correct
+`EditRole` answers (2.21) and validate identically through
+`dataclasses.replace`.
+
+Lesson 2.23 — Selection followed next, Core per its own blueprint
+entry, landed cleanly under **Survives**, no hedge. Two Concept Units
+(`QItemSelectionModel` and `currentRowChanged`, isolated; a detail
+panel for the selected asset). Real, structural decision, resolved and
+executed rather than left open: "the detail panel" became a genuinely
+new, separate, read-only panel — five real `QLabel`s in a new
+`QFormLayout` — rather than repurposing `AssetEditor` for a second real
+purpose; the SE Lens states plainly why: `AssetEditor.asset_submitted`
+(2.14) means exactly one thing everywhere in this project ("a new
+asset was created"), and overloading that meaning would have been a
+real, structural change touching every lesson since 2.14, for a
+feature (viewing/editing a selected existing asset) 2.22's own in-table
+editing already covers. Real, confirmed mechanism: `self.assets_table
+.selectionModel()` already exists automatically the instant `setModel`
+runs — no separate construction anywhere — and its own real
+`currentRowChanged` signal fires specifically when the current *row*
+changes (confirmed distinct from the more general `currentChanged`).
+`self.assets_table.setSelectionBehavior(QAbstractItemView
+.SelectionBehavior.SelectRows)` — confirmed, by direct comparison, to
+be a real UX choice, not a requirement for `currentRowChanged` itself
+(which already fired correctly under the real, default `SelectItems`
+behavior in this lesson's own isolated proof). `Asset.owner` (1.4) and
+`Asset.is_retired` (1.2) appear in this project's UI for the first
+time ever, neither ever shown by the table's own three columns. Real,
+deliberate design choice, stated plainly: the detail panel's own `Name`
+label shows plain `asset.name`, not `display_name` (1.10, 2.21), since
+a separate `Status` label already carries the retirement fact — showing
+both would repeat the identical information twice. Confirmed for real,
+end-to-end, including the live-update case: marking an asset retired
+directly (`Asset.mark_retired()`, 1.2) and re-selecting its row updates
+`Status` to `"Retired"` with no stale caching anywhere.
+
+Lesson 2.24 — Proxy Models followed next, Core per its own blueprint
+entry, landed cleanly under **Survives**, no hedge — genuinely one of
+the more substantial, "Core" architectural lessons this session has
+written. Four Concept Units (`QSortFilterProxyModel` basics, isolated;
+edits pass through the proxy automatically, isolated; a custom filter
+combining search and category, isolated; building the real Asset
+search box). Real, structural addition: a brand-new file,
+`asset_manager/desktop/asset_filter_proxy_model.py`, defines
+`AssetFilterProxyModel(QSortFilterProxyModel)`, inserted between `self
+.assets_model` (2.20, completely untouched) and `self.assets_table`
+(2.19) — `self.assets_table.setModel(self.proxy_model)` replaces the
+old direct connection, while `add_asset` (2.20) and `setData` (2.22)
+both still target `self.assets_model` directly, unaffected. Real,
+load-bearing proof, not assumed: calling `setData` directly on an
+*unmodified* base `QSortFilterProxyModel` was shown to already forward
+correctly to a real, validating source model, with correct index
+translation and no override written anywhere — confirmed *before*
+deciding `AssetFilterProxyModel` itself needed no `setData` of its own
+at all, avoiding real, unnecessary duplicated code. Real, non-obvious,
+checked-not-assumed finding, this lesson's own central "verify before
+using" moment: two similarly-named, plausible-sounding real methods,
+`invalidateFilter` and `invalidateRowsFilter`, are **both** deprecated
+in this project's own installed PySide6 — confirmed by actually
+calling each and catching a real `DeprecationWarning`, not by trusting
+a remembered API name; the correct, current method is plain
+`invalidate()`. `filterAcceptsRow`, one real, custom method, checks
+both a category match and a case-insensitive search-text match
+together, against real `Name`/`Category` columns — resolved, and
+executed, as one combined proxy rather than two chained ones, a real
+design call. `self.category_box` (2.7) gained its first-ever
+non-category item (`"All Categories"`) and its first-ever signal
+connection (`currentTextChanged`, unconnected since 2.7);
+`on_current_row_changed` (2.23) was updated to call `self.proxy_model
+.mapToSource(current)` before indexing `self.submitted_assets`, since
+`current` now names a row in the *proxy's* own index space — confirmed
+correct end-to-end even while the table is actively, doubly filtered
+(a real, valid, filtered selection still resolves to the correct real
+asset in the detail panel).
+
+Lesson 2.25 — Delegates followed next, landed per the blueprint's own
+explicit hedge — **"mostly throwaway," "we know where to go when we
+need one"** — resolved by landing exactly one, small, well-motivated
+real example rather than treating the whole lesson as throwaway or
+building a general delegate framework. Two Concept Units
+(`QStyledItemDelegate` basics, isolated; a real `CategoryDelegate`
+landing). Real, structural addition: a brand-new, small file,
+`asset_manager/desktop/category_delegate.py`, defines `CategoryDelegate
+(QStyledItemDelegate)` — `createEditor` builds a real `QComboBox`
+populated from a class-level `CATEGORIES` list; `setEditorData` reads
+the cell's own `EditRole` value (2.21) and sets it as the combo box's
+current text; `setModelData` writes the combo box's `currentText()`
+back through `model.setData(index, ..., Qt.ItemDataRole.EditRole)`
+(2.22); `updateEditorGeometry` sizes the editor to `option.rect`.
+Attached via `self.assets_table.setItemDelegateForColumn(2, self
+.category_delegate)` — `Category` (column `2`) now opens this real
+combo box instead of `QTableView`'s own default free-text `QLineEdit`
+editor; `Name`/`Serial Number` are untouched, still using the default.
+Real, confirmed, load-bearing proof: the delegate's own `setModelData`
+was exercised with `model` genuinely bound to `self.proxy_model`
+(2.24), not `self.assets_model` directly, since that's what
+`self.assets_table` is actually showing — an edit through the delegate
+was confirmed to reach the real, underlying `Asset` object correctly,
+through the proxy, the identical transparent write-forwarding 2.24
+already proved for `setData` generally, now exercised through a real
+delegate for the first time. Real, honestly-named cost, not hidden:
+`CategoryDelegate.CATEGORIES` and `AssetEditor.category_field`'s own
+item list (2.9) are now two separate, real, duplicated copies of the
+identical five category strings — a real, small, accepted cost,
+explicitly matching this lesson's own "mostly throwaway" framing
+rather than building a shared, single source for that list now. All
+required executions run for real, headless
+(`verification/2.25/lab1_delegate_basics.py`,
+`step1_real_project_confirmation/confirm.py`, the latter confirming
+`window.assets_table.itemDelegateForColumn(2) is window
+.category_delegate`, exercising `createEditor`/`setEditorData`/
+`setModelData` against the real, live project end-to-end, and
+confirming the edit reached the real `Asset` through the proxy). No
+vocabulary or fidelity gaps found on self-check.
+
+Lesson 2.26 — Application State followed next, Core, **Major
+transferable concept**, per its own blueprint entry, landed cleanly.
+Two Concept Units (deleting redundant state; a dedicated application
+state object). Real, structural removal, this lesson's own first unit:
+`self.current_search_text` (2.6, 2.12) was confirmed — via a real
+Socratic check of every call site, not assumed — to be a dead,
+duplicated copy of state `AssetFilterProxyModel.self._search_text`
+(2.24) already owned for real; deleted outright from `MainWindow
+.__init__` and `on_search_text_changed`, confirmed afterward
+(`hasattr(window, "current_search_text")` reading `False`) with zero
+change to the search box's own real, observable behavior. Real,
+structural addition, this lesson's own second unit and its own real
+"major transferable concept": a brand-new, small file, `asset_manager/
+desktop/application_state.py`, defines a plain (deliberately
+non-`QObject`) `ApplicationState` class holding `self.assets` and
+`self.validation_errors` — `MainWindow.__init__` now builds exactly one
+`self.state = ApplicationState()`, replacing the old bare
+`self.submitted_assets = []` and the old bare `self.validation_errors
+= []` (the latter also deleted from `__init__`'s own tail this same
+lesson) — `MainWindow` now holds exactly one real attribute for genuine
+UI-lifetime state (`self.editor`, 2.11) and one real reference to
+everything domain-adjacent (`self.state`), the real, structural seam
+the blueprint's own "stop widgets from becoming the application's
+database" framing asked for. Real, confirmed, load-bearing proof, not
+assumed: `AssetTableModel`'s own real, single-reference contract (2.20)
+still holds, now reached one attribute hop further through `self.state`
+— `window.state.assets is window.assets_model._assets` confirmed
+`True` — and both a valid and an invalid real submission were confirmed,
+end-to-end, in one real, batched headless run, to behave exactly as
+they did before this lesson. Both isolated labs this lesson used
+(a `Radio`/`VolumeDisplay` toy proving the general "redundant state"
+problem; a `TodoWidget`/`TodoState` toy proving "extracting a dedicated
+state object") were plain Python with no framework involved and fully,
+confidently predictable — stated from confidence rather than executed,
+per the Verification Rule's own Necessity part, matching this
+curriculum's own standing note not to run trivially-predictable code
+just for safety margin. Only the real project's own integration was
+actually run this session (`verification/2.26/
+step1_real_project_confirmation/confirm.py`, batching both units'
+real-project claims in one pass, including the standing `timeout 3`
+sanity run on the real `main.py`, exit code `124`, no crash). Self-check
+caught one real gap: `AttributeError`, used in this lesson's own
+Mechanical Walkthrough to state a concrete, checkable consequence of
+the deletion, had no Header slot on the first draft — fixed by reviving
+this curriculum's own earlier (pre-2.20) "Terms used in this lesson"
+convention for this one entry, since the more recent lessons' practice
+of omitting that section entirely left no natural home for a
+reapplied, tangential exception class. Self-check also caught three
+code blocks sitting back-to-back with no prose between them (the
+`__init__`/`on_current_row_changed`/`on_asset_submitted` slices inside
+the second unit's own Updated Project step) — fixed by inserting a
+one-line prose transition before each. Real, deliberately open
+question, not decided here: whether `ApplicationState` itself becomes
+(or anchors) `2.27 — Architecture Boundary`'s own "Application logic"
+layer, or whether that layer still needs real behavior moved into it —
+left for next session, per **Current position** above. While closing
+out this lesson, also caught and fixed two real, stale leftovers in
+this HANDOFF's own **Project state** section from 2.25's own closeout:
+a "Real, still-open gap" paragraph describing the `Category` column's
+free-text editor as unfixed, even though 2.25 had already landed
+`CategoryDelegate` to fix exactly that; and a "Read
+`asset_table_model.py` before writing 2.25" instruction left in place
+after 2.25 was already written. Both corrected in place, matching this
+handoff's own standing discipline of keeping **Project state** a live,
+accurate description rather than a historical log.
 
 ## After finishing a lesson (do this before handing off / before clearing)
 

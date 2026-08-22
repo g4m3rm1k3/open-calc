@@ -20,7 +20,6 @@ from PySide6.QtWidgets import (
 from asset_manager.domain.asset import Asset, InvalidAssetError
 from asset_manager.domain.owner import Owner
 
-from .application_state import ApplicationState
 from .asset_editor import AssetEditor
 from .asset_filter_proxy_model import AssetFilterProxyModel
 from .asset_table_model import AssetTableModel
@@ -71,8 +70,8 @@ class MainWindow(QMainWindow):
         search_row.addWidget(self.search_box)
         search_row.addWidget(self.category_box)
 
-        self.state = ApplicationState()
-        self.assets_model = AssetTableModel(self.state.assets, self)
+        self.submitted_assets = []
+        self.assets_model = AssetTableModel(self.submitted_assets, self)
         self.proxy_model = AssetFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.assets_model)
         self.assets_table = QTableView()
@@ -106,6 +105,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
 
         self.editor = None
+        self.current_search_text = ""
+        self.validation_errors = []
 
     def open_asset_editor(self) -> None:
         self.editor = AssetEditor()
@@ -113,6 +114,7 @@ class MainWindow(QMainWindow):
         self.editor.show()
 
     def on_search_text_changed(self, new_text: str) -> None:
+        self.current_search_text = new_text
         self.proxy_model.set_search_text(new_text)
 
     def on_category_filter_changed(self, category: str) -> None:
@@ -127,7 +129,7 @@ class MainWindow(QMainWindow):
             self.detail_status_label.setText("")
             return
         source_index = self.proxy_model.mapToSource(current)
-        asset = self.state.assets[source_index.row()]
+        asset = self.submitted_assets[source_index.row()]
         self.detail_name_label.setText(asset.name)
         self.detail_serial_label.setText(asset.serial_number)
         self.detail_category_label.setText(asset.category)
@@ -138,7 +140,7 @@ class MainWindow(QMainWindow):
         try:
             asset = Asset(name, serial_number, category, PLACEHOLDER_OWNER)
         except InvalidAssetError as error:
-            self.state.validation_errors.append(error)
+            self.validation_errors.append(error)
             QMessageBox.warning(self.editor, "Invalid Asset", str(error))
             return
         self.assets_model.add_asset(asset)
