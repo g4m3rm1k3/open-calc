@@ -1,12 +1,12 @@
 # Lesson 7.3: An Address on Disk
 
 - **What you will build** — This lesson gives `AndroidCalculator`'s own
-  real calculation history (Lesson 7.1) a genuine, durable home for the
+  real calculation history a genuine, durable home for the
   first time — real, permanent Room-backed persistence: a real `@Entity`
   shaping one row of a real, on-device SQLite table; a real `@Dao`
   turning plain method signatures into real, generated SQL; and a real
   `@Database` tying both into one real, openable, queryable database.
-  This closes exactly the gap Lesson 7.2 proved: this project's own
+  This closes exactly the real gap already proven: this project's own
   history, right now, is real but lives only in RAM, gone the instant
   the process ends. The transferable problem underneath all three: how
   an ordinary, in-memory data shape becomes something a real database
@@ -53,10 +53,10 @@
   actually begins running, not at the moment the test class itself is
   constructed.
 - **`::class.java`** — already established in this project's own
-  `assertThrows(IllegalArgumentException::class.java) { ... }` calls;
-  reused here to hand Room's own real database builder a real `Class`
-  object naming which database to build, the same real mechanism, just
-  a different real caller.
+  `assertThrows` calls, where `IllegalArgumentException::class.java`
+  names the real exception type expected; reused here to hand Room's
+  own real database builder a real `Class` object naming which database
+  to build, the same real mechanism, just a different real caller.
 
 ## Objects and methods used
 
@@ -336,8 +336,8 @@
 - **`ApplicationProvider.getApplicationContext()`**
   - What it is: a real, static method from AndroidX's own test library,
     returning a real, Robolectric-simulated `Context` — already
-    resolved on this project's classpath since Lesson 4.1, used
-    directly for the first time this lesson.
+    resolved on this project's classpath since its own earlier
+    navigation work, used directly for the first time this lesson.
   - Implementation: `fun <T> getApplicationContext(): T`.
   - Its use: `Room.inMemoryDatabaseBuilder` requires a real `Context` to
     construct a real database against; this is the real, established
@@ -356,10 +356,11 @@
 
 ### The Problem
 
-Lesson 7.2 already named exactly what durable storage needs — tables of
-uniform records, and real Create/Read/Update/Delete operations. But
-nothing in this project's own current build knows how to actually talk
-to a real, on-device database yet. Room is the real library that fills
+This project's own earlier work already named exactly what durable
+storage needs — tables of uniform records, and real
+Create/Read/Update/Delete operations. But nothing in this project's own
+current build knows how to actually talk to a real, on-device database
+yet. Room is the real library that fills
 that gap — but unlike every dependency this project has added so far
 (Compose, Navigation, Robolectric), Room needs to *generate real code*
 from annotations at compile time, not just sit on the runtime classpath
@@ -399,6 +400,9 @@ waiting to be called.
 ```kotlin
 id("kotlin-kapt")
 ```
+
+This same unit also adds the three real Room dependencies the new
+plugin line makes possible:
 
 ```kotlin
 implementation("androidx.room:room-runtime:2.6.1")
@@ -496,7 +500,8 @@ other file needing to change for this step alone.
 - `implementation("androidx.room:room-ktx:2.6.1")` (line 52) — adds
   Room's own real Kotlin-extensions library, providing Kotlin-friendly
   wrappers (most notably `suspend`-based ones this project isn't using
-  yet, deliberately, until Lesson 7.5) around the plain-Java core.
+  yet, deliberately, until a later, dedicated lesson) around the
+  plain-Java core.
 - `kapt("androidx.room:room-compiler:2.6.1")` (line 53) — routes Room's
   own real annotation processor through KAPT specifically, rather than
   `implementation`, since this dependency's whole real job is running
@@ -564,10 +569,11 @@ Room "this Kotlin type represents one real row of a real table."
 
 ### The Problem
 
-This project's own real `Calculation` (Lesson 7.1) has four real
-fields — `operator`, `operandA`, `operandB`, `result` — and Lesson 7.2
-already proved that shape already matches a real database table's own
-row, column for column. But nothing about an ordinary Kotlin
+This project's own real `Calculation` has four real
+fields — `operator`, `operandA`, `operandB`, `result` — and this
+project's own earlier work already proved that shape already matches a
+real database table's own row, column for column. But nothing about an
+ordinary Kotlin
 `data class` tells Room's own real annotation processor that a type
 represents a persistent table row at all, or how a real database engine
 should tell one row apart from another.
@@ -797,9 +803,22 @@ actually use. Neither of those exists yet.
 
 ### Introduce the Concept in Isolation
 
+The `@PrimaryKey`-fixed `LabBrokenEntity` from the unit above was
+already discarded, so this lab redeclares it fresh, real and unchanged,
+alongside its own new `@Dao` and `@Database`:
+
 ```kotlin
+@Entity(tableName = "lab_broken")
+data class LabBrokenEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val operator: String,
+    val operandA: Int,
+    val operandB: Int,
+    val result: Int
+)
+
 @Dao
-interface LabCalculationDao {
+interface LabBrokenDao {
     @Insert
     fun insert(entity: LabBrokenEntity)
 
@@ -809,12 +828,12 @@ interface LabCalculationDao {
 
 @Database(entities = [LabBrokenEntity::class], version = 1)
 abstract class LabBrokenDatabase : RoomDatabase() {
-    abstract fun labBrokenDao(): LabCalculationDao
+    abstract fun labBrokenDao(): LabBrokenDao
 }
 ```
 
-Real, executed output (compiling this real, temporary DAO and
-database):
+Real, executed output (compiling this real, temporary entity, DAO, and
+database together):
 
 ```
 BUILD SUCCESSFUL in 2s
@@ -833,13 +852,48 @@ protected String createQuery() {
 }
 ```
 
+The real, generated `getAll()` method is longer, but shows the same
+real mechanism from the other direction — building a real `Cursor` and
+walking it column by column, shown here in full, exactly as generated,
+nothing trimmed:
+
 ```java
 public List<LabBrokenEntity> getAll() {
   final String _sql = "SELECT * FROM lab_broken";
   final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
   __db.assertNotSuspendingTransaction();
   final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
-  ...
+  try {
+    final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+    final int _cursorIndexOfOperator = CursorUtil.getColumnIndexOrThrow(_cursor, "operator");
+    final int _cursorIndexOfOperandA = CursorUtil.getColumnIndexOrThrow(_cursor, "operandA");
+    final int _cursorIndexOfOperandB = CursorUtil.getColumnIndexOrThrow(_cursor, "operandB");
+    final int _cursorIndexOfResult = CursorUtil.getColumnIndexOrThrow(_cursor, "result");
+    final List<LabBrokenEntity> _result = new ArrayList<LabBrokenEntity>(_cursor.getCount());
+    while (_cursor.moveToNext()) {
+      final LabBrokenEntity _item;
+      final long _tmpId;
+      _tmpId = _cursor.getLong(_cursorIndexOfId);
+      final String _tmpOperator;
+      if (_cursor.isNull(_cursorIndexOfOperator)) {
+        _tmpOperator = null;
+      } else {
+        _tmpOperator = _cursor.getString(_cursorIndexOfOperator);
+      }
+      final int _tmpOperandA;
+      _tmpOperandA = _cursor.getInt(_cursorIndexOfOperandA);
+      final int _tmpOperandB;
+      _tmpOperandB = _cursor.getInt(_cursorIndexOfOperandB);
+      final int _tmpResult;
+      _tmpResult = _cursor.getInt(_cursorIndexOfResult);
+      _item = new LabBrokenEntity(_tmpId,_tmpOperator,_tmpOperandA,_tmpOperandB,_tmpResult);
+      _result.add(_item);
+    }
+    return _result;
+  } finally {
+    _cursor.close();
+    _statement.release();
+  }
 }
 ```
 
@@ -892,7 +946,13 @@ Real, executed output (the identical insert, run again after this one
 change):
 
 ```
-BUILD SUCCESSFUL
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.calculator.LabPersistenceCheckTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-22T20:07:19" hostname="Michaels-Mac-mini.local" time="3.082">
+  <properties/>
+  <testcase name="insertOnTheDefaultRealDatabaseFromATestThread" classname="com.example.calculator.LabPersistenceCheckTest" time="3.082"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
 ```
 
 ### Discard the Throwaway Example
@@ -902,7 +962,8 @@ real output already proved everything it needed to: `@Dao` methods
 really do become real, generated SQL and cursor-handling code; a real
 `RoomDatabase` really does refuse a query from what it considers the
 main thread; and `.allowMainThreadQueries()` is the real, deliberate
-escape hatch this lesson needs until `suspend` arrives in Lesson 7.5.
+escape hatch this lesson needs until a later, dedicated lesson
+introduces `suspend`.
 
 ### Project Change
 
@@ -917,7 +978,8 @@ escape hatch this lesson needs until `suspend` arrives in Lesson 7.5.
 - **Dependencies**: `CalculationEntity`, from the unit above;
   `androidx.room` (`@Dao`, `@Insert`, `@Query`, `@Database`,
   `RoomDatabase`, `Room`); `androidx.test.core.app.ApplicationProvider`,
-  already resolved on this project's classpath since Lesson 4.1.
+  already resolved on this project's classpath since its own earlier
+  navigation work.
 
 ### The New Code
 
@@ -931,6 +993,9 @@ interface CalculationDao {
     fun getAll(): List<CalculationEntity>
 }
 ```
+
+This same unit also adds the real database class tying that DAO to a
+real, concrete table:
 
 ```kotlin
 @Database(entities = [CalculationEntity::class], version = 1, exportSchema = false)
@@ -1074,7 +1139,7 @@ main-thread constraint before any of this real code was written.
 
 ### Mechanical Walkthrough
 
-- `@Dao interface CalculationDao { ... }` — the same real mechanism
+- `@Dao interface CalculationDao` — the same real mechanism
   proven in isolation above, now permanent: an `interface`, marked
   `@Dao`, whose own real implementation Room generates entirely.
   - `@Insert fun insert(calculation: CalculationEntity)` — declares a
@@ -1091,13 +1156,13 @@ main-thread constraint before any of this real code was written.
   - `abstract fun calculationDao(): CalculationDao` — the real, required
     way any caller reaches a working `CalculationDao` — Room generates
     a real implementation returning its own generated `CalculationDao_Impl`.
-- `@RunWith(RobolectricTestRunner::class) class AppDatabaseTest { ... }`
+- `@RunWith(RobolectricTestRunner::class) class AppDatabaseTest`
   — a real, permanent test class, run through Robolectric's own
   established real Android simulation.
   - `private lateinit var database: AppDatabase` — declares a real,
     mutable property with no initial value, on the promise `@Before`
     assigns one before any real `@Test` reads it.
-  - `@Before fun createDatabase() { ... }` — runs automatically before
+  - `@Before fun createDatabase()` — runs automatically before
     every real test in this class.
     - `Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java)`
       — starts building a real, memory-only `AppDatabase`, using
@@ -1168,7 +1233,9 @@ transparency, not a free improvement.
 Real, executed test-report output (this session):
 
 ```
+<?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="com.example.calculator.AppDatabaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-22T20:00:50" hostname="Michaels-Mac-mini.local" time="3.011">
+  <properties/>
   <testcase name="insertedCalculationCanBeReadBackFromARealDatabase" classname="com.example.calculator.AppDatabaseTest" time="3.011"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
@@ -1180,8 +1247,8 @@ Real, executed test-report output (this session):
 `CalculationEntity` gave this project's history a real row shape;
 `CalculationDao` and `AppDatabase`, proven together in this same unit,
 give that shape a real, working way to actually be written and read
-back — the exact, complete, real mechanism Lesson 7.2 named but couldn't
-yet build.
+back — the exact, complete, real mechanism this project's own earlier
+work named but couldn't yet build.
 
 ---
 
