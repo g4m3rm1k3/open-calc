@@ -1,1 +1,0 @@
-assertThrows caught it - no exception escaped main()
