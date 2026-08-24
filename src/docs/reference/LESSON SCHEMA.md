@@ -42,9 +42,31 @@ everything it depends on, in full, inside itself, regardless of what
 any other lesson does or doesn't say about the same thing, and without
 needing to consult any other lesson to decide how much to write.
 
-The one place a lesson number still belongs is the header's "What you
-need to know first" list and the closing "next lesson" pointer — never
-as a substitute for an explanation inside a Concept Unit's own prose.
+**This rule is not limited to this curriculum's own lesson numbers.** A
+lesson that exists as a deliberate port or comparison against a sibling
+curriculum (the same project rebuilt in a different language or
+framework, for instance) is bound by the identical rule for the sibling
+series' lesson numbers as it is for its own: "Java's Lesson 04," "the
+Python series' Lesson 7," or any other named lesson from any other
+curriculum is exactly as forbidden inside a Concept Unit's own prose as
+a same-curriculum citation would be, with no exception for a curriculum
+that is explicitly written as a comparison piece. A reader of this
+lesson has no guarantee they've read, remember, or even have access to
+that other curriculum; naming it assumes a prerequisite this schema
+never grants anywhere outside the exact two locations below. If a
+comparison to another language or an earlier approach is worth making,
+make it on its own terms — describe what that earlier approach did, in
+full, inline, the same as any other concept this lesson defines — never
+by pointing at "Lesson N" of anything, named or unnamed, in or out of
+this curriculum.
+
+The one place a lesson number still belongs — and only a number from
+*this same curriculum*, never another one — is the header's "What you
+need to know first" list and the closing "next lesson" pointer, and
+even there it is a bare name, not a re-explanation smuggled in under
+citation cover: never as a substitute for an explanation inside a
+Concept Unit's own prose, and never naming a lesson from any other
+curriculum in either location either.
 
 ---
 
@@ -111,8 +133,12 @@ Title is concept-first, not feature-first. Not "Lesson 2: File Browsing."
 
 - **What you will build** — one paragraph. State the working feature,
   then state the transferable problem(s) this lesson is actually about.
-- **What you need to know first** — name the specific prior lesson(s) and
-  specific concepts from them being reused. "Nothing" only for Lesson 1.
+- **What you need to know first** — name the specific prior lesson(s)
+  from *this same curriculum only* and the specific concepts from them
+  being reused. "Nothing" only for Lesson 1. Never name a lesson from a
+  different curriculum or series here or anywhere else in the lesson —
+  see the Repetition Rule's cross-curriculum clause, above; a reader of
+  this curriculum should never need to have read a different one.
 - **Pipeline diagram, if applicable.** Once a lesson touches any stage of
   a named multi-stage pipeline this curriculum has established (for
   example, `Text → Lexer → Parser → AST → Semantic Analysis`), open by
@@ -830,12 +856,24 @@ stays one level up (`## Concept Unit: <name>`), so headings nest
    > with nothing else ("— reappearing (Lesson 2c)") is not an
    > explanation; it's an assertion the reader has to go verify by
    > opening another file, and it fails this rule exactly like silence
-   > does. Never hyperlink to the earlier lesson either — the site's
-   > search finds where a concept was introduced and everywhere else
-   > it's used; that's the lookup path, not an in-body citation. The one
-   > place a lesson number belongs is the header's "What you need to
-   > know first" list and the closing "next lesson" pointer — never
-   > inside a Concept Unit's own prose.
+   > does. **Naming the lesson number is the violation, not just
+   > omitting the explanation that would have made it unnecessary** —
+   > "the same Observer pattern Lesson 2c already proved: a subject
+   > holds a list..." fails this exactly as badly as the bare citation
+   > above, even though a full explanation follows it, because the
+   > sentence still asks the reader to know what "Lesson 2c" is. Cut the
+   > lesson number, keep the explanation. This applies identically to a
+   > lesson number from a different curriculum or series ("Java's Lesson
+   > 04 already proved...") — see the Repetition Rule's cross-curriculum
+   > clause, above; a curriculum written as a deliberate port or
+   > comparison piece is not an exception. Never hyperlink to the
+   > earlier lesson either — the site's search finds where a concept was
+   > introduced and everywhere else it's used; that's the lookup path,
+   > not an in-body citation. The one place a lesson number belongs at
+   > all is the header's "What you need to know first" list and the
+   > closing "next lesson" pointer, and only a number from this same
+   > curriculum there — never inside a Concept Unit's own prose, and
+   > never naming another curriculum's lesson in either location.
 
    **Execution trace, if this code carries a loop, recursion, or state
    across steps.** A prose description of what a loop "generally does"
@@ -1001,6 +1039,18 @@ Read the draft top to bottom and answer honestly:
       or "already covered" — that reasoning is exactly what the
       Repetition Rule now forbids; nothing here is skipped or
       abbreviated on the grounds that an earlier lesson already said it.
+- [ ] Does any sentence anywhere in this lesson — Concept Unit prose,
+      Mechanical Walkthrough, a Lens, Connect the Pieces, the opening
+      "What you will build" paragraph — name a lesson number, from this
+      curriculum or any other ("Lesson 6," "Java's Lesson 04," "the
+      Python series' Lesson 7")? The only two places a lesson number may
+      appear at all are the header's "What you need to know first" list
+      and the closing "next lesson" pointer, and only a number from
+      *this same curriculum* even there. This check applies with no
+      exception for a curriculum deliberately written as a port or
+      comparison against a sibling series — naming the sibling lesson is
+      exactly the failure, regardless of whether a full explanation
+      follows it.
 - [ ] Does the Header have both a "Terms used in this lesson" glossary
       and an "Objects and methods used" section, each entry stating
       *why* the thing exists or what problem it solves, not just what
