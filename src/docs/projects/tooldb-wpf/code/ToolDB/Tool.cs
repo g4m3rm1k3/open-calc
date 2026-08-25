@@ -1,13 +1,13 @@
 using Microsoft.Data.Sqlite;
 
-public class Tool
+public record Tool
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Manufacturer { get; set; } = "";
-    public double OverallDiameter { get; set; }
-    public double OverallLength { get; set; }
-    public int FluteCount { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; } = "";
+    public string Manufacturer { get; init; } = "";
+    public double OverallDiameter { get; init; }
+    public double OverallLength { get; init; }
+    public int FluteCount { get; init; }
 
     public static Tool FromReader(SqliteDataReader reader)
     {

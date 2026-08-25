@@ -5,7 +5,128 @@ Read this first when resuming. Roadmap and lesson status live in
 
 ## Status
 
-- **Next lesson:** 8 — Records & Strong Types
+- **Roadmap extended this session (2026-08-25), no lesson content written:**
+  the user's real, stated end goal is a Mastercam PDM app — WPF UI,
+  merging Mastercam SQLite databases, generating documents/HTML (Jinja did
+  this in the Python original), a real checkout/lock/version system. This
+  project (`tooldb-wpf`) is the correct, already-in-progress vehicle for
+  that goal rather than a new curriculum — confirmed with the user
+  directly rather than assumed. `Curriculum.md` gained two new slices,
+  inserted ahead of the old Slice 10 (renumbered to Slice 12, nothing
+  else changed about it): **Slice 10 — Document and Report Generation**
+  (Scriban, chosen for its Jinja-like `{{ }}`/`{% %}` syntax and zero
+  ASP.NET Core dependency — a locked decision, not a placeholder) and
+  **Slice 11 — PDM: Checkout, Locking, and Version History** (explicitly
+  reusing `forge-pdm`'s already-proven lock/transaction/WIP-snapshot
+  design, adapted into this project's own C#/SQLite terms per the Lesson
+  Schema's Repetition Rule — never cited by `forge-pdm`'s own lesson
+  numbers). Neither new slice is broken into individual lessons yet,
+  same status Slice 10/12's 3D-visualization content was already left
+  in — seeded rough shape only, real lesson numbers/prereqs deferred
+  until Slices 2–9 actually exist to number against.
+- **Open question, not yet resolved, worth settling before Slice 11 is
+  written:** whether `tooldb-wpf` stays a standalone WPF process (reads/
+  writes Mastercam's `.TOOLDB` files from outside Mastercam, which is
+  everything the roadmap assumes today) or needs to also become an
+  in-process Mastercam add-in (hosted inside Mastercam's own Win32/WinForms
+  process via its .NET API, using WPF's `HwndHost`/`ElementHost` interop).
+  The user's own framing ("building interfaces in mastercam") leans toward
+  wanting the add-in-hosting case at least eventually; nothing in the
+  current roadmap builds toward it yet. Ask directly before Slice 11 (or
+  whichever slice ends up covering app shell/hosting) is written, rather
+  than assuming either way.
+- **Lesson 8 written and verified this session (2026-08-25):** `ToolDB/Tool.cs`
+  changed from `class Tool` with `set` properties to `record Tool` with
+  `init` properties — `Tool.FromReader`'s own body needed zero changes
+  (object-initializer syntax works identically for `set` and `init`).
+  Three Concept Units: (1) a real, run aliasing bug using `Widget`
+  (`Widget alias = original; alias.Name = "..."` also changes
+  `original.Name` — real captured output), (2) `class` vs. `record`
+  equality proven with two new throwaway types, `PlainPoint`/`PointRecord`
+  (real output: `False`/`False` for the class, `True`/`True` for the
+  record, plus the record's real synthesized `ToString` output), (3) the
+  real `Tool.cs` change, proven closed by a deliberate
+  `tools[0].Name = "..."` mutation attempt that now fails to compile with
+  a real, captured `CS8852` error. `ToolDB.Tests` still passes unchanged
+  (`ToolTests.cs` only reads properties, never mutates). `record`/`init`
+  documentation was fetched fresh this session from Microsoft Learn (the
+  `record` language reference page and the `init` keyword page); the
+  `Object.Equals`/`Object.ToString` fetches came back oversized and were
+  read from the tool's own persisted output file instead of a second
+  fetch — both real, both cited with exact quoted signatures/remarks in
+  the lesson itself.
+- **Environment fix, this session, not a curriculum decision:** this
+  session's machine had only .NET SDKs 7.0.406/8.0.130/9.0.120/9.0.307
+  installed (`dotnet --list-sdks`) — no .NET 10 SDK, even though all four
+  `.csproj` files (`ToolDB`, `ToolDB.Tests`, `LabScratch`,
+  `LabScratch.Wpf`) targeted `net10.0`/`net10.0-windows`. No `global.json`
+  exists in this project pinning a specific SDK. Retargeted all four to
+  `net9.0`/`net9.0-windows` so real verification could happen at all —
+  confirmed via a real `dotnet build`/`dotnet test` pass on `ToolDB`
+  *before* touching `Tool.cs`, so this fix is isolated from Lesson 8's own
+  real content. Nothing this curriculum has taught or plans to teach
+  depends on .NET 10 specifically. If a future session finds .NET 10
+  available again, retargeting back is a free, independent choice — not
+  required by anything Lesson 8 did.
+- **`tools.db` was found empty (0 bytes) at the start of this session** —
+  expected, not a bug: `*.db` files are `.gitignore`d (per
+  `code/.gitignore`), so they never travel with the repository itself, and
+  this session's working copy simply never had one populated. Recreated
+  with the exact schema and one row Lessons 2–3 already established
+  (`1/2 in 4-Flute Carbide End Mill`, `O'Brien Carbide Tools`, 0.5, 3.0,
+  4) via a temporary `LabScratch/Program.cs` script, run once, before any
+  of Lesson 8's own real verification. **Future sessions should expect
+  this on a fresh checkout and know the fix** — recreate via the same
+  `CREATE TABLE`/`INSERT` shape shown in `ToolDB.Tests/ToolTests.cs`
+  (lines 17–30), not re-derive it from scratch or treat it as a real bug
+  worth investigating.
+- **A real course-correction happened mid-session, worth carrying
+  forward:** the user pushed back hard, twice — first that this session's
+  own chat responses (not the lesson content itself) were dumping dense,
+  jargon-heavy architecture decisions on them and stopping for approval on
+  things they can't yet evaluate (that's the whole point of taking the
+  lessons); second, mid-lesson-8-research, that too many tool-call steps
+  were passing with no visible deliverable ("lots of usage building an
+  example of what I will never use"). Both corrections are about *this
+  session's own chat pacing/tone*, not about the lesson file's own
+  content or rigor — the schema-mandated lesson format itself was not
+  challenged and should keep being followed in full. Going forward:
+  make stack/tooling decisions unilaterally and state them in one plain
+  sentence rather than asking the user to choose between options they
+  don't have context to weigh; keep chat updates short and in plain
+  language; minimize the gap between "starting a lesson" and "here's the
+  finished lesson" — batch research/verification tool calls tightly
+  rather than narrating each one.
+- **Lesson 9 written and verified this session (2026-08-25), same session
+  as Lesson 8:** real `tools.db` migrated from a single `tools` table with
+  a plain `manufacturer TEXT` column to `tools` + a new `vendors` table,
+  linked by a real `vendor_id` foreign key — `CREATE TABLE vendors`,
+  `INSERT ... SELECT DISTINCT manufacturer FROM tools`, `ALTER TABLE tools
+  ADD COLUMN vendor_id ...`, a correlated-subquery `UPDATE` to backfill it,
+  then `ALTER TABLE tools DROP COLUMN manufacturer` — dry-run proven first
+  against a disposable `migration_test.db`, then applied for real. Real,
+  useful surprise caught this session: `Microsoft.Data.Sqlite` enforces
+  foreign keys **by default**, with no `PRAGMA foreign_keys = ON` needed —
+  differs from raw SQLite's own off-by-default behavior; proven with three
+  real runs (no pragma → fails, `OFF` → succeeds, `ON` → fails). Real
+  connection-pooling gotcha hit and worked around while building that lab:
+  reusing one `.db` filename across three sequential `SqliteConnection`s in
+  the same process hit the same "file still locked after Dispose" issue
+  Lesson 3 already named — fixed by giving each of the three test calls its
+  own database file instead of fighting the pool. `MainWindow.xaml.cs`'s
+  own `SELECT` became a real `tools JOIN vendors ON tools.vendor_id =
+  vendors.id`, explicit-qualified column list; `Tool.FromReader` needed
+  zero changes (proven, not just claimed) since it only ever reads six
+  columns by position. `ToolDB` builds clean and `ToolDB.Tests` still
+  passes unchanged. All `fk_test*.db`/`migration_test.db` throwaway files
+  cleaned up from `LabScratch/` after use.
+- **Both Lesson 8 and Lesson 9 were written in the same session, faster
+  than this project's usual one-lesson-per-session pace, at the user's own
+  explicit request** ("if you are efficient you can squeeze another lesson
+  out") given limited remaining usage — not a new standing pace
+  expectation for every future session; ask/default back to the normal
+  unhurried pace unless the user signals a similar constraint again.
+- **Next lesson:** 10 — jQuery Basics
 - **Lessons written:** 0 — Environment & Project Setup
   (`lessons/lesson-00-environment-and-project-setup.md`); 1 — Static
   Types, Connection Strings, and a Resource's Lifetime

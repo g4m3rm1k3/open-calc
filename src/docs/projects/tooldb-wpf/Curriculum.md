@@ -132,8 +132,8 @@ view replacing today's):
 
 | # | Lesson | Prereqs | Concepts Introduced | Status |
 |---|---|---|---|---|
-| 8 | Records & Strong Types (why a domain model exists — record vs. class, value semantics — instead of the raw mapped object from Lesson 4) | 4 | domain model, record vs. class, value semantics | not written |
-| 9 | Multiple Tables & `JOIN` (categories/vendors, foreign keys) | 2–4 | foreign key, `JOIN`, referential relationship | not written |
+| 8 | Records & Strong Types (why a domain model exists — record vs. class, value semantics — instead of the raw mapped object from Lesson 4) | 4 | domain model, record vs. class, value semantics | written |
+| 9 | Multiple Tables & `JOIN` (categories/vendors, foreign keys) | 2–4 | foreign key, `JOIN`, referential relationship | written |
 | 10 | jQuery Basics (selectors, events) | 6 | selector, event binding, DOM | not written |
 | 11 | DataTables Fundamentals (rendering the full tool list) | 7, 9–10 | table plugin, client-side rendering, sorting/searching | not written |
 | 12 | Styling & Layout (CSS for the web content) | 11 | CSS box model, layout, visual hierarchy | not written |
@@ -216,7 +216,76 @@ view replacing today's):
 | 36 | Backup, `VACUUM`, Integrity Checks, In-Memory DBs for Testing | 1–4 | `VACUUM`, `integrity_check`, in-memory DB, test isolation | not written |
 | 37 | Final Integration & Review | all preceding | system review, acceptance review | not written |
 
-### Slice 10 — 3D Tool Visualization (Three.js)
+### Slice 10 — Document and Report Generation (the Jinja Replacement)
+*Capabilities established:*
+- *The application can generate real HTML and text documents from live
+  application data — the same role Python/Jinja played in the original
+  tool database app — through a real .NET text-templating engine, not
+  hand-built string concatenation.*
+- *Generated documents can be previewed inside the app's existing WebView2
+  surface, reusing the exact hosting pattern Slice 1 already established
+  (`NavigateToString` instead of `Source`), not a new rendering path.*
+- *A generated document can be exported to a real file the user can open
+  outside the app.*
+
+**Library decision, made now so it doesn't drift lesson to lesson:**
+[Scriban](https://github.com/scriban/scriban) — its `{{ }}`/`{% %}`-family
+syntax, `for`/`if` control flow, filters, and `include` mechanism are the
+closest real match to Jinja2's own model of any actively maintained .NET
+templating library, and — unlike Razor-based engines (RazorLight, etc.) —
+it has zero ASP.NET Core dependency, which matters for a plain WPF desktop
+process. This is a locked stack decision, the same status as the Slice
+1 "Host = WPF" decisions, not a placeholder to reconsider per-lesson.
+
+Not yet broken into individual lessons/prereqs/concepts (no build spec
+written yet, same status Slice 10 — now Slice 12 — was left in) — rough
+shape: template engine fundamentals in isolation → rendering a real tool
+report from `ToolDB`'s own data → shared includes/layouts across reports →
+previewing the rendered HTML in WebView2 → exporting to a real file.
+Exact lesson numbers and prereqs are deferred until Slices 2–9 are actually
+written, since this slice's own prereqs depend on lesson numbers that
+don't exist yet.
+
+### Slice 11 — PDM: Checkout, Locking, and Version History
+*Capabilities established:*
+- *Exactly one user at a time can hold an exclusive edit lock on a given
+  record, enforced by a real database transaction — not a client-side
+  convention any caller could ignore.*
+- *Every check-in creates a permanent, retrievable version; nothing already
+  saved is ever silently overwritten by a second, later save.*
+- *The same lost-update race condition already diagnosed and fixed once in
+  this repo gets reproduced and fixed again here, in this project's own
+  C#/SQLite stack, so the fix is understood as a real, general database
+  problem — not something specific to the stack it was first fixed in.*
+
+**Reference architecture, not a reference to re-derive from scratch:**
+[`forge-pdm`](../forge-pdm/README.md) (`src/docs/projects/forge-pdm/`)
+already designed and proved this exact problem — a `Lock` row whose mere
+existence *is* the lock, checked and set inside one real, atomic
+transaction, plus WIP snapshots that never touch permanent version
+history until a real check-in commits one. Per this repo's own Lesson
+Schema, a lesson here still has to write out that reasoning in full, in
+this project's own terms and this project's own C#/SQLite code — never a
+citation to `forge-pdm`'s lesson numbers — but the *design* itself
+(one canonical row per lock, one atomic transaction closing the race, WIP
+vs. committed version as two genuinely different things) does not need to
+be reinvented; adapt it, don't re-derive it from zero.
+
+**Open question this slice's own Lesson 1 needs to settle before it's
+written, not before:** whether a "checkout" applies to a whole `.TOOLDB`
+file, or to individual rows within it (a single tool record) — the real
+Mastercam file this project already uses (`Untitled.TOOLDB`) makes
+row-level locking the more useful shape, but that's a real design decision
+for that lesson to state and justify, not something to assume here.
+
+Not yet broken into individual lessons/prereqs/concepts, same status as
+Slice 10's own entry above — rough shape: reproduce the race on purpose →
+the checkout domain function → atomic locking with a real transaction →
+checkout API/UI → WIP snapshots → check-in → version history → a review
+lesson reproducing the original race and showing it's now structurally
+impossible, mirroring `forge-pdm`'s own Phase 4 shape.
+
+### Slice 12 — 3D Tool Visualization (Three.js)
 *Capabilities established:*
 - *A real tool database is the data source — `Untitled.TOOLDB` (a Mastercam
   tool-library SQLite file, pasted into this project's folder), not sample/
@@ -232,6 +301,13 @@ written yet) — see `reference-tool-geometry.md` for the pulled-in technique
 (`TlProfileData`'s `x`=radius/`y`=axial convention, `THREE.LatheGeometry`
 revolve, and the inch/mm unit-conversion gotcha) and `Untitled.TOOLDB` in
 this folder for the real data source.
+
+**Renumbered this session (2026-08-25):** this was Slice 10 before Slices
+10–11 above (Document Generation, PDM) were inserted ahead of it, per a
+priority call — the templating and checkout/locking capabilities are the
+actually-motivating need behind this whole project's real-world use case;
+3D visualization is a real, planned capability but not the urgent one. No
+lessons existed under the old numbering yet, so nothing needed migrating.
 
 ## Concept recurrence (cross-cutting only)
 

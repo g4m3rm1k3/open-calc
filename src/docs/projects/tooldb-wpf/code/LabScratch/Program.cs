@@ -1,55 +1,27 @@
 using Microsoft.Data.Sqlite;
-using System.Text.Json;
-
-Widget single = new Widget { Name = "O'Brien Carbide Tools", Count = 1 };
-Console.WriteLine(JsonSerializer.Serialize(single));
-
-List<Widget> many = new List<Widget>();
-many.Add(new Widget { Name = "O'Brien Carbide Tools", Count = 1 });
-many.Add(new Widget { Name = "Kennametal", Count = 40 });
-Console.WriteLine(JsonSerializer.Serialize(many));
 
 using var connection = new SqliteConnection("Data Source=../ToolDB/tools.db");
 connection.Open();
 
-using var selectCommand = new SqliteCommand(
-    "SELECT id, name, manufacturer, overall_diameter, overall_length, flute_count FROM tools",
-    connection);
-using var reader = selectCommand.ExecuteReader();
+new SqliteCommand("CREATE TABLE vendors (id INTEGER PRIMARY KEY, name TEXT NOT NULL)", connection).ExecuteNonQuery();
+new SqliteCommand("INSERT INTO vendors (name) SELECT DISTINCT manufacturer FROM tools", connection).ExecuteNonQuery();
+new SqliteCommand("ALTER TABLE tools ADD COLUMN vendor_id INTEGER REFERENCES vendors(id)", connection).ExecuteNonQuery();
+new SqliteCommand("UPDATE tools SET vendor_id = (SELECT id FROM vendors WHERE vendors.name = tools.manufacturer)", connection).ExecuteNonQuery();
+new SqliteCommand("ALTER TABLE tools DROP COLUMN manufacturer", connection).ExecuteNonQuery();
 
-List<Tool> tools = new List<Tool>();
-while (reader.Read())
+Console.WriteLine("Real tools.db migrated. New tools schema:");
+using (var schemaCmd = new SqliteCommand("SELECT sql FROM sqlite_schema WHERE name = 'tools'", connection))
+using (var schemaReader = schemaCmd.ExecuteReader())
 {
-    tools.Add(Tool.FromReader(reader));
+    schemaReader.Read();
+    Console.WriteLine(schemaReader.GetString(0));
 }
 
-Console.WriteLine(JsonSerializer.Serialize(tools));
-
-class Widget
+using (var vendorCmd = new SqliteCommand("SELECT id, name FROM vendors", connection))
+using (var vendorReader = vendorCmd.ExecuteReader())
 {
-    public string Name { get; set; } = "";
-    public int Count { get; set; }
-}
-
-class Tool
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Manufacturer { get; set; } = "";
-    public double OverallDiameter { get; set; }
-    public double OverallLength { get; set; }
-    public int FluteCount { get; set; }
-
-    public static Tool FromReader(SqliteDataReader reader)
+    while (vendorReader.Read())
     {
-        return new Tool
-        {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            Manufacturer = reader.GetString(2),
-            OverallDiameter = reader.GetDouble(3),
-            OverallLength = reader.GetDouble(4),
-            FluteCount = reader.GetInt32(5)
-        };
+        Console.WriteLine($"vendor id={vendorReader.GetInt32(0)}, name={vendorReader.GetString(1)}");
     }
 }

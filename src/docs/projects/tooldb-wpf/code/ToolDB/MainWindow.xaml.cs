@@ -28,7 +28,7 @@ public partial class MainWindow : Window
         connection.Open();
 
         using var selectCommand = new SqliteCommand(
-            "SELECT id, name, manufacturer, overall_diameter, overall_length, flute_count FROM tools",
+            "SELECT tools.id, tools.name, vendors.name, tools.overall_diameter, tools.overall_length, tools.flute_count FROM tools JOIN vendors ON tools.vendor_id = vendors.id",
             connection);
         using var reader = selectCommand.ExecuteReader();
 
