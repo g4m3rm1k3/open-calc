@@ -1,9 +1,7 @@
 # Lesson Schema
 
 This is the mechanical production template for every lesson in this
-curriculum. `LessonContract` is the philosophy — what teaching means
-here, and why. `Guide.md` is the per-concept dimension list. This
-document is neither of those: it's the literal, ordered sequence of
+curriculum. This document is neither of those: it's the literal, ordered sequence of
 things to write, so that following it _in order_ makes a code-dump
 structurally impossible rather than relying on judgment each time.
 
@@ -431,11 +429,23 @@ throwaway code from scratch. Check that folder before running anything:
 if the exact code already has a real, saved run on file, reuse that
 output instead of re-executing it. If this curriculum doesn't have a
 verification folder yet, create one the first time this rule requires
-running something, following the convention documented in
-`src/docs/tutorials/OOPDSAETC/verification/README.md` (folder-per-lesson,
+running something, following the convention (folder-per-lesson,
 `lab*`/`step*`/`break*`/`scale*` naming) — adapted to this curriculum's
 own language and lesson-ID scheme, and recorded in this curriculum's own
 HANDOFF so the location isn't rediscovered by search next session.
+
+**This folder is a record of what was run and what it produced — nothing
+more.** It holds the minimal snippet that was actually uncertain, plus
+its real output, per entry — not a growing, always-buildable mirror of
+whatever real-world application the curriculum's own lessons happen to
+teach. That application's full, real state already lives completely,
+lesson by lesson, in each lesson's own "Updated Project" steps — this
+folder exists only so a specific, already-answered question about real
+behavior doesn't get re-asked and re-run from scratch. Never let it grow
+into, or get treated as, a second, independently-maintained copy of the
+taught project; that copy would need its own upkeep this rule never asks
+for, and the taught project already has a complete, sufficient record
+without it.
 
 ---
 
@@ -475,6 +485,21 @@ Throwaway code must:
   output confidently predictable without a run;
 - be explicitly discarded once understood — it never appears in the
   project again.
+
+**"The project" here means the curriculum's own taught subject matter —
+the real-world application the lessons teach the reader to build, whose
+complete state lives in each lesson's own "Updated Project" steps.**
+Discarding a throwaway example means one specific thing, said to the
+reader, in the lesson's own prose: this code is not folded into that
+taught project. It says nothing about whether Claude's own execution of
+that same code gets kept — that's the Verification Rule's own Persistence
+part (above), a separate, independent fact. A throwaway example fully
+discarded from the taught project can, and ordinarily should, still have
+its real run saved to the verification folder, so a later lesson needing
+the identical check reuses it instead of re-deriving and re-running it
+from nothing. One phrase, two different audiences: "discarded" describes
+what the reader's own project never contains; it is not an instruction
+about what Claude deletes from disk.
 
 This distinction matters beyond tidiness: most tutorials teach using
 examples that quietly become part of the project, so a student can never
@@ -1196,6 +1221,16 @@ Read the draft top to bottom and answer honestly:
       this curriculum's persistent verification folder (real source,
       real output), rather than left only in session-local scratch for
       the next session to rebuild from nothing?
+- [ ] Has the verification folder itself stayed a record of what was run
+      and what it produced, or has it — or some other directory — quietly
+      grown into a second, independently-maintained copy of whatever
+      real-world application the curriculum teaches the reader to build?
+      The taught project's own state already lives completely in each
+      lesson's own "Updated Project" steps; a verification folder that's
+      being kept "current" with the whole project, rebuilt or extended
+      lesson to lesson as if it were a live deliverable, has drifted into
+      exactly the failure mode this rule exists to prevent, even though
+      every individual snippet inside it was legitimately run.
 - [ ] Does every Concept Unit step use a `###` heading rather than a
       bolded run-in phrase? A lesson with `**The Problem.**` buried inside
       a paragraph instead of `### The Problem` as its own heading hasn't
