@@ -1,520 +1,730 @@
 # Lesson 11: Buffer Overflows — How They Work and How They're Exploited
 
-## Series: Computer Systems: A Programmer's Perspective (CS:APP by Bryant & O'Hallaron)
-## Module: Module 1 — From C to Machine
-## Language: C and x86-64 assembly (AT&T syntax). Trace by hand.
+What you will build: The reader will understand exactly how a buffer overflow works mechanically: how writing past the end of a stack buffer corrupts the return address, how an attacker crafts input to redirect execution, and what the four modern defenses do. This isn't just theory; we will trace the exact bytes on the stack before and after an overflow.
 
-### Prerequisites
-What you need to know first: Lessons 00–10 (entire Module 0 and Lessons 06–10 of Module 1).
+What you need to know first: Lessons 00–10. Specifically, you need to understand the x86-64 stack layout, what the instruction pointer (`%rip`) is, and how the `call` and `ret` instructions manage the return address on the stack.
 
-### What you will build
-The reader will understand exactly how a buffer overflow works mechanically: how writing past the end of a stack buffer corrupts the return address, how an attacker crafts input to redirect execution to injected shellcode, and what the four modern defenses do to prevent it. The transferable insight: C gives you access to raw memory — the price is that you must enforce your own bounds. Every unchecked array write is a potential remote code execution vulnerability. Understanding the exploit is the only way to understand why the defenses work.
+Terms used in this lesson:
+- **Buffer Overflow** — A memory safety violation where a program writes more data to an allocated block of memory (buffer) than it can hold, overflowing into adjacent memory locations. This destroys the data that was previously there.
+- **Return Address** — The memory address pushed onto the stack by the `call` instruction. It tells the CPU where to resume execution after the current function finishes.
+- **Shellcode** — Small piece of executable machine code injected into a vulnerable program by an attacker, typically used to start a command shell (like `/bin/sh`).
+- **Stack Canary** — A random, secret value placed on the stack between local variables and the return address to detect buffer overflows before the function returns.
+- **ASLR (Address Space Layout Randomization)** — An OS-level defense that randomizes the locations of the stack, heap, and libraries in memory each time the program runs, making it hard for an attacker to guess addresses.
+- **NX Bit (No-Execute)** — A hardware feature that marks certain areas of memory (like the stack) as non-executable. If the CPU tries to run code there, it triggers a fault.
+- **ROP (Return-Oriented Programming)** — An exploit technique used to bypass the NX bit by chaining together small snippets of already-existing, executable code (gadgets) instead of executing injected code.
+- **PIE (Position-Independent Executable)** — A compiler feature that compiles the main program text so it can be loaded at a random address, applying ASLR to the program binary itself.
+- **RELRO (Relocation Read-Only)** — A mitigation that makes the Global Offset Table (GOT) read-only after the dynamic linker resolves symbols, preventing attackers from overwriting function pointers.
 
----
+Objects and methods used:
 
-## Objects and Methods
+**`gets`**
+- *What it is:* A standard C library function for reading a line of text from standard input.
+- *Implementation:* `char *gets(char *s);`
+- *Its use:* Used historically to read strings, but is intrinsically unsafe because it performs no bounds checking. We use it to demonstrate how vulnerabilities are introduced.
+- *Type:* A free function in the C standard library (`libc`).
+- *Responsibility:* Reads characters from `stdin` and stores them into the string pointed to by `s` until a newline character or end-of-file is encountered.
+- *Depends on:* A pointer to an allocated memory buffer large enough to hold the input.
+- *Connects to:* Called by user code; calls internal OS read routines to get characters from `stdin`.
+- *Shape:* A public API surface of the C standard library.
 
-* `gets()`
-  * **What it is**: A standard library function in older C standards that reads characters from standard input.
-  * **Implementation**: Reads from `stdin` until a newline character or EOF is encountered, storing the result in a provided memory buffer.
-  * **Its use**: Used to read a line of text from the user.
-  * **Type**: Function taking a `char*` and returning a `char*`.
-  * **Responsibility**: To populate a buffer with user input.
-  * **Depends on**: The `stdin` stream and a valid memory pointer.
-  * **Connects to**: The stack or heap memory where the buffer resides.
-  * **Shape**: A sequential writer of bytes.
+**`printf`**
+- *What it is:* A standard C library function for formatted output.
+- *Implementation:* `int printf(const char *format, ...);`
+- *Its use:* Used to print the buffer to the screen to prove the data was read.
+- *Type:* A variadic free function in the C standard library (`libc`).
+- *Responsibility:* Formats data according to the format string and writes the result to `stdout`.
+- *Depends on:* A valid format string and corresponding arguments matching the format specifiers.
+- *Connects to:* Called by user code; calls internal OS write routines to send data to `stdout`.
+- *Shape:* A public API surface of the C standard library.
 
-* Buffer
-  * **What it is**: A contiguous block of memory allocated to hold multiple instances of the same data type.
-  * **Implementation**: Allocated on the stack via array declaration or on the heap via `malloc`.
-  * **Its use**: Temporarily storing data while it is being processed.
-  * **Type**: Array or pointer to a memory region.
-  * **Responsibility**: Holding bytes exactly as they are written.
-  * **Depends on**: The memory management subsystem of the process.
-  * **Connects to**: Pointers that reference its starting address.
-  * **Shape**: A linear array of fixed capacity.
-
-* Stack Frame
-  * **What it is**: A segment of the call stack dedicated to a single function invocation.
-  * **Implementation**: Delimited by the base pointer (`rbp`) and stack pointer (`rsp`) registers.
-  * **Its use**: Storing local variables, saved registers, and the return address.
-  * **Type**: Execution context memory.
-  * **Responsibility**: Maintaining the isolated state of a running function.
-  * **Depends on**: CPU registers and the process's stack segment.
-  * **Connects to**: The previous function's stack frame via the saved base pointer.
-  * **Shape**: A LIFO (Last-In-First-Out) contiguous block.
-
-* Return Address
-  * **What it is**: The memory address of the instruction to execute after a function finishes.
-  * **Implementation**: Pushed onto the stack by the `call` instruction.
-  * **Its use**: Tells the CPU where to resume execution using the `ret` instruction.
-  * **Type**: 64-bit integer representing an instruction pointer (`rip`).
-  * **Responsibility**: Ensuring the control flow correctly returns to the caller.
-  * **Depends on**: The integrity of the stack memory.
-  * **Connects to**: The instruction stream in the text segment.
-  * **Shape**: An 8-byte pointer on x86-64.
-
-* Shellcode
-  * **What it is**: A small piece of code used as the payload in the exploitation of a software vulnerability.
-  * **Implementation**: Hand-crafted machine code, often starting a command shell (`/bin/sh`).
-  * **Its use**: Giving an attacker control over a compromised system.
-  * **Type**: Executable byte sequence.
-  * **Responsibility**: Executing arbitrary system commands on behalf of the attacker.
-  * **Depends on**: Being mapped into executable memory and having the instruction pointer directed to it.
-  * **Connects to**: The operating system's system call interface.
-  * **Shape**: A dense, typically null-free sequence of opcodes.
-
-* Canary (Stack Protector)
-  * **What it is**: A random value placed on the stack to detect buffer overflows.
-  * **Implementation**: Generated at program start and stored in thread-local storage; placed just before the saved base pointer.
-  * **Its use**: Checked before a function returns; if altered, the program terminates safely.
-  * **Type**: 64-bit random integer.
-  * **Responsibility**: Protecting the return address from linear overflows.
-  * **Depends on**: Compiler support (`-fstack-protector`) and a secure source of randomness.
-  * **Connects to**: The function prologue (insertion) and epilogue (verification).
-  * **Shape**: An 8-byte unpredictable value.
-
-* ASLR (Address Space Layout Randomization)
-  * **What it is**: A security technique that randomizes the memory locations of key data areas.
-  * **Implementation**: Provided by the operating system kernel during program loading.
-  * **Its use**: Preventing attackers from knowing the exact addresses of buffers and functions.
-  * **Type**: Kernel memory management feature.
-  * **Responsibility**: Randomizing the base addresses of the stack, heap, and libraries.
-  * **Depends on**: The OS loader and available address space entropy.
-  * **Connects to**: The virtual memory mapping of the process.
-  * **Shape**: Variable address offsets applied per-execution.
-
-* NX bit (No-Execute)
-  * **What it is**: A hardware feature that marks certain areas of memory as non-executable.
-  * **Implementation**: A bit in the CPU's page table entries.
-  * **Its use**: Preventing the CPU from executing data as code.
-  * **Type**: Hardware-level memory protection.
-  * **Responsibility**: Ensuring that the stack and heap cannot run injected shellcode.
-  * **Depends on**: Hardware support and OS page table configuration.
-  * **Connects to**: The CPU's instruction fetch mechanism (raising a fault if violated).
-  * **Shape**: A single binary flag per memory page.
-
-* PIE (Position-Independent Executable)
-  * **What it is**: A body of machine code that executes properly regardless of its absolute memory address.
-  * **Implementation**: Generated by the compiler using relative addressing.
-  * **Its use**: Enabling ASLR for the main executable's text and data segments.
-  * **Type**: Executable file format configuration.
-  * **Responsibility**: Allowing the entire program to be loaded at a random base address.
-  * **Depends on**: Compiler and linker flags (`-fPIE`, `-pie`).
-  * **Connects to**: The OS loader and ASLR mechanisms.
-  * **Shape**: Code that relies on instruction-pointer-relative offsets.
-
-* RELRO (Relocation Read-Only)
-  * **What it is**: A mitigation technique that hardens the data sections of an executable.
-  * **Implementation**: The dynamic linker resolves symbols at startup and then marks the Global Offset Table (GOT) as read-only.
-  * **Its use**: Preventing attackers from overwriting function pointers in the GOT.
-  * **Type**: Linker security feature.
-  * **Responsibility**: Protecting dynamically linked function addresses.
-  * **Depends on**: The dynamic linker (e.g., `ld.so`) and compiler flags.
-  * **Connects to**: The GOT and PLT (Procedure Linkage Table).
-  * **Shape**: Read-only memory pages initialized once.
-
-* Safe String Functions
-  * **What it is**: Bounded versions of standard C library functions.
-  * **Implementation**: Functions like `fgets`, `strncpy`, and `snprintf` that take a maximum length parameter.
-  * **Its use**: Replacing unsafe functions to prevent buffer overflows.
-  * **Type**: C standard library functions.
-  * **Responsibility**: Ensuring memory operations do not exceed buffer capacities.
-  * **Depends on**: The programmer correctly specifying the buffer size.
-  * **Connects to**: Memory buffers across the application.
-  * **Shape**: API calls with explicit size limits.
+**`execve`**
+- *What it is:* A POSIX system call to execute a program.
+- *Implementation:* `int execve(const char *pathname, char *const argv[], char *const envp[]);`
+- *Its use:* Used in shellcode to replace the current vulnerable process with a command shell.
+- *Type:* A system call wrapper provided by `libc`, or directly invoked via the `syscall` instruction.
+- *Responsibility:* Completely replaces the current process image with a new process image specified by `pathname`.
+- *Depends on:* A valid path to an executable, an array of argument strings, and an array of environment strings.
+- *Connects to:* Called by the attacker's shellcode; traps into the OS kernel to load the new binary.
+- *Shape:* The boundary between user-space execution and kernel-level process management.
 
 ---
 
-### Concept Unit 1: The vulnerable function — stack layout
+## Concept Unit: The Vulnerable Function and its Stack Layout
 
-Before we examine the C code for a vulnerable function, we must set up our throwaway lab. The throwaway lab consists of a Racket script that will simulate the source code generation and display the program output. 
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Displaying the Vulnerable C Code
-(displayln "Lab Output:")
-(displayln "#include <stdio.h>")
-(displayln "#include <string.h>")
-(displayln "")
-(displayln "void echo(void)")
-(displayln "{")
-(displayln "    char buf[8];           /* 8-byte buffer on the stack */")
-(displayln "    gets(buf);             /* DANGEROUS: reads until newline, no bounds check */")
-(displayln "    printf(\"%s\\n\", buf);")
-(displayln "}")
-(displayln "")
-(displayln "int main(void)")
-(displayln "{")
-(displayln "    echo();")
-(displayln "    return 0;")
-(displayln "}")
+Programs need to read user input, but if a program assumes the input will be a certain size and the user provides more, where does that extra data go? In C, memory is raw bytes. If you write past the end of an array on the stack, you simply overwrite whatever variables happen to live next to it in memory.
+
+What would you try here first if you were asked to read user input into an 8-byte array? What happens if you type 10 characters?
+
+### Introduce the concept in isolation
+
+Let's write a small throwaway C program that demonstrates reading an unbounded string into a small buffer.
+
+```c
+#include <stdio.h>
+
+int main(void) {
+    char name[4];
+    gets(name);
+    return 0;
+}
 ```
 
-And here is the simulated output of running this Racket code:
+Predicted output (exempt from execution because the exact crash behavior is known and standard): If we input "A", it exits normally. If we input "AAAAAAAAAA", the OS kills the program with a Segmentation Fault (`SIGSEGV`).
 
-```racket
-#lang racket
-;; Output:
-;; Lab Output:
-;; #include <stdio.h>
-;; #include <string.h>
-;; 
-;; void echo(void)
-;; {
-;;     char buf[8];           /* 8-byte buffer on the stack */
-;;     gets(buf);             /* DANGEROUS: reads until newline, no bounds check */
-;;     printf("%s\n", buf);
-;; }
-;; 
-;; int main(void)
-;; {
-;;     echo();
-;;     return 0;
-;; }
+This proves that `gets` has no concept of the size of `name`. It just takes a starting memory address and writes bytes there until it sees a newline.
+
+### Discard the throwaway example
+
+The 4-byte `name` throwaway is deleted. It will not appear in the project again.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating a classic security vulnerability pattern, not building a calculator feature.
+- **Files affected**: `echo.c` (created)
+- **Change type**: Add
+- **Location**: N/A (brand new file)
+- **Dependencies**: C standard library, GCC.
+
+### The New Code
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+void echo(void)
+{
+    char buf[8];
+    gets(buf);             /* reads until newline, NO bounds check */
+    printf("%s\n", buf);
+}
+
+int main(void)
+{
+    echo();
+    return 0;
+}
 ```
 
-In the C code above, `gets()` reads characters from `stdin` and writes them to `buf` starting at `buf[0]`. It writes until it sees `\n` or EOF. Crucially, it does NOT check the length of `buf`. This was deprecated in C99 and removed in C11 because it is intrinsically unsafe.
+### The Updated Project
 
-Let us model the stack frame for `echo()` before any input is read. We'll use a Racket script to visualize the stack layout.
+```c
+// ← new file: echo.c
+1: #include <stdio.h>
+2: #include <string.h>
+3: 
+4: void echo(void)
+5: {
+6:     char buf[8];
+7:     gets(buf);             /* reads until newline, NO bounds check */
+8:     printf("%s\n", buf);
+9: }
+10: 
+11: int main(void)
+12: {
+13:     echo();
+14:     return 0;
+15: }
+```
+This complete program calls `echo`, which allocates an 8-byte buffer and reads user input into it.
 
-```racket
-#lang racket
-(displayln " High addresses")
-(displayln " +----------------+")
-(displayln " | return address |  <- pushed by call instruction (address of next instr in main)")
-(displayln " +----------------+")
-(displayln " | saved rbp      |  <- pushed by echo's prologue")
-(displayln " +----------------+")
-(displayln " | buf[7]         |  \\")
-(displayln " | buf[6]         |   |")
-(displayln " | buf[5]         |   |  8 bytes for buf")
-(displayln " | buf[4]         |   |")
-(displayln " | buf[3]         |   |")
-(displayln " | buf[2]         |   |")
-(displayln " | buf[1]         |   |")
-(displayln " | buf[0]         |  /   <- rsp points here")
-(displayln " +----------------+")
-(displayln " Low addresses")
+### Mechanical walkthrough
+
+- `char buf[8];` allocates an 8-byte array on the stack. The compiler subtracts 8 from the stack pointer (`%rsp`) to make room for this local variable.
+- `gets(buf);` calls the `gets` function, passing the address of the first byte of `buf` (`&buf[0]`). `gets` reads characters from standard input and stores them sequentially in memory starting at that address. It stops when it reads a newline, appending a null terminator (`\0`). It does not know or care that `buf` is only 8 bytes long.
+- `printf("%s\n", buf);` prints the string back out to the terminal.
+
+Stack frame for `echo()` before any input:
+```
+ High addresses
+ +------------------+
+ | return address   |  <- pushed by call (address of next instr in main)
+ +------------------+
+ | saved rbp        |  <- pushed by echo's prologue
+ +------------------+
+ | buf[7]           |  \
+ | buf[6]           |   |
+ | buf[5]           |   |  8 bytes for buf
+ | buf[4]           |   |
+ | buf[3]           |   |
+ | buf[2]           |   |
+ | buf[1]           |   |
+ | buf[0]           |  /  <- rsp points here
+ +------------------+
+ Low addresses
 ```
 
-The execution output accurately diagrams our stack layout:
+### CS lens
 
-```racket
-#lang racket
-;; Output:
-;;  High addresses
-;;  +----------------+
-;;  | return address |  <- pushed by call instruction (address of next instr in main)
-;;  +----------------+
-;;  | saved rbp      |  <- pushed by echo's prologue
-;;  +----------------+
-;;  | buf[7]         |  \
-;;  | buf[6]         |   |
-;;  | buf[5]         |   |  8 bytes for buf
-;;  | buf[4]         |   |
-;;  | buf[3]         |   |
-;;  | buf[2]         |   |
-;;  | buf[1]         |   |
-;;  | buf[0]         |  /   <- rsp points here
-;;  +----------------+
-;;  Low addresses
+The stack data structure is fundamental to program execution. It manages function calls, local variables, and control flow. Because control data (the return address) and user data (the buffer) are intermixed on the same stack, a flaw in how user data is handled can corrupt the control data. This is an instance of the classic "in-band signaling" problem, where instructions and data share the same channel.
+
+### SE lens
+
+The C standard library included `gets` in its earliest versions. The alternative that was *not* chosen was to require the programmer to pass the size of the buffer to the function. The tradeoff was convenience versus safety. The failure cost of this design decision has been catastrophic: buffer overflows have caused billions of dollars in damage and countless security breaches. `gets` was officially removed from the C standard in C11.
+
+### Commands needed to make this unit real
+
+`gcc -O0 -fno-stack-protector -z execstack -no-pie echo.c -o echo`
+- `gcc`: The GNU C Compiler.
+- `-O0`: Disable optimizations so the stack looks exactly like our diagram.
+- `-fno-stack-protector`: Disables stack canaries (we will learn about these later).
+- `-z execstack`: Marks the stack as executable (disables NX bit).
+- `-no-pie`: Disables position-independent execution (disables ASLR for the code).
+
+### Run it
+
+Predicted output (exempt from execution): 
+If we compile and run with normal input ("hello"):
 ```
+hello
+```
+This is predictably normal because "hello" (5 bytes + null terminator) fits perfectly within the 8-byte buffer.
+
+### Connect the pieces
+
+The `buf` array sits directly below the saved frame pointer and the return address. Because memory addresses grow upwards, writing past the end of `buf` writes directly into the saved frame pointer and then the return address.
 
 ---
 
-### Concept Unit 2: What happens when input is too long
+## Concept Unit: What Happens with Oversized Input
 
-Before showing what happens when the input overflows, let's write a throwaway lab in Racket that constructs the malicious input of 19 'A' characters.
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Crafting 19 'A' characters
-(define input-string (make-string 19 #\A))
-(printf "Crafted Input: ~a\n" input-string)
-(printf "Length: ~a bytes\n" (string-length input-string))
+If `gets` writes past the 8th byte, it overwrites the `saved rbp`. If it keeps writing, it overwrites the return address. How does this actually crash the program?
+
+What do you think the CPU does when it tries to return from `echo` if the return address has been overwritten with 'A' characters?
+
+### Introduce the concept in isolation
+
+Let's look at how the `ret` instruction works in x86-64 assembly.
+
+```asm
+# throwaway.s
+.global _start
+_start:
+    push $0x4141414141414141
+    ret
 ```
 
-The output of our throwaway lab:
+Predicted output (exempt from execution): The program will crash with a segmentation fault at address `0x4141414141414141`. This proves that `ret` blindly pops whatever is at the top of the stack and jumps to it.
 
-```racket
-#lang racket
-;; Output:
-;; Crafted Input: AAAAAAAAAAAAAAAAAAA
-;; Length: 19 bytes
+### Discard the throwaway example
+
+The isolated assembly file is deleted and will not appear in the project again.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart.
+- **Files affected**: No files modified. We are analyzing the input to the existing `echo` program.
+- **Change type**: N/A
+- **Location**: N/A
+- **Dependencies**: The compiled `echo` binary from the previous unit.
+
+### The New Code
+
+Input to the program:
+`"AAAAAAAAAAAAAAAAAAA"` (19 'A' characters, each = 0x41)
+
+### The Updated Project
+
+No source code changed. We are feeding the 19 'A's into `echo.c`.
+
+### Mechanical walkthrough
+
+- The user inputs 19 'A' characters, followed by a newline.
+- `gets` writes `0x41` starting at `buf[0]`.
+- `buf[0]` to `buf[7]` are filled with the first 8 'A's.
+- `buf[8]` to `buf[15]` are filled with the next 8 'A's, overwriting the 8-byte `saved rbp`.
+- `buf[16]` to `buf[18]` are filled with the last 3 'A's, overwriting the first 3 bytes of the return address. The null terminator `\0` (0x00) overwrites the 4th byte.
+
+The stack now looks like this:
+```
+buf[0]  = 0x41  ('A')
+buf[1]  = 0x41
+...     ...
+buf[7]  = 0x41   (last byte of buf)
+buf[8]  = 0x41   (overwrites saved_rbp byte 0)
+...     ...
+buf[15] = 0x41   (overwrites saved_rbp byte 7)
+buf[16] = 0x41   (overwrites ret_addr byte 0)
+buf[17] = 0x41
+buf[18] = 0x41
+buf[19] = 0x00   (null terminator)
 ```
 
-If we pass "AAAAAAAAAAAAAAAAAAA" (19 'A' characters = 0x41 each) to `gets()`, it writes into memory starting at `buf[0]`. Because there are no bounds checks, it continues writing past the end of the 8-byte buffer. Let's trace the memory layout using Racket to print the exact byte placement.
+When `echo` finishes, it executes `ret`. The CPU pops the corrupted return address (which is now `0x0000000000414141`) off the stack into `%rip`. The CPU attempts to fetch an instruction from that address, which is invalid memory, triggering a `SIGSEGV` (Segmentation Fault).
 
-```racket
-#lang racket
-(displayln "Byte  0: buf[0] = 0x41 ('A')")
-(displayln "Byte  1: buf[1] = 0x41")
-(displayln "...      ...")
-(displayln "Byte  7: buf[7] = 0x41   (last byte of buf)")
-(displayln "Byte  8: saved_rbp[0] = 0x41  (overwrites saved frame pointer!)")
-(displayln "...      ...")
-(displayln "Byte 15: saved_rbp[7] = 0x41")
-(displayln "Byte 16: ret_addr[0] = 0x41  (overwrites return address!)")
-(displayln "...      ...")
-(displayln "Byte 19: ret_addr[3] = 0x41")
+### CS lens
+
+A Segmentation Fault is the operating system's memory protection mechanism in action. The OS uses virtual memory and page tables to map valid addresses. When the CPU attempts to access an unmapped page (like `0x414141`), the Memory Management Unit (MMU) raises an exception, and the OS kills the offending process.
+
+### SE lens
+
+The alternative to letting the program crash is attempting to recover or ignore the error. Crashing is the correct engineering choice (Fail-Fast principle). Continuing execution with a corrupted instruction pointer would lead to completely unpredictable and dangerous behavior.
+
+### Commands needed to make this unit real
+
+`python3 -c "print('A'*19)" | ./echo`
+Pipes exactly 19 'A' characters into the program.
+
+### Run it
+
+Predicted output (exempt from execution):
 ```
-
-The printed layout reveals the corruption:
-
-```racket
-#lang racket
-;; Output:
-;; Byte  0: buf[0] = 0x41 ('A')
-;; Byte  1: buf[1] = 0x41
-;; ...      ...
-;; Byte  7: buf[7] = 0x41   (last byte of buf)
-;; Byte  8: saved_rbp[0] = 0x41  (overwrites saved frame pointer!)
-;; ...      ...
-;; Byte 15: saved_rbp[7] = 0x41
-;; Byte 16: ret_addr[0] = 0x41  (overwrites return address!)
-;; ...      ...
-;; Byte 19: ret_addr[3] = 0x41
+AAAAAAAAAAAAAAAAAAA
+Segmentation fault (core dumped)
 ```
+This is predictably exactly how Linux reports a segmentation fault on a corrupted instruction pointer.
 
-When `echo` finishes and executes `ret`, it pops the corrupted return address `0x41414141` (or `0x4141414141414141` on 64-bit systems) off the stack and blindly jumps there. The operating system intervenes and delivers a `SIGSEGV` (segmentation fault) signal because `0x41414141...` is not a valid mapped memory address. The program crashes violently. 
+### Connect the pieces
+
+The program crashed because we overwrote the return address with garbage. If we can overwrite it with garbage, we can overwrite it with a specific memory address of our choosing.
 
 ---
 
-### Concept Unit 3: The exploit — redirecting execution to shellcode
+## Concept Unit: The Exploit — Redirecting Execution to Shellcode
 
-An attacker who controls the input can overwrite the return address not with arbitrary characters, but with the specific address of their own injected code, known as shellcode. Let's create a throwaway lab in Racket that outlines the exploit structure.
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Designing the Exploit Payload Structure
-(displayln "[   8 bytes: padding to fill buf   ]")
-(displayln "[   8 bytes: overwrite saved rbp   ]")
-(displayln "[   8 bytes: new return address    ]  <- address of shellcode")
-(displayln "[   shellcode bytes                ]  <- the malicious code")
+Crashing a program is a denial-of-service, but an attacker wants *control*. If the attacker can control the return address, where should they point it?
+
+If you can jump anywhere, and you want to run your own code, how do you get your code into the program's memory in the first place?
+
+### Introduce the concept in isolation
+
+Let's look at how shellcode actually works. Shellcode is just raw machine bytes that execute a system call.
+
+```c
+// shellcode.c
+void main() {
+    char shellcode[] = "\x48\x31\xc0\xb0\x3b\x48\x31\xf6\x48\x31\xd2\x0f\x05"; 
+    // This isn't full shellcode, just a fragment to prove execution
+    void (*func)() = (void (*)())shellcode;
+    func();
+}
 ```
 
-The output gives us a clear blueprint for the payload:
+Predicted output (exempt from execution): This crashes or executes the fragment depending on memory protections. It proves that a character array can be executed as code if the CPU is told to jump to it.
 
-```racket
-#lang racket
-;; Output:
-;; [   8 bytes: padding to fill buf   ]
-;; [   8 bytes: overwrite saved rbp   ]
-;; [   8 bytes: new return address    ]  <- address of shellcode
-;; [   shellcode bytes                ]  <- the malicious code
+### Discard the throwaway example
+
+The `shellcode.c` throwaway is deleted and will not be used again.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart.
+- **Files affected**: No files modified.
+- **Change type**: N/A
+- **Location**: N/A
+- **Dependencies**: The `echo` binary.
+
+### The New Code
+
+Exploit input structure:
+```
+[ 8 bytes: shellcode starts here... ]
+[ 8 bytes: overwrite rbp            ]
+[ 8 bytes: new return addr          ]  <- address of buf[0] (where shellcode started)
 ```
 
-We can now look at what the actual shellcode looks like. Our Racket script will display the assembly bytes for a simplified shellcode that calls `execve("/bin/sh", NULL, NULL)`. The attacker knows (or guesses) the address where `buf` starts. They put shellcode at `buf[0]` and put `&buf[0]` as the return address, or they place it after the return address.
-
-```racket
-#lang racket
-(displayln "48 31 c0            # xor rax, rax")
-(displayln "b0 3b               # mov al, 59 (execve syscall number)")
-(displayln "48 bf ...           # mov rdi, address of \"/bin/sh\" string")
-(displayln "48 31 f6            # xor rsi, rsi (argv = NULL)")
-(displayln "48 31 d2            # xor rdx, rdx (envp = NULL)")
-(displayln "0f 05               # syscall")
+Shellcode that calls `execve("/bin/sh", NULL, NULL)` -- byte sequence:
+```asm
+48 31 c0     # xor %rax, %rax
+b0 3b        # mov $59, %al       (59 = execve syscall number)
+48 bf ...    # movabs $addr, %rdi  (address of "/bin/sh" string)
+48 31 f6     # xor %rsi, %rsi     (argv = NULL)
+48 31 d2     # xor %rdx, %rdx     (envp = NULL)
+0f 05        # syscall
 ```
 
-The displayed assembly sequence performs the necessary system call:
+### The Updated Project
 
-```racket
-#lang racket
-;; Output:
-;; 48 31 c0            # xor rax, rax
-;; b0 3b               # mov al, 59 (execve syscall number)
-;; 48 bf ...           # mov rdi, address of "/bin/sh" string
-;; 48 31 f6            # xor rsi, rsi (argv = NULL)
-;; 48 31 d2            # xor rdx, rdx (envp = NULL)
-;; 0f 05               # syscall
-```
+We supply the exploit string to the running `echo` process.
 
-When the `ret` instruction executes, the CPU pops the overwritten return address and jumps to the attacker-controlled location. That address points directly to the shellcode bytes. The CPU begins executing these bytes with the full privileges of the victim process. If the victim process is running as root (such as a system daemon or web server), the attacker instantly gains a root shell. This exact technique was famously used in the Morris Worm of 1988 and countless real-world exploits since.
+### Mechanical walkthrough
+
+- The attacker crafts a specific payload string.
+- The first part of the payload is the raw machine code instructions (shellcode) shown above. It is written directly into `buf[0]`.
+- The attacker pads the input to exactly reach the return address on the stack.
+- The attacker overwrites the return address with the memory address of `buf[0]`.
+- When `echo` executes `ret`, it pops the address of `buf[0]` and jumps there.
+- The CPU begins executing the bytes inside `buf` as if they were normal program instructions.
+- The shellcode sets up the registers: `%al = 59` (the syscall number for `execve`), `%rdi` points to the string "/bin/sh", `%rsi` and `%rdx` are null.
+- The `syscall` instruction traps into the kernel.
+- The kernel replaces the current process with `/bin/sh`. The attacker now has a command shell running with the privileges of the victim program.
+
+Trace of control flow:
+1. `call echo` — original return address pushed.
+2. `gets(buf)` — buffer overflows; return address replaced with `&buf[0]`.
+3. `ret` — CPU jumps to `&buf[0]`.
+4. `xor %rax, %rax ... syscall` — shellcode executes in buffer memory.
+5. `execve` replaces process.
+
+### CS lens
+
+This exploits the Von Neumann architecture, where both instructions and data are stored in the same memory. The CPU cannot tell the difference between a string of text and a sequence of machine instructions; it just executes whatever bytes it is pointed to.
+
+### SE lens
+
+The security impact of a buffer overflow depends on what privileges the vulnerable program has. If the program is a network service running as `root`, the attacker gains a `root` shell and completely compromises the server.
+
+### Commands needed to make this unit real
+
+Running an actual exploit requires a script to format the raw bytes (like `\x48`) properly, which we won't execute here, but the theory is complete.
+
+### Run it
+
+Predicted output (exempt from execution): If the exploit is successful, the output is a shell prompt (`$ `), proving the process was replaced.
+
+### Connect the pieces
+
+The attacker used the vulnerability not just to crash the program, but to hijack its control flow and execute arbitrary code. To stop this, the industry developed several layers of defense.
 
 ---
 
-### Concept Unit 4: Defense 1: Stack canaries (-fstack-protector)
+## Concept Unit: Defense 1 — Stack Canaries (-fstack-protector)
 
-To prevent simple overflows from corrupting the return address, modern compilers like GCC insert a random value, called the "canary," between the local variables and the saved frame pointer. Let's map out this new protected stack layout in our Racket throwaway lab.
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Protected Stack Layout
-(displayln " +----------------+")
-(displayln " | return address |")
-(displayln " +----------------+")
-(displayln " | canary value   |  <- random 8-byte value set at function entry")
-(displayln " +----------------+")
-(displayln " | saved rbp      |")
-(displayln " +----------------+")
-(displayln " | buf[0..7]      |")
-(displayln " +----------------+")
+If the attacker has to write past the buffer to reach the return address, they must overwrite everything in between. How can the program detect that the memory between the buffer and the return address has been tampered with?
+
+### Introduce the concept in isolation
+
+A stack canary is exactly what it sounds like — a coal mine canary.
+
+```c
+// canary_concept.c
+#include <stdlib.h>
+void func() {
+    long canary = rand();
+    char buf[8];
+    // ... do stuff ...
+    if (canary != rand_value_saved_elsewhere) exit(1);
+}
 ```
 
-The output of the layout clearly shows the canary shielding the return address:
+Predicted output (exempt from execution): If `buf` overflows, it overwrites `canary`. The check fails, and the program exits safely before calling `ret`.
 
-```racket
-#lang racket
-;; Output:
-;;  +----------------+
-;;  | return address |
-;;  +----------------+
-;;  | canary value   |  <- random 8-byte value set at function entry
-;;  +----------------+
-;;  | saved rbp      |
-;;  +----------------+
-;;  | buf[0..7]      |
-;;  +----------------+
+### Discard the throwaway example
+
+The `canary_concept.c` file is discarded.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart.
+- **Files affected**: We recompile `echo.c` without the `-fno-stack-protector` flag.
+- **Change type**: Configure
+- **Location**: N/A
+- **Dependencies**: GCC.
+
+### The New Code
+
+Stack layout with a canary:
+```
++------------------+
+| return address   |
++------------------+
+| canary value     |  <- random 8 bytes, loaded from fs:0x28 at entry
++------------------+
+| saved rbp        |
++------------------+
+| buf[0..7]        |
++------------------+
 ```
 
-The canary is loaded from a secret, unpredictable location—typically thread-local storage (accessed via `%fs:0x28` on Linux)—at function entry. Before the function executes its `ret` instruction, the compiler injects assembly code to verify that the canary remains intact. We can display this assembly check using Racket.
-
-```racket
-#lang racket
-(displayln "/* Before ret: */")
-(displayln "    movq    %fs:0x28, %rax   /* load original canary value */")
-(displayln "    xorq    -8(%rbp), %rax   /* compare with canary on stack */")
-(displayln "    je      .L_ok             /* if equal, proceed to ret */")
-(displayln "    call    __stack_chk_fail  /* canary corrupted -- abort! */")
-(displayln ".L_ok:")
-(displayln "    ret")
+Assembly inserted by compiler (before `ret`):
+```asm
+    movq    %fs:0x28, %rax    # load original canary from TLS
+    xorq    -8(%rbp), %rax    # compare with canary on stack
+    je      .L_ok             # equal: proceed to ret
+    call    __stack_chk_fail  # not equal: abort!
+.L_ok:
+    ret
 ```
 
-The validation logic halts the process if tampered with:
+### The Updated Project
 
-```racket
-#lang racket
-;; Output:
-;; /* Before ret: */
-;;     movq    %fs:0x28, %rax   /* load original canary value */
-;;     xorq    -8(%rbp), %rax   /* compare with canary on stack */
-;;     je      .L_ok             /* if equal, proceed to ret */
-;;     call    __stack_chk_fail  /* canary corrupted -- abort! */
-;; .L_ok:
-;;     ret
+The C code remains identical. The compiler changes the generated assembly.
+
+### Mechanical walkthrough
+
+- During the function prologue, the compiler inserts code to load a random 64-bit value from Thread-Local Storage (`%fs:0x28`).
+- This random value (the canary) is pushed onto the stack right above the local variables and below the saved base pointer and return address.
+- The user inputs a long string.
+- The string overflows `buf`, overwriting the saved base pointer, the canary, and the return address.
+- During the function epilogue, before `ret` executes, the compiler inserts a check.
+- `movq %fs:0x28, %rax` loads the master copy of the canary into `%rax`.
+- `xorq -8(%rbp), %rax` compares the master copy with the canary value currently on the stack. If they are identical, `xor` produces 0.
+- `je .L_ok` jumps to the `ret` instruction if the values matched (result was 0).
+- Because the attacker overwrote the canary on the stack with 'A's, it no longer matches the master copy in TLS. The `je` falls through.
+- `call __stack_chk_fail` executes, which immediately terminates the process and prints an error message. The corrupted `ret` is never executed.
+
+### CS lens
+
+This is a probabilistic defense. The canary is random and changes every time the program runs. The attacker cannot predict it. If they try to guess it, they have a 1 in 18 quintillion chance (for a 64-bit canary) of getting it right.
+
+### SE lens
+
+The canary is loaded from Thread-Local Storage (`fs:0x28`) rather than a global variable because in a multi-threaded program, a global variable could be overwritten or leaked more easily, and accessing it requires synchronization. TLS is fast and isolated per-thread. The tradeoff is a small performance hit on every function call for the setup and check.
+
+### Commands needed to make this unit real
+
+Compile normally: `gcc echo.c -o echo_secure` (modern GCC enables stack protectors by default).
+
+### Run it
+
+Predicted output (exempt from execution):
 ```
+AAAAAAAAAAAAAAAAAAA
+*** stack smashing detected ***: terminated
+Aborted (core dumped)
+```
+This is predictably the exact output of `__stack_chk_fail`.
 
-If the attacker attempts the same linear overflow by writing 24 bytes (8 bytes for `buf` + 8 bytes for the canary + 8 bytes for the return address), they will inevitably overwrite the canary. When the function attempts to return, the canary on the stack will no longer match the master copy in thread-local storage. The program will branch to `__stack_chk_fail`, safely terminating the process before the attacker's return address is used. The attacker must somehow KNOW the exact random canary value to bypass this defense, and since it changes on every execution, guessing is practically impossible.
+### Connect the pieces
+
+The canary prevents basic sequential overwrites. However, if an attacker can read the canary value (an information leak vulnerability) before exploiting the overflow, they can simply include the correct canary value in their payload and bypass the check.
 
 ---
 
-### Concept Unit 5: Defense 2: ASLR (Address Space Layout Randomization)
+## Concept Unit: Defense 2 — ASLR (Address Space Layout Randomization)
 
-Even if an attacker can bypass the canary (perhaps via an arbitrary memory write rather than a linear overflow), they still need to know exactly where their shellcode is located to set the return address correctly. Let's use Racket to build a throwaway lab that simulates consecutive program executions under ASLR.
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Simulating ASLR Address Generation
-(define (random-address base)
-  (string-append base (number->string (random #x1000 #xFFFF) 16) "xxxx"))
+If the attacker bypasses the canary, they still need to overwrite the return address with the address of `buf[0]`. How do they know where `buf[0]` is in memory? Historically, the stack always started at the exact same address.
 
-(printf "Run 1: stack at ~a\n" (random-address "0x7fff"))
-(printf "Run 2: stack at ~a\n" (random-address "0x7fff"))
-(printf "Run 3: stack at ~a\n" (random-address "0x7fff"))
+### Introduce the concept in isolation
+
+```bash
+# throwaway command
+cat /proc/sys/kernel/randomize_va_space
 ```
 
-The output shows randomized addresses for each run:
+Predicted output (exempt from execution): `2`. This means ASLR is fully enabled on the system.
 
-```racket
-#lang racket
-;; Output:
-;; Run 1: stack at 0x7fff1234xxxx
-;; Run 2: stack at 0x7fff5678xxxx
-;; Run 3: stack at 0x7fffe8abxxxx
+### Discard the throwaway example
+
+The command is discarded.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart.
+- **Files affected**: System configuration.
+- **Change type**: Configure
+- **Location**: N/A
+- **Dependencies**: Linux Kernel.
+
+### The New Code
+
+With ASLR enabled, memory addresses change every run:
+```
+Run 1: stack at 0x7fff1234xxxx, buf at 0x7fff12348020
+Run 2: stack at 0x7fff5678xxxx, buf at 0x7fff5678b0e0
+Run 3: stack at 0x7fffe8abxxxx, buf at 0x7fffe8ab3140
 ```
 
-Without ASLR, every run of a program loads the stack at the very same deterministic address. The attacker can simply test the program locally, find out exactly where `buf` starts, and hardcode that address into the exploit payload as the new return address.
+### The Updated Project
 
-With ASLR (enabled by default on modern Linux, macOS, and Windows operating systems), the operating system kernel heavily randomizes the starting base addresses of the stack, heap, and shared libraries every single time the program runs. The attacker cannot reliably predict where to redirect execution. On a 64-bit Linux system, ASLR provides approximately 42 bits of entropy. Brute-forcing this randomization would take over 4 trillion attempts on average.
+The C code remains identical. The operating system changes how it loads the program.
 
-However, ASLR does have limitations. It can be bypassed if the attacker discovers an "information leak"—a separate vulnerability that allows the attacker to read a pointer from the process's memory, thereby revealing the current memory layout. On older 32-bit systems, the limited address space means the entropy is low enough that brute-force attacks are feasible.
+### Mechanical walkthrough
+
+- The OS kernel is responsible for setting up the virtual memory space for a new process.
+- When `execve` is called to launch `echo`, the kernel chooses random base addresses for the stack, the heap, and shared libraries (`libc`).
+- When `echo` runs and `gets` is called, `buf[0]` is located at a completely different, unpredictable address every time.
+- The attacker crafts their payload, but they must guess the address of `buf[0]` to overwrite the return address.
+- On a 64-bit system, there are about 42 bits of entropy (randomness) in the stack address.
+- The attacker guesses wrong. The corrupted return address points to unmapped memory or the middle of an instruction.
+- The program crashes (`SIGSEGV`) instead of executing the shellcode.
+
+### CS lens
+
+ASLR relies on the massive virtual address space of 64-bit processors. On a 32-bit system, there isn't enough room to randomize addresses effectively (only a few bits of entropy), so attackers can simply brute-force the address by trying repeatedly until they get lucky.
+
+### SE lens
+
+ASLR is a defense-in-depth mechanism. It doesn't fix the bug; it just makes it extremely unreliable to exploit. Like canaries, ASLR is completely defeated by an information leak. If the attacker can trick the program into printing a pointer to the stack, they can calculate the exact address of `buf[0]` for that specific run.
+
+### Commands needed to make this unit real
+
+None. ASLR is enabled by default on all modern operating systems.
+
+### Run it
+
+Predicted output (exempt from execution): Program crashes, exploit fails.
+
+### Connect the pieces
+
+Even if the attacker leaks the stack address and bypasses the canary, they still have to execute their shellcode on the stack. What if the stack simply refuses to execute code?
 
 ---
 
-### Concept Unit 6: Defense 3: NX bit / DEP (No-Execute / Data Execution Prevention)
+## Concept Unit: Defense 3 — NX Bit / DEP
 
-If an attacker successfully bypasses the canary and ASLR, they still need their injected shellcode to execute. Modern CPUs support a per-page No-Execute (NX) bit in their page table entries. Let's use Racket to print a table showing memory segment permissions to serve as our throwaway lab.
+### The Problem
 
-```racket
-#lang racket
-;; Throwaway Lab: Memory Segment Permissions
-(displayln "Page         | Readable | Writable | Executable")
-(displayln "-------------|----------|----------|------------")
-(displayln "Text (.text) |    YES   |    NO    |    YES")
-(displayln "Data (.data) |    YES   |    YES   |    NO")
-(displayln "Stack        |    YES   |    YES   |    NO  <- shellcode here cannot run!")
-(displayln "Heap         |    YES   |    YES   |    NO")
+The CPU shouldn't need to execute code on the stack. The stack is for data. Why does the CPU allow shellcode to run there at all?
+
+### Introduce the concept in isolation
+
+Modern CPUs have a page table attribute that marks memory pages.
+
+```
+Page         | Readable | Writable | Executable
+-------------|----------|----------|------------
+.text        |   YES    |    NO    |    YES
+.data        |   YES    |    YES   |    NO
+Stack        |   YES    |    YES   |    NO   <- shellcode here can't execute!
+Heap         |   YES    |    YES   |    NO
 ```
 
-The output matrix reveals strict separation of code and data:
+### Discard the throwaway example
 
-```racket
-#lang racket
-;; Output:
-;; Page         | Readable | Writable | Executable
-;; -------------|----------|----------|------------
-;; Text (.text) |    YES   |    NO    |    YES
-;; Data (.data) |    YES   |    YES   |    NO
-;; Stack        |    YES   |    YES   |    NO  <- shellcode here cannot run!
-;; Heap         |    YES   |    YES   |    NO
-```
+The conceptual table is discarded.
 
-When the NX bit is set for a page of memory, the CPU will proactively raise a hardware fault if an instruction fetch (execution) is attempted on that page. As shown above, the stack and heap are marked as NX (they contain data only, and are not executable). The text segment (the actual compiled program code) is executable but not writable, preventing modification.
+### Project Change
 
-When the attacker redirects execution to the stack (where their shellcode resides), the CPU raises a fault instead of executing it. This completely neutralizes direct code injection attacks.
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Recompile without `-z execstack`.
+- **Change type**: Configure
+- **Location**: N/A
+- **Dependencies**: Hardware NX bit support.
 
-To bypass this formidable defense, attackers developed Return-Oriented Programming (ROP). Instead of injecting new executable code, an attacker chains together existing, already-executable code snippets called "gadgets" from the `.text` segment or loaded libraries. Each gadget is a short sequence of instructions ending in a `ret` instruction. By placing a carefully crafted chain of addresses on the stack, the attacker forces the CPU to execute these existing gadgets sequentially, computing the attack without ever executing data.
+### The New Code
+
+No code changes. The compiler simply does not request an executable stack in the ELF binary header.
+
+### The Updated Project
+
+The C code remains identical.
+
+### Mechanical walkthrough
+
+- The attacker successfully overflows the buffer, bypasses the canary, guesses the stack address, and overwrites the return address to point to `buf[0]`.
+- The `ret` instruction pops `&buf[0]` into `%rip`.
+- The CPU attempts to fetch the first instruction of the shellcode from `&buf[0]`.
+- The MMU checks the page table entry for the stack memory page.
+- The No-Execute (NX) bit is set to 1 (true) for this page.
+- The CPU hardware immediately raises a fault (Segmentation Fault) because of the permission violation. The shellcode never executes a single instruction.
+
+### CS lens
+
+Also known as DEP (Data Execution Prevention) on Windows. It enforces a strict separation between code and data at the hardware level, fixing the fundamental flaw of the Von Neumann architecture for this specific attack vector.
+
+### SE lens
+
+To bypass NX, attackers developed ROP (Return-Oriented Programming). Instead of writing new code to the stack, the attacker overflows the stack with a chain of return addresses pointing to small snippets of existing executable code (in `.text` or `libc`) ending in `ret`. By chaining these "gadgets" together, they can perform arbitrary computation without ever executing data.
+
+### Commands needed to make this unit real
+
+Compile normally. The stack is non-executable by default.
+
+### Run it
+
+Predicted output (exempt from execution): `Segmentation fault` upon attempting to jump to the stack.
+
+### Connect the pieces
+
+NX stops code execution on the stack, but ROP bypasses it by reusing existing code. To stop ROP, we need ASLR to randomize the locations of the existing code, which leads to the final compiler defenses.
 
 ---
 
-### Concept Unit 7: Defense 4: RELRO, PIE, and safe string functions
+## Concept Unit: Defense 4 — PIE, RELRO, and Safe C Functions
 
-PIE (Position-Independent Executable) ensures that the entire program binary, including the `.text` segment, is loaded at a randomized base address. Without PIE, only the stack, heap, and external libraries are randomized by ASLR, while the core application code sits at a fixed address, providing reliable gadgets for ROP attacks.
+### The Problem
 
-RELRO (Relocation Read-Only) mitigates attacks that attempt to overwrite function pointers. After the dynamic linker resolves symbols at startup, it marks the Global Offset Table (GOT) as read-only.
+If ASLR randomizes the stack and libraries, but the main program executable (`echo`) is loaded at the same fixed address every time, an attacker can just use ROP gadgets from the main program. How do we randomize the main program? And how do we stop the overflow in the first place?
 
-However, all of these advanced defenses are mitigations, not cures. The real first line of defense is writing correct code with strict bounds checking. Let's use Racket to print the final throwaway lab contrasting unsafe C functions with their safe counterparts.
+### Introduce the concept in isolation
 
-```racket
-#lang racket
-;; Throwaway Lab: Safe vs Unsafe String Functions
-(displayln "/* UNSAFE functions to avoid: */")
-(displayln "gets(buf);               /* no bounds at all */")
-(displayln "strcpy(dst, src);        /* copies until NUL, no length limit */")
-(displayln "sprintf(buf, fmt, ...);  /* no length limit on buf */")
-(displayln "")
-(displayln "/* SAFE replacements: */")
-(displayln "fgets(buf, sizeof(buf), stdin);     /* reads at most sizeof(buf)-1 chars */")
-(displayln "strncpy(dst, src, sizeof(dst)-1);   /* copies at most n-1 chars */")
-(displayln "dst[sizeof(dst)-1] = '\\0';         /* ensure NUL termination */")
-(displayln "snprintf(buf, sizeof(buf), fmt, ...); /* length-limited sprintf */")
+```c
+/* UNSAFE: */
+gets(buf);                        /* no bounds at all -- never use */
+strcpy(dst, src);                 /* copies until NUL, no limit */
+sprintf(buf, fmt, ...);           /* no length limit */
 ```
 
-The output provides the safe coding guidelines every C programmer must memorize:
+Predicted output (exempt from execution): These functions will blindly write past buffer boundaries and cause memory corruption.
 
-```racket
-#lang racket
-;; Output:
-;; /* UNSAFE functions to avoid: */
-;; gets(buf);               /* no bounds at all */
-;; strcpy(dst, src);        /* copies until NUL, no length limit */
-;; sprintf(buf, fmt, ...);  /* no length limit on buf */
-;; 
-;; /* SAFE replacements: */
-;; fgets(buf, sizeof(buf), stdin);     /* reads at most sizeof(buf)-1 chars */
-;; strncpy(dst, src, sizeof(dst)-1);   /* copies at most n-1 chars */
-;; dst[sizeof(dst)-1] = '\0';         /* ensure NUL termination */
-;; snprintf(buf, sizeof(buf), fmt, ...); /* length-limited sprintf */
+### Discard the throwaway example
+
+The unsafe functions list is discarded.
+
+### Project Change
+
+- **Reference Source**: No reference counterpart.
+- **Files affected**: `echo.c`
+- **Change type**: Replace
+- **Location**: Inside the `echo` function.
+- **Dependencies**: C standard library.
+
+### The New Code
+
+```c
+    /* SAFE replacements: */
+    fgets(buf, sizeof(buf), stdin);    /* reads at most sizeof(buf)-1 chars */
 ```
 
-`fgets` guarantees it will never read more characters than the size provided, leaving space for the null terminator. `strncpy` and `snprintf` similarly enforce explicit boundaries.
+### The Updated Project
 
-The critical lesson here is that all four defenses—Canaries, ASLR, NX, and PIE/RELRO—can be bypassed given enough time, resources, and chained vulnerabilities (such as combining an information leak with a ROP chain). The only true defense is writing structurally sound code that mathematically guarantees bounds checking.
+```c
+// ← new file: echo.c
+1: #include <stdio.h>
+2: #include <string.h>
+3: 
+4: void echo(void)
+5: {
+6:     char buf[8];
+7:     fgets(buf, sizeof(buf), stdin); // ← new: bounds checked
+8:     printf("%s\n", buf);
+9: }
+10: 
+11: int main(void)
+12: {
+13:     echo();
+14:     return 0;
+15: }
+```
+We replace `gets` with `fgets`, passing the exact size of the buffer.
 
-Buffer overflows are the archetype of the entire class of memory safety bugs. Lessons 43–45 (the security capstone) will return to this topic in depth, specifically focusing on Return-Oriented Programming and modern exploit mitigations. Lesson 12 covers reading compiler output with optimizations.
+### Mechanical walkthrough
 
-**Exercises**: 
-1. Draw the exact stack layout for `echo()` on x86-64, taking into account 16-byte stack alignment padding.
-2. Explain why the stack canary must be loaded from thread-local storage rather than a standard global variable.
-3. What does the `-fsanitize=address` compiler flag do differently from a traditional stack canary?
+- `fgets(buf, sizeof(buf), stdin)` is an instance call provided by the C standard library.
+- `sizeof(buf)` evaluates at compile-time to 8.
+- `fgets` reads characters from `stdin`.
+- It keeps an internal counter. If it reads 7 characters without seeing a newline, it stops reading automatically.
+- It writes the null terminator at `buf[7]`.
+- Even if the user inputs 100 'A's, `fgets` only writes 7 'A's and a null byte. The remaining 92 'A's are left in the input stream.
+- The `saved rbp` and return address are completely untouched. The program is physically impossible to overflow via this input.
+
+Beyond safe code, modern compilers enable PIE and RELRO by default:
+- **PIE (Position-Independent Executable)**: The compiler generates relative jumps (`%rip`-relative addressing) instead of absolute addresses, allowing the OS to apply ASLR to the main binary itself. Attackers can no longer find fixed ROP gadgets.
+- **RELRO (Relocation Read-Only)**: Attackers often overwrite function pointers in the Global Offset Table (GOT) to redirect calls like `printf` to `system`. RELRO marks the GOT as read-only after the dynamic linker resolves all symbols at startup, preventing these overwrites.
+
+### CS lens
+
+The ultimate defense is correct code. Mitigations like Canaries, ASLR, NX, PIE, and RELRO are band-aids over a fundamental language design flaw: C does not automatically track array bounds.
+
+### SE lens
+
+Writing safe C code requires manual vigilance. You must always use bounded functions (`strncpy`, `snprintf`, `fgets`). Because humans make mistakes, modern systems programming is shifting towards memory-safe languages like Rust, which enforce bounds checking at compile-time and runtime automatically, eliminating buffer overflows entirely.
+
+### Commands needed to make this unit real
+
+None. `fgets` is standard C.
+
+### Run it
+
+Predicted output (exempt from execution):
+```
+AAAAAAAAAAAAAAAAAAA
+AAAAAAA
+```
+The program safely truncates the input, prints the first 7 characters, and exits cleanly.
+
+### Connect the pieces
+
+The program is now safe. A user typing 100 characters no longer corrupts the stack; the excess data is simply ignored or handled gracefully.
+
+Buffer overflows are the archetype of memory safety bugs. They exist because C trusts the programmer implicitly. Lesson 12 covers reading compiler output with optimizations, where we will see how the compiler transforms our safe code into highly efficient machine instructions.
