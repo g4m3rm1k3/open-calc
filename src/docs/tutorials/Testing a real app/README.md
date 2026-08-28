@@ -16,16 +16,16 @@ app → next behavior.
 **The method, as of Lesson 1, is a test-driven strangler rewrite, not
 just adding tests.** `manufacturing-platform/backend` and `src/` (the
 **legacy app**) are the real, already-running application — the
-*behavioral oracle*, not the design to copy. `manufacturing-platform/rebuild-3`
+*behavioral oracle*, not the design to copy. `manufacturing-platform/rebuild`
 (the **new app**) is a real, currently-empty rebuild target. The
 behavioral contract carried by each acceptance test is the actual
-invariant here, not the technology stack — Flask/React is `rebuild-3`'s
+invariant here, not the technology stack — Flask/React is `rebuild`'s
 chosen implementation because it's already the right stack for this
 app, not a rule the curriculum imposes on every feature. A shared
 `acceptance-tests/` folder, sibling to both, holds tests that belong to
 neither implementation — each one checks a real HTTP request/response
 contract, characterized against legacy first, then used to drive
-building the identical real behavior in `rebuild-3`, on purpose
+building the identical real behavior in `rebuild`, on purpose
 implemented however is actually good, not copied from legacy's own
 internals. Every real behavior carries one of three honest labels:
 **Preserve** (legacy's real behavior, reproduced as-is — the default,
@@ -69,7 +69,7 @@ folder next to that lesson, not reconstructed from memory.
 - 1: Pointing One Test at Two Real Apps. Small, infrastructure-only:
   `acceptance-tests/`, one test, capable of running against either real
   backend by name, proven against legacy and proven to fail honestly
-  against the still-empty `rebuild-3` — the shift from a test coupled to
+  against the still-empty `rebuild` — the shift from a test coupled to
   implementation to one coupled to a contract, which is what makes it
   reusable against a second, independently-built app at all.
 
@@ -78,7 +78,7 @@ written rather than fixed up front:
 
 - 2: real sign-in (`POST /api/auth/login`) — the first real feature.
   Characterize legacy's three real cases (400/401/200), then build the
-  smallest possible real Flask app in `rebuild-3/backend` and the same
+  smallest possible real Flask app in `rebuild/backend` and the same
   route inside it, until the identical test passes there too.
 - Fixtures, once a second acceptance test needs the same setup as the
   first.

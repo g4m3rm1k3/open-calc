@@ -4,7 +4,7 @@
 > real path this lesson names is inside `manufacturing-platform`, a
 > separate sibling repository, not `open-calc`. `manufacturing-platform`
 > has one real, already-running Flask backend (`backend/`) and one
-> deliberately empty target directory, `rebuild-3/backend/`, where a
+> deliberately empty target directory, `rebuild/backend/`, where a
 > second backend will eventually be built from scratch — nothing exists
 > there yet, not even a package. "legacy" and "new" below name which is
 > which, not a value judgment about either; "new" stays empty until a
@@ -44,7 +44,7 @@ here exactly as they were there.
   back the exact same module object it already built the first time,
   from this cache. This matters directly for this lesson: this
   project's two real Flask backends both name their own top-level
-  package `app` (`backend/app/` and `rebuild-3/backend/app/`) — so a
+  package `app` (`backend/app/` and `rebuild/backend/app/`) — so a
   single Python process that imported one, then tried to import the
   other by the same name, would silently get the *first* one back
   twice, never the second.
@@ -89,6 +89,53 @@ here exactly as they were there.
     request-handling code path a genuine deployed server runs, minus
     only the actual network socket.
 
+- **`Response.status_code`**
+  - *What it is:* a real attribute on Werkzeug's own `Response` class —
+    the class every object `Flask.test_client()` returns from `.get()`,
+    `.post()`, and its other real HTTP methods actually belongs to.
+  - *Implementation:* checked against Werkzeug's own official
+    documentation this session — a plain integer, already set by the
+    time a response object exists, holding the real HTTP status code
+    (`200`, `404`, and so on) that response was built with.
+  - *Its use:* this lesson's test reads it directly to check which real
+    HTTP status code the `/health` route actually returned.
+  - *Type:* an instance attribute on Werkzeug's `Response` class,
+    holding an `int`.
+  - *Responsibility:* exposing one specific response's already-decided
+    HTTP status code as a plain Python value a test can compare against
+    directly, with no parsing.
+  - *Depends on:* a real `Response` object already returned by a call
+    through this lesson's Header's `Flask.test_client()`.
+  - *Connects to:* read directly by this lesson's own test function;
+    the identical attribute exists on every response `test_client()`
+    produces, project-wide, not just this one route.
+  - *Shape:* part of the same real Werkzeug response boundary
+    `Flask.test_client()` sits on — not project-specific.
+
+- **`Response.get_json()`**
+  - *What it is:* a real method on Werkzeug's own `Response` class,
+    the same class `status_code`, above, belongs to.
+  - *Implementation:* checked against Werkzeug's own official
+    documentation this session — reads the response's real body text,
+    parses it as JSON, and returns the result as a plain Python value
+    (a `dict`, for a JSON object body); raises if the body isn't valid
+    JSON.
+  - *Its use:* this lesson's test calls it to turn the real `/health`
+    route's JSON response body into a plain `dict` it can index and
+    make a real assertion against.
+  - *Type:* an instance method on Werkzeug's `Response` class, taking
+    no required arguments, returning a parsed Python value.
+  - *Responsibility:* converting one response's raw JSON text body into
+    a real, usable Python value, so a test never has to parse JSON text
+    by hand.
+  - *Depends on:* a real `Response` object whose body is actually valid
+    JSON text.
+  - *Connects to:* called directly by this lesson's own test function;
+    the identical method is available on every response
+    `Flask.test_client()` returns, project-wide.
+  - *Shape:* part of the same real Werkzeug response boundary
+    `status_code`, above, sits on — not project-specific.
+
 ---
 
 ## Concept Unit: Reaching Either Real App by Name
@@ -96,7 +143,7 @@ here exactly as they were there.
 ### The Problem
 
 `get_client()` needs to import `create_app` from `backend/app/` for one
-real run, and from `rebuild-3/backend/app/` for another — two separate,
+real run, and from `rebuild/backend/app/` for another — two separate,
 real Python packages that both happen to be named `app`. Importing both
 by that same name, in the same Python process, without doing anything
 about it, is genuinely broken — not a style concern, a real, silent
@@ -118,7 +165,7 @@ second backend at all.
 - **Files affected** — created: `acceptance-tests/target.py`,
   `acceptance-tests/test_health.py`, both new, directly inside a new
   `acceptance-tests/` folder at this project's own repository root,
-  sibling to `backend/` and `rebuild-3/`.
+  sibling to `backend/` and `rebuild/`.
 - **Change type** — add (two new files).
 - **Location** — brand-new folder; nothing to locate a position within.
 - **Dependencies** — none beyond `pytest`, already installed in
@@ -137,7 +184,7 @@ def get_client():
     target = os.environ.get('ACCEPTANCE_TARGET', 'legacy')
     roots = {
         'legacy': 'backend',
-        'new': 'rebuild-3/backend',
+        'new': 'rebuild/backend',
     }
     if target not in roots:
         raise ValueError(f"ACCEPTANCE_TARGET must be 'legacy' or 'new', got {target!r}")
@@ -148,6 +195,23 @@ def get_client():
     from app import create_app
     app = create_app('testing')
     return app.test_client()
+```
+
+`get_client()` alone has nothing to prove itself against — it's a
+function that returns a client, not a test. This unit's own Project
+Change, above, creates a second new file for exactly that reason, the
+thing that actually calls it:
+
+```python
+from target import get_client
+
+
+def test_health_returns_200_and_status_healthy():
+    client = get_client()
+    response = client.get('/health')
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body['status'] == 'healthy'
 ```
 
 ### The Updated Project
@@ -166,7 +230,7 @@ file:
  8      target = os.environ.get('ACCEPTANCE_TARGET', 'legacy')
  9      roots = {
 10          'legacy': 'backend',
-11          'new': 'rebuild-3/backend',
+11          'new': 'rebuild/backend',
 12      }
 13      if target not in roots:
 14          raise ValueError(f"ACCEPTANCE_TARGET must be 'legacy' or 'new', got {target!r}")
@@ -177,6 +241,21 @@ file:
 19      from app import create_app
 20      app = create_app('testing')
 21      return app.test_client()
+```
+
+`acceptance-tests/test_health.py`, in full — also brand new, so this is
+the whole file too:
+
+```python
+1  from target import get_client
+2
+3
+4  def test_health_returns_200_and_status_healthy():
+5      client = get_client()
+6      response = client.get('/health')
+7      assert response.status_code == 200
+8      body = response.get_json()
+9      assert body['status'] == 'healthy'
 ```
 
 ### Mechanical Walkthrough
@@ -213,7 +292,7 @@ file:
 - **Line 16, `app_root = os.path.join(REPO_ROOT, roots[target])`** —
   builds one real, concrete, absolute path: either
   `.../manufacturing-platform/backend` or
-  `.../manufacturing-platform/rebuild-3/backend`, never both in the
+  `.../manufacturing-platform/rebuild/backend`, never both in the
   same call.
 - **Line 17, `sys.path.insert(0, app_root)`** — `sys.path` is a real,
   ordinary Python `list` — the ordered set of real directories Python
@@ -236,6 +315,36 @@ file:
 - **Line 21, `return app.test_client()`** — this lesson's Header's
   `Flask.test_client()`, handing back the real object every test in this
   series calls `.get(...)`/`.post(...)` on.
+- **`test_health.py` line 1, `from target import get_client`** —
+  imports this unit's own `get_client`, just defined above, from the
+  sibling file it lives in; both files sit directly inside
+  `acceptance-tests/`, so a plain, unqualified import resolves between
+  them with no package structure needed.
+- **Line 5, `client = get_client()`** — calls it, keeping the real
+  object it returns — this lesson's Header's `Flask.test_client()`
+  object, already pointed at whichever real backend `ACCEPTANCE_TARGET`
+  names — in a local variable named `client`.
+- **Line 6, `response = client.get('/health')`** — this lesson's
+  Header's `Flask.test_client()`, its own `.get(path)` method, called
+  here with the real path `'/health'`: sends a real, in-process `GET`
+  request against whichever backend `client` was built for, returning a
+  real `Response` object.
+- **Line 7, `assert response.status_code == 200`** — this lesson's
+  Header's `Response.status_code`, read here and compared, by real
+  value, against the literal `200` — Lesson 0's own **Assertion**,
+  applied to an HTTP status code for the first time: if the real code
+  returned isn't exactly `200`, this line raises a real
+  `AssertionError` and the test fails right here.
+- **Line 8, `body = response.get_json()`** — this lesson's Header's
+  `Response.get_json()`, called here with no arguments, keeping the
+  real, parsed Python `dict` it returns in a local variable named
+  `body`.
+- **Line 9, `assert body['status'] == 'healthy'`** — a second real
+  assertion: `body['status']` reads the real value at the `'status'`
+  key of the real dict `get_json()` returned; `== 'healthy'` compares
+  it, by real value, against the literal string `'healthy'` — this
+  unit's actual claim about the real `/health` route, checked by the
+  machine.
 
 ### CS Lens
 
@@ -256,7 +365,7 @@ process at once.
 ### SE Lens
 
 The real, deliberately chosen alternative *not* taken here: renaming one
-backend's package (`rebuild-3/backend/app/` to something like `new_app/`)
+backend's package (`rebuild/backend/app/` to something like `new_app/`)
 would also avoid the collision, permanently, with less code. It's
 rejected on purpose — this project's own real convention, everywhere
 else, is that a Flask app's top-level package is named `app`; renaming
@@ -266,59 +375,6 @@ problem entirely local to how tests happen to be run. Isolating the
 *process*, per call, via `sys.path`, keeps both real backends' own code
 exactly as an ordinary Flask developer would expect it, and confines
 this lesson's real workaround to the one file that actually needs it.
-
-### The Second File — `test_health.py`
-
-`target.py` alone has nothing to prove itself against — it's a function
-that returns a client, not a test. This lesson's actual second file is
-the thing that calls it, checking one real, already-existing route:
-
-```python
-from target import get_client
-
-
-def test_health_returns_200_and_status_healthy():
-    client = get_client()
-    response = client.get('/health')
-    assert response.status_code == 200
-    body = response.get_json()
-    assert body['status'] == 'healthy'
-```
-
-`acceptance-tests/test_health.py`, in full — brand new, so this is the
-whole file:
-
-```python
-1  from target import get_client
-2
-3
-4  def test_health_returns_200_and_status_healthy():
-5      client = get_client()
-6      response = client.get('/health')
-7      assert response.status_code == 200
-8      body = response.get_json()
-9      assert body['status'] == 'healthy'
-```
-
-`from target import get_client` — imports this lesson's own
-`get_client` from the sibling file just built above; both files sit
-directly inside `acceptance-tests/`, so a plain, unqualified import
-resolves between them with no package structure needed. `client =
-get_client()` calls it, returning this lesson's Header's real
-`Flask.test_client()` object, already pointed at whichever backend
-`ACCEPTANCE_TARGET` names. `client.get('/health')` — this lesson's
-Header's `Flask.test_client()`, its own `.get(path)` method, sending a
-real, in-process `GET /health` request and returning a real response
-object. `response.status_code` reads the real HTTP status code that
-came back. `response.get_json()` — a real method on Werkzeug's own
-response object (the object Flask's `test_client()` returns), parsing
-the real response body as JSON and returning it as a plain Python
-`dict`. The two `assert` lines are this lesson's actual claim, reusing
-the bare `assert` Lesson 0 already gave full treatment to: this
-project's real, already-existing `/health` route
-(`backend/app/__init__.py`) returns HTTP 200 with a JSON body whose
-`'status'` key is exactly the string `'healthy'` — nothing about this
-test's own code decides that; it only checks it.
 
 ### Commands needed
 
@@ -354,7 +410,7 @@ test_health.py::test_health_returns_200_and_status_healthy PASSED [100%]
 1 passed in ...s
 ```
 
-And, real output, this session, `ACCEPTANCE_TARGET=new` — `rebuild-3/backend`
+And, real output, this session, `ACCEPTANCE_TARGET=new` — `rebuild/backend`
 has no `app` package at all yet:
 
 ```
@@ -367,7 +423,7 @@ target.py:19: ModuleNotFoundError
 
 (Full real captures for both: `lesson-1-verification/`.) This second
 run is not a mistake to fix — it's the honest, correct state of things
-right now, proven rather than assumed: `rebuild-3` genuinely has
+right now, proven rather than assumed: `rebuild` genuinely has
 nothing in it yet, and this harness correctly says so instead of
 silently testing the wrong backend or passing by accident.
 
@@ -396,6 +452,6 @@ later lesson in this series now gets to take for granted.
 
 **Next lesson:** the actual first real feature — characterizing
 `POST /api/auth/login`'s three real behaviors against `backend/`, then
-building the smallest possible real Flask app in `rebuild-3/backend`
+building the smallest possible real Flask app in `rebuild/backend`
 and the same route inside it, until the identical test passes there
 too.
