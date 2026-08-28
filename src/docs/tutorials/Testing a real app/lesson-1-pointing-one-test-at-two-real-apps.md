@@ -3,10 +3,12 @@
 > **What "this project" means in this lesson.** Same as Lesson 0: every
 > real path this lesson names is inside `manufacturing-platform`, a
 > separate sibling repository, not `open-calc`. `manufacturing-platform`
-> now has two real Flask backends: `backend/` (the existing, real,
-> already-running application) and `rebuild-3/backend/` (the target of
-> a real rebuild, currently empty). Both are real; "legacy" and "new"
-> below name which is which, not a value judgment about either.
+> has one real, already-running Flask backend (`backend/`) and one
+> deliberately empty target directory, `rebuild-3/backend/`, where a
+> second backend will eventually be built from scratch — nothing exists
+> there yet, not even a package. "legacy" and "new" below name which is
+> which, not a value judgment about either; "new" stays empty until a
+> later lesson actually builds something in it.
 
 ## What you will build
 
@@ -265,18 +267,83 @@ problem entirely local to how tests happen to be run. Isolating the
 exactly as an ordinary Flask developer would expect it, and confines
 this lesson's real workaround to the one file that actually needs it.
 
+### The Second File — `test_health.py`
+
+`target.py` alone has nothing to prove itself against — it's a function
+that returns a client, not a test. This lesson's actual second file is
+the thing that calls it, checking one real, already-existing route:
+
+```python
+from target import get_client
+
+
+def test_health_returns_200_and_status_healthy():
+    client = get_client()
+    response = client.get('/health')
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body['status'] == 'healthy'
+```
+
+`acceptance-tests/test_health.py`, in full — brand new, so this is the
+whole file:
+
+```python
+1  from target import get_client
+2
+3
+4  def test_health_returns_200_and_status_healthy():
+5      client = get_client()
+6      response = client.get('/health')
+7      assert response.status_code == 200
+8      body = response.get_json()
+9      assert body['status'] == 'healthy'
+```
+
+`from target import get_client` — imports this lesson's own
+`get_client` from the sibling file just built above; both files sit
+directly inside `acceptance-tests/`, so a plain, unqualified import
+resolves between them with no package structure needed. `client =
+get_client()` calls it, returning this lesson's Header's real
+`Flask.test_client()` object, already pointed at whichever backend
+`ACCEPTANCE_TARGET` names. `client.get('/health')` — this lesson's
+Header's `Flask.test_client()`, its own `.get(path)` method, sending a
+real, in-process `GET /health` request and returning a real response
+object. `response.status_code` reads the real HTTP status code that
+came back. `response.get_json()` — a real method on Werkzeug's own
+response object (the object Flask's `test_client()` returns), parsing
+the real response body as JSON and returning it as a plain Python
+`dict`. The two `assert` lines are this lesson's actual claim, reusing
+the bare `assert` Lesson 0 already gave full treatment to: this
+project's real, already-existing `/health` route
+(`backend/app/__init__.py`) returns HTTP 200 with a JSON body whose
+`'status'` key is exactly the string `'healthy'` — nothing about this
+test's own code decides that; it only checks it.
+
 ### Commands needed
 
-```
+This project's own real shell is PowerShell, not bash — the command
+below uses PowerShell's own syntax for setting an environment variable
+for a single command, because bash's `VAR=value command` form is not
+valid PowerShell and fails with a `CommandNotFoundException` if typed
+here.
+
+```powershell
 cd manufacturing-platform
-ACCEPTANCE_TARGET=legacy backend\.venv\Scripts\python.exe -m pytest acceptance-tests/test_health.py -v
+$env:ACCEPTANCE_TARGET='legacy'; backend\.venv\Scripts\python.exe -m pytest acceptance-tests/test_health.py -v
 ```
 
-`ACCEPTANCE_TARGET=legacy` — sets a real environment variable for this
-one command only, read by `target.py`'s own `os.environ.get(...)` above.
-The rest of the command is the identical real pattern Lesson 0 already
-used: this project's own `.venv`'s `python`, running `pytest` as a
-module, `-v` for per-test verbose output.
+`$env:ACCEPTANCE_TARGET='legacy'` — PowerShell's own real syntax for
+setting an environment variable: `$env:<NAME>` is how PowerShell exposes
+the current process's environment as assignable variables, and this
+assignment sets `ACCEPTANCE_TARGET` for the rest of the current shell
+session, not just one command — it stays set until the shell is closed
+or the variable is reassigned. The `;` is PowerShell's statement
+separator, running the assignment and then the next command in
+sequence, the same real role a newline would play. The rest of the
+command is the identical real pattern Lesson 0 already used: this
+project's own `.venv`'s `python`, running `pytest` as a module, `-v`
+for per-test verbose output.
 
 ### Run it, per the Verification Rule
 
