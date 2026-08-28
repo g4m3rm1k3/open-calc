@@ -398,5 +398,167 @@
         "STEM",
         "Courses"
       ]
-    }
+    },
+      {
+    "title": "Eloquent JavaScript",
+    "description": "Free online book teaching JavaScript, programming, and the browser, with in-browser coding exercises",
+    "url": "https://eloquentjavascript.net/",
+    "tags": ["JavaScript", "Book", "Interactive"]
+  },
+  {
+    "title": "SICP (Structure and Interpretation of Computer Programs)",
+    "description": "The classic free MIT book on programming fundamentals using Scheme",
+    "url": "https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html",
+    "tags": ["CS", "Book", "Scheme"]
+  },
+  {
+    "title": "How to Design Programs",
+    "description": "Free book teaching a systematic approach to programming, used in intro CS courses",
+    "url": "https://htdp.org/",
+    "tags": ["CS", "Book", "Fundamentals"]
+  },
+  {
+    "title": "Think Python",
+    "description": "Free introductory Python book by Allen Downey",
+    "url": "https://greenteapress.com/wp/think-python-2e/",
+    "tags": ["Python", "Book"]
+  },
+  {
+    "title": "A Byte of Python",
+    "description": "Free beginner-friendly Python book",
+    "url": "https://python.swaroopch.com/",
+    "tags": ["Python", "Book"]
+  },
+  {
+    "title": "Learn You a Haskell for Great Good!",
+    "description": "Free, illustrated, humorous introduction to Haskell",
+    "url": "https://learnyouahaskell.github.io/",
+    "tags": ["Haskell", "Book", "Functional Programming"]
+  },
+  {
+    "title": "The Rust Programming Language (interactive edition)",
+    "description": "Rust's official book with runnable code examples inline",
+    "url": "https://rust-book.cs.brown.edu/",
+    "tags": ["Rust", "Book", "Interactive"]
+  },
+  {
+    "title": "Learning Go the hard way / Go by Example",
+    "description": "Hands-on annotated example programs for learning Go",
+    "url": "https://gobyexample.com/",
+    "tags": ["Go", "Interactive", "Examples"]
+  },
+  {
+    "title": "Zero to Production in Rust (free chapters)",
+    "description": "Practical book on building backend systems in Rust",
+    "url": "https://www.zero2prod.com/index.html",
+    "tags": ["Rust", "Book", "Backend"]
+  },
+  {
+    "title": "The Book of Shaders",
+    "description": "Free interactive book teaching fragment shaders, with live editable code",
+    "url": "https://thebookofshaders.com/",
+    "tags": ["Graphics", "Book", "Interactive"]
+  },
+  {
+    "title": "Ray Tracing in One Weekend",
+    "description": "Free short book series on building a ray tracer from scratch",
+    "url": "https://raytracing.github.io/",
+    "tags": ["Graphics", "Book"]
+  },
+  {
+    "title": "Physically Based Rendering (PBR Book)",
+    "description": "Free online edition of the definitive rendering textbook",
+    "url": "https://pbr-book.org/",
+    "tags": ["Graphics", "Book"]
+  },
+  {
+    "title": "The Little Schemer / free CS books archive (r/algorithms wiki style)",
+    "description": "Free community-maintained list of free CS books across all topics",
+    "url": "https://github.com/EbookFoundation/free-programming-books",
+    "tags": ["CS", "Book List", "Reference"]
+  },
+  {
+    "title": "Codecademy (free tier)",
+    "description": "Interactive in-browser coding lessons across many languages",
+    "url": "https://www.codecademy.com/catalog",
+    "tags": ["Interactive", "CS", "Tutorials"]
+  },
+  {
+    "title": "Scrimba",
+    "description": "Interactive screencasts where you can edit code directly inside the video",
+    "url": "https://scrimba.com/",
+    "tags": ["Interactive", "Web Dev", "Video"]
+  },
+  {
+    "title": "Codewars",
+    "description": "Practice coding through community-created challenges (katas) with instant feedback",
+    "url": "https://www.codewars.com/",
+    "tags": ["Interactive", "Practice", "Algorithms"]
+  },
+  {
+    "title": "LeetCode (free tier)",
+    "description": "Interactive coding problems with an online judge for practice",
+    "url": "https://leetcode.com/",
+    "tags": ["Interactive", "Algorithms", "Practice"]
+  },
+  {
+    "title": "HackerRank",
+    "description": "Free interactive coding challenges across domains (algorithms, SQL, etc.)",
+    "url": "https://www.hackerrank.com/",
+    "tags": ["Interactive", "Practice", "CS"]
+  },
+  {
+    "title": "Codingame",
+    "description": "Learn programming by solving puzzles and building bots/games interactively",
+    "url": "https://www.codingame.com/",
+    "tags": ["Interactive", "Games", "Practice"]
+  },
+  {
+    "title": "SQL Zoo",
+    "description": "Interactive SQL tutorial with live query execution",
+    "url": "https://sqlzoo.net/",
+    "tags": ["SQL", "Interactive"]
+  },
+  {
+    "title": "Regex101 / RegexOne",
+    "description": "Interactive regular expressions tutorial with live pattern testing",
+    "url": "https://regexone.com/",
+    "tags": ["Regex", "Interactive"]
+  },
+  {
+    "title": "Vim Adventures / OpenVim",
+    "description": "Interactive in-browser tutorial for learning Vim commands",
+    "url": "https://www.openvim.com/",
+    "tags": ["Vim", "Interactive", "Tools"]
+  },
+  {
+    "title": "Explorable Explanations",
+    "description": "Collection of interactive, playable explanations of math and science concepts",
+    "url": "https://explorabl.es/",
+    "tags": ["Math", "STEM", "Interactive"]
+  },
+  {
+    "title": "Seeing Theory",
+    "description": "Interactive visual introduction to probability and statistics",
+    "url": "https://seeing-theory.brown.edu/",
+    "tags": ["Statistics", "Math", "Interactive"]
+  },
+  {
+    "title": "Distill.pub (archive)",
+    "description": "Interactive, visual explanations of machine learning research",
+    "url": "https://distill.pub/",
+    "tags": ["Machine Learning", "Interactive", "Research"]
+  },
+  {
+    "title": "Feynman Lectures on Physics",
+    "description": "Free complete online edition of Feynman's famous physics lectures",
+    "url": "https://www.feynmanlectures.caltech.edu/",
+    "tags": ["Physics", "Book", "STEM"]
+  },
+  {
+    "title": "OpenStax",
+    "description": "Free peer-reviewed textbooks covering math, physics, chemistry, and more",
+    "url": "https://openstax.org/subjects",
+    "tags": ["STEM", "Book", "Textbooks"]
+  }
   ]
