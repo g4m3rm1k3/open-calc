@@ -58,5 +58,103 @@
     "description": "Learn to Code",
     "url": "https://www.w3schools.com/",
     "tags": ["CS", "Web Dev", "Tutorials"]
+  },
+  [
+  {
+    "title": "CS50",
+    "description": "Harvard's free introduction to computer science and programming",
+    "url": "https://cs50.harvard.edu/x/",
+    "tags": ["CS", "Fundamentals", "Course"]
+  },
+  {
+    "title": "The Odin Project",
+    "description": "Free full-stack curriculum with project-based learning",
+    "url": "https://www.theodinproject.com/",
+    "tags": ["Web Dev", "Curriculum"]
+  },
+  {
+    "title": "Teach Yourself CS",
+    "description": "Curated reading list covering the core CS topics missed outside a degree",
+    "url": "https://teachyourselfcs.com/",
+    "tags": ["CS", "Curriculum", "Self-Study"]
+  },
+  {
+    "title": "MIT OpenCourseWare",
+    "description": "Free lecture notes, exams, and videos from actual MIT courses",
+    "url": "https://ocw.mit.edu/",
+    "tags": ["CS", "STEM", "Courses"]
+  },
+  {
+    "title": "Visualgo",
+    "description": "Visualizing data structures and algorithms through animation",
+    "url": "https://visualgo.net/",
+    "tags": ["Algorithms", "Data Structures", "Visualization"]
+  },
+  {
+    "title": "NeetCode",
+    "description": "Curated algorithm/data structure problems with free video explanations",
+    "url": "https://neetcode.io/",
+    "tags": ["Algorithms", "Interview Prep"]
+  },
+  {
+    "title": "Exercism",
+    "description": "Free code practice and mentorship in 70+ languages",
+    "url": "https://exercism.org/",
+    "tags": ["Practice", "Mentorship", "CS"]
+  },
+  {
+    "title": "The Rust Book",
+    "description": "Official free book for learning the Rust programming language",
+    "url": "https://doc.rust-lang.org/book/",
+    "tags": ["Rust", "Systems Programming"]
+  },
+  {
+    "title": "Nand2Tetris",
+    "description": "Build a modern computer system from first principles (free course)",
+    "url": "https://www.nand2tetris.org/",
+    "tags": ["Computer Architecture", "Systems"]
+  },
+  {
+    "title": "OSSU Computer Science",
+    "description": "A complete self-taught CS degree built entirely from free online courses",
+    "url": "https://github.com/ossu/computer-science",
+    "tags": ["CS", "Curriculum", "Self-Study"]
+  },
+  {
+    "title": "Real Python",
+    "description": "Python tutorials ranging from beginner to advanced (free tier)",
+    "url": "https://realpython.com/",
+    "tags": ["Python", "Tutorials"]
+  },
+  {
+    "title": "Automate the Boring Stuff with Python",
+    "description": "Free book teaching practical Python scripting for automation",
+    "url": "https://automatetheboringstuff.com/",
+    "tags": ["Python", "Automation", "Manufacturing"]
+  },
+  {
+    "title": "Control Systems Engineering (LibreTexts)",
+    "description": "Open-access textbook covering feedback and control systems theory",
+    "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
+    "tags": ["Controls", "Manufacturing", "Engineering"]
+  },
+  {
+    "title": "Paul's Online Math Notes",
+    "description": "Free calculus, linear algebra, and differential equations notes",
+    "url": "https://tutorial.math.lamar.edu/",
+    "tags": ["Math", "STEM"]
+  },
+  {
+    "title": "3Blue1Brown",
+    "description": "Visual, intuition-first math explanations (linear algebra, calculus, etc.)",
+    "url": "https://www.3blue1brown.com/",
+    "tags": ["Math", "Visualization"]
+  },
+  {
+    "title": "Khan Academy",
+    "description": "Free courses across math, CS, and STEM subjects",
+    "url": "https://www.khanacademy.org/",
+    "tags": ["Math", "STEM", "Courses"]
   }
+]
 ]
