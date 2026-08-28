@@ -5,6 +5,12 @@
     "url": "https://www.freecodecamp.org/",
     "tags": ["Web Dev", "Learning"]
   },
+    {
+    "title": "Data Oriented Design",
+    "description": "This is the free, online, reduced version",
+    "url": " https://www.dataorienteddesign.com/dodbook/node1.html",
+    "tags": ["Software Engineering"]
+  },
   {
     "title": "Game Math Book",
     "description": "3D Math Primer for Graphics and Game Development – Dunn & Parberry",
