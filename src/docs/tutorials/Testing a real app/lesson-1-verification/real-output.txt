@@ -1,0 +1,31 @@
+Verified this session, backend/.venv, pytest 9.1.1, Python 3.13.14
+Command: ACCEPTANCE_TARGET=<target> .venv/Scripts/python -m pytest test_health.py -v
+REPO_ROOT hardcoded to the real manufacturing-platform path for this
+verification copy; the taught version in the lesson computes it from
+__file__ instead, since the verification copy doesn't sit in the real
+acceptance-tests/ location.
+
+=== RUN 1: ACCEPTANCE_TARGET=legacy ===
+
+test_health.py::test_health_returns_200_and_status_healthy PASSED [100%]
+
+1 passed in ...s
+
+=== RUN 2: ACCEPTANCE_TARGET=new (rebuild-3/backend is genuinely empty) ===
+
+    def get_client():
+        ...
+        from app import create_app
+E       ModuleNotFoundError: No module named 'app'
+
+target.py:19: ModuleNotFoundError
+
+1 failed in 0.05s
+
+Also verified in the same session: test_login.py (four cases -
+missing fields/400, unknown email/401, wrong password/401, valid
+credentials/200 with a well-formed token and a user dict with no
+password_hash) - all 5 tests across test_health.py + test_login.py
+PASSED against ACCEPTANCE_TARGET=legacy in one run, 5 passed in 2.68s.
+This file belongs to Lesson 2 (login), not Lesson 1; recorded here only
+because it ran in the same verification session as the health check.

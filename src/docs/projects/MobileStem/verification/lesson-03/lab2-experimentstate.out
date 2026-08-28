@@ -1,0 +1,8 @@
+Configuring
+Running(startedAtMillis=1000)
+Stopped(startedAtMillis=1000, stoppedAtMillis=5000)
+Saved(startedAtMillis=1000, stoppedAtMillis=5000)
+Exception in thread "main" java.lang.IllegalStateException: Cannot start from Saved(startedAtMillis=1000, stoppedAtMillis=5000)
+	at ExperimentStateKt.start(ExperimentState.kt:10)
+	at ExperimentStateKt.main(ExperimentState.kt:32)
+	at ExperimentStateKt.main(ExperimentState.kt)

@@ -1,0 +1,7 @@
+Open
+Closed
+Locked
+Exception in thread "main" java.lang.IllegalStateException: Cannot open from Locked
+	at DoorKt.open(Door.kt:9)
+	at DoorKt.main(Door.kt:30)
+	at DoorKt.main(Door.kt)

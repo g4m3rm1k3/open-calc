@@ -1,0 +1,68 @@
+Verified this session, backend/.venv, pytest 9.1.1, Python 3.13.14
+Command: .venv/Scripts/python -m pytest <file> -v
+rootdir: manufacturing-platform (run from backend/, paths shown relative to repo root)
+
+=== RUN 1: test_part_to_dict.py, second test asserting the WRONG (assumed) value ===
+(test body at this point: `assert data['status'] == 'draft'`)
+
+testing/verified/lesson-0/test_part_to_dict.py::test_to_dict_reflects_the_fields_i_actually_set PASSED [ 50%]
+testing/verified/lesson-0/test_part_to_dict.py::test_to_dict_status_before_any_database_write FAILED [100%]
+
+================================== FAILURES ===================================
+________________ test_to_dict_status_before_any_database_write ________________
+
+    def test_to_dict_status_before_any_database_write():
+        app = create_app('testing')
+        with app.app_context():
+            part = Part(
+                id='P-TEST-2',
+                part_number='7654321',
+                description='Another Bracket',
+            )
+            data = part.to_dict()
+>           assert data['status'] == 'draft'
+E           AssertionError: assert None == 'draft'
+
+testing/verified/lesson-0/test_part_to_dict.py:28: AssertionError
+---------------------------- Captured stdout call -----------------------------
+Seeding default users...
+1 failed, 1 passed, 10 warnings in 1.63s
+
+=== RUN 2: test_part_to_dict.py, corrected to assert the real observed value ===
+(test body corrected to: `assert data['status'] is None`)
+
+testing/verified/lesson-0/test_part_to_dict.py::test_to_dict_reflects_the_fields_i_actually_set PASSED [ 50%]
+testing/verified/lesson-0/test_part_to_dict.py::test_to_dict_status_is_none_before_any_database_write PASSED [100%]
+
+2 passed, 10 warnings in 1.31s
+
+=== RUN 3: test_part_to_dict_deliberately_broken.py — Part.to_dict monkeypatched to prove the test is real ===
+
+testing/verified/lesson-0/test_part_to_dict_deliberately_broken.py::test_to_dict_reflects_the_fields_i_actually_set FAILED [100%]
+
+================================== FAILURES ===================================
+_______________ test_to_dict_reflects_the_fields_i_actually_set _______________
+
+    def test_to_dict_reflects_the_fields_i_actually_set():
+        PartClass.to_dict = _broken_to_dict
+        app = create_app('testing')
+        with app.app_context():
+            part = Part(
+                id='P-TEST',
+                part_number='1234567',
+                description='Test Bracket',
+            )
+            data = part.to_dict()
+>           assert data['id'] == 'P-TEST'
+E           AssertionError: assert 'P-TEST-OOPS' == 'P-TEST'
+E
+E             - P-TEST
+E             + P-TEST-OOPS
+
+testing/verified/lesson-0/test_part_to_dict_deliberately_broken.py:20: AssertionError
+1 failed, 5 warnings in 1.02s
+
+Note: all three runs also print "Seeding default users..." to stdout — a real,
+already-existing side effect of this project's own create_app('testing') calling
+seed_users() every time an app context is pushed. Not this lesson's subject;
+observed directly in real output, not invented.

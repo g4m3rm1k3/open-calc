@@ -1,0 +1,3 @@
+true
+Order(id=o1, items=[LineItem(product=Widget, quantity=2), LineItem(product=Gadget, quantity=1)])
+3

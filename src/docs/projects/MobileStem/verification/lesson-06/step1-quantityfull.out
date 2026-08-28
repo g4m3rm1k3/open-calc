@@ -1,0 +1,10 @@
+false
+Quantity(value=5.0, unit=Meter)
+Quantity(value=5.0, unit=Second)
+Quantity(value=5.0, unit=MetersPerSecond)
+Quantity(value=328.0839895013123, unit=Foot)
+Quantity(value=100.0, unit=Meter)
+Exception in thread "main" java.lang.IllegalArgumentException: Cannot convert m to s: different dimensions
+	at QuantityFullKt.convertTo(QuantityFull.kt:14)
+	at QuantityFullKt.main(QuantityFull.kt:39)
+	at QuantityFullKt.main(QuantityFull.kt)
