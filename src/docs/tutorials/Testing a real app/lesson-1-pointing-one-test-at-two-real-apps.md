@@ -450,8 +450,7 @@ later lesson in this series now gets to take for granted.
 
 ---
 
-**Next lesson:** the actual first real feature — characterizing
-`POST /api/auth/login`'s three real behaviors against `backend/`, then
-building the smallest possible real Flask app in `rebuild/backend`
-and the same route inside it, until the identical test passes there
-too.
+**Next lesson:** the "implement it from scratch" half of this exact
+slice — the actual smallest real Flask application `rebuild/backend`
+can be built from, until this lesson's own unmodified test passes
+against it too, not just legacy.

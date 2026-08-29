@@ -73,19 +73,90 @@ folder next to that lesson, not reconstructed from memory.
   implementation to one coupled to a contract, which is what makes it
   reusable against a second, independently-built app at all.
 
+**Lessons 2–7 are the walking skeleton — a thin, real slice through
+the whole stack (backend, frontend, the connection between them,
+styling) built before any real feature, following it agile-style: get
+something real and complete end-to-end first, then layer real features
+on top of it, rather than going deep on one layer before the others
+exist.** No database, no login, and no other real feature appears
+anywhere in this slice, on purpose.
+
+- 2: Standing Up `rebuild` — An Application From Nothing. The
+  "implement it from scratch" half of the slice Lesson 1 already
+  proved RED: the smallest real Flask app, built from nothing, until
+  Lesson 1's own unmodified `/health` test passes against `rebuild`
+  too.
+- 3: Testing Something That Doesn't Exist Yet. `rebuild/frontend`'s
+  own first real code — but test-first, the same way every backend
+  lesson already has been: this series' first real frontend test
+  (Vitest, Testing Library), written and proven to fail honestly,
+  before any real component exists to satisfy it.
+- 4: Something Real on Screen. The actual smallest real component that
+  makes Lesson 3's own test pass — nothing more.
+- 5: Testing the Real Connection. A real, mocked-network unit test,
+  written before `App` knows how to fetch anything, proving the
+  *component's own logic* is correct without needing a real, running
+  backend just to run a test.
+- 6: Connecting `rebuild`'s Two Real Halves. The real code that makes
+  Lesson 5's test pass, plus the real, separate infrastructure — a
+  dev-server proxy, the same real technique legacy's frontend already
+  uses — needed to prove it against a real, running `rebuild/backend`
+  too, not just against a test's own fake.
+- 7: Real Styling, Scoped to `rebuild/frontend`. Tailwind, matching
+  legacy's own real tool choice, with its own config so this project
+  never silently inherits legacy's. The walking skeleton is complete
+  after this lesson — a real backend, a real frontend, a real,
+  styled connection between them, and nothing else yet.
+
+**Lessons 8–12 are the first real feature slice — real sign-in — built
+on top of the now-complete walking skeleton:**
+
+- 8: Testing Real Sign-In. Characterizes legacy's own real
+  `POST /api/auth/login` — four real cases (missing input, unknown
+  email, wrong password, real success), the last two proven to return
+  the identical generic error on purpose, resisting user enumeration.
+- 9: A Real Database Connection. The first real infrastructure this
+  slice needs — SQLAlchemy, a real config class, proven only by not
+  breaking the already-working `/health` route.
+- 10: A Real User Model. Matching legacy's own real fields exactly,
+  with real, delegated password hashing.
+- 11: The Authentication Decision, Testable On Its Own. A real,
+  deliberate **Deliberately changed** design choice: the actual
+  authentication decision pulled into one plain function, independently
+  tested with no HTTP anywhere near it — legacy's own real, identical
+  decision has never been testable this way.
+- 12: The Real Login Route. The thinnest possible real adapter between
+  a request and Lesson 11's own decision — where Lesson 8's own real
+  test, written before any of this existed, finally passes against
+  `rebuild` too.
+- 13: Testing a Real Login Form. The backend half of sign-in, alone,
+  repeats this series' own earlier `/health`-only mistake — a feature
+  isn't a real, complete slice until its frontend half exists too. A
+  real, test-first login form test: type credentials, submit, see a
+  real error or real success.
+- 14: The Real Login Form. The actual component, both real outcomes
+  proven. Real sign-in is now a complete, full-stack vertical slice.
+
+**Lessons 15–17 are a real, second, separate feature slice —
+authorization — built on top of real sign-in:**
+
+- 15: Testing Real Authorization. Characterizes legacy's real `401`
+  (no proof of identity) vs. `403` (real, valid identity, still not
+  allowed) distinction on `GET /api/auth/users`, building its own real
+  test data through the already-proven login/register routes.
+- 16: A Real, Reusable Authorization Check. `token_required`, a real
+  decorator factory, independently tested with no HTTP anywhere near
+  it — Preserving legacy's three-layer shape and 401/403 distinction,
+  deliberately not Preserving its "operator bypass" special case (no
+  real, current test exercises it).
+- 17: Wiring Real Authorization Onto Real Routes. The real feature
+  routes, protected, completing the slice.
+
 Later lessons, roughly in order, refined as each one is actually
 written rather than fixed up front:
 
-- 2: real sign-in (`POST /api/auth/login`) — the first real feature.
-  Characterize legacy's three real cases (400/401/200), then build the
-  smallest possible real Flask app in `rebuild/backend` and the same
-  route inside it, until the identical test passes there too.
 - Fixtures, once a second acceptance test needs the same setup as the
   first.
-- Authorization — a real protected route, roles, and what a 403 versus
-  a 401 actually means.
-- The new app's own React frontend, once its backend has real,
-  passing coverage to build against.
 - Coverage measurement on the new app — and what it does and doesn't
   actually prove.
 - UI/UX: what's actually mechanically checkable versus what still
