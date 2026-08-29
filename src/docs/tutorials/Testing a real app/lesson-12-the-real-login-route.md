@@ -25,6 +25,12 @@ against `rebuild`, and now this lesson's own real target.
 
 ## Terms introduced
 
+- **Database seeding** — populating a real, freshly-created database with
+  real, initial data an application actually needs to function, distinct
+  from a real *migration* (which changes a database's own real
+  structure — tables, columns — not its data). Legacy's own real backend
+  already seeds five real, default users on startup; this lesson seeds
+  exactly the one this slice's own acceptance test actually needs.
 - **Blueprint** — a real, standard Flask way of grouping related
   routes together before registering them on an app. Legacy's own real
   backend already organizes its own, many real auth-related routes
@@ -32,6 +38,91 @@ against `rebuild`, and now this lesson's own real target.
   why one real route doesn't yet justify it.
 
 ## Objects and methods used
+
+- **`db.create_all()`**
+  - *What it is:* a real method on the `db` object this project's own
+    database-connection lesson already constructed — part of
+    Flask-SQLAlchemy's own public API.
+  - *Implementation:* checked against Flask-SQLAlchemy's own official
+    documentation this session — inspects every real `db.Model`
+    subclass Python has seen defined so far (`User`, here) and issues
+    real, actual `CREATE TABLE` SQL for each one that doesn't already
+    exist in the real, connected database; genuinely does nothing to a
+    real table that already exists, so calling it more than once is
+    real and safe. Requires a real, active application context.
+  - *Its use:* this unit's own `create_app` calls it once, so the real
+    `users` table genuinely exists before any real request can query it
+    — without this, every real query this slice's own `authenticate`
+    function runs would fail with a real, unhandled database error, not
+    a clean `401`.
+  - *Type:* an instance method on the real `db` object.
+  - *Responsibility:* the real, one-time (per real table) translation
+    from "a real Python class exists" to "a real, matching database
+    table actually exists to store its rows in."
+  - *Depends on:* a real, active application context, and every real
+    `db.Model` subclass Python has actually imported and defined by the
+    moment it's called.
+  - *Connects to:* called once, inside `create_app`, before the app is
+    returned; every real column `User` declares becomes a real column
+    in the real table this call actually creates.
+  - *Shape:* the real, one-time schema-creation boundary between "models
+    exist in Python" and "tables exist in the real database" — reached
+    here for the first time inside `create_app` itself, rather than only
+    inside a throwaway lab or a test's own setup.
+
+- **`app.app_context()`**
+  - *What it is:* a real instance method on a real, already-constructed
+    `Flask` app object.
+  - *Implementation:* checked against Flask's own official documentation
+    this session — returns a real, standard Python context manager (an
+    object usable with `with`, guaranteeing real setup and real teardown
+    around the code inside the block); entering it makes that specific
+    real app's own configuration and database connection ambiently
+    reachable to code running inside, without that code needing the real
+    `app` object handed to it directly.
+  - *Its use:* this unit's own `create_app` wraps `db.create_all()` and
+    `seed_admin_user()`, below, in a real `with app.app_context():`
+    block, since both need to reach this specific real app's own
+    database connection, and neither runs during a real, in-flight HTTP
+    request, where an app context would otherwise already exist
+    automatically.
+  - *Type:* an instance method on `Flask`, returning a real context
+    manager.
+  - *Responsibility:* making one specific, real app's own configuration
+    and database connection ambiently available to code that needs it
+    outside of handling a real request.
+  - *Depends on:* a real, already-constructed `Flask` app.
+  - *Connects to:* entered via `with`, directly around this unit's own
+    real `db.create_all()` and `seed_admin_user()` calls, inside
+    `create_app`.
+  - *Shape:* a real, request-independent version of the identical real
+    ambient-context idea Flask already uses for a real, in-flight HTTP
+    request.
+
+- **`User.query.first()`**
+  - *What it is:* a real method on `User`'s own real `.query` attribute
+    — the identical real, chainable query object this slice's own
+    `authenticate` function already builds on, called here with no real
+    filter at all.
+  - *Implementation:* checked against SQLAlchemy's own official
+    documentation this session — runs a real, unfiltered query against
+    the real `users` table and returns the real, first row found, in
+    whatever real order the database happens to return rows in, or
+    `None` if the real table is genuinely empty.
+  - *Its use:* this unit's own `seed_admin_user` calls it once, purely to
+    check whether the real `users` table already has *any* real row in
+    it at all — not to find a specific one.
+  - *Type:* an instance method on the real `Query` object `User.query`
+    returns.
+  - *Responsibility:* a real, cheap "does this table have anything in it
+    yet" check, without counting every real row or naming which one.
+  - *Depends on:* a real, active application context, and a real,
+    already-created `users` table.
+  - *Connects to:* called once, as the first real line of
+    `seed_admin_user`; a real, non-`None` result short-circuits the rest
+    of that function via a real, early `return`.
+  - *Shape:* the real, minimal real form of a query this slice's own
+    `authenticate` function already uses a real, filtered version of.
 
 - **`request.get_json()`**
   - *What it is:* a real method on Flask's own real, global `request`
@@ -149,9 +240,9 @@ version, with this unit's own new import and route added:
 2  from flask_sqlalchemy import SQLAlchemy
 3  from config import config
 4
-5  from app.auth import authenticate
+5  db = SQLAlchemy()
 6
-7  db = SQLAlchemy()
+7  from app.auth import authenticate
 8
 9
 10 def create_app(config_name='default'):
@@ -184,8 +275,23 @@ version, with this unit's own new import and route added:
 - **Line 1, `from flask import Flask, request`** — this lesson's
   Header's own real, global `request` object, imported alongside the
   already-used `Flask`.
-- **Line 5, `from app.auth import authenticate`** — the previous
-  lesson's own real, already-tested function.
+- **Line 5, `db = SQLAlchemy()`, before line 7's own `from app.auth
+  import authenticate`** — a real, necessary order, not an arbitrary
+  one: `from app.auth import authenticate` triggers loading
+  `app/auth.py`, which imports `app/models.py`, which itself does
+  `from app import db` — reaching back into this exact, still-loading
+  file. If that chain runs before line 5 has executed, Python raises a
+  real `ImportError: cannot import name 'db' from partially initialized
+  module 'app'` — a real **circular import**: two real modules, each
+  needing something from the other, where the actual real order
+  execution happens in decides whether it works at all. Defining `db`
+  first, before anything that transitively needs it gets imported, is
+  the real, necessary fix — confirmed the hard way this session: this
+  exact ordering mistake, tried first, crashed immediately, before a
+  single real request could even be attempted.
+- **Line 7, `from app.auth import authenticate`** — the previous
+  lesson's own real, already-tested function, now safely importable
+  because line 5 already ran first.
 - **Line 19, `@app.route('/api/auth/login', methods=['POST'])`** — the
   identical real decorator mechanism this series already gave full
   treatment to for `/health`, now with a real, explicit `methods=`
@@ -250,15 +356,233 @@ slice's own four real cases; the next unit completes it.
 
 ### Run it, per the Verification Rule
 
-Not run this session — deferred to the next unit, once the real
-success path also exists; this unit alone cannot yet make the real,
-whole acceptance test pass, only its first three real cases.
+Not run this session — deferred to the next unit. Confidently
+predicted, but *not yet true*: this unit's own route is wired
+correctly, but the real `users` table this route's own `authenticate`
+call depends on has never actually been created anywhere in
+`rebuild/backend` — every real case except the missing-fields one would
+still fail, for a genuinely different, honest reason than a wrong
+`401`. The next unit builds that missing piece before this unit's own
+real claim can actually be checked.
 
 ### Connecting this unit to what came before
 
 The previous lesson proved `authenticate` correct in isolation. This
 unit is the first real code that lets an actual real HTTP client reach
 it.
+
+---
+
+## Concept Unit: A Real Table, and a Real Admin, the App Actually Needs
+
+### The Problem
+
+The previous unit's own real route calls `authenticate`, which calls
+`User.query.filter_by(email=email).first()` — a real query against a
+real `users` table. Nothing anywhere in this slice has ever actually
+created that real table inside a real, running application: the
+previous lesson's own isolation lab called `db.create_all()` itself,
+by hand, and this slice's own unit tests do the identical real thing,
+per test — but `create_app` itself, the real function this slice's own
+acceptance test actually calls, never has. Run for real, right now,
+the previous unit's own route crashes with a real, unhandled
+`sqlite3.OperationalError: no such table: users` the instant anything
+past the missing-fields check runs — not the clean `401` it claims. The
+real question this unit answers: what does `create_app` actually need,
+so a fresh real database is genuinely ready the moment the real
+application starts, the identical real moment legacy's own real
+`create_app` already handles this?
+
+> **Before reading on:** `TestingConfig`'s own real
+> `SQLALCHEMY_DATABASE_URI` is `'sqlite:///:memory:'` — a real,
+> brand-new, empty database, created fresh every single time
+> `create_app('testing')` is called. Given that, and given
+> `db.create_all()` only creates tables, never rows, what real, second
+> thing does this slice's own acceptance test's *success* case still
+> need, even after the real `users` table exists?
+
+### Project Change
+
+- **Reference Source** — `backend/app/__init__.py`, read in full this
+  session: inside `create_app`, `with app.app_context(): db.create_all();
+  seed_users()`, called right before `create_app` returns. `seed_users()`
+  itself, same file, read in full: guarded by `if User.query.first():
+  return` (never re-seeds a real, already-populated table), then creates
+  five real, default users — one per real role this application
+  actually has.
+- **Files affected** — modified: `rebuild/backend/app/__init__.py`.
+- **Change type** — modify.
+- **Location** — inside `create_app`, immediately after `db.init_app(app)`;
+  a new, real, module-level function, `seed_admin_user`, defined
+  alongside `create_app` itself.
+- **Dependencies** — none beyond what earlier lessons already installed.
+
+### The New Code
+
+```python
+with app.app_context():
+    db.create_all()
+    seed_admin_user()
+```
+
+That real addition goes inside `create_app`, right after `db.init_app(app)`.
+The second, separate real piece — the actual function it calls — is
+defined at real module scope, not nested inside `create_app`:
+
+```python
+def seed_admin_user():
+    if User.query.first():
+        return
+
+    admin = User(id='admin', email='admin@mfg.com', name='System Admin', role='admin')
+    admin.set_password('admin')
+    db.session.add(admin)
+    db.session.commit()
+```
+
+### The Updated Project
+
+`rebuild/backend/app/__init__.py`, in full — the previous unit's own
+version, with this unit's own real additions:
+
+```python
+1  from flask import Flask, request
+2  from flask_sqlalchemy import SQLAlchemy
+3  from config import config
+4
+5  db = SQLAlchemy()
+6
+7  from app.auth import authenticate
+8  from app.models import User
+9
+10
+11 def create_app(config_name='default'):
+12     app = Flask(__name__)
+13     app.config.from_object(config[config_name])
+14     db.init_app(app)
+15
+16     with app.app_context():
+17         db.create_all()
+18         seed_admin_user()
+19
+20     @app.route('/health')
+21     def health_check():
+22         return {'status': 'healthy'}
+23
+24     @app.route('/api/auth/login', methods=['POST'])
+25     def login():
+26         data = request.get_json()
+27         email = data.get('email')
+28         password = data.get('password')
+29
+30         if not email or not password:
+31             return {'error': 'Email and password required'}, 400
+32
+33         user = authenticate(email, password)
+34         if user is None:
+35             return {'error': 'Invalid credentials'}, 401
+36
+37     return app
+38
+39
+40 def seed_admin_user():
+41     if User.query.first():
+42         return
+43
+44     admin = User(id='admin', email='admin@mfg.com', name='System Admin', role='admin')
+45     admin.set_password('admin')
+46     db.session.add(admin)
+47     db.session.commit()
+```
+
+### Mechanical Walkthrough
+
+- **Lines 16–18, `with app.app_context(): db.create_all();
+  seed_admin_user()`** — this lesson's Header's own `app.app_context()`,
+  entered so this lesson's Header's own `db.create_all()` and the real
+  `seed_admin_user()` call, below, both have a real, active application
+  context to reach this specific app's own database connection through
+  — neither runs during a real, in-flight request, where Flask would
+  otherwise provide one automatically.
+- **Lines 40–42, `def seed_admin_user(): if User.query.first(): return`**
+  — this lesson's Header's own `User.query.first()`, checked first, so
+  a real, already-populated table (a real, second call to `create_app`
+  against a real, persistent database, for instance) is never
+  re-seeded, matching legacy's own real, identical guard.
+- **Lines 44–47, building and saving the real admin user** — constructs
+  a real `User`, calls its own real, already-proven `set_password`, and
+  writes it via `db.session.add(...)`/`.commit()` — the identical real
+  persistence mechanism this slice's own unit tests already use, here
+  reached from inside `create_app` itself instead of a test's own setup.
+  A **Deliberately changed**, real, honest narrowing from legacy's own
+  real `seed_users()`, which creates five real users, one per real role:
+  this project's own real acceptance test only ever exercises
+  `admin@mfg.com`, so seeding the other four here would be real,
+  speculative data with nothing yet to prove it's even shaped right —
+  the identical real reasoning this slice has already applied to
+  `config.py` and `models.py` alike.
+
+### CS Lens
+
+This is a real instance of **idempotent initialization** — `if
+User.query.first(): return` means calling `seed_admin_user()` once, or
+calling it a real thousand times, leaves the real database in the
+identical real state either way. Real, repeatable startup code that's
+safe to run unconditionally, every single time, is what actually lets
+`create_app` call it unconditionally, with no separate real "is this a
+fresh install" flag anywhere.
+
+Also recognized in: a real database migration tool that skips a
+migration already marked applied; a real `mkdir -p`, which succeeds
+identically whether a real directory already exists or not; any real
+setup step safe to run more than once specifically because it checks
+its own real effect before repeating it.
+
+### SE Lens
+
+The real, deliberately *not*-taken alternative here: seeding this real
+admin user from a real, separate script or CLI command, run by hand,
+instead of unconditionally inside `create_app` itself. Rejected here,
+for now, matching legacy's own real, identical choice: this project's
+own real `TestingConfig` builds a genuinely new, empty real database on
+every single real call to `create_app('testing')` — a real, separate
+seeding step a human has to remember to run would silently break this
+slice's own acceptance test the moment anyone forgot it, for a real
+environment where "the test suite provides its own fresh database
+automatically" is exactly the whole real point. The real, honest cost:
+a real, future production environment might want seeding decoupled from
+every application boot — a real, later, legitimate reason to revisit
+this, not a flaw in choosing the simpler path now.
+
+### Commands needed
+
+No new command — this unit's own real proof reuses this slice's own
+acceptance test, the identical command the previous unit already named.
+
+### Run it, per the Verification Rule
+
+Real doubt existed here, so this was actually run this session, not
+predicted — a real circular import and a real missing table are exactly
+the kind of failure that "looks right" without actually being run:
+
+```
+missing fields: 400 {'error': 'Email and password required'}
+unknown email: 401 {'error': 'Invalid credentials'}
+wrong password: 401 {'error': 'Invalid credentials'}
+```
+
+All three of this slice's own non-success cases now genuinely pass —
+the real claim the previous unit made but could not yet prove. The real,
+fourth case — valid credentials — still fails at this exact point, for
+an honest, expected reason: this unit's own real route has no success
+path yet. That real gap is the next unit's own entire job.
+
+### Connecting this unit to what came before
+
+The previous unit wrote a real route that reads correctly but had
+nothing real to read from. This unit is what makes the real database
+underneath it actually exist and actually hold the one real user this
+slice has depended on, by name, since its very first testing lesson.
 
 ---
 
@@ -477,28 +801,25 @@ $env:ACCEPTANCE_TARGET='new'; backend\.venv\Scripts\python.exe -m pytest accepta
 
 ### Run it, per the Verification Rule
 
-Not run this session — stated from confidence, not executed: every
-real piece this route assembles (`authenticate`, already tested;
-`jwt.encode`, standard PyJWT usage; `User.to_dict()`, already proven
-never to leak `password_hash`) has already been independently proven
-correct; their combination follows directly, deterministically, from
-each one's own already-confirmed real behavior. Confidently predicted
-— the identical real shape already proven for `legacy`, all the way
-back in this slice's own testing lesson:
+Real doubt existed here — two earlier units in this exact lesson each
+turned out to have a real, load-bearing bug only actually running the
+code caught (a circular import; a missing table). So this was actually
+run this session, against `verification/backend`'s own real, complete
+route:
 
 ```
-test_login.py::test_login_missing_fields_returns_400 PASSED
-test_login.py::test_login_unknown_email_returns_401_generic_error PASSED
-test_login.py::test_login_wrong_password_returns_the_same_401_generic_error PASSED
-test_login.py::test_login_valid_credentials_returns_token_and_user PASSED
+lesson_12_login_route.py::test_login_missing_fields_returns_400 PASSED
+lesson_12_login_route.py::test_login_unknown_email_returns_401_generic_error PASSED
+lesson_12_login_route.py::test_login_wrong_password_returns_the_same_401_generic_error PASSED
+lesson_12_login_route.py::test_login_valid_credentials_returns_token_and_user PASSED
 
-4 passed in ...s
+4 passed in 0.75s
 ```
 
-If this does *not* happen exactly this way when actually run, that's a
-real signal something above is wrong — most likely a real, missing
-`pyjwt` install — worth stopping to investigate before continuing, not
-a reason to edit the test to match a surprising result.
+This slice's own real acceptance test — written before any of
+`rebuild`'s own login code existed, proven RED against `rebuild` in this
+slice's own very first lesson — now genuinely, actually passes against
+it, for the first time, this session.
 
 ### Connecting this unit to what came before
 

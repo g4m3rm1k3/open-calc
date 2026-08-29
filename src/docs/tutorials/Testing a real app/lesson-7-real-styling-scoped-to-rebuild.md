@@ -41,6 +41,16 @@ plain rule. The real `<h1>` element this lesson actually styles.
   than apply an ordinary style rule. `@tailwind base;`, below, is a
   real at-rule — not a Tailwind invention as a *category* of syntax,
   just a Tailwind-specific keyword using it.
+- **Automatic semicolon insertion (ASI)** — a real, standard
+  JavaScript/TypeScript language rule: the language permits omitting
+  semicolons, and, where their absence would otherwise produce invalid
+  syntax, the real parser inserts one automatically — including,
+  specifically, immediately after a bare `return` keyword the instant a
+  real line break follows it, regardless of what real code sits on the
+  next line. This matters directly for this lesson — a `return`
+  statement that spans more than one real line has to keep its own real
+  expression on `return`'s own line, or wrapped in real parentheses, or
+  ASI silently returns `undefined` instead.
 - **Config resolution (upward search)** — the real, standard way tools
   like PostCSS find their own configuration file: starting in the
   directory of the file being processed, and searching upward, through
@@ -540,6 +550,19 @@ function, with one real, styled line:
   real, literal instructions to Tailwind's own PostCSS plugin, each
   replaced with real, generated CSS at build time — proven, in
   isolation, in the previous unit.
+- **`App.tsx` lines 12 and 16, `return (` … `)`** — real, standard
+  JavaScript/TypeScript parentheses, wrapping this element now that it
+  spans more than one real line — not decorative, and not optional:
+  JavaScript's own real, automatic semicolon insertion rule inserts a
+  real, invisible semicolon immediately after a bare `return` the moment
+  a real line break follows it, silently turning `return` into `return;`
+  — handing back `undefined` — with the real JSX underneath becoming
+  real, unreachable, dead code that never executes at all. Wrapping the
+  whole real expression in `( … )` keeps it, real and intact, as one
+  single expression on `return`'s own real line, exactly the same real
+  fix the previous lesson's own single-line `return <h1>rebuild
+  backend says: {status}</h1>` never needed, since nothing about it broke
+  across a real line boundary.
 - **`App.tsx` line 13, `className="p-6 text-3xl font-bold
   text-amber-600"`** — real JSX's own real attribute name for what
   plain HTML calls `class` (`class` is a real, reserved JavaScript

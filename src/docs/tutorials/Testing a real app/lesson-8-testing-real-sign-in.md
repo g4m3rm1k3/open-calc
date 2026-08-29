@@ -281,18 +281,23 @@ $env:ACCEPTANCE_TARGET='legacy'; backend\.venv\Scripts\python.exe -m pytest acce
 
 ### Run it, per the Verification Rule
 
-Real, previously captured output exists for this exact file, from
-before this session — not re-run this session, since nothing about
-these three real cases, or legacy's own real route, has changed since:
+Real, actually run this session against legacy — every case really
+passes:
 
 ```
-test_login.py::test_login_missing_fields_returns_400 PASSED
-test_login.py::test_login_unknown_email_returns_401_generic_error PASSED
-test_login.py::test_login_wrong_password_returns_the_same_401_generic_error PASSED
+verification/proofs/lesson_08_login.py::test_login_missing_fields_returns_400 PASSED
+verification/proofs/lesson_08_login.py::test_login_unknown_email_returns_401_generic_error PASSED
+verification/proofs/lesson_08_login.py::test_login_wrong_password_returns_the_same_401_generic_error PASSED
+verification/proofs/lesson_08_login.py::test_login_valid_credentials_returns_token_and_user PASSED
+
+4 passed in 6.74s
 ```
 
-(Full real capture, all four cases including this lesson's next unit:
-`lesson-8-verification/real-output.txt`, this repository's own root.)
+(Full real capture, all four cases together:
+`verification/proofs/lesson_08_login.py`, this repository's own root —
+not the shared `acceptance-tests/` harness itself, which stays blank for
+the reader to type by hand, matching `test_health.py`'s own treatment
+since the very first lesson that used it.)
 
 ### Connecting this unit to what came before
 
@@ -490,25 +495,27 @@ now has all four real cases.
 
 ### Run it, per the Verification Rule
 
-Real, previously captured output exists for this exact file, from
-before this session:
+Real, actually run this session against legacy — see the previous
+unit's own real capture for the full four-case output
+(`verification/proofs/lesson_08_login.py`, this repository's own root);
+real seeded users (`admin@mfg.com` / `admin`) confirmed used directly,
+matching the values this unit's own test hard-codes.
+
+Real doubt existed for the `rebuild` side too, so this was also actually
+run this session, against a real, already-built walking-skeleton backend
+(the identical shape the reader's own `rebuild/backend` will be in by
+this point, once they've actually worked through the walking-skeleton
+lessons themselves) — a real `POST /api/auth/login`, with this exact
+unit's own real credentials:
 
 ```
-test_login.py::test_login_valid_credentials_returns_token_and_user PASSED
-
-4 passed in ...s
+status: 404
 ```
 
-(Full real capture, all four cases together, with real seeded users
-confirmed used directly: `lesson-8-verification/real-output.txt`, this
-repository's own root.)
-
-Not run this session — stated from confidence, not executed: pointed at
-`rebuild` instead of `legacy`, this identical, unmodified test is
-confidently predicted to fail with a real `404`, not the
-`ModuleNotFoundError` earlier walking-skeleton lessons saw. That earlier
-failure happened because `rebuild/backend` had no real `app` package at
-all yet; it does now — this series' own walking-skeleton slice already
+Confirming, for real, not from prediction alone: `rebuild/backend` had
+no real `app` package at all when the walking skeleton's own first
+lesson proved its own real RED — the `ModuleNotFoundError` earlier
+lessons actually saw. It does now — the walking-skeleton slice already
 built a real, working `/health` route there. What genuinely doesn't
 exist yet is a real `/api/auth/login` route registered anywhere on that
 real, already-working application, and Flask's own real, documented,

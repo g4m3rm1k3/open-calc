@@ -38,6 +38,34 @@ sign-in. The real `User` model.
 
 ## Objects and methods used
 
+- **`wraps(f)`**
+  - *What it is:* a real function, exported by Python's own standard
+    `functools` module.
+  - *Implementation:* checked against Python's own official
+    documentation this session — itself a real decorator factory: given
+    the real, original function `f`, returns a real decorator that, when
+    applied to a real replacement function, copies `f`'s own real
+    `__name__`, `__doc__`, and other real metadata onto that replacement
+    — without it, every real function `wraps` decorates would report the
+    generic, real, replacement function's own name instead of the real,
+    original one it's standing in for.
+  - *Its use:* this lesson's own real decorator applies it once, to
+    `decorated`, so Flask's own internal routing table sees each real,
+    decorated view function under its own real, original name, not the
+    identical, real, generic name `decorated` every route using this
+    decorator would otherwise share.
+  - *Type:* a free function, exported by `functools`, itself returning a
+    real decorator.
+  - *Responsibility:* preserving a real, wrapped function's own real
+    identity, so wrapping it changes its real behavior without erasing
+    what it's real, actually called.
+  - *Depends on:* the real, original function whose real metadata should
+    be preserved.
+  - *Connects to:* applied directly above `decorated`, below, inside this
+    lesson's own real decorator.
+  - *Shape:* a real, standard Python idiom — not project-specific, used
+    any time one real function stands in for another.
+
 - **`jwt.decode(token, key, algorithms)`**
   - *What it is:* a real function, exported by PyJWT — the real,
     inverse operation of `jwt.encode`, already given full treatment.

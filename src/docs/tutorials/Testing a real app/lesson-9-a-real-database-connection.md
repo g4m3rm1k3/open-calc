@@ -269,11 +269,20 @@ classes.
   real SQLite dialect, `:memory:` naming the real, special, in-memory
   database instead of a real file path — the identical real value
   legacy's own `TestingConfig` already uses.
-- **Line 10, `config = {`** — a real, plain Python dictionary, mapping
-  real string names to real classes themselves (not real instances of
-  them) — the identical real shape legacy's own real `config`
-  dictionary already uses, deliberately narrowed to the one real
-  environment this project actually runs under so far.
+- **Lines 10–13, `config = { 'testing': TestingConfig, 'default':
+  TestingConfig }`** — a real, plain Python dictionary, mapping real
+  string names to real classes themselves (not real instances of them)
+  — the identical real shape legacy's own real `config` dictionary
+  already uses, deliberately narrowed to the one real environment this
+  project actually runs under so far. A **Deliberately changed** real
+  detail worth naming explicitly: legacy's own real `'default'` key
+  maps to `DevelopmentConfig`, not `TestingConfig` — a real, sensible
+  choice there, since legacy actually has a real development environment
+  to fall back to. This project doesn't yet; `'default'` maps to the one
+  real config class that actually exists so far, so an argument-less
+  `create_app()` call still resolves to something real and valid instead
+  of a real `KeyError`, matching this unit's own real Header entry for
+  `create_app`'s own new default argument, below.
 
 ### CS Lens
 
@@ -346,8 +355,12 @@ module scope, get correctly attached to a genuinely different real
 
 - **Reference Source** — `backend/app/__init__.py`, read in full this
   session: `db = SQLAlchemy()` at real module scope, then, inside
-  `create_app`, `app.config.from_object(config[config_name])` followed
-  by `db.init_app(app)`.
+  `create_app`, `app.config.from_object(config.get(config_name,
+  config['default']))` followed by `db.init_app(app)`. This unit's own
+  new code below deliberately simplifies that first call to a plain
+  `config[config_name]` — see the Mechanical Walkthrough, below, for
+  why that's a real, honest simplification here, not silently dropped
+  behavior.
 - **Files affected** — modified: `rebuild/backend/app/__init__.py`.
 - **Change type** — modify.
 - **Location** — inside the existing real `create_app` function; a new
@@ -420,9 +433,21 @@ simpler version entirely, so this is the whole file:
   resolves to a real, valid config instead of raising a real `KeyError`.
 - **Line 10, `app.config.from_object(config[config_name])`** — this
   lesson's Header's own `Flask.config.from_object(...)`, called with
-  `config[config_name]` — a real dictionary lookup, resolving the real
-  string this call was given into one of the previous unit's own real
-  config classes.
+  `config[config_name]` — a real, plain dictionary lookup, resolving the
+  real string this call was given into one of the previous unit's own
+  real config classes. A **Deliberately changed** real simplification
+  from legacy's own real, identical line, which instead calls
+  `config.get(config_name, config['default'])` — a real, defensive
+  fallback: an unrecognized real string still resolves to
+  `config['default']` rather than raising a real `KeyError`. Rejected
+  here on purpose: this project's own real `config` dictionary has
+  exactly one real, meaningful entry so far (`'testing'`, aliased as
+  `'default'` too) — a real fallback exists to protect against choosing
+  among several real, legitimate environments, a real problem this
+  project doesn't have yet. A plain `config[config_name]` raising a real,
+  loud `KeyError` for a genuinely unrecognized name is, for now, more
+  honest than legacy's own real, silent fallback to a different real
+  environment than the one actually requested.
 - **Line 11, `db.init_app(app)`** — this lesson's Header's own
   `SQLAlchemy.init_app(app)`, attaching the module-level `db` object,
   line 5, to this specific real `app` instance, now that real

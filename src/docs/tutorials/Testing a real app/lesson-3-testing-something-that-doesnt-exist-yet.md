@@ -66,6 +66,17 @@ make it pass, at least once already, against a real, empty backend.
   real **Acceptance test** already established: a check tied to a real
   external, user-visible fact survives a real internal rewrite; a
   check tied to internal structure does not.
+- **Test environment (Vitest config)** — a real Vitest configuration
+  setting, `environment`, controlling which real global objects
+  (`document`, `window`, and the rest of a real, in-memory DOM) exist
+  while a test file runs. Vitest's own real, documented default is
+  `'node'` — a real, plain Node.js runtime with no DOM-shaped globals
+  at all, deliberately lightweight for tests that never touch a DOM.
+  Any real test that calls something needing a real `document` — this
+  lesson's own `render(...)`, among others — has to set this to
+  `'jsdom'` explicitly first, or every such call fails immediately with
+  a real `ReferenceError`, before the test's own actual claim is ever
+  checked.
 
 ## Objects and methods used
 
@@ -165,6 +176,35 @@ make it pass, at least once already, against a real, empty backend.
     this project's own real, bare Python `assert` plays, reached
     through a genuinely different real language's own real mechanism.
 
+- **`defineConfig(config)`**
+  - *What it is:* a real function, exported by `vite`, wrapping a real
+    configuration object so Vite's own tooling can type-check and
+    autocomplete it — already present in `rebuild/frontend/vite.config.ts`
+    the moment this lesson's own scaffolding command generates it, not
+    written by this lesson.
+  - *Implementation:* checked against Vite's own official documentation
+    this session — takes one real object literal (real keys like
+    `plugins`, and, after this lesson's own first unit, `test`) and
+    returns that same real object, unchanged at runtime; its only real
+    job is compile-time type information for whoever edits the file.
+  - *Its use:* this lesson's own first unit adds a new real key,
+    `test`, to the real object already passed into this call, rather
+    than calling it again or replacing it.
+  - *Type:* a free function, exported by `vite`, returning the same
+    real object type it was given.
+  - *Responsibility:* giving one real configuration object real,
+    checked shape — both Vite's own real build settings and, once
+    added, Vitest's own real test settings — in one real, shared file.
+  - *Depends on:* a real object literal, passed as its one real
+    argument.
+  - *Connects to:* called once, at real module load time, by
+    `rebuild/frontend/vite.config.ts` itself; its real, returned object
+    is what both Vite's own dev server and Vitest itself read their
+    real settings from.
+  - *Shape:* the real root of this project's own frontend build-and-test
+    configuration — every real setting either tool needs lives inside
+    the one real object this call wraps.
+
 - **`.toBeDefined()`**
   - *What it is:* a real, chainable method on the object `expect(...)`
     returns.
@@ -188,45 +228,216 @@ make it pass, at least once already, against a real, empty backend.
 
 ---
 
+## Concept Unit: Telling Vitest There's a Real DOM to Render Into
+
+### The Problem
+
+This lesson's next unit is about to write a real test that calls
+`render(<App />)` — a real function that draws a real component into a
+real, in-memory DOM. But nothing yet has told Vitest that a real DOM
+should exist while a test runs. Vitest was written to run any real
+JavaScript/TypeScript test, not only ones that render UI — plenty of
+real tests check plain functions, plain data, or plain logic with no
+DOM involved at all, so Vitest doesn't assume one exists unless told
+to. The real question this unit answers: how does a real Vitest test
+get a real, in-memory DOM to render into at all, before any test that
+needs one can even attempt its real claim?
+
+> **Before reading on:** if Vitest's own real, default environment is a
+> plain Node.js runtime with no DOM, what real, honest error would you
+> expect a function that needs `document` to raise, if nothing was ever
+> told to provide one?
+
+### Project Change
+
+- **Reference Source** — no reference counterpart. `rebuild/frontend`
+  and its `vite.config.ts` don't exist until this unit's own scaffolding
+  command creates them; this is this project's first real test-tooling
+  configuration, not a port of anything legacy has (legacy's own
+  frontend has no real, isolated tests of this kind to configure at
+  all).
+- **Files affected** — created: `rebuild/frontend/` (the entire real,
+  scaffolded project, via the scaffolding command below); modified:
+  `rebuild/frontend/vite.config.ts` (the scaffold creates it with only a
+  `plugins: [react()]` entry; this unit adds to it, not replaces it).
+- **Change type** — add (the scaffolded project), configure
+  (`vite.config.ts`).
+- **Location** — inside the object passed to `defineConfig({...})`,
+  alongside the existing `plugins` entry.
+- **Dependencies** — Node.js and `npm` (checked in an earlier session:
+  Node `v24.12.0`, npm `11.6.2`); `vitest`, `@testing-library/react`,
+  `@testing-library/jest-dom`, and `jsdom`, four real, new npm packages
+  this unit installs — `jsdom` specifically is what the `'jsdom'` value
+  below actually resolves to.
+
+### The New Code
+
+```ts
+test: {
+  environment: 'jsdom',
+},
+```
+
+### The Updated Project
+
+`rebuild/frontend/vite.config.ts`, in full:
+
+```ts
+1  import react from '@vitejs/plugin-react'
+2  import { defineConfig } from 'vite'
+3
+4  // https://vite.dev/config/
+5  export default defineConfig({
+6    plugins: [react()],
+7    test: {
+8      environment: 'jsdom',
+9    },
+10 })
+```
+
+### Mechanical Walkthrough
+
+- **Lines 7–9, `test: { environment: 'jsdom' }`** — this lesson's
+  Header's own **Test environment** term, given a real value here for
+  the first time: a real, nested object literal, `{ environment:
+  'jsdom' }`, assigned to a real key, `test`, on the same real
+  configuration object `defineConfig(...)` already builds for Vite
+  itself — Vite and Vitest share this one real config file on purpose,
+  since Vitest is built by Vite's own team specifically to reuse Vite's
+  own configuration instead of needing a second, separate one.
+  `'jsdom'` — a real, plain string, naming the real, published `jsdom`
+  package this unit's own command installs — tells Vitest, explicitly,
+  to build a real, in-memory DOM from that package before running any
+  test in this project, rather than its own real, default, DOM-less
+  Node.js environment.
+
+### CS Lens
+
+A real instance of explicit configuration over implicit assumption:
+Vitest could have guessed, from a test file importing
+`@testing-library/react`, that a DOM is probably wanted — real tools
+that guess like this exist — but Vitest's own real, documented design
+instead asks for this to be stated, once, plainly, rather than
+inferred.
+
+Also recognized in: any real tool exposing a `strict` mode instead of
+guessing intent; a compiler's real, explicit target flag instead of
+inferring a runtime; a database driver's explicit connection-pool size
+instead of an implicit, guessed default.
+
+### SE Lens
+
+The real, deliberately *not*-taken alternative: a per-file
+`// @vitest-environment jsdom` comment directly above a test file, which
+Vitest's own real docs also support. Rejected here because this
+project's very next lessons already plan a real component, then a real,
+connected frontend — every future test file this project will ever have
+is going to need the identical real DOM, so setting it once, project-
+wide, in `vite.config.ts`, is the real, correct choice over repeating a
+per-file comment in every one of them. The real, honest cost: a test
+that genuinely never needs a DOM still pays Vitest's own real overhead
+of building one, project-wide — a real, accepted tradeoff, not a free
+choice.
+
+### Commands needed
+
+```powershell
+cd manufacturing-platform
+npm create vite@latest rebuild/frontend -- --template react-ts
+cd rebuild/frontend
+npm install
+npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+```
+
+`npm create vite@latest rebuild/frontend -- --template react-ts` — this
+lesson's Header's own **Scaffolding**: `npm create` runs a real,
+published scaffolding package (`create-vite`) without permanently
+installing it first; `--` — a real, standard command-line convention:
+everything after it passes through to the underlying `create-vite`
+tool itself; `--template react-ts` selects React with TypeScript,
+matching legacy's own real frontend, checked in an earlier session
+(this repository's own root `package.json`). `npm install` — installs
+every real dependency the scaffolded `package.json` already lists.
+`npm install -D vitest @testing-library/react @testing-library/jest-dom
+jsdom` — `-D`, a real, standard `npm` flag, installing these as
+*development* dependencies, real tools this project's own build
+process needs but never ships to a real browser; `vitest` — a real,
+published test runner, built and maintained by Vite's own team
+specifically to reuse Vite's own real configuration and transform
+pipeline, rather than needing a second, separate one; `@testing-library/react`
+— this lesson's Header's own `render` and `screen`;
+`@testing-library/jest-dom` — real, additional test assertions,
+installed alongside Testing Library per its own official setup
+instructions; `jsdom` — a real, published, pure-JavaScript
+implementation of the browser's own DOM API, the exact real package
+this unit's own `environment: 'jsdom'` names.
+
+### Run it, per the Verification Rule
+
+This unit's own change has no observable effect by itself — real,
+actually run, this session: with `environment: 'jsdom'` absent, calling
+`render(...)` at all (the next unit's own test) raises this real,
+actual error, immediately, before any real assertion is even reached:
+
+```
+ReferenceError: document is not defined
+ ❯ render node_modules/@testing-library/react/dist/pure.js:265:5
+```
+
+That is the real, honest proof this configuration is load-bearing, not
+optional — without it, no test that renders anything can run at all,
+regardless of what it claims. The next unit's own test is what actually
+exercises the fixed, working configuration.
+
+### Connecting this unit to what came before
+
+This lesson opened by scaffolding a real, empty test-tooling setup; this
+unit is the one real piece that setup was still missing before any test
+touching a real DOM could run at all.
+
+---
+
 ## Concept Unit: A Real Test, Before a Real Component
 
 ### The Problem
 
 Every prior lesson in this series wrote a real test against real code
 that already existed — legacy's own already-existing model methods,
-legacy's own already-existing HTTP routes. `rebuild/frontend` does not
-exist at all yet — there is no real component, and no real tool
-installed that could even run a real frontend test if one were
-written. The real question this unit answers: what does "test first"
-actually mean when the real thing being tested has no legacy
-counterpart to characterize, and doesn't exist yet at all — not even a
-stub?
+legacy's own already-existing HTTP routes. `rebuild/frontend` now
+exists, real and scaffolded, with a real, working test tool configured
+by the previous unit — but there is still no real component of this
+project's own, on purpose: only Vite's own generic starter content. The
+real question this unit answers: what does "test first" actually mean
+when the real thing being tested has no legacy counterpart to
+characterize, and doesn't exist yet at all — not even a stub?
 
-> **Before reading on:** this series' own backend tests all reused one
-> already-installed real tool, this project's own Python test runner.
-> A real frontend test needs a genuinely different real tool — one
-> capable of running real TypeScript/JSX and simulating a real DOM
-> without a real browser. Given this project's frontend is built with
-> Vite, what real, related tool would you guess Vite's own team
-> maintains for exactly this?
+> **Before reading on:** the previous unit's own real error,
+> `ReferenceError: document is not defined`, is now fixed — a real,
+> working `render(...)` is available. Given this project's real claim is
+> that `App` should eventually show the word `rebuild` somewhere real
+> and visible, and `screen.getByText`, this lesson's Header's own real
+> **Query** method, searches by real, visible text — what real value
+> would you guess belongs inside `screen.getByText(...)` to check for
+> that, before reading the actual test below?
 
 ### Project Change
 
 - **Reference Source** — no reference counterpart. `rebuild/frontend`
-  does not exist yet at all; there is nothing to port or characterize
-  from legacy — see this unit's own SE Lens for why this makes this
-  lesson genuinely different from the backend's own test-first shape.
-- **Files affected** — created: `rebuild/frontend/` (the entire real,
-  scaffolded project); `rebuild/frontend/src/App.test.tsx`.
+  had nothing real in it before the previous unit's own scaffolding
+  command; there is nothing to port or characterize from legacy — see
+  this unit's own SE Lens for why this makes this lesson genuinely
+  different from the backend's own test-first shape.
+- **Files affected** — created: `rebuild/frontend/src/App.test.tsx`.
 - **Change type** — add.
-- **Location** — new project; new test file, directly inside
-  `rebuild/frontend/src/`, sibling to where `App.tsx` will eventually
-  live — the real, standard convention this lesson's own test tooling
-  expects.
-- **Dependencies** — Node.js and `npm` (checked in an earlier session:
-  Node `v24.12.0`, npm `11.6.2`); `vitest`, `@testing-library/react`,
-  `@testing-library/jest-dom`, and `jsdom`, four real, new npm
-  packages this unit installs.
+- **Location** — new test file, directly inside `rebuild/frontend/src/`,
+  sibling to the real `App.tsx` the previous unit's own scaffolding
+  command already generated (with real, default Vite starter content —
+  not `rebuild`'s own, not yet) and to where this project's real,
+  intentional version of it will eventually live — the real, standard
+  convention this lesson's own test tooling expects.
+- **Dependencies** — `vitest`, `@testing-library/react`, and the real,
+  `'jsdom'` test environment, all already installed and configured by
+  the previous unit; nothing new to install here.
 
 ### The New Code
 
@@ -315,9 +526,14 @@ this proof is understood; it never becomes part of `rebuild/frontend`.
   Header's own `test` and `expect`, both real, named exports from
   Vitest itself.
 - **Line 3, `import App from './App'`** — a real, standard import,
-  reaching the real component this test is actually about — not yet
-  written; per this unit's own real, deliberate order, this line is
-  real code pointing at something that doesn't exist yet on purpose.
+  reaching the real component this test is actually about. `App.tsx`
+  itself already exists at this point — the previous unit's own
+  scaffolding command already generated it, with real, default Vite
+  starter content (a counter button, links to Vite's and React's own
+  documentation) — but nothing in that real, default content is this
+  project's own intentional design; per this unit's own real,
+  deliberate order, this line reaches a real file whose real content
+  doesn't yet do what this test expects, on purpose.
 - **Line 5, `test('renders the word rebuild', () => {`** — this
   lesson's Header's own `test`, called with a real, descriptive string
   (this series' own already-established habit: a good test name states,
@@ -378,65 +594,41 @@ ported one.
 ### Commands needed
 
 ```powershell
-cd manufacturing-platform
-npm create vite@latest rebuild/frontend -- --template react-ts
-cd rebuild/frontend
-npm install
-npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
 npx vitest run
 ```
 
-`npm create vite@latest rebuild/frontend -- --template react-ts` — this
-lesson's Header's own **Scaffolding**: `npm create` runs a real,
-published scaffolding package (`create-vite`) without permanently
-installing it first; `--` — a real, standard command-line convention:
-everything after it passes through to the underlying `create-vite`
-tool itself; `--template react-ts` selects React with TypeScript,
-matching legacy's own real frontend, checked in an earlier session
-(this repository's own root `package.json`). `npm install` — installs
-every real dependency the scaffolded `package.json` already lists.
-`npm install -D vitest @testing-library/react @testing-library/jest-dom
-jsdom` — `-D`, a real, standard `npm` flag, installing these as
-*development* dependencies, real tools this project's own build
-process needs but never ships to a real browser; `vitest` — a real,
-published test runner, built and maintained by Vite's own team
-specifically to reuse Vite's own real configuration and transform
-pipeline, rather than needing a second, separate one; `@testing-library/react`
-— this lesson's Header's own `render` and `screen`;
-`@testing-library/jest-dom` — real, additional test assertions,
-installed alongside Testing Library per its own official setup
-instructions; `jsdom` — a real, published, pure-JavaScript
-implementation of the browser's own DOM API, giving Vitest a real,
-in-memory DOM to render into with no real browser installed or opened.
-`npx vitest run` — `npx` runs a real, locally-installed package's own
-binary without a global install; `vitest run` — a real, one-shot run
-of every real test file Vitest finds (by its own real, default naming
-convention: any file ending `.test.tsx`), rather than Vitest's own
-real default *watch* mode, which would keep running indefinitely,
-re-running on every real file change — appropriate for interactive
-development, not for this lesson's own real, one-time proof.
+`npx` runs a real, locally-installed package's own binary without a
+global install; `vitest run` — a real, one-shot run of every real test
+file Vitest finds (by its own real, default naming convention: any file
+ending `.test.tsx`), rather than Vitest's own real default *watch*
+mode, which would keep running indefinitely, re-running on every real
+file change — appropriate for interactive development, not for this
+lesson's own real, one-time proof.
 
 ### Run it, per the Verification Rule
 
-Not run this session, and, honestly, not something this lesson claims
-an exact transcript for: Testing Library's own precise error wording
-and Vitest's own console formatting are real, specific details this
-lesson has not actually verified against a real run, and this series
-does not put a fabricated-but-confident transcript in a lesson —
-stating one anyway would be exactly the kind of wrong prediction the
-Verification Rule treats as a real defect, not a shortcut. What *is*
-honestly, confidently known, from `screen.getByText`'s own documented
-contract alone: `App.tsx` doesn't exist yet, so nothing in the real,
-in-memory DOM this test renders could possibly contain the text
-`rebuild` — the test fails, on those real, correct, honest grounds.
-The actual, exact console output is something to read directly off a
-real run of `npx vitest run`, not something to trust from this page.
+Real doubt existed here, so this was actually run this session, not
+predicted — Testing Library's own precise error wording is a real,
+specific detail this lesson has no business guessing at:
 
-This predicted failure is the correct, honest starting point, per this
-series' own established rule: `App.tsx` doesn't exist yet at all, the
-same real, deliberate RED this series' own backend lessons already
-proved, reached here without a legacy counterpart to run against
-instead.
+```
+FAIL  src/App.test.tsx > renders the word rebuild
+TestingLibraryElementError: Unable to find an element with the text: rebuild.
+This could be because the text is broken up by multiple elements. In this
+case, you can provide a function for your text matcher to make your
+matcher more flexible.
+```
+
+followed by a real, full printout of the current, actual DOM
+`render(<App />)` produced — the previous unit's own scaffolded,
+default Vite starter markup (a `Get started` heading, a `Count is 0`
+button, links to Vite's and React's own documentation), so a reader can
+see for themselves that `screen.getByText('rebuild')` genuinely
+searched real, rendered content and genuinely found nothing matching,
+rather than crashing or being skipped. This is the correct, honest RED:
+not because `App.tsx` doesn't exist — it does, real and scaffolded —
+but because nothing in what it *actually renders yet* is this project's
+own real `rebuild` content.
 
 ### Connecting this unit to what came before
 

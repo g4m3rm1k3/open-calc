@@ -110,6 +110,30 @@ already-scaffolded `rebuild/frontend` project this lesson finishes.
     mechanism any JavaScript on any real web page already uses to reach
     into the page it's running inside.
 
+- **`StrictMode`**
+  - *What it is:* a real, exported value from the `react` package —
+    not a component this project defines, a real component React itself
+    provides.
+  - *Implementation:* checked against React's own official
+    documentation this session — a real component whose only real job
+    is development-time checking: it renders its own real children
+    twice, in development only, specifically to surface real bugs that
+    only show up when something runs more than once (a component
+    accidentally depending on being rendered exactly once); genuinely
+    absent, with zero real effect, from a real production build.
+  - *Its use:* `main.tsx`, kept unchanged from this project's own real
+    scaffolding, wraps this lesson's own real `<App />` in it.
+  - *Type:* a real component, imported from `react`.
+  - *Responsibility:* catching a real, specific category of bug —
+    accidental reliance on being rendered exactly once — during real
+    development, before it ever reaches a real user.
+  - *Depends on:* real JSX passed as its own real children.
+  - *Connects to:* wraps this project's own real `<App />` inside
+    `main.tsx`'s own real `Root.render(...)` call, below.
+  - *Shape:* a real, optional development-time safety net, sitting
+    between `Root.render(...)` and this project's own real component
+    tree — never part of a real, shipped production build.
+
 ---
 
 ## Concept Unit: Making the Real Test Pass
@@ -117,10 +141,15 @@ already-scaffolded `rebuild/frontend` project this lesson finishes.
 ### The Problem
 
 This project's own real, already-written test fails for the correct,
-honest reason — `App.tsx` doesn't exist. The real question this unit
-answers: what's the actual smallest real component that makes it pass,
-without building anything this lesson's own real requirement doesn't
-need yet?
+honest reason — `App.tsx` exists (the previous lesson's own scaffolding
+command generated it, with real, default Vite starter content: a
+counter button, links to Vite's and React's own documentation), but
+nothing in that real, default content is `rebuild`'s own real,
+intentional design, and none of it contains the real, visible text
+`rebuild` this project's own test actually checks for. The real question
+this unit answers: what's the actual smallest real component that makes
+it pass, without building anything this lesson's own real requirement
+doesn't need yet?
 
 > **Before reading on:** this project's own real, already-written test
 > checks for real, visible text matching the literal string
@@ -263,7 +292,7 @@ unchanged:
 4      <meta charset="UTF-8" />
 5      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 6      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-7      <title>scaffold-check</title>
+7      <title>frontend</title>
 8    </head>
 9    <body>
 10     <div id="root"></div>

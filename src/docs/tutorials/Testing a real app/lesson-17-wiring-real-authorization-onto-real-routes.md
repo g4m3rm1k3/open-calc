@@ -354,25 +354,23 @@ $env:ACCEPTANCE_TARGET='new'; backend\.venv\Scripts\python.exe -m pytest accepta
 
 ### Run it, per the Verification Rule
 
-Not run this session — stated from confidence, not executed: every
-real piece this lesson assembles (`token_required`, already
-independently tested; `User.query.filter_by`/`.all()`, standard,
-already-used SQLAlchemy calls; `User.to_dict()`, already proven safe)
-has already been proven correct on its own; their combination follows
-directly from each one's own already-confirmed real behavior.
-Confidently predicted:
+Real doubt existed here too — this real sign-in slice's own login-route
+lesson already proved an identical, confident-sounding prediction wrong
+twice over, in that same lesson, so this was actually run this session
+against `verification/backend`'s own real, complete routes, not merely
+predicted:
 
 ```
-test_authorization.py::test_users_list_requires_a_token_at_all PASSED
-test_authorization.py::test_users_list_rejects_a_token_with_the_wrong_role PASSED
+lesson_17_authorization_route.py::test_users_list_requires_a_token_at_all PASSED
+lesson_17_authorization_route.py::test_users_list_rejects_a_token_with_the_wrong_role PASSED
 
-2 passed in ...s
+2 passed in 0.77s
 ```
 
-If this does *not* happen exactly this way when actually run, that's a
-real signal something above is wrong — worth stopping to investigate
-before continuing, not a reason to edit the test to match a surprising
-result.
+Both real cases pass, genuinely — this time the prediction held,
+confirming the previous lesson's own `token_required` was already
+correct in isolation, with nothing left for this lesson's own thin
+wiring to get wrong.
 
 ### Connecting this unit to what came before
 

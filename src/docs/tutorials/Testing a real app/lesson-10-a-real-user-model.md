@@ -87,6 +87,73 @@ passing `/health` route this lesson proves still passes.
   - *Shape:* the real, individual building block every real model's own
     real table shape is assembled from.
 
+- **`db.create_all()`**
+  - *What it is:* a real method on the `db` object this project's own
+    database-connection lesson already constructed — part of
+    Flask-SQLAlchemy's own public API.
+  - *Implementation:* checked against Flask-SQLAlchemy's own official
+    documentation this session — inspects every real `db.Model` subclass
+    Python has seen defined so far (`Widget`, `User`, and any real,
+    future model) and issues real, actual `CREATE TABLE` SQL for each
+    one that doesn't already exist in the real, connected database;
+    genuinely does nothing to a real table that already exists. Requires
+    a real, active **application context** — a real, ambient reference
+    to which specific Flask app's own configuration and database
+    connection the code inside a real `with app.app_context():` block
+    should use, since nothing about this call takes an `app` argument
+    directly.
+  - *Its use:* this unit's own throwaway lab calls it once, so
+    `Widget`'s own real table actually exists in the real, in-memory
+    SQLite database before anything tries to write a real row to it.
+  - *Type:* an instance method on the real `db` object.
+  - *Responsibility:* the real, one-time (per real table) translation
+    from "a real Python class exists" to "a real, matching database
+    table actually exists to store its rows in" — genuinely distinct
+    from `create_app`, this project's own real Flask *application*
+    factory, which this method's own similar-sounding name is easy to
+    confuse it with but shares no real relationship to at all.
+  - *Depends on:* a real, active application context, and every real
+    `db.Model` subclass Python has actually imported and defined by the
+    moment it's called.
+  - *Connects to:* called once, inside this unit's own throwaway lab's
+    `with app.app_context():` block; every real column this unit's own
+    `User` class (and, in the lab, `Widget`) declares becomes a real
+    column in the real table this call actually creates.
+  - *Shape:* the real, one-time schema-creation boundary between "models
+    exist in Python" and "tables exist in the real database" — not
+    something a real route or a real request ever calls; a real, one-off
+    setup step, here only exercised inside a throwaway lab, never inside
+    `rebuild/backend` itself.
+
+- **`app.app_context()`**
+  - *What it is:* a real instance method on a real, already-constructed
+    `Flask` app object.
+  - *Implementation:* checked against Flask's own official documentation
+    this session — returns a real, standard Python **context manager**
+    (an object usable with `with`, guaranteeing real setup and real
+    teardown around the code inside the block); entering it makes that
+    specific real app's own configuration and database connection
+    ambiently reachable to code running inside, without that code having
+    to be handed the real `app` object directly by every real function
+    along the way.
+  - *Its use:* this unit's own throwaway lab wraps `db.create_all()` and
+    the real row-write-and-read code in a real `with
+    app.app_context():` block, so both can reach `Widget`'s own real
+    table inside `app`'s own specific, real, in-memory database.
+  - *Type:* an instance method on `Flask`, returning a real context
+    manager.
+  - *Responsibility:* making one specific, real app's own configuration
+    and database connection ambiently available to code that needs it,
+    without threading the real `app` object through every real function
+    call by hand.
+  - *Depends on:* a real, already-constructed `Flask` app.
+  - *Connects to:* entered via `with`, directly around this unit's own
+    throwaway lab's real `db.create_all()` and database calls.
+  - *Shape:* a real, request-independent version of the identical real
+    ambient-context idea Flask already uses for a real, in-flight HTTP
+    request — here needed because this lab's own code runs with no real
+    request happening at all.
+
 - **`generate_password_hash(password)`** / **`check_password_hash(hash, password)`**
   - *What they are:* two real functions, exported by
     `werkzeug.security` — part of Werkzeug, the real library Flask
@@ -146,7 +213,19 @@ own real shape rather than inventing a new one?
   detail safe to trim.
 - **Files affected** — created: `rebuild/backend/app/models.py`.
 - **Change type** — add (new file).
-- **Location** — directly inside the existing real `app/` package.
+- **Location** — directly inside the existing real `app/` package. A
+  **Deliberately changed** real structural choice, worth naming
+  honestly: legacy organizes its own real models as a real *package* —
+  `backend/app/models/`, with `user.py` one real file inside it, sitting
+  alongside real siblings for its other real tables. This unit uses one
+  real, flat `models.py` instead, on purpose: this project has exactly
+  one real model so far, and a real package with one real file inside it
+  is speculative structure for real tables that don't exist yet — the
+  identical real reasoning this slice's own database-connection lesson
+  already gave for not porting legacy's `DevelopmentConfig`/
+  `ProductionConfig` early. The real, honest cost: this file will likely
+  need to become a real package itself, the moment a second real model
+  gives it an actual reason to.
 - **Dependencies** — none beyond what the previous lesson already
   installed.
 
@@ -275,10 +354,13 @@ This proves, in isolation, exactly what `User` depends on:
 `db.Model`'s own real subclassing turns `Widget` into a real table;
 `db.Column(db.String(10), primary_key=True)` declares a real,
 uniquely-identifying column — this lesson's Header's own **Primary
-key** term; `db.create_all()` — already given full treatment when
-this series first called `create_app`, reused unchanged — actually
-creates the real table; `db.session.add(...)`/`.commit()` write a real
-row; `Widget.query.get('w1')` reads it back by its real primary key.
+key** term; this lesson's Header's own `db.create_all()`, called inside
+a real `with app.app_context():` block — a real, ambient reference to
+which specific Flask app's own database connection this code should
+use, required because `db.create_all()` itself takes no `app` argument
+directly — actually creates the real table; `db.session.add(...)`/
+`.commit()` write a real row; `Widget.query.get('w1')` reads it back by
+its real primary key.
 `User`, below, uses the identical real mechanism, just with more real
 columns.
 

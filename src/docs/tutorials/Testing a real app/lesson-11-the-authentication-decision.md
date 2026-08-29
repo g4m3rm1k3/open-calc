@@ -248,26 +248,26 @@ def test_authenticate_returns_the_user_on_correct_credentials():
     app = create_app('testing')
     with app.app_context():
         db.create_all()
-        user = User(id='admin', email='admin@mfg.com', name='Admin')
-        user.set_password('admin')
+        user = User(id='testuser', email='testuser@mfg.com', name='Test User')
+        user.set_password('testpass123')
         db.session.add(user)
         db.session.commit()
 
-        result = authenticate('admin@mfg.com', 'admin')
+        result = authenticate('testuser@mfg.com', 'testpass123')
         assert result is not None
-        assert result.id == 'admin'
+        assert result.id == 'testuser'
 
 
 def test_authenticate_returns_none_on_wrong_password():
     app = create_app('testing')
     with app.app_context():
         db.create_all()
-        user = User(id='admin', email='admin@mfg.com', name='Admin')
-        user.set_password('admin')
+        user = User(id='testuser', email='testuser@mfg.com', name='Test User')
+        user.set_password('testpass123')
         db.session.add(user)
         db.session.commit()
 
-        assert authenticate('admin@mfg.com', 'wrong') is None
+        assert authenticate('testuser@mfg.com', 'wrong') is None
 
 
 def test_authenticate_returns_none_on_unknown_email():
@@ -292,26 +292,26 @@ the whole file:
 7      app = create_app('testing')
 8      with app.app_context():
 9          db.create_all()
-10         user = User(id='admin', email='admin@mfg.com', name='Admin')
-11         user.set_password('admin')
+10         user = User(id='testuser', email='testuser@mfg.com', name='Test User')
+11         user.set_password('testpass123')
 12         db.session.add(user)
 13         db.session.commit()
 14
-15         result = authenticate('admin@mfg.com', 'admin')
+15         result = authenticate('testuser@mfg.com', 'testpass123')
 16         assert result is not None
-17         assert result.id == 'admin'
+17         assert result.id == 'testuser'
 18
 19
 20 def test_authenticate_returns_none_on_wrong_password():
 21     app = create_app('testing')
 22     with app.app_context():
 23         db.create_all()
-24         user = User(id='admin', email='admin@mfg.com', name='Admin')
-25         user.set_password('admin')
+24         user = User(id='testuser', email='testuser@mfg.com', name='Test User')
+25         user.set_password('testpass123')
 26         db.session.add(user)
 27         db.session.commit()
 28
-29         assert authenticate('admin@mfg.com', 'wrong') is None
+29         assert authenticate('testuser@mfg.com', 'wrong') is None
 30
 31
 32 def test_authenticate_returns_none_on_unknown_email():
@@ -335,12 +335,19 @@ the whole file:
   calls its own real `set_password`, and writes it for real via
   `db.session.add(...)`/`.commit()` — the identical real persistence
   mechanism this lesson's Header's own isolation lab already proved.
-- **Line 15, `result = authenticate('admin@mfg.com', 'admin')`** — a
-  real, direct function call — no `test_client()`, no real HTTP
-  request, no real Flask route anywhere in this line.
+- **Line 15, `result = authenticate('testuser@mfg.com', 'testpass123')`**
+  — a real, direct function call — no `test_client()`, no real HTTP
+  request, no real Flask route anywhere in this line. A real,
+  deliberately generic fixture identity, `testuser@mfg.com` — not
+  `admin@mfg.com` — since this real function's own job is checking that
+  *any* real, matching email/password pair authenticates correctly, not
+  specifically the real, seeded admin account a real, later lesson adds
+  automatically to every fresh test database; reusing that real,
+  well-known identity here would make this test's own real correctness
+  depend on whether that later seeding happens to exist yet.
 - **Lines 16–17, the real assertions** — checks a real `User` object
   came back, and it's the real one just created.
-- **Line 29, `assert authenticate('admin@mfg.com', 'wrong') is None`**
+- **Line 29, `assert authenticate('testuser@mfg.com', 'wrong') is None`**
   — the real, wrong-password case, proven directly.
 - **Line 36, `assert authenticate('nobody@mfg.com', 'anything') is None`**
   — the real, unknown-email case — notably, with *no* real user ever

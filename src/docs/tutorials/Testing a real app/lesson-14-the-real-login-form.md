@@ -19,12 +19,95 @@ both failure and success.
 
 ## Terms introduced
 
+- **Test isolation** — a real, general testing principle: one real test's
+  own effects should never leak into another real test's own starting
+  conditions. For a real, rendered UI component specifically, that means
+  whatever a previous real test drew into the real, in-memory DOM has to
+  be genuinely removed before the next real test renders anything of its
+  own — otherwise a real query like `getByPlaceholderText` can find more
+  than one real match: the previous test's own leftover element, and the
+  new one.
 - **Event object** — a real, standard object a real DOM event handler
   receives as its own argument, describing the real event that
   happened. `event.target.value`, below, reads the real, current value
   of the real input that triggered a real `change` event.
 
 ## Objects and methods used
+
+- **`cleanup()`**
+  - *What it is:* a real function, exported by `@testing-library/react`.
+  - *Implementation:* checked against Testing Library's own official
+    documentation this session — real, actually unmounts every real
+    component `render(...)` has drawn into the real, in-memory DOM since
+    the last real cleanup, and removes the real DOM nodes themselves,
+    leaving a genuinely empty real document body behind.
+  - *Its use:* this unit's own new `src/setupTests.ts` calls it once,
+    inside `afterEach`, below, so every real test starts against a
+    genuinely empty real DOM, this lesson's Header's own **Test
+    isolation** term, made real.
+  - *Type:* a free function, exported by `@testing-library/react`.
+  - *Responsibility:* undoing every real, visible effect a real
+    `render(...)` call had, completely, so it can never be mistaken for
+    something a later real test drew.
+  - *Depends on:* nothing — reads whatever `render(...)` has already
+    drawn into the real, shared, in-memory DOM.
+  - *Connects to:* called once, inside `afterEach`, in this unit's own
+    new `src/setupTests.ts`.
+  - *Shape:* Testing Library's own real, standard undo for `render(...)`
+    — the identical real relationship `db.session.rollback()` would have
+    to `db.session.add(...)`, applied to a real, rendered DOM instead of
+    a real database row.
+
+- **`afterEach(fn)`**
+  - *What it is:* a real function, exported by Vitest.
+  - *Implementation:* checked against Vitest's own official
+    documentation this session — registers a real function Vitest calls
+    automatically after every single real `test(...)` in the same real
+    file (or, called from a real **setup file**, below, after every real
+    test in the whole real project) finishes, whether that real test
+    passed or failed.
+  - *Its use:* this unit's own new `src/setupTests.ts` calls it once,
+    with this lesson's Header's own `cleanup`, so cleanup genuinely runs
+    after every single real test, automatically, with no test file ever
+    needing to remember to call it itself.
+  - *Type:* a free function, exported by `vitest`.
+  - *Responsibility:* the real, standard mechanism for real,
+    "no matter what happened, always do this after" cleanup logic,
+    distinct from a real test's own body, which only runs when that
+    specific test is the one executing.
+  - *Depends on:* a real function containing the actual cleanup logic.
+  - *Connects to:* called once, at the top level of this unit's own new
+    `src/setupTests.ts`; Vitest itself calls the function it's given,
+    automatically, after every real test.
+  - *Shape:* Vitest's own real, standard test-lifecycle hook — not
+    project-specific.
+
+- **`test.setupFiles` (Vitest config)**
+  - *What it is:* a real Vitest configuration setting, alongside
+    `environment` inside the same real `test` object this project's own
+    `vite.config.ts` already has.
+  - *Implementation:* checked against Vitest's own official documentation
+    this session — a real array of real file paths, each one real,
+    actually run once, before any real test file, in every real test
+    run; a real, standard place for cross-cutting setup exactly one real
+    project needs everywhere, rather than every real test file repeating
+    it.
+  - *Its use:* this unit adds one real entry, pointing at this unit's
+    own new `src/setupTests.ts`, so its own real `afterEach(cleanup)`
+    call actually registers before any real test in this project runs.
+  - *Type:* a real array-valued key inside Vitest's own `test`
+    configuration object.
+  - *Responsibility:* real, project-wide test setup, run once per real
+    test run, not once per real test file.
+  - *Depends on:* a real, valid file path to a real module Vitest can
+    actually load.
+  - *Connects to:* read by Vitest itself, once, before any real test
+    runs; the real file it names is where this unit's own real
+    `afterEach(cleanup)` actually lives.
+  - *Shape:* the real, project-wide counterpart to this project's own
+    already-established `environment` setting — both real, shared
+    configuration every real test file benefits from without repeating
+    it.
 
 - **`Response.ok`**
   - *What it is:* a real, standard property on the Fetch API's own real
@@ -477,18 +560,177 @@ npx vitest run
 
 ### Run it, per the Verification Rule
 
-Not run this session, honestly. What's confidently known: once
-`fetch` resolves with `ok: true` and the given real user object,
-`signedInAs` becomes `'admin@mfg.com'`, and the real, conditional `<p>`
-renders `'Signed in as admin@mfg.com'` — real, visible text this
-unit's own new test has real, correct grounds to find.
+Real doubt existed here, so this was actually run this session, not
+predicted — and the real result was a genuine surprise:
+
+```
+TestingLibraryElementError: Found multiple elements with the placeholder
+text of: Email
+```
+
+Not the real, expected pass. The next unit's own real job is
+understanding exactly why, and fixing it for real — a real, honest
+gap this lesson would be dishonest to paper over with a confident
+prediction that turned out wrong.
 
 ### Connecting this unit to what came before
 
-The previous unit proved a real failure displays correctly. This unit
-proves a real success does too — the same real component, the same
-real mechanism, both real outcomes this slice's own backend testing
-lesson already established as the complete, real contract.
+The previous unit proved a real failure displays correctly. This unit's
+own new test proves a real success *should* too — but running it for
+real surfaces a real problem neither test alone ever could.
+
+---
+
+## Concept Unit: Why the Second Test Needs a Clean Slate
+
+### The Problem
+
+Both of this file's own real tests call `render(<LoginForm />)`. The
+first one actually runs, actually draws a real `LoginForm` into the
+real, shared, in-memory DOM Vitest's own `jsdom` environment provides
+— and nothing, anywhere in this project so far, ever removes it once
+that test finishes. The real question this unit answers: what happens
+to the second real test's own `render(<LoginForm />)` call, and every
+real query after it, when the first test's own real DOM nodes are still
+sitting there?
+
+> **Before reading on:** `screen.getByPlaceholderText('Email')`, this
+> series' own already-established **Query** term, throws a real,
+> descriptive error the moment it finds anything other than exactly
+> one real match. Given two real `LoginForm` instances now genuinely
+> exist in the same real DOM — one from each real test — what real,
+> honest error would you expect the second test's own identical query
+> to raise?
+
+### Project Change
+
+- **Reference Source** — no reference counterpart; this is a real,
+  project-wide testing-infrastructure gap, not a port of anything
+  legacy has.
+- **Files affected** — created: `rebuild/frontend/src/setupTests.ts`;
+  modified: `rebuild/frontend/vite.config.ts`.
+- **Change type** — add (new file); configure (`vite.config.ts`).
+- **Location** — `setupTests.ts`: new file, directly inside
+  `rebuild/frontend/src/`. `vite.config.ts`: a new key inside the
+  existing real `test: { ... }` object this project's own earlier,
+  jsdom-environment lesson already added.
+- **Dependencies** — none beyond what earlier frontend lessons already
+  installed.
+
+### The New Code
+
+```ts
+import { afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+
+afterEach(cleanup)
+```
+
+That real, new file is the whole first real change. The second, separate
+real change tells Vitest to actually run it:
+
+```ts
+setupFiles: ['./src/setupTests.ts'],
+```
+
+### The Updated Project
+
+`rebuild/frontend/src/setupTests.ts`, in full — brand new, so this is
+the whole file:
+
+```ts
+1  import { afterEach } from 'vitest'
+2  import { cleanup } from '@testing-library/react'
+3
+4  afterEach(cleanup)
+```
+
+`rebuild/frontend/vite.config.ts`, in full — the earlier, jsdom-
+environment lesson's own version, with this unit's own new key added:
+
+```ts
+1  import react from '@vitejs/plugin-react'
+2  import { defineConfig } from 'vite'
+3
+4  // https://vite.dev/config/
+5  export default defineConfig({
+6    plugins: [react()],
+7    test: {
+8      environment: 'jsdom',
+9      setupFiles: ['./src/setupTests.ts'],
+10   },
+11 })
+```
+
+### Mechanical Walkthrough
+
+- **`setupTests.ts` line 4, `afterEach(cleanup)`** — this lesson's
+  Header's own `afterEach`, called once, with this lesson's Header's
+  own `cleanup` passed directly as the real function to run — not
+  called here (`cleanup()`, with parentheses, would run it once,
+  immediately, at setup time); passed by real, bare reference, so
+  Vitest itself calls it fresh, after every single real test.
+- **`vite.config.ts` line 9, `setupFiles: ['./src/setupTests.ts']`** —
+  this lesson's Header's own `test.setupFiles`, given a real, one-element
+  array naming the file just written — a real, relative path, resolved
+  against this same `vite.config.ts`'s own real location.
+
+### CS Lens
+
+This is a real, direct instance of this lesson's Header's own **Test
+isolation** term, finally enforced by real, working code instead of
+just defined: every real test now starts from a real, identically
+empty DOM, regardless of what any earlier real test in the same real
+run happened to draw, leave behind, or fail while doing.
+
+Also recognized in: a real database test wrapping every test in a real
+transaction that's always rolled back afterward, win or lose; a real
+CI job spinning up a genuinely fresh container per test suite instead
+of reusing one that might carry leftover state; any real testing
+setup where "did this pass because it's correct, or because an earlier
+test happened to leave things in a convenient state" is a real question
+worth making structurally impossible to ask.
+
+### SE Lens
+
+The real, deliberately *not*-taken alternative here: calling
+`afterEach(cleanup)` inside `LoginForm.test.tsx` itself, right where the
+real bug actually showed up. Rejected on purpose: every real test file
+this project will ever write renders a real component into the real,
+same, shared DOM, so every real test file needs the identical real
+fix — a real, project-wide `setupFiles` entry, written once, is the
+honest, non-repeating real answer; repeating `afterEach(cleanup)` in
+every real test file this project ever grows to have would be the exact
+real kind of repeated boilerplate this series has already rejected more
+than once, for a real problem that was never actually specific to
+`LoginForm.test.tsx` at all.
+
+### Commands needed
+
+```powershell
+cd manufacturing-platform/rebuild/frontend
+npx vitest run
+```
+
+### Run it, per the Verification Rule
+
+Real, actually run this session, confirming the fix:
+
+```
+Test Files  2 passed (2)
+     Tests  3 passed (3)
+```
+
+Both of this file's own real tests now pass, independently — each one
+genuinely testing `LoginForm` fresh, with no real trace of the other
+test's own earlier render left behind.
+
+### Connecting this unit to what came before
+
+The previous unit's own new test was correct in what it claimed; what
+it was missing was something no single test could reveal on its own —
+only running two of them, back to back, against the same real
+component, actually surfaced it.
 
 ---
 
