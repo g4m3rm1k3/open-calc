@@ -104,7 +104,7 @@ re-run the script after any lesson changes instead.
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the first line of a real HTTP request:
 
 ## request.args.get
-- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter (Terms, above) from the current request, by name, returning `None` if it wasn't given.
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
 
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of

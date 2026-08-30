@@ -8,6 +8,34 @@
 
 lesson:
 
+  header_its_use_scope:
+    problem: >
+      "Its use" (an Objects/methods entry's own field) was being
+      written pinned to one specific call site - "download_cam_file
+      reads an optional commit_sha this way" - instead of the
+      construct's general reason for appearing in this lesson at all.
+      That breaks the moment the same construct is used a second time,
+      elsewhere in the same lesson, for a different specific reason -
+      the Header would still only state the first one, and a reader
+      has to reconcile a Header claim that no longer matches what
+      they're looking at.
+    rule: >
+      "What it is" (generic identity) and "Its use" (why THIS LESSON
+      reaches for it at all) stay genuinely different claims - "Its
+      use" is still lesson-specific, not a second generic dictionary
+      definition, but it states the construct's overall role in this
+      lesson, one level up from any single call site - never a
+      specific call's specific arguments. Example: not "reads an
+      optional commit_sha this way" (one call site) but "reads an
+      optional value from the URL's own query string, without it
+      affecting which route handles the request" (the general reason
+      this lesson needs the construct at all). Every specific,
+      moment-by-moment reason a PARTICULAR line does what it does -
+      including a second, different reason the same construct
+      reappears later in the same lesson - belongs in the Mechanical
+      Walkthrough's own per-element explanation, which is already built
+      for exactly that granularity.
+
   vocabulary_extraction:
     order: strict
     steps:
@@ -32,15 +60,40 @@ lesson:
 
   repetition_rule:
     applies_to: every construct, new or reappearing
+    scope: >
+      CROSS-LESSON only. The rule exists so a lesson never skips
+      explaining something on the grounds that a DIFFERENT lesson
+      already covered it - that reliance is what broke in practice
+      (a citation target that moved, was rewritten, or was never as
+      complete as assumed). It says nothing about repeating yourself
+      WITHIN one lesson's own already-self-contained Header. A Header
+      entry (Terms/Objects, full CRC) is written exactly once per
+      lesson; that single entry IS the full treatment. Everything
+      after it in the SAME lesson - Mechanical Walkthrough, Lenses,
+      Connect the Pieces - just uses the name naturally. It does not
+      need to say "(full treatment above)" or any other self-citation
+      phrase every time the name reappears in the same document - that
+      phrase adds no information a reader doesn't already have (the
+      Header is right there, in the same lesson), and repeating it
+      turns into pure noise across a long walkthrough. This was a real
+      mistake made early on: writing "(full treatment above)" after
+      nearly every reappearing name in a Mechanical Walkthrough,
+      confusing "don't skip explaining across lessons" with "keep
+      pointing back at your own Header within one lesson."
     instruction: >
       Every concept, construct, method, or term gets full, real
-      treatment at every single use - first appearance or the
-      fiftieth. A hard concept (design pattern, SE principle, CS idea,
-      named architectural decision) gets its real, full explanation -
-      what it is, why it exists, what it does - written out again, by
-      name, every time. A basic already-taught construct gets the
-      identical treatment. Never a brief reminder, never a citation
-      substituting for explanation.
+      treatment at every single use ACROSS LESSONS - first appearance
+      in the curriculum, or the fiftieth lesson to use it. A hard
+      concept (design pattern, SE principle, CS idea, named
+      architectural decision) gets its real, full explanation - what it
+      is, why it exists, what it does - written out again, by name, in
+      EVERY LESSON that uses it. A basic already-taught construct gets
+      the identical treatment, in every lesson. Never a brief reminder,
+      never a citation to a different lesson substituting for
+      explanation. Within one lesson's own Header, write the full
+      treatment ONCE per entry - never repeated a second time later in
+      the same lesson, and never flagged with a self-referential
+      pointer phrase either.
     forbidden:
       - Citing "Lesson N" (this curriculum or any other) as a
         substitute for explaining a concept inline, even with a full
@@ -49,6 +102,14 @@ lesson:
       - "Already covered elsewhere" or "already explained earlier in
         this curriculum" language anywhere except a Header's own
         forward-looking pointer fields."
+      - "(full treatment above)" or any equivalent self-citation phrase
+        pointing back at this SAME lesson's own Header - just use the
+        name; the Header already did its job once.
+    basic_python_phrasing: >
+      When something genuinely is ordinary, already-assumed-known
+      Python (an `if`, `open()`, a plain `or`), a short parenthetical
+      like "(basic Python)" says everything "ordinary Python, already
+      assumed prior knowledge" said, with none of the repeated bulk.
     permitted_lesson_number_locations:
       - "Header: what you need to know first (concepts only preferred; see project override)"
       - "Closing: next lesson pointer"

@@ -21,7 +21,7 @@
 - **`ast.parse`**
   - *What it is:* A standard-library function that parses real Python source text into a real Abstract Syntax Tree.
   - *Implementation:* `ast.parse(source: str) -> ast.Module`
-  - *Its use:* This lesson's lab calls it on `pdm.py`'s real, actual source text to get a real, inspectable tree instead of reading the file as plain text.
+  - *Its use:* This lesson's lab uses it to turn a real file's raw source text into a real, inspectable tree, rather than reading the text by eye.
   - *Type:* A free function, in Python's standard library `ast` module.
   - *Responsibility:* Parse the given source text according to Python's real grammar and return the root of a real, structured tree representing it - not a guess or an approximation, the same structure Python's own compiler builds internally.
   - *Depends on:* Syntactically valid Python source text.
@@ -41,7 +41,7 @@
 - **`ast.FunctionDef`**
   - *What it is:* The real AST node type representing one function definition.
   - *Implementation:* A class with real fields (`'name'`, `'args'`, `'body'`, `'decorator_list'`, `'returns'`, `'type_comment'`, `'type_params'`), confirmed this session via `ast.FunctionDef._fields` against the installed Python's real `ast` module.
-  - *Its use:* This lesson's lab checks `isinstance(node, ast.FunctionDef)` to find real function definitions, then reads both its `name` and `decorator_list` fields.
+  - *Its use:* This lesson's lab uses it to recognize which parsed nodes are actual function definitions, as opposed to any other kind of node a tree might contain.
   - *Type:* A class (an `ast.AST` subclass).
   - *Responsibility:* Represent, as real structured data, everything about one function definition the parser found - its name, its parameters, its body, and every decorator applied to it.
   - *Depends on:* Being produced by `ast.parse` - never constructed directly by this lesson's own code.
@@ -51,7 +51,7 @@
 - **`ast.Call`**
   - *What it is:* The real AST node type representing one function or method call.
   - *Implementation:* A class with real fields (`'func'`, `'args'`, `'keywords'`), confirmed this session via `ast.Call._fields`.
-  - *Its use:* Each decorator in a real `decorator_list` is checked with `isinstance(dec, ast.Call)`, since a decorator written as `@bp.route(...)` is itself a real call expression, not a bare name.
+  - *Its use:* This lesson's lab uses it to recognize when a decorator is itself a call expression, as opposed to a bare decorator name.
   - *Type:* A class (an `ast.AST` subclass).
   - *Responsibility:* Represent, as real structured data, what's being called (`func`), what positional arguments were given (`args`), and what keyword arguments were given (`keywords`).
   - *Depends on:* Being produced by `ast.parse`, appearing wherever the real source contains a call expression.
@@ -61,7 +61,7 @@
 - **`ast.Attribute`**
   - *What it is:* The real AST node type representing one dotted attribute access, like `bp.route`.
   - *Implementation:* A class with real fields (`'value'`, `'attr'`, `'ctx'`), confirmed this session via `ast.Attribute._fields`.
-  - *Its use:* A `Call`'s `func` field, for `@bp.route(...)`, is itself an `Attribute` node - this lesson's lab reads its `attr` field to check the accessed name is literally `'route'`, not some other method.
+  - *Its use:* This lesson's lab uses it to recognize a dotted method call on a decorator, so the specific method name being called can be checked.
   - *Type:* A class (an `ast.AST` subclass).
   - *Responsibility:* Represent, as real structured data, the object an attribute is being accessed on (`value`) and the real name of the attribute being accessed (`attr`).
   - *Depends on:* Being produced by `ast.parse` wherever the real source contains a dotted access.
@@ -71,7 +71,7 @@
 - **`ast.Constant`**
   - *What it is:* The real AST node type representing one literal value written directly in the source - a string, a number, a bare `True`/`False`/`None`.
   - *Implementation:* A class with real fields (`'value'`, `'kind'`), confirmed this session via `ast.Constant._fields`.
-  - *Its use:* The real route path string, `'/cam-files/<string:cam_file_id>/download'`, is parsed as a `Constant` node; this lesson's lab reads its `value` field to get the real path back out as a plain Python string.
+  - *Its use:* This lesson's lab uses it to read a literal value straight out of the parsed tree, as a plain Python value instead of a further node to keep unpacking.
   - *Type:* A class (an `ast.AST` subclass).
   - *Responsibility:* Represent, as real structured data, one literal value exactly as written in the source, with `value` holding the real, already-converted Python value.
   - *Depends on:* Being produced by `ast.parse` wherever the real source contains a literal.
@@ -89,9 +89,9 @@
   - *Shape:* The same routing seam already proven real, applied here to a route that itself delegates entirely to a service.
 
 - **`request.args.get`**
-  - *What it is:* A method reading one real query parameter (Terms, above) from the current request, by name, returning `None` if it wasn't given.
+  - *What it is:* A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
   - *Implementation:* `request.args.get(key: str) -> str | None` - called here as `request.args.get('commit_sha')`.
-  - *Its use:* `download_cam_file` reads an optional `commit_sha` query parameter this way, so a caller can ask for a specific historical version instead of always getting the latest.
+  - *Its use:* Reads an optional value from the URL's own query string, without it affecting which route handles the request.
   - *Type:* An instance method on Flask's real `request.args`, a dict-like object.
   - *Responsibility:* Look up the given key among the real query parameters attached to the current request's URL, returning the real string value if present, `None` if it wasn't given at all.
   - *Depends on:* Being called during a real request - `request` is only meaningfully populated while handling one.
@@ -101,7 +101,7 @@
 - **`jsonify`**
   - *What it is:* A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
   - *Implementation:* `flask.jsonify(*args, **kwargs) -> Response`
-  - *Its use:* `download_cam_file`'s own `except` block uses it to turn a caught error's message into a real JSON error response, `{'error': str(e)}`, with a real `500` status code.
+  - *Its use:* Used on the error path here, to turn a caught exception's message into a real, properly-labeled JSON response.
   - *Type:* A free function.
   - *Responsibility:* Serialize the given value to JSON text and wrap it in a response object with the correct header set.
   - *Depends on:* A JSON-serializable Python value.
@@ -112,8 +112,8 @@
   - *What it is:* A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
   - *Implementation:* `PDMService.download_file(cam_file_id: str, commit_sha: str | None = None)`, defined at `backend/app/services/pdm_service.py:162-190`.
   - *Its use:* `download_cam_file` (the route) does nothing except call this and catch whatever it raises - this method is where the real work actually happens.
-  - *Type:* A static method (Terms, above) on the `PDMService` class.
-  - *Responsibility:* Given a real CAM file's id and an optional specific commit, produce a real, downloadable HTTP response carrying that file's real content - trying a different real server first, falling back to this application's own locally stored copy if that attempt fails, and raising a specific, named exception (Terms, above) for either 'no such file' or 'no content anywhere.'
+  - *Type:* A static method on the `PDMService` class.
+  - *Responsibility:* Given a real CAM file's id and an optional specific commit, produce a real, downloadable HTTP response carrying that file's real content - trying a different real server first, falling back to this application's own locally stored copy if that attempt fails, and raising a specific, named exception for either 'no such file' or 'no content anywhere.'
   - *Depends on:* A real `cam_file_id`; a real, already-configured database connection; a real, already-configured connection to the external GitLab server this application depends on.
   - *Connects to:* Called by `download_cam_file`, above; calls `CAMFile.query.get` and `get_gitlab_service`, below, and returns whatever `send_file`, below, builds.
   - *Shape:* The real service-layer boundary this route delegates to entirely - all the real decisions live here, not in the route itself.
@@ -195,18 +195,18 @@ Not applicable - the code shown above is already the whole new structure, with n
 
 ### Mechanical Walkthrough
 
-- `source = open("backend/app/routes/pdm.py").read()` — Reads the real, current text of the real file this lesson is investigating - `open()` and `.read()` are ordinary Python, assumed prior knowledge; nothing here is Flask- or backend-specific yet.
-- `tree = ast.parse(source)` — Calls `ast.parse` (full treatment above) on that real text, producing a real `ast.Module` - the root of the whole file's parsed structure, assigned to `tree`.
-- `for node in ast.walk(tree):` — Calls `ast.walk` (full treatment above) on that root, and iterates every node it yields, one at a time, checking each one in turn.
-- `if isinstance(node, ast.FunctionDef):` — `isinstance` is ordinary Python, assumed prior knowledge; `ast.FunctionDef` (full treatment above) is the real node type this check is looking for - most nodes `ast.walk` yields are something else (a `Call`, a `Name`, a `Constant`) and get skipped here.
-- `for dec in node.decorator_list:` — Reads the real `decorator_list` field (full treatment under `ast.FunctionDef`, above) - a real list, since a function can have more than one decorator - and checks each one.
-- `isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute) and dec.func.attr == "route"` — Three real conditions, all required: the decorator is itself a call (`ast.Call`, full treatment above - true for `@bp.route(...)`, false for a bare decorator like `@staticmethod`); the thing being called is a dotted attribute access (`ast.Attribute`, full treatment above - true for `bp.route`, false for a bare name); and the real attribute name accessed is literally the string `"route"`, not some other method name that happens to also be called as a decorator.
-- `path = dec.args[0].value` — Reads the first positional argument of the real call - a real `ast.Constant` node (full treatment above) - and its `value` field, giving back the real route path as a plain Python string, exactly as it's written in `pdm.py`'s own source.
-- `print(f"{node.name}: {path}")` — Prints the real function's name (`FunctionDef.name`, full treatment above) alongside the real path just extracted - an f-string, already-assumed prior Python knowledge.
+- `source = open("backend/app/routes/pdm.py").read()` — Reads the real, current text of the real file this lesson is investigating - `open()` and `.read()` (basic Python); nothing here is Flask- or backend-specific yet.
+- `tree = ast.parse(source)` — Calls `ast.parse` on that real text, producing a real `ast.Module` - the root of the whole file's parsed structure, assigned to `tree`.
+- `for node in ast.walk(tree):` — Calls `ast.walk` on that root, and iterates every node it yields, one at a time, checking each one in turn.
+- `if isinstance(node, ast.FunctionDef):` — `isinstance` (basic Python); `ast.FunctionDef` is the real node type this check is looking for - most nodes `ast.walk` yields are something else (a `Call`, a `Name`, a `Constant`) and get skipped here.
+- `for dec in node.decorator_list:` — Reads the real `decorator_list` field - a real list, since a function can have more than one decorator - and checks each one.
+- `isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute) and dec.func.attr == "route"` — Three real conditions, all required: the decorator is itself a call (`ast.Call` - true for `@bp.route(...)`, false for a bare decorator like `@staticmethod`); the thing being called is a dotted attribute access (`ast.Attribute` - true for `bp.route`, false for a bare name); and the real attribute name accessed is literally the string `"route"`, not some other method name that happens to also be called as a decorator.
+- `path = dec.args[0].value` — Reads the first positional argument of the real call - a real `ast.Constant` node - and its `value` field, giving back the real route path as a plain Python string, exactly as it's written in `pdm.py`'s own source.
+- `print(f"{node.name}: {path}")` — Prints the real function's name (`FunctionDef.name`, full treatment above) alongside the real path just extracted - an f-string (basic Python).
 
 ### CS Lens
 
-This is static analysis (Terms, above): extracting real facts about a program from its own structure, without running it. Also recognized in: a linter flagging an unused variable before the program ever executes, a compiler's own type-checking pass, and an IDE's "find all usages" feature - all of them answer real questions about code by reading its structure, never by running it and watching what happens.
+This is static analysis: extracting real facts about a program from its own structure, without running it. Also recognized in: a linter flagging an unused variable before the program ever executes, a compiler's own type-checking pass, and an IDE's "find all usages" feature - all of them answer real questions about code by reading its structure, never by running it and watching what happens.
 
 ### SE Lens
 
@@ -308,16 +308,16 @@ def download_file(cam_file_id, commit_sha=None):
 
 ### Mechanical Walkthrough
 
-- `@pdm_bp.route('/cam-files/<string:cam_file_id>/download', methods=['GET'])` — `Blueprint.route` (full treatment above), the same real routing mechanism already proven - this is the exact route the unit above's own tool found and printed.
-- `commit_sha = request.args.get('commit_sha')` — `request.args.get` (full treatment above) reads an optional query parameter (Terms, above); if a caller doesn't supply one, `commit_sha` is `None`, which matters shortly, in `download_file`.
-- `try: return PDMService.download_file(cam_file_id, commit_sha) except Exception as e: return jsonify({'error': str(e)}), 500` — The route's own entire job is one delegated call, wrapped in a `try`/`except` - if `download_file` raises anything at all, this catches it and returns a real JSON error response (`jsonify`, full treatment above) with a real `500` status, rather than letting the real exception crash the request unhandled.
-- `@staticmethod` — A static method (Terms, above) - `download_file` doesn't use `self`, since it needs nothing from any particular `PDMService` instance to do its job.
-- `cam_file = CAMFile.query.get(cam_file_id)` — `CAMFile.query.get` (full treatment above) reads the real, persisted row this request is about, by its real primary key.
-- `if not cam_file: raise ValueError("CAM file not found")` — Raising an exception (Terms, above) with a specific, named type - `ValueError` - the moment the real database lookup came back empty, rather than continuing with a `cam_file` that doesn't actually exist.
-- `filename = cam_file.cam_file_original_name or f"{cam_file_id}.cam"` — Reads the real file's own stored original name, falling back to a generated one built from the real `cam_file_id` if none was ever recorded - ordinary Python `or`, already assumed prior knowledge.
-- `try: gitlab_service = get_gitlab_service() ... except Exception: file_content = cam_file.cam_file_content` — The real fallback (Terms, above) this whole unit is about: `get_gitlab_service` (full treatment above) is called, and either `get_file_at_commit` or `get_file` is used depending on whether a specific `commit_sha` was given - both are real network calls to a different real server, and both can genuinely fail for reasons this application doesn't control. The bare `except Exception:` catches any such failure and assigns `cam_file.cam_file_content` instead - the same real file's content, already stored locally in this application's own database, read directly off the `cam_file` object already fetched above.
-- `if file_content is None: raise FileNotFoundError("File content not found")` — A second, different raised exception type (Terms, above) - this one specifically for "neither GitLab nor the local fallback actually had any content," which is a genuinely different real situation than "the row doesn't exist at all," caught above.
-- `return send_file(io.BytesIO(file_content), mimetype='application/octet-stream', as_attachment=True, download_name=filename)` — `send_file` (full treatment above) builds the real, downloadable HTTP response - `io.BytesIO` (Python's standard library, wrapping the real bytes so `send_file` can read them as if from a real file) - carrying whichever real content actually ended up in `file_content`, GitLab's or the local fallback's, with no difference visible to whoever downloads it.
+- `@pdm_bp.route('/cam-files/<string:cam_file_id>/download', methods=['GET'])` — `Blueprint.route`, the same real routing mechanism already proven - this is the exact route the unit above's own tool found and printed.
+- `commit_sha = request.args.get('commit_sha')` — `request.args.get` reads an optional query parameter; if a caller doesn't supply one, `commit_sha` is `None`, which matters shortly, in `download_file`.
+- `try: return PDMService.download_file(cam_file_id, commit_sha) except Exception as e: return jsonify({'error': str(e)}), 500` — The route's own entire job is one delegated call, wrapped in a `try`/`except` - if `download_file` raises anything at all, this catches it and returns a real JSON error response (`jsonify`) with a real `500` status, rather than letting the real exception crash the request unhandled.
+- `@staticmethod` — A static method - `download_file` doesn't use `self`, since it needs nothing from any particular `PDMService` instance to do its job.
+- `cam_file = CAMFile.query.get(cam_file_id)` — `CAMFile.query.get` reads the real, persisted row this request is about, by its real primary key.
+- `if not cam_file: raise ValueError("CAM file not found")` — Raising an exception with a specific, named type - `ValueError` - the moment the real database lookup came back empty, rather than continuing with a `cam_file` that doesn't actually exist.
+- `filename = cam_file.cam_file_original_name or f"{cam_file_id}.cam"` — Reads the real file's own stored original name, falling back to a generated one built from the real `cam_file_id` if none was ever recorded - `or` (basic Python).
+- `try: gitlab_service = get_gitlab_service() ... except Exception: file_content = cam_file.cam_file_content` — The real fallback this whole unit is about: `get_gitlab_service` is called, and either `get_file_at_commit` or `get_file` is used depending on whether a specific `commit_sha` was given - both are real network calls to a different real server, and both can genuinely fail for reasons this application doesn't control. The bare `except Exception:` catches any such failure and assigns `cam_file.cam_file_content` instead - the same real file's content, already stored locally in this application's own database, read directly off the `cam_file` object already fetched above.
+- `if file_content is None: raise FileNotFoundError("File content not found")` — A second, different raised exception type - this one specifically for "neither GitLab nor the local fallback actually had any content," which is a genuinely different real situation than "the row doesn't exist at all," caught above.
+- `return send_file(io.BytesIO(file_content), mimetype='application/octet-stream', as_attachment=True, download_name=filename)` — `send_file` builds the real, downloadable HTTP response - `io.BytesIO` (Python's standard library, wrapping the real bytes so `send_file` can read them as if from a real file) - carrying whichever real content actually ended up in `file_content`, GitLab's or the local fallback's, with no difference visible to whoever downloads it.
 
 ### CS Lens
 
