@@ -80,7 +80,10 @@ export default function CodeTypingStudio() {
   }, [startedAt, done])
 
   const elapsed = startedAt ? Math.max(1, Math.floor((now - startedAt) / 1000)) : 0
-  const wpm = elapsed ? Math.round((correctKeystrokes / 5) / (elapsed / 60)) : 0
+  // Speed and accuracy are deliberately separate: WPM answers “how quickly are
+  // you typing?”, while accuracy answers “how cleanly?”. Using only correct
+  // characters here made a fast attempt with a few misses look artificially slow.
+  const wpm = elapsed ? Math.round((typed.length / 5) / (elapsed / 60)) : 0
   const accuracy = attempts ? Math.round((correctKeystrokes / attempts) * 100) : 100
   const progress = lesson.code.length ? Math.round((typed.length / lesson.code.length) * 100) : 0
   const activeIndex = typed.length
