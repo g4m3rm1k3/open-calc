@@ -18,6 +18,15 @@ const SYMBOLS = [
   ['`', 'backtick'], ['!', 'bang'], ['/', 'slash'], ['_', 'underscore'],
 ]
 
+function shuffle(items) {
+  const copy = [...items]
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    ;[copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]]
+  }
+  return copy
+}
+
 function prettyKey(char) {
   if (char === ' ') return 'Space'
   if (char === '\n') return 'Enter'
@@ -118,7 +127,14 @@ export default function CodeTypingStudio() {
 
   useEffect(() => {
     let alive = true
-    const ids = getAvailableConceptIds().slice(0, 14)
+    let recentlyUsed = []
+    try { recentlyUsed = JSON.parse(localStorage.getItem('oc-code-typing-recent') ?? '[]') } catch { /* fresh session */ }
+    const allIds = getAvailableConceptIds()
+    // Prefer unseen material, then fall back gracefully once the library has
+    // been explored. Sampling a wider pool keeps short/unsuitable snippets from
+    // making the lesson queue feel repetitive.
+    const freshIds = allIds.filter(id => !recentlyUsed.includes(id))
+    const ids = shuffle(freshIds.length >= 12 ? freshIds : allIds).slice(0, 32)
     Promise.all(ids.map(async id => {
       const file = await getConceptFile(id)
       const [language, content] = Object.entries(file?.languages ?? {})[0] ?? []
@@ -126,7 +142,18 @@ export default function CodeTypingStudio() {
       return example && example.length <= 600 && example.length > 15
         ? { id, title: file.name, language: language === 'javascript' ? 'JavaScript' : language, concept: file.name, code: example }
         : null
-    })).then(items => { if (alive) setConceptLessons(items.filter(Boolean).slice(0, 5)) })
+    })).then(items => {
+      if (!alive) return
+      const selected = shuffle(items.filter(Boolean)).slice(0, 6)
+      if (!selected.length) return
+      setConceptLessons(selected)
+      try {
+        localStorage.setItem('oc-code-typing-recent', JSON.stringify([...recentlyUsed, ...selected.map(item => item.id)].slice(-24)))
+      } catch { /* local storage is optional */ }
+      // A new visit starts with fresh real code; the tiny starter remains in
+      // the queue as a dependable fallback.
+      setLesson(current => current.id === STARTER_LESSON.id ? selected[0] : current)
+    })
     return () => { alive = false }
   }, [])
 
