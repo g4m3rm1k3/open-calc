@@ -6,7 +6,7 @@ name that appears, execution traces on every loop, and a throwaway lab for
 every construct no matter how small. Applied literally to a lesson this size,
 that would run to tens of thousands of words and stop being something you
 can actually read and learn from in one sitting. I kept the parts that carry
-real teaching weight for *this* topic — problem before code, isolate before
+real teaching weight for _this_ topic — problem before code, isolate before
 using for real, real executed output, why-not-just-alternatives, real tests —
 and skipped the CRC card on things like `str.strip()`. Every code block in
 this lesson was actually run. Real output is pasted in, not invented.
@@ -40,7 +40,7 @@ that a file can be read line by line. Nothing else assumed.
   yet (a field you haven't parsed out of a line), and pretending they're
   always a valid `X` hides that possibility from anyone reading the code.
 - **Mutable default trap** — a classic Python bug where a default argument
-  or field (like `[]`) is created *once*, when the function/class is
+  or field (like `[]`) is created _once_, when the function/class is
   defined, and then silently shared by every instance that doesn't
   override it. It exists as a concept because it's one of the most common
   sources of "why do two unrelated objects have the same data in them"
@@ -52,7 +52,7 @@ that a file can be read line by line. Nothing else assumed.
   came before it, not just on the line's own text.
 - **Result/error-collecting pattern** — instead of a function raising an
   exception on the first problem it finds (and stopping), it returns an
-  object holding *every* problem found, so the caller sees the whole
+  object holding _every_ problem found, so the caller sees the whole
   picture at once. This exists because in a validation context, "here's
   the one thing that's wrong" is much less useful than "here are the
   seven things that are wrong," especially when you're a human fixing a
@@ -66,7 +66,7 @@ that a file can be read line by line. Nothing else assumed.
   function per case. It exists to keep a large set of small, similar cases
   (like "does this line match this pattern") from turning into a wall of
   copy-pasted test functions.
-- **Golden test** — a test that runs the *whole* pipeline once against a
+- **Golden test** — a test that runs the _whole_ pipeline once against a
   known-real (or representative) input and checks the final result matches
   what you expect. It exists to catch regressions across the whole system
   at once, as a complement to (never a replacement for) testing each small
@@ -75,47 +75,47 @@ that a file can be read line by line. Nothing else assumed.
 ## Objects and methods used
 
 - **`@dataclass`** (from `dataclasses`)
-  *What it is:* a class decorator that auto-generates the boring, error-prone
+  _What it is:_ a class decorator that auto-generates the boring, error-prone
   parts of a class — `__init__`, `__repr__`, `__eq__` — from a list of typed
   fields you declare.
-  *Implementation:* applied above a class whose body is just
+  _Implementation:_ applied above a class whose body is just
   `name: type` lines (optionally with `= default`); generates a constructor
   taking those fields as keyword-or-positional arguments in declaration order.
-  *Its use:* every "thing with named fields" in this lesson (`Server`,
+  _Its use:_ every "thing with named fields" in this lesson (`Server`,
   `Rack`, `Datacenter`, `ValidationError`) is a dataclass — it's the
   standard-library tool for exactly this job, and it's what you told me
   you want to lean on.
 - **`dataclasses.field(default_factory=...)`**
-  *What it is:* a way to tell `@dataclass` "build a fresh default value by
+  _What it is:_ a way to tell `@dataclass` "build a fresh default value by
   calling this function each time," instead of reusing one shared object.
-  *Implementation:* `field(default_factory=list)` means "default to a new,
+  _Implementation:_ `field(default_factory=list)` means "default to a new,
   empty `list()` per instance."
-  *Its use:* required any time a dataclass field's default is a mutable
+  _Its use:_ required any time a dataclass field's default is a mutable
   type (`list`, `dict`, `set`) — see Concept Unit 1, where skipping this
   causes a real, reproducible bug.
 - **`re.compile` / `re.match`** (from `re`, the standard-library regex module)
-  *What it is:* `re.compile(pattern)` turns a text pattern into a reusable
+  _What it is:_ `re.compile(pattern)` turns a text pattern into a reusable
   matcher object; `.match(line)` tests one string against it from the start
   of the string.
-  *Implementation:* returns a `Match` object (with `.group(n)` to pull out
+  _Implementation:_ returns a `Match` object (with `.group(n)` to pull out
   parenthesized capture groups) on success, or `None` on failure.
-  *Its use:* recognizing "which kind of line is this" and pulling the
+  _Its use:_ recognizing "which kind of line is this" and pulling the
   useful text out of it, without hand-rolling string-slicing logic for each
   line shape.
 - **`pytest.mark.parametrize`**
-  *What it is:* a decorator that runs one test function multiple times,
+  _What it is:_ a decorator that runs one test function multiple times,
   once per row of test data you give it.
-  *Implementation:* `@pytest.mark.parametrize("a, b", [(1, 2), (3, 4)])`
+  _Implementation:_ `@pytest.mark.parametrize("a, b", [(1, 2), (3, 4)])`
   above `def test_x(a, b):` runs `test_x` twice, with `a=1, b=2` then
   `a=3, b=4`.
-  *Its use:* covering many small line-parsing cases without writing a
+  _Its use:_ covering many small line-parsing cases without writing a
   near-duplicate test function for each one.
 - **`dataclasses.asdict`**
-  *What it is:* a function that walks a (possibly nested) dataclass and
+  _What it is:_ a function that walks a (possibly nested) dataclass and
   returns a plain, ordinary `dict` — recursively, including nested
   dataclasses and lists of them.
-  *Implementation:* `asdict(some_instance) -> dict`.
-  *Its use:* here, purely so we could print/inspect the parsed tree as
+  _Implementation:_ `asdict(some_instance) -> dict`.
+  _Its use:_ here, purely so we could print/inspect the parsed tree as
   readable JSON while verifying the pipeline actually worked.
 
 ---
@@ -167,11 +167,11 @@ added z fine: 9
 This proves three things about `@dataclass` that a plain dict doesn't give
 you for free: a real, readable `repr` (`Point(x=3, y=4)`, not
 `<Point object at 0x7f...>`), field-by-field equality (`p1 == p2` is `True`
-because the *values* match, not because they're the same object in memory),
+because the _values_ match, not because they're the same object in memory),
 and named, typed attributes you access with `.x`, not `["x"]` — so a typo
 like `p1.xx` fails loudly instead of silently returning `None` the way a
 missing dict key sometimes would if you used `.get()`. (Note: plain
-attributes on a dataclass *can* still be added dynamically, as `p1.z = 9`
+attributes on a dataclass _can_ still be added dynamically, as `p1.z = 9`
 shows — a dataclass isn't locked down by default. That's a real, if minor,
 looseness worth knowing about.)
 
@@ -243,7 +243,7 @@ that comes in Concept Unit 3.
 - `tags: List[str] = field(default_factory=list)` — here's the mutable
   default trap directly. If this had been written as `tags: List[str] = []`
   instead, every `Server` you construct without explicitly passing `tags`
-  would share the *same* list object. Concept Unit 1's own lab (below,
+  would share the _same_ list object. Concept Unit 1's own lab (below,
   inline, since it's short) proves this concretely:
 
 ```python
@@ -280,7 +280,7 @@ same list object? False
 ```
 
 Two things worth noticing in that output. First, Python's `dataclasses`
-module actually *refuses* to let you write `tags: list = []` at all — it
+module actually _refuses_ to let you write `tags: list = []` at all — it
 raises `ValueError` at class-definition time, which is the standard
 library protecting you from a bug that, in plain classes or plain
 functions (`def f(x=[])`), it would happily let you write and then bite
@@ -294,7 +294,7 @@ This is an instance of a broader idea: **shared mutable state**. Any time
 two things that are supposed to be independent end up pointing at the same
 underlying mutable object, changes to one become invisible bugs in the
 other. Also recognized in: JavaScript's `function f(arr = []) {}` having
-the *opposite*, safer default behavior (a fresh array per call, unlike
+the _opposite_, safer default behavior (a fresh array per call, unlike
 Python's plain function defaults); shared configuration dictionaries
 passed by reference between unrelated parts of a codebase; the classic
 "two threads holding the same list" concurrency bug; even spreadsheet
@@ -305,7 +305,7 @@ formulas that reference the same cell by accident instead of a copy.
 The alternative here would be requiring every caller to explicitly pass
 `tags=[]` themselves, every time, to guarantee a fresh list. That works,
 but it pushes a correctness burden onto every single call site instead of
-making the *default itself* safe — and it's exactly the kind of thing a
+making the _default itself_ safe — and it's exactly the kind of thing a
 tired future-you (or a coworker) forgets once, six months from now,
 producing a bug that only shows up when two objects mysteriously share
 data. `default_factory` centralizes the fix in one place: the field
@@ -372,7 +372,7 @@ when scanning a file line by line without knowing in advance what each
 line is.
 
 This is called a **regular expression** (regex): a compact pattern
-language for describing the *shape* of text you want to match, rather than
+language for describing the _shape_ of text you want to match, rather than
 its exact contents. `^` anchors to the start of the string, `\s*` means
 "zero or more whitespace characters," `([A-Za-z]+)` is a capture group
 matching one or more letters, `:` matches a literal colon, and `(.+)`
@@ -401,13 +401,26 @@ FIELD_RE = re.compile(r'^\s{12}([A-Za-z]+):\s*(.+)$')
 
 ### The Updated Project
 
-```python
- 1  FIELD_RE = re.compile(r'^\s{12}([A-Za-z]+):\s*(.+)$')  # ← new
-```
+This is a freestanding new statement with no enclosing structure of its
+own — but "nothing to locate a position _within_" (Project Change's
+exemption) does not mean showing it in isolation as if it were the whole
+file. Here is the actual, honest state of `inventory.py` at this point:
+everything from Unit 1, plus this one new line appended at the bottom.
 
-This is a freestanding new statement — nothing existing surrounds it yet,
-so there's no enclosing structure to show (Project Change already covers
-this: nothing to locate a position *within*).
+```python
+ 1  from dataclasses import dataclass, field
+ 2  from typing import List, Optional
+ 3
+ 4  @dataclass
+ 5  class Server:
+ 6      name: str
+ 7      cpu_cores: Optional[int] = None
+ 8      ram_gb: Optional[int] = None
+ 9      status: Optional[str] = None
+10      tags: List[str] = field(default_factory=list)
+11
+12  FIELD_RE = re.compile(r'^\s{12}([A-Za-z]+):\s*(.+)$')  # ← new
+```
 
 ### Mechanical walkthrough
 
@@ -417,9 +430,9 @@ this: nothing to locate a position *within*).
   a small efficiency habit, not a correctness requirement here.
 - `r'^\s{12}([A-Za-z]+):\s*(.+)$'` — the pattern itself, now made specific
   to this file format rather than generic: `\s{12}` (exactly 12 spaces,
-  not `\s*`) is deliberate — it's how this parser tells a *field* line
-  (12-space indent) apart from a *server* line (8-space indent) or a
-  *rack* line (4-space indent), purely by counting leading spaces. This is
+  not `\s*`) is deliberate — it's how this parser tells a _field_ line
+  (12-space indent) apart from a _server_ line (8-space indent) or a
+  _rack_ line (4-space indent), purely by counting leading spaces. This is
   the indentation-as-structure idea from your earlier question, made
   concrete: the file's nesting is encoded entirely in whitespace, and this
   regex is how one specific nesting level gets recognized.
@@ -455,12 +468,40 @@ None — `re` ships with Python.
 
 ### Run it
 
-Output pasted above, from a real run.
+The isolated lab above proved the general pattern shape. `FIELD_RE`
+itself is stricter (`\s{12}`, exactly 12 spaces, not `\s*`), so it needs
+its own real check against lines at different indent depths before
+trusting it:
+
+```python
+FIELD_RE = re.compile(r'^\s{12}([A-Za-z]+):\s*(.+)$')
+test_lines = [
+    "            CPU: 8 cores",
+    "        Server web-01",
+    "            RAM: 32GB",
+]
+for line in test_lines:
+    m = FIELD_RE.match(line)
+    print(repr(line), "->", m.groups() if m else None)
+```
+
+Real output:
+
+```
+'            CPU: 8 cores' -> ('CPU', '8 cores')
+'        Server web-01' -> None
+'            RAM: 32GB' -> ('RAM', '32GB')
+```
+
+This is the actually-useful proof: `FIELD_RE` correctly matches 12-space
+field lines and correctly rejects the 8-space `Server web-01` line — the
+exact depth-discrimination this pattern exists for, which the generic
+lab (using `\s*`, not `\s{12}`) never tested at all.
 
 ### Connect
 
 You can now turn one line into `(key, value)`. Next: doing this across
-*every* line of a multi-level file, while remembering which server/rack
+_every_ line of a multi-level file, while remembering which server/rack
 you're currently inside — the state-tracking piece from your original
 question.
 
@@ -470,7 +511,7 @@ question.
 
 ### The Problem
 
-A single line like `"            CPU: 8 cores"` doesn't say *which server*
+A single line like `"            CPU: 8 cores"` doesn't say _which server_
 it belongs to — that's only knowable from the lines that came before it.
 Given what `FIELD_RE` already does (recognize one line), what additional
 piece of information does your code need to carry from one line to the
@@ -516,7 +557,7 @@ just "a variable that remembers context across iterations").
 `Cursor` doesn't appear in the real project — the real walker below uses
 three plain local variables (`current_dc`, `current_rack`,
 `current_server`) instead of wrapping them in a class, which is exactly
-what this toy example was isolating: the *idea* of remembered state, not
+what this toy example was isolating: the _idea_ of remembered state, not
 any particular way of packaging it.
 
 ### Project Change
@@ -697,14 +738,14 @@ walks a list of raw lines and returns a list of fully-populated
   jumps straight to the next iteration of the `for` loop without running
   any of the code below it for this line.
 - `if (m := DATACENTER_RE.match(line)):` — the walrus operator (`:=`)
-  assigns the match result to `m` *and* uses it as the `if` condition in
+  assigns the match result to `m` _and_ uses it as the `if` condition in
   one expression, so you don't need a separate `m = ...` line above the
   `if`. When a `Datacenter:` line is found, a fresh `Datacenter` is
   created, appended to the running list, and — importantly —
   `current_rack`/`current_server` are reset to `None`. That reset matters:
   it's what stops a stray `RAM:` line at the very top of a new datacenter,
   before any `Server` line, from accidentally attaching to a server left
-  over from the *previous* datacenter.
+  over from the _previous_ datacenter.
 - The `RACK_RE` and `SERVER_RE` branches follow the identical shape: match,
   build a new object, append it into its parent's list, reset any deeper
   state. This is the same pattern three times at three levels — which is
@@ -810,7 +851,7 @@ Real output pasted above, from an actual run against the full sample text.
 ### Connect
 
 The parser now reliably turns text into a tree of `Server`/`Rack`/
-`Datacenter` objects. Nothing checks whether that data is actually *good*
+`Datacenter` objects. Nothing checks whether that data is actually _good_
 yet — a server missing its RAM field parses just fine, silently, as
 `ram_gb=None`. That's next.
 
@@ -824,7 +865,7 @@ Suppose `web-02` above is missing its `RAM:` line entirely in the real
 file — a typo, a copy-paste mistake, whatever. `parse_lines` will still
 happily produce a `Server` for it, with `ram_gb=None`. If your validation
 raised an exception on the very first problem it found, what would you
-learn about the *rest* of the file in that same run? What would you
+learn about the _rest_ of the file in that same run? What would you
 actually want instead, if you were the one fixing the file by hand
 afterward?
 
@@ -856,7 +897,7 @@ stopped at first problem: -3 is not positive
 
 This demonstrates the exact shortfall the Problem above describes: `-1`
 is also broken, but you'd never find out in this run — you'd fix `-3`,
-run it again, *then* discover `-1`. That's the case for collecting errors
+run it again, _then_ discover `-1`. That's the case for collecting errors
 instead of raising on the first one.
 
 ### Discard the throwaway example
@@ -948,7 +989,7 @@ functions — full code already shown above in The New Code.)
 - `ValidationError` — a plain dataclass, same mechanism as `Server`: a
   named place a problem happened (`path`) and what the problem was
   (`message`).
-- `ValidationResult` — holds a *list* of `ValidationError`s, again with
+- `ValidationResult` — holds a _list_ of `ValidationError`s, again with
   `default_factory=list` for the same reason as every prior list field.
 - `@property` — a decorator turning a method into something read like a
   plain attribute: callers write `result.is_valid`, not
@@ -973,7 +1014,7 @@ functions — full code already shown above in The New Code.)
 - `validate_datacenters` — three nested `for` loops walking the whole
   tree (datacenter → rack → server), building a human-readable `path`
   string per server (`"US-EAST-1/R01/web-01"`) so an error message says
-  *exactly* which server it's about, and a `seen_names` set catching
+  _exactly_ which server it's about, and a `seen_names` set catching
   duplicate server names across the entire file, not just within one
   rack.
 
@@ -1194,7 +1235,7 @@ as `Server` was in Unit 1 — so the whole file is what's shown above.
   split, nothing to split) — parametrize is a tool for many similar cases,
   not a requirement for every test regardless of count.
 - `MINI_FILE` — a small, hand-written fixture string, standing in for a
-  real file, per the Problem above: proving the *walker's nesting logic*
+  real file, per the Problem above: proving the _walker's nesting logic_
   doesn't require a 500-line real inventory file, only enough structure
   to prove one datacenter/rack/server chain assembles correctly.
 - `test_walker_builds_correct_nesting` — asserts on the actual object
@@ -1211,7 +1252,7 @@ as `Server` was in Unit 1 — so the whole file is what's shown above.
   independent checks inside `validate_server` in isolation from each
   other.
 - `test_duplicate_server_name_flagged` — builds a small `Datacenter` with
-  the *same* server object (via `valid_server()`, called twice) placed in
+  the _same_ server object (via `valid_server()`, called twice) placed in
   two different racks, proving the cross-rack duplicate-name check in
   `validate_datacenters` actually fires.
 - `test_full_pipeline_on_sample_text_is_valid` — the golden test: real
@@ -1262,7 +1303,7 @@ staging server rarely, in a separate suite).
 
 The alternative — one giant test that runs the whole parser against a
 real, full-size file and checks the final output — is faster to write
-*once*, but when it fails, it tells you almost nothing about *where*: was
+_once_, but when it fails, it tells you almost nothing about _where_: was
 it the CPU regex, the state tracking, or a validation rule? Layered tests
 cost more to write up front (15 small tests instead of 1 big one here) in
 exchange for a failure pointing you, by test name, straight at the broken
