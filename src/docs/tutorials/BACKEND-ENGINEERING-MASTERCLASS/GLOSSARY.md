@@ -13,6 +13,9 @@ re-run the script after any lesson changes instead.
 ## Abstract Syntax Tree (AST)
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A tree structure representing a program's real grammatical structure - which function contains which decorator, which call has which arguments - built by parsing source code without running it. It exists so a program's own shape can be inspected mechanically and exactly, the same way every time, instead of a person reading it by eye and possibly missing something.
 
+## application context
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
+
 ## Application layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend that decides which piece of code should run for a given request — routing a parsed request to a handler — without itself containing the actual business decision that handler makes. It exists as a separate boundary from domain logic (below) so the *routing* decision (which function runs) can change independently of the *business* decision (what that function actually does).
 
@@ -79,6 +82,9 @@ re-run the script after any lesson changes instead.
 ## Client
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that initiates a request. It doesn't have
 
+## collaborator (test scope)
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Anything a piece of code depends on but does not itself define - a database, a file on disk, another service, the current time. It exists as a precise way to talk about test scope: whether a check counts as unit, integration, or system is entirely a question of how many real collaborators it lets in, not how much code happens to run while it executes.
+
 ## confidence
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - In the sense this lesson uses it, the concrete, checkable knowledge that a change did not break existing behavior - as opposed to a personal hope or guess based on reading code or output. It exists as a distinct idea because "I think this still works" and "something just verified this still works" are different states, and only the second one is a safe basis for deciding to ship a change.
 
@@ -87,6 +93,7 @@ re-run the script after any lesson changes instead.
 
 ## create_app
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real Flask application factory function - the one place this backend's own real circular dependency is deliberately resolved.
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - This project's real Flask application factory function.
 
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
@@ -150,6 +157,9 @@ re-run the script after any lesson changes instead.
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
 
+## Flask.test_client
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real method on Flask's own `Flask` class, returning a test client that can make requests against the app without a real network socket.
+
 ## generate_nc_file
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real route function whose own docstring says it 'Saves the file to the database as an NCFile record' - shown here at the specific real lines where that save actually happens.
@@ -163,11 +173,20 @@ re-run the script after any lesson changes instead.
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
 
+## get_json)
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The real response object Flask's test client returns from a simulated request.
+
 ## Hashable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - A real property a value either has or doesn't: whether Python can compute a stable hash for it, usable as a dict key or a set member. Every immutable built-in value (a string, an int, a tuple whose own elements are all themselves hashable) is hashable; every mutable built-in value (a list, a dict, a set itself) is not. A tuple is the one case where immutability alone doesn't automatically guarantee it: `(1, 2, [3, 4])` is itself immutable (nothing can reassign its own elements) but still isn't hashable, since hashing it would require hashing its own contained list too, and a list can't be hashed at all - confirmed this session: `hash((1, 2, [3, 4]))` raises the identical real `TypeError: unhashable type: 'list'` this lesson's own Sets unit already produces. It exists as its own concept because a dict/set's own real lookup speed depends on that hash staying valid for as long as the value is stored - a value that could change after being stored would silently break that lookup, so Python refuses mutable values as keys/members outright rather than risk it.
 
 ## Header
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (HTTP) — a `Name: value` line following the request or
+
+## health_check (blueprint route)
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A second, real, existing Flask view function - sharing the same Python name as the one above, but declared inside its own blueprint.
+
+## health_check (direct route)
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, existing Flask view function registered directly on the app object itself, not through any blueprint.
 
 ## Host
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the address (here, `127.0.0.1`, meaning "this same
@@ -175,8 +194,17 @@ re-run the script after any lesson changes instead.
 ## HTTP (HyperText Transfer Protocol)
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - a real, plain-text format for
 
+## HTTP GET request
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A request asking a server to return a resource, carrying no request body of its own - the "read," not "write," half of the request/response exchange this project's backend serves over the network. It exists as one specific, named request method (among several this lesson does not cover) because a client has to state which kind of operation it's asking for, not only which URL.
+
+## HTTP status code
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real three-digit number every HTTP response carries, stating in one compact, standardized value whether the request succeeded and, if not, roughly why - `200` means "succeeded, here is the result." It exists so a caller, or a test, can tell success from failure without first having to parse the response body at all.
+
 ## Import graph
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, directed structure formed by every "this file imports that file" relationship across a whole project - not drawn by hand, but implied automatically by every real `import`/ `from ... import` statement already in the source. It exists as its own concept because a project's real files depend on each other in a specific, real shape, and that shape can be traced mechanically from the source itself rather than assumed from a folder structure alone.
+
+## in-memory database
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, fully-functioning SQLite database that exists only in memory (`sqlite:///:memory:`) for the lifetime of one Python process, instead of being written to a file on disk. It exists so an integration test can use a genuinely real database - real tables, real SQL, real constraints - without ever touching a real, permanent data file, and with nothing left over to clean up afterward.
 
 ## Infrastructure
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real, concrete technical systems domain logic depends on but isn't itself about — which specific database engine, which filesystem, which network client library. It exists as a boundary separate from persistence and external services because "we store data somewhere" (persistence, a concept) and "we use SQLite specifically, at this file path" (infrastructure, a real, swappable detail) are different kinds of claims.
@@ -190,20 +218,30 @@ re-run the script after any lesson changes instead.
 ## inspect.signature
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A standard-library function returning a real, structured description of a callable's parameters.
 
+## integration test
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises real code together with at least one real collaborator it actually depends on - most often a real database - to confirm the two genuinely work together, not just that each one works alone. It exists because a unit test can prove a function's own logic is right while saying nothing at all about whether that function correctly reads or writes whatever real system it was built to talk to.
+
 ## itertools.groupby
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library function that groups consecutive real elements of an iterable sharing the identical real key.
 
 ## Jinja2 Template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real class from the Jinja2 templating library, and the real method that fills in a template's placeholders with real values.
 
+## JSON response body
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The actual data an HTTP response carries, written in JSON (JavaScript Object Notation) - a plain-text format built from the same nested objects, arrays, strings, numbers, and booleans Python's own dicts and lists already represent. It exists as this project's real, chosen format for handing structured data back to a caller, because it reads as plain text and nearly every mainstream language already knows how to parse it.
+
 ## jsonify
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real function from the Flask package that converts a Python value into a real Flask `Response` carrying a JSON body.
 
 ## Key function
 - **Term** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, callable argument - a lambda, a named function, or a real pre-built extractor like `operator.itemgetter` - that a tool calls once per real element to decide what that element should be compared or grouped BY, without changing the element itself. It exists as its own concept because both this lesson's own real sorting and real grouping tools share the identical real parameter for it, `key=...`, and because a key function's own real return value is only ever used for comparison/grouping - the real element passed through unchanged into the actual result either way.
 
 ## list slicing
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `sequence[start:stop]` syntax, returning a new, separate sequence containing the elements from index `start` up to (but not including) index `stop`; omitting either side means "from the beginning" or "through the end." It exists as a compact way to select a contiguous sub-range of a sequence without writing an explicit loop.
+
+## Machine
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real SQLAlchemy model representing one CNC machine row in this project's own database.
 
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
@@ -281,6 +319,9 @@ re-run the script after any lesson changes instead.
 ## request.args.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
 
+## Response (status_code
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The real response object Flask's test client returns from a simulated request.
+
 ## Return value
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
 
@@ -292,6 +333,9 @@ re-run the script after any lesson changes instead.
 
 ## Server
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that waits for a request and responds to
+
+## Session (db.session)
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
 
 ## set
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in unordered collection type, holding only hashable values, each stored at most once.
@@ -336,8 +380,14 @@ re-run the script after any lesson changes instead.
 ## Static method
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method attached to a class for organizational purposes, but that doesn't receive the instance (`self`) at all and doesn't need one to do its job - marked with the `@staticmethod` decorator. It exists so a function that's conceptually "part of" a class (grouped with related behavior) but doesn't need any per-instance state can say so plainly, rather than accepting an unused `self` parameter it would never use.
 
+## static method
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A method declared with Python's `@staticmethod` decorator, callable directly on the class itself (`ClassName.method(...)`) without ever constructing an instance, and receiving no automatic `self` argument. It exists for a method whose logic genuinely doesn't need any per-instance state - it's grouped inside the class only because it's conceptually related to it, not because it needs anything a real instance of that class carries.
+
 ## Status line
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the first line of a real HTTP response:
+
+## STLScaffoldService._extract_operation_num
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, existing static method on this project's own `STLScaffoldService`, extracting a subprogram's leading operation-number digit from a string.
 
 ## str.encode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - A method converting a Python text string into a real
@@ -348,11 +398,20 @@ re-run the script after any lesson changes instead.
 ## sum
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in Python function that adds together every item in an iterable and returns the total.
 
+## system test
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises the whole application through the same real interface an actual caller would use - an HTTP request, for this project - touching routing, application setup, and every layer in between, not just one function or one database call. It exists to catch problems that only exist at the seams between pieces - a route wired to an unexpected URL, for instance - that no smaller-scoped check would ever see.
+
 ## TCP (Transmission Control Protocol)
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the specific real protocol
 
 ## test_parser
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A real, already-existing function in this project's own backend, named as though it tests the Mastercam XML parser.
+
+## test_xml_import
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A second real, already-existing "test" script in this project, similar in spirit to `test_xml_parser.py`'s `test_parser`, but for the database-import path specifically.
+
+## time.perf_counter
+- **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real function from Python's standard library `time` module, used for measuring short, real elapsed durations.
 
 ## traceback
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The block of text Python prints when an exception propagates all the way up without being caught: which line raised it, which function called which function to get there, and the exception's own type and message. It exists so a failure is not just "the program stopped" - it is a specific, readable record of exactly where and why.
@@ -371,6 +430,9 @@ re-run the script after any lesson changes instead.
 
 ## typing.Union
 - **Object/method** in `LESSON-1.5-TYPE-HINTS` - A real generic alias from the standard library `typing` module, meaning 'one of these types, but genuinely could be any of them.'
+
+## unit test
+- **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises exactly one piece of code - typically one function or method - in complete isolation from everything it doesn't itself define: no real database, no real network call, no other real service standing in the way. It exists to answer the narrowest possible question - does this one piece of logic do what it claims - as fast and as unambiguously as possible.
 
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
@@ -395,18 +457,28 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `ast.ImportFrom` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.parse` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
+- `application context` / `Application layer` - shares: application
+- `application context` / `Application server` - shares: application
 - `Application layer` / `Application server` - shares: application
 - `Application layer` / `Transport layer` - shares: layer
 - `Application server` / `Server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `ast.Import` / `Import graph` - shares: import
+- `ast.Import` / `test_xml_import` - shares: import
+- `Blueprint.route` / `health_check (blueprint route)` - shares: blueprint
 - `Business logic` / `Domain logic` - shares: logic
 - `Byte string` / `f-string` - shares: string
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
+- `check_password_hash` / `health_check (blueprint route)` - shares: check
+- `check_password_hash` / `health_check (direct route)` - shares: check
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
+- `Client` / `Flask.test_client` - shares: client
+- `db` / `Session (db.session)` - shares: db
+- `db.session.add` / `Session (db.session)` - shares: db, session
+- `db.session.commit` / `Session (db.session)` - shares: db, session
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `dictionary key access` / `Key function` - shares: key
@@ -429,7 +501,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
+- `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
+- `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
 - `Infrastructure exception` / `Raising an exception` - shares: exception
 - `inspect.Parameter` / `Parameter` - shares: parameter
@@ -447,3 +521,5 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Return value` / `Value object` - shares: value
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Static analysis` / `Static method` - shares: static
+- `Static analysis` / `static method` - shares: static
+- `Static method` / `static method` - shares: method, static
