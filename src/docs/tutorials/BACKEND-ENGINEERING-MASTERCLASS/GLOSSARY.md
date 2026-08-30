@@ -262,6 +262,7 @@ re-run the script after any lesson changes instead.
 
 ## Static analysis
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or `CodeLens`'s own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
+- **Term** in `LESSON-1.5-TYPE-HINTS` - Checking real code for problems by reading its source and its annotations - never by running it. It exists as its own concept because it's a genuinely different kind of check than this curriculum's own `verification` sections have used so far: every real output shown until this lesson came from actually executing code and reading what happened; a static analysis tool instead reads the code's own declared shape and reasons about what could go wrong before a single line of it ever runs - catching a real class of bug (a value that could be the wrong type) that might not show up in any one particular real run, only in some future run this lesson's own labs never happened to try.
 
 ## Static method
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method attached to a class for organizational purposes, but that doesn't receive the instance (`self`) at all and doesn't need one to do its job - marked with the `@staticmethod` decorator. It exists so a function that's conceptually "part of" a class (grouped with related behavior) but doesn't need any per-instance state can say so plainly, rather than accepting an unused `self` parameter it would never use.
@@ -283,6 +284,15 @@ re-run the script after any lesson changes instead.
 
 ## tuple
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in fixed-size, immutable sequence type.
+
+## Type annotation
+- **Term** in `LESSON-1.5-TYPE-HINTS` - Real, optional syntax attached to a parameter or return value - `text: str`, `-> float` - stating what type a value is meant to be. It exists as its own concept because Python itself never checks it: the annotation is stored (real, inspectable metadata) but nothing in the language stops a caller from passing a value of a different type anyway, and nothing in the function's own body is affected by it - the annotation is a real claim a human or a separate tool can check, not a runtime guard the language enforces on its own.
+
+## typing.Optional
+- **Object/method** in `LESSON-1.5-TYPE-HINTS` - A real generic alias from Python's standard library `typing` module, meaning 'this type, or `None`.'
+
+## typing.Union
+- **Object/method** in `LESSON-1.5-TYPE-HINTS` - A real generic alias from the standard library `typing` module, meaning 'one of these types, but genuinely could be any of them.'
 
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
