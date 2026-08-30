@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronRight, Code2, Keyboard, RotateCcw, Sparkles, Target, Timer, Trophy, Zap } from 'lucide-react'
+import { Check, ChevronRight, Code2, Keyboard, Play, RotateCcw, Sparkles, Target, Terminal, Timer, Trophy, Zap } from 'lucide-react'
 import { getAvailableConceptIds, getConceptFile } from '../../concepts/loader.ts'
+import { runJS, runPython, stripTypeScript } from '../../utils/codeRunner.js'
 
 const STARTER_LESSON = {
   id: 'starter-function',
@@ -65,6 +66,19 @@ function keyHint(char) {
   return { keys: prettyKey(char ?? '✓'), note: 'next key' }
 }
 
+function buildTrace(code, language) {
+  const lines = code.split('\n').map((line, index) => ({ text: line.trim(), index: index + 1 })).filter(line => line.text && !line.text.startsWith('//') && !line.text.startsWith('#'))
+  const definitions = lines.filter(({ text }) => /^(?:function\s+\w+|def\s+\w+|const\s+\w+\s*=\s*\(?)/.test(text)).slice(0, 2)
+  const returns = lines.filter(({ text }) => /\breturn\b/.test(text)).slice(0, 2)
+  const output = lines.filter(({ text }) => /(console\.log|print\()/.test(text)).slice(0, 2)
+  const steps = [
+    ...definitions.map(({ text, index }) => ({ line: index, label: `Defines ${text.replace(/[({=].*$/, '').replace(/^(function|def|const)\s+/, '')}` })),
+    ...returns.map(({ text, index }) => ({ line: index, label: `Returns ${text.replace(/^.*?\breturn\s+/, '')}` })),
+    ...output.map(({ text, index }) => ({ line: index, label: `Outputs ${text.replace(/^(console\.log\(|print\()/, '').replace(/\);?$/, '')}` })),
+  ]
+  return steps.length ? steps.slice(0, 4) : [{ line: 1, label: `${language} reads the snippet from top to bottom.` }]
+}
+
 function elapsedLabel(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
@@ -98,6 +112,8 @@ export default function CodeTypingStudio() {
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0)
   const [done, setDone] = useState(false)
   const [lastError, setLastError] = useState(null)
+  const [runState, setRunState] = useState('idle')
+  const [runOutput, setRunOutput] = useState('')
   const typingRef = useRef(null)
 
   useEffect(() => {
@@ -131,13 +147,13 @@ export default function CodeTypingStudio() {
   const nextHint = keyHint(expected)
 
   const reset = useCallback(() => {
-    setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null)
+    setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null); setRunState('idle'); setRunOutput('')
     requestAnimationFrame(() => typingRef.current?.focus())
   }, [])
 
   const chooseLesson = useCallback((next) => {
     setLesson(next)
-    setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null)
+    setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null); setRunState('idle'); setRunOutput('')
     requestAnimationFrame(() => typingRef.current?.focus())
   }, [])
 
@@ -193,6 +209,28 @@ export default function CodeTypingStudio() {
     })
   }, [lesson.code, startedAt])
 
+  const runLesson = useCallback(async () => {
+    const language = lesson.language.toLowerCase()
+    setRunState('running')
+    setRunOutput('')
+    try {
+      let output
+      if (language === 'javascript' || language === 'js') output = runJS(lesson.code)
+      else if (language === 'typescript' || language === 'ts') output = runJS(stripTypeScript(lesson.code))
+      else if (language === 'python' || language === 'py') output = await runPython(lesson.code)
+      else output = `This ${lesson.language} snippet is ready for its native runtime. The execution trace below explains the flow.`
+      setRunOutput(output || '(program completed with no console output)')
+      setRunState('complete')
+    } catch (error) {
+      setRunOutput(`Error: ${error instanceof Error ? error.message : String(error)}`)
+      setRunState('error')
+    }
+  }, [lesson])
+
+  useEffect(() => {
+    if (done) runLesson()
+  }, [done, runLesson])
+
   const characters = useMemo(() => [...lesson.code], [lesson.code])
   const errorCount = attempts - correctKeystrokes
 
@@ -247,7 +285,7 @@ export default function CodeTypingStudio() {
               <AnimatePresence mode="wait">{lastError && !done ? <motion.div key={lastError.nonce} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-xs font-bold text-rose-500">Expected “{prettyKey(lastError.expected)}” · typed “{prettyKey(lastError.received)}”</motion.div> : <div className="text-xs font-medium text-slate-400">Backspace lets you revise your last key.</div>}</AnimatePresence>
             </div>
           </div>
-          <AnimatePresence>{done && <motion.div initial={{ opacity: 0, scale: .96 }} animate={{ opacity: 1, scale: 1 }} className="absolute inset-0 z-20 grid place-items-center bg-slate-950/80 p-6 text-center backdrop-blur-sm"><div className="max-w-sm"><motion.div initial={{ rotate: -20, scale: .5 }} animate={{ rotate: 0, scale: 1 }} className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-amber-300 to-orange-500 text-white shadow-2xl"><Trophy className="h-10 w-10" /></motion.div><h2 className="text-3xl font-black text-white">Snippet complete!</h2><p className="mt-2 text-slate-300">{wpm} WPM · {accuracy}% accuracy · {errorCount} corrections to learn from.</p><div className="mt-6 flex justify-center gap-3"><button onClick={reset} className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/20">Try again</button><button onClick={() => { const options = [STARTER_LESSON, ...conceptLessons]; const index = options.findIndex(x => x.id === lesson.id); chooseLesson(options[(index + 1) % options.length]) }} className="flex items-center gap-1 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-400">Next lesson <ChevronRight className="h-4 w-4" /></button></div></div></motion.div>}</AnimatePresence>
+          <AnimatePresence>{done && <motion.div initial={{ opacity: 0, scale: .96 }} animate={{ opacity: 1, scale: 1 }} className="absolute inset-0 z-20 overflow-y-auto bg-slate-950/80 p-5 text-center backdrop-blur-sm sm:p-7"><div className="mx-auto max-w-2xl"><motion.div initial={{ rotate: -20, scale: .5 }} animate={{ rotate: 0, scale: 1 }} className="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-amber-300 to-orange-500 text-white shadow-2xl"><Trophy className="h-8 w-8" /></motion.div><h2 className="text-3xl font-black text-white">Snippet complete!</h2><p className="mt-1 text-sm text-slate-300">{wpm} WPM · {accuracy}% accuracy · {errorCount} corrections to learn from.</p><div className="mt-5 grid gap-3 text-left sm:grid-cols-2"><div className="rounded-2xl border border-white/10 bg-black/30 p-4"><div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2 text-xs font-black uppercase tracking-[.14em] text-brand-200"><Terminal className="h-4 w-4" />Run output</div><button onClick={runLesson} disabled={runState === 'running'} className="flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-bold text-white transition hover:bg-white/20 disabled:opacity-50"><Play className="h-3.5 w-3.5" />{runState === 'running' ? 'Running' : 'Run again'}</button></div><pre className="mt-3 min-h-[62px] whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-emerald-200">{runState === 'running' ? 'Executing the typed code…' : runOutput || 'Preparing sandbox…'}</pre></div><div className="rounded-2xl border border-white/10 bg-white/[.06] p-4"><div className="flex items-center gap-2 text-xs font-black uppercase tracking-[.14em] text-violet-200"><Sparkles className="h-4 w-4" />What it does</div><ol className="mt-3 space-y-2">{buildTrace(lesson.code, lesson.language).map((step, index) => <li key={`${step.line}-${index}`} className="flex gap-2 text-xs leading-relaxed text-slate-200"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violet-400/20 font-mono text-[10px] font-bold text-violet-200">{step.line}</span><span>{step.label}</span></li>)}</ol></div></div><div className="mt-5 flex justify-center gap-3"><button onClick={reset} className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/20">Try again</button><button onClick={() => { const options = [STARTER_LESSON, ...conceptLessons]; const index = options.findIndex(x => x.id === lesson.id); chooseLesson(options[(index + 1) % options.length]) }} className="flex items-center gap-1 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-400">Next lesson <ChevronRight className="h-4 w-4" /></button></div></div></motion.div>}</AnimatePresence>
         </section>
 
         <aside className="space-y-5">
