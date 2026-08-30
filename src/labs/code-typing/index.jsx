@@ -173,11 +173,31 @@ export default function CodeTypingStudio() {
   const activeIndex = typed.length
   const expected = lesson.code[activeIndex]
   const nextHint = keyHint(expected)
+  const codeLines = useMemo(() => {
+    let cursor = 0
+    const lines = lesson.code.split('\n')
+    return lines.map((text, lineIndex) => {
+      const characters = [...text].map(char => ({ char, index: cursor++ }))
+      const newlineIndex = lineIndex < lines.length - 1 ? cursor++ : null
+      return { text, line: lineIndex + 1, characters, newlineIndex }
+    })
+  }, [lesson.code])
 
-  // Long concept examples remain in a compact viewport, but the cursor always
-  // follows the learner so they never need to hunt for the current line.
+  // Keep the active typing position in the comfortable upper-middle of an
+  // editor viewport. Extra padding after the code means this also works for
+  // the final lines, rather than pinning them to the bottom edge.
   useEffect(() => {
-    activeCharRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
+    const viewport = typingRef.current
+    const caret = activeCharRef.current
+    if (!viewport || !caret) return undefined
+    const frame = requestAnimationFrame(() => {
+      const viewportBox = viewport.getBoundingClientRect()
+      const caretBox = caret.getBoundingClientRect()
+      const caretTop = viewport.scrollTop + caretBox.top - viewportBox.top
+      const targetTop = Math.max(0, caretTop - viewport.clientHeight * 0.42)
+      if (Math.abs(viewport.scrollTop - targetTop) > 4) viewport.scrollTo({ top: targetTop, behavior: 'smooth' })
+    })
+    return () => cancelAnimationFrame(frame)
   }, [activeIndex])
 
   const reset = useCallback(() => {
@@ -281,7 +301,6 @@ export default function CodeTypingStudio() {
     if (done) runLesson()
   }, [done, runLesson])
 
-  const characters = useMemo(() => [...lesson.code], [lesson.code])
   const errorCount = attempts - correctKeystrokes
 
   return <main className="relative min-h-full overflow-hidden bg-slate-50 px-4 py-5 text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:px-7 sm:py-7">
@@ -322,12 +341,16 @@ export default function CodeTypingStudio() {
           <div className="relative p-3 sm:p-6">
             <div className="mb-3 flex items-center justify-between px-1 text-[11px] font-bold uppercase tracking-[.14em] text-slate-400"><span>Target code</span><span>Click anywhere to type</span></div>
             <div ref={typingRef} tabIndex={0} role="textbox" aria-label="Code typing practice area" onKeyDown={onKeyDown} onClick={() => typingRef.current?.focus()} className="relative h-[min(56vh,520px)] min-h-[330px] cursor-text overflow-y-auto rounded-2xl border border-slate-200 bg-slate-950 p-4 font-mono text-[14px] leading-7 shadow-inner outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 sm:p-6 sm:text-[15px]">
-              <pre className="m-0 whitespace-pre-wrap break-words">{characters.map((char, index) => {
-                const entry = typed[index]
-                const isCurrent = index === activeIndex
-                const shown = char === ' ' ? '·' : char === '\n' ? '↵\n' : char === '\t' ? '⇥  ' : char
-                return <motion.span ref={isCurrent ? activeCharRef : null} key={index} initial={false} animate={entry ? { scale: entry.correct ? 1 : [1, 1.2, 1], y: entry.correct ? 0 : [0, -2, 0] } : { scale: 1, y: 0 }} transition={{ duration: .2 }} className={`relative scroll-mt-24 rounded-sm ${entry?.correct ? 'bg-emerald-400/15 text-emerald-300' : entry && !entry.correct ? 'bg-rose-500/30 text-rose-200 underline decoration-rose-400 decoration-2' : isCurrent ? 'bg-brand-400/25 text-white ring-1 ring-brand-300/70' : codeClass(char)}`}>{shown}{isCurrent && <span className="absolute -bottom-1 left-0 h-0.5 w-full animate-pulse bg-brand-300" />}</motion.span>
-              })}</pre>
+              <div className="min-w-0 pb-[48vh] font-mono">{codeLines.map(({ line, characters: lineCharacters, newlineIndex }) => {
+                const activeLine = lineCharacters.some(({ index }) => index === activeIndex) || newlineIndex === activeIndex
+                const renderCharacter = (char, index, isNewline = false) => {
+                  const entry = typed[index]
+                  const isCurrent = index === activeIndex
+                  const shown = char === ' ' ? '·' : isNewline ? '↵' : char === '\t' ? '⇥' : char
+                  return <motion.span ref={isCurrent ? activeCharRef : null} data-active-char={isCurrent || undefined} key={index} initial={false} animate={entry ? { scale: entry.correct ? 1 : [1, 1.2, 1], y: entry.correct ? 0 : [0, -2, 0] } : { scale: 1, y: 0 }} transition={{ duration: .2 }} className={`relative rounded-sm ${isNewline || char === '\t' ? 'mx-0.5 inline-flex min-w-4 justify-center px-0.5' : ''} ${entry?.correct ? 'bg-emerald-400/15 text-emerald-300' : entry && !entry.correct ? 'bg-rose-500/30 text-rose-200 underline decoration-rose-400 decoration-2' : isCurrent ? 'bg-brand-400/25 text-white ring-1 ring-brand-300/70' : codeClass(char)}`}>{shown}{isCurrent && <span className="absolute -bottom-1 left-0 h-0.5 w-full animate-pulse bg-brand-300" />}</motion.span>
+                }
+                return <div key={line} className={`grid min-h-7 grid-cols-[3rem_minmax(0,1fr)] rounded-sm ${activeLine ? 'bg-white/[.035]' : ''}`}><span className={`select-none border-r border-white/[.06] pr-3 text-right text-[11px] leading-7 ${activeLine ? 'text-brand-300' : 'text-slate-600'}`}>{line}</span><code className="min-w-0 whitespace-pre-wrap break-words pl-4 pr-3 leading-7">{lineCharacters.map(({ char, index }) => renderCharacter(char, index))}{newlineIndex !== null && renderCharacter('\n', newlineIndex, true)}</code></div>
+              })}</div>
               {activeIndex === 0 && <div className="pointer-events-none absolute bottom-8 right-8 hidden items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-2 text-xs text-slate-400 sm:flex"><Keyboard className="h-4 w-4 text-brand-300" />Start typing to begin</div>}
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60">
