@@ -22,6 +22,12 @@ re-run the script after any lesson changes instead.
 ## Argument
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real, specific value actually supplied for a parameter at one particular call - the real strings in a real call like `download_file('CF-100', 'a1b2c3')`. It exists because the same parameter can receive a different real argument on every call; a function's real behavior on any one call depends on the argument actually passed, not on the parameter merely existing.
 
+## assert statement
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - Python's own built-in `assert <condition>, <message>` statement: it evaluates `<condition>`; if that is `True`, execution continues as though the line were not there; if it is `False`, Python raises `AssertionError` immediately, carrying `<message>`. It exists as the smallest possible way to write "I expect this to be true" in a form Python itself checks every time the line runs, rather than a comment a human has to re-verify by eye.
+
+## AssertionError
+- **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in exception class that Python raises automatically when an `assert` statement's condition evaluates to `False`.
+
 ## ast.alias
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real AST node type representing one imported name within either an `ast.Import` or `ast.ImportFrom`.
 
@@ -73,6 +79,12 @@ re-run the script after any lesson changes instead.
 ## Client
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that initiates a request. It doesn't have
 
+## confidence
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - In the sense this lesson uses it, the concrete, checkable knowledge that a change did not break existing behavior - as opposed to a personal hope or guess based on reading code or output. It exists as a distinct idea because "I think this still works" and "something just verified this still works" are different states, and only the second one is a safe basis for deciding to ship a change.
+
+## correctness
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The property of a piece of code producing the output its author actually intended for a given input - not "ran without crashing" or "looks plausible," but matches a specific, statable expectation. It exists as a concept because "the code executed" and "the code did the right thing" are two entirely different claims, and a program can satisfy the first while completely failing the second.
+
 ## create_app
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real Flask application factory function - the one place this backend's own real circular dependency is deliberately resolved.
 
@@ -100,6 +112,12 @@ re-run the script after any lesson changes instead.
 ## dict.get
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - A real built-in `dict` method that reads a key's value without raising if the key is absent.
 
+## dictionary key access
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `some_dict["key"]` syntax, which looks up and returns the value stored under the literal key `"key"`, raising `KeyError` if that exact key is not present. It exists as the direct, ordinary way to read one named field out of a dict, used throughout this lesson's own `op["minutes"]`.
+
+## docstring
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A string literal written as the very first statement inside a function's (or class's, or module's) body, conventionally describing what that function does; Python stores it on the function object itself but never executes or checks it against anything. It exists as a place to write human-readable documentation directly next to the code it documents - but, as this lesson's own executable-specification unit shows, being written does not make it true.
+
 ## Domain exception
 - **Term** in `LESSON-1.2-EXCEPTIONS` - An exception type representing a real, meaningful business condition the code recognizes and is designed to detect - the code itself is working correctly; it's reporting a real fact about the specific request it was given, like "no row exists for this id." It exists as its own category because a domain exception usually deserves a specific, informative response - the caller asked for something the domain doesn't allow or doesn't have, not something the system failed to do.
 
@@ -120,8 +138,14 @@ re-run the script after any lesson changes instead.
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - A way of running code that might fail, while stating in advance what should happen if it does, using Python's real `try`/`except` statement. It exists so a real failure (a bad template, a missing row) can be handled deliberately, in one place, instead of crashing whatever else happens to be running at the time.
 - **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately stopping propagation at one specific, chosen point, using Python's real `try`/`except` statement, naming which exception type(s) to intercept and what real code should run instead of letting the exception keep traveling. It exists so a real failure can be handled exactly once, at whichever real point in a call chain actually has enough information to decide what to do about it - not automatically at the place closest to where it happened.
 
+## executable specification
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A written statement of what code is supposed to do, expressed in a form the computer itself runs and checks, rather than prose a human has to read and separately re-verify by eye. It exists because a prose description (a comment, a docstring) can silently drift out of sync with the code it describes, while a specification the machine actually runs cannot lie about whether it still holds.
+
 ## External services
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - Real, separate systems this backend depends on but doesn't control — a different real server, owned and run by someone else. It exists as its own boundary because failures here (a network timeout, a service being down) are a fundamentally different kind of problem than a bug in this application's own code.
+
+## f-string
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A string literal written as `f"...{expression}..."`, where anything inside `{}` is evaluated as real Python and inserted into the string at the point the f-string itself runs. It exists so a value does not have to be manually converted to text and concatenated by hand to appear inside a message.
 
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
@@ -132,6 +156,9 @@ re-run the script after any lesson changes instead.
 
 ## generate_password_hash
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real function from Flask's own real dependency, `werkzeug.security`, that turns a real plaintext password into a real, salted hash.
+
+## generator expression
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A compact expression of the shape `EXPR for NAME in ITERABLE`, producing values one at a time, on demand, rather than building a whole list in memory up front. It exists so an aggregating call like `sum(...)` can consume items one at a time without a separate, fully-built intermediate list ever needing to exist.
 
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
@@ -175,6 +202,9 @@ re-run the script after any lesson changes instead.
 ## Key function
 - **Term** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, callable argument - a lambda, a named function, or a real pre-built extractor like `operator.itemgetter` - that a tool calls once per real element to decide what that element should be compared or grouped BY, without changing the element itself. It exists as its own concept because both this lesson's own real sorting and real grouping tools share the identical real parameter for it, `key=...`, and because a key function's own real return value is only ever used for comparison/grouping - the real element passed through unchanged into the actual result either way.
 
+## list slicing
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `sequence[start:stop]` syntax, returning a new, separate sequence containing the elements from index `start` up to (but not including) index `stop`; omitting either side means "from the beginning" or "through the end." It exists as a compact way to select a contiguous sub-range of a sequence without writing an explicit loop.
+
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
 
@@ -183,6 +213,9 @@ re-run the script after any lesson changes instead.
 
 ## Mutable / immutable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
+
+## name rebinding
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - What happens when a name - like a function's own name, `total_minutes` - is assigned to again: Python does not modify whatever the name previously pointed to; it simply makes the name point at the new object from that point in the code onward, and any later use of that name reaches the new object. It exists as a real mechanism (not just a phrase) because Python names are labels pointing at objects, not fixed slots holding one unchangeable value - writing `def total_minutes(ops):` a second time in the same scope produces a second, brand-new function object and re-points the name at it.
 
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
@@ -230,8 +263,14 @@ re-run the script after any lesson changes instead.
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
 - **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately signaling that something has gone wrong using Python's own `raise` statement, naming a specific exception type - `ValueError`, `FileNotFoundError` - rather than continuing as if nothing happened. It exists so a function that cannot do its real job can say so immediately, in a form the language itself will keep passing upward until something actually deals with it - propagation, below.
 
+## refactoring safety
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The guarantee that restructuring code's internal shape (how it is written) without changing its external behavior (what it does) can actually be verified, not just assumed. It exists because a "refactor" that quietly changes behavior is not a refactor at all - it is an undetected bug - and only a check run both before and after the restructuring can tell the two apart.
+
 ## Reflection
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
+
+## regression
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A previously-working piece of behavior that quietly stops working because of a later, often unrelated-looking, change elsewhere in the code. It exists as a named failure mode because software rarely breaks all at once - it breaks one small, later edit at a time - and without something re-checking the old behavior every time, nobody notices until the broken version has already shipped.
 
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
@@ -306,8 +345,17 @@ re-run the script after any lesson changes instead.
 ## subprocess.run
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - A standard-library function that runs a real, separate process and waits for it to finish.
 
+## sum
+- **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in Python function that adds together every item in an iterable and returns the total.
+
 ## TCP (Transmission Control Protocol)
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the specific real protocol
+
+## test_parser
+- **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A real, already-existing function in this project's own backend, named as though it tests the Mastercam XML parser.
+
+## traceback
+- **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The block of text Python prints when an exception propagates all the way up without being caught: which line raised it, which function called which function to get there, and the exception's own type and message. It exists so a failure is not just "the program stopped" - it is a specific, readable record of exactly where and why.
 
 ## Transport layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend responsible only for moving raw bytes between a client and a server — sockets, HTTP parsing — with no awareness of what those bytes mean to this specific application. It exists as its own named boundary because the exact same transport code works for a manufacturing app, a blog, or anything else; nothing about it is specific to what this application does.
@@ -353,6 +401,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `ast.Import` / `Import graph` - shares: import
 - `Business logic` / `Domain logic` - shares: logic
+- `Byte string` / `f-string` - shares: string
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
@@ -360,6 +409,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
+- `dictionary key access` / `Key function` - shares: key
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
 - `Domain exception` / `Exception boundary` - shares: exception
