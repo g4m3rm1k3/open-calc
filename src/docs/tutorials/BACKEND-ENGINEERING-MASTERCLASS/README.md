@@ -90,6 +90,16 @@ its `exemption_reason` still renders on the page, because "how do we
 know this is true" is a live question for every unit, not a step some
 units skip.
 
+A unit can also carry `mental_model` - a plain-text structural diagram
+(arrows/boxes), rendered right after Mechanical Walkthrough, only when
+`applicable: true`. It exists for units whose real shape has more than
+one path/boundary/branch a reader can't easily hold in mind from prose
+alone (two exception boundaries at two different points in a call
+chain, for instance) - not for every unit, and never a restatement of
+one run's actual values (that's what `execution_trace` is for). See
+`prompts.yaml`'s own `mental_model` section for when it earns its place
+versus when it's just decoration.
+
 **`LESSON AUTHORING CONTRACT.md` / `LESSON SCHEMA.md` / `LESSON
 VALIDATION CHECKLIST.md`** (one level up, in the `manufacturing-platform`
 repo) — still the canonical statement of every rule above; this system

@@ -421,12 +421,6 @@ replying?
 - **Dependencies:** None beyond the real repository already checked
   out on disk.
 
-### The New Code
-
-There is no new code in this unit — every file named below already
-exists in the real app. Nothing here gets typed; each is named so it
-can be opened and read.
-
 ### The Updated Project
 
 Six real responsibilities, each grounded in a real, already-existing
@@ -460,13 +454,6 @@ don't type any of it:
   investigation) — real uploaded files stored outside the database
   entirely, on disk.
 
-### Mechanical Walkthrough
-
-Not applicable in the usual sense — this unit names real, existing
-files as evidence rather than walking through a syntactic element in a
-new code block. Each bullet above states which real responsibility it
-demonstrates and exactly where to find it.
-
 ### CS Lens
 
 This is **separation of responsibilities by boundary**: request
@@ -490,10 +477,6 @@ alternative this curriculum will actually build toward, later, isn't
 each responsibility explicitly enough that mixing them becomes visible
 the moment it happens, the same way this unit just named six of them
 concretely instead of leaving "what a backend does" as a vague feeling.
-
-### Commands needed
-
-None — this unit is read-only investigation, no commands run.
 
 ### Verification
 

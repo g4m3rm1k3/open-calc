@@ -73,6 +73,16 @@ concept_units:
           explanation: >
             Explain, don't describe - why it's shaped this way, not
             just what it does.
+    mental_model:
+      applicable: false        # true only when the unit has a shape a
+                                # reader can't easily hold in prose alone -
+                                # more than one path/boundary/branch, or a
+                                # multi-stage relationship between them.
+      diagram: |
+        plain-text diagram (arrows/boxes), showing structure or
+        relationships - not real per-step values (that's
+        execution_trace's job) and not decorative (only when the real
+        shape genuinely needs a picture to stay straight)
     execution_trace:
       applicable: false        # true only if there's a loop/recursion/state, or real timing to trace
       shape: values            # values | timing

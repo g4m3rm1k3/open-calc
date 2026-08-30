@@ -482,24 +482,6 @@ Tracing one real, concrete request through every stage — a real
 - **Dependencies:** None beyond the real repository already checked
   out on disk.
 
-### The New Code
-
-There is no new code in this unit — every file named above already
-exists. Nothing here gets typed.
-
-### The Updated Project
-
-Not applicable — this unit cites real, existing files rather than
-building up a new one; see the trace above for exactly where each
-stage lives.
-
-### Mechanical Walkthrough
-
-Not applicable in the usual sense — this unit names real, existing
-files and lines as evidence for each pipeline stage, the same way the
-previous lesson's second unit did, rather than walking through a new
-syntactic element.
-
 ### CS Lens
 
 This is a **pipeline architecture**: a fixed sequence of stages, each
@@ -522,10 +504,6 @@ shape. The pipeline names the *stages that can exist*, not a guarantee
 that each one always does — a lesson later in this curriculum, once
 validation is taught properly, will show a real request that *does*
 have one, and the contrast will be exactly this absence, made concrete.
-
-### Commands needed
-
-None — this unit is read-only investigation, no commands run.
 
 ### Verification
 

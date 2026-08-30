@@ -112,6 +112,67 @@
     @apply font-sans text-slate-800 dark:text-slate-200 antialiased bg-[var(--color-page-bg)];
   }
 
+  /* Code Typing Studio — optional amber/green phosphor terminal skin. It is
+     deliberately scoped so the user's selected app theme remains untouched. */
+  .code-typing-classic {
+    color: #b9e69a;
+    background-color: #151b18 !important;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(145, 218, 116, .035) 0 1px, transparent 1px 4px),
+      radial-gradient(ellipse at 50% -20%, rgba(109, 191, 87, .20), transparent 55%) !important;
+    font-family: "Courier New", "JetBrains Mono", monospace;
+  }
+  .code-typing-classic::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    opacity: .24;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+  }
+  .code-typing-classic .rounded-3xl,
+  .code-typing-classic .rounded-2xl {
+    border-color: #4e6253 !important;
+    background-color: #1b2520 !important;
+    box-shadow: inset 0 0 22px rgba(101, 196, 91, .05), 0 10px 28px rgba(0,0,0,.28);
+  }
+  .code-typing-classic .crt-screen {
+    border: 12px solid #57605a !important;
+    border-radius: 12% 12% 9% 9% / 6% 6% 5% 5% !important;
+    background-color: #101a14 !important;
+    box-shadow: inset 0 0 0 2px #101410, inset 0 0 70px rgba(74, 184, 78, .11), 0 22px 45px rgba(0,0,0,.48) !important;
+  }
+  .code-typing-classic .crt-screen > div,
+  .code-typing-classic .crt-screen [role="textbox"] {
+    border-color: #48634d !important;
+    background-color: #0b130e !important;
+  }
+  .code-typing-classic [role="textbox"] {
+    color: #baff96;
+    text-shadow: 0 0 5px rgba(143, 255, 109, .36);
+  }
+  .code-typing-classic .seven-segment {
+    color: #c7ff83 !important;
+    font-family: "Courier New", monospace;
+    letter-spacing: .08em;
+    text-shadow: 0 0 2px #c7ff83, 0 0 8px rgba(126, 247, 90, .85);
+  }
+  .code-typing-classic .classic-toggle {
+    box-shadow: inset 0 0 11px rgba(154, 246, 105, .16), 0 0 12px rgba(119, 216, 93, .13);
+  }
+  .code-typing-classic .text-slate-800,
+  .code-typing-classic .text-slate-700,
+  .code-typing-classic .text-slate-500,
+  .code-typing-classic .text-slate-400 {
+    color: #a7bd9c !important;
+  }
+  .code-typing-classic .text-brand-600,
+  .code-typing-classic .text-brand-500,
+  .code-typing-classic .text-emerald-600 {
+    color: #baff96 !important;
+  }
+
   /* ── Global dark-mode bg-white override ────────────────────────────────────
      bg-white is used in ~300+ components. Rather than editing every file,
      we remap it at the CSS level in dark mode so it picks up the theme's

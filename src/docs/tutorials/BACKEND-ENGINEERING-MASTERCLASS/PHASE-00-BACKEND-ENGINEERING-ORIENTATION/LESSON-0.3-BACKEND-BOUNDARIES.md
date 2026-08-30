@@ -18,6 +18,16 @@
 
 ## Objects and methods used
 
+- **`generate_nc_file`**
+  - *What it is:* The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
+  - *Implementation:* `generate_nc_file(pairing_id)`, defined at `backend/app/routes/operation_manager.py:465-624`, a real 160-line function.
+  - *Its use:* The concrete real subject of this unit's own excerpts and walkthrough - one real route, read closely enough to show where it actually mixes several of the six named boundaries together.
+  - *Type:* A free function, registered as a Flask route.
+  - *Responsibility:* Given a real pairing id, read a request body, validate a real pairing exists, render an NC file's content from a real template, build export data, and persist a real database row - all inside one function.
+  - *Depends on:* A real, already-configured database connection; a real request body; real, already-fetched related objects (pairing, CAM file, machine, part) it looks up itself.
+  - *Connects to:* Calls `MachineCAMPairing.query.get`, `NCTemplate.query.get`, `Jinja2 Template`/`.render` or `render_template`, and `_build_export_data`, below, all from directly inside itself.
+  - *Shape:* Takes one real string argument in; returns a real Flask `Response` - but between those two points, real transport-layer parsing, real domain decisions, real template rendering, and a real database write all happen inside the same real function, with nothing separating them.
+
 - **`MachineCAMPairing.query.get`**
   - *What it is:* A real ORM query reading one row from the database by its primary key.
   - *Implementation:* `Model.query.get(primary_key) -> Model | None` - called here as `MachineCAMPairing.query.get(pairing_id)`.

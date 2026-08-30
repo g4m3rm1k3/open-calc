@@ -22,6 +22,9 @@ re-run the script after any lesson changes instead.
 ## Argument
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real, specific value actually supplied for a parameter at one particular call - the real strings in a real call like `download_file('CF-100', 'a1b2c3')`. It exists because the same parameter can receive a different real argument on every call; a function's real behavior on any one call depends on the argument actually passed, not on the parameter merely existing.
 
+## ast.alias
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real AST node type representing one imported name within either an `ast.Import` or `ast.ImportFrom`.
+
 ## ast.Attribute
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one dotted attribute access, like `bp.route`.
 
@@ -33,6 +36,12 @@ re-run the script after any lesson changes instead.
 
 ## ast.FunctionDef
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one function definition.
+
+## ast.Import
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real AST node type representing one plain `import x` statement.
+
+## ast.ImportFrom
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real AST node type representing one `from x import y` statement.
 
 ## ast.parse
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A standard-library function that parses real Python source text into a real Abstract Syntax Tree.
@@ -55,11 +64,20 @@ re-run the script after any lesson changes instead.
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
 
+## Circular dependency
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - Two or more real modules or packages that need something from each other, forming a real cycle in the import graph rather than a straight line. It exists as its own concept because Python resolves an ordinary, straight-line import predictably, but a genuine cycle can succeed or fail depending on the real, exact order those modules happen to load in - timing-dependent behavior, not a fixed rule.
+
 ## Client
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that initiates a request. It doesn't have
 
+## create_app
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real Flask application factory function - the one place this backend's own real circular dependency is deliberately resolved.
+
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
+
+## db
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, module-level SQLAlchemy instance every model in this application is built on - created once, in `app/__init__.py`, before `create_app`, below, is even defined.
 
 ## db.session.add
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
@@ -73,11 +91,22 @@ re-run the script after any lesson changes instead.
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
 
+## Domain exception
+- **Term** in `LESSON-1.2-EXCEPTIONS` - An exception type representing a real, meaningful business condition the code recognizes and is designed to detect - the code itself is working correctly; it's reporting a real fact about the specific request it was given, like "no row exists for this id." It exists as its own category because a domain exception usually deserves a specific, informative response - the caller asked for something the domain doesn't allow or doesn't have, not something the system failed to do.
+
 ## Domain logic
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The actual decision-making specific to this application — which parts are valid, how a filter should behave, what counts as a duplicate. It exists as its own named boundary because it's the one layer that couldn't be copied wholesale into a completely different application the way transport or application-layer code often can be.
 
+## download_cam_file
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real route this whole unit exists to investigate end to end - one of the six real routes the tool built in the unit above already found and printed, this time shown and walked through in full rather than only named.
+- **Object/method** in `LESSON-1.2-EXCEPTIONS` - The real Flask route that calls `PDMService.download_file` and is the one place in this real call chain that actually catches whatever it raises.
+
+## Exception boundary
+- **Term** in `LESSON-1.2-EXCEPTIONS` - The specific, real place in a call chain where a `try`/`except` is deliberately placed to catch a propagating exception, chosen because that real location is where enough context exists to decide what response is correct - not chosen by default, and not necessarily the innermost function that could have caught it. It exists because a boundary placed too early can hide real information a caller further up would have needed; a boundary placed too late lets a real failure propagate further than necessary.
+
 ## Exception handling (try/except)
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - A way of running code that might fail, while stating in advance what should happen if it does, using Python's real `try`/`except` statement. It exists so a real failure (a bad template, a missing row) can be handled deliberately, in one place, instead of crashing whatever else happens to be running at the time.
+- **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately stopping propagation at one specific, chosen point, using Python's real `try`/`except` statement, naming which exception type(s) to intercept and what real code should run instead of letting the exception keep traveling. It exists so a real failure can be handled exactly once, at whichever real point in a call chain actually has enough information to decide what to do about it - not automatically at the place closest to where it happened.
 
 ## External services
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - Real, separate systems this backend depends on but doesn't control — a different real server, owned and run by someone else. It exists as its own boundary because failures here (a network timeout, a service being down) are a fundamentally different kind of problem than a bug in this application's own code.
@@ -86,6 +115,7 @@ re-run the script after any lesson changes instead.
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
 
 ## generate_nc_file
+- **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real route function whose own docstring says it 'Saves the file to the database as an NCFile record' - shown here at the specific real lines where that save actually happens.
 
 ## get_gitlab_service
@@ -100,8 +130,14 @@ re-run the script after any lesson changes instead.
 ## HTTP (HyperText Transfer Protocol)
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - a real, plain-text format for
 
+## Import graph
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, directed structure formed by every "this file imports that file" relationship across a whole project - not drawn by hand, but implied automatically by every real `import`/ `from ... import` statement already in the source. It exists as its own concept because a project's real files depend on each other in a specific, real shape, and that shape can be traced mechanically from the source itself rather than assumed from a folder structure alone.
+
 ## Infrastructure
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real, concrete technical systems domain logic depends on but isn't itself about — which specific database engine, which filesystem, which network client library. It exists as a boundary separate from persistence and external services because "we store data somewhere" (persistence, a concept) and "we use SQLite specifically, at this file path" (infrastructure, a real, swappable detail) are different kinds of claims.
+
+## Infrastructure exception
+- **Term** in `LESSON-1.2-EXCEPTIONS` - An exception representing a failure in a real, external, technical dependency the code relies on but doesn't control - a network timeout, an unreachable service, a broken connection - rather than a business decision about the current request. It exists as its own category, distinct from a domain exception, because the correct response is usually different: retry, fall back, or report a real operational problem - not tell the caller their request itself was invalid.
 
 ## inspect.Parameter
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real class representing one parameter within a `Signature` - what `Signature.parameters` maps each real parameter name to.
@@ -121,12 +157,16 @@ re-run the script after any lesson changes instead.
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
 
+## Package boundary
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real line between what one package considers its own business and everything else, crossed every time code in one package imports from another. It exists because a package that imports freely in every direction, with no real discipline about which direction dependencies actually flow, loses the entire point of splitting a project into packages in the first place.
+
 ## Parameter
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A name declared in a function's own definition, naming a slot the function's body refers to - `cam_file_id` and `commit_sha` in `def download_file(cam_file_id, commit_sha=None):`, not any specific value yet. It exists as its own concept, separate from the value eventually supplied, so a function's real contract - what it needs to do its job - can be stated once, independent of any one particular call.
 
 ## PDMService.download_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real static method, already investigated in this curriculum for its real fallback behavior - shown here for a different real question: what its own parameters actually promise.
+- **Object/method** in `LESSON-1.2-EXCEPTIONS` - The same real static method already investigated for its real fallback behavior and its real parameters - shown here for a third real question: which real domain condition each of its own two raised exceptions represents, and which real failure inside it is instead caught internally as an infrastructure one.
 
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
@@ -138,6 +178,12 @@ re-run the script after any lesson changes instead.
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
 
+## Propagation
+- **Term** in `LESSON-1.2-EXCEPTIONS` - What a raised exception does by default, with nothing extra required: it exits the function that raised it immediately, then exits whatever called that function, then whatever called that, one real stack frame at a time, until some code actually catches it or there's no caller left at all. It exists as its own concept because it's easy to assume an exception "goes" somewhere specific - it doesn't, until a real `except` block says otherwise; silence, not interception, is the default.
+
+## Public/private module interface
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - A real convention - Python's leading underscore, `_name` - used to mark a module-level name as not meant to be imported or relied on by other files, distinguished from a name with no leading underscore, meant to be part of what a module actually offers the rest of the project. It exists because a module with every name equally importable gives every other file equal license to depend on its internals, making a later change to those internals a real risk to code that was never supposed to be touching them.
+
 ## Pure function
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
 
@@ -146,6 +192,7 @@ re-run the script after any lesson changes instead.
 
 ## Raising an exception
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
+- **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately signaling that something has gone wrong using Python's own `raise` statement, naming a specific exception type - `ValueError`, `FileNotFoundError` - rather than continuing as if nothing happened. It exists so a function that cannot do its real job can say so immediately, in a form the language itself will keep passing upward until something actually deals with it - propagation, below.
 
 ## Reflection
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
@@ -213,6 +260,9 @@ re-run the script after any lesson changes instead.
 ## str.encode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - A method converting a Python text string into a real
 
+## subprocess.run
+- **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - A standard-library function that runs a real, separate process and waits for it to finish.
+
 ## TCP (Transmission Control Protocol)
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the specific real protocol
 
@@ -230,25 +280,45 @@ re-run the script after any lesson changes instead.
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
 - `.render` / `render_template` - shares: render
+- `Abstract Syntax Tree (AST)` / `ast.alias` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Attribute` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Call` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Constant` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.FunctionDef` - shares: ast
+- `Abstract Syntax Tree (AST)` / `ast.Import` - shares: ast
+- `Abstract Syntax Tree (AST)` / `ast.ImportFrom` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.parse` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
 - `Application layer` / `Application server` - shares: application
 - `Application layer` / `Transport layer` - shares: layer
 - `Application server` / `Server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `ast.Import` / `Import graph` - shares: import
 - `Business logic` / `Domain logic` - shares: logic
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
+- `Circular dependency` / `Dependency (of a function)` - shares: dependency
 - `Dependency (of a function)` / `Pure function` - shares: function
+- `Domain exception` / `Domain logic` - shares: domain
+- `Domain exception` / `Exception boundary` - shares: exception
+- `Domain exception` / `Exception handling (try/except)` - shares: exception
+- `Domain exception` / `Infrastructure exception` - shares: exception
+- `Domain exception` / `Raising an exception` - shares: exception
+- `download_cam_file` / `generate_nc_file` - shares: file
+- `download_cam_file` / `PDMService.download_file` - shares: download, file
+- `download_cam_file` / `send_file` - shares: file
+- `Exception boundary` / `Exception handling (try/except)` - shares: exception
+- `Exception boundary` / `Infrastructure exception` - shares: exception
+- `Exception boundary` / `Package boundary` - shares: boundary
+- `Exception boundary` / `Raising an exception` - shares: exception
+- `Exception handling (try/except)` / `Infrastructure exception` - shares: exception
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
+- `Infrastructure` / `Infrastructure exception` - shares: infrastructure
+- `Infrastructure exception` / `Raising an exception` - shares: exception
 - `inspect.Parameter` / `Parameter` - shares: parameter
 - `inspect.Parameter` / `Query parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
@@ -258,6 +328,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `Parameter` / `Query parameter` - shares: parameter
 - `PDMService.download_file` / `send_file` - shares: file
+- `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Request line` / `Status line` - shares: line
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Static analysis` / `Static method` - shares: static

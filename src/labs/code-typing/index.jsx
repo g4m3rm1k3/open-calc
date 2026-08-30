@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronRight, Code2, Keyboard, Play, RotateCcw, Sparkles, Target, Terminal, Timer, Trophy, Zap } from 'lucide-react'
+import { Check, ChevronRight, Code2, Keyboard, Monitor, Play, RotateCcw, Sparkles, Target, Terminal, Timer, Trophy, Zap } from 'lucide-react'
 import { getAvailableConceptIds, getConceptFile } from '../../concepts/loader.ts'
 import { runJS, runPython, stripTypeScript } from '../../utils/codeRunner.js'
 
@@ -107,12 +107,13 @@ function Stat({ icon: Icon, label, value, tint = 'brand' }) {
   }
   return <div className="min-w-[92px] rounded-2xl border border-slate-200/80 bg-white/70 px-3 py-2.5 shadow-sm dark:border-white/[.07] dark:bg-slate-900/60">
     <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[.13em] text-slate-400 dark:text-slate-500"><Icon className={`h-3.5 w-3.5 ${tints[tint]}`} />{label}</div>
-    <div className="mt-1 text-xl font-black tabular-nums text-slate-800 dark:text-slate-100">{value}</div>
+    <div className="seven-segment mt-1 text-xl font-black tabular-nums text-slate-800 dark:text-slate-100">{value}</div>
   </div>
 }
 
 export default function CodeTypingStudio() {
   const [lesson, setLesson] = useState(STARTER_LESSON)
+  const [classicMode, setClassicMode] = useState(() => localStorage.getItem('oc-code-typing-display') === 'crt')
   const [conceptLessons, setConceptLessons] = useState([])
   const [typed, setTyped] = useState([])
   const [startedAt, setStartedAt] = useState(null)
@@ -125,6 +126,14 @@ export default function CodeTypingStudio() {
   const [runOutput, setRunOutput] = useState('')
   const typingRef = useRef(null)
   const activeCharRef = useRef(null)
+
+  const toggleClassicMode = useCallback(() => {
+    setClassicMode(current => {
+      const next = !current
+      localStorage.setItem('oc-code-typing-display', next ? 'crt' : 'modern')
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     let alive = true
@@ -183,9 +192,10 @@ export default function CodeTypingStudio() {
     })
   }, [lesson.code])
 
-  // Keep the active typing position in the comfortable upper-middle of an
-  // editor viewport. Extra padding after the code means this also works for
-  // the final lines, rather than pinning them to the bottom edge.
+  // Follow only forward, just like an editor: once the active character reaches
+  // the lower part of the viewport, bring it back toward the middle. Never
+  // scroll upward behind the learner — that made manual reading feel like a
+  // jump back to the top of the file.
   useEffect(() => {
     const viewport = typingRef.current
     const caret = activeCharRef.current
@@ -193,9 +203,11 @@ export default function CodeTypingStudio() {
     const frame = requestAnimationFrame(() => {
       const viewportBox = viewport.getBoundingClientRect()
       const caretBox = caret.getBoundingClientRect()
-      const caretTop = viewport.scrollTop + caretBox.top - viewportBox.top
-      const targetTop = Math.max(0, caretTop - viewport.clientHeight * 0.42)
-      if (Math.abs(viewport.scrollTop - targetTop) > 4) viewport.scrollTo({ top: targetTop, behavior: 'smooth' })
+      const caretInViewport = caretBox.top - viewportBox.top
+      const followThreshold = viewport.clientHeight * 0.66
+      if (caretInViewport <= followThreshold) return
+      const targetTop = viewport.scrollTop + caretInViewport - viewport.clientHeight * 0.42
+      if (targetTop > viewport.scrollTop + 4) viewport.scrollTo({ top: targetTop, behavior: 'smooth' })
     })
     return () => cancelAnimationFrame(frame)
   }, [activeIndex])
@@ -303,17 +315,17 @@ export default function CodeTypingStudio() {
 
   const errorCount = attempts - correctKeystrokes
 
-  return <main className="relative min-h-full overflow-hidden bg-slate-50 px-4 py-5 text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:px-7 sm:py-7">
+  return <main className={`relative min-h-full overflow-hidden bg-slate-50 px-4 py-5 text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:px-7 sm:py-7 ${classicMode ? 'code-typing-classic' : ''}`}>
     <div className="pointer-events-none absolute inset-x-0 top-0 h-[430px] bg-[radial-gradient(ellipse_at_top,rgba(var(--tw-custom-brand-500),.18),transparent_60%)]" />
     <div className="pointer-events-none absolute left-[10%] top-24 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
     <div className="relative mx-auto max-w-7xl">
       <header className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[.2em] text-brand-600 dark:text-brand-300"><Sparkles className="h-4 w-4" />Code fluency lab</div>
-          <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Type code. <span className="text-brand-600 dark:text-brand-300">Build instinct.</span></h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">Practice the punctuation, rhythm, and patterns you will actually use while writing code.</p>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <button onClick={toggleClassicMode} className={`classic-toggle shrink-0 rounded-2xl border px-3 py-2.5 text-xs font-black uppercase tracking-[.12em] transition ${classicMode ? 'border-[#a9e47c] bg-[#203525] text-[#ccff9f]' : 'border-slate-200 bg-white/80 text-slate-500 hover:border-brand-300 hover:text-brand-600 dark:border-white/[.08] dark:bg-slate-900/70 dark:text-slate-300'}`} title="Toggle classic CRT terminal mode"><Monitor className="mr-1.5 inline h-4 w-4" />{classicMode ? 'Modern' : 'Classic CRT'}</button>
           <Stat icon={Timer} label="Time" value={elapsedLabel(elapsed)} />
           <Stat icon={Zap} label="Speed" value={`${wpm} WPM`} tint="amber" />
           <Stat icon={Target} label="Accuracy" value={`${accuracy}%`} tint="emerald" />
@@ -332,7 +344,7 @@ export default function CodeTypingStudio() {
           <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-500 dark:bg-slate-950/60 dark:text-slate-400">Concept Explorer snippets appear here automatically when available.</p>
         </aside>
 
-        <section className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 shadow-2xl shadow-slate-900/[.08] backdrop-blur dark:border-white/[.08] dark:bg-slate-900/75">
+        <section className={`relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 shadow-2xl shadow-slate-900/[.08] backdrop-blur dark:border-white/[.08] dark:bg-slate-900/75 ${classicMode ? 'crt-screen' : ''}`}>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 px-5 py-4 dark:border-white/[.07]">
             <div><div className="text-sm font-black">{lesson.title}</div><div className="mt-0.5 text-xs text-slate-400">{lesson.language} · <span className="text-brand-600 dark:text-brand-300">{lesson.concept}</span></div></div>
             <div className="flex items-center gap-2"><div className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500 dark:bg-slate-950 dark:text-slate-400">{typed.length} / {lesson.code.length}</div><button onClick={reset} className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/10" title="Restart lesson"><RotateCcw className="h-4 w-4" /></button></div>

@@ -313,6 +313,36 @@ unit:
       anything else - if a real tool can show it, show that output;
       a confident sentence is not a substitute.
 
+  mental_model:
+    when: >
+      Only when the unit's real shape has more than one path, boundary,
+      or branch that prose alone makes hard to hold in mind at once -
+      two different exception boundaries at two different points in a
+      call chain, several conditional branches converging on one
+      outcome, a fallback with more than one real trigger. A single
+      linear sequence (call this, which calls that, which returns)
+      never needs one - the Mechanical Walkthrough already covers that
+      clearly enough in prose.
+    what_it_is_not: >
+      Not a restatement of execution_trace's real per-step values, and
+      not decoration. A mental model diagram shows STRUCTURE or
+      RELATIONSHIP (what connects to what, which branch goes where) -
+      the moment it starts carrying one specific run's actual values,
+      it has become an execution trace instead and belongs in that
+      field, not this one.
+    placement: >
+      After the Mechanical Walkthrough, not before - a diagram naming
+      functions or branches the reader hasn't met yet orients no one;
+      recapping the same structure just walked through in prose, in one
+      picture, is what actually earns its place on the page.
+    check_before_using: >
+      Before adding one, check whether removing it would actually cost
+      the reader something a careful re-read of the Mechanical
+      Walkthrough wouldn't already give them. If not, `applicable:
+      false` and no diagram - a decorative diagram is exactly the kind
+      of thing this curriculum's "real, not decorative" standard exists
+      to keep out.
+
   execution_trace:
     when: loop, recursion, or state carried across steps - OR a
       sequence of calls where the point is timing/control-flow order.

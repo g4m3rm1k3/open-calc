@@ -494,8 +494,9 @@ concept_units:
           explanation: >
             A real ORM lookup by primary key, deciding which of the two
             real branches below actually runs - the same real
-            `Model.query.get` pattern already established elsewhere in
-            this curriculum's own evidence.
+            `Model.query.get` pattern as `PDMService.download_file`'s
+            own `CAMFile.query.get` call: one primary-key argument in,
+            one real row or `None` back.
         - element: "if existing: ... else: existing = NCFile(...)"
           explanation: >
             A real branch: update an already-loaded real row's real

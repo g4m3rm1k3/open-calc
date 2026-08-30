@@ -78,6 +78,16 @@
   - *Connects to:* Read from a `Call`'s first `args` entry; its `value` is what actually gets printed.
   - *Shape:* One object whose `value` field holds the literal already converted to a plain Python value (a real `str`, `int`, `bool`, or `None` - not a further node to keep unpacking) - confirmed via `ast.Constant._fields`.
 
+- **`download_cam_file`**
+  - *What it is:* The real route this whole unit exists to investigate end to end - one of the six real routes the tool built in the unit above already found and printed, this time shown and walked through in full rather than only named.
+  - *Implementation:* `download_cam_file(cam_file_id)`, defined at `backend/app/routes/pdm.py:95-102`, registered via `@pdm_bp.route(...)`.
+  - *Its use:* The concrete real subject of this unit's mechanical walkthrough and execution trace - what a route mechanically found in the unit above actually does, once its real body is read rather than just its name.
+  - *Type:* A free function, registered as a Flask route.
+  - *Responsibility:* Read one real, optional query parameter, delegate the entire real request to `PDMService.download_file`, and catch anything that call raises or lets propagate.
+  - *Depends on:* A real `cam_file_id` from the URL; an optional `commit_sha` query parameter; `PDMService.download_file`, below, for all of its actual behavior.
+  - *Connects to:* Registered by `Blueprint.route`, below; calls `PDMService.download_file`, below, and returns whatever that call returns or raises.
+  - *Shape:* Takes one real string argument in from the URL; returns whatever `PDMService.download_file` returns - a real Flask `Response` - or, on any raised exception, a real JSON error response with status `500` instead.
+
 - **`Blueprint.route`**
   - *What it is:* A method registering a URL rule on a Blueprint and returning a decorator for the function that handles it.
   - *Implementation:* `route(rule: str, methods: list[str] = ["GET"])` - called here as `@pdm_bp.route('/cam-files/<string:cam_file_id>/download', methods=['GET'])`.
@@ -247,48 +257,7 @@ Before reading on:
 - **Location:** N/A
 - **Dependencies:** None beyond the real repository already checked out on disk.
 
-`download_cam_file` (below) is the same real route the unit
-above's own tool already found and printed - now shown in full
-instead of just named. It does almost nothing itself: it reads
-one query parameter and immediately delegates to
-`PDMService.download_file`, which is where the real behavior
-actually lives. That method's own real control flow, traced
-through the code shown below:
-
-```text
-GET /cam-files/<id>/download?commit_sha=...
-            |
-            v
-    download_cam_file(cam_file_id)
-            |
-            v
- PDMService.download_file(cam_file_id, commit_sha)
-            |
-            v
-  CAMFile.query.get(cam_file_id)  -- loads the row: filename + stored content
-            |
-            v
-  try: get_gitlab_service() -> get_file_at_commit / get_file
-     |                  |
-  succeeds            raises (any Exception)
-     |                  |
-     v                  v
-file_content =      file_content = cam_file.cam_file_content
-GitLab bytes        (the same row already loaded above)
-     |                  |
-     +--------+---------+
-              v
-      send_file(file_content, ...)
-              |
-              v
-         HTTP response
-```
-
-The database is not a second alternative alongside GitLab - it
-is read first, for the row's metadata, and that same row's
-already-loaded `cam_file_content` is what the fallback reuses
-if the GitLab attempt fails. Nothing about the fallback path
-queries the database a second time.
+`download_cam_file` (below) is the same real route the unit above's own tool already found and printed - now shown in full instead of just named. It does almost nothing itself: it reads one query parameter and immediately delegates to `PDMService.download_file`, which is where the real behavior actually lives - its own real control flow is traced in the Mental Model below, once the code itself has been walked through.
 
 ### The Updated Project
 
@@ -351,6 +320,43 @@ def download_file(cam_file_id, commit_sha=None):
 - `try: gitlab_service = get_gitlab_service() ... except Exception: file_content = cam_file.cam_file_content` — The real fallback this whole unit is about: `get_gitlab_service` is called, and either `get_file_at_commit` or `get_file` is used depending on whether a specific `commit_sha` was given - both are real network calls to a different real server, and both can genuinely fail for reasons this application doesn't control. The bare `except Exception:` catches any such failure and assigns `cam_file.cam_file_content` instead - the same real file's content, already stored locally in this application's own database, read directly off the `cam_file` object already fetched above.
 - `if file_content is None: raise FileNotFoundError("File content not found")` — A second, different raised exception type - this one specifically for "neither GitLab nor the local fallback actually had any content," which is a genuinely different real situation than "the row doesn't exist at all," caught above.
 - `return send_file(io.BytesIO(file_content), mimetype='application/octet-stream', as_attachment=True, download_name=filename)` — `send_file` builds the real, downloadable HTTP response - `io.BytesIO` (Python's standard library, wrapping the real bytes so `send_file` can read them as if from a real file) - carrying whichever real content actually ended up in `file_content`, GitLab's or the local fallback's, with no difference visible to whoever downloads it.
+
+### Mental Model
+
+```text
+GET /cam-files/<id>/download?commit_sha=...
+            |
+            v
+    download_cam_file(cam_file_id)
+            |
+            v
+ PDMService.download_file(cam_file_id, commit_sha)
+            |
+            v
+  CAMFile.query.get(cam_file_id)  -- loads the row: filename + stored content
+            |
+            v
+  try: get_gitlab_service() -> get_file_at_commit / get_file
+     |                  |
+  succeeds            raises (any Exception)
+     |                  |
+     v                  v
+file_content =      file_content = cam_file.cam_file_content
+GitLab bytes        (the same row already loaded above -
+                      NOT a second database query)
+     |                  |
+     +--------+---------+
+              v
+      send_file(file_content, ...)
+              |
+              v
+         HTTP response
+
+The database is not a second alternative alongside GitLab - it
+is read once, first, for the row's metadata, and that same
+row's already-loaded cam_file_content is what the fallback
+reuses if the GitLab attempt fails.
+```
 
 ### CS Lens
 

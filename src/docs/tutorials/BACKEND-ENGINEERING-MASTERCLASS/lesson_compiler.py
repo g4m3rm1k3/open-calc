@@ -167,6 +167,10 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
                 if not item.get("explanation", "").strip():
                     errors.append(f"concept_units[{i}] ({title}) mechanical_walkthrough[{j}] ({item.get('element', '?')}): missing explanation")
 
+        mental_model = unit.get("mental_model", {})
+        if mental_model.get("applicable", False) and not mental_model.get("diagram", "").strip():
+            errors.append(f"concept_units[{i}] ({title}) mental_model: applicable: true but no diagram given")
+
     # Vocabulary cross-check (Python code only): every real NAME token
     # (via the standard library's own tokenizer, not a regex) should
     # trace back to a terms/objects_and_methods name, or be an ordinary
@@ -353,6 +357,10 @@ def render_concept_unit(unit: dict, index: int) -> str:
         for item in walkthrough["items"]:
             out.append(f"- `{item['element']}` — {item['explanation']}")
         out.append("")
+
+    mental_model = unit.get("mental_model", {})
+    if mental_model.get("applicable", False):
+        out += ["### Mental Model", "", render_code_block(mental_model["diagram"], "text"), ""]
 
     trace = unit.get("execution_trace", {})
     if trace.get("applicable"):
