@@ -24,6 +24,47 @@ function prettyKey(char) {
   return char
 }
 
+// US/ANSI keyboard cues. Keeping this next to the target makes unfamiliar code
+// punctuation teachable instead of feeling like a guessing game.
+const KEY_HINTS = {
+  ' ': { keys: 'Space', note: 'space bar' },
+  '\n': { keys: 'Enter', note: 'new line' },
+  '\t': { keys: 'Tab', note: 'indent' },
+  '{': { keys: 'Shift + [', note: 'left brace' },
+  '}': { keys: 'Shift + ]', note: 'right brace' },
+  '[': { keys: '[', note: 'left bracket' },
+  ']': { keys: ']', note: 'right bracket' },
+  '(': { keys: 'Shift + 9', note: 'open parenthesis' },
+  ')': { keys: 'Shift + 0', note: 'close parenthesis' },
+  '<': { keys: 'Shift + ,', note: 'less than' },
+  '>': { keys: 'Shift + .', note: 'greater than' },
+  ':': { keys: 'Shift + ;', note: 'colon' },
+  ';': { keys: ';', note: 'semicolon' },
+  '"': { keys: 'Shift + \'', note: 'double quote' },
+  "'": { keys: "'", note: 'single quote' },
+  '`': { keys: '`', note: 'backtick' },
+  '!': { keys: 'Shift + 1', note: 'bang' },
+  '?': { keys: 'Shift + /', note: 'question mark' },
+  '/': { keys: '/', note: 'forward slash' },
+  '\\': { keys: '\\', note: 'backslash — key above Enter' },
+  '|': { keys: 'Shift + \\', note: 'pipe — key above Enter' },
+  '=': { keys: '=', note: 'equals' },
+  '+': { keys: 'Shift + =', note: 'plus' },
+  '-': { keys: '-', note: 'minus' },
+  '_': { keys: 'Shift + -', note: 'underscore' },
+  '*': { keys: 'Shift + 8', note: 'asterisk' },
+  '&': { keys: 'Shift + 7', note: 'ampersand' },
+  '$': { keys: 'Shift + 4', note: 'dollar sign' },
+  '@': { keys: 'Shift + 2', note: 'at sign' },
+  '#': { keys: 'Shift + 3', note: 'hash' },
+}
+
+function keyHint(char) {
+  if (KEY_HINTS[char]) return KEY_HINTS[char]
+  if (char && char >= 'A' && char <= 'Z') return { keys: `Shift + ${char}`, note: 'capital letter' }
+  return { keys: prettyKey(char ?? '✓'), note: 'next key' }
+}
+
 function elapsedLabel(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
@@ -80,14 +121,14 @@ export default function CodeTypingStudio() {
   }, [startedAt, done])
 
   const elapsed = startedAt ? Math.max(1, Math.floor((now - startedAt) / 1000)) : 0
-  // Speed and accuracy are deliberately separate: WPM answers “how quickly are
-  // you typing?”, while accuracy answers “how cleanly?”. Using only correct
-  // characters here made a fast attempt with a few misses look artificially slow.
-  const wpm = elapsed ? Math.round((typed.length / 5) / (elapsed / 60)) : 0
+  // Speed and accuracy are deliberately separate: WPM counts physical typing
+  // attempts, while accuracy shows how cleanly those attempts match the code.
+  const wpm = elapsed ? Math.round((attempts / 5) / (elapsed / 60)) : 0
   const accuracy = attempts ? Math.round((correctKeystrokes / attempts) * 100) : 100
   const progress = lesson.code.length ? Math.round((typed.length / lesson.code.length) * 100) : 0
   const activeIndex = typed.length
   const expected = lesson.code[activeIndex]
+  const nextHint = keyHint(expected)
 
   const reset = useCallback(() => {
     setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null)
@@ -111,17 +152,42 @@ export default function CodeTypingStudio() {
     }
     let key = event.key
     if (key === 'Enter') key = '\n'
-    if (key === 'Tab') key = '\t'
-    if (key.length !== 1 && key !== '\n' && key !== '\t') return
+    if (key === 'Tab') {
+      event.preventDefault()
+      setTyped(current => {
+        if (current.length >= lesson.code.length || lesson.code[current.length] !== ' ') return current
+        const lineStart = lesson.code.lastIndexOf('\n', current.length - 1) + 1
+        const isIndent = /^ *$/.test(lesson.code.slice(lineStart, current.length))
+        const remainingSpaces = lesson.code.slice(current.length).match(/^ +/)?.[0].length ?? 1
+        // A Tab at the beginning of a line covers the visible indentation; in
+        // the middle of code it behaves like one ordinary space.
+        const covered = isIndent ? remainingSpaces : 1
+        const next = Array.from({ length: covered }, (_, offset) => ({ char: offset === 0 ? '\t' : ' ', correct: true, viaTab: true }))
+        setAttempts(total => total + 1)
+        setCorrectKeystrokes(total => total + covered)
+        if (!startedAt) setStartedAt(Date.now())
+        if (current.length + covered === lesson.code.length) setDone(true)
+        setLastError(null)
+        return [...current, ...next]
+      })
+      return
+    }
+    if (key.length !== 1 && key !== '\n') return
     event.preventDefault()
     setTyped(current => {
       if (current.length >= lesson.code.length) return current
       const isCorrect = key === lesson.code[current.length]
       setAttempts(total => total + 1)
-      if (isCorrect) setCorrectKeystrokes(total => total + 1)
-      else setLastError({ expected: lesson.code[current.length], received: key, index: current.length, nonce: Date.now() })
+      if (!isCorrect) {
+        // A tutor should hold the cursor at the character being learned. The
+        // next correct key resolves this message and advances the code.
+        setLastError({ expected: lesson.code[current.length], received: key, index: current.length, nonce: Date.now() })
+        return current
+      }
+      setCorrectKeystrokes(total => total + 1)
+      setLastError(null)
       if (!startedAt) setStartedAt(Date.now())
-      const next = [...current, { char: key, correct: isCorrect }]
+      const next = [...current, { char: key, correct: true }]
       if (next.length === lesson.code.length) setDone(true)
       return next
     })
@@ -177,7 +243,7 @@ export default function CodeTypingStudio() {
               {activeIndex === 0 && <div className="pointer-events-none absolute bottom-8 right-8 hidden items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-2 text-xs text-slate-400 sm:flex"><Keyboard className="h-4 w-4 text-brand-300" />Start typing to begin</div>}
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60">
-              <div className="text-xs text-slate-500 dark:text-slate-400">Next key <kbd className="ml-1.5 rounded border border-slate-300 bg-white px-2 py-1 font-mono font-bold text-slate-700 shadow-sm dark:border-white/10 dark:bg-slate-800 dark:text-slate-200">{prettyKey(expected ?? '✓')}</kbd></div>
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"><span>Next key</span><kbd className="rounded border border-brand-300/70 bg-white px-2 py-1 font-mono font-bold text-brand-700 shadow-sm dark:border-brand-400/30 dark:bg-slate-800 dark:text-brand-200">{nextHint.keys}</kbd><span className="hidden text-slate-400 sm:inline">{nextHint.note}</span></div>
               <AnimatePresence mode="wait">{lastError && !done ? <motion.div key={lastError.nonce} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-xs font-bold text-rose-500">Expected “{prettyKey(lastError.expected)}” · typed “{prettyKey(lastError.received)}”</motion.div> : <div className="text-xs font-medium text-slate-400">Backspace lets you revise your last key.</div>}</AnimatePresence>
             </div>
           </div>
