@@ -354,11 +354,15 @@ it.
 
 ### Commands needed
 
-- `python <path>` — runs a script directly with the real Python
-  interpreter. Running the server and client as two separate,
-  simultaneous invocations (see Verification, below) is what makes this
-  lab actually demonstrate two real processes rather than one script
-  pretending to be two.
+- `python verification/phase-00/lab_server.py` — runs the server
+  script directly with the real Python interpreter. Run this one
+  first, in its own terminal — it blocks on `accept()` and won't return
+  until a client connects.
+- `python verification/phase-00/lab_client.py` — run this second, in a
+  *separate* terminal while the server from the command above is still
+  running. Running them as two separate, simultaneous invocations (see
+  Verification, below) is what makes this lab actually demonstrate two
+  real processes rather than one script pretending to be two.
 
 ### Verification
 

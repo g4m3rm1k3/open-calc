@@ -1,0 +1,254 @@
+number: "0.3"
+title: "Backend Boundaries"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Nothing new to run — this lesson names six real architectural
+  boundaries a backend is supposed to keep separate, traces where each
+  one lives in this exact application's own real code, then finds a
+  real, already-documented place this backend currently violates one of
+  them badly. The transferable problem: naming a boundary doesn't
+  guarantee it's respected — real code has to be read to find out.
+
+what_you_need_to_know_first: >
+  A request/response pipeline with named stages (routing, business
+  logic, persistence); reading a real, existing file as evidence rather
+  than typing new code.
+
+terms:
+  - name: "Transport layer"
+    definition: >
+      The part of a backend responsible only for moving raw bytes
+      between a client and a server — sockets, HTTP parsing — with no
+      awareness of what those bytes mean to this specific application.
+      It exists as its own named boundary because the exact same
+      transport code works for a manufacturing app, a blog, or anything
+      else; nothing about it is specific to what this application does.
+  - name: "Application layer"
+    definition: >
+      The part of a backend that decides which piece of code should
+      run for a given request — routing a parsed request to a handler
+      — without itself containing the actual business decision that
+      handler makes. It exists as a separate boundary from domain logic
+      (below) so the *routing* decision (which function runs) can
+      change independently of the *business* decision (what that
+      function actually does).
+  - name: "Domain logic"
+    definition: >
+      The actual decision-making specific to this application — which
+      parts are valid, how a filter should behave, what counts as a
+      duplicate. It exists as its own named boundary because it's the
+      one layer that couldn't be copied wholesale into a completely
+      different application the way transport or application-layer
+      code often can be.
+  - name: "Persistence"
+    definition: >
+      Storing data somewhere that survives past the current request and
+      the current process. It exists as its own boundary so domain
+      logic can be written and tested without caring whether the data
+      it reads or writes actually lives in a real database, a test
+      double, or an in-memory stand-in.
+  - name: "Infrastructure"
+    definition: >
+      The real, concrete technical systems domain logic depends on but
+      isn't itself about — which specific database engine, which
+      filesystem, which network client library. It exists as a boundary
+      separate from persistence and external services because "we
+      store data somewhere" (persistence, a concept) and "we use
+      SQLite specifically, at this file path" (infrastructure, a real,
+      swappable detail) are different kinds of claims.
+  - name: "External services"
+    definition: >
+      Real, separate systems this backend depends on but doesn't
+      control — a different real server, owned and run by someone
+      else. It exists as its own boundary because failures here (a
+      network timeout, a service being down) are a fundamentally
+      different kind of problem than a bug in this application's own
+      code.
+
+objects_and_methods: []
+
+concept_units:
+  - title: "Naming the Real Boundaries"
+    problem: >
+      The pipeline traced through GET /api/parts already showed several
+      real stages doing genuinely different kinds of work. "Different
+      kinds of work" is a real architectural claim, not just a
+      description — it means each of those stages is supposed to be
+      replaceable or testable on its own, without dragging every other
+      stage along with it.
+    socratic_prompt:
+      - "Given the six terms just defined, which of them could you
+        replace (a different database engine, a different web
+        framework) without touching this application's own domain
+        logic at all, if the boundaries were actually kept clean?"
+      - "Which of the six would you expect to be the hardest to test in
+        isolation, and why?"
+    project_change:
+      reference_source: >
+        backend/app/routes/parts.py:18-55 (already read and quoted in
+        this curriculum's own tracing of the request/response
+        pipeline); backend/run.py:1-19; backend/app/models/part.py.
+      files_affected: []
+      change_type: none
+      location: "N/A"
+      dependencies: "None beyond the real repository already checked out on disk."
+    new_code:
+      applicable: false
+      note: >
+        There is no new code in this unit — every file named below
+        already exists. Nothing here gets typed; each is named so it
+        can be opened and read.
+    updated_project:
+      applicable: false
+      note: >
+        Not applicable — this unit cites real, existing files as
+        evidence for each named boundary rather than building up a new
+        one.
+    mechanical_walkthrough:
+      applicable: false
+      note: >
+        Not applicable in the usual sense — six real files/lines are
+        named below as evidence for each boundary, rather than a new
+        syntactic element being enumerated.
+      items: []
+    cs_lens: >
+      This is layered architecture: a system organized so each layer
+      only depends on the layer(s) beneath it, never the reverse, and
+      each layer can be understood, tested, or replaced without full
+      knowledge of the others. Also recognized in: the OSI networking
+      model (physical, data link, network, transport, ... application —
+      the same idea this lesson's own "transport" and "application"
+      terms are directly named after), a car's own separation between
+      its engine, transmission, and body (each replaceable by a
+      mechanic without redesigning the others), and a restaurant's
+      separation between the kitchen (domain logic), the walk-in
+      cooler (persistence), and its produce supplier (an external
+      service it depends on but doesn't control).
+    se_lens: >
+      The real alternative this application could have taken and
+      didn't: writing every request handler as one undifferentiated
+      block of code, transport parsing through database writes all
+      inline. That alternative is genuinely faster to write once and
+      genuinely more expensive later — every one of these six
+      boundaries, kept separate, is what lets one of them change (a
+      different database, a stricter validation rule) without a
+      developer needing to re-verify all the others still work. The
+      next unit shows this application's own real, current cost of not
+      keeping one of these boundaries clean.
+    commands: []
+    verification:
+      applicable: false
+      exemption_reason: >
+        Not applicable under the Verification Rule's own exemption:
+        every claim in this unit is a direct citation to real,
+        already-existing files, already read and quoted elsewhere in
+        this curriculum — there is no execution to run.
+    connection_to_previous: >
+      There is no previous unit — this is the first one in this lesson.
+
+  - title: "Where This Backend Actually Violates Them"
+    problem: >
+      Naming six clean boundaries doesn't mean this real application
+      actually respects all of them. Before reading on, given that
+      domain logic (Terms, above) is supposed to be independent of the
+      application layer that calls it — what would it look like, in
+      real code, if that boundary were violated? What would you expect
+      to find living somewhere it shouldn't?
+    socratic_prompt:
+      - "If a route file contained real business logic instead of just
+        calling out to it, what would that route function's own line
+        count start to look like compared to the other routes in the
+        same file?"
+    project_change:
+      reference_source: >
+        backend/app/routes/operation_manager.py:815-904
+        (`_build_export_data`), 907-962
+        (`_apply_customizations_to_sequences`), 965-1013
+        (`_build_sequence_export`), 1016-1062
+        (`_build_operation_export`), and 465-624 (the `generate_nc_file`
+        route itself) — all real, already-investigated findings, cited
+        to file and line in this curriculum's own backend investigation.
+      files_affected: []
+      change_type: none
+      location: "N/A"
+      dependencies: "None beyond the real repository already checked out on disk."
+    new_code:
+      applicable: false
+      note: >
+        There is no new code in this unit — every file named below
+        already exists. Nothing here gets typed.
+    updated_project:
+      applicable: false
+      note: >
+        Not applicable — this unit cites a real, already-existing
+        violation rather than building anything new.
+    mechanical_walkthrough:
+      applicable: false
+      note: >
+        Not applicable — see the real citations below in place of a
+        syntactic enumeration.
+      items: []
+    cs_lens: >
+      This is a real instance of the "God object"/"God function"
+      anti-pattern applied to a route handler instead of a class — one
+      function or module accumulating responsibilities that belong to
+      several different, genuinely separate layers. Also recognized in:
+      a single utility class in a large codebase that ends up importing
+      from every other module because everyone added "just one more
+      helper" to it, and a single spreadsheet tab that starts as one
+      report and slowly absorbs raw data entry, formulas, and a
+      dashboard all in the same sheet.
+    se_lens: >
+      The real, current, honest cost, not a hypothetical one: four
+      real functions — `_build_export_data`,
+      `_apply_customizations_to_sequences`, `_build_sequence_export`,
+      `_build_operation_export` — total 248 lines, about 23% of
+      `operation_manager.py`'s entire file, and constitute a full,
+      real domain service that lives directly in the routes module
+      instead of in `operation_manager_service.py`, the file that
+      exists specifically to hold this kind of logic. The
+      `generate_nc_file` route itself, 160 lines, does real database
+      lookups, real print-based debug logging, real Jinja2 template
+      loading and rendering, real filename derivation, and a real
+      database upsert — all inline, all in one function. The
+      alternative not chosen: moving this logic into the service file
+      that already exists for it. The real cost of not having done so:
+      none of this logic can be tested, reused, or reasoned about
+      without also reading and understanding an HTTP route handler at
+      the same time — the domain layer and the application layer have
+      been fused into one file, and untangling them later (a real,
+      future lesson in this curriculum) has to happen with real,
+      currently-passing behavior still intact.
+    commands: []
+    verification:
+      applicable: false
+      exemption_reason: >
+        Not applicable under the Verification Rule's own exemption:
+        every real claim here — the exact line ranges, the exact line
+        counts, the exact operations performed inline — is a direct
+        citation to this curriculum's own backend investigation,
+        independently re-verified against the real file this session.
+    connection_to_previous: >
+      The unit above named six boundaries a backend is supposed to
+      keep separate; this unit found one real, already-documented place
+      in this exact application where two of them — the application
+      layer and domain logic — are not separate at all.
+
+closing:
+  connect_the_pieces: >
+    Six named boundaries, traced through one real request in the unit
+    above (transport and application layer real and working, domain
+    logic and persistence real and working, for GET /api/parts) — then
+    one real, concrete counter-example: operation_manager.py, where 248
+    lines of real domain logic and a 160-line route handler mixing
+    transport, domain logic, templating, and persistence together prove
+    that naming a boundary and actually keeping it are two different
+    things, in this exact, real codebase.
+  next_lesson_pointer: >
+    How to actually investigate a real, unfamiliar backend before
+    trusting any of it — entry points, imports, routes, models,
+    services, configuration, dependencies.

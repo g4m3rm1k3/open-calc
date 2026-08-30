@@ -1,0 +1,296 @@
+# What the agent does at each step - the HOW, migrated out of
+# LESSON SCHEMA.md's prose so it's an explicit work order instead of
+# something to remember to re-apply by feel each time.
+#
+# validation.yaml holds what Python can mechanically reject.
+# This file holds what only judgment/authoring discipline produces -
+# a rule belongs here only if Python genuinely cannot check it.
+
+lesson:
+
+  vocabulary_extraction:
+    order: strict
+    steps:
+      - Before drafting Terms or Objects/methods, collect every code
+        span this lesson will show anywhere - New Code, isolated lab
+        code, any real signature quoted inside an Implementation
+        bullet. A token appearing only inside a quoted signature still
+        counts.
+      - Tokenize each span into its distinct pieces - keyword,
+        annotation, operator, type name, method name, named constant.
+      - Give every token a slot before writing a single word of prose -
+        a Terms entry (keyword/annotation/operator/reappearing
+        language concept) or an Objects/methods entry (real class,
+        interface, method) - decided by category, never by which
+        section "feels right."
+      - Once the Header is assembled this way it is closed vocabulary -
+        no later section may introduce a technical word with no slot.
+        If a sentence in Mechanical Walkthrough/CS Lens/SE Lens/Connect
+        the Pieces/Commands needs a word with no slot, that is the
+        signal a token was missed - stop, add the slot, then finish
+        the sentence.
+
+  repetition_rule:
+    applies_to: every construct, new or reappearing
+    instruction: >
+      Every concept, construct, method, or term gets full, real
+      treatment at every single use - first appearance or the
+      fiftieth. A hard concept (design pattern, SE principle, CS idea,
+      named architectural decision) gets its real, full explanation -
+      what it is, why it exists, what it does - written out again, by
+      name, every time. A basic already-taught construct gets the
+      identical treatment. Never a brief reminder, never a citation
+      substituting for explanation.
+    forbidden:
+      - Citing "Lesson N" (this curriculum or any other) as a
+        substitute for explaining a concept inline, even with a full
+        explanation following it - naming the lesson number is itself
+        the violation.
+      - "Already covered elsewhere" or "already explained earlier in
+        this curriculum" language anywhere except a Header's own
+        forward-looking pointer fields."
+    permitted_lesson_number_locations:
+      - "Header: what you need to know first (concepts only preferred; see project override)"
+      - "Closing: next lesson pointer"
+
+  concept_extraction:
+    instruction: >
+      Recursively analyze the real code/material being added to
+      identify every new teachable concept - any language feature,
+      library API, framework feature, construct, design pattern, SE
+      principle, CS idea, architectural decision, tooling concept, or
+      project-specific abstraction not already introduced earlier in
+      THIS lesson (per-lesson self-containment; see project override
+      on cross-lesson citation).
+    split_rule: >
+      If a piece of code introduces more than one new concept, split
+      at the seam into separate Concept Units. The goal is the
+      smallest meaningful teaching sequence, not the smallest syntax
+      tree.
+    stopping_rule: >
+      Continue splitting until each Concept Unit introduces exactly
+      one new concept, then stop. Do not decompose into punctuation or
+      basic syntax already taught, unless that exact token is itself
+      the concept being taught. Test: "has this exact IDEA - not this
+      exact character - been taught before?"
+
+  concept_isolation:
+    instruction: >
+      The first appearance of every new concept in a Concept Unit uses
+      throwaway code, never production/rebuild code, before it's used
+      for real. Applies to every construct, not just unfamiliar-feeling
+      ones - a construct with a direct equivalent in something already
+      taught still gets its own lab; the idea may be familiar, the
+      specific syntax/behavior is not.
+    throwaway_code_requirements:
+      - Demonstrates only the one new concept, minimum surrounding code.
+      - Actually executed per verification.necessity (validation.yaml),
+        real output shown, or the narrow prediction exemption stated
+        and marked as such.
+      - States what the output PROVES about the concept, not just what
+        the code does.
+      - Explicitly marked discarded - stated plainly it will not appear
+        in the real/rebuild project again.
+    escalating_input_rule: >
+      When the real project input this construct will face is
+      genuinely complex, don't jump straight from a minimal lab to
+      that complexity - run the real construct against a short
+      escalating sequence of tiny inputs first, each changing exactly
+      one thing.
+
+unit:
+
+  problem:
+    instruction: >
+      State the problem in prose, no code yet - what are we trying to
+      solve, right now, specifically?
+
+  socratic:
+    instruction: >
+      After stating the problem, before revealing the concept, ask 2-4
+      real questions putting the reader in the position of trying to
+      solve it themselves first.
+    rules:
+      - Answerable using only what THIS lesson has already established -
+        never demanding syntax/an API the reader hasn't seen; that's
+        trivia, not Socratic.
+      - Explicitly invite pausing and attempting something concrete -
+        a guess, pseudocode, a predicted output - before reading on.
+    good_shapes:
+      - "Given what X already does, what would you try here first?"
+      - "What happens if this step is just skipped?"
+      - "Look at the name Y - what does it suggest this does, before you're told?"
+
+  project_change:
+    instruction: >
+      Before showing real code, state exactly how it lands in the
+      actual project - a delta against the previous unit's/lesson's
+      end state, never a full snapshot.
+    required_fields:
+      reference_source: >
+        Real file + line range, quoted verbatim, read this session -
+        or an explicit "No reference counterpart - because ___." This
+        field comes first; nothing below it can be trusted without it.
+      files_affected: Exact path(s), created/modified/deleted.
+      change_type: add | replace | remove | refactor | configure | none
+      location: Named by what's already there, not a guess a reader must make.
+      dependencies: Anything required that isn't already present.
+    skip_rule: >
+      Skip only fields genuinely inapplicable (a brand-new file has no
+      "location" to name within). Never skip reference_source silently
+      even when the honest answer is none.
+
+  new_code:
+    instruction: >
+      The smallest resulting fragment after concept_extraction - not a
+      whole function/file. Written as something to actually type, not
+      just read.
+
+  updated_project:
+    instruction: >
+      Return immediately, before any explanation - show the smallest
+      enclosing structure that already existed, new piece placed
+      inside, marked. Say briefly what the structure now does as a
+      whole (orientation, then meaning - not just a marker with no
+      sentence).
+    never:
+      - Eliding any part of the shown structure ("{ ... }", "// unchanged",
+        any placeholder) - even code just shown moments earlier, even
+        code identical to an earlier lesson.
+    when_new_since_a_prior_step_in_this_lesson: >
+      If any part of what's shown already appeared in an earlier step
+      of the SAME lesson (New Code, or an earlier Updated Project in
+      the same or an earlier unit), every line new since that step
+      must carry a real marker - never left for prose alone to
+      describe. (Mechanically checked in validation.yaml.)
+    skip_condition: >
+      Skip this step only when New Code IS the whole new structure with
+      nothing surrounding it yet (a brand-new file/freestanding
+      function) - Project Change already covers that case.
+
+  mechanical_walkthrough:
+    instruction: >
+      Before writing a word of prose, literally enumerate every
+      distinct syntactic element in New Code, in order - every method
+      call, property access, operator, literal. A fluent/chained call
+      sequence is every one of those calls, not one block waved
+      through as a unit.
+    per_item_requirements:
+      - Explain, don't just describe - the reasoning (why shaped this
+        way, what breaks without it, what it enables), not a flat
+        account of what it looks like/does.
+      - Real vocabulary, not paraphrase - the item's real declaring
+        type/signature stays in the sentence; effect-only language
+        ("this pre-fills the field") without the mechanism fails this.
+      - When a concept needs more than a clause, take the room (a
+        longer paragraph, an extra Concept Unit, or a whole extra
+        lesson) rather than compressing it to fit one bullet.
+      - One method/object/function explanation per bullet, leading
+        with its name - never folded as a clause into prose about
+        something else, even when mentioned only in passing.
+    objects_and_methods_shape_rule: >
+      Show the real declared shape (verified against real source/docs
+      this session) when either holds: (i) the lesson calls more than
+      one related member of the same external type, or (ii) a value
+      passed/returned is a compound type. Skip only when a single
+      simple method with one plain input/output already fully explains
+      itself in prose.
+    hidden_behavior_rule: >
+      A claim about hidden/invisible behavior ("the compiler generated
+      it," "this happens automatically") needs the same proof as
+      anything else - if a real tool can show it, show that output;
+      a confident sentence is not a substitute.
+
+  execution_trace:
+    when: loop, recursion, or state carried across steps - OR a
+      sequence of calls where the point is timing/control-flow order.
+    value_trace_shape: >
+      Fenced "Iteration N: values" - concrete real values AND the
+      reasoning for each (which condition/branch/argument produced it),
+      only while lines stay terse and tabulate-able. The moment
+      explaining "why" pushes a line into a real sentence, switch to
+      the timing shape below even though the data is still values.
+    timing_trace_shape: >
+      Unfenced numbered list, one real statement (as an inline code
+      span) per step, plus prose on what happens and, where it's the
+      crux, why a reader would expect otherwise. Never wrap this shape
+      in a code fence - it's prose that references code, not code.
+
+  cs_lens:
+    instruction: >
+      Name the computational concept, if any. For a hard concept
+      specifically, name SEVERAL unrelated real-world recurrences, not
+      one - one example teaches "this has a use"; several teach "this
+      is a pattern you'll keep noticing."
+
+  se_lens:
+    instruction: >
+      Name the design principle. State the real alternative NOT chosen
+      and why - a real tradeoff, not a vocabulary definition. State the
+      honest maintenance/failure cost, including debt the project is
+      currently carrying, if any.
+
+  commands:
+    instruction: >
+      Every terminal command needed to make this unit real: program,
+      every flag/argument's meaning, what success output looks like.
+    rule: >
+      The real, concrete, actually-runnable command - a real file
+      path, a real flag value - never a placeholder like <path> left
+      for the reader to guess how to fill in. If more than one command
+      runs, state the real order and whether they run
+      separately/simultaneously.
+
+  verification:
+    instruction: >
+      Run it, show the real output - unless the narrow prediction
+      exemption applies (see validation.yaml's verification rules),
+      in which case state the predicted output/shape directly, marked
+      as a prediction, with why it's confidently predictable.
+
+  connection:
+    instruction: >
+      One sentence connecting this unit to what came immediately
+      before it.
+
+closing:
+
+  connect_the_pieces:
+    instruction: >
+      A full trace - one concrete value or action moving through every
+      unit built in this lesson, start to finish.
+
+  next_lesson:
+    instruction: >
+      State what the next lesson builds on top of this one - no lesson
+      number required; a real description of the next real thing.
+
+project_overrides:
+  # This project's own decisions, layered on top of the generic rules
+  # above - kept here, in one place, rather than re-litigated per lesson.
+  - "What you need to know first" states concepts only, never a lesson
+    number/pointer - a lesson is never itself the dependency, only its
+    content is, and content gets fully re-taught inline regardless per
+    repetition_rule.
+  - "elsewhere in this curriculum" (or equivalent hand-waves) is
+    forbidden in Shape bullets, Commands, or anywhere else - if
+    something reappears, restate its real content in full, in place.
+  - Every code block states its real file and new-vs-existing status in
+    its own immediately adjacent prose, not once, disconnected, earlier
+    in the unit.
+  - rebuild/ holds only lesson code - nothing added there that wasn't
+    taught in a lesson first (mechanically checked by
+    verify_rebuild_taught.py, not this file).
+  - Every inline code reference in prose text fields (a file name, a
+    function/method/class name, a literal value) is wrapped in
+    backticks - "pdm.py" and "ast.parse" in running prose read as plain
+    English words, not real identifiers; "`pdm.py`" and "`ast.parse`"
+    read as real code, which is what they are. This isn't mechanically
+    checked (a compiler can't tell an intentional plain-English mention
+    from a missed one) - it's an authoring habit to hold consistently,
+    found missing across an early YAML-authored lesson where hand-
+    written earlier lessons had it right by feel.
+  - Don't restate a code block's own file path in an "intro" prose field
+    when the compiler already renders a separate `**File:**` line for
+    that same block (updated_project) - say what changed since the
+    prior step instead of repeating the path a second time.
