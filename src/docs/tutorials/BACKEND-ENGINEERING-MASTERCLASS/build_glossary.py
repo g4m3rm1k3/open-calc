@@ -88,7 +88,10 @@ def parse_entries(section_text: str, is_objects_section: bool):
 
 
 def main():
-    lesson_files = sorted(CURRICULUM_DIR.glob("LESSON-*.md"))
+    lesson_files = sorted(
+        p for p in CURRICULUM_DIR.rglob("LESSON-*.md")
+        if not any(part.upper().startswith("ARCHIVE") for part in p.relative_to(CURRICULUM_DIR).parts)
+    )
     if not lesson_files:
         print("No LESSON-*.md files found in", CURRICULUM_DIR)
         return
@@ -136,11 +139,25 @@ def main():
     def words(name: str):
         return set(re.findall(r"[a-zA-Z]+", name.lower())) - STOPWORDS
 
+    def is_expected_parent_child(name_a: str, name_b: str) -> bool:
+        """'Socket' vs 'socket.accept', or 'socket.accept' vs
+        'socket.bind', aren't real collisions to review - they're
+        methods named after (or siblings of) the real object they
+        belong to, on purpose. Skip this pattern generally instead of
+        hardcoding every domain word (flask, http, socket, ...) into
+        STOPWORDS by hand as each new topic gets taught."""
+        a, b = name_a.lower().strip("`"), name_b.lower().strip("`")
+        if b.startswith(a + ".") or a.startswith(b + "."):
+            return True
+        if "." in a and "." in b and a.split(".")[0] == b.split(".")[0]:
+            return True
+        return False
+
     names = sorted(glossary.keys(), key=str.lower)
     collisions = []
     for i, name_a in enumerate(names):
         for name_b in names[i + 1 :]:
-            if name_a == name_b:
+            if name_a == name_b or is_expected_parent_child(name_a, name_b):
                 continue
             shared = words(name_a) & words(name_b)
             if shared:
