@@ -8,12 +8,15 @@ path_note: >
 what_you_will_build: >
   A real, small tool, continuing the same `ast`-based investigation
   technique already used to find routes, this time extracting a real
-  file's actual module-level import graph mechanically - then a return
-  to this real backend's own `app/__init__.py`, which turns out to
-  contain a real, genuine circular dependency between the package that
-  holds the shared database object and the package that holds the
-  routes needing it, already resolved by deliberately deferring one
-  real import until the moment it's actually needed.
+  file's own top-level import declarations mechanically - the raw
+  material an actual project-wide import graph would be built from,
+  not that graph itself - then a return to this real backend's own
+  `app/__init__.py`, which turns out to contain a real cycle in that
+  graph between the package that holds the shared database object and
+  the package that holds the routes needing it. Whether a real cycle
+  like this actually fails depends on initialization order, not on the
+  cycle merely existing - and this exact one is deliberately ordered so
+  it doesn't.
 
 what_you_need_to_know_first: >
   Reading a real, existing file as evidence; a real, small tool built
@@ -33,31 +36,42 @@ terms:
       folder structure alone.
   - name: "Package boundary"
     definition: >
-      The real line between what one package considers its own
-      business and everything else, crossed every time code in one
-      package imports from another. It exists because a package that
-      imports freely in every direction, with no real discipline about
-      which direction dependencies actually flow, loses the entire
-      point of splitting a project into packages in the first place.
+      The real organizational unit a Python package forms - a real
+      directory carrying an `__init__.py`, grouping related real
+      modules under one importable namespace (`app.routes`,
+      `app.models`) and exposing them to the rest of a project only
+      through real import statements crossing that boundary. It exists
+      as its own concept because Python enforces the namespace itself
+      (you import `app.routes`, not any arbitrary file on disk) but
+      enforces nothing about which *direction* real imports should
+      flow across it - two packages can import each other, and Python
+      permits that just as readily as a clean, one-way dependency.
   - name: "Circular dependency"
     definition: >
-      Two or more real modules or packages that need something from
-      each other, forming a real cycle in the import graph rather than
-      a straight line. It exists as its own concept because Python
-      resolves an ordinary, straight-line import predictably, but a
-      genuine cycle can succeed or fail depending on the real, exact
-      order those modules happen to load in - timing-dependent
-      behavior, not a fixed rule.
+      A real cycle in the import graph - two or more real modules or
+      packages each needing something from the other, rather than a
+      straight line. A circular dependency is a fact about the real
+      *shape* of the graph, not a prediction about whether it fails:
+      whether a genuine cycle actually raises a real error depends on
+      the real, exact order those modules happen to initialize in, not
+      on the mere presence of the cycle. A circular dependency is a
+      graph property; a circular-import failure is an initialization-
+      order problem - the two are related, never the same claim.
   - name: "Public/private module interface"
     definition: >
-      A real convention - Python's leading underscore, `_name` - used
-      to mark a module-level name as not meant to be imported or relied
-      on by other files, distinguished from a name with no leading
-      underscore, meant to be part of what a module actually offers the
-      rest of the project. It exists because a module with every name
-      equally importable gives every other file equal license to depend
-      on its internals, making a later change to those internals a real
-      risk to code that was never supposed to be touching them.
+      A Python naming convention - a leading underscore, `_name` -
+      indicating a module-level name is intended for internal use
+      only, distinguished from a name with no leading underscore,
+      meant to be part of what a module actually offers the rest of
+      the project. Python itself enforces nothing here: nothing stops
+      another real file from importing a leading-underscore name
+      anyway, and nothing about the language treats it differently at
+      runtime. It exists as a convention, not access control, because a
+      module with every name equally importable gives every other file
+      equal *license* to depend on its internals, even though the
+      language provides no actual barrier - making a later change to
+      those internals a real risk to code that was never supposed to
+      be touching them.
 
 objects_and_methods:
   - name: "ast.Import"
@@ -123,16 +137,17 @@ objects_and_methods:
     shape: "Takes a list of real command-line argument strings in; returns one `CompletedProcess` object whose `.stdout` and `.stderr` are plain strings (because `text=True`) holding everything that real child process actually printed - not a live stream, the whole real output, captured only once the process has already exited."
 
 concept_units:
-  - title: "Extracting a Real File's Import Graph, Mechanically"
+  - title: "Extracting a Real File's Top-Level Import Declarations, Mechanically"
     problem: >
       A real file's actual dependencies are declared at its own top,
       but a large real file can also carry imports scattered elsewhere
       inside it - already seen once, when a local `from datetime import
       datetime` turned up inside a function body rather than at the
       top of the file. A small, real tool, continuing the same `ast`
-      technique already used to find routes, can extract exactly the
-      module-level import graph mechanically, rather than reading a
-      long real file by eye.
+      technique already used to find routes, can extract exactly this
+      one file's own top-level import declarations mechanically -
+      the raw material an actual import graph is built from, not a
+      full graph itself - rather than reading a long real file by eye.
     socratic_prompt:
       - "Given that `import uuid` and `from app import db` both appear
         in the same real file, what real, structural difference does
@@ -153,8 +168,10 @@ concept_units:
         "what does this file actually depend on," this unit builds a
         small, real tool that answers the same question by parsing the
         file's actual source and reading only its own top-level
-        statements - the real, declared import graph, not every import
-        anywhere in the file.
+        statements - this file's own real, declared import
+        declarations, not every import anywhere in the file, and not
+        yet a resolved, project-wide graph (that would need following
+        each of these into the actual file it names).
       files_affected:
         - path: "verification/phase-01/lab_find_imports.py"
           status: new
@@ -228,15 +245,23 @@ concept_units:
       dependencies, and a spreadsheet recomputing cells in the real
       order their formulas actually depend on each other.
     se_lens: >
-      The real, honest limitation of choosing `tree.body` over
-      `ast.walk`: this tool would never notice a real import placed
-      deliberately inside a function body, on purpose, rather than one
-      left there by accident - and there's a real, deliberate one
-      waiting in this exact backend's own `app/__init__.py`, investigated
-      next. A tool that only reads a file's own declared top-level
-      imports can tell you what a file depends on at load time; it
-      can't tell you whether a file is hiding a deferred import for a
-      real reason.
+      This tool's own real output is top-level import declarations, not
+      a resolved project import graph, and the gap between those two is
+      worth being honest about. Choosing `tree.body` over `ast.walk`
+      means it would never notice a real import placed deliberately
+      inside a function body, on purpose, rather than one left there by
+      accident - and there's a real, deliberate one waiting in this
+      exact backend's own `app/__init__.py`, investigated next. Beyond
+      that, it wouldn't handle a real relative import (`from .foo
+      import bar` - `node.level`, a real field this tool never reads),
+      it wouldn't tell a real project module apart from a real
+      third-party package (`app.models.part` and `flask` print
+      identically here, though only one of them is this project's own
+      code), and it wouldn't follow any of these names to the actual
+      real file each one points at - the one further step an actual,
+      resolved import graph would need. What this tool actually gives:
+      the raw declarations a real graph could be built from, for one
+      file, not the graph itself.
     commands:
       - command: "python verification/phase-01/lab_find_imports.py"
         explanation: "Run from the manufacturing-platform repository root, so the relative path to backend/app/routes/operation_manager.py resolves correctly."
@@ -476,15 +501,18 @@ concept_units:
             something that imports back from `app`.
         - element: "from app.routes import register_routes"
           explanation: >
-            The real line that closes this backend's own circular
-            dependency. `app.routes` (and, inside it,
-            `operation_manager.py`) does `from app import db` - which
-            only works because, by the time this line actually runs
-            (inside a real call to `create_app()`), `db = SQLAlchemy()`
-            already ran, long before, the moment `app` was first
-            imported. Deferring this one import is what makes both real
-            packages able to depend on each other without either one
-            failing to find what it needs.
+            The real line that resolves the timing of this backend's
+            own circular dependency, without removing the dependency
+            itself - `app` still needs `routes`, `routes` still needs
+            `app`, a real cycle either way. `app.routes` (and, inside
+            it, `operation_manager.py`) does `from app import db` -
+            which only finds `db` there because, by the time this line
+            actually runs (inside a real call to `create_app()`), `db =
+            SQLAlchemy()` already ran, long before, the moment `app`
+            was first imported. Deferring this one import changes when
+            each side of the real cycle resolves, so neither side ever
+            reaches for something not there yet - it doesn't make the
+            two real packages stop depending on each other.
         - element: "register_routes(app); app.register_blueprint(bootstrap_bp)"
           explanation: >
             Only reachable after the import above has already
@@ -528,37 +556,55 @@ concept_units:
       database connection pool that opens its first real connection on
       first use rather than at process startup.
     se_lens: >
-      The real alternative not chosen, and why: importing
+      A circular dependency is a graph property; a circular-import
+      failure is an initialization-order problem - the two are not the
+      same claim, and this real backend is proof: `app` and
+      `app.routes` genuinely depend on each other both ways (`routes`
+      needs `db` from `app`; `app`'s own `create_app` needs
+      `register_routes` from `routes`) - a real cycle, still there,
+      not removed by anything this unit found. What the deferred import
+      actually changes is not whether the cycle exists, but *when* each
+      side of it is resolved: by the time `create_app`'s own deferred
+      import runs, `db` already exists, so the reverse edge never finds
+      anything missing. That's the real alternative not chosen - import
       `app.routes` at the very top of `app/__init__.py`, the same way
       `db` is created at the top - exactly the shape the `broken/`
-      reproduction above actually ran, and actually failed. Its real,
-      captured error - `ImportError: cannot import name 'db' from 'pkg'
-      (consider renaming '...__init__.py' if it has the same name as a
-      library you intended to import)` - was worth actually running
-      rather than assuming: an earlier guess at this exact wording,
-      made from memory before this unit's own lab existed, named a
-      real, genuine Python `ImportError` correctly but got its precise
-      text wrong - the same real failure, run through this same real
+      reproduction above actually ran, and actually failed, because
+      `import`/`from ... import` are executable statements, run in
+      real, top-to-bottom order like any other - not declarations
+      resolved all at once. Its real, captured error - `ImportError:
+      cannot import name 'db' from 'pkg' (consider renaming
+      '...__init__.py' if it has the same name as a library you
+      intended to import)` - was worth actually running rather than
+      assuming: an earlier guess at this exact wording, made from
+      memory before this unit's own lab existed, named a real, genuine
+      Python `ImportError` correctly but got its precise text wrong -
+      the same real failure, run through this same real
       `subprocess.run` command, produces a different exact message than
       it does through a plain `sys.path` import, a real reminder that
       even a message this well-known deserves running, not reciting.
-      Given `operation_manager.py` does `from app import db` at its own
-      top
-      level, and `db` is defined at line 158 - after where a top-level
-      routes import would have to sit to run before `create_app` is
-      even defined - the same real failure would hit this actual
-      backend, not only the small reproduction. Deferring the routes
-      import into `create_app`'s own body - a real, deliberate design
-      choice, not an accident - is the actual real fix already in
-      place, and the `fixed/` reproduction's own real output confirms
-      it actually works, not just that it should. It also draws a real
-      package
-      boundary: `app` owns `db`'s creation and must finish that first;
-      `routes` depends on `app`, never the reverse, and the deferred
-      import is what keeps that direction genuinely one-way instead of
-      circular. The same real file also shows the other concept this
-      lesson names: `_build_export_data`, already investigated, keeps
-      its leading underscore specifically because nothing outside
+      The captured message's own absolute path is specific to the real
+      machine this was run on, and would read differently - a different
+      path, on some platforms a different separator - on anyone else's;
+      the part that doesn't change is the `ImportError` itself and what
+      it names: `db`, not found in `pkg`, while `pkg` is still mid-import.
+      The underlying mechanism, regardless of exact wording: `pkg`
+      exists as a real, partially-built module object the moment its
+      own `__init__.py` starts running, but `db` isn't one of its real
+      attributes yet until that file's own execution actually reaches
+      the line that creates it - a real name lookup against a real,
+      still-incomplete object, not a language limitation. This
+      backend's real fix - deferring the routes import into
+      `create_app`'s own body - makes the code work, and the `fixed/`
+      reproduction's own real output confirms it actually works, not
+      just that it should. But "works at runtime" and "is
+      architecturally ideal" are different real claims: the two
+      packages are still coupled in both directions, and only the real,
+      careful ordering of module-level code versus deferred,
+      call-time code is what keeps that real cycle from failing. The
+      same real file also shows the other concept this lesson names:
+      `_build_export_data`, already investigated, keeps its leading
+      underscore specifically because nothing outside
       `operation_manager.py`'s own module is meant to import it
       directly - unlike `generate_nc_file`, exposed as a real route,
       `_build_export_data` is this module's own private interface, by
@@ -584,17 +630,19 @@ concept_units:
       output_file: "verification/phase-01/lab_circular_import/run_circular_import_demo_output.txt"
     connection_to_previous: >
       The unit above built a tool that reads a file's own declared,
-      top-level import graph; this unit found a real import placed
-      deliberately outside that graph's usual shape - deferred, on
-      purpose, inside a function body - and read closely enough to see
-      exactly why: two real packages that need each other, made to work
-      by controlling when, not just whether, each import actually runs.
+      top-level import statements; this unit found a real import placed
+      deliberately outside that usual shape - deferred, on purpose,
+      inside a function body - and read closely enough to see exactly
+      why: two real packages that need each other, still coupled both
+      ways, made to work by controlling when, not whether, each import
+      actually runs.
 
 closing:
   connect_the_pieces: >
     One small, real tool extracted `operation_manager.py`'s own
-    top-level import graph, including its real dependency on `app` for
-    `db` - then `app/__init__.py` itself, read closely enough to show
+    top-level import declarations, including its real dependency on
+    `app` for `db` - then `app/__init__.py` itself, read closely
+    enough to show
     that same dependency runs in the other direction too: `app` needs
     `routes`, `routes` needs `app`. `db = SQLAlchemy()` at module level,
     before `create_app` is even defined, and two real imports deferred

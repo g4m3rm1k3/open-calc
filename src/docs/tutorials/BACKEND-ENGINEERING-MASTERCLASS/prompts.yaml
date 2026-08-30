@@ -57,6 +57,20 @@ lesson:
         the Pieces/Commands needs a word with no slot, that is the
         signal a token was missed - stop, add the slot, then finish
         the sentence.
+    prose_jargon_note: >
+      The mechanical compiler check only tokenizes real CODE spans
+      against Terms/Objects - a CS/SE-jargon word introduced only in
+      prose (a Lens, a walkthrough explanation), never appearing as a
+      literal code token, gets no mechanical check at all. Lesson 1.4's
+      own list-comprehension unit called the construct "declarative" in
+      its CS Lens without ever giving that word its own Terms slot or
+      explaining what it actually commits the reader to - caught only
+      by a human re-read, never the compiler. Before reaching for a
+      technical term that isn't already a Terms/Objects entry, either
+      give it one or don't use the word - describe the mechanism in
+      plain terms instead (what a list comprehension actually does:
+      iterate, filter, produce, collect) rather than reaching for a
+      paradigm label the lesson never actually defines.
 
   repetition_rule:
     applies_to: every construct, new or reappearing
@@ -113,6 +127,47 @@ lesson:
     permitted_lesson_number_locations:
       - "Header: what you need to know first (concepts only preferred; see project override)"
       - "Closing: next lesson pointer"
+
+  verified_claim_vs_design_rationale:
+    problem: >
+      Lesson 1.4's own Tuples unit stated that `dict.items()` and
+      `enumerate()` hand back tuples "because" tuples are immutable and
+      therefore "can be trusted" - phrased as the real, structural
+      reason those APIs are shaped that way. What this lesson actually
+      verified was only that they yield tuples; why CPython's own
+      designers chose that representation is a plausible design
+      rationale, never run or proven, and it was stated with the exact
+      same confidence as the verified fact sitting right next to it.
+    rule: >
+      A Lens (or any prose field) may name a design rationale for why a
+      construct is shaped the way it is, but must not present that
+      rationale with the same certainty as something this lesson
+      actually ran and observed. Verified: "X yields a tuple - this
+      lesson's own execution confirms it." Design rationale (weaker,
+      and must read as such): "one reason a tuple is a natural fit
+      here is ___." Never "the real, structural reason X happens is
+      ___" for something that is design opinion, not verified
+      execution.
+
+  implementation_detail_vs_language_guarantee:
+    problem: >
+      Lesson 1.4's own Sets unit stated flatly that "a set is the same
+      real hash table structure a dict uses internally" - true of
+      CPython, the interpreter this curriculum actually runs and
+      verifies against every single time, but not a guarantee the
+      Python language itself makes about every implementation.
+    rule: >
+      A claim about HOW a built-in type is actually implemented
+      internally (a hash table, a specific data structure) gets
+      attributed to CPython by name, not stated as a bare "Python"
+      language fact - unless the behavior is one the language itself
+      documents as guaranteed (average O(1) dict/set membership, for
+      instance) as opposed to merely true of the one real
+      implementation this project happens to verify against every
+      time. This curriculum verifies real, running CPython constantly
+      - that's exactly why it's easy to blur "what I just watched
+      CPython do" with "what Python promises," and the two are
+      different claims.
 
   concept_extraction:
     instruction: >
@@ -403,6 +458,20 @@ unit:
       what happens when it runs. This is the same source-vs-behavioral
       distinction this curriculum's own CS/SE Lenses exist to teach -
       the exemption_reason should model it, not contradict it.
+    repeated_run_claims: >
+      If a Lens or Mechanical Walkthrough claims something is true
+      ACROSS repeated executions specifically ("run to run," "each time
+      this runs," "isn't the same from one run to the next") - not just
+      true of a single run - the verification block must actually show
+      more than one real run's output proving it, the same way any
+      other behavioral claim needs the code/output behind it visible on
+      the page. Lesson 1.4's own Sets unit claimed set iteration order
+      "isn't even the same from one run to the next" - true, and
+      actually checked by running the lab three times during authoring
+      - but the lesson's own verification block only ever showed one
+      run, leaving the claim unproven to an actual reader of the
+      finished page. Being run-this-session isn't enough on its own
+      here; what's shown has to match what's claimed.
 
   connection:
     instruction: >

@@ -65,7 +65,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
 
 ## Circular dependency
-- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - Two or more real modules or packages that need something from each other, forming a real cycle in the import graph rather than a straight line. It exists as its own concept because Python resolves an ordinary, straight-line import predictably, but a genuine cycle can succeed or fail depending on the real, exact order those modules happen to load in - timing-dependent behavior, not a fixed rule.
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - A real cycle in the import graph - two or more real modules or packages each needing something from the other, rather than a straight line. A circular dependency is a fact about the real *shape* of the graph, not a prediction about whether it fails: whether a genuine cycle actually raises a real error depends on the real, exact order those modules happen to initialize in, not on the mere presence of the cycle. A circular dependency is a graph property; a circular-import failure is an initialization- order problem - the two are related, never the same claim.
 
 ## Client
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that initiates a request. It doesn't have
@@ -90,6 +90,9 @@ re-run the script after any lesson changes instead.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
+
+## dict.get
+- **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - A real built-in `dict` method that reads a key's value without raising if the key is absent.
 
 ## Domain exception
 - **Term** in `LESSON-1.2-EXCEPTIONS` - An exception type representing a real, meaningful business condition the code recognizes and is designed to detect - the code itself is working correctly; it's reporting a real fact about the specific request it was given, like "no row exists for this id." It exists as its own category because a domain exception usually deserves a specific, informative response - the caller asked for something the domain doesn't allow or doesn't have, not something the system failed to do.
@@ -120,6 +123,9 @@ re-run the script after any lesson changes instead.
 
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
+
+## Hashable
+- **Term** in `LESSON-1.4-DATA-STRUCTURES` - A real property a value either has or doesn't: whether Python can compute a stable hash for it, usable as a dict key or a set member. Every immutable built-in value (a string, an int, a tuple whose own elements are all themselves hashable) is hashable; every mutable built-in value (a list, a dict, a set itself) is not. A tuple is the one case where immutability alone doesn't automatically guarantee it: `(1, 2, [3, 4])` is itself immutable (nothing can reassign its own elements) but still isn't hashable, since hashing it would require hashing its own contained list too, and a list can't be hashed at all - confirmed this session: `hash((1, 2, [3, 4]))` raises the identical real `TypeError: unhashable type: 'list'` this lesson's own Sets unit already produces. It exists as its own concept because a dict/set's own real lookup speed depends on that hash staying valid for as long as the value is stored - a value that could change after being stored would silently break that lookup, so Python refuses mutable values as keys/members outright rather than risk it.
 
 ## Header
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (HTTP) — a `Name: value` line following the request or
@@ -154,11 +160,14 @@ re-run the script after any lesson changes instead.
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
 
+## Mutable / immutable
+- **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
+
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
 
 ## Package boundary
-- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real line between what one package considers its own business and everything else, crossed every time code in one package imports from another. It exists because a package that imports freely in every direction, with no real discipline about which direction dependencies actually flow, loses the entire point of splitting a project into packages in the first place.
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
 
 ## Parameter
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A name declared in a function's own definition, naming a slot the function's body refers to - `cam_file_id` and `commit_sha` in `def download_file(cam_file_id, commit_sha=None):`, not any specific value yet. It exists as its own concept, separate from the value eventually supplied, so a function's real contract - what it needs to do its job - can be stated once, independent of any one particular call.
@@ -182,7 +191,7 @@ re-run the script after any lesson changes instead.
 - **Term** in `LESSON-1.2-EXCEPTIONS` - What a raised exception does by default, with nothing extra required: it exits the function that raised it immediately, then exits whatever called that function, then whatever called that, one real stack frame at a time, until some code actually catches it or there's no caller left at all. It exists as its own concept because it's easy to assume an exception "goes" somewhere specific - it doesn't, until a real `except` block says otherwise; silence, not interception, is the default.
 
 ## Public/private module interface
-- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - A real convention - Python's leading underscore, `_name` - used to mark a module-level name as not meant to be imported or relied on by other files, distinguished from a name with no leading underscore, meant to be part of what a module actually offers the rest of the project. It exists because a module with every name equally importable gives every other file equal license to depend on its internals, making a later change to those internals a real risk to code that was never supposed to be touching them.
+- **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - A Python naming convention - a leading underscore, `_name` - indicating a module-level name is intended for internal use only, distinguished from a name with no leading underscore, meant to be part of what a module actually offers the rest of the project. Python itself enforces nothing here: nothing stops another real file from importing a leading-underscore name anyway, and nothing about the language treats it differently at runtime. It exists as a convention, not access control, because a module with every name equally importable gives every other file equal *license* to depend on its internals, even though the language provides no actual barrier - making a later change to those internals a real risk to code that was never supposed to be touching them.
 
 ## Pure function
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
@@ -217,6 +226,9 @@ re-run the script after any lesson changes instead.
 
 ## Server
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that waits for a request and responds to
+
+## set
+- **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in unordered collection type, holding only hashable values, each stored at most once.
 
 ## Side effect
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Any real, observable change a function makes to something outside its own local variables and its own return value - writing a real row to a real database, mutating an object passed in, printing to the console. It exists as its own term because two functions with identical parameters and identical return values can still behave completely differently once side effects are counted - one changes nothing outside itself, the other changes real, persistent state.
@@ -268,6 +280,9 @@ re-run the script after any lesson changes instead.
 
 ## Transport layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend responsible only for moving raw bytes between a client and a server — sockets, HTTP parsing — with no awareness of what those bytes mean to this specific application. It exists as its own named boundary because the exact same transport code works for a manufacturing app, a blog, or anything else; nothing about it is specific to what this application does.
+
+## tuple
+- **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in fixed-size, immutable sequence type.
 
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,

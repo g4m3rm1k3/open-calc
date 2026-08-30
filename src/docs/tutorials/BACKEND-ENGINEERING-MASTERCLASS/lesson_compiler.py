@@ -264,6 +264,38 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
             "not found in any name: " + ", ".join(sorted(unresolved))
         )
 
+    # Repeated-run claim heuristic: a Lens or walkthrough item asserting
+    # something is true ACROSS repeated executions ("run to run", "each
+    # time this runs") needs that repetition actually shown in
+    # Verification, not just asserted from what the author privately
+    # ran while authoring - see prompts.yaml's repeated_run_claims.
+    # There's no reliable mechanical way to confirm the verification
+    # block genuinely shows more than one run, so this only flags the
+    # phrase for human review - a warning, not a blocking error.
+    REPEATED_RUN_PATTERN = re.compile(
+        r"run.to.run|between runs|each (?:time (?:it|this) )?runs|"
+        r"repeated runs|from one run to (?:the )?next|"
+        r"every time (?:it|this) runs|varies between runs|"
+        r"not the same (?:each|every) time",
+        re.IGNORECASE,
+    )
+    for i, unit in enumerate(lesson.get("concept_units", [])):
+        title = unit.get("title", f"unit {i}")
+        flagged = any(
+            REPEATED_RUN_PATTERN.search(str(unit.get(field, "")))
+            for field in ("cs_lens", "se_lens")
+        ) or any(
+            REPEATED_RUN_PATTERN.search(str(item.get("explanation", "")))
+            for item in unit.get("mechanical_walkthrough", {}).get("items", [])
+        )
+        if flagged:
+            warnings.append(
+                f"concept_units[{i}] ({title}): prose claims behavior "
+                "across repeated runs (e.g. 'run to run') - confirm "
+                "verification.real_output actually shows more than one "
+                "real run proving it, not just one"
+            )
+
     return errors, warnings
 
 
