@@ -115,8 +115,8 @@ established yet in this curriculum.
   - *Depends on:* A path string, an explicit or default method list, and
     the function it decorates.
   - *Connects to:* Called by `health.py`'s own module-level code at
-    import time; consulted by Flask's real dispatcher on every incoming
-    request, to decide whether `health_check` is the function to run.
+    import time; consulted by Flask itself on every incoming request, to
+    decide whether `health_check` is the function to run.
   - *Shape:* The public entry point of Flask's routing system — the one
     line of code that turns "a function" into "an endpoint."
 
@@ -143,6 +143,78 @@ established yet in this curriculum.
   - *Shape:* The seam between "a Python value" and "a real, spec-shaped
     HTTP response" — this is what a route handler is expected to return.
 
+- **`Flask`**
+  - *What it is:* The class at the center of the framework — an instance
+    of it represents one real, running (or testable) web application.
+  - *Implementation:* `flask.Flask(import_name: str)` — constructed once,
+    normally inside a factory function.
+  - *Its use:* The isolated lab builds one directly (`Flask(__name__)`)
+    to have something real to register the lab blueprint into; the real
+    app builds one indirectly, inside `create_app` (below).
+  - *Type:* A class.
+  - *Responsibility:* Hold the app's whole configuration and its entire
+    real routing table — every blueprint and every directly-registered
+    route, combined into one structure a real request can be matched
+    against.
+  - *Depends on:* An `import_name`, conventionally `__name__`, so Flask
+    can locate the application's own files.
+  - *Connects to:* Blueprints (via `register_blueprint`, next entry)
+    attach their routes to it; `app.test_client()` builds a testing
+    handle onto it; a real deployment runs it directly.
+  - *Shape:* The outermost public seam of the whole framework — every
+    other Flask object shown in this lesson exists to be attached to, or
+    called through, one of these.
+
+- **`Flask.register_blueprint`**
+  - *What it is:* An instance method that copies a `Blueprint`'s own
+    recorded routes into a real `Flask` app's routing table.
+  - *Implementation:* `register_blueprint(blueprint: Blueprint, url_prefix:
+    str = None)` — called in this lesson as
+    `app.register_blueprint(health_bp, url_prefix='/api')`.
+  - *Its use:* This is the one call that turns `health_bp` (built in
+    `health.py`, entirely separate from any running app) into something
+    a real, running app actually answers requests through.
+  - *Type:* An instance method on `Flask`.
+  - *Responsibility:* For every route the given blueprint recorded,
+    register the same method-and-path mapping on the real app, with the
+    given `url_prefix` joined onto the front of each path.
+  - *Depends on:* A `Blueprint` object that already has its own routes
+    recorded (via `@health_bp.route(...)`, already explained above).
+  - *Connects to:* Called once, inside `create_app` (below), for every
+    blueprint the real app has; after this call returns, the real app's
+    routing table includes everything the blueprint recorded.
+  - *Shape:* The seam between "a blueprint, defined in its own file" and
+    "a real app that actually answers requests" — this is where the two
+    become one.
+
+- **`create_app`**
+  - *What it is:* The real project's own application factory — an
+    ordinary Python function, not something Flask provides, that builds
+    and fully configures one real `Flask` app and returns it.
+  - *Implementation:* `create_app(config_name: str = None) -> Flask`,
+    defined at `backend/app/__init__.py:172`.
+  - *Its use:* This lesson's test calls `create_app("testing")` to get a
+    real app instance — the exact same kind a real deployment would run,
+    just configured with an in-memory database instead of the real,
+    persistent one.
+  - *Type:* A free function (module-level, not a method on any class).
+  - *Responsibility:* Build one `Flask` instance, load the right
+    configuration for the given name (`backend/config.py`'s `config`
+    dict), register every real blueprint (including `health_bp`), and
+    return the fully-assembled app — one function responsible for
+    everything that has to happen before the app can answer a single
+    real request.
+  - *Depends on:* A config name (`"testing"`, `"development"`,
+    `"production"`, or `None` for the default), used to select which
+    configuration class from `backend/config.py` to apply.
+  - *Connects to:* Called by this lesson's test; also called by
+    whatever real entry point starts the actual deployed server. Both
+    paths run through the exact same function.
+  - *Shape:* The single, real starting point for the entire application
+    — everything else in this lesson (`health_bp`, its registration, the
+    running app the test calls into) exists because this one function
+    assembled it.
+
 - **`FlaskClient.get`** (from `app.test_client()`)
   - *What it is:* A method that simulates a real HTTP GET request
     against a Flask app, in-process, without opening an actual network
@@ -168,22 +240,51 @@ established yet in this curriculum.
     "test code" and "the real application code," deliberately left thin
     so a passing test says something true about the real app.
 
-- **`Response.get_json` / `Response.status_code`**
-  - *What it is:* `get_json()` is a method that parses a response body
-    back into a Python value; `status_code` is a plain integer attribute
-    holding the response's real HTTP status code.
-  - *Implementation:* `Response.get_json() -> dict | list | None`;
-    `Response.status_code: int`.
+- **`response.get_json()` / `response.status_code`**
+  - *What it is:* Two related members of the same real response object —
+    `get_json()` parses the response body back into a Python value;
+    `status_code` reads the response's real HTTP status code.
+  - *Implementation:* Both are inherited, not defined by Flask itself.
+    The real object `client.get(...)` returns is a
+    `werkzeug.test.WrapperTestResponse`, which is (in real inheritance
+    order) `TestResponse → flask.wrappers.Response →
+    werkzeug.wrappers.response.Response → werkzeug.sansio.response.Response`.
+    Their real declared shapes, fetched from the installed
+    `werkzeug` package this session:
+
+    ```python
+    # werkzeug/sansio/response.py
+    @property
+    def status_code(self) -> int:
+        """The HTTP status code as a number."""
+        return self._status_code
+
+    # werkzeug/wrappers/response.py
+    def get_json(self, force: bool = False, silent: bool = False) -> t.Any | None:
+        """Parse `data` as JSON. Useful during testing.
+
+        If the mimetype does not indicate JSON, this returns None.
+        """
+    ```
+
+    `status_code` is a real `@property` (an instance attribute computed
+    by a method, not stored directly) backed by `self._status_code`.
+    `get_json` takes two real optional arguments this lesson doesn't
+    use — `force` (parse as JSON even if the `Content-Type` header
+    doesn't say so) and `silent` (return `None` instead of raising on
+    malformed JSON) — both left at their defaults here because
+    `jsonify` (already covered above) always sets the correct
+    `Content-Type`, so neither override is needed.
   - *Its use:* This lesson's test reads both to state, precisely, what
     each real endpoint actually returned — not what its source code
     looks like it should return.
-  - *Type:* `get_json` is an instance method; `status_code` is a plain
-    instance attribute.
+  - *Type:* `get_json` is a real instance method; `status_code` is a
+    real instance property (not a plain stored attribute).
   - *Responsibility:* `get_json` decodes the response body's raw JSON
     text back into a native Python value for the test to compare against
     a real expected value; `status_code` exposes the numeric outcome the
     server actually sent.
-  - *Depends on:* A real `Response` object already returned by a call
+  - *Depends on:* A real response object already returned by a call
     such as `client.get(...)`.
   - *Connects to:* Both are read directly by this lesson's test
     assertions, immediately after `client.get(...)` returns.
@@ -225,9 +326,11 @@ key?
 
 ### The New Code
 
-Before looking at the real file, the underlying mechanism in isolation —
-the smallest version of "a function that answers a URL" that can
-actually be run:
+This first code block is a lab you type and run yourself, anywhere
+scratch (a new, temporary file of your own — it is not part of your
+real project and never will be). It exists only to isolate the
+mechanism, before you look at the real, already-existing health check
+sitting in your actual app:
 
 ```python
 from flask import Blueprint, Flask, jsonify
@@ -248,51 +351,55 @@ print("get_json():", response.get_json())
 print("content_type:", response.content_type)
 ```
 
-This is throwaway lab code — a `lab_bp` blueprint under a `/lab` prefix
-that will never appear in the real project again, built only to isolate
-the routing mechanism before looking at the real, already-existing
-health check.
-
 ### The Updated Project
 
-There's no project structure to return to for this lab — it's a
-complete, freestanding script with nothing surrounding it yet. Running
-it (see Verification, below) is what actually answers the Problem's
-question: Flask's own answer to "what's the dictionary key" is **method
-plus path together**, not path alone — which is exactly why
-`methods=["GET"]` appears explicitly in the decorator instead of being
-implied.
+This lab has no existing project file to fold into — it's a complete
+script, short enough to run start-to-finish on its own, with nothing
+else around it. Running it (see Verification, below) is what actually
+answers the Problem's question: Flask's own answer to "what's the
+dictionary key" is **method plus path together**, not path alone —
+which is exactly why `methods=["GET"]` appears explicitly in the
+decorator instead of being implied.
 
-Now the real code this lab was standing in for — the actual, unmodified
-legacy file, in full:
+The next two code blocks are different in kind from the lab above: both
+are real code that already exists in your actual app, right now. Don't
+type either of them — open the real files and read them.
 
-```python
-1  from flask import Blueprint, jsonify
-2
-3  health_bp = Blueprint('health', __name__)
-4
-5  @health_bp.route('/health', methods=['GET'])
-6  def health_check():
-7      """Basic health check to verify backend is running."""
-8      return jsonify({
-9          'status': 'online',
-10         'message': 'Manufacturing Data Platform Backend is ready.',
-11         'version': '1.0.0'
-12     })
-```
-
-And the one line, elsewhere, that turns this blueprint into a real,
-reachable endpoint:
+**File:** `backend/app/routes/health.py` (already exists — read-only,
+nothing to type):
 
 ```python
-15    from app.routes.health import health_bp
-16    app.register_blueprint(health_bp, url_prefix='/api')
+from flask import Blueprint, jsonify
+
+health_bp = Blueprint('health', __name__)
+
+@health_bp.route('/health', methods=['GET'])
+def health_check():
+    """Basic health check to verify backend is running."""
+    return jsonify({
+        'status': 'online',
+        'message': 'Manufacturing Data Platform Backend is ready.',
+        'version': '1.0.0'
+    })
 ```
 
-Line 16's `url_prefix='/api'` is why a request has to say `GET
-/api/health`, not `GET /health`, to reach this particular function —
-Flask joins the prefix and the route's own path (`/health` from line 5)
-together at registration time.
+That's the entire file — 12 lines, nothing omitted.
+
+**File:** `backend/app/routes/__init__.py` (already exists — read-only;
+the two lines below are quoted out of the middle of a longer file, so
+they're shown without line numbers to avoid implying they're the whole
+file or that they start at its beginning):
+
+```python
+from app.routes.health import health_bp
+app.register_blueprint(health_bp, url_prefix='/api')
+```
+
+The `register_blueprint` call's `url_prefix='/api'` is why a request has
+to say `GET /api/health`, not `GET /health`, to reach this particular
+function — Flask joins the prefix and the route's own path (`/health`,
+from the `@health_bp.route(...)` call above) together at registration
+time.
 
 ### Mechanical Walkthrough
 
@@ -354,10 +461,13 @@ own routing machinery runs relative to this file's own code:
    with `/api` joined onto the front of every path. Still no request has
    happened.
 4. A real `GET /api/health` request arrives (from a browser, `curl`, or
-   this lesson's own test client). Only *now* does Flask's own
-   dispatcher look up `("GET", "/api/health")` in the table built in
-   step 3, find `health_check`, and actually call it — the first moment
-   any of this file's own logic runs in response to anything.
+   this lesson's own test client). Only *now* does Flask itself look up
+   `("GET", "/api/health")` in the table built in step 3, find
+   `health_check`, and actually call it — the first moment any of this
+   file's own logic runs in response to anything. (The name for
+   "choosing which function to run based on data only available at run
+   time," like Flask does right here, is **dispatch** — named and
+   explained in the CS Lens, just below.)
 
 Steps 1-3 happen once, at startup, regardless of whether any request
 ever arrives. Step 4 is the only one that can happen zero, one, or a
@@ -444,23 +554,31 @@ other?
   — created.
 - **Change type:** Add (a new test file; no application code changes).
 - **Location:** New file, `verification/lesson-01/`, this curriculum's
-  own verification location for Lesson 1.
+  own verification location for this unit's characterization work.
 - **Dependencies:** `pytest`, and the real `create_app` factory, both
   already present in `backend/requirements.txt` and `backend/.venv`.
 
-The second real endpoint, quoted verbatim:
+**File:** `backend/app/__init__.py` (already exists — read-only; this is
+a real, currently-running route, not something to type). The snippet
+below is quoted from the middle of a much longer file, shown without
+its original line numbers for the same reason as the excerpt in the
+unit above — a short, out-of-context excerpt isn't the start of the
+file:
 
 ```python
-424    # STEP 11: Register Health Check Endpoint
-425    @app.route('/health')
-426    def health_check():
-427        """
-428        Health check endpoint for monitoring and load balancers.
-429        """
-430        return {'status': 'healthy', 'message': 'Manufacturing Platform API is running'}
+@app.route('/health')
+def health_check():
+    """
+    Health check endpoint for monitoring and load balancers.
+    """
+    return {'status': 'healthy', 'message': 'Manufacturing Platform API is running'}
 ```
 
 ### The New Code
+
+This is new code — you're about to type it into a brand-new file,
+`verification/lesson-01/test_characterize_health.py`, which doesn't
+exist yet:
 
 ```python
 def test_blueprint_health_route():
@@ -479,47 +597,48 @@ def test_blueprint_health_route():
 
 ### The Updated Project
 
-The full test file this fragment belongs to,
-`verification/lesson-01/test_characterize_health.py`, in full, both
-tests numbered:
+**File:** `verification/lesson-01/test_characterize_health.py` — new,
+shown here in full, both real tests included (the fragment above is
+just the first one, `test_blueprint_health_route`, seen alone before
+its sibling test joins it):
 
 ```python
-1  import sys
-2  from pathlib import Path
-3
-4  sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
-5
-6  from app import create_app
-7
-8
-9  def test_blueprint_health_route():              # ← new
-10     app = create_app("testing")                 # ← new
-11     client = app.test_client()                  # ← new
-12                                                  # ← new
-13     response = client.get("/api/health")         # ← new
-14                                                  # ← new
-15     assert response.status_code == 200           # ← new
-16     assert response.get_json() == {              # ← new
-17         "status": "online",                      # ← new
-18         "message": "Manufacturing Data Platform Backend is ready.",  # ← new
-19         "version": "1.0.0",                      # ← new
-20     }                                            # ← new
-21
-22
-23 def test_app_level_health_route():               # ← new
-24     app = create_app("testing")                  # ← new
-25     client = app.test_client()                   # ← new
-26                                                   # ← new
-27     response = client.get("/health")              # ← new
-28                                                   # ← new
-29     assert response.status_code == 200            # ← new
-30     assert response.get_json() == {               # ← new
-31         "status": "healthy",                      # ← new
-32         "message": "Manufacturing Platform API is running",  # ← new
-33     }                                             # ← new
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
+
+from app import create_app
+
+
+def test_blueprint_health_route():
+    app = create_app("testing")
+    client = app.test_client()
+
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "status": "online",
+        "message": "Manufacturing Data Platform Backend is ready.",
+        "version": "1.0.0",
+    }
+
+
+def test_app_level_health_route():
+    app = create_app("testing")
+    client = app.test_client()
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "status": "healthy",
+        "message": "Manufacturing Platform API is running",
+    }
 ```
 
-Lines 1-6 exist so this file, sitting outside `backend/`, can import the
+The file's first six lines exist so this file, sitting outside `backend/`, can import the
 real `app` package as if it were running from inside `backend/` —
 `sys.path.insert` adds `backend/`'s real filesystem location to the list
 of directories Python searches for importable packages, computed
