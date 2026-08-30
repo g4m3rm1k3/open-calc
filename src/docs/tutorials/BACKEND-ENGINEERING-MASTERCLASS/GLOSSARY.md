@@ -28,6 +28,9 @@ re-run the script after any lesson changes instead.
 ## assert statement
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - Python's own built-in `assert <condition>, <message>` statement: it evaluates `<condition>`; if that is `True`, execution continues as though the line were not there; if it is `False`, Python raises `AssertionError` immediately, carrying `<message>`. It exists as the smallest possible way to write "I expect this to be true" in a form Python itself checks every time the line runs, rather than a comment a human has to re-verify by eye. It is a primitive language mechanism, not a testing framework - Python can be told to skip every `assert` in a program entirely (running it with the `-O` flag strips them out), which is exactly why real test suites are normally built on a dedicated framework instead of bare `assert` statements left in production code; this lesson uses bare `assert` deliberately, to teach the underlying idea before a framework is introduced.
 
+## assertion rewriting
+- **Term** in `LESSON-2.3-PYTEST` - pytest's own technique of intercepting a plain `assert` statement at import time and rewriting its bytecode so that a failure reports the actual runtime values on both sides of the comparison, not just the literal source text. It exists because a bare Python `AssertionError` says nothing about what the real values actually were unless the author manually writes that into the message - assertion rewriting gets that for free, from ordinary `assert` syntax nobody had to change.
+
 ## AssertionError
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in exception class that Python raises automatically when an `assert` statement's condition evaluates to `False`.
 
@@ -94,6 +97,7 @@ re-run the script after any lesson changes instead.
 ## create_app
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real Flask application factory function - the one place this backend's own real circular dependency is deliberately resolved.
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - This project's real Flask application factory function.
+- **Object/method** in `LESSON-2.3-PYTEST` - This project's real Flask application factory function.
 
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
@@ -156,6 +160,12 @@ re-run the script after any lesson changes instead.
 
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
+
+## fixture
+- **Term** in `LESSON-2.3-PYTEST` - A `@pytest.fixture`-decorated function that provides setup (and optional teardown) a test needs, made available to that test simply by naming the fixture as one of the test function's own parameters. It exists to separate "what does this test need to exist first" from "what does this test actually check," so many tests can share identical setup logic without copying it into every one of them.
+
+## fixture injection
+- **Term** in `LESSON-2.3-PYTEST` - The mechanism by which pytest matches a test function's own parameter names against fixture names it already knows about, and calls the matching fixture function automatically before running the test - with no explicit wiring written by the test's own author. It exists so a test can simply ask for what it needs by name, rather than constructing that thing inline, itself, every single time.
 
 ## Flask.test_client
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real method on Flask's own `Flask` class, returning a test client that can make requests against the app without a real network socket.
@@ -249,6 +259,9 @@ re-run the script after any lesson changes instead.
 ## map
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that applies a real, given function to every element of a real iterable, one at a time.
 
+## mark (pytest marker)
+- **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.X`, real pytest decorator syntax that attaches metadata to a test function for pytest itself (or a plugin) to inspect and act on - `parametrize` is one specific, built-in mark among several. It exists as one general mechanism for attaching many different real behaviors to a test (parametrizing it, skipping it, marking it as an expected failure) without a separate, one-off decorator syntax for each.
+
 ## Mutable / immutable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
 
@@ -269,6 +282,9 @@ re-run the script after any lesson changes instead.
 
 ## Parameter
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A name declared in a function's own definition, naming a slot the function's body refers to - `cam_file_id` and `commit_sha` in `def download_file(cam_file_id, commit_sha=None):`, not any specific value yet. It exists as its own concept, separate from the value eventually supplied, so a function's real contract - what it needs to do its job - can be stated once, independent of any one particular call.
+
+## parametrization
+- **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.parametrize`, a real pytest decorator that runs one test function's body once per set of arguments supplied to it, generating a separate, individually-reported test case for each set. It exists so checking the same logic against several different real inputs never requires writing the same test body over and over, once per input.
 
 ## PDMService.download_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
@@ -293,6 +309,12 @@ re-run the script after any lesson changes instead.
 
 ## Pure function
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
+
+## pytest.fixture
+- **Object/method** in `LESSON-2.3-PYTEST` - A real decorator, provided by the `pytest` package, that marks a function as a fixture pytest can inject into any test naming it.
+
+## pytest.mark.parametrize
+- **Object/method** in `LESSON-2.3-PYTEST` - A real decorator, provided by the `pytest` package, that runs one test function once per real set of arguments supplied to it.
 
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
@@ -336,6 +358,7 @@ re-run the script after any lesson changes instead.
 
 ## Session (db.session)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
+- **Object/method** in `LESSON-2.3-PYTEST` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
 
 ## set
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in unordered collection type, holding only hashable values, each stored at most once.
@@ -388,6 +411,7 @@ re-run the script after any lesson changes instead.
 
 ## STLScaffoldService._extract_operation_num
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, existing static method on this project's own `STLScaffoldService`, extracting a subprogram's leading operation-number digit from a string.
+- **Object/method** in `LESSON-2.3-PYTEST` - A real, existing static method on this project's own `STLScaffoldService`, extracting a subprogram's leading operation-number digit from a string.
 
 ## str.encode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - A method converting a Python text string into a real
@@ -403,6 +427,18 @@ re-run the script after any lesson changes instead.
 
 ## TCP (Transmission Control Protocol)
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the specific real protocol
+
+## test discovery
+- **Term** in `LESSON-2.3-PYTEST` - pytest's own process of scanning a directory tree for files and functions matching a plain naming convention, and collecting them as real tests to run - without any author registering each one by hand. It exists so a project never needs a manually-maintained list of "here are all my tests"; the naming convention itself is the registration.
+
+## test function
+- **Term** in `LESSON-2.3-PYTEST` - An ordinary Python function pytest recognizes, by its own naming convention, as a real test - called with no arguments (or with real fixtures injected as arguments), expected to raise nothing at all if what it checks holds true. It exists as the actual unit pytest's own discovery and reporting operate on - not a file, not a class, one specific function.
+
+## test ID
+- **Term** in `LESSON-2.3-PYTEST` - The real, readable name pytest generates for one specific test case, built from its function name and, for a parametrized case, the actual argument values used - `test_extract_operation_num[O1103-1]`, for instance. It exists so a reader of test output can tell, instantly, which specific case passed or failed, without having to guess from a bare line number.
+
+## test session
+- **Term** in `LESSON-2.3-PYTEST` - One full run of pytest, from the moment collection starts to the final pass/fail summary line it prints across every test it collected. It exists as the real unit pytest itself reports on - `"X passed in Y seconds"` describes one whole session, never any single test in isolation.
 
 ## test_parser
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A real, already-existing function in this project's own backend, named as though it tests the Mastercam XML parser.
@@ -443,6 +479,9 @@ re-run the script after any lesson changes instead.
 ## WSGI (Web Server Gateway Interface)
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - a real, standard Python
 
+## yield fixture
+- **Term** in `LESSON-2.3-PYTEST` - A fixture written with `yield` in place of `return`, splitting its body into setup (everything before the `yield`) and teardown (everything after it); pytest runs the first half before the test and the second half after, automatically. It exists so cleanup code lives right next to the setup it's undoing, in one real function, instead of split into a separate teardown mechanism.
+
 ## Possible collisions (shared words, different names)
 
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
@@ -478,9 +517,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Client` / `Flask.test_client` - shares: client
 - `db` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
+- `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
+- `db.session.commit` / `test session` - shares: session
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
+- `Dependency (of a function)` / `test function` - shares: function
 - `dictionary key access` / `Key function` - shares: key
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
@@ -498,6 +540,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Exception boundary` / `Raising an exception` - shares: exception
 - `Exception handling (try/except)` / `Infrastructure exception` - shares: exception
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
+- `fixture` / `fixture injection` - shares: fixture
+- `fixture` / `pytest.fixture` - shares: fixture
+- `fixture` / `yield fixture` - shares: fixture
+- `fixture injection` / `pytest.fixture` - shares: fixture
+- `fixture injection` / `yield fixture` - shares: fixture
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
@@ -511,15 +558,21 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.signature` / `Signature.parameters` - shares: signature
 - `Jinja2 Template` / `render_template` - shares: template
 - `Key function` / `Pure function` - shares: function
+- `Key function` / `test function` - shares: function
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
+- `mark (pytest marker)` / `pytest.fixture` - shares: pytest
+- `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `Parameter` / `Query parameter` - shares: parameter
 - `PDMService.download_file` / `send_file` - shares: file
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
+- `Pure function` / `test function` - shares: function
+- `pytest.fixture` / `yield fixture` - shares: fixture
 - `Request line` / `Status line` - shares: line
 - `Return value` / `Value object` - shares: value
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `Session (db.session)` / `test session` - shares: session
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
