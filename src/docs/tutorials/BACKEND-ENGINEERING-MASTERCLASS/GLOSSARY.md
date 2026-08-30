@@ -64,6 +64,9 @@ re-run the script after any lesson changes instead.
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
 
+## check_password_hash
+- **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - The real matching function from `werkzeug.security` that verifies a real plaintext password against an already-generated real hash.
+
 ## Circular dependency
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - A real cycle in the import graph - two or more real modules or packages each needing something from the other, rather than a straight line. A circular dependency is a fact about the real *shape* of the graph, not a prediction about whether it fails: whether a genuine cycle actually raises a real error depends on the real, exact order those modules happen to initialize in, not on the mere presence of the cycle. A circular dependency is a graph property; a circular-import failure is an initialization- order problem - the two are related, never the same claim.
 
@@ -75,6 +78,9 @@ re-run the script after any lesson changes instead.
 
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
+
+## dataclasses.dataclass
+- **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real class decorator from the standard library `dataclasses` module that generates several real methods from a class's own field declarations.
 
 ## db
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, module-level SQLAlchemy instance every model in this application is built on - created once, in `app/__init__.py`, before `create_app`, below, is even defined.
@@ -100,6 +106,9 @@ re-run the script after any lesson changes instead.
 ## Domain logic
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The actual decision-making specific to this application — which parts are valid, how a filter should behave, what counts as a duplicate. It exists as its own named boundary because it's the one layer that couldn't be copied wholesale into a completely different application the way transport or application-layer code often can be.
 
+## Domain object
+- **Term** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real bundle of data with its own persistent identity, tracked separately from its current values, usually carrying real behavior (methods that do more than just return a stored field) and expected to change over its own real lifetime while remaining "the same" real thing throughout. It exists as its own concept because a value object's own core property - sameness determined purely by current values - is exactly wrong for something like a real user account, whose password, name, or login time can all genuinely change while it's still unambiguously the same real account throughout.
+
 ## download_cam_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real route this whole unit exists to investigate end to end - one of the six real routes the tool built in the unit above already found and printed, this time shown and walked through in full rather than only named.
 - **Object/method** in `LESSON-1.2-EXCEPTIONS` - The real Flask route that calls `PDMService.download_file` and is the one place in this real call chain that actually catches whatever it raises.
@@ -120,6 +129,9 @@ re-run the script after any lesson changes instead.
 ## generate_nc_file
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real route function whose own docstring says it 'Saves the file to the database as an NCFile record' - shown here at the specific real lines where that save actually happens.
+
+## generate_password_hash
+- **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real function from Flask's own real dependency, `werkzeug.security`, that turns a real plaintext password into a real, salted hash.
 
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
@@ -165,6 +177,9 @@ re-run the script after any lesson changes instead.
 
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
+
+## OperationScaffoldItem
+- **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real, already-existing `@dataclass(frozen=True)` in this backend, the exact real fix this lesson's own third unit reaches for.
 
 ## Package boundary
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
@@ -297,6 +312,9 @@ re-run the script after any lesson changes instead.
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
 
+## Value object
+- **Term** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real bundle of data whose own identity IS its values - two value objects holding the identical real data are considered the same, interchangeably, with no separate real identity tracked beyond what they actually hold. It exists as its own concept because a real program often needs to distinguish this case (a computed result, a coordinate, a fixed set of related fields describing one real thing) from a case where two objects holding identical data right now are still genuinely different real things - the next unit's own real contrast.
+
 ## WSGI (Web Server Gateway Interface)
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - a real, standard Python
 
@@ -323,13 +341,16 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
+- `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Domain exception` / `Domain logic` - shares: domain
+- `Domain exception` / `Domain object` - shares: domain
 - `Domain exception` / `Exception boundary` - shares: exception
 - `Domain exception` / `Exception handling (try/except)` - shares: exception
 - `Domain exception` / `Infrastructure exception` - shares: exception
 - `Domain exception` / `Raising an exception` - shares: exception
+- `Domain logic` / `Domain object` - shares: domain
 - `download_cam_file` / `generate_nc_file` - shares: file
 - `download_cam_file` / `PDMService.download_file` - shares: download, file
 - `download_cam_file` / `send_file` - shares: file
@@ -339,6 +360,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Exception boundary` / `Raising an exception` - shares: exception
 - `Exception handling (try/except)` / `Infrastructure exception` - shares: exception
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
+- `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
@@ -355,5 +377,6 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `PDMService.download_file` / `send_file` - shares: file
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Request line` / `Status line` - shares: line
+- `Return value` / `Value object` - shares: value
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Static analysis` / `Static method` - shares: static
