@@ -319,12 +319,13 @@ print("manual check:", add_tax(100, 0.05))
 
 ### The Updated Project
 
-There's no existing project file this fits into — it's a short, complete
-script you run entirely on its own. Running just the fragment above
-prints `manual check: 105.0` — a real, correct answer, checked once, by
-a person reading the printed number.
+Running just the fragment above (before typing anything else) prints
+`manual check: 105.0` — a real, correct answer, checked once, by a
+person reading the printed number.
 
-Now the rest of the same file, showing what happens next:
+**File:** `verification/lesson-00/lab_why_automated_tests.py` — the
+same file from the step above; everything past the first `print` is
+new, typed in now, marked below:
 
 ```python
 def add_tax(price, rate):
@@ -334,17 +335,17 @@ def add_tax(price, rate):
 print("manual check:", add_tax(100, 0.05))
 
 
-def add_tax(price, rate):
-    return price + rate
+def add_tax(price, rate):                                          # ← new
+    return price + rate                                           # ← new
 
 
-print("after the edit, nobody re-checked by eye:", add_tax(100, 0.05))
+print("after the edit, nobody re-checked by eye:", add_tax(100, 0.05))  # ← new
 
-try:
-    assert add_tax(100, 0.05) == 105.0
-    print("assert passed")
-except AssertionError:
-    print("assert FAILED:", add_tax(100, 0.05), "expected 105.0")
+try:                                                                # ← new
+    assert add_tax(100, 0.05) == 105.0                              # ← new
+    print("assert passed")                                          # ← new
+except AssertionError:                                              # ← new
+    print("assert FAILED:", add_tax(100, 0.05), "expected 105.0")   # ← new
 ```
 
 ### Mechanical Walkthrough
@@ -466,8 +467,69 @@ print("unit:        add_tax(100, 0.05) ==", unit_result)
 
 ### The Updated Project
 
-**File:** `verification/lesson-00/lab_unit_integration_e2e.py` (new —
-shown here with the integration section added):
+**File:** `verification/lesson-00/lab_unit_integration_e2e.py` — the
+same file from the step above; everything from the `flask` import
+onward is new, typed in now, marked below (the step above only had the
+`add_tax` function and the two `unit_result` lines):
+
+```python
+from flask import Flask, jsonify                                # ← new
+
+
+def add_tax(price, rate):
+    return price + (price * rate)
+
+
+unit_result = add_tax(100, 0.05)
+print("unit:        add_tax(100, 0.05) ==", unit_result)
+
+
+app = Flask(__name__)                                            # ← new
+
+
+@app.route("/tax")                                               # ← new
+def tax_route():                                                 # ← new
+    return jsonify({"total": add_tax(100, 0.05)})                # ← new
+
+
+client = app.test_client()                                       # ← new
+integration_response = client.get("/tax")                        # ← new
+print(                                                           # ← new
+    "integration: GET /tax (in-process) ==",                     # ← new
+    integration_response.status_code,                            # ← new
+    integration_response.get_json(),                             # ← new
+)                                                                 # ← new
+```
+
+A second, separate file this same lab starts as a real process — it is
+never imported, only launched:
+
+**File:** `verification/lesson-00/e2e_server.py` (new):
+
+```python
+from flask import Flask, jsonify
+
+
+def add_tax(price, rate):
+    return price + (price * rate)
+
+
+app = Flask(__name__)
+
+
+@app.route("/tax")
+def tax_route():
+    return jsonify({"total": add_tax(100, 0.05)})
+
+
+if __name__ == "__main__":
+    app.run(port=5099)
+```
+
+**File:** `verification/lesson-00/lab_unit_integration_e2e.py` — the
+same file again, now complete. Everything from `import subprocess`
+onward is new since the block above; it starts the second file,
+`e2e_server.py`, as a real, separate process:
 
 ```python
 from flask import Flask, jsonify
@@ -496,59 +558,29 @@ print(
     integration_response.status_code,
     integration_response.get_json(),
 )
-```
 
-A second, separate file this same lab starts as a real process — it is
-never imported, only launched:
+import subprocess                                                # ← new
+import sys                                                       # ← new
+import time                                                      # ← new
+import urllib.request                                            # ← new
+import json                                                      # ← new
+from pathlib import Path                                         # ← new
 
-**File:** `verification/lesson-00/e2e_server.py` (new):
-
-```python
-from flask import Flask, jsonify
-
-
-def add_tax(price, rate):
-    return price + (price * rate)
-
-
-app = Flask(__name__)
-
-
-@app.route("/tax")
-def tax_route():
-    return jsonify({"total": add_tax(100, 0.05)})
-
-
-if __name__ == "__main__":
-    app.run(port=5099)
-```
-
-And the third section of `lab_unit_integration_e2e.py`, which starts
-that second file as a real, separate process:
-
-```python
-import subprocess
-import sys
-import time
-import urllib.request
-import json
-from pathlib import Path
-
-server_path = Path(__file__).parent / "e2e_server.py"
-proc = subprocess.Popen(
-    [sys.executable, str(server_path)],
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL,
-)
-try:
-    time.sleep(1.5)
-    with urllib.request.urlopen("http://127.0.0.1:5099/tax") as resp:
-        e2e_status = resp.status
-        e2e_body = json.loads(resp.read())
-    print("end-to-end:  GET /tax (real socket, real process) ==", e2e_status, e2e_body)
-finally:
-    proc.terminate()
-    proc.wait()
+server_path = Path(__file__).parent / "e2e_server.py"             # ← new
+proc = subprocess.Popen(                                          # ← new
+    [sys.executable, str(server_path)],                           # ← new
+    stdout=subprocess.DEVNULL,                                    # ← new
+    stderr=subprocess.DEVNULL,                                    # ← new
+)                                                                 # ← new
+try:                                                              # ← new
+    time.sleep(1.5)                                               # ← new
+    with urllib.request.urlopen("http://127.0.0.1:5099/tax") as resp:  # ← new
+        e2e_status = resp.status                                  # ← new
+        e2e_body = json.loads(resp.read())                        # ← new
+    print("end-to-end:  GET /tax (real socket, real process) ==", e2e_status, e2e_body)  # ← new
+finally:                                                          # ← new
+    proc.terminate()                                              # ← new
+    proc.wait()                                                   # ← new
 ```
 
 ### Mechanical Walkthrough
@@ -687,13 +719,14 @@ print(f"real call:   result={real_result}, elapsed={real_elapsed:.2f}s")
 
 ### The Updated Project
 
-**File:** `verification/lesson-00/lab_mocking.py` (new — shown here in
-full, with the mocked call added):
+**File:** `verification/lesson-00/lab_mocking.py` — the same file from
+the step above; the `unittest.mock` import and everything from the
+`with patch(...)` block onward is new, typed in now, marked below:
 
 ```python
 import time
 import random
-from unittest.mock import patch
+from unittest.mock import patch                                    # ← new
 
 
 def get_shipping_rate(zip_code):
@@ -710,18 +743,18 @@ real_result = total_with_shipping(100, "90210")
 real_elapsed = time.time() - start
 print(f"real call:   result={real_result}, elapsed={real_elapsed:.2f}s")
 
-with patch("__main__.get_shipping_rate", return_value=5.0) as mock_rate:
-    start = time.time()
-    mocked_result = total_with_shipping(100, "90210")
-    mocked_elapsed = time.time() - start
-    print(f"mocked call: result={mocked_result}, elapsed={mocked_elapsed:.4f}s")
-    print(f"mock_rate.call_count: {mock_rate.call_count}")
-    print(f"mock_rate.call_args:  {mock_rate.call_args}")
+with patch("__main__.get_shipping_rate", return_value=5.0) as mock_rate:  # ← new
+    start = time.time()                                                 # ← new
+    mocked_result = total_with_shipping(100, "90210")                    # ← new
+    mocked_elapsed = time.time() - start                                 # ← new
+    print(f"mocked call: result={mocked_result}, elapsed={mocked_elapsed:.4f}s")  # ← new
+    print(f"mock_rate.call_count: {mock_rate.call_count}")               # ← new
+    print(f"mock_rate.call_args:  {mock_rate.call_args}")                # ← new
 
-start = time.time()
-real_again = total_with_shipping(100, "90210")
-real_again_elapsed = time.time() - start
-print(f"real again:  result={real_again}, elapsed={real_again_elapsed:.2f}s")
+start = time.time()                                                  # ← new
+real_again = total_with_shipping(100, "90210")                       # ← new
+real_again_elapsed = time.time() - start                             # ← new
+print(f"real again:  result={real_again}, elapsed={real_again_elapsed:.2f}s")  # ← new
 ```
 
 ### Mechanical Walkthrough

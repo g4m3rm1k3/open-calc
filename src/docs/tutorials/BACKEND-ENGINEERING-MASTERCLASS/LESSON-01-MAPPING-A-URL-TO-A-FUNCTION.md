@@ -597,18 +597,19 @@ def test_blueprint_health_route():
 
 ### The Updated Project
 
-**File:** `verification/lesson-01/test_characterize_health.py` — new,
-shown here in full, both real tests included (the fragment above is
-just the first one, `test_blueprint_health_route`, seen alone before
-its sibling test joins it):
+**File:** `verification/lesson-01/test_characterize_health.py` — the
+file just started in the step above (which only had
+`test_blueprint_health_route`'s own body); everything else — the
+imports, the `sys.path` line, and the whole second test function — is
+new, typed in now, marked below:
 
 ```python
-import sys
-from pathlib import Path
+import sys                                                        # ← new
+from pathlib import Path                                          # ← new
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))  # ← new
 
-from app import create_app
+from app import create_app                                       # ← new
 
 
 def test_blueprint_health_route():
@@ -625,17 +626,17 @@ def test_blueprint_health_route():
     }
 
 
-def test_app_level_health_route():
-    app = create_app("testing")
-    client = app.test_client()
+def test_app_level_health_route():                               # ← new
+    app = create_app("testing")                                   # ← new
+    client = app.test_client()                                    # ← new
 
-    response = client.get("/health")
+    response = client.get("/health")                               # ← new
 
-    assert response.status_code == 200
-    assert response.get_json() == {
-        "status": "healthy",
-        "message": "Manufacturing Platform API is running",
-    }
+    assert response.status_code == 200                            # ← new
+    assert response.get_json() == {                                # ← new
+        "status": "healthy",                                       # ← new
+        "message": "Manufacturing Platform API is running",         # ← new
+    }                                                              # ← new
 ```
 
 The file's first six lines exist so this file, sitting outside `backend/`, can import the

@@ -226,9 +226,10 @@ def _health_payload():
 
 ### The Updated Project
 
-**File:** `rebuild/rebuild_app/routes/health.py` (new — shown here in
-full, with both real routes added, each calling the one shared helper
-above):
+**File:** `rebuild/rebuild_app/routes/health.py` — the file just started
+in the step above (which only had `_health_payload()`); both real
+routes below are new, typed in now, marked below, each calling that
+same shared helper:
 
 ```python
 from flask import Blueprint, jsonify
@@ -244,14 +245,14 @@ def _health_payload():
     }
 
 
-@health_bp.route('/health', methods=['GET'])
-def health_check():
-    return jsonify(_health_payload())
+@health_bp.route('/health', methods=['GET'])                     # ← new
+def health_check():                                                # ← new
+    return jsonify(_health_payload())                              # ← new
 
 
-@health_bp.route('/api/health', methods=['GET'])
-def health_check_api():
-    return jsonify(_health_payload())
+@health_bp.route('/api/health', methods=['GET'])                  # ← new
+def health_check_api():                                            # ← new
+    return jsonify(_health_payload())                              # ← new
 ```
 
 **File:** `rebuild/rebuild_app/__init__.py` (new — the application
