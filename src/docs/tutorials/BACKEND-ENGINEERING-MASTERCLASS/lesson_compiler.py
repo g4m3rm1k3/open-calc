@@ -43,6 +43,24 @@ def has_new_marker(line: str) -> bool:
     return bool(NEW_MARKER.search(line))
 
 
+def get_blocks(section: dict) -> list[dict]:
+    """Both new_code and updated_project support either a single
+    file/code pair (the common case) or a `files: [...]` list of
+    {file, status, code} (when a unit needs to show more than one real
+    file - e.g. a route file and the service it delegates to).
+    Normalizes either shape to a list so validation/rendering never
+    has to special-case which one was used."""
+    if section.get("files"):
+        return section["files"]
+    if section.get("file") or section.get("code"):
+        return [{
+            "file": section.get("file", ""),
+            "status": section.get("status", ""),
+            "code": section.get("code", ""),
+        }]
+    return []
+
+
 def validate(lesson: dict) -> tuple[list[str], list[str]]:
     """Returns (errors, warnings). Errors block compilation - they're
     the structural rules a program can actually be certain about.
@@ -88,35 +106,50 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
 
         new_code = unit.get("new_code", {})
         if new_code.get("applicable", True):
-            for field in ("file", "status", "code"):
-                if not new_code.get(field):
-                    errors.append(f"concept_units[{i}] ({title}) new_code: missing '{field}'")
+            new_blocks = get_blocks(new_code)
+            if not new_blocks:
+                errors.append(f"concept_units[{i}] ({title}) new_code: no file/code (or files: [...]) given")
+            for j, block in enumerate(new_blocks):
+                for field in ("file", "code"):
+                    if not block.get(field):
+                        errors.append(f"concept_units[{i}] ({title}) new_code block[{j}]: missing '{field}'")
 
         updated = unit.get("updated_project", {})
         if updated.get("applicable", True):
-            for field in ("file", "code"):
-                if not updated.get(field):
-                    errors.append(f"concept_units[{i}] ({title}) updated_project: missing '{field}'")
+            updated_blocks = get_blocks(updated)
+            if not updated_blocks:
+                errors.append(f"concept_units[{i}] ({title}) updated_project: no file/code (or files: [...]) given")
+            for j, block in enumerate(updated_blocks):
+                for field in ("file", "code"):
+                    if not block.get(field):
+                        errors.append(f"concept_units[{i}] ({title}) updated_project block[{j}]: missing '{field}'")
             # Mechanical check for the actual bug that kept happening:
             # every line in updated_project not already in new_code must
             # carry a real <- new marker - prose claiming this is
             # impossible to check by hand reliably; a set difference is
-            # not.
-            new_lines = {
-                strip_new_marker(l).strip()
-                for l in new_code.get("code", "").splitlines()
-                if l.strip()
-            }
-            for line in updated.get("code", "").splitlines():
-                stripped = line.strip()
-                if not stripped:
+            # not. Existing/read-only blocks (status != "new") are
+            # exempt - nothing there is meant to be typed at all.
+            new_lines = set()
+            for block in get_blocks(new_code):
+                new_lines.update(
+                    strip_new_marker(l).strip()
+                    for l in block.get("code", "").splitlines()
+                    if l.strip()
+                )
+            for block in updated_blocks:
+                if block.get("status") not in (None, "", "new"):
                     continue
-                bare = strip_new_marker(line).strip()
-                if bare not in new_lines and not has_new_marker(line):
-                    errors.append(
-                        f"concept_units[{i}] ({title}) updated_project: "
-                        f"line not in new_code and not marked '<- new': {stripped!r}"
-                    )
+                for line in block.get("code", "").splitlines():
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    bare = strip_new_marker(line).strip()
+                    if bare not in new_lines and not has_new_marker(line):
+                        errors.append(
+                            f"concept_units[{i}] ({title}) updated_project "
+                            f"({block.get('file', '?')}): line not in new_code "
+                            f"and not marked '<- new': {stripped!r}"
+                        )
 
         for j, cmd in enumerate(unit.get("commands", [])):
             command_text = cmd.get("command", "")
@@ -141,9 +174,22 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
     # Real tokenization means a word sitting inside a string literal or
     # a comment is never mistaken for a real identifier - a regex over
     # the raw text can't tell the difference; tokenize.NAME can.
+    def quoted_names(text: str) -> set[str]:
+        found = set(re.findall(r"['\"]([a-zA-Z_][a-zA-Z0-9_]*)['\"]", text))
+        # A backtick span naming a decorator ("`@staticmethod`") or a
+        # dotted/parenthesized reference still names one real token
+        # worth resolving - not just a bare identifier alone.
+        found.update(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", " ".join(re.findall(r"`([^`]*)`", text))))
+        return found
+
     known_names = set()
     for term in lesson.get("terms", []):
         known_names.update(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", term.get("name", "")))
+        # A term's own definition often names the real keyword/type it's
+        # explaining (e.g. "using Python's `raise` statement") - that
+        # counts as a real slot for the token too, the same as an
+        # Objects/methods entry's prose does below.
+        known_names.update(quoted_names(str(term.get("definition", ""))))
     for obj in lesson.get("objects_and_methods", []):
         known_names.update(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", obj.get("name", "")))
     # A dotted Objects/methods name like "socket.accept" also resolves
@@ -152,16 +198,28 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
     for obj in lesson.get("objects_and_methods", []):
         parts = obj.get("name", "").split(".")
         known_names.update(parts)
-    # A real field/attribute an entry's own Implementation text names
-    # explicitly (e.g. "real fields ('name', 'args', 'decorator_list')")
-    # is explained there, in prose, even without its own separate
-    # top-level entry - quoted single- or double-quoted bare words in
-    # Implementation/Its use/Connects to count as resolved too.
+    # A real field/attribute/name an entry's own prose names explicitly
+    # (e.g. "real fields ('name', 'args', 'decorator_list')", or
+    # "PDMService.download_file uses it") is explained there, even
+    # without its own separate top-level entry - scan every CRC field,
+    # not just three of them.
     for obj in lesson.get("objects_and_methods", []):
-        for field in ("implementation", "its_use", "connects_to"):
-            text = str(obj.get(field, ""))
-            known_names.update(re.findall(r"['\"]([a-zA-Z_][a-zA-Z0-9_]*)['\"]", text))
-            known_names.update(re.findall(r"`([a-zA-Z_][a-zA-Z0-9_]*)`", text))
+        for field in ("implementation", "its_use", "responsibility",
+                      "depends_on", "connects_to", "shape"):
+            known_names.update(quoted_names(str(obj.get(field, ""))))
+    # A Concept Unit's own prose - the Problem, both Lenses, a
+    # walkthrough item's explanation, Connection - routinely explains a
+    # real name in place (e.g. a Lens naming "the bare `except
+    # Exception:`" as the actual tradeoff being discussed) without that
+    # name necessarily having its own Header slot; that's still a real
+    # explanation, not a gap.
+    for unit in lesson.get("concept_units", []):
+        for field in ("problem", "cs_lens", "se_lens", "connection_to_previous"):
+            known_names.update(quoted_names(str(unit.get(field, ""))))
+        known_names.update(quoted_names(str(unit.get("project_change", {}).get("explanation", ""))))
+        for item in unit.get("mechanical_walkthrough", {}).get("items", []):
+            known_names.update(quoted_names(str(item.get("explanation", ""))))
+            known_names.update(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", str(item.get("element", ""))))
 
     ASSUMED = {
         "def", "return", "import", "from", "as", "if", "else", "elif",
@@ -174,25 +232,26 @@ def validate(lesson: dict) -> tuple[list[str], list[str]]:
 
     unresolved = set()
     for unit in lesson.get("concept_units", []):
-        for block_key in ("new_code", "updated_project"):
-            block = unit.get(block_key, {})
-            if block.get("language", "python") != "python":
+        for section_key in ("new_code", "updated_project"):
+            section = unit.get(section_key, {})
+            if section.get("language", "python") not in (None, "", "python"):
                 continue
-            code = block.get("code", "")
-            if not code.strip():
-                continue
-            try:
-                tokens = tokenize.generate_tokens(io.StringIO(code).readline)
-                names = [t.string for t in tokens if t.type == tokenize.NAME]
-            except (tokenize.TokenError, IndentationError, SyntaxError):
-                # A fragment (not a complete, standalone file) can
-                # legitimately fail to tokenize - fall back to no check
-                # for this block rather than crashing the validator.
-                continue
-            for token in names:
-                if token in ASSUMED or token in known_names:
+            for block in get_blocks(section):
+                code = block.get("code", "")
+                if not code.strip():
                     continue
-                unresolved.add(token)
+                try:
+                    tokens = tokenize.generate_tokens(io.StringIO(code).readline)
+                    names = [t.string for t in tokens if t.type == tokenize.NAME]
+                except (tokenize.TokenError, IndentationError, SyntaxError):
+                    # A fragment (not a complete, standalone file) can
+                    # legitimately fail to tokenize - fall back to no
+                    # check for this block rather than crashing.
+                    continue
+                for token in names:
+                    if token in ASSUMED or token in known_names:
+                        continue
+                    unresolved.add(token)
 
     if unresolved:
         warnings.append(
@@ -233,7 +292,15 @@ def render_project_change(pc: dict) -> str:
     lines.append(f"- **Change type:** {pc['change_type']}")
     lines.append(f"- **Location:** {pc['location']}")
     lines.append(f"- **Dependencies:** {pc['dependencies']}")
-    return "\n".join(lines)
+    text = "\n".join(lines)
+    # Optional real prose describing what the existing code actually
+    # does/is for, before the metadata bullets above - the bullets are
+    # deliberately terse (a path, a line range); this is where an
+    # actual explanation goes instead of leaving a reader with only
+    # file:line citations and no description of what's there.
+    if pc.get("explanation"):
+        text += f"\n\n{pc['explanation']}"
+    return text
 
 
 def render_code_block(code: str, language: str = "python") -> str:
@@ -252,12 +319,26 @@ def render_concept_unit(unit: dict, index: int) -> str:
 
     out += ["### Project Change", "", render_project_change(unit["project_change"]), ""]
 
+    STATUS_LABEL = {
+        "new": "new",
+        "existing": "already exists — read-only, nothing to type",
+        "modified": "already exists — modified",
+    }
+
+    def render_blocks(section: dict) -> list[str]:
+        lines = []
+        for block in get_blocks(section):
+            status = STATUS_LABEL.get(block.get("status", ""), block.get("status", ""))
+            label = f"**File:** `{block['file']}`" + (f" ({status})" if status else "")
+            lines += [label, "", render_code_block(block["code"], section.get("language", "python")), ""]
+        return lines
+
     new_code = unit.get("new_code", {})
     out += ["### The New Code", ""]
     if new_code.get("applicable", True):
         if new_code.get("intro"):
             out += [new_code["intro"], ""]
-        out += [render_code_block(new_code["code"], new_code.get("language", "python")), ""]
+        out += render_blocks(new_code)
     else:
         out += [new_code.get("note", "There is no new code in this unit."), ""]
 
@@ -266,8 +347,7 @@ def render_concept_unit(unit: dict, index: int) -> str:
     if updated.get("applicable", True):
         if updated.get("intro"):
             out += [updated["intro"], ""]
-        out += [f"**File:** `{updated['file']}`", ""]
-        out += [render_code_block(updated["code"], updated.get("language", "python")), ""]
+        out += render_blocks(updated)
     else:
         out += [updated.get("note", "Not applicable."), ""]
 

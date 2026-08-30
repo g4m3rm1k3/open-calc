@@ -290,6 +290,13 @@ project_overrides:
     from a missed one) - it's an authoring habit to hold consistently,
     found missing across an early YAML-authored lesson where hand-
     written earlier lessons had it right by feel.
+  - A YAML folded scalar (">") joins wrapped source lines with a single
+    space - a literal string (a file path, a route path) that happens
+    to wrap across two source lines in the .yaml file gets a stray
+    space inserted into it in the compiled output (e.g. "cam-\nfiles"
+    becomes "cam- files"). Keep any literal string that must stay
+    exact on one source line, or avoid repeating a long literal path in
+    prose at all when a plain description works just as well.
   - Don't restate a code block's own file path in an "intro" prose field
     when the compiler already renders a separate `**File:**` line for
     that same block (updated_project) - say what changed since the

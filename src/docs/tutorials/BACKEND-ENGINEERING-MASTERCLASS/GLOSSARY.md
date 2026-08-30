@@ -19,7 +19,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one function or method call.
 
 ## ast.Constant
-- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one literal value written directly in the source - a string, a number, a bare True/False/None.
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one literal value written directly in the source - a string, a number, a bare `True`/`False`/`None`.
 
 ## ast.FunctionDef
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one function definition.
@@ -30,6 +30,9 @@ re-run the script after any lesson changes instead.
 ## ast.walk
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A standard-library function that visits every node in a tree, in no particular guaranteed order, one at a time.
 
+## Blueprint.route
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method registering a URL rule on a Blueprint and returning a decorator for the function that handles it.
+
 ## Business logic
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the actual decision-making specific to what this
 
@@ -38,6 +41,9 @@ re-run the script after any lesson changes instead.
 
 ## bytes.decode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - The reverse of `str.encode` — converts raw bytes back
+
+## CAMFile.query.get
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
 
 ## Client
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that initiates a request. It doesn't have
@@ -57,6 +63,9 @@ re-run the script after any lesson changes instead.
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
 
+## get_gitlab_service
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
+
 ## Header
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (HTTP) — a `Name: value` line following the request or
 
@@ -69,6 +78,12 @@ re-run the script after any lesson changes instead.
 ## Infrastructure
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real, concrete technical systems domain logic depends on but isn't itself about — which specific database engine, which filesystem, which network client library. It exists as a boundary separate from persistence and external services because "we store data somewhere" (persistence, a concept) and "we use SQLite specifically, at this file path" (infrastructure, a real, swappable detail) are different kinds of claims.
 
+## jsonify
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
+
+## PDMService.download_file
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
+
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - Storing data somewhere that survives past the current request and the current process. It exists as its own boundary so domain logic can be written and tested without caring whether the data it reads or writes actually lives in a real database, a test double, or an in-memory stand-in.
@@ -79,11 +94,23 @@ re-run the script after any lesson changes instead.
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
 
+## Query parameter
+- **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
+
+## Raising an exception
+- **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
+
 ## Request line
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the first line of a real HTTP request:
 
+## request.args.get
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter (Terms, above) from the current request, by name, returning `None` if it wasn't given.
+
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of
+
+## send_file
+- **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
 
 ## Server
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that waits for a request and responds to
@@ -113,7 +140,10 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - The class representing one endpoint of a network
 
 ## Static analysis
-- **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or CodeLens's own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
+- **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or `CodeLens`'s own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
+
+## Static method
+- **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method attached to a class for organizational purposes, but that doesn't receive the instance (`self`) at all and doesn't need one to do its job - marked with the `@staticmethod` decorator. It exists so a function that's conceptually "part of" a class (grouped with related behavior) but doesn't need any per-instance state can say so plainly, rather than accepting an unused `self` parameter it would never use.
 
 ## Status line
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the first line of a real HTTP response:
@@ -148,6 +178,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `Server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Business logic` / `Domain logic` - shares: logic
+- `CAMFile.query.get` / `Query parameter` - shares: query
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
+- `PDMService.download_file` / `send_file` - shares: file
 - `Request line` / `Status line` - shares: line
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `Static analysis` / `Static method` - shares: static
