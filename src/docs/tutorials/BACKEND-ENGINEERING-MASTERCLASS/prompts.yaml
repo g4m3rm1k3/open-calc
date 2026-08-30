@@ -359,6 +359,20 @@ unit:
       exemption applies (see validation.yaml's verification rules),
       in which case state the predicted output/shape directly, marked
       as a prediction, with why it's confidently predictable.
+    citation_only_exemption_reason_scope: >
+      When applicable: false because the unit is citation-only (real,
+      already-existing code shown, nothing executed), the
+      exemption_reason must name the SPECIFIC claim the citation
+      actually establishes (a structural fact - what the code says,
+      what branches exist, where a function lives) and say plainly that
+      it does NOT establish runtime behavior (what a dependency
+      actually returns, what's in a real database, what a real request
+      does end to end) - that would need a separate execution trace.
+      "The code itself is the evidence" is too strong on its own: real
+      source is evidence of the control flow being examined, not of
+      what happens when it runs. This is the same source-vs-behavioral
+      distinction this curriculum's own CS/SE Lenses exist to teach -
+      the exemption_reason should model it, not contradict it.
 
   connection:
     instruction: >

@@ -2,7 +2,7 @@
 
 *File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
 
-**What you will build:** A real, small tool that finds every route in a real backend file by parsing it as a real Abstract Syntax Tree, instead of reading the file by eye - then a real, fully shown trace of one request that leaves this application entirely, reaches a different real server, and falls back to a database when that server doesn't answer. The transferable problem: investigating a backend you didn't write means finding real, verifiable facts about it mechanically, not trusting a docstring, a filename, or a guess about what a function probably does.
+**What you will build:** A real, small tool that finds every route expressed with the conventional `@something.route(...)` decorator shape in a real backend file, by parsing it as a real Abstract Syntax Tree, instead of reading the file by eye - then a real, fully shown trace of one request that leaves this application entirely, reaches a different real server, and falls back to a database when that server doesn't answer. The transferable problem: investigating a backend you didn't write means finding real, verifiable facts about it mechanically, not trusting a docstring, a filename, or a guess about what a function probably does.
 
 **What you need to know first:** A request/response pipeline with named stages; reading a real, existing file as evidence; a real, documented architectural boundary violation in this exact application.
 
@@ -36,7 +36,7 @@
   - *Responsibility:* Yield every node reachable from the given root node exactly once, so calling code doesn't have to write its own recursive tree-walking logic.
   - *Depends on:* A real AST node, typically the `Module` `ast.parse` returned.
   - *Connects to:* Called on `ast.parse`'s return value; each yielded node is checked with `isinstance` against `ast.FunctionDef`, below.
-  - *Shape:* Takes one tree node in, hands back a flat, one-at-a-time generator of every node reachable from it - the parent/child nesting `ast.parse` built is gone once you're iterating; each node comes back on its own, with no way to tell from the iterator alone which node was whose parent.
+  - *Shape:* Takes one tree node in, hands back a flat, one-at-a-time generator of every node reachable from it. The tree itself isn't destroyed - each node still holds its own children through its own fields (a `FunctionDef`'s `body` is still a list of its child nodes) - the generator just doesn't expose parent/child position as you iterate; you get each node in turn with no indication of whose parent or child it was, unless you read that node's own fields yourself.
 
 - **`ast.FunctionDef`**
   - *What it is:* The real AST node type representing one function definition.
@@ -73,7 +73,7 @@
   - *Implementation:* A class with real fields (`'value'`, `'kind'`), confirmed this session via `ast.Constant._fields`.
   - *Its use:* This lesson's lab uses it to read a literal value straight out of the parsed tree, as a plain Python value instead of a further node to keep unpacking.
   - *Type:* A class (an `ast.AST` subclass).
-  - *Responsibility:* Represent, as real structured data, one literal value exactly as written in the source, with `value` holding the real, already-converted Python value.
+  - *Responsibility:* Represent, as real structured data, the Python value a literal in the source represents - with `value` holding that real, already-converted Python value, not the raw source characters themselves (different source text, like `0x10` and `16`, can produce the same `value`).
   - *Depends on:* Being produced by `ast.parse` wherever the real source contains a literal.
   - *Connects to:* Read from a `Call`'s first `args` entry; its `value` is what actually gets printed.
   - *Shape:* One object whose `value` field holds the literal already converted to a plain Python value (a real `str`, `int`, `bool`, or `None` - not a further node to keep unpacking) - confirmed via `ast.Constant._fields`.
@@ -247,7 +247,48 @@ Before reading on:
 - **Location:** N/A
 - **Dependencies:** None beyond the real repository already checked out on disk.
 
-`download_cam_file` (below) is the same real route the unit above's own tool already found and printed - now shown in full instead of just named. It does almost nothing itself: it reads one query parameter and immediately delegates to `PDMService.download_file`, which is where the real behavior actually lives - a real database read, a real attempt to reach a different real server, and a real fallback when that attempt fails.
+`download_cam_file` (below) is the same real route the unit
+above's own tool already found and printed - now shown in full
+instead of just named. It does almost nothing itself: it reads
+one query parameter and immediately delegates to
+`PDMService.download_file`, which is where the real behavior
+actually lives. That method's own real control flow, traced
+through the code shown below:
+
+```text
+GET /cam-files/<id>/download?commit_sha=...
+            |
+            v
+    download_cam_file(cam_file_id)
+            |
+            v
+ PDMService.download_file(cam_file_id, commit_sha)
+            |
+            v
+  CAMFile.query.get(cam_file_id)  -- loads the row: filename + stored content
+            |
+            v
+  try: get_gitlab_service() -> get_file_at_commit / get_file
+     |                  |
+  succeeds            raises (any Exception)
+     |                  |
+     v                  v
+file_content =      file_content = cam_file.cam_file_content
+GitLab bytes        (the same row already loaded above)
+     |                  |
+     +--------+---------+
+              v
+      send_file(file_content, ...)
+              |
+              v
+         HTTP response
+```
+
+The database is not a second alternative alongside GitLab - it
+is read first, for the row's metadata, and that same row's
+already-loaded `cam_file_content` is what the fallback reuses
+if the GitLab attempt fails. Nothing about the fallback path
+queries the database a second time.
 
 ### The Updated Project
 
@@ -317,11 +358,11 @@ This is graceful degradation: a system continuing to provide a real, useful (if 
 
 ### SE Lens
 
-The real alternative not chosen: `download_file` could have let a GitLab failure propagate as a real error, forcing every caller to handle "the file exists, but you can't have it right now." Instead, the bare `except Exception:` shown above catches any real failure from `gitlab_service` and falls back to `cam_file.cam_file_content` - the same file's content, already stored locally. The real, honest cost, visible directly in the code just shown: catching a bare `Exception` also silently swallows a real bug inside the GitLab integration itself, not only a genuine network failure - this application currently cannot tell those two situations apart from this code alone.
+The real alternative not chosen: `download_file` could have let a GitLab failure propagate as a real error, forcing every caller to handle "the file exists, but you can't have it right now." Instead, the bare `except Exception:` shown above catches any real failure from `gitlab_service` and falls back to `cam_file.cam_file_content` - the same file's content, already stored locally. The real, honest cost, visible directly in the code just shown: catching a bare `Exception` also silently swallows a real bug inside the GitLab integration itself, not only a genuine network failure - this application currently cannot tell those two situations apart from this code alone. If `get_file_at_commit` or `get_file` raised an `AttributeError` because of an actual programming mistake inside `gitlab_service`, this `except` catches it exactly the same way it catches a real network timeout, and the request falls back to the local database either way - two genuinely different failure causes, collapsed into one fallback path, indistinguishable from outside this function.
 
 ### Verification
 
-Not applicable under the Verification Rule's own exemption: both files shown above are quoted verbatim from real, already-existing source, read this session - there is no execution to run; the code itself is the evidence.
+Not applicable under the Verification Rule's own exemption: no execution is required for this unit's actual claim. Both files shown above are quoted verbatim from real, already-existing source, read this session - the source establishes the real control flow being examined here (that a fallback exists, that a bare `except` is what catches the GitLab failure). It does not establish runtime behavior - what `get_gitlab_service()` actually returns, what's in the database, or what really happens on a live request - which would need a separate execution trace, not a citation.
 
 ### Connection to the previous unit
 

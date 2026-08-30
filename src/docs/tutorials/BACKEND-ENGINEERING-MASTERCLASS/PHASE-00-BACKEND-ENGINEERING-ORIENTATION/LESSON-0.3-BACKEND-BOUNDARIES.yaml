@@ -199,10 +199,13 @@ concept_units:
     verification:
       applicable: false
       exemption_reason: >
-        Not applicable under the Verification Rule's own exemption:
-        every claim in this unit is a direct citation to real,
-        already-existing files, already read and quoted elsewhere in
-        this curriculum — there is no execution to run.
+        Not applicable under the Verification Rule's own exemption: no
+        execution is required for this unit's actual claim - which
+        boundary each named file belongs to. Every citation below is a
+        direct reference to real, already-existing files, and that
+        classification is established by what the file is, not by
+        anything that has to run. It does not establish anything about
+        those files' runtime behavior, which is not this unit's claim.
     connection_to_previous: >
       There is no previous unit — this is the first one in this lesson.
 
@@ -430,11 +433,15 @@ concept_units:
     verification:
       applicable: false
       exemption_reason: >
-        Not applicable under the Verification Rule's own exemption:
-        every real claim here is directly backed by the real code
-        quoted above, read and confirmed verbatim from the genuine
-        current source this session - there is no execution to run;
-        the code itself is the evidence.
+        Not applicable under the Verification Rule's own exemption: no
+        execution is required for this unit's actual claim - that this
+        route mixes transport, domain logic, templating, and
+        persistence in one function, and that `_build_export_data`
+        lives in the routes file instead of the service file. The real
+        code quoted above, read and confirmed verbatim this session,
+        establishes that structural claim directly. It does not
+        establish this route's runtime behavior on a live request,
+        which is not what this unit is claiming.
     connection_to_previous: >
       The unit above named six boundaries a backend is supposed to
       keep separate; this unit found one real, already-documented place

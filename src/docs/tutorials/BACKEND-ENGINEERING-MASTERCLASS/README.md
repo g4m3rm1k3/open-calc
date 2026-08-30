@@ -81,7 +81,14 @@ local variable name from a genuine gap) prints but does not block.
 `new_code`/`updated_project` both support a `files: [{file, status,
 code}, ...]` list, not just a single file/code pair, for a unit that
 needs to show more than one real file together (a route and the
-service it delegates to, for instance).
+service it delegates to, for instance). When `new_code`,
+`updated_project`, or `mechanical_walkthrough` is set to
+`applicable: false`, the renderer omits that section's heading and body
+entirely — no "not applicable, because..." placeholder gets written.
+`verification` is the one exception: even set to `applicable: false`,
+its `exemption_reason` still renders on the page, because "how do we
+know this is true" is a live question for every unit, not a step some
+units skip.
 
 **`LESSON AUTHORING CONTRACT.md` / `LESSON SCHEMA.md` / `LESSON
 VALIDATION CHECKLIST.md`** (one level up, in the `manufacturing-platform`
