@@ -8,6 +8,7 @@ re-run the script after any lesson changes instead.
 
 ## _build_export_data
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - One of four real, substantial functions this lesson's own investigation already found living directly in this routes file, instead of in the service file that exists for exactly this kind of logic.
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real, already-cited function whose own docstring calls itself a pure function with no side effects - shown here in full to check that claim against its real body.
 
 ## Abstract Syntax Tree (AST)
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A tree structure representing a program's real grammatical structure - which function contains which decorator, which call has which arguments - built by parsing source code without running it. It exists so a program's own shape can be inspected mechanically and exactly, the same way every time, instead of a person reading it by eye and possibly missing something.
@@ -17,6 +18,9 @@ re-run the script after any lesson changes instead.
 
 ## Application server
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the real running process that accepts
+
+## Argument
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real, specific value actually supplied for a parameter at one particular call - the real strings in a real call like `download_file('CF-100', 'a1b2c3')`. It exists because the same parameter can receive a different real argument on every call; a function's real behavior on any one call depends on the argument actually passed, not on the parameter merely existing.
 
 ## ast.Attribute
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real AST node type representing one dotted attribute access, like `bp.route`.
@@ -57,8 +61,17 @@ re-run the script after any lesson changes instead.
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
 
+## db.session.add
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
+
+## db.session.commit
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that actually writes every currently staged change to the real database.
+
 ## Decorator
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Python syntax (`@something`) that wraps a function in another piece of behavior without changing the function's own body. It exists so "register this function as a route handler" can be stated once, directly above the function it applies to, instead of a separate registration call elsewhere in the file.
+
+## Dependency (of a function)
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
 
 ## Domain logic
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The actual decision-making specific to this application — which parts are valid, how a filter should behave, what counts as a duplicate. It exists as its own named boundary because it's the one layer that couldn't be copied wholesale into a completely different application the way transport or application-layer code often can be.
@@ -71,6 +84,9 @@ re-run the script after any lesson changes instead.
 
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
+
+## generate_nc_file
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real route function whose own docstring says it 'Saves the file to the database as an NCFile record' - shown here at the specific real lines where that save actually happens.
 
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
@@ -87,6 +103,12 @@ re-run the script after any lesson changes instead.
 ## Infrastructure
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real, concrete technical systems domain logic depends on but isn't itself about — which specific database engine, which filesystem, which network client library. It exists as a boundary separate from persistence and external services because "we store data somewhere" (persistence, a concept) and "we use SQLite specifically, at this file path" (infrastructure, a real, swappable detail) are different kinds of claims.
 
+## inspect.Parameter
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real class representing one parameter within a `Signature` - what `Signature.parameters` maps each real parameter name to.
+
+## inspect.signature
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A standard-library function returning a real, structured description of a callable's parameters.
+
 ## Jinja2 Template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real class from the Jinja2 templating library, and the real method that fills in a template's placeholders with real values.
 
@@ -99,8 +121,12 @@ re-run the script after any lesson changes instead.
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
 
+## Parameter
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A name declared in a function's own definition, naming a slot the function's body refers to - `cam_file_id` and `commit_sha` in `def download_file(cam_file_id, commit_sha=None):`, not any specific value yet. It exists as its own concept, separate from the value eventually supplied, so a function's real contract - what it needs to do its job - can be stated once, independent of any one particular call.
+
 ## PDMService.download_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real static method, already investigated in this curriculum for its real fallback behavior - shown here for a different real question: what its own parameters actually promise.
 
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
@@ -112,11 +138,17 @@ re-run the script after any lesson changes instead.
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
 
+## Pure function
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
+
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
 
 ## Raising an exception
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
+
+## Reflection
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
 
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
@@ -127,6 +159,9 @@ re-run the script after any lesson changes instead.
 ## request.args.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
 
+## Return value
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
+
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of
 
@@ -135,6 +170,12 @@ re-run the script after any lesson changes instead.
 
 ## Server
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that waits for a request and responds to
+
+## Side effect
+- **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Any real, observable change a function makes to something outside its own local variables and its own return value - writing a real row to a real database, mutating an object passed in, printing to the console. It exists as its own term because two functions with identical parameters and identical return values can still behave completely differently once side effects are counted - one changes nothing outside itself, the other changes real, persistent state.
+
+## Signature.parameters
+- **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real, ordered, read-only mapping from each parameter's real name to a `Parameter` object describing it.
 
 ## Socket
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - a real, addressable endpoint a process opens so another
@@ -203,12 +244,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
+- `Dependency (of a function)` / `Pure function` - shares: function
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
+- `generate_nc_file` / `PDMService.download_file` - shares: file
+- `generate_nc_file` / `send_file` - shares: file
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
+- `inspect.Parameter` / `Parameter` - shares: parameter
+- `inspect.Parameter` / `Query parameter` - shares: parameter
+- `inspect.signature` / `Signature.parameters` - shares: signature
 - `Jinja2 Template` / `render_template` - shares: template
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
+- `Parameter` / `Query parameter` - shares: parameter
 - `PDMService.download_file` / `send_file` - shares: file
 - `Request line` / `Status line` - shares: line
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server

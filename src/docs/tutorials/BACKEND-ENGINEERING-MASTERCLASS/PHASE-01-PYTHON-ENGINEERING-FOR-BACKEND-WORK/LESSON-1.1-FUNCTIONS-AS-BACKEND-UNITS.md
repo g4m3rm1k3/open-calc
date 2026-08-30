@@ -1,0 +1,334 @@
+# Lesson 1.1: Functions as Backend Units
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** A real, small tool using Python's own `inspect` module to read a real function's actual parameters and their defaults directly off the live function object - a different kind of investigation than parsing source text before anything runs: this one asks an already-loaded real object about itself, a technique called reflection - then a real, side-by-side look at two functions living in the same real file, one whose own docstring calls itself a pure function, one that really writes to the database, to make "parameter," "argument," "return value," "side effect," "pure function," and "dependency" concrete, checkable facts about real code rather than abstract vocabulary.
+
+**What you need to know first:** Reading a real, existing file as evidence; investigating unfamiliar code mechanically with a real tool instead of trusting a docstring or a guess.
+
+## Terms used in this lesson
+
+- **Parameter** — A name declared in a function's own definition, naming a slot the function's body refers to - `cam_file_id` and `commit_sha` in `def download_file(cam_file_id, commit_sha=None):`, not any specific value yet. It exists as its own concept, separate from the value eventually supplied, so a function's real contract - what it needs to do its job - can be stated once, independent of any one particular call.
+- **Argument** — The real, specific value actually supplied for a parameter at one particular call - the real strings in a real call like `download_file('CF-100', 'a1b2c3')`. It exists because the same parameter can receive a different real argument on every call; a function's real behavior on any one call depends on the argument actually passed, not on the parameter merely existing.
+- **Return value** — The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
+- **Side effect** — Any real, observable change a function makes to something outside its own local variables and its own return value - writing a real row to a real database, mutating an object passed in, printing to the console. It exists as its own term because two functions with identical parameters and identical return values can still behave completely differently once side effects are counted - one changes nothing outside itself, the other changes real, persistent state.
+- **Pure function** — A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
+- **Dependency (of a function)** — Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
+- **Reflection** — A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
+
+## Objects and methods used
+
+- **`inspect.signature`**
+  - *What it is:* A standard-library function returning a real, structured description of a callable's parameters.
+  - *Implementation:* `inspect.signature(callable) -> Signature`
+  - *Its use:* This lesson's lab uses it to read a real function's actual parameters directly off the live function object, rather than trusting how the function happens to be called elsewhere or a comment describing it.
+  - *Type:* A free function, in Python's standard library `inspect` module.
+  - *Responsibility:* Given any real callable, build and return a real `Signature` object describing every one of its real parameters, in their real declared order, including which ones carry a real default value.
+  - *Depends on:* A real, already-defined callable - a function, method, or class - already loaded into memory (already imported).
+  - *Connects to:* Its return value's `parameters` field is iterated below, via `Signature.parameters`.
+  - *Shape:* Takes one real callable in; returns one `Signature` object - not a plain dict, an object whose own `parameters` field is itself iterated to get at the real per-parameter detail.
+
+- **`Signature.parameters`**
+  - *What it is:* A real, ordered, read-only mapping from each parameter's real name to a `Parameter` object describing it.
+  - *Implementation:* `Signature.parameters -> types.MappingProxyType[str, Parameter]` - a real attribute, not a method call.
+  - *Its use:* This lesson's lab iterates it to read every real parameter name, in real declared order, and check whether each one carries a real default.
+  - *Type:* An instance attribute on a real `Signature` object, confirmed this session via Python's own `inspect` module.
+  - *Responsibility:* Hold every real parameter this signature describes, keyed by its real name, in the exact real order the function itself declares them.
+  - *Depends on:* Being read from an already-built `Signature` object - never constructed directly by this lesson's own code.
+  - *Connects to:* Iterated with `.items()`, below; each value's own `default` field is checked against `Parameter.empty`.
+  - *Shape:* A real, ordered mapping - iterating it yields `(name, Parameter)` pairs in real declared order, never re-sorted; read-only, so nothing this lesson's code does can mutate the real signature it came from.
+
+- **`inspect.Parameter`**
+  - *What it is:* The real class representing one parameter within a `Signature` - what `Signature.parameters` maps each real parameter name to.
+  - *Implementation:* `inspect.Parameter` - a real class; `.default` is one of its real instance attributes, and `.empty` is a real class-level sentinel value (`inspect.Parameter.empty`), distinct from `None`.
+  - *Its use:* This lesson's lab reads each real `Parameter`'s `.default` field and compares it against the real `.empty` sentinel, to tell a genuinely optional parameter apart from one with no default at all.
+  - *Type:* A class, in Python's standard library `inspect` module.
+  - *Responsibility:* Represent, as real structured data, one function parameter's real name, its real default (or the real fact that it has none), and its real kind (positional, keyword-only, and so on).
+  - *Depends on:* Being produced by `inspect.signature`, as a value inside the `Signature.parameters` mapping - never constructed directly by this lesson's own code.
+  - *Connects to:* Read from `Signature.parameters`, above; its own `.default` field is compared against `Parameter.empty`.
+  - *Shape:* One object per real parameter; its `.default` field holds either the real default value (which can genuinely be `None`, as with `commit_sha` below) or the distinct sentinel `Parameter.empty` - never conflating 'no default' with 'the default is `None`,' which two different real parameters in this lesson's own evidence actually are.
+
+- **`PDMService.download_file`**
+  - *What it is:* A real static method, already investigated in this curriculum for its real fallback behavior - shown here for a different real question: what its own parameters actually promise.
+  - *Implementation:* `PDMService.download_file(cam_file_id, commit_sha=None)`, defined at `backend/app/services/pdm_service.py:162`.
+  - *Its use:* This lesson's lab reflects on its real, live signature to confirm which of its two real parameters carries a default, and what that default actually is.
+  - *Type:* A static method on the `PDMService` class.
+  - *Responsibility:* Declare exactly two real parameters this method needs to do its job - a required `cam_file_id`, and an optional `commit_sha` whose real default, confirmed below, is `None`.
+  - *Depends on:* Nothing to be called with a real signature at all - `inspect.signature` works on it whether or not it's ever actually invoked.
+  - *Connects to:* Its real signature is read by `inspect.signature`, above, inside this lesson's own lab.
+  - *Shape:* Two real parameters: `cam_file_id`, with no default (`Parameter.empty`), and `commit_sha`, whose real default is the value `None` itself - not the absence of a default, a real, meaningful default that happens to be `None`.
+
+- **`_build_export_data`**
+  - *What it is:* A real, already-cited function whose own docstring calls itself a pure function with no side effects - shown here in full to check that claim against its real body.
+  - *Implementation:* `_build_export_data(pairing, cam_file, machine, part, sequences, operation_order) -> dict`, defined at `backend/app/routes/operation_manager.py:815-904`.
+  - *Its use:* This lesson's lab confirms its six real parameters reflectively; this lesson's second unit reads its real body directly to check its own 'pure function' claim against what it actually does.
+  - *Type:* A free function, at module level, in a real routes file.
+  - *Responsibility:* Combine six real, already-fetched objects into one real dict the template-rendering step elsewhere in this same file needs - and, per its own docstring, do so without any side effect.
+  - *Depends on:* Six real objects, one per parameter, already fetched by its caller before it's ever invoked; also, less obviously, the real system clock (see Shape, below).
+  - *Connects to:* Its real signature is read by `inspect.signature` in the unit above; its real body - and the one real dependency its own docstring doesn't mention - is read directly in this lesson's second unit.
+  - *Shape:* Takes six real objects in, none with a default; returns one dict built entirely from those six objects and real, local computation - with one exception: one line reads the real system clock (`datetime.utcnow()`), so the same six real arguments do not guarantee the exact same real return value on a second call.
+
+- **`generate_nc_file`**
+  - *What it is:* The real route function whose own docstring says it 'Saves the file to the database as an NCFile record' - shown here at the specific real lines where that save actually happens.
+  - *Implementation:* `generate_nc_file(pairing_id)`, defined at `backend/app/routes/operation_manager.py:465-624`.
+  - *Its use:* This lesson's second unit shows its real database-write section directly, as the concrete real side effect `_build_export_data`, above, has none of.
+  - *Type:* A free function, registered as a Flask route via `Blueprint.route`.
+  - *Responsibility:* Given a real pairing id, build a real NC file's content and either update an already-persisted real `NCFile` row or create a new one - and, either way, really commit that change to the real database before returning.
+  - *Depends on:* A real, already-configured database connection (reached through the real, already-imported `db` object); a real `pairing_id` argument; real, already-fetched context this lesson doesn't re-quote.
+  - *Connects to:* Calls `NCFile.query.get`, then either `db.session.add` or nothing (depending on whether the row already existed), then `db.session.commit`, below, in every real case.
+  - *Shape:* Takes one real string argument in; returns a real Flask `Response` (via `jsonify`) - but its real return value is not the interesting part here. The interesting part is what happens before it returns: a real row in the real database ends up different than it was, which nothing about this function's own return value, on its own, would ever reveal.
+
+- **`db.session.add`**
+  - *What it is:* A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
+  - *Implementation:* `Session.add(instance) -> None`
+  - *Its use:* Stages the newly-constructed real `NCFile` row, in `generate_nc_file`, above, so the commit that follows actually writes it.
+  - *Type:* An instance method on a real SQLAlchemy `Session` object, reached here as `db.session.add`.
+  - *Responsibility:* Record that the given real object should be included the next time this real session is committed - nothing is written to the real database yet when this line alone runs.
+  - *Depends on:* A real, already-configured `Session` object (`db.session`); a real model instance to stage.
+  - *Connects to:* Called once, in `generate_nc_file`'s `else` branch, above; the real write it stages only actually happens once `db.session.commit`, below, runs.
+  - *Shape:* Takes one real object in; returns `None`. Its real effect isn't in its return value at all - it's a real, observable change to the session's own internal pending state, which is exactly what makes it a side effect rather than an ordinary computation.
+
+- **`db.session.commit`**
+  - *What it is:* A real method on SQLAlchemy's `Session` object that actually writes every currently staged change to the real database.
+  - *Implementation:* `Session.commit() -> None`
+  - *Its use:* The real line in `generate_nc_file`, above, where the whole unit's side effect actually takes hold - before this line runs, nothing is genuinely different in the real database yet.
+  - *Type:* An instance method on a real SQLAlchemy `Session` object, reached here as `db.session.commit`.
+  - *Responsibility:* Write every real change staged since the last commit - a new row from `db.session.add`, or a modified row's already-changed attributes - to the real database, and end the current real transaction.
+  - *Depends on:* A real, already-configured `Session` object; a real, reachable database to write to.
+  - *Connects to:* Called once, unconditionally, after either real branch in `generate_nc_file` runs - the modified-row branch and the newly-added-row branch both reach this same real line.
+  - *Shape:* Takes nothing; returns `None`. Like `db.session.add`, above, its real effect is entirely a side effect - after this line runs, the real database itself holds different data than it did before, which nothing about this function's own return value states directly.
+
+## Concept Unit: Reading What a Function Actually Promises, Mechanically
+
+### The Problem
+
+A function's real parameters are declared once, in its own definition - but a reader investigating unfamiliar code often has to guess, from a docstring or from how the function happens to be called elsewhere, whether a given parameter is required or optional. Reflection lets that be answered mechanically and exactly, off the real, live function object itself.
+
+Before reading on:
+
+- Given a real call like `download_file('CF-100', 'a1b2c3')` and another real call like `download_file('CF-100')`, what does the second call's missing argument tell you about `commit_sha`, before you've read the function's own definition at all?
+- If a function's own default value ever changed, what would have to change for a docstring describing it to also stay correct?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - a from-scratch investigation tool, run against two real, already-existing functions (`backend/app/services/pdm_service.py:162`, `backend/app/routes/operation_manager.py:815`).
+- **Files affected:** `verification/phase-01/lab_inspect_signature.py` (new)
+- **Change type:** add
+- **Location:** New file, no existing project to place it within.
+- **Dependencies:** Python's standard library `inspect` module only.
+
+Rather than trust a docstring, or how each function happens to be called elsewhere in this real codebase, this unit builds a small, real tool that answers "what does this function's own signature actually require" by asking the real, live function object directly.
+
+### The New Code
+
+New code, typed into a new throwaway file - the whole file at once, since there's no existing structure to return to for something this small:
+
+**File:** `verification/phase-01/lab_inspect_signature.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+import inspect
+from app.services.pdm_service import PDMService
+from app.routes.operation_manager import _build_export_data
+
+for fn in (PDMService.download_file, _build_export_data):
+    print(f"{fn.__qualname__}:")
+    sig = inspect.signature(fn)
+    for name, param in sig.parameters.items():
+        has_default = param.default is not inspect.Parameter.empty
+        if has_default:
+            print(f"    {name}: default={param.default!r}")
+        else:
+            print(f"    {name}: no default")
+```
+
+### Mechanical Walkthrough
+
+- `sys.path.insert(0, "backend")` — Makes the real `app` package importable from the repository root, without needing the whole Flask application actually running - `sys.path` (basic Python), enabling the two real imports below.
+- `from app.services.pdm_service import PDMService; from app.routes.operation_manager import _build_export_data` — Imports the two real, already-existing project objects this lab reflects on - the same real static method and free function this curriculum has already read as evidence, not stand-ins written for this lesson.
+- `for fn in (PDMService.download_file, _build_export_data):` — Basic Python iteration over two real callables just imported, treating a bound static method and a free function identically - `inspect.signature` works the same real way on either.
+- `sig = inspect.signature(fn)` — `inspect.signature`, called for real, producing a real `Signature` object for whichever function this iteration currently holds.
+- `for name, param in sig.parameters.items():` — `Signature.parameters`, iterated in its real declared order via `.items()` (basic Python mapping iteration).
+- `has_default = param.default is not inspect.Parameter.empty` — `Parameter.default` checked against the real `Parameter.empty` sentinel - not against `None` - because `None` is itself a real, meaningful default for one of these two real functions' parameters, and conflating "no default" with "the default is `None`" would get that parameter wrong.
+- `print(f"    {name}: default={param.default!r}") / print(f"    {name}: no default")` — Prints each real parameter's real default when one exists - `!r` (basic Python) so `None` prints as the literal `None`, not an empty string - or states plainly that none exists otherwise.
+
+### CS Lens
+
+This is reflection: a program examining its own real, already-loaded objects directly, rather than parsing source text before anything runs. Also recognized in: a debugger's own "variables" pane, showing a paused program's real live state by asking it directly, not by re-reading its source; an IDE's autocomplete popup, listing a real object's real available methods by asking that object's own type; and Python's own `help()` function, which builds its output by reflecting on a real, already-loaded object, not by re-parsing the file that defined it.
+
+### SE Lens
+
+The real alternative not chosen: opening `pdm_service.py` and reading the `def download_file(...)` line by eye. That works fine for one already-open function in one already-open file, but doesn't scale to answering "does any function in this real, unfamiliar codebase have a required parameter I'm not providing" without opening every file by hand - the same real problem already solved for finding every route across a whole file mechanically instead of reading it end to end, here applied to one function's own real parameters instead of a whole file's route decorators.
+
+### Commands needed
+
+- `python verification/phase-01/lab_inspect_signature.py` — Run from the manufacturing-platform repository root, so `sys.path.insert(0, "backend")` resolves the real `app` package correctly.
+
+### Verification
+
+```text
+PDMService.download_file:
+    cam_file_id: no default
+    commit_sha: default=None
+_build_export_data:
+    pairing: no default
+    cam_file: no default
+    machine: no default
+    part: no default
+    sequences: no default
+    operation_order: no default
+```
+
+Full saved run: `verification/phase-01/lab_inspect_signature_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first one in this lesson.
+
+## Concept Unit: Same File, Two Real Functions: One Pure, One Not
+
+### The Problem
+
+"Parameter" and "argument" are now checkable, mechanically. But "side effect," "pure function," and "dependency" are still just vocabulary until they're checked against real function bodies, not just real signatures. This same real file already contains one function whose own docstring calls itself a pure function, and, a few real lines later inside a different function, a real write to a real database.
+
+Before reading on:
+
+- Before reading either function's body: given only `_build_export_data(pairing, cam_file, machine, part, sequences, operation_order)`'s real parameter list, what would have to be true about its body for calling it twice with the exact same six real arguments to always produce the exact same real result?
+- If `generate_nc_file`'s real database write failed halfway through a second real call, would `_build_export_data` need to know or care? Why or why not?
+
+### Project Change
+
+- **Reference Source:** `backend/app/routes/operation_manager.py:815-838` and `896-904` (`_build_export_data`'s real signature, docstring, and the start and end of its real body); `backend/app/routes/operation_manager.py:565-604` (`generate_nc_file`'s real database-write section) - all real, already-existing code in the same real file, read and quoted verbatim this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A
+- **Dependencies:** None beyond the real repository already checked out on disk.
+
+`_build_export_data` already appeared as cited evidence for an architectural boundary violation; shown here in full for a different real question - not where it lives, but what it actually does when called. Its own docstring calls it a real pure function with no side effects; the real body below confirms no side effects, but also reveals one real hidden dependency the docstring doesn't mention. `generate_nc_file`, whose own docstring says it "Saves the file to the database as an NCFile record," is shown here at the specific real lines where that save actually happens - the concrete real side effect `_build_export_data` has none of.
+
+### The Updated Project
+
+**File:** `backend/app/routes/operation_manager.py (lines 815-838)` (already exists — read-only, nothing to type)
+
+```python
+def _build_export_data(pairing, cam_file, machine, part, sequences, operation_order):
+    """
+    Build the complete export data structure.
+
+    This is a PURE FUNCTION (no side effects) that transforms input data.
+    Following Single Responsibility Principle - only builds export structure.
+
+    Args:
+        pairing: MachineCAMPairing object
+        cam_file: CAMFile object
+        machine: Machine object (or None)
+        part: Part object (or None)
+        sequences: List of Sequence objects
+        operation_order: OperationOrder object (or None)
+
+    Returns:
+        dict: Complete export data structure
+    """
+    from datetime import datetime
+
+    # Base export metadata
+    export = {
+        'exportedAt': datetime.utcnow().isoformat() + 'Z',
+        'pairingId': pairing.id,
+```
+
+**File:** `backend/app/routes/operation_manager.py (lines 896-904)` (already exists — read-only, nothing to type)
+
+```python
+# Summary statistics
+total_operations = sum(len(seq.get('operations', [])) for seq in export['sequences'])
+export['summary'] = {
+    'totalSequences': len(export['sequences']),
+    'totalOperations': total_operations,
+    'uniqueTools': list(set(seq['toolNumber'] for seq in export['sequences'] if seq.get('toolNumber')))
+}
+
+return export
+```
+
+**File:** `backend/app/routes/operation_manager.py (lines 565-604)` (already exists — read-only, nothing to type)
+
+```python
+# STEP 7: Prepare NCFile metadata
+# Generate filename based on user input, part number or CAM file
+raw_name = custom_file_name if custom_file_name else (part.part_number if part else "PROG")
+base_name = raw_name.rsplit('.', 1)[0] if '.' in raw_name else raw_name
+file_name = f"{base_name}.nc"
+
+# Consistent Program Numbering
+program_number = base_name.upper()
+if not program_number.startswith('O'):
+    program_number = 'O' + program_number
+
+# Target the PRIMARY NC file record for this program
+nc_id = f"NC-{pairing.cam_file_id}-{base_name}"
+existing = NCFile.query.get(nc_id)
+
+if existing:
+    existing.file_name = file_name
+    existing.program_number = program_number # Ensure program_number is updated
+    existing.file_content = nc_content
+    existing.file_size = len(nc_content)
+    existing.upload_status = 'uploaded'
+    existing.updated_at = datetime.utcnow()
+    message = f"Process result '{file_name}' updated"
+else:
+    existing = NCFile(
+        id=nc_id,
+        cam_file_id=pairing.cam_file_id,
+        program_number=program_number,
+        file_name=file_name,
+        file_content=nc_content,
+        file_size=len(nc_content),
+        upload_status='uploaded',
+        program_type='main',
+        created_at=datetime.utcnow(),
+        created_by='system'
+    )
+    db.session.add(existing)
+    message = f"Process result '{file_name}' created"
+
+db.session.commit()
+```
+
+### Mechanical Walkthrough
+
+- `def _build_export_data(pairing, cam_file, machine, part, sequences, operation_order):` — The same real six-parameter signature the tool built in the unit above already confirmed reflectively - none of the six carry a default, so every real call has to supply all six real arguments explicitly.
+- `"""... This is a PURE FUNCTION (no side effects) ..."""` — A real, specific claim the function makes about itself, in a comment - exactly the kind of claim this curriculum's own evidence-first habit exists to check against the real body below, not accept because a docstring says so.
+- `from datetime import datetime` — A real, local import - inside the function body, not at module level - basic Python (a local import is legal, just less common than a top-level one); what it makes available matters directly in the very next real line.
+- `export = {'exportedAt': datetime.utcnow().isoformat() + 'Z', 'pairingId': pairing.id, ...}` — Real dict-literal construction (basic Python), building this function's own local `export` variable - except one of its values, `datetime.utcnow()`, reads the real system clock. That's this function's one real dependency: its output is not a function of its six arguments alone, even though nothing about it is a side effect.
+- `total_operations = sum(...); export['summary'] = {...}` — More real local computation over the same local `export` dict already being built - the same real pattern repeats for `part`, `cam_file`, `machine`, and `operation_order` in the real, omitted middle (lines 839-895): each one conditionally adds another key to this same local dict, never writing anywhere else.
+- `return export` — The function's one real return value - the fully-built local dict, and nothing else ever happens to it, or because of it, inside this function.
+- `existing = NCFile.query.get(nc_id)` — A real ORM lookup by primary key, deciding which of the two real branches below actually runs - the same real `Model.query.get` pattern already established elsewhere in this curriculum's own evidence.
+- `if existing: ... else: existing = NCFile(...)` — A real branch: update an already-loaded real row's real attributes in place, or construct a brand-new real `NCFile` instance from ten real keyword arguments - either way, `existing` ends this branch bound to a real object that either already existed or didn't a moment ago.
+- `db.session.add(existing)` — `db.session.add` - the real side effect's first half: stages the newly-constructed real row with the real, already-configured database session. Nothing is written to the real database yet; the session's own real pending state is what just changed.
+- `db.session.commit()` — `db.session.commit` - the real side effect's second half, reached unconditionally by both real branches above: after this line runs, the real database itself holds different data than it did before - the concrete, checkable side effect `_build_export_data`, above, never has.
+
+### CS Lens
+
+This is the real distinction between purity and side-effect freedom, which aren't quite the same real claim. `_build_export_data` never mutates anything outside itself and never writes anywhere - side-effect-free, and its own docstring's claim about that much holds up against its real body. But it isn't strictly pure either, once `datetime.utcnow()` is counted: calling it twice with the exact same six real arguments produces a different `exportedAt` value each time, because its real output depends on something besides its arguments - the real system clock, a hidden dependency no parameter names. Also recognized in: a `random.choice(...)` call buried inside an otherwise-innocent-looking data transformer, a function that reads a real environment variable partway through instead of receiving it as an argument, and a "pure" calculation function that secretly reads a global cache.
+
+### SE Lens
+
+The real, honest cost of leaving `datetime.utcnow()` inside this function rather than passing a real timestamp in as an argument: it cannot be tested with a fixed, predictable `exportedAt` value without patching the real system clock itself, and two real calls with identical arguments will never produce byte-identical results - a genuinely different guarantee than what the docstring's own "PURE FUNCTION" claim promises. The real alternative not chosen: accepting a timestamp as a seventh parameter, letting the caller decide what "now" means. `generate_nc_file`, by contrast, doesn't just have a hidden dependency - it has a full side effect: `db.session.add` and `db.session.commit` really do write a new or changed row to the real database, a fundamentally more consequential difference than a differing timestamp - calling it twice with the same `pairing_id` genuinely leaves the real database different than it found it, on purpose.
+
+### Verification
+
+Not applicable under the Verification Rule's own exemption: no execution is required for this unit's actual claim - that `_build_export_data`'s shown body contains no direct external mutation beyond reading the real system clock, and that `generate_nc_file`'s shown body really does stage and commit a database write. The real code shown above, read and confirmed verbatim this session, establishes that structural claim directly. It does not establish what actually happens on a live request - whether the write succeeds, what ends up in the real database - which would need a separate execution trace, not a citation.
+
+### Connection to the previous unit
+
+The unit above built a real, reflective tool confirming both functions' real parameters carry no defaults; this unit read both functions' real bodies directly, confirming one is side-effect-free but not strictly pure, and the other really does write to the real database.
+
+## Connect the pieces
+
+One real tool, `inspect.signature`, confirmed two real functions' parameters carry no defaults - then both functions' real bodies, read directly: `_build_export_data`, six real arguments in, one real dict out, no side effect but one hidden dependency on the real system clock; `generate_nc_file`, one real argument in, and, a few real lines later, a real row genuinely added and committed to the real database. The same real file, the same real investigation habit - a docstring's claim checked against the real code, not accepted on its own.
+
+**Next lesson:** What happens when a function can't produce a real return value at all - deliberately signaling failure with Python's own exception mechanism, and where in a real call chain that failure should actually be caught.
