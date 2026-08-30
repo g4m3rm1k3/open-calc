@@ -41,13 +41,19 @@ terms:
       shipped.
   - name: executable specification
     definition: >
-      A written statement of what code is supposed to do, expressed in
-      a form the computer itself runs and checks, rather than prose a
-      human has to read and separately re-verify by eye. It exists
-      because a prose description (a comment, a docstring) can silently
-      drift out of sync with the code it describes, while a
-      specification the machine actually runs cannot lie about whether
-      it still holds.
+      A statement of what code is supposed to do, expressed in a form
+      the computer itself runs and checks against the real
+      implementation, rather than prose a human has to read and
+      separately re-verify by eye. It exists because a prose description
+      (a comment, a docstring) can silently drift out of sync with the
+      code it describes, and nothing about running the code ever
+      re-checks it - while a specification written as real code gets
+      re-checked, automatically, every single time it runs. This does
+      not mean an executable specification is automatically correct: the
+      expected value written into it can itself be the wrong one, the
+      same as a prose claim can. What it guarantees is narrower and
+      still real - it cannot silently stop matching the code without
+      saying so, the way a comment or docstring can.
   - name: confidence
     definition: >
       In the sense this lesson uses it, the concrete, checkable
@@ -73,7 +79,14 @@ terms:
       raises `AssertionError` immediately, carrying `<message>`. It
       exists as the smallest possible way to write "I expect this to be
       true" in a form Python itself checks every time the line runs,
-      rather than a comment a human has to re-verify by eye.
+      rather than a comment a human has to re-verify by eye. It is a
+      primitive language mechanism, not a testing framework - Python can
+      be told to skip every `assert` in a program entirely (running it
+      with the `-O` flag strips them out), which is exactly why real
+      test suites are normally built on a dedicated framework instead of
+      bare `assert` statements left in production code; this lesson uses
+      bare `assert` deliberately, to teach the underlying idea before a
+      framework is introduced.
   - name: generator expression
     definition: >
       A compact expression of the shape `EXPR for NAME in ITERABLE`,
