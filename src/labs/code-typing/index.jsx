@@ -124,6 +124,7 @@ export default function CodeTypingStudio() {
   const [runState, setRunState] = useState('idle')
   const [runOutput, setRunOutput] = useState('')
   const typingRef = useRef(null)
+  const activeCharRef = useRef(null)
 
   useEffect(() => {
     let alive = true
@@ -173,6 +174,12 @@ export default function CodeTypingStudio() {
   const expected = lesson.code[activeIndex]
   const nextHint = keyHint(expected)
 
+  // Long concept examples remain in a compact viewport, but the cursor always
+  // follows the learner so they never need to hunt for the current line.
+  useEffect(() => {
+    activeCharRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
+  }, [activeIndex])
+
   const reset = useCallback(() => {
     setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null); setRunState('idle'); setRunOutput('')
     requestAnimationFrame(() => typingRef.current?.focus())
@@ -198,7 +205,23 @@ export default function CodeTypingStudio() {
     if (key === 'Tab') {
       event.preventDefault()
       setTyped(current => {
-        if (current.length >= lesson.code.length || lesson.code[current.length] !== ' ') return current
+        if (current.length >= lesson.code.length) return current
+        // Some source files (including Go examples) contain literal tab
+        // characters. They must accept one physical Tab directly.
+        if (lesson.code[current.length] === '\t') {
+          setAttempts(total => total + 1)
+          setCorrectKeystrokes(total => total + 1)
+          setLastError(null)
+          if (!startedAt) setStartedAt(Date.now())
+          const next = [...current, { char: '\t', correct: true, viaTab: true }]
+          if (next.length === lesson.code.length) setDone(true)
+          return next
+        }
+        if (lesson.code[current.length] !== ' ') {
+          setAttempts(total => total + 1)
+          setLastError({ expected: lesson.code[current.length], received: '\t', index: current.length, nonce: Date.now() })
+          return current
+        }
         const lineStart = lesson.code.lastIndexOf('\n', current.length - 1) + 1
         const isIndent = /^ *$/.test(lesson.code.slice(lineStart, current.length))
         const remainingSpaces = lesson.code.slice(current.length).match(/^ +/)?.[0].length ?? 1
@@ -298,12 +321,12 @@ export default function CodeTypingStudio() {
           <div className="h-1 bg-slate-100 dark:bg-slate-950"><motion.div className="h-full bg-gradient-to-r from-brand-500 via-violet-500 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ type: 'spring', stiffness: 100, damping: 20 }} /></div>
           <div className="relative p-3 sm:p-6">
             <div className="mb-3 flex items-center justify-between px-1 text-[11px] font-bold uppercase tracking-[.14em] text-slate-400"><span>Target code</span><span>Click anywhere to type</span></div>
-            <div ref={typingRef} tabIndex={0} role="textbox" aria-label="Code typing practice area" onKeyDown={onKeyDown} onClick={() => typingRef.current?.focus()} className="relative min-h-[330px] cursor-text rounded-2xl border border-slate-200 bg-slate-950 p-4 font-mono text-[14px] leading-7 shadow-inner outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 sm:p-6 sm:text-[15px]">
+            <div ref={typingRef} tabIndex={0} role="textbox" aria-label="Code typing practice area" onKeyDown={onKeyDown} onClick={() => typingRef.current?.focus()} className="relative h-[min(56vh,520px)] min-h-[330px] cursor-text overflow-y-auto rounded-2xl border border-slate-200 bg-slate-950 p-4 font-mono text-[14px] leading-7 shadow-inner outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 sm:p-6 sm:text-[15px]">
               <pre className="m-0 whitespace-pre-wrap break-words">{characters.map((char, index) => {
                 const entry = typed[index]
                 const isCurrent = index === activeIndex
                 const shown = char === ' ' ? '·' : char === '\n' ? '↵\n' : char === '\t' ? '⇥  ' : char
-                return <motion.span key={index} initial={false} animate={entry ? { scale: entry.correct ? 1 : [1, 1.2, 1], y: entry.correct ? 0 : [0, -2, 0] } : { scale: 1, y: 0 }} transition={{ duration: .2 }} className={`relative rounded-sm ${entry?.correct ? 'bg-emerald-400/15 text-emerald-300' : entry && !entry.correct ? 'bg-rose-500/30 text-rose-200 underline decoration-rose-400 decoration-2' : isCurrent ? 'bg-brand-400/25 text-white ring-1 ring-brand-300/70' : codeClass(char)}`}>{shown}{isCurrent && <span className="absolute -bottom-1 left-0 h-0.5 w-full animate-pulse bg-brand-300" />}</motion.span>
+                return <motion.span ref={isCurrent ? activeCharRef : null} key={index} initial={false} animate={entry ? { scale: entry.correct ? 1 : [1, 1.2, 1], y: entry.correct ? 0 : [0, -2, 0] } : { scale: 1, y: 0 }} transition={{ duration: .2 }} className={`relative scroll-mt-24 rounded-sm ${entry?.correct ? 'bg-emerald-400/15 text-emerald-300' : entry && !entry.correct ? 'bg-rose-500/30 text-rose-200 underline decoration-rose-400 decoration-2' : isCurrent ? 'bg-brand-400/25 text-white ring-1 ring-brand-300/70' : codeClass(char)}`}>{shown}{isCurrent && <span className="absolute -bottom-1 left-0 h-0.5 w-full animate-pulse bg-brand-300" />}</motion.span>
               })}</pre>
               {activeIndex === 0 && <div className="pointer-events-none absolute bottom-8 right-8 hidden items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-2 text-xs text-slate-400 sm:flex"><Keyboard className="h-4 w-4 text-brand-300" />Start typing to begin</div>}
             </div>
