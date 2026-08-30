@@ -163,14 +163,23 @@ re-run the script after any lesson changes instead.
 ## inspect.signature
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A standard-library function returning a real, structured description of a callable's parameters.
 
+## itertools.groupby
+- **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library function that groups consecutive real elements of an iterable sharing the identical real key.
+
 ## Jinja2 Template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real class from the Jinja2 templating library, and the real method that fills in a template's placeholders with real values.
 
 ## jsonify
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
 
+## Key function
+- **Term** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, callable argument - a lambda, a named function, or a real pre-built extractor like `operator.itemgetter` - that a tool calls once per real element to decide what that element should be compared or grouped BY, without changing the element itself. It exists as its own concept because both this lesson's own real sorting and real grouping tools share the identical real parameter for it, `key=...`, and because a key function's own real return value is only ever used for comparison/grouping - the real element passed through unchanged into the actual result either way.
+
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
+
+## map
+- **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that applies a real, given function to every element of a real iterable, one at a time.
 
 ## Mutable / immutable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
@@ -180,6 +189,9 @@ re-run the script after any lesson changes instead.
 
 ## OperationScaffoldItem
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real, already-existing `@dataclass(frozen=True)` in this backend, the exact real fix this lesson's own third unit reaches for.
+
+## operator.itemgetter
+- **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library callable factory that builds a real key function extracting one named or indexed real value from each element.
 
 ## Package boundary
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
@@ -275,6 +287,9 @@ re-run the script after any lesson changes instead.
 ## socket.socket
 - **Object/method** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - The class representing one endpoint of a network
 
+## sorted
+- **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that returns a new, real list containing every element of a given iterable, in sorted order.
+
 ## Static analysis
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or `CodeLens`'s own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
 - **Term** in `LESSON-1.5-TYPE-HINTS` - Checking real code for problems by reading its source and its annotations - never by running it. It exists as its own concept because it's a genuinely different kind of check than this curriculum's own `verification` sections have used so far: every real output shown until this lesson came from actually executing code and reading what happened; a static analysis tool instead reads the code's own declared shape and reasons about what could go wrong before a single line of it ever runs - catching a real class of bug (a value that could be the wrong type) that might not show up in any one particular real run, only in some future run this lesson's own labs never happened to try.
@@ -343,6 +358,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
+- `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
@@ -370,6 +386,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.Parameter` / `Query parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
 - `Jinja2 Template` / `render_template` - shares: template
+- `Key function` / `Pure function` - shares: function
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
