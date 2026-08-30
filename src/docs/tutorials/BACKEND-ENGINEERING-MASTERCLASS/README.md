@@ -28,9 +28,10 @@ BACKEND-ENGINEERING-MASTERCLASS/
 ├── lesson_compiler.py     ← validate() + compile_to_markdown()
 ├── build_glossary.py      ← rebuilds GLOSSARY.md from every LESSON-*.md
 └── PHASE-00-.../
-    ├── LESSON-0.1-....yaml / .md
-    ├── LESSON-0.2-....yaml / .md
-    └── LESSON-0.3-....yaml / .md
+    ├── LESSON-0.1-....md          (hand-written, pre-compiler - no .yaml)
+    ├── LESSON-0.2-....md          (hand-written, pre-compiler - no .yaml)
+    ├── LESSON-0.3-....yaml / .md
+    └── LESSON-0.4-....yaml / .md
 ```
 
 ## Responsibility of each file
@@ -46,13 +47,23 @@ extraction before writing prose, what a Socratic prompt has to satisfy,
 what "explain, don't describe" means concretely, when an execution
 trace needs the values shape versus the timing shape, and this
 project's own overrides (concepts-only prerequisites, no
-"elsewhere in this curriculum," per-block file/status labeling). This
-is the part a YAML *shape* can't enforce — whether a Socratic question
-is actually answerable from prior material, or an SE Lens actually
-names a real tradeoff, is judgment, not structure. Read this before
-authoring a lesson's YAML, the same way `LESSON SCHEMA.md`'s prose used
-to be re-read from memory each time — except now it's an explicit,
-checkable work order instead of something to remember.
+"elsewhere in this curriculum," per-block file/status labeling). Also
+covers real mistakes caught while actually using this system, not just
+theoretical rules: the Repetition Rule's real scope (cross-lesson only —
+never a "(full treatment above)" self-citation inside one lesson's own
+Header), `Its use`'s correct scope (the construct's general role in
+this lesson, never one specific call site's arguments — that specific
+reasoning belongs in the Mechanical Walkthrough instead), and when
+citing a real file by line range is legitimate versus when the actual
+code must be shown and walked through (`citation_vs_walkthrough` — the
+moment a Lens asserts anything about *how* code behaves, that code has
+to be visible, not just cited). This is the part a YAML *shape* can't
+enforce — whether a Socratic question is actually answerable from prior
+material, or an SE Lens actually names a real tradeoff, is judgment, not
+structure. Read this before authoring a lesson's YAML, the same way
+`LESSON SCHEMA.md`'s prose used to be re-read from memory each time —
+except now it's an explicit, checkable work order instead of something
+to remember.
 
 **`lesson_compiler.py`** — currently holds both roles a separate
 `validation.yaml` would otherwise carry (**not yet split out** — see
@@ -62,8 +73,15 @@ stated, every `updated_project` line either matching `new_code` or
 carrying a real `← new` marker — computed by a set difference, not
 memory, every command free of `<placeholder>` syntax, every Python
 code block's real identifiers, via the standard library's own
-tokenizer, cross-checked against Terms/Objects names) — and the
-Markdown renderer. Refuses to write a `.md` file if validation fails.
+tokenizer, cross-checked against Terms/Objects names, Terms
+definitions, and Concept Unit prose) — and the Markdown renderer.
+Refuses to write a `.md` file if a real error is found; a softer
+heuristic warning (the vocabulary check, which can't tell a plain
+local variable name from a genuine gap) prints but does not block.
+`new_code`/`updated_project` both support a `files: [{file, status,
+code}, ...]` list, not just a single file/code pair, for a unit that
+needs to show more than one real file together (a route and the
+service it delegates to, for instance).
 
 **`LESSON AUTHORING CONTRACT.md` / `LESSON SCHEMA.md` / `LESSON
 VALIDATION CHECKLIST.md`** (one level up, in the `manufacturing-platform`

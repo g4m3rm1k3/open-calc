@@ -26,7 +26,7 @@
   - *Responsibility:* Parse the given source text according to Python's real grammar and return the root of a real, structured tree representing it - not a guess or an approximation, the same structure Python's own compiler builds internally.
   - *Depends on:* Syntactically valid Python source text.
   - *Connects to:* Its return value is walked by `ast.walk`, below.
-  - *Shape:* The entry point of Python's own real static-analysis seam - everything else in this unit inspects the tree this function builds.
+  - *Shape:* Returns one `ast.Module` object with a single field, `body` - a list of top-level statement nodes. Each of those nodes has its own fields that can themselves hold further nested nodes, so the result is a real nested tree, not a flat list.
 
 - **`ast.walk`**
   - *What it is:* A standard-library function that visits every node in a tree, in no particular guaranteed order, one at a time.
@@ -36,7 +36,7 @@
   - *Responsibility:* Yield every node reachable from the given root node exactly once, so calling code doesn't have to write its own recursive tree-walking logic.
   - *Depends on:* A real AST node, typically the `Module` `ast.parse` returned.
   - *Connects to:* Called on `ast.parse`'s return value; each yielded node is checked with `isinstance` against `ast.FunctionDef`, below.
-  - *Shape:* A traversal utility sitting on top of the tree `ast.parse` builds - it doesn't change the tree, only visits it.
+  - *Shape:* Takes one tree node in, hands back a flat, one-at-a-time generator of every node reachable from it - the parent/child nesting `ast.parse` built is gone once you're iterating; each node comes back on its own, with no way to tell from the iterator alone which node was whose parent.
 
 - **`ast.FunctionDef`**
   - *What it is:* The real AST node type representing one function definition.
@@ -46,7 +46,7 @@
   - *Responsibility:* Represent, as real structured data, everything about one function definition the parser found - its name, its parameters, its body, and every decorator applied to it.
   - *Depends on:* Being produced by `ast.parse` - never constructed directly by this lesson's own code.
   - *Connects to:* Its `decorator_list` field (a real list) is iterated to find route decorators, below; its `name` field is read directly for printing.
-  - *Shape:* One node type in the real tree `ast.parse` builds - the specific one this lesson's lab is actually looking for.
+  - *Shape:* One object with the fields `name` (a plain string), `args` (an `arguments` node), `body` (a list of statement nodes), and `decorator_list` (a list of expression nodes) - confirmed via `ast.FunctionDef._fields` this session.
 
 - **`ast.Call`**
   - *What it is:* The real AST node type representing one function or method call.
@@ -56,7 +56,7 @@
   - *Responsibility:* Represent, as real structured data, what's being called (`func`), what positional arguments were given (`args`), and what keyword arguments were given (`keywords`).
   - *Depends on:* Being produced by `ast.parse`, appearing wherever the real source contains a call expression.
   - *Connects to:* Its `func` field is checked against `ast.Attribute`, below; its `args` field is indexed to read the real route path.
-  - *Shape:* The node type that makes `@bp.route(...)` different, in the tree, from a bare decorator like `@staticmethod`.
+  - *Shape:* One object with the fields `func` (the thing being called - itself a node), `args` (a list of positional-argument nodes), and `keywords` (a list of keyword-argument nodes) - confirmed via `ast.Call._fields`.
 
 - **`ast.Attribute`**
   - *What it is:* The real AST node type representing one dotted attribute access, like `bp.route`.
@@ -66,7 +66,7 @@
   - *Responsibility:* Represent, as real structured data, the object an attribute is being accessed on (`value`) and the real name of the attribute being accessed (`attr`).
   - *Depends on:* Being produced by `ast.parse` wherever the real source contains a dotted access.
   - *Connects to:* Read from a `Call`'s `func` field, above; its own `attr` field is compared against the literal string `'route'`.
-  - *Shape:* The node type distinguishing `bp.route` from a plain name like `route` alone.
+  - *Shape:* One object with the fields `value` (the node the attribute is accessed on), `attr` (a plain string - the attribute's name), and `ctx` - confirmed via `ast.Attribute._fields`.
 
 - **`ast.Constant`**
   - *What it is:* The real AST node type representing one literal value written directly in the source - a string, a number, a bare `True`/`False`/`None`.
@@ -76,7 +76,7 @@
   - *Responsibility:* Represent, as real structured data, one literal value exactly as written in the source, with `value` holding the real, already-converted Python value.
   - *Depends on:* Being produced by `ast.parse` wherever the real source contains a literal.
   - *Connects to:* Read from a `Call`'s first `args` entry; its `value` is what actually gets printed.
-  - *Shape:* The node type turning source text like `'/download'` into a real, usable Python string, rather than a further sub-tree.
+  - *Shape:* One object whose `value` field holds the literal already converted to a plain Python value (a real `str`, `int`, `bool`, or `None` - not a further node to keep unpacking) - confirmed via `ast.Constant._fields`.
 
 - **`Blueprint.route`**
   - *What it is:* A method registering a URL rule on a Blueprint and returning a decorator for the function that handles it.
@@ -86,7 +86,7 @@
   - *Responsibility:* Record 'this rule, these methods, call this function' against the blueprint it was called on.
   - *Depends on:* A path string, an explicit or default method list, and the function it decorates.
   - *Connects to:* Called by `pdm.py`'s own module-level code at import time; consulted by Flask on every incoming request to this path.
-  - *Shape:* The same routing seam already proven real, applied here to a route that itself delegates entirely to a service.
+  - *Shape:* Takes a path string and a list of method-name strings; returns a decorator - a function that takes the handler function and hands it back unchanged, after recording it against the blueprint. No compound object is built or returned to the caller.
 
 - **`request.args.get`**
   - *What it is:* A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
@@ -96,7 +96,7 @@
   - *Responsibility:* Look up the given key among the real query parameters attached to the current request's URL, returning the real string value if present, `None` if it wasn't given at all.
   - *Depends on:* Being called during a real request - `request` is only meaningfully populated while handling one.
   - *Connects to:* Its result, `commit_sha`, is passed straight into `PDMService.download_file`, below.
-  - *Shape:* The real seam between 'what's in the URL' and 'a plain Python value a route handler can use directly'.
+  - *Shape:* Takes a plain string key; returns either a plain string or `None` - never a list or dict, even though a URL can technically repeat the same query-parameter name more than once.
 
 - **`jsonify`**
   - *What it is:* A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
@@ -106,7 +106,7 @@
   - *Responsibility:* Serialize the given value to JSON text and wrap it in a response object with the correct header set.
   - *Depends on:* A JSON-serializable Python value.
   - *Connects to:* Called only on the error path here; the success path returns whatever `PDMService.download_file` itself returns instead.
-  - *Shape:* The same Python-value-to-HTTP-response seam already proven real, used here specifically for an error response.
+  - *Shape:* Takes any JSON-serializable Python value (here, a plain dict with one key, `'error'`); returns one `Response` object whose body is that value's JSON text and whose `Content-Type` header is already set to `application/json`.
 
 - **`PDMService.download_file`**
   - *What it is:* A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
@@ -116,7 +116,7 @@
   - *Responsibility:* Given a real CAM file's id and an optional specific commit, produce a real, downloadable HTTP response carrying that file's real content - trying a different real server first, falling back to this application's own locally stored copy if that attempt fails, and raising a specific, named exception for either 'no such file' or 'no content anywhere.'
   - *Depends on:* A real `cam_file_id`; a real, already-configured database connection; a real, already-configured connection to the external GitLab server this application depends on.
   - *Connects to:* Called by `download_cam_file`, above; calls `CAMFile.query.get` and `get_gitlab_service`, below, and returns whatever `send_file`, below, builds.
-  - *Shape:* The real service-layer boundary this route delegates to entirely - all the real decisions live here, not in the route itself.
+  - *Shape:* Takes a plain string id and an optional plain string commit; returns one Flask `Response` object (built by `send_file`, below) on success, or raises a named exception - there's no separate 'result' object in between, only a response or a raised error.
 
 - **`CAMFile.query.get`**
   - *What it is:* A real ORM query reading one row from the database by its primary key.
@@ -126,7 +126,7 @@
   - *Responsibility:* Look up one real row in the real database by its primary key and return it as a real Python object, or `None` if no such row exists.
   - *Depends on:* A real, already-configured database connection - already true throughout this real application.
   - *Connects to:* Its result, `cam_file`, is read from repeatedly below (`cam_file_original_name`, `cam_file_content`).
-  - *Shape:* The real persistence boundary - how an ORM works in full, and what `query` actually is, is developed properly elsewhere in this curriculum's own database-focused material; here it's simply the real, working seam this method already crosses.
+  - *Shape:* Takes a plain primary-key value; returns either one model instance with the row's real columns as attributes (`cam_file.cam_file_original_name`, `cam_file.cam_file_content`), or `None` - never a list, even though `query` itself supports other methods that do return lists.
 
 - **`get_gitlab_service`**
   - *What it is:* A real function returning a configured client for talking to a different, real, external GitLab server.
@@ -136,7 +136,7 @@
   - *Responsibility:* Build and return a real object able to make real network calls to a real, external GitLab instance on this application's behalf.
   - *Depends on:* Real, already-configured GitLab credentials/URL, already present in this application's own configuration.
   - *Connects to:* Its return value's `get_file_at_commit`/`get_file` methods are what actually reach across the network; both can genuinely fail.
-  - *Shape:* The real boundary where this backend stops being only a server and becomes a client itself, of a different real server it doesn't control.
+  - *Shape:* Takes nothing; returns one already-configured `GitLabService` object - not a plain value, an object whose own further methods (`get_file_at_commit`, `get_file`) are what actually make the network calls.
 
 - **`send_file`**
   - *What it is:* A Flask function building a real HTTP response whose body is a file's actual binary content.
@@ -146,7 +146,7 @@
   - *Responsibility:* Build a real response carrying the given bytes, with the given MIME type and filename, and (when `as_attachment` is true) the real headers telling a browser to download rather than display it.
   - *Depends on:* A real, already-available source of bytes - here, an `io.BytesIO` wrapping the real file content already found.
   - *Connects to:* Called once, as the real final step of a successful `download_file` call - whichever earlier branch (GitLab or fallback) supplied `file_content`.
-  - *Shape:* The same real Python-value-to-HTTP-response family as `jsonify`, specialized for real binary file content instead of JSON.
+  - *Shape:* Takes raw bytes (wrapped in an `io.BytesIO`) plus three plain values describing how to serve them; returns one `Response` object with those bytes as its body and the given headers already set - the same input/output shape as `jsonify`, above, just with bytes instead of a JSON-serializable value going in.
 
 ## Concept Unit: Finding Every Route Mechanically
 
@@ -188,10 +188,6 @@ for node in ast.walk(tree):
                 path = dec.args[0].value
                 print(f"{node.name}: {path}")
 ```
-
-### The Updated Project
-
-Not applicable - the code shown above is already the whole new structure, with nothing existing to return to (per this schema's own skip condition for a brand-new file).
 
 ### Mechanical Walkthrough
 
@@ -252,10 +248,6 @@ Before reading on:
 - **Dependencies:** None beyond the real repository already checked out on disk.
 
 `download_cam_file` (below) is the same real route the unit above's own tool already found and printed - now shown in full instead of just named. It does almost nothing itself: it reads one query parameter and immediately delegates to `PDMService.download_file`, which is where the real behavior actually lives - a real database read, a real attempt to reach a different real server, and a real fallback when that attempt fails.
-
-### The New Code
-
-There is no new code in this unit - both real files below already exist. Nothing here gets typed.
 
 ### The Updated Project
 
@@ -326,10 +318,6 @@ This is graceful degradation: a system continuing to provide a real, useful (if 
 ### SE Lens
 
 The real alternative not chosen: `download_file` could have let a GitLab failure propagate as a real error, forcing every caller to handle "the file exists, but you can't have it right now." Instead, the bare `except Exception:` shown above catches any real failure from `gitlab_service` and falls back to `cam_file.cam_file_content` - the same file's content, already stored locally. The real, honest cost, visible directly in the code just shown: catching a bare `Exception` also silently swallows a real bug inside the GitLab integration itself, not only a genuine network failure - this application currently cannot tell those two situations apart from this code alone.
-
-### Commands needed
-
-None.
 
 ### Verification
 

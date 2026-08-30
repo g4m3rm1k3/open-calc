@@ -334,22 +334,18 @@ def render_concept_unit(unit: dict, index: int) -> str:
         return lines
 
     new_code = unit.get("new_code", {})
-    out += ["### The New Code", ""]
     if new_code.get("applicable", True):
+        out += ["### The New Code", ""]
         if new_code.get("intro"):
             out += [new_code["intro"], ""]
         out += render_blocks(new_code)
-    else:
-        out += [new_code.get("note", "There is no new code in this unit."), ""]
 
     updated = unit.get("updated_project", {})
-    out += ["### The Updated Project", ""]
     if updated.get("applicable", True):
+        out += ["### The Updated Project", ""]
         if updated.get("intro"):
             out += [updated["intro"], ""]
         out += render_blocks(updated)
-    else:
-        out += [updated.get("note", "Not applicable."), ""]
 
     walkthrough = unit.get("mechanical_walkthrough", {})
     if walkthrough.get("applicable", True) and walkthrough.get("items"):
@@ -357,8 +353,6 @@ def render_concept_unit(unit: dict, index: int) -> str:
         for item in walkthrough["items"]:
             out.append(f"- `{item['element']}` — {item['explanation']}")
         out.append("")
-    elif walkthrough.get("note"):
-        out += ["### Mechanical Walkthrough", "", walkthrough["note"], ""]
 
     trace = unit.get("execution_trace", {})
     if trace.get("applicable"):
@@ -372,13 +366,11 @@ def render_concept_unit(unit: dict, index: int) -> str:
     out += ["### CS Lens", "", unit["cs_lens"], ""]
     out += ["### SE Lens", "", unit["se_lens"], ""]
 
-    out += ["### Commands needed", ""]
     if unit.get("commands"):
+        out += ["### Commands needed", ""]
         for cmd in unit["commands"]:
             out.append(f"- `{cmd['command']}` — {cmd['explanation']}")
-    else:
-        out.append("None.")
-    out.append("")
+        out.append("")
 
     ver = unit.get("verification", {})
     out += ["### Verification", ""]

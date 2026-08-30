@@ -68,8 +68,64 @@ terms:
       network timeout, a service being down) are a fundamentally
       different kind of problem than a bug in this application's own
       code.
+  - name: "Exception handling (try/except)"
+    definition: >
+      A way of running code that might fail, while stating in advance
+      what should happen if it does, using Python's real `try`/`except`
+      statement. It exists so a real failure (a bad template, a missing
+      row) can be handled deliberately, in one place, instead of
+      crashing whatever else happens to be running at the time.
 
-objects_and_methods: []
+objects_and_methods:
+  - name: "MachineCAMPairing.query.get"
+    what_it_is: "A real ORM query reading one row from the database by its primary key."
+    implementation: "`Model.query.get(primary_key) -> Model | None` - called here as `MachineCAMPairing.query.get(pairing_id)`."
+    its_use: "Reads a real, persisted row this request needs, before anything else can happen."
+    type: "A class-level attribute (`query`) whose own `get` method is called on it - provided by Flask-SQLAlchemy, not written by this application."
+    responsibility: "Look up one real row in the real database by its primary key and return it as a real Python object, or `None` if no such row exists."
+    depends_on: "A real, already-configured database connection."
+    connects_to: "Its result, `pairing`, is read from repeatedly below."
+    shape: "Takes a plain primary-key value; returns one model instance with the row's real columns as attributes, or `None` - never a list."
+  - name: "Jinja2 Template / .render"
+    what_it_is: "A real class from the Jinja2 templating library, and the real method that fills in a template's placeholders with real values."
+    implementation: "`jinja2.Template(source: str)` builds a template object from real text; `.render(**context) -> str` fills it in."
+    its_use: "Builds an NC file's real text content from a template stored directly in the database, when one exists there."
+    type: "`Template` is a class; `.render` is an instance method on it."
+    responsibility: "Parse a real template string once, then substitute real values from the given keyword arguments wherever the template names them, producing real, final text."
+    depends_on: "A real template string with valid Jinja2 syntax; real values for whatever names it references."
+    connects_to: "Its input comes from `NCTemplate.query.get`, below; its output, `nc_content`, is what eventually gets saved."
+    shape: "`Template(...)` takes one plain string and returns one `Template` object; `.render(...)` takes arbitrary keyword arguments and returns one plain string with every placeholder substituted - text in, text out, no intermediate structure."
+  - name: "render_template"
+    what_it_is: "Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory."
+    implementation: "`flask.render_template(template_name: str, **context) -> str`"
+    its_use: "The real fallback when no matching template row exists in the database - reads a real `.jinja2` file from this application's own templates folder instead."
+    type: "A free function."
+    responsibility: "Locate a real template file by name, parse it, and substitute the given values into it - the same substitution job as `Template.render`, above, sourced from a real file instead of a database row."
+    depends_on: "A real template file actually existing at the given path."
+    connects_to: "Called only when `NCTemplate.query.get`, below, returned nothing."
+    shape: "Takes a plain filename string plus arbitrary keyword arguments; returns one plain string - the same input/output shape as `Template.render`, above, just sourced from a file instead of an in-memory string."
+  - name: "NCTemplate.query.get"
+    what_it_is: "The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table."
+    implementation: "`NCTemplate.query.get(template_id) -> NCTemplate | None`"
+    its_use: "Checks whether a real template is stored in the database before falling back to a real file on disk."
+    type: "A class-level attribute (`query`) whose own `get` method is called on it."
+    responsibility: "Look up one real row by primary key, returning `None` if no matching template is stored in the database."
+    depends_on: "A real, already-configured database connection."
+    connects_to: "Its result, `db_tpl`, decides which of the two real rendering paths above actually runs."
+    shape: "Takes a plain primary-key value; returns one model instance or `None` - the same shape as `MachineCAMPairing.query.get`, above, on a different table."
+  - name: "_build_export_data"
+    what_it_is: "One of four real, substantial functions this lesson's own investigation already found living directly in this routes file, instead of in the service file that exists for exactly this kind of logic."
+    implementation: >
+      `_build_export_data(pairing, cam_file, machine, part, sequences,
+      operation_order)`, defined at
+      `backend/app/routes/operation_manager.py:815-904` - a real,
+      90-line function, confirmed this session.
+    its_use: "Called from inside the route to build the real data structure the template above is rendered against."
+    type: "A free function, at module level, in a real routes file."
+    responsibility: "Transform the real, separate pieces of data this route already looked up (a pairing, a CAM file, a machine, a part, sequences, an operation order) into the one combined structure the template rendering above actually needs."
+    depends_on: "Real objects already fetched via `MachineCAMPairing.query.get` and similar real lookups this route performs first."
+    connects_to: "Called once, from inside `generate_nc_file`; its return value, `context`, is passed straight into the real template rendering above."
+    shape: "Takes six separate real objects as plain arguments; returns one dict - a real return type confirmed this session by reading the function's own docstring and body. That dict's keys are exactly the placeholder names the template rendering above substitutes against."
 
 concept_units:
   - title: "Naming the Real Boundaries"
@@ -165,13 +221,24 @@ concept_units:
         same file?"
     project_change:
       reference_source: >
-        backend/app/routes/operation_manager.py:815-904
-        (`_build_export_data`), 907-962
-        (`_apply_customizations_to_sequences`), 965-1013
-        (`_build_sequence_export`), 1016-1062
-        (`_build_operation_export`), and 465-624 (the `generate_nc_file`
-        route itself) — all real, already-investigated findings, cited
-        to file and line in this curriculum's own backend investigation.
+        backend/app/routes/operation_manager.py:465-503, 544-563, and
+        815-829 - three real, verbatim excerpts from a single, much
+        larger real file (the route itself is 160 real lines,
+        465-624; the full file is over 900 lines) - not the whole
+        function, but enough of it, contiguous and unedited, to show
+        the real mixing this unit's own Lenses describe, rather than
+        only asserting it.
+      explanation: >
+        `generate_nc_file` is the real route this application uses to
+        turn reconciled operation data into a real NC file, using a
+        real Jinja2 template. The three excerpts below show its real
+        opening (routing, a database lookup, real debug logging), its
+        real template-rendering section (two different real paths to
+        the same outcome, one from the database, one from a file on
+        disk), and the real signature of one of four functions this
+        curriculum's own investigation already found living in this
+        same routes file instead of in the service file that exists
+        for exactly this kind of logic.
       files_affected: []
       change_type: none
       location: "N/A"
@@ -179,19 +246,154 @@ concept_units:
     new_code:
       applicable: false
       note: >
-        There is no new code in this unit — every file named below
+        There is no new code in this unit - every file named below
         already exists. Nothing here gets typed.
     updated_project:
-      applicable: false
-      note: >
-        Not applicable — this unit cites a real, already-existing
-        violation rather than building anything new.
+      applicable: true
+      files:
+        - file: "backend/app/routes/operation_manager.py (lines 465-503)"
+          status: existing
+          code: |
+            @operation_manager_bp.route('/operation-orders/<pairing_id>/generate', methods=['POST'])
+            def generate_nc_file(pairing_id):
+                """
+                GENERATE NC FILE FROM TEMPLATE
+
+                Generates an NC file using a Jinja2 template and the reconciled
+                operation data. Saves the file to the database as an NCFile record.
+
+                URL Parameters:
+                    pairing_id: The MachineCAMPairing ID
+                """
+                try:
+                    from jinja2 import Template
+
+                    # STEP 0: Get template ID and filename from request
+                    data = request.get_json() or {}
+                    template_id = data.get('templateId', 'default_nc')
+                    custom_file_name = data.get('fileName')
+
+                    # STEP 1: Validate pairing exists
+                    pairing = MachineCAMPairing.query.get(pairing_id)
+                    if not pairing:
+                        return jsonify({'error': 'Machine pairing not found'}), 404
+
+                    # DEBUG
+                    print(f"[NC-GEN] Pairing ID: {pairing_id}")
+                    print(f"[NC-GEN] CAM File ID on Pairing: {pairing.cam_file_id}")
+
+                    # STEP 2: Get related entities
+                    cam_file = CAMFile.query.get(pairing.cam_file_id)
+                    machine = Machine.query.get(pairing.machine_id) if pairing.machine_id else None
+                    part = Part.query.get(cam_file.part_id) if cam_file else None
+        - file: "backend/app/routes/operation_manager.py (lines 544-563)"
+          status: existing
+          code: |
+            # STEP 6: Load and Render template
+            nc_content = ""
+            db_tpl = NCTemplate.query.get(template_id)
+
+            if db_tpl:
+                print(f"[NC-GEN] DB Template Found. Content length: {len(db_tpl.content)}")
+                # Render from database content
+                try:
+                    tpl = Template(db_tpl.content)
+                    nc_content = tpl.render(**context)
+
+                except Exception as e:
+                    return jsonify({'error': f"Template rendering error: {str(e)}"}), 500
+            else:
+                # Fallback to filesystem
+                template_path = f'nc_files/{template_id}.jinja2'
+                try:
+                    nc_content = render_template(template_path, **context)
+                except Exception as template_err:
+                    return jsonify({'error': f"Template error: {str(template_err)}"}), 500
+        - file: "backend/app/routes/operation_manager.py (lines 815-829)"
+          status: existing
+          code: |
+            def _build_export_data(pairing, cam_file, machine, part, sequences, operation_order):
+                """
+                Build the complete export data structure.
+
+                This is a PURE FUNCTION (no side effects) that transforms input data.
+                Following Single Responsibility Principle - only builds export structure.
+
+                Args:
+                    pairing: MachineCAMPairing object
+                    cam_file: CAMFile object
+                    machine: Machine object (or None)
+                    part: Part object (or None)
+                    sequences: List of Sequence objects
+                    operation_order: OperationOrder object (or None)
     mechanical_walkthrough:
-      applicable: false
-      note: >
-        Not applicable — see the real citations below in place of a
-        syntactic enumeration.
-      items: []
+      applicable: true
+      items:
+        - element: "@operation_manager_bp.route('/operation-orders/<pairing_id>/generate', methods=['POST'])"
+          explanation: >
+            `Blueprint.route` registers `generate_nc_file` against this
+            path and method list, so Flask calls it whenever a matching
+            request arrives - this route only accepts `POST`, since
+            generating a file is a real action, not a read.
+        - element: "try: from jinja2 import Template ..."
+          explanation: >
+            Exception handling wraps nearly the entire route - a
+            single `try` covering everything from the request parsing
+            through the final database write (not shown in this
+            excerpt), so any real failure anywhere in that whole
+            sequence is caught in one place, at the very end of the
+            real function (not shown in this excerpt either).
+        - element: "data = request.get_json() or {}"
+          explanation: >
+            Reads the real request's JSON body, falling back to an
+            empty `dict` if none was sent - `or` (basic Python).
+        - element: "pairing = MachineCAMPairing.query.get(pairing_id); if not pairing: return jsonify(...), 404"
+          explanation: >
+            `MachineCAMPairing.query.get` reads the real, persisted
+            row this whole request is about; a real `404` is returned
+            immediately if it doesn't exist, before any of the real
+            work below ever runs.
+        - element: "print(f\"[NC-GEN] Pairing ID: {pairing_id}\")"
+          explanation: >
+            Real, plain `print` statements, prefixed `[NC-GEN]` by
+            convention - this application's real debug logging, run
+            directly in production route code rather than through a
+            real logging framework.
+        - element: "cam_file = CAMFile.query.get(...); machine = Machine.query.get(...) if ... else None; part = Part.query.get(...) if ... else None"
+          explanation: >
+            The same real `Model.query.get` pattern as
+            `MachineCAMPairing.query.get`, above, repeated for three
+            more real tables - each a separate real database
+            round-trip, one after another, inside the same route
+            function.
+        - element: "db_tpl = NCTemplate.query.get(template_id)"
+          explanation: >
+            `NCTemplate.query.get` checks whether a real template row
+            exists in the database for the given id - `db_tpl` is
+            either a real row or `None`, and that single value decides
+            which of the two real rendering paths below actually runs.
+        - element: "if db_tpl: ... tpl = Template(db_tpl.content); nc_content = tpl.render(**context) ... except Exception as e: return jsonify(...), 500"
+          explanation: >
+            When a real template row exists, `Jinja2 Template`/`.render`
+            builds the real output text from it, wrapped in its own
+            exception handling - a real rendering failure here returns
+            a real `500` with the real error message included.
+        - element: "else: ... nc_content = render_template(template_path, **context) except Exception as template_err: return jsonify(...), 500"
+          explanation: >
+            When no database row exists, `render_template` reads a
+            real `.jinja2` file from disk instead - a second, separate
+            real path to the same real outcome, with its own separate
+            exception handling around it.
+        - element: "def _build_export_data(pairing, cam_file, machine, part, sequences, operation_order):"
+          explanation: >
+            `_build_export_data`'s real signature - six real
+            parameters, matching exactly the real objects the excerpt
+            above already fetched (`pairing`, `cam_file`, `machine`,
+            `part`) plus two more (`sequences`, `operation_order`) -
+            this is the real function this route calls, further down
+            in the same file, to combine everything just looked up
+            into the one structure the template rendering above
+            actually needs.
     cs_lens: >
       This is a real instance of the "God object"/"God function"
       anti-pattern applied to a route handler instead of a class — one
@@ -203,35 +405,36 @@ concept_units:
       report and slowly absorbs raw data entry, formulas, and a
       dashboard all in the same sheet.
     se_lens: >
-      The real, current, honest cost, not a hypothetical one: four
-      real functions — `_build_export_data`,
-      `_apply_customizations_to_sequences`, `_build_sequence_export`,
-      `_build_operation_export` — total 248 lines, about 23% of
-      `operation_manager.py`'s entire file, and constitute a full,
-      real domain service that lives directly in the routes module
-      instead of in `operation_manager_service.py`, the file that
-      exists specifically to hold this kind of logic. The
-      `generate_nc_file` route itself, 160 lines, does real database
-      lookups, real print-based debug logging, real Jinja2 template
-      loading and rendering, real filename derivation, and a real
-      database upsert — all inline, all in one function. The
-      alternative not chosen: moving this logic into the service file
-      that already exists for it. The real cost of not having done so:
-      none of this logic can be tested, reused, or reasoned about
-      without also reading and understanding an HTTP route handler at
-      the same time — the domain layer and the application layer have
-      been fused into one file, and untangling them later (a real,
-      future lesson in this curriculum) has to happen with real,
-      currently-passing behavior still intact.
+      The real, current, honest cost, not a hypothetical one, directly
+      visible in the excerpts just shown: real database lookups (four
+      separate `.query.get` calls, back to back), real print-based
+      debug logging, and real Jinja2 template loading and rendering -
+      with two entirely separate fallback paths - all inline, all in
+      one function, all before the function has even finished (the
+      excerpts above stop before the real database write that follows).
+      `_build_export_data`, called from inside this same route, is one
+      of four real functions - together 248 real lines, about 23% of
+      `operation_manager.py`'s entire file - constituting a full, real
+      domain service that lives directly in the routes module instead
+      of in `operation_manager_service.py`, the file that exists
+      specifically to hold this kind of logic. The alternative not
+      chosen: moving this logic into the service file that already
+      exists for it. The real cost of not having done so, now visible
+      directly in real code rather than only asserted: none of this
+      logic can be tested, reused, or reasoned about without also
+      reading and understanding an HTTP route handler at the same time
+      - the domain layer and the application layer have been fused
+      into one file, and untangling them later has to happen with
+      real, currently-passing behavior still intact.
     commands: []
     verification:
       applicable: false
       exemption_reason: >
         Not applicable under the Verification Rule's own exemption:
-        every real claim here — the exact line ranges, the exact line
-        counts, the exact operations performed inline — is a direct
-        citation to this curriculum's own backend investigation,
-        independently re-verified against the real file this session.
+        every real claim here is directly backed by the real code
+        quoted above, read and confirmed verbatim from the genuine
+        current source this session - there is no execution to run;
+        the code itself is the evidence.
     connection_to_previous: >
       The unit above named six boundaries a backend is supposed to
       keep separate; this unit found one real, already-documented place

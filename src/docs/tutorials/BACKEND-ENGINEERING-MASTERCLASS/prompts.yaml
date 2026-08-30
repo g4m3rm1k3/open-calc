@@ -201,11 +201,43 @@ unit:
       "location" to name within). Never skip reference_source silently
       even when the honest answer is none.
 
+  citation_vs_walkthrough:
+    problem: >
+      A whole Concept Unit was built as pure citation - Reference
+      Source named real file:line ranges, but no code was ever shown,
+      and CS/SE Lens then asserted things about that code's behavior
+      ("graceful degradation") that a reader had no way to verify,
+      because they never saw it.
+    rule: >
+      Citation-only (new_code and updated_project both applicable:
+      false, nothing shown) is legitimate ONLY when this unit's actual
+      teaching point is classification or location - WHERE something
+      lives, or WHICH named category/boundary it belongs to - and nothing
+      in CS Lens or SE Lens depends on the reader having seen the code's
+      actual mechanism. The moment CS Lens or SE Lens makes a claim
+      about HOW code behaves (a fallback, a conditional, an algorithm,
+      an exception path) - that code MUST be shown as a real block
+      (use new_code/updated_project's `files: [...]` list when more
+      than one real file is involved) and given a real Mechanical
+      Walkthrough. An assertion about behavior the reader never saw is
+      exactly the "prose isn't proof" failure this curriculum exists to
+      avoid, whether the code is brand-new or an already-existing file
+      being read.
+    test: >
+      Before setting new_code/updated_project to applicable: false, ask:
+      does CS Lens or SE Lens name a *behavior* (not just a location)?
+      If yes, the code behind that behavior must be shown, not cited.
+
   new_code:
     instruction: >
       The smallest resulting fragment after concept_extraction - not a
       whole function/file. Written as something to actually type, not
-      just read.
+      just read. When a unit needs to show more than one real file
+      together (e.g. a route and the service it delegates to), use a
+      `files: [{file, status, code}, ...]` list instead of a single
+      file/code pair - the compiler renders each with its own `**File:**`
+      line and code block, and the vocabulary/marker checks cover every
+      block in the list the same way.
 
   updated_project:
     instruction: >
@@ -213,7 +245,9 @@ unit:
       enclosing structure that already existed, new piece placed
       inside, marked. Say briefly what the structure now does as a
       whole (orientation, then meaning - not just a marker with no
-      sentence).
+      sentence). Supports the same `files: [...]` multi-file shape as
+      new_code, above, when showing more than one real file - each
+      gets its own status label (existing/new) and marker check.
     never:
       - Eliding any part of the shown structure ("{ ... }", "// unchanged",
         any placeholder) - even code just shown moments earlier, even
@@ -228,6 +262,23 @@ unit:
       Skip this step only when New Code IS the whole new structure with
       nothing surrounding it yet (a brand-new file/freestanding
       function) - Project Change already covers that case.
+
+  applicable_false_rendering: >
+    When new_code, updated_project, or mechanical_walkthrough is set to
+    applicable: false, the compiler omits that section's heading and
+    body from the compiled lesson entirely - it does not print a "not
+    applicable, because..." placeholder. These three are steps in the
+    write-code/place-it/walk-through-it sequence; a citation-only unit
+    simply doesn't have that step, the same way a unit with no loop
+    doesn't get an empty "### Execution Trace" heading. A `note` field
+    may still be written in the YAML for the next author's own
+    reference, but it is authoring-time documentation only - it is
+    never rendered. Verification is different in kind and keeps its
+    own explicit exemption_reason ON THE PAGE even when applicable:
+    false - "how do we know this is true" is a live question for every
+    unit, not a step some units skip, and the Verification Rule this
+    curriculum runs on depends on that reasoning being visible, not
+    just recorded.
 
   mechanical_walkthrough:
     instruction: >
