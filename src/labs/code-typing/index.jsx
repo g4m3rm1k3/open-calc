@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Editor from '@monaco-editor/react'
 import { Check, ChevronRight, Code2, Keyboard, Monitor, Play, RotateCcw, Sparkles, Target, Terminal, Timer, Trophy, Zap } from 'lucide-react'
 import { getAvailableConceptIds, getConceptFile } from '../../concepts/loader.ts'
 import { runJS, runPython, stripTypeScript } from '../../utils/codeRunner.js'
+import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 
 const STARTER_LESSON = {
   id: 'starter-function',
@@ -17,6 +20,16 @@ const SYMBOLS = [
   ['[', 'left bracket'], [']', 'right bracket'], [';', 'semicolon'], ['=', 'equals'],
   ['`', 'backtick'], ['!', 'bang'], ['/', 'slash'], ['_', 'underscore'],
 ]
+
+const MONACO_LANGUAGES = { javascript: 'javascript', js: 'javascript', typescript: 'typescript', ts: 'typescript', python: 'python', py: 'python', go: 'go', java: 'java', csharp: 'csharp', cpp: 'cpp', c: 'c', sql: 'sql' }
+const CODE_FONTS = {
+  jetbrains: '"JetBrains Mono", Consolas, monospace',
+  consolas: 'Consolas, "Cascadia Code", monospace',
+  courier: '"Courier New", monospace',
+  mono: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+}
+const FONT_SIZE_ORDER = ['sm', 'base', 'lg', 'xl']
+const FONT_SIZE_PX = { sm: 14, base: 16, lg: 18, xl: 20 }
 
 function shuffle(items) {
   const copy = [...items]
@@ -92,13 +105,6 @@ function elapsedLabel(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
 
-function codeClass(char) {
-  if (/['"`]/.test(char)) return 'text-amber-500 dark:text-amber-300'
-  if (/\d/.test(char)) return 'text-violet-500 dark:text-violet-300'
-  if (/[{}()[\];=!.\/]/.test(char)) return 'text-sky-500 dark:text-sky-300'
-  return 'text-slate-500 dark:text-slate-500'
-}
-
 function Stat({ icon: Icon, label, value, tint = 'brand' }) {
   const tints = {
     brand: 'bg-brand-500/12 text-brand-600 dark:text-brand-300',
@@ -112,6 +118,7 @@ function Stat({ icon: Icon, label, value, tint = 'brand' }) {
 }
 
 export default function CodeTypingStudio() {
+  const { codeTypography, setCodeTypography, themeStyles } = useGlobalTheme()
   const [lesson, setLesson] = useState(STARTER_LESSON)
   const [classicMode, setClassicMode] = useState(() => localStorage.getItem('oc-code-typing-display') === 'crt')
   const [conceptLessons, setConceptLessons] = useState([])
@@ -124,8 +131,11 @@ export default function CodeTypingStudio() {
   const [lastError, setLastError] = useState(null)
   const [runState, setRunState] = useState('idle')
   const [runOutput, setRunOutput] = useState('')
+  const [editorReady, setEditorReady] = useState(false)
   const typingRef = useRef(null)
-  const activeCharRef = useRef(null)
+  const editorRef = useRef(null)
+  const monacoRef = useRef(null)
+  const decorationsRef = useRef(null)
 
   const toggleClassicMode = useCallback(() => {
     setClassicMode(current => {
@@ -182,35 +192,49 @@ export default function CodeTypingStudio() {
   const activeIndex = typed.length
   const expected = lesson.code[activeIndex]
   const nextHint = keyHint(expected)
-  const codeLines = useMemo(() => {
-    let cursor = 0
-    const lines = lesson.code.split('\n')
-    return lines.map((text, lineIndex) => {
-      const characters = [...text].map(char => ({ char, index: cursor++ }))
-      const newlineIndex = lineIndex < lines.length - 1 ? cursor++ : null
-      return { text, line: lineIndex + 1, characters, newlineIndex }
-    })
-  }, [lesson.code])
+  const monacoLanguage = MONACO_LANGUAGES[lesson.language.toLowerCase()] ?? 'plaintext'
+  const fontSize = FONT_SIZE_PX[codeTypography.fontSize] ?? 14
+  const monacoTheme = classicMode ? 'code-typing-crt' : (themeStyles.monaco ?? 'open-calc-dark')
 
-  // Follow only forward, just like an editor: once the active character reaches
-  // the lower part of the viewport, bring it back toward the middle. Never
-  // scroll upward behind the learner — that made manual reading feel like a
-  // jump back to the top of the file.
-  useEffect(() => {
-    const viewport = typingRef.current
-    const caret = activeCharRef.current
-    if (!viewport || !caret) return undefined
-    const frame = requestAnimationFrame(() => {
-      const viewportBox = viewport.getBoundingClientRect()
-      const caretBox = caret.getBoundingClientRect()
-      const caretInViewport = caretBox.top - viewportBox.top
-      const followThreshold = viewport.clientHeight * 0.66
-      if (caretInViewport <= followThreshold) return
-      const targetTop = viewport.scrollTop + caretInViewport - viewport.clientHeight * 0.42
-      if (targetTop > viewport.scrollTop + 4) viewport.scrollTo({ top: targetTop, behavior: 'smooth' })
+  const onEditorMount = useCallback((editor, monaco) => {
+    setupOpenCalcMonaco(monaco)
+    monaco.editor.defineTheme('code-typing-crt', {
+      base: 'vs-dark', inherit: true,
+      rules: [{ token: '', foreground: 'B9E69A' }, { token: 'comment', foreground: '6E9667' }, { token: 'keyword', foreground: 'C7FF83' }, { token: 'string', foreground: 'D9E887' }, { token: 'number', foreground: 'B1E6A2' }],
+      colors: { 'editor.background': '#0B130E', 'editor.foreground': '#B9E69A', 'editorLineNumber.foreground': '#557050', 'editorLineNumber.activeForeground': '#C7FF83', 'editor.lineHighlightBackground': '#17301D', 'editorCursor.foreground': '#C7FF83', 'editor.selectionBackground': '#315B30' },
     })
-    return () => cancelAnimationFrame(frame)
-  }, [activeIndex])
+    editorRef.current = editor
+    monacoRef.current = monaco
+    decorationsRef.current = editor.createDecorationsCollection([])
+    setEditorReady(true)
+  }, [])
+
+  useEffect(() => {
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+    const decorations = decorationsRef.current
+    if (!editor || !monaco || !decorations) return
+    const model = editor.getModel()
+    if (!model) return
+    const marks = typed.map((entry, index) => {
+      const start = model.getPositionAt(index)
+      const end = model.getPositionAt(index + 1)
+      return { range: new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column), options: { inlineClassName: entry.correct ? 'typing-tutor-correct' : 'typing-tutor-error' } }
+    })
+    if (activeIndex < lesson.code.length) {
+      const start = model.getPositionAt(activeIndex)
+      const end = model.getPositionAt(Math.min(activeIndex + 1, lesson.code.length))
+      marks.push({ range: new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column), options: { inlineClassName: 'typing-tutor-current', wholeLineClassName: 'typing-tutor-current-line' } })
+      editor.revealPositionInCenterIfOutsideViewport(start, 0)
+    }
+    decorations.set(marks)
+  }, [typed, activeIndex, lesson.code, fontSize, editorReady])
+
+  const changeFontSize = useCallback((direction) => {
+    const current = FONT_SIZE_ORDER.indexOf(codeTypography.fontSize)
+    const next = Math.max(0, Math.min(FONT_SIZE_ORDER.length - 1, current + direction))
+    setCodeTypography({ fontSize: FONT_SIZE_ORDER[next] })
+  }, [codeTypography.fontSize, setCodeTypography])
 
   const reset = useCallback(() => {
     setTyped([]); setStartedAt(null); setNow(Date.now()); setAttempts(0); setCorrectKeystrokes(0); setDone(false); setLastError(null); setRunState('idle'); setRunOutput('')
@@ -347,22 +371,13 @@ export default function CodeTypingStudio() {
         <section className={`relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 shadow-2xl shadow-slate-900/[.08] backdrop-blur dark:border-white/[.08] dark:bg-slate-900/75 ${classicMode ? 'crt-screen' : ''}`}>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 px-5 py-4 dark:border-white/[.07]">
             <div><div className="text-sm font-black">{lesson.title}</div><div className="mt-0.5 text-xs text-slate-400">{lesson.language} · <span className="text-brand-600 dark:text-brand-300">{lesson.concept}</span></div></div>
-            <div className="flex items-center gap-2"><div className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500 dark:bg-slate-950 dark:text-slate-400">{typed.length} / {lesson.code.length}</div><button onClick={reset} className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/10" title="Restart lesson"><RotateCcw className="h-4 w-4" /></button></div>
+            <div className="flex items-center gap-2"><div className="hidden items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-950 sm:flex"><button onClick={() => changeFontSize(-1)} className="rounded-full px-2 py-1 text-xs font-black text-slate-500 hover:bg-white dark:hover:bg-white/10" title="Decrease code font size">A−</button><select value={codeTypography.font} onChange={event => setCodeTypography({ font: event.target.value })} className="max-w-24 bg-transparent text-[11px] font-bold text-slate-500 outline-none dark:text-slate-300">{Object.keys(CODE_FONTS).map(font => <option key={font} value={font}>{font}</option>)}</select><button onClick={() => changeFontSize(1)} className="rounded-full px-2 py-1 text-xs font-black text-slate-500 hover:bg-white dark:hover:bg-white/10" title="Increase code font size">A+</button></div><div className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500 dark:bg-slate-950 dark:text-slate-400">{typed.length} / {lesson.code.length}</div><button onClick={reset} className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/10" title="Restart lesson"><RotateCcw className="h-4 w-4" /></button></div>
           </div>
           <div className="h-1 bg-slate-100 dark:bg-slate-950"><motion.div className="h-full bg-gradient-to-r from-brand-500 via-violet-500 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ type: 'spring', stiffness: 100, damping: 20 }} /></div>
           <div className="relative p-3 sm:p-6">
             <div className="mb-3 flex items-center justify-between px-1 text-[11px] font-bold uppercase tracking-[.14em] text-slate-400"><span>Target code</span><span>Click anywhere to type</span></div>
-            <div ref={typingRef} tabIndex={0} role="textbox" aria-label="Code typing practice area" onKeyDown={onKeyDown} onClick={() => typingRef.current?.focus()} className="relative h-[min(56vh,520px)] min-h-[330px] cursor-text overflow-y-auto rounded-2xl border border-slate-200 bg-slate-950 p-4 font-mono text-[14px] leading-7 shadow-inner outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 sm:p-6 sm:text-[15px]">
-              <div className="min-w-0 pb-[48vh] font-mono">{codeLines.map(({ line, characters: lineCharacters, newlineIndex }) => {
-                const activeLine = lineCharacters.some(({ index }) => index === activeIndex) || newlineIndex === activeIndex
-                const renderCharacter = (char, index, isNewline = false) => {
-                  const entry = typed[index]
-                  const isCurrent = index === activeIndex
-                  const shown = char === ' ' ? '·' : isNewline ? '↵' : char === '\t' ? '⇥' : char
-                  return <motion.span ref={isCurrent ? activeCharRef : null} data-active-char={isCurrent || undefined} key={index} initial={false} animate={entry ? { scale: entry.correct ? 1 : [1, 1.2, 1], y: entry.correct ? 0 : [0, -2, 0] } : { scale: 1, y: 0 }} transition={{ duration: .2 }} className={`relative rounded-sm ${isNewline || char === '\t' ? 'mx-0.5 inline-flex min-w-4 justify-center px-0.5' : ''} ${entry?.correct ? 'bg-emerald-400/15 text-emerald-300' : entry && !entry.correct ? 'bg-rose-500/30 text-rose-200 underline decoration-rose-400 decoration-2' : isCurrent ? 'bg-brand-400/25 text-white ring-1 ring-brand-300/70' : codeClass(char)}`}>{shown}{isCurrent && <span className="absolute -bottom-1 left-0 h-0.5 w-full animate-pulse bg-brand-300" />}</motion.span>
-                }
-                return <div key={line} className={`grid min-h-7 grid-cols-[3rem_minmax(0,1fr)] rounded-sm ${activeLine ? 'bg-white/[.035]' : ''}`}><span className={`select-none border-r border-white/[.06] pr-3 text-right text-[11px] leading-7 ${activeLine ? 'text-brand-300' : 'text-slate-600'}`}>{line}</span><code className="min-w-0 whitespace-pre-wrap break-words pl-4 pr-3 leading-7">{lineCharacters.map(({ char, index }) => renderCharacter(char, index))}{newlineIndex !== null && renderCharacter('\n', newlineIndex, true)}</code></div>
-              })}</div>
+            <div ref={typingRef} tabIndex={0} role="textbox" aria-label="Code typing practice area" onKeyDown={onKeyDown} onClick={() => typingRef.current?.focus()} className="relative h-[min(56vh,520px)] min-h-[330px] cursor-text overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-inner outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15">
+              <div className="pointer-events-none h-full"><Editor height="100%" value={lesson.code} language={monacoLanguage} theme={monacoTheme} onMount={onEditorMount} options={{ readOnly: true, domReadOnly: true, minimap: { enabled: false }, lineNumbers: 'on', glyphMargin: false, folding: false, scrollBeyondLastLine: true, renderWhitespace: 'all', renderControlCharacters: true, wordWrap: 'on', wordWrapColumn: 110, fontFamily: CODE_FONTS[codeTypography.font] ?? CODE_FONTS.jetbrains, fontSize, lineHeight: Math.round(fontSize * 1.75), fontLigatures: codeTypography.ligatures, padding: { top: 22, bottom: 220 }, scrollbar: { verticalScrollbarSize: 12 }, overviewRulerLanes: 0, contextmenu: false }} /></div>
               {activeIndex === 0 && <div className="pointer-events-none absolute bottom-8 right-8 hidden items-center gap-2 rounded-full border border-white/10 bg-white/[.06] px-3 py-2 text-xs text-slate-400 sm:flex"><Keyboard className="h-4 w-4 text-brand-300" />Start typing to begin</div>}
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60">

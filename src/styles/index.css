@@ -172,6 +172,26 @@
   .code-typing-classic .text-emerald-600 {
     color: #baff96 !important;
   }
+  .monaco-editor .typing-tutor-correct {
+    background: rgba(52, 211, 153, .22);
+    border-radius: 2px;
+  }
+  .monaco-editor .typing-tutor-error {
+    background: rgba(244, 63, 94, .30);
+    text-decoration: underline wavy #fb7185;
+  }
+  .monaco-editor .typing-tutor-current {
+    background: rgba(129, 147, 248, .30);
+    outline: 1px solid rgba(165, 184, 252, .85);
+    border-radius: 2px;
+  }
+  .monaco-editor .typing-tutor-current-line {
+    background: rgba(129, 147, 248, .06);
+  }
+  .code-typing-classic .monaco-editor .typing-tutor-current {
+    background: rgba(186, 255, 150, .18);
+    outline-color: rgba(199, 255, 131, .82);
+  }
 
   /* ── Global dark-mode bg-white override ────────────────────────────────────
      bg-white is used in ~300+ components. Rather than editing every file,
