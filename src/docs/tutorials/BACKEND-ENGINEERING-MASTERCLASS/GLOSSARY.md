@@ -48,6 +48,9 @@ re-run the script after any lesson changes instead.
 ## .status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
 
+## 1NF (First Normal Form)
+- **Term** in `LESSON-6.7-NORMALIZATION` - The rule that every attribute in a relation holds exactly one atomic value per row, and that no group of attributes repeats within a single row to hold what is really a variable-length list of the same kind of thing. It exists as the foundational normalization rule because both failures - a single cell packing in several real values, and several real, same-shaped columns standing in for a list - break the same basic promise a relation makes: one row, one fact per attribute, checkable by name, not by parsing a value or by hand-enumerating a fixed set of columns.
+
 ## 200 (OK)
 - **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real, generic success status: the request worked, and the real response body carries what was asked for. It exists as the default, unmarked "it worked" - used when nothing more specific (like a new resource being created) needs to be said.
 
@@ -57,8 +60,14 @@ re-run the script after any lesson changes instead.
 ## 204 (No Content)
 - **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real success status for "this worked, and there is genuinely nothing to send back" - a real response with this code carries no real body at all. It exists for exactly the case a `200`'s own real body would otherwise be empty or pointless, and this project's own real `DELETE` route, checked directly in this lesson, never actually uses it.
 
+## 2NF (Second Normal Form)
+- **Term** in `LESSON-6.7-NORMALIZATION` - Given a relation already in 1NF with a composite primary key (more than one column together), the rule that every OTHER attribute must depend on the WHOLE key, not merely part of it. It exists specifically for composite-key relations, because only a composite key creates the possibility of an attribute depending on just one piece of that key while ignoring the rest - a relation with a single-column key cannot violate this rule at all, since there is no "part of the key" for anything to depend on instead.
+
 ## 2xx (success)
 - **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real family of status codes whose first digit tells a caller, without reading anything else, that a request genuinely succeeded. It exists so a caller can branch on "did this work at all" using one digit, before ever inspecting a real response body.
+
+## 3NF (Third Normal Form)
+- **Term** in `LESSON-6.7-NORMALIZATION` - Given a relation already in 2NF, the rule that every non-key attribute must depend directly on the key - never on another non-key attribute instead. It exists because a non-key attribute depending on a different non-key attribute (rather than the key itself) means the same real fact ends up repeated wherever that other non-key attribute repeats, which is the identical real risk a repeating group creates, just discovered one level removed from the key.
 
 ## 400 (Bad Request)
 - **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "this request's own body or shape is wrong" - this lesson's own real `update_machine_status` calls return it for two genuinely different real reasons. It exists as the general, real catch-all for "I can't even process what you sent," whether that's a missing field or a value that doesn't parse.
@@ -874,6 +883,9 @@ re-run the script after any lesson changes instead.
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
 
+## repeating group
+- **Term** in `LESSON-6.7-NORMALIZATION` - A set of attributes, sharing the same real shape, that appears more than once in a single row under different names (a prefix, typically) instead of appearing once per real occurrence as its own separate row. It exists as its own named failure, distinct from a single non-atomic cell, because a repeating group hides a real one-to-many relationship - one row genuinely needing several of the same kind of fact - inside a FIXED number of columns instead of a variable number of rows.
+
 ## representation
 - **Term** in `LESSON-3.6-REST` - A real, concrete format a resource can be rendered as - JSON metadata, or a real, raw file download, for the identical underlying resource, in this lesson's own second unit. It exists because a resource itself is an abstract, real thing; a client only ever actually receives one of its possible representations.
 
@@ -1176,6 +1188,9 @@ re-run the script after any lesson changes instead.
 ## unittest.mock.patch
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real function (usable as a context manager or a decorator) from Python's own standard library `unittest.mock` module, that performs real monkeypatching.
 
+## update anomaly
+- **Term** in `LESSON-6.7-NORMALIZATION` - A situation where a single real-world fact is stored in more than one place, so correcting it requires finding and editing every copy by hand - and missing even one leaves the data self-contradictory, with nothing in the schema itself flagging that anything is wrong. It exists as the concrete, practical cost that makes normalization worth doing at all: a repeating group or a non-atomic value is not wrong in the abstract - it is wrong because of this specific, real consequence.
+
 ## update_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function updating an existing machine's fields - the real specimen this lesson's own `PUT` and `PATCH` units both call, against the identical real route.
 
@@ -1235,7 +1250,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.recv` / `socket.recv` - shares: recv
 - `.render` / `render_template` - shares: render
 - `.sendall` / `socket.sendall` - shares: sendall
+- `1NF (First Normal Form)` / `2NF (Second Normal Form)` - shares: form, nf, normal
+- `1NF (First Normal Form)` / `3NF (Third Normal Form)` - shares: form, nf, normal
+- `1NF (First Normal Form)` / `get_health_response (tested directly, for the first time)` - shares: first
 - `204 (No Content)` / `Content-Type` - shares: content
+- `2NF (Second Normal Form)` / `3NF (Third Normal Form)` - shares: form, nf, normal
 - `2xx (success)` / `4xx (client error)` - shares: xx
 - `2xx (success)` / `5xx (server error)` - shares: xx
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
@@ -1480,6 +1499,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `Machine.to_dict` - shares: machine
 - `create_machine_group` / `Query (Machine.query` - shares: machine
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine_group` / `repeating group` - shares: group
 - `create_machine_group` / `update_machine` - shares: machine
 - `create_machine_group` / `update_machine (PATCH)` - shares: machine
 - `create_machine_group` / `update_machine_status` - shares: machine
@@ -1494,6 +1514,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `POST` - shares: post
 - `create_machine_group (POST)` / `Query (Machine.query` - shares: machine
 - `create_machine_group (POST)` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine_group (POST)` / `repeating group` - shares: group
 - `create_machine_group (POST)` / `update_machine` - shares: machine
 - `create_machine_group (POST)` / `update_machine (PATCH)` - shares: machine
 - `create_machine_group (POST)` / `update_machine_status` - shares: machine
@@ -1903,6 +1924,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
 - `tuple (Python builtin type)` / `Type annotation` - shares: type
 - `unittest.mock.patch` / `update_machine (PATCH)` - shares: patch
+- `update anomaly` / `update_machine` - shares: update
+- `update anomaly` / `update_machine (PATCH)` - shares: update
+- `update anomaly` / `update_machine_status` - shares: update
+- `update anomaly` / `update_machine_status (PUT)` - shares: update
 - `update_machine` / `update_machine (PATCH)` - shares: machine, update
 - `update_machine` / `update_machine_status` - shares: machine, update
 - `update_machine` / `update_machine_status (PUT)` - shares: machine, update

@@ -1,0 +1,353 @@
+# Lesson 6.7: Normalization
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Four small, real scripts studying what normalization actually protects against, using two genuinely real violations already sitting in this project's own schema - `backend/app/models/part.py`'s own real, comma-separated `tags` string, and `backend/app/models/machine_pairing.py`'s own real, three-times- repeated quality/engineering/programming approval columns - plus one honestly-labeled invented illustration for 2NF and 3NF, since this project's own real schema happens not to contain a naturally-occurring violation of either.
+
+**What you need to know first:** This curriculum's own Relational Model lesson - what an attribute and a tuple are; string splitting and joining; plain dict and list literals.
+
+## Terms used in this lesson
+
+- **1NF (First Normal Form)** — The rule that every attribute in a relation holds exactly one atomic value per row, and that no group of attributes repeats within a single row to hold what is really a variable-length list of the same kind of thing. It exists as the foundational normalization rule because both failures - a single cell packing in several real values, and several real, same-shaped columns standing in for a list - break the same basic promise a relation makes: one row, one fact per attribute, checkable by name, not by parsing a value or by hand-enumerating a fixed set of columns.
+- **repeating group** — A set of attributes, sharing the same real shape, that appears more than once in a single row under different names (a prefix, typically) instead of appearing once per real occurrence as its own separate row. It exists as its own named failure, distinct from a single non-atomic cell, because a repeating group hides a real one-to-many relationship - one row genuinely needing several of the same kind of fact - inside a FIXED number of columns instead of a variable number of rows.
+- **update anomaly** — A situation where a single real-world fact is stored in more than one place, so correcting it requires finding and editing every copy by hand - and missing even one leaves the data self-contradictory, with nothing in the schema itself flagging that anything is wrong. It exists as the concrete, practical cost that makes normalization worth doing at all: a repeating group or a non-atomic value is not wrong in the abstract - it is wrong because of this specific, real consequence.
+- **2NF (Second Normal Form)** — Given a relation already in 1NF with a composite primary key (more than one column together), the rule that every OTHER attribute must depend on the WHOLE key, not merely part of it. It exists specifically for composite-key relations, because only a composite key creates the possibility of an attribute depending on just one piece of that key while ignoring the rest - a relation with a single-column key cannot violate this rule at all, since there is no "part of the key" for anything to depend on instead.
+- **3NF (Third Normal Form)** — Given a relation already in 2NF, the rule that every non-key attribute must depend directly on the key - never on another non-key attribute instead. It exists because a non-key attribute depending on a different non-key attribute (rather than the key itself) means the same real fact ends up repeated wherever that other non-key attribute repeats, which is the identical real risk a repeating group creates, just discovered one level removed from the key.
+
+## Objects and methods used
+
+None — this lesson introduces no new external class, interface, or method, only Terms.
+## Concept Unit: 1NF - When One Cell Holds More Than One Fact
+
+### The Problem
+
+`backend/app/models/part.py`'s own real `tags` column is declared `db.Column(db.Text, nullable=True)`, storing values like `"urgent,prototype"` - its own real comment says so directly: "Stored as comma-separated string". Given a part actually tagged only `"not-urgent-yet"` and `"prototype"`, what happens if code looks for the tag `"urgent"` the naive way - by checking whether that word appears anywhere inside the stored string at all?
+
+Before reading on:
+
+- `"urgent" in "not-urgent-yet,prototype"` - evaluated as a plain Python substring check, not a real tag-membership check - what does this actually evaluate to, and is that the CORRECT answer to "does this part have the tag urgent"?
+- `backend/app/models/part.py`'s own real `to_dict()` already calls `self.tags.split(',')` before returning tags to the frontend. What does that line's own existence already admit about the column it is reading from?
+
+### Project Change
+
+- **Reference Source:** Real, verbatim, read this session, `backend/app/models/part.py:286-290`: ``` # Tags for flexible categorization # Stored as comma-separated string (e.g., "urgent,prototype,Q2-2024") # Alternative: Use a separate tags table for true many-to-many # We use simple string for easier querying and no join overhead tags = db.Column(db.Text, nullable=True) ``` and, real, verbatim, `backend/app/models/part.py:419`: ``` 'tags': self.tags.split(',') if self.tags else [], ``` Real, already-existing evidence of a genuine 1NF violation - this project's own comment even names the real, proper alternative (a separate tags table), already fully built and cited in this curriculum's own Many-to-Many lesson as `Tag`/ `part_tags` - real, unconnected, sitting right next to the violation it would fix.
+- **Files affected:** `verification/phase-06/lab_1nf_atomic_values.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None beyond plain Python.
+
+### The New Code
+
+The exact real risk `part.py`'s own comma-separated `tags` column carries, modeled directly with the same real value shape:
+
+**File:** `verification/phase-06/lab_1nf_atomic_values.py` (new)
+
+```python
+part_tags_field = "not-urgent-yet,prototype"
+looking_for = "urgent"
+
+naive_match = looking_for in part_tags_field
+print(f"naive substring check: {looking_for!r} in {part_tags_field!r} = {naive_match}")
+
+real_tags = part_tags_field.split(",")
+correct_match = looking_for in real_tags
+print(f"real tags, split apart: {real_tags}")
+print(f"correct membership check: {looking_for!r} in {real_tags} = {correct_match}")
+```
+
+### Mechanical Walkthrough
+
+- `looking_for in part_tags_field` — Basic-Python substring containment on the RAW, un-split string - exactly what a naive, direct check against this project's own real `tags` column would do without first calling `.split(',')`. Because `"urgent"` is literally a substring of `"not-urgent-yet"`, this evaluates `True` - wrongly.
+- `part_tags_field.split(",")` — Basic-Python string splitting, the identical real call `part.py`'s own real `to_dict()` already makes, turning the single non-atomic string into a real list of atomic, individually-comparable values.
+- `looking_for in real_tags` — Basic-Python list membership, checked against the real, split list instead of the raw string - correctly evaluates `False`, since `"urgent"` is not actually one of this part's two real tags.
+
+### CS Lens
+
+This is **1NF**, fully named in this lesson's own Header, in its "no non-atomic values" form. Also recognized in: a spreadsheet cell holding `"Alice, Bob, Carol"` instead of three separate rows; a CSV file with a field containing an un-escaped comma, silently corrupting every column after it; an HTTP header packing several values into one comma-separated string (`Accept: text/html, application/json`), requiring a caller to parse it correctly every single time; and, in this project's own domain, exactly this real column - one string standing in for what should be several real, independently-checkable tag values.
+
+### SE Lens
+
+The design principle 1NF protects is letting every attribute be checked, filtered, and joined on directly, without every single caller independently re-implementing the same parsing logic - and getting it right, or wrong, on its own. The real alternative this project's OWN comment names and chose NOT to take - `backend/app/models/tag.py`'s own real `Tag`/`part_tags` many-to- many design, already cited in this curriculum's own Many-to-Many lesson - solves this exact problem, fully built, and is never actually called. The honest cost of the string this project actually uses instead, stated in its own comment: "easier querying and no join overhead" - true for the simplest case, and false the moment anything needs to search, count, or safely edit one tag without touching the others, which this unit's own naive-match result demonstrates going wrong silently.
+
+### Commands needed
+
+- `python verification/phase-06/lab_1nf_atomic_values.py` — Runs the lab from the manufacturing-platform repository root; no flags needed.
+
+### Verification
+
+```text
+naive substring check: 'urgent' in 'not-urgent-yet,prototype' = True
+real tags, split apart: ['not-urgent-yet', 'prototype']
+correct membership check: 'urgent' in ['not-urgent-yet', 'prototype'] = False
+```
+
+Full saved run: `verification/phase-06/lab_1nf_atomic_values_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it shows 1NF's "atomic value" half of the rule; the next unit shows 1NF's other, real-evidenced shape in this project - a repeating group of whole columns instead of one packed string.
+
+## Concept Unit: 1NF - When a Missing Column Becomes Three
+
+### The Problem
+
+`backend/app/models/machine_pairing.py`'s real `MachineCAMPairing` declares `quality_approved`/`quality_approved_by`/`quality_approved_email`/`quality_approved_at`, then the identical four-column shape again for `engineering_`, then again for `programming_` - twelve real columns doing the same real job three times over. Given that every one of those three groups answers the identical real question ("did this role approve, who, and when") for a DIFFERENT role, what would it cost this project, concretely, to add a fourth real approval role tomorrow?
+
+Before reading on:
+
+- `backend/app/models/machine_pairing.py`'s own real `to_dict()`, read this session, builds its `'approvals'` dict by naming `quality`, `engineering`, and `programming` individually, one at a time. What would have to change in that real method - and in the real table's own schema - to add a fourth role?
+- If `role` were instead a real, ordinary column value (like `"quality"`, `"engineering"`, `"programming"`, `"quality_manager"`), stored once per row instead of baked into three sets of column names, would adding a fourth role still require changing the table's own real structure at all?
+
+### Project Change
+
+- **Reference Source:** Real, verbatim, read this session, `backend/app/models/machine_pairing.py:27-43`: ``` # Approval tracking - Quality quality_approved = db.Column(db.Boolean, default=False) quality_approved_by = db.Column(db.String(100), nullable=True) quality_approved_email = db.Column(db.String(100), nullable=True) quality_approved_at = db.Column(db.DateTime, nullable=True)
+# Approval tracking - Engineering engineering_approved = db.Column(db.Boolean, default=False) engineering_approved_by = db.Column(db.String(100), nullable=True) engineering_approved_email = db.Column(db.String(100), nullable=True) engineering_approved_at = db.Column(db.DateTime, nullable=True)
+# Approval tracking - Programming (creator) programming_approved = db.Column(db.Boolean, default=True)  # Auto-approved by creator programming_approved_by = db.Column(db.String(100), nullable=True) programming_approved_email = db.Column(db.String(100), nullable=True) programming_approved_at = db.Column(db.DateTime, nullable=True) ``` Real, already-existing evidence of a genuine repeating group - the identical four-column shape, real, declared three separate times, once per role, instead of once per real approval row.
+- **Files affected:** `verification/phase-06/lab_repeating_group.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None beyond plain Python.
+
+### The New Code
+
+This project's own real repeating-columns shape, modeled directly, next to the normalized alternative it could have been - one role per real row instead of one role per column prefix:
+
+**File:** `verification/phase-06/lab_repeating_group.py` (new)
+
+```python
+pairing_repeating_columns = {
+    "quality_approved": True,
+    "quality_approved_by": "jsmith",
+    "engineering_approved": False,
+    "engineering_approved_by": None,
+    "programming_approved": True,
+    "programming_approved_by": "system",
+}
+
+
+def all_approvals_repeating_shape(pairing):
+    """Matches this project's own real to_dict(): each role named by hand."""
+    return {
+        "quality": {"approved": pairing["quality_approved"], "by": pairing["quality_approved_by"]},
+        "engineering": {"approved": pairing["engineering_approved"], "by": pairing["engineering_approved_by"]},
+        "programming": {"approved": pairing["programming_approved"], "by": pairing["programming_approved_by"]},
+    }
+
+
+print(f"repeating-columns shape: {all_approvals_repeating_shape(pairing_repeating_columns)}")
+
+pairing_normalized = [
+    {"role": "quality", "approved": True, "by": "jsmith"},
+    {"role": "engineering", "approved": False, "by": None},
+    {"role": "programming", "approved": True, "by": "system"},
+]
+print(f"normalized shape: {pairing_normalized}")
+
+print("adding a new 'quality_manager' role to the repeating-columns shape needs new dict keys, structurally:")
+pairing_repeating_columns["quality_manager_approved"] = False
+pairing_repeating_columns["quality_manager_approved_by"] = None
+print(f"repeating-columns shape now: {pairing_repeating_columns}")
+
+print("adding the identical new role to the normalized shape needs only one new list entry, no structural change:")
+pairing_normalized.append({"role": "quality_manager", "approved": False, "by": None})
+print(f"normalized shape now: {pairing_normalized}")
+```
+
+### Mechanical Walkthrough
+
+- `def all_approvals_repeating_shape(pairing): return {...}` — A real, minimal stand-in for `MachineCAMPairing.to_dict()`'s own real pattern - three dict keys, `"quality"`, `"engineering"`, `"programming"`, each one hand-built from a differently-prefixed group of the same underlying pairing dict. Every role has to be named explicitly, by the person writing this function, for the function to know it exists at all.
+- `pairing_normalized = [ {...}, {...}, {...} ]` — A basic-Python list of dicts, each one already self- describing its own role via a real `"role"` key/value pair instead of a column-name prefix - the normalized alternative, where "which role is this" is DATA, not part of the schema's own structure.
+- `pairing_repeating_columns["quality_manager_approved"] = False / [...]_by = None` — Basic-Python dict-key assignment, adding two BRAND NEW keys to model what adding a fourth role would really require in the repeating-columns shape: real, new column names, one per field the existing three roles already have - the real equivalent of a schema migration, not a plain data write.
+- `pairing_normalized.append({...})` — A single, real `list.append`, already established in this curriculum's own One-to-Many lesson, adding one new, ordinary dict to the list - no new key names anywhere, no change to the SHAPE any other entry has, because a new role here is just another row, not new structure.
+
+### Mental Model
+
+```text
+repeating-columns shape                normalized shape
+------------------------                ----------------
+quality_approved: True                  {role: quality,     approved: True,  by: jsmith}
+quality_approved_by: jsmith             {role: engineering, approved: False, by: None}
+engineering_approved: False             {role: programming, approved: True,  by: system}
+engineering_approved_by: None
+programming_approved: True              adding "quality_manager":
+programming_approved_by: system         just append one more dict, same shape as the rest
+
+adding "quality_manager":
+quality_manager_approved: False   <- NEW key
+quality_manager_approved_by: None <- NEW key
+
+The repeating-columns shape grows sideways (new keys, real
+structural change); the normalized shape grows downward (a new
+row, same real structure).
+```
+
+### CS Lens
+
+This is a **repeating group**, fully named in this lesson's own Header - "role" hidden as a column-name prefix instead of stored as data. Also recognized in: a spreadsheet with columns `Phone1`, `Phone2`, `Phone3` instead of one `Phones` sheet keyed by contact; a legacy form with `Child1Name`, `Child2Name`, `Child3Name` fields, silently capping how many children a record can hold; a class with `tag1`, `tag2`, `tag3` attributes instead of a real list; and, in this project's own domain, exactly this real schema's own three approval-role column groups, capping "how many approval roles can this project ever have" at whatever number of column groups someone remembered to declare.
+
+### SE Lens
+
+The design principle a repeating group violates is letting the NUMBER of real, same-shaped facts a row can hold vary freely, rather than being fixed by however many column groups exist in the schema. The real alternative NOT chosen here - a separate table, one row per real approval, with `pairing_id`, `role`, `approved`, `approved_by` as real columns - would make adding a role a plain `INSERT`, never a schema change. The honest cost actually paid by this project's own real, chosen shape, made concrete by this unit's own lab: a fourth role is not a data problem here at all - it is a real migration, touching the table's own structure, and every piece of code (like `to_dict()`'s own real, hand-written three-role dict) that already enumerates the existing roles by name.
+
+### Commands needed
+
+- `python verification/phase-06/lab_repeating_group.py` — Runs the lab from the repository root; no flags needed.
+
+### Verification
+
+```text
+repeating-columns shape: {'quality': {'approved': True, 'by': 'jsmith'}, 'engineering': {'approved': False, 'by': None}, 'programming': {'approved': True, 'by': 'system'}}
+normalized shape: [{'role': 'quality', 'approved': True, 'by': 'jsmith'}, {'role': 'engineering', 'approved': False, 'by': None}, {'role': 'programming', 'approved': True, 'by': 'system'}]
+adding a new 'quality_manager' role to the repeating-columns shape needs new dict keys, structurally:
+repeating-columns shape now: {'quality_approved': True, 'quality_approved_by': 'jsmith', 'engineering_approved': False, 'engineering_approved_by': None, 'programming_approved': True, 'programming_approved_by': 'system', 'quality_manager_approved': False, 'quality_manager_approved_by': None}
+adding the identical new role to the normalized shape needs only one new list entry, no structural change:
+normalized shape now: [{'role': 'quality', 'approved': True, 'by': 'jsmith'}, {'role': 'engineering', 'approved': False, 'by': None}, {'role': 'programming', 'approved': True, 'by': 'system'}, {'role': 'quality_manager', 'approved': False, 'by': None}]
+```
+
+Full saved run: `verification/phase-06/lab_repeating_group_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed one cell holding too many facts; this unit shows the same rule violated a different way - a fixed set of columns standing in for what should be a variable number of rows. The next unit names the real, concrete cost both violations share.
+
+## Concept Unit: Update Anomalies - The Real Cost These Violations Share
+
+### The Problem
+
+Both of this lesson's own real violations - `Part.tags`'s comma-string and `MachineCAMPairing`'s repeating approval columns - store what is really a variable-length collection of facts inside a fixed, singular shape. What specific, concrete, bad thing actually happens later because of that choice - not in the abstract, but the next time someone tries to change one of those facts?
+
+Before reading on:
+
+- If a real part's `tags` string, `"urgent,prototype"`, needs the `"urgent"` tag corrected to `"URGENT-Q3"` everywhere that part is referenced, how many real places does that edit have to happen - and what ensures none of them get missed?
+- This lesson's own previous unit showed adding a fourth approval role requires new columns. Suppose, instead, someone just wanted to correct WHO approved as "engineering" for one single real pairing. Does that correction risk touching anything it shouldn't - and does it, by itself, prove anything is inconsistent yet?
+
+### Project Change
+
+- **Reference Source:** No new reference source - this unit draws its own conclusion directly from the same two real citations already shown in this lesson's previous two units (`backend/app/models/part.py:286-290` and `backend/app/models/machine_pairing.py:27-43`), rather than introducing a third.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - this unit reasons about the two real violations already shown; no new file is added.
+- **Dependencies:** None beyond what the previous two units already established.
+
+### CS Lens
+
+This is an **update anomaly**, fully named in this lesson's own Header - the real, practical cost that makes a repeating group or a non-atomic value a genuine problem rather than a stylistic complaint. Also recognized in: a phone book listing the same business's real address on several separate lines, none of which automatically stays in sync if the business moves; a codebase with the same magic number copy-pasted in five files, only four of which get updated when the real value changes; a spreadsheet formula silently referencing a stale copy of a value that was already corrected elsewhere; and, in this project's own domain, this lesson's own two real, concrete cases: a tag correction that has to be found and re-typed everywhere that string appears, and a fourth approval role that cannot be added at all without a real schema change touching every piece of code already naming the other three.
+
+### SE Lens
+
+The design principle an update anomaly exposes is that redundant storage of the same real fact is a real, ongoing maintenance liability, not a one-time cost paid only at write time. The real alternative NOT chosen for either of this project's own two real violations - normalizing `tags` into `Tag`/`part_tags` (already built, per this curriculum's own Many-to-Many lesson) or approval roles into a separate, role-keyed table - would mean a correction happens in exactly one real place, guaranteed, because there is only one real place for that fact to live. The honest cost on the other side: this project's own real, chosen shapes are simpler to read directly off a single row for a human, at the real price of every future correction needing to find every copy by hand, with nothing in the schema itself checking that all of them were actually found.
+
+### Verification
+
+This unit draws its own conclusion from the two real citations and real lab outputs already shown and verified in this lesson's previous two units - it introduces no new code or claim that itself needs a fresh, separate run.
+
+### Connection to the previous unit
+
+The previous two units each showed a real 1NF violation; this unit names the concrete, shared cost both actually have. The next unit studies two further normalization rules this project's own real schema happens to already satisfy.
+
+## Concept Unit: 2NF and 3NF - Rules This Project's Own Schema Happens to Already Satisfy
+
+### The Problem
+
+`backend/app/models/tag.py`'s own real `part_tags` table, already cited in this curriculum's own Primary Keys and Many-to-Many lessons, has a composite primary key, `(part_id, tag_id)`, and NO other columns at all. Given that 2NF and 3NF are both specifically about non-key attributes depending on the wrong thing, what does a table with literally no non-key attributes have to worry about from either rule?
+
+Before reading on:
+
+- 2NF requires every non-key attribute to depend on the WHOLE composite key. `part_tags` has no non-key attributes at all. Can a rule about non-key attributes ever be violated by a table that has none?
+- The lab below invents a small, explicitly-labeled illustration, since this project's own real schema has no real example handy. Given a `(sequence_id, tool_number)` composite key and a `tool_description` that only actually depends on `tool_number`, what real, concrete problem does that cause the next time a tool's real description needs correcting?
+
+### Project Change
+
+- **Reference Source:** Real, verbatim, read this session, `backend/app/models/tag.py:11-15`, already cited in this curriculum's own Primary Keys lesson: ``` part_tags = db.Table(
+    'part_tags',
+    db.Column('part_id', db.String(50), db.ForeignKey('parts.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+) ``` No reference counterpart exists in this project's own real schema for an actual 2NF or 3NF VIOLATION - every real composite- key table this session found, `part_tags` included, carries no non-key attribute at all for either rule to apply to. The lab below is explicitly invented, in this project's own real domain vocabulary, to make both rules concrete anyway.
+- **Files affected:** `verification/phase-06/lab_2nf_3nf_illustrative.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone, explicitly-invented illustrative script; no existing project structure to place it within.
+- **Dependencies:** None beyond plain Python.
+
+### The New Code
+
+Two small, explicitly invented tables - a 2NF violation, then a 3NF violation - in this project's own domain vocabulary, since no real instance of either exists in the actual schema:
+
+**File:** `verification/phase-06/lab_2nf_3nf_illustrative.py` (new)
+
+```python
+# Illustrative only - this project's own real schema does not happen to
+# contain a naturally-occurring 2NF or 3NF violation to cite instead.
+
+# 2NF: a composite key (sequence_id, tool_number), where tool_description
+# depends only on tool_number - part of the key, not the whole key.
+sequence_tools = [
+    {"sequence_id": "seq1", "tool_number": 12, "tool_description": "1/2in Carbide End Mill"},
+    {"sequence_id": "seq2", "tool_number": 12, "tool_description": "1/2in Carbide End Mill"},
+    {"sequence_id": "seq3", "tool_number": 7, "tool_description": "3/8in Drill"},
+]
+print("2NF violation: tool_description repeats wherever tool_number repeats, independent of sequence_id")
+for row in sequence_tools:
+    print(row)
+
+print("correcting tool 12's real description means finding and editing every repeated row, by hand:")
+for row in sequence_tools:
+    if row["tool_number"] == 12:
+        row["tool_description"] = "1/2in Carbide End Mill - 4 Flute"
+print(sequence_tools)
+
+# 3NF: material_density depends on material, a non-key attribute -
+# not directly on part_id, the actual key.
+parts_with_material = [
+    {"part_id": "P1", "material": "6061-T6 Aluminum", "material_density": 2.70},
+    {"part_id": "P2", "material": "6061-T6 Aluminum", "material_density": 2.70},
+    {"part_id": "P3", "material": "17-4 PH Stainless", "material_density": 7.75},
+]
+print("3NF violation: material_density repeats wherever material repeats, independent of part_id")
+for row in parts_with_material:
+    print(row)
+```
+
+### Mechanical Walkthrough
+
+- `sequence_tools = [ {...}, {...}, {...} ]` — Three dicts sharing a composite key shape, `(sequence_id, tool_number)`, with `tool_description` riding along - the invented 2NF violation: `tool_description` genuinely depends only on `tool_number` (tool 12 always means the same real description), never on `sequence_id`, which is only part of the declared key.
+- `for row in sequence_tools: if row['tool_number'] == 12: row['tool_description'] = ...` — A basic-Python `for` loop with a conditional, correcting EVERY row whose `tool_number` happens to be `12` - two separate real rows have to be found and changed identically for a single real-world correction to actually take effect everywhere it appears.
+- `parts_with_material = [ {...}, {...}, {...} ]` — Three dicts keyed by `part_id`, with `material_density` depending on `material` - a non-key attribute - rather than on `part_id` itself: the invented 3NF violation. Correcting aluminum's real density would face the identical real problem the 2NF example already showed: every row using that material would need the identical, separate edit.
+
+### CS Lens
+
+**2NF** is about a non-key attribute depending on only PART of a composite key; **3NF** is about a non-key attribute depending on ANOTHER non-key attribute instead of the key at all - both fully named in this lesson's own Header. Also recognized in: a `(student_id, course_id)` composite-key enrollment table where `course_name` depends only on `course_id` (2NF); a `zip_code` column from which `city` and `state` could always be looked up, yet are stored directly anyway (3NF); and, in this project's own domain, the two invented cases above - a tool's own description depending only on its tool number, a material's own density depending only on which material it is.
+
+### SE Lens
+
+The design principle both rules protect is the same one this lesson's own 1NF units already established, applied one level further: a fact should be stored in exactly the one place its real dependency actually points to, never copied wherever a WEAKER dependency happens to repeat. The real alternative NOT chosen in either invented case - a separate `tools` table keyed on `tool_number` alone, a separate `materials` table keyed on `material` alone - would store `tool_description` and `material_density` exactly once each, however many sequences or parts ever reference them. The honest cost, specific to THIS project: neither violation exists in the real schema today, so there is real, honest uncertainty here that this lesson's own first three units did not have to carry - these two rules are taught correctly, but without a real, live instance of either actually going wrong in this project's own real data.
+
+### Commands needed
+
+- `python verification/phase-06/lab_2nf_3nf_illustrative.py` — Runs the lab from the repository root; no flags needed.
+
+### Verification
+
+```text
+2NF violation: tool_description repeats wherever tool_number repeats, independent of sequence_id
+{'sequence_id': 'seq1', 'tool_number': 12, 'tool_description': '1/2in Carbide End Mill'}
+{'sequence_id': 'seq2', 'tool_number': 12, 'tool_description': '1/2in Carbide End Mill'}
+{'sequence_id': 'seq3', 'tool_number': 7, 'tool_description': '3/8in Drill'}
+correcting tool 12's real description means finding and editing every repeated row, by hand:
+[{'sequence_id': 'seq1', 'tool_number': 12, 'tool_description': '1/2in Carbide End Mill - 4 Flute'}, {'sequence_id': 'seq2', 'tool_number': 12, 'tool_description': '1/2in Carbide End Mill - 4 Flute'}, {'sequence_id': 'seq3', 'tool_number': 7, 'tool_description': '3/8in Drill'}]
+3NF violation: material_density repeats wherever material repeats, independent of part_id
+{'part_id': 'P1', 'material': '6061-T6 Aluminum', 'material_density': 2.7}
+{'part_id': 'P2', 'material': '6061-T6 Aluminum', 'material_density': 2.7}
+{'part_id': 'P3', 'material': '17-4 PH Stainless', 'material_density': 7.75}
+```
+
+Full saved run: `verification/phase-06/lab_2nf_3nf_illustrative_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit named the shared, real cost of this lesson's own two real violations; this unit completes the classical progression - 1NF, 2NF, 3NF - with the two rules this project's own real schema happens not to break, demonstrated honestly with an invented, clearly-labeled example instead of a forced one.
+
+## Connect the pieces
+
+Follow the real word `"urgent"` and the real role `"quality"` through every unit. As a raw substring inside `Part.tags`'s own real, comma-separated string, `"urgent"` produces a wrong answer the instant a naively-matching lookup runs against it - 1NF's own atomic-value half, broken. As a column-name prefix instead of real data, `"quality"` is one of exactly three roles `MachineCAMPairing`'s own real schema can ever hold, because adding a fourth means adding new columns, not new rows - 1NF's own repeating- group half, broken the same way, a different shape. Both failures converge on the identical real cost the third unit names directly: correcting either one means finding every real copy by hand, with nothing in the schema itself confirming all of them were found - an update anomaly. And the fourth unit shows the classical progression does not stop at 1NF: even a real, correctly-designed composite key like `part_tags`'s own `(part_id, tag_id)` could, in principle, still carry a 2NF or 3NF violation if it held the wrong non-key attribute - it simply happens not to, in this project's own real, current schema, which this lesson says honestly rather than inventing a violation where none exists.
+
+**Next lesson:** Next, the opposite real question gets asked directly: `CAMFile.version`'s own real, stored, computed value - already redundant with the real `part_rev` and `cam_rev` columns sitting right next to it - looks exactly like this lesson's own kind of violation, and yet was chosen deliberately. What makes redundancy like that a legitimate, documented tradeoff instead of an anomaly waiting to happen.
