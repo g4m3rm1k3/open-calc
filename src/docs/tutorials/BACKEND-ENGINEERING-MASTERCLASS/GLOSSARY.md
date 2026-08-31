@@ -186,6 +186,9 @@ re-run the script after any lesson changes instead.
 ## ast.walk
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A standard-library function that visits every node in a tree, in no particular guaranteed order, one at a time.
 
+## atomicity
+- **Term** in `LESSON-6.11-TRANSACTIONS` - The specific guarantee a transaction makes: "all or nothing" - if any real operation inside it fails, every other operation in that SAME transaction is undone too, even ones that were themselves perfectly valid. It exists as the most fundamental transaction guarantee because without it, a transaction would only be a grouping in name - a single real failure partway through could leave some of the group's changes applied and others not, which is the exact opposite of what grouping them was supposed to prevent.
+
 ## attribute
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - One named, single-valued property every tuple in a relation has - the formal name for what a declared column actually is: a name (like `category`) paired with a domain, the set of values it is allowed to hold (like a maximum-length string). It exists as a distinct idea from a tuple's raw position (its first value, its second value, ...) because a real relation's own columns are identified by NAME, not by position - `backend/app/models/machine.py`'s own real `category` column is always reached by that name, never by "the third value in the row."
 
@@ -273,6 +276,9 @@ re-run the script after any lesson changes instead.
 ## column
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word for exactly what the relational model formally calls an attribute: one named, single-valued property every row shares. It exists for the identical reason "row" does - it is the word real SQL, and this project's own real code (its `db.Column` declarations), actually uses, even though "attribute" is the formally precise term for the same idea.
 
+## commit
+- **Term** in `LESSON-6.11-TRANSACTIONS` - The real, explicit action that makes every operation in the current transaction permanent, all at once - `db.session.commit()` in this project's own real code. It exists as a distinct, separate step from staging changes (`db.session.add(...)`) specifically so several real operations can be staged first and only actually take effect together, at one single, deliberate point, rather than one at a time as each is staged.
+
 ## composite index
 - **Term** in `LESSON-6.10-INDEXES` - An index built across more than one column together, in a specific, declared order - useful for narrowing a search using the FIRST (leftmost) column efficiently, but not necessarily useful for searching on a later column alone. It exists because some real queries filter on more than one column at once, and a single composite index, built in the right column order, can serve those queries directly - at the real cost that filtering by a column other than the leading one may not benefit from it at all, which this lesson's own final unit proves directly, in this project's own real schema.
 
@@ -290,6 +296,9 @@ re-run the script after any lesson changes instead.
 
 ## configuration object
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real Python class - `Config`, and the three real classes that inherit from it - holding a real, named group of settings as plain real class attributes. It exists so an entire, real set of related settings can be selected together, by name, rather than individually assembled every time a real app is built.
+
+## consistency
+- **Term** in `LESSON-6.11-TRANSACTIONS` - The guarantee that a transaction can only ever move a database from one state that satisfies every real constraint to another state that also satisfies every real constraint - never to a state that violates one. It exists as the natural, combined consequence of atomicity and this curriculum's own Constraints lesson: because an invalid write is refused, and because atomicity ensures a failed write undoes its whole transaction, a committed transaction can never leave behind a row that breaks a real, enforced constraint.
 
 ## consistency cost
 - **Term** in `LESSON-6.8-DENORMALIZATION` - The real, ongoing risk that a denormalized value and its own real source of truth quietly stop agreeing, because keeping them in sync depends on every real code path that changes the source actually remembering to also update the derived copy. It exists as the honest price of denormalization's own real benefit: the moment more than one real place in the codebase is capable of changing the source of truth, each one of those places becomes a real opportunity for the derived value to go stale, with nothing in the schema itself checking that it did not.
@@ -370,6 +379,12 @@ re-run the script after any lesson changes instead.
 
 ## db.session.commit
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that actually writes every currently staged change to the real database.
+
+## db.session.commit()
+- **Object/method** in `LESSON-6.11-TRANSACTIONS` - The real SQLAlchemy session method that ends the current transaction by making every staged change permanent, already used throughout this curriculum without being separately named.
+
+## db.session.rollback()
+- **Object/method** in `LESSON-6.11-TRANSACTIONS` - The real SQLAlchemy session method that discards every staged change in the current transaction, already used once in this curriculum's own Constraints lesson without being explained.
 
 ## db.Table
 - **Object/method** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - A real SQLAlchemy construct for declaring a table directly, by its real columns, without wrapping it in a full model class - used specifically for a table, like `part_tags`, that has no real data of its own beyond the two real foreign keys connecting it.
@@ -668,6 +683,9 @@ re-run the script after any lesson changes instead.
 ## is_valid_machine_status
 - **Object/method** in `LESSON-2.9-TDD` - A new, real, small function this lesson builds from nothing, through a real RED-GREEN-REFACTOR cycle - not a real, existing part of this project's backend, and never wired into it.
 
+## isolation
+- **Term** in `LESSON-6.11-TRANSACTIONS` - The guarantee that one, real, in-progress transaction's own uncommitted changes are invisible to every other real connection, until that transaction actually commits. It exists so a second, real reader can never observe a transaction's changes partway through - only the state before it began, or the complete state after it commits, never an in-between moment nothing was ever supposed to be visible.
+
 ## itertools.groupby
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library function that groups consecutive real elements of an iterable sharing the identical real key.
 
@@ -808,6 +826,9 @@ re-run the script after any lesson changes instead.
 
 ## PDMService.get_history
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real, existing static method on this project's own `PDMService`, retrieving a CAM file's commit history from GitLab.
+
+## PendingRollbackError
+- **Object/method** in `LESSON-6.11-TRANSACTIONS` - A real SQLAlchemy exception raised when code tries to use a session whose current transaction has already failed, before that session's own required `rollback()` has been called.
 
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
@@ -984,6 +1005,9 @@ re-run the script after any lesson changes instead.
 
 ## Return value
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
+
+## rollback
+- **Term** in `LESSON-6.11-TRANSACTIONS` - The real, explicit action that discards every operation staged in the current transaction, returning the database to the state it was in before that transaction began. It exists as commit's own real counterpart - the way a transaction that cannot, or should not, be made permanent is undone cleanly, rather than left half-applied or leaving the session unable to do anything further at all.
 
 ## route prefix
 - **Term** in `LESSON-4.5-BLUEPRINTS` - A real, shared URL segment automatically prepended to every real route a blueprint defines - `/api/machines`, for `machines_bp`'s own routes. It exists so an entire real blueprint's worth of routes can be relocated, or namespaced, by changing one real string in one real place, rather than editing every individual real route pattern.
@@ -1187,6 +1211,9 @@ re-run the script after any lesson changes instead.
 
 ## traceback
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The block of text Python prints when an exception propagates all the way up without being caught: which line raised it, which function called which function to get there, and the exception's own type and message. It exists so a failure is not just "the program stopped" - it is a specific, readable record of exactly where and why.
+
+## transaction
+- **Term** in `LESSON-6.11-TRANSACTIONS` - A group of one or more real database operations treated as a single, indivisible unit - either every real operation in the group actually takes effect, or none of them do. It exists because some real changes only make sense together - inserting a `CAMFile` and its first real `Sequence` in the same real save, for instance - and a database that only ever applied SOME of a related group of writes could leave data in a state nothing ever intended.
 
 ## Transport layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend responsible only for moving raw bytes between a client and a server — sockets, HTTP parsing — with no awareness of what those bytes mean to this specific application. It exists as its own named boundary because the exact same transport code works for a manufacturing app, a blog, or anything else; nothing about it is specific to what this application does.
@@ -1502,6 +1529,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `commit` / `db.session.commit` - shares: commit
+- `commit` / `db.session.commit()` - shares: commit
 - `composite index` / `composite uniqueness` - shares: composite
 - `composite uniqueness` / `uniqueness` - shares: uniqueness
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
@@ -1514,6 +1543,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
+- `consistency` / `consistency cost` - shares: consistency
 - `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
 - `Content-Type` / `tuple (Python builtin type)` - shares: type
@@ -1591,6 +1621,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `db.relationship (secondary=)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.session.commit()` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.session.rollback()` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.Table` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
@@ -1612,6 +1644,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
+- `db.session.commit()` / `Session (db.session)` - shares: db, session
+- `db.session.commit()` / `test session` - shares: session
+- `db.session.rollback()` / `rollback` - shares: rollback
+- `db.session.rollback()` / `Session (db.session)` - shares: db, session
+- `db.session.rollback()` / `test session` - shares: session
 - `db.Table` / `Session (db.session)` - shares: db
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
