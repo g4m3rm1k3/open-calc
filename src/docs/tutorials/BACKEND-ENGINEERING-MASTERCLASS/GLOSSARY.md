@@ -104,11 +104,17 @@ re-run the script after any lesson changes instead.
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
 
+## app.url_map
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central routing table Flask (through Werkzeug) builds from every real `@app.route`/`@blueprint.route` call made during `create_app`'s own real setup.
+
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
 
 ## Application layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend that decides which piece of code should run for a given request — routing a parsed request to a handler — without itself containing the actual business decision that handler makes. It exists as a separate boundary from domain logic (below) so the *routing* decision (which function runs) can change independently of the *business* decision (what that function actually does).
+
+## application object
+- **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central Python object - an instance of Flask's own `Flask` class - that accumulates everything a running app needs: real configuration, real registered routes, real blueprints. It exists as the one real, shared object every part of `create_app`'s own real setup attaches something to.
 
 ## Application server
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the real running process that accepts
@@ -214,6 +220,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - This project's real Flask application factory function.
 - **Object/method** in `LESSON-2.3-PYTEST` - This project's real Flask application factory function.
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - This project's real Flask application factory function.
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - This project's own real application factory function, already read in earlier lessons, revisited here specifically for what it actually builds onto the `app` object step by step.
 
 ## create_machine
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
@@ -347,6 +354,9 @@ re-run the script after any lesson changes instead.
 ## flaky test
 - **Term** in `LESSON-2.4-TEST-ISOLATION` - A real test that sometimes passes and sometimes fails against the exact same, completely unchanged code - the directly observable symptom of a test that isn't deterministic. It exists as the practical, felt cost of non-determinism: once a team stops trusting one test's own failure to mean something real, trust in the whole suite erodes with it.
 
+## Flask (the class, and this project's own app instance)
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central class this entire framework is built around - `app = Flask(__name__)` (`backend/app/__init__.py:244`) is the one real object this project's own `create_app()` configures.
+
 ## Flask.test_client
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real method on Flask's own `Flask` class, returning a test client that can make requests against the app without a real network socket.
 
@@ -388,6 +398,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
 - **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, existing Flask view function retrieving one machine by ID - already studied earlier in this phase, revisited here specifically for its real error shape.
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - Two real, existing Flask view functions, returning their real result two genuinely different real ways.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
@@ -413,6 +424,9 @@ re-run the script after any lesson changes instead.
 
 ## header
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - One real line of an HTTP message, before its blank-line separator, carrying one real piece of metadata as a `Name: value` pair - `Content-Type: application/json`, in this lesson's own response unit. It exists so real information about a message (its format, its length) travels with the message itself, without being mixed into the actual body.
+
+## health_check
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - Two real, existing Flask view functions, returning their real result two genuinely different real ways.
 
 ## health_check (blueprint route)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A second, real, existing Flask view function - sharing the same Python name as the one above, but declared inside its own blueprint.
@@ -637,8 +651,14 @@ re-run the script after any lesson changes instead.
 ## request
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, complete message a client sends to a server, structured as a start line (naming the method and URL), one or more header lines, a blank line, and an optional body - this lesson's own request unit sends exactly that shape, by hand, over a raw socket. It exists as the one real, agreed-upon shape a server can always parse the same way, regardless of who wrote the client.
 
+## request (the real context-local proxy)
+- **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, importable name from `flask` that every view function in this project already uses, without it ever being passed as an argument.
+
 ## request body
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The real data a request carries beyond its URL and headers - here, real JSON - read by the server via `request.get_json()`. It exists so an operation like "update this machine's status" can carry the actual new value along with it, not just identify which machine to act on.
+
+## request context
+- **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, temporary state Flask activates for the exact duration of one real request, making `request` (and `current_app`) usable as if they were plain global variables, without actually being passed as an argument to every real view function. It exists so a real view function's own signature stays simple, while still having genuine, real access to the specific request it's handling.
 
 ## request header
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - Real key-value metadata sent alongside a request, separate from its body - information *about* the request, not the request's own payload. It exists because some real information (who's asking, what format they want back) belongs with every request regardless of what that request's own body happens to contain.
@@ -666,6 +686,7 @@ re-run the script after any lesson changes instead.
 
 ## response
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, complete message a server sends back, structured the same way a request is - a status line (naming the real outcome), header lines, a blank line, and an optional body. It exists so a client gets back not just data, but a real, structured account of what happened, in a shape it can parse exactly as reliably as the server parsed the request.
+- **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, final HTTP response Flask builds from whatever a view function returns - a bare dict, a `jsonify(...)` call, a real `(dict, int)` tuple - converted, whichever real form it started as, into the identical real kind of HTTP response. It exists as Flask's own real, final translation step between Python return values and real HTTP bytes.
 
 ## Response (.status_code
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
@@ -687,6 +708,9 @@ re-run the script after any lesson changes instead.
 
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of
+
+## routing
+- **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, internal table Flask (through Werkzeug) builds from every `@app.route`/`@blueprint.route` call, matching a real incoming URL and method against the exact real Python function that should handle it. It exists so a real request's own URL can be resolved to real code before any of that code actually runs.
 
 ## safe (HTTP method property)
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that a method's own definition promises zero side effects on the server - calling it changes nothing, no matter how many real times it's called. It exists so real tooling (browsers prefetching a link, a proxy caching a response) can treat a safe method specially, without ever having to inspect what a specific real route actually does.
@@ -904,6 +928,9 @@ re-run the script after any lesson changes instead.
 ## Value object
 - **Term** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real bundle of data whose own identity IS its values - two value objects holding the identical real data are considered the same, interchangeably, with no separate real identity tracked beyond what they actually hold. It exists as its own concept because a real program often needs to distinguish this case (a computed result, a coordinate, a fixed set of related fields describing one real thing) from a case where two objects holding identical data right now are still genuinely different real things - the next unit's own real contrast.
 
+## WSGI
+- **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, standard interface between a Python web application and the real server running it - a single, agreed-upon real calling convention (`app(environ, start_response)`) any compliant real server can use against any compliant real application. It exists so a real Python web framework and a real production server (or a real development server) can be written independently, by different people, and still work together.
+
 ## WSGI (Web Server Gateway Interface)
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - a real, standard Python
 
@@ -971,10 +998,16 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
 - `API contract` / `unified error contract` - shares: contract
+- `app.url_map` / `map` - shares: map
 - `application context` / `Application layer` - shares: application
+- `application context` / `application object` - shares: application
 - `application context` / `Application server` - shares: application
+- `application context` / `request (the real context-local proxy)` - shares: context
+- `application context` / `request context` - shares: context
+- `Application layer` / `application object` - shares: application
 - `Application layer` / `Application server` - shares: application
 - `Application layer` / `Transport layer` - shares: layer
+- `application object` / `Application server` - shares: application
 - `Application server` / `Server` - shares: server
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
@@ -1009,6 +1042,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
+- `check_password_hash` / `health_check` - shares: check
 - `check_password_hash` / `health_check (blueprint route)` - shares: check
 - `check_password_hash` / `health_check (direct route)` - shares: check
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
@@ -1126,6 +1160,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
 - `fixture scope` / `yield fixture` - shares: fixture
+- `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `FlaskClient (.post)` / `POST` - shares: post
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
@@ -1146,6 +1181,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Header` / `header` - shares: header
 - `Header` / `request header` - shares: header
 - `header` / `request header` - shares: header
+- `health_check` / `health_check (blueprint route)` - shares: check, health
+- `health_check` / `health_check (direct route)` - shares: check, health
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `Import graph` / `test_xml_import` - shares: import
@@ -1217,6 +1254,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `random (seed` / `random seed` - shares: random, seed
 - `random (seed` / `random)` - shares: random
 - `random seed` / `random)` - shares: random
+- `request (the real context-local proxy)` / `request context` - shares: context
 - `request body` / `response body` - shares: body
 - `Request line` / `Status line` - shares: line
 - `Request line` / `status line` - shares: line
@@ -1246,3 +1284,4 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `update_machine (PATCH)` / `update_machine_status` - shares: machine, update
 - `update_machine (PATCH)` / `update_machine_status (PUT)` - shares: machine, update
 - `update_machine_status` / `update_machine_status (PUT)` - shares: machine, update
+- `WSGI` / `WSGI (Web Server Gateway Interface)` - shares: wsgi

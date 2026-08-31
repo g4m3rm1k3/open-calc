@@ -1,0 +1,977 @@
+number: "4.1"
+title: "What Flask Provides"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Five real, run checks against this project's own real Flask app,
+  finally naming the framework every earlier phase has already been
+  using without explaining: calling the real app object directly as a
+  raw WSGI callable, with no test client involved at all; comparing a
+  bare `Flask(__name__)` against this project's own real, fully-built
+  app; watching `request` genuinely fail outside a real request and
+  work inside one; proving a bare Python dict and an explicit
+  `jsonify(...)` call produce the identical real response; and matching
+  a real URL directly against this project's own real routing table,
+  before any view function ever runs.
+
+what_you_need_to_know_first: >
+  What the real HTTP methods, status codes, headers, and JSON response
+  shapes this project's own backend actually returns; what a decorator
+  is; what a Python callable is.
+
+terms:
+  - name: WSGI
+    definition: >
+      The real, standard interface between a Python web application and
+      the real server running it - a single, agreed-upon real calling
+      convention (`app(environ, start_response)`) any compliant real
+      server can use against any compliant real application. It exists
+      so a real Python web framework and a real production server (or a
+      real development server) can be written independently, by
+      different people, and still work together.
+  - name: application object
+    definition: >
+      The real, central Python object - an instance of Flask's own
+      `Flask` class - that accumulates everything a running app needs:
+      real configuration, real registered routes, real blueprints. It
+      exists as the one real, shared object every part of `create_app`'s
+      own real setup attaches something to.
+  - name: request context
+    definition: >
+      The real, temporary state Flask activates for the exact duration
+      of one real request, making `request` (and `current_app`) usable
+      as if they were plain global variables, without actually being
+      passed as an argument to every real view function. It exists so a
+      real view function's own signature stays simple, while still
+      having genuine, real access to the specific request it's handling.
+  - name: response
+    definition: >
+      The real, final HTTP response Flask builds from whatever a view
+      function returns - a bare dict, a `jsonify(...)` call, a real
+      `(dict, int)` tuple - converted, whichever real form it started
+      as, into the identical real kind of HTTP response. It exists as
+      Flask's own real, final translation step between Python return
+      values and real HTTP bytes.
+  - name: routing
+    definition: >
+      The real, internal table Flask (through Werkzeug) builds from
+      every `@app.route`/`@blueprint.route` call, matching a real
+      incoming URL and method against the exact real Python function
+      that should handle it. It exists so a real request's own URL can
+      be resolved to real code before any of that code actually runs.
+
+objects_and_methods:
+  - name: Flask (the class, and this project's own app instance)
+    what_it_is: >
+      The real, central class this entire framework is built around -
+      `app = Flask(__name__)` (`backend/app/__init__.py:244`) is the one
+      real object this project's own `create_app()` configures.
+    implementation: >
+      `Flask.__call__(self, environ, start_response)` (part of Flask's
+      own real, public interface) is what makes a `Flask` instance a
+      real WSGI application - it delegates to `self.wsgi_app(environ,
+      start_response)`, confirmed directly in this project's own real
+      tracebacks earlier in this curriculum
+      (`flask/app.py:1478`, `return self.wsgi_app(environ,
+      start_response)`).
+    its_use: >
+      This lesson calls this project's own real `app` object directly,
+      as a raw WSGI callable, and separately inspects its own real
+      `.config`, `.blueprints`, and `.url_map` attributes.
+    type: A real class from the `flask` package; this project's own
+      `app` is one real instance of it.
+    responsibility: >
+      Being the one real, central object a WSGI server calls, and the
+      one real object every part of `create_app`'s own setup
+      (extensions, blueprints, configuration) attaches itself to.
+    depends_on: >
+      A real WSGI `environ` dict and a real `start_response` callable,
+      when called directly; real configuration and real blueprint
+      registrations, to become this project's own fully-built app.
+    connects_to: >
+      Every real route this curriculum has studied is ultimately
+      reached through this one real object's own real `__call__`.
+    shape: >
+      Callable as `app(environ, start_response)`, returning a real,
+      iterable sequence of real bytes - the actual real HTTP response
+      body.
+
+  - name: create_app
+    what_it_is: >
+      This project's own real application factory function, already
+      read in earlier lessons, revisited here specifically for what it
+      actually builds onto the `app` object step by step.
+    implementation: >
+      `def create_app(config_name: str = None) -> Flask: ...`
+      (`backend/app/__init__.py:172-444`) - creates a bare
+      `app = Flask(__name__)` (`:244`), then real, sequential calls
+      (`app.config.from_object(...)`, `db.init_app(app)`,
+      `register_routes(app)`) each attach real, additional state onto
+      the identical real object.
+    its_use: >
+      This lesson contrasts a bare `Flask(__name__)` against this real
+      function's own finished output, specifically to see what its own
+      real steps actually add.
+    type: A real, module-level function - the application factory
+      pattern.
+    responsibility: >
+      Producing one real, fully-configured `Flask` instance, with every
+      real extension and blueprint already attached.
+    depends_on: >
+      A real config name; every real extension and blueprint module it
+      imports along the way.
+    connects_to: >
+      Its own real, sequential calls are what this lesson's own
+      application-object unit traces the effect of.
+    shape: >
+      Takes an optional real config name string in; returns one real,
+      fully-configured `Flask` instance out.
+
+  - name: request (the real context-local proxy)
+    what_it_is: >
+      The real, importable name from `flask` that every view function in
+      this project already uses, without it ever being passed as an
+      argument.
+    implementation: >
+      `from flask import request` - `request` is a real
+      `werkzeug.local.LocalProxy`, resolving, on every real attribute
+      access, to whichever real request is currently active for the
+      thread/greenlet handling it; accessing any of its real attributes
+      (`.path`, `.method`, `.get_json()`) outside a real, active request
+      raises a genuine `RuntimeError`, confirmed directly this session.
+    its_use: >
+      This lesson accesses it directly, outside any real request,
+      inside a real one (via `app.test_request_context(...)`), and after
+      that context ends - specifically to observe its real behavior
+      change in each real case.
+    type: A real `LocalProxy` instance, imported directly from `flask`.
+    responsibility: >
+      Standing in for "the current real request," resolving correctly
+      no matter which real view function reads it, and failing loudly
+      the moment there isn't a real request to resolve to.
+    depends_on: >
+      A real, active request context - established by a real, incoming
+      request, or, in this lesson, by
+      `app.test_request_context(...)`.
+    connects_to: >
+      Every real route this curriculum has already called
+      `request.get_json()`, `request.headers`, or `request.args` on was
+      relying on this identical real mechanism, every single time.
+    shape: >
+      Behaves like a real `Request` object while a real context is
+      active; raises a real `RuntimeError` on any attribute access
+      otherwise.
+
+  - name: health_check / get_machine
+    what_it_is: >
+      Two real, existing Flask view functions, returning their real
+      result two genuinely different real ways.
+    implementation: >
+      `def health_check(): return {'status': 'healthy', 'message': ...}`
+      (`backend/app/__init__.py:426-439`) returns a real, bare Python
+      dict directly, with no `jsonify(...)` call anywhere in its own real
+      body; `def get_machine(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:48-61`) explicitly calls
+      `jsonify({'data': machine.to_dict()})` instead.
+    its_use: >
+      This lesson calls both, specifically to compare their real,
+      resulting `Content-Type` and response shape directly.
+    type: Two Flask view functions.
+    responsibility: >
+      Producing a real HTTP response from a real Python return value -
+      one relying on Flask's own real, automatic dict conversion, one
+      calling the real, explicit `jsonify` helper itself.
+    depends_on: >
+      Nothing, for `health_check`; a real `machine_id`, for
+      `get_machine`.
+    connects_to: >
+      Their own real, different return statements are the entire
+      specimen this lesson's own response unit is built around.
+    shape: >
+      Both ultimately produce a real `Response` with
+      `Content-Type: application/json` and an implicit `200` - `health_check`'s
+      own real return value is a bare `dict`; `get_machine`'s is already
+      a real `Response` object, built explicitly by `jsonify`.
+
+  - name: app.url_map
+    what_it_is: >
+      The real, central routing table Flask (through Werkzeug) builds
+      from every real `@app.route`/`@blueprint.route` call made during
+      `create_app`'s own real setup.
+    implementation: >
+      `app.url_map` is a real `werkzeug.routing.Map`;
+      `.iter_rules()` returns every real, registered `Rule`, each
+      carrying its own real URL pattern and real, allowed HTTP methods;
+      `.bind(...).match(path, method=...)` performs the identical real
+      matching a genuine incoming request goes through, returning the
+      real endpoint name and any real, extracted URL parameters.
+    its_use: >
+      This lesson inspects it directly to list every real
+      `/api/machines...` rule this project registers, and to perform one
+      real, explicit match by hand.
+    type: A real `werkzeug.routing.Map` instance, an attribute of every
+      real `Flask` app.
+    responsibility: >
+      Holding every real route this app knows about, and resolving a
+      real URL and method to the exact real Python function that
+      should handle it.
+    depends_on: >
+      Every real `@app.route`/`@blueprint.route` call made anywhere
+      during `create_app`'s own real setup.
+    connects_to: >
+      Every real request this curriculum has ever sent, in every earlier
+      lesson, was matched against this identical real structure before
+      the view function this lesson has studied ever actually ran.
+    shape: >
+      `.iter_rules()` returns real `Rule` objects; `.bind(...).match(...)`
+      returns a real `(endpoint: str, args: dict)` tuple.
+
+concept_units:
+  - title: "WSGI - What a Real Server Actually Calls"
+    problem: >
+      Every earlier lesson in this curriculum reached this project's own
+      routes through `FlaskClient` or the real `requests` library. What
+      does Flask's own `app` object actually do, underneath both of
+      those, when a real request arrives?
+    socratic_prompt:
+      - >
+        This curriculum's own earlier real tracebacks (from this
+        project's own real `500` crash) showed a real call chain passing
+        through `flask/app.py`'s own `__call__`, calling
+        `self.wsgi_app(environ, start_response)`. What does that suggest
+        about what kind of object `app` actually is - a plain container
+        of routes, or something a server can directly invoke?
+      - >
+        If you had to hand-build the minimum real information a web
+        server would need to describe "a GET request for `/health`" -
+        no framework, no library helpers - what real pieces of
+        information would you need to include?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/__init__.py:172-444` (`create_app`),
+        read again this session; this curriculum's own earlier, real,
+        captured tracebacks showing `flask/app.py:1478`'s real
+        `self.wsgi_app(environ, start_response)` call.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: None beyond this project's own real `app`.
+    new_code:
+      applicable: true
+      intro: >
+        This project's own real app, called directly as a raw WSGI
+        application - no test client, no `requests` library:
+      file: verification/phase-04/lab_flask_wsgi.py
+      status: new
+      language: python
+      code: |
+        import sys
+        import io
+        sys.path.insert(0, "backend")
+
+        from app import create_app
+
+        app = create_app("testing")
+
+        print("app is callable (a real WSGI application):", callable(app))
+        print("app.wsgi_app is callable:", callable(app.wsgi_app))
+
+        environ = {
+            "REQUEST_METHOD": "GET",
+            "PATH_INFO": "/health",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "5000",
+            "SERVER_PROTOCOL": "HTTP/1.1",
+            "wsgi.version": (1, 0),
+            "wsgi.url_scheme": "http",
+            "wsgi.input": io.BytesIO(b""),
+            "wsgi.errors": sys.stderr,
+            "wsgi.multithread": False,
+            "wsgi.multiprocess": False,
+            "wsgi.run_once": False,
+        }
+
+        captured = {}
+
+
+        def start_response(status, headers):
+            captured["status"] = status
+            captured["headers"] = headers
+
+
+        body_iter = app(environ, start_response)
+        body = b"".join(body_iter)
+
+        print("real WSGI status:", captured["status"])
+        print("real WSGI body:", body)
+
+        assert captured["status"] == "200 OK"
+        assert b"healthy" in body
+        print("no Flask test client, no werkzeug test helpers - a hand-built real WSGI environ dict and a plain function, and this project's own real app answered exactly like any real WSGI server would call it")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'callable(app)'
+          explanation: >
+            Confirms, for real, that `app` itself - the same real object
+            this curriculum has been importing since Phase 3 - can be
+            called like a function; this is the real, structural fact
+            that makes it a WSGI application at all.
+        - element: 'environ = {"REQUEST_METHOD": "GET", "PATH_INFO": "/health", ...}'
+          explanation: >
+            A real, hand-built WSGI `environ` dict - the actual, minimal
+            real information a real server passes: which method, which
+            path, and a handful of real, required `wsgi.*` keys the WSGI
+            spec itself demands.
+        - element: 'def start_response(status, headers): captured["status"] = status; captured["headers"] = headers'
+          explanation: >
+            A real, plain function matching WSGI's own real calling
+            convention - the application calls this itself, to report
+            its own real status line and headers, before returning its
+            real body.
+        - element: 'body_iter = app(environ, start_response)'
+          explanation: >
+            The real, central moment - calling `app` directly, exactly
+            the way a real WSGI server does, with no Flask-specific test
+            helper involved anywhere.
+        - element: 'body = b"".join(body_iter)'
+          explanation: >
+            WSGI's own real spec requires the application return an
+            iterable of real byte strings, not a single value - joining
+            them is the real, correct way any WSGI server actually
+            collects the full response body.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **standard interface decoupling two independently-built
+      real systems**: WSGI defines exactly what a real server calls and
+      what a real application must return, so either side can be
+      swapped without the other ever changing. Also recognized in:
+      Java's own real Servlet interface, playing the identical real role
+      between a Java web server and a Java web application; a database
+      driver's own real DB-API interface, letting an application swap
+      Postgres for SQLite without changing its own query code; and, in
+      this project's own domain, a G-code dialect's own real, standard
+      command set, letting the identical real program run on machines
+      from different real manufacturers.
+    se_lens: >
+      The design principle is that a real, minimal, agreed interface -
+      here, `environ` in, an iterable of real bytes out - lets Flask be
+      written once and run under Werkzeug's own real development server
+      (what `run.py` uses), gunicorn, or any other real, WSGI-compliant
+      server, with zero real code changes to this project's own app. The
+      real alternative not chosen: a framework-specific, non-standard
+      real calling convention, which would lock this project into
+      whichever specific real server first supported it; the honest
+      cost of WSGI's own real, general-purpose shape: this lesson's own
+      hand-built `environ` needed a real handful of low-level keys
+      (`wsgi.input`, `wsgi.errors`) no application-level code would ever
+      normally have to think about - real complexity every WSGI server
+      absorbs on an application's behalf, in exchange for that
+      real interchangeability.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-04/lab_flask_wsgi.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        app is callable (a real WSGI application): True
+        app.wsgi_app is callable: True
+        real WSGI status: 200 OK
+        real WSGI body: b'{"message":"Manufacturing Platform API is running","status":"healthy"}\n'
+        no Flask test client, no werkzeug test helpers - a hand-built real WSGI environ dict and a plain function, and this project's own real app answered exactly like any real WSGI server would call it
+      output_file: verification/phase-04/lab_flask_wsgi_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it reaches underneath every real
+      client this curriculum has used so far, to the actual, real
+      interface a server calls.
+
+  - title: "The Application Object - What create_app Actually Builds"
+    problem: >
+      `create_app`'s own real code (`backend/app/__init__.py:172-444`)
+      makes many real, sequential calls against a single `app` object.
+      What does a bare `Flask(__name__)` actually have, before any of
+      that runs?
+    socratic_prompt:
+      - >
+        `create_app`'s own real first steps are `app = Flask(__name__)`
+        (`:244`), then `app.config.from_object(...)` (`:254`), then
+        `register_routes(app)` (`:298`). Is `app` a genuinely different
+        real object after each of those calls, or the identical real
+        object, gaining real state?
+      - >
+        This project's own real backend has 18 real route files. Would
+        you expect a bare `Flask(__name__)`, with none of them
+        registered yet, to have any real blueprints at all?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/__init__.py:172-444`
+        (`create_app`), read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: None.
+    new_code:
+      applicable: true
+      intro: >
+        A bare `Flask` app, next to this project's own real, fully-built
+        one:
+      file: verification/phase-04/lab_flask_app_object.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from flask import Flask
+        from app import create_app
+
+        bare_app = Flask(__name__)
+        print("real, bare Flask(__name__) -> config keys:", "TESTING" in bare_app.config, "blueprints:", len(bare_app.blueprints), "url rules:", len(list(bare_app.url_map.iter_rules())))
+
+        real_app = create_app("testing")
+        print("this project's own real app -> TESTING:", real_app.config["TESTING"], "DATABASE_URI:", real_app.config["SQLALCHEMY_DATABASE_URI"])
+        print("this project's own real app -> real blueprint count:", len(real_app.blueprints))
+        print("this project's own real app -> real blueprint names (first 5):", list(real_app.blueprints.keys())[:5])
+        print("this project's own real app -> real URL rules registered:", len(list(real_app.url_map.iter_rules())))
+
+        assert len(bare_app.blueprints) == 0
+        assert len(real_app.blueprints) == 18
+        print("the identical real Flask class, in two real states - one bare, one carrying everything create_app's own real steps accumulated onto it")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'bare_app = Flask(__name__)'
+          explanation: >
+            The real, minimal starting point - `TESTING` already exists
+            as a real, default config key (Flask's own class ships real
+            defaults), but zero real blueprints are registered yet.
+        - element: 'real_app = create_app("testing")'
+          explanation: >
+            Runs this project's own real, full setup sequence -
+            configuration, extensions, and every real blueprint, all
+            accumulated onto one real `Flask` instance.
+        - element: 'len(real_app.blueprints)'
+          explanation: >
+            Reads the real, resulting count directly - `18`, matching
+            this project's own real route-file count, confirms every
+            single real blueprint `register_routes` (called inside
+            `create_app`) attaches actually landed on this object.
+        - element: 'assert len(bare_app.blueprints) == 0 / assert len(real_app.blueprints) == 18'
+          explanation: >
+            Confirms both real states together - the identical real
+            class, holding genuinely different real state depending on
+            what's actually been done to the one real instance.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **stateful builder object**: a single real instance,
+      progressively configured through a real sequence of method calls,
+      rather than constructed complete in one real step. Also recognized
+      in: a real `argparse.ArgumentParser`, accumulating real arguments
+      one `.add_argument()` call at a time before `.parse_args()` ever
+      runs; a real SQL query builder, chaining real `.filter()` calls
+      onto one accumulating object; and, in this project's own domain, a
+      machine's own real control panel, accumulating a real program's
+      worth of settings before a cycle start is ever pressed.
+    se_lens: >
+      The design principle behind the application factory pattern
+      (`create_app` itself) is that this real, stateful `Flask` object
+      can be built completely fresh, every real time - once for a real
+      test, once for real production - by simply calling the identical
+      real function again, rather than relying on one, real,
+      module-level instance shared everywhere. The real alternative not
+      chosen: a real, bare module-level `app = Flask(__name__)`, built
+      once when the module first imports; the honest cost of that
+      simpler real alternative, which this project's own code
+      deliberately avoids: every real test in this curriculum would
+      share the identical real app instance, and its own real,
+      accumulated state (a database connection, a blueprint registered
+      twice) would leak between tests that were supposed to be
+      independent.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-04/lab_flask_app_object.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        real, bare Flask(__name__) -> config keys: True blueprints: 0 url rules: 1
+        Seeding default users...
+        this project's own real app -> TESTING: True DATABASE_URI: sqlite:///:memory:
+        this project's own real app -> real blueprint count: 18
+        this project's own real app -> real blueprint names (first 5): ['health', 'parts', 'machines', 'cam_files', 'nc_files']
+        this project's own real app -> real URL rules registered: 112
+        the identical real Flask class, in two real states - one bare, one carrying everything create_app's own real steps accumulated onto it
+      output_file: verification/phase-04/lab_flask_app_object_output.txt
+    connection_to_previous: >
+      The previous unit called this project's own app as a raw WSGI
+      callable; this unit looks inside that identical real object, at
+      everything `create_app`'s own real setup actually put there.
+
+  - title: "Request Context - Why request Isn't Just a Global Variable"
+    problem: >
+      Every real view function this curriculum has studied reads
+      `request.get_json()` or `request.headers` with no `request`
+      parameter ever passed in. What real mechanism makes that work -
+      and does it work everywhere, or only somewhere specific?
+    socratic_prompt:
+      - >
+        If `request` were a genuinely ordinary global variable, set once
+        when the app starts, could two real, simultaneous requests ever
+        read two different real values from it at the same time?
+      - >
+        Before running anything: what would you expect to happen if a
+        real script imported `request` from `flask` and tried to read
+        `request.path` completely outside of handling any real request
+        at all?
+    project_change:
+      reference_source: >
+        No reference counterpart - this unit demonstrates a real,
+        general Flask mechanism directly, not one specific route.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: None.
+    new_code:
+      applicable: true
+      intro: >
+        The identical real name, `request`, accessed in three real
+        moments - before, during, and after a real context:
+      file: verification/phase-04/lab_flask_request_context.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app
+        from flask import request
+
+        app = create_app("testing")
+
+        try:
+            request.path
+            print("accessing request.path outside a request succeeded (unexpected)")
+        except RuntimeError as e:
+            print("outside any real request -> RuntimeError:", str(e).splitlines()[0])
+
+        with app.test_request_context("/api/machines/M-TEST-001"):
+            print("inside a real request context -> request.path:", request.path)
+            print("inside a real request context -> request.method:", request.method)
+
+        try:
+            request.path
+            print("accessing request.path after the context ended succeeded (unexpected)")
+        except RuntimeError as e:
+            print("after the context ended -> RuntimeError again:", str(e).splitlines()[0])
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'request.path (outside any context, inside try/except RuntimeError)'
+          explanation: >
+            Reads a real attribute off the real `request` proxy with no
+            real request active at all - raises a genuine
+            `RuntimeError`, proof `request` has no real value of its own
+            until something activates one.
+        - element: 'with app.test_request_context("/api/machines/M-TEST-001"): ...'
+          explanation: >
+            Manually activates a real request context, the same real
+            mechanism Flask itself activates automatically for every
+            genuine incoming request - for this block only, `request`
+            resolves to a real, specific `Request` object.
+        - element: 'request.path (after the with block exits)'
+          explanation: >
+            The identical real line as the first attempt, run again
+            after the real context has already ended - raises the
+            identical real `RuntimeError`, confirming the context's own
+            real effect was temporary, not permanent.
+    mental_model:
+      applicable: true
+      diagram: |
+        outside any context:  request.path  -> RuntimeError
+                |
+                v
+        with app.test_request_context(...):
+            request.path   -> "/api/machines/M-TEST-001"   (real, active context)
+                |
+                v
+        outside again:  request.path  -> RuntimeError
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **context-local state**: a real value that resolves
+      differently depending on which real, currently-executing context
+      asks for it, without being passed explicitly through every real
+      function call in between. Also recognized in: Python's own real
+      `contextvars` module, which this exact mechanism is built on;
+      a real thread-local variable in a multi-threaded server, giving
+      each real thread its own private view of a shared real name; and,
+      in this project's own domain, "the current operator" meaning a
+      genuinely different real person depending on which real machine's
+      terminal is asking.
+    se_lens: >
+      The design principle is that a real view function's own signature
+      stays simple - `def get_machine(current_user, machine_id): ...`
+      never needs a `request` parameter threaded through it - while
+      still having genuine, real access to exactly the request it's
+      handling. The real alternative not chosen: passing a real request
+      object explicitly into every view function and every helper it
+      calls, which Flask's own actual design avoids; the honest cost of
+      the context-local approach Flask actually uses, proven directly by
+      this unit's own real run: code that tries to use `request` outside
+      a real, active context - a background task, a script run at
+      import time - fails with a real, sometimes-confusing
+      `RuntimeError`, rather than a real, ordinary `NameError` that would
+      immediately point at the actual real mistake.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-04/lab_flask_request_context.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        outside any real request -> RuntimeError: Working outside of request context.
+        inside a real request context -> request.path: /api/machines/M-TEST-001
+        inside a real request context -> request.method: GET
+        after the context ended -> RuntimeError again: Working outside of request context.
+      output_file: verification/phase-04/lab_flask_request_context_output.txt
+    connection_to_previous: >
+      The previous unit inspected the application object's own,
+      long-lived state; this unit studies the opposite - real state that
+      exists only for the real duration of one request, and genuinely
+      nothing before or after it.
+
+  - title: "Response - What a Real Return Value Actually Becomes"
+    problem: >
+      `health_check`'s own real code (`backend/app/__init__.py:426-439`)
+      returns a bare Python dict; `get_machine`'s own real code calls
+      `jsonify(...)` explicitly. Do these two real return statements
+      actually produce different real responses?
+    socratic_prompt:
+      - >
+        If Flask genuinely required every real view function to call
+        `jsonify(...)` explicitly, would `health_check`'s own real code,
+        as written, even work at all?
+      - >
+        Given that it does work, what does that suggest about what Flask
+        actually does with a real view function's own return value,
+        before it ever becomes real HTTP bytes?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/__init__.py:426-439`
+        (`health_check`) and `backend/app/routes/machines.py:48-61`
+        (`get_machine`), both read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: A real `Machine` row.
+    new_code:
+      applicable: true
+      intro: >
+        Two real view functions, two real return statements, compared
+        directly:
+      file: verification/phase-04/lab_flask_response.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            db.session.add(machine)
+            db.session.commit()
+
+            client = app.test_client()
+
+            r_bare_dict = client.get("/health")
+            r_jsonify = client.get("/api/machines/M-TEST-001")
+
+            print("GET /health (view returns a bare Python dict) -> real type:", type(r_bare_dict), "Content-Type:", r_bare_dict.content_type)
+            print("GET /api/machines/<id> (view calls jsonify(...)) -> real type:", type(r_jsonify), "Content-Type:", r_jsonify.content_type)
+
+            assert r_bare_dict.content_type == r_jsonify.content_type == "application/json"
+            assert r_bare_dict.status_code == r_jsonify.status_code == 200
+            print("two real view functions, two genuinely different real return statements - one a bare dict, one an explicit jsonify(...) call - converted into the identical real kind of HTTP response either way")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'client = app.test_client()'
+          explanation: >
+            Builds one real `FlaskClient` - this lesson's own only
+            construction of it; the previous two units used
+            `app.test_request_context(...)` and a raw WSGI call instead,
+            since neither needed a real client object.
+        - element: 'r_bare_dict = client.get("/health")'
+          explanation: >
+            `health_check`'s own real body ends with `return {'status':
+            'healthy', ...}` - a plain Python `dict`, nothing more; Flask
+            itself recognizes a real dict return value and converts it
+            automatically.
+        - element: 'r_jsonify = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            `get_machine`'s own real body ends with `return
+            jsonify({'data': machine.to_dict()})` - the real, explicit
+            conversion done by hand, by this project's own code, rather
+            than left to Flask's own automatic handling.
+        - element: 'assert r_bare_dict.content_type == r_jsonify.content_type == "application/json"'
+          explanation: >
+            Confirms, for real, that both real paths land on the
+            identical real outcome - the automatic conversion and the
+            explicit `jsonify` call produce indistinguishable real
+            responses.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **implicit response coercion**: a framework recognizing
+      certain real return-value shapes and converting them
+      automatically, so common cases need no real, explicit
+      boilerplate. Also recognized in: a real shell function whose last
+      real expression becomes its own exit output, with no explicit
+      `return` needed; a real GraphQL resolver returning a plain real
+      object that the framework itself serializes; and, in this
+      project's own domain, a G-code post-processor automatically
+      appending a real program-end block a programmer never has to type
+      themselves.
+    se_lens: >
+      The design principle behind implicit coercion is reducing real,
+      repetitive boilerplate for the common case - most real Flask JSON
+      APIs return a dict most of the time, so requiring an explicit
+      `jsonify(...)` on every single real route would be pure, real
+      repetition. The real alternative this project's own code
+      overwhelmingly chooses instead: calling `jsonify(...)` explicitly
+      anyway, everywhere except `health_check`; the honest cost of that
+      real inconsistency, proven directly by this unit's own two real
+      calls: a reader scanning this project's own real routes can't
+      actually tell, from the return statement's own shape alone,
+      whether a bare dict return would even work correctly without
+      checking whether Flask's own automatic conversion applies to this
+      specific real case - and, as this unit shows, it does, but nothing
+      about the code makes that obvious without knowing Flask's own
+      real behavior in advance.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-04/lab_flask_response.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        GET /health (view returns a bare Python dict) -> real type: <class 'werkzeug.test.WrapperTestResponse'> Content-Type: application/json
+        GET /api/machines/<id> (view calls jsonify(...)) -> real type: <class 'werkzeug.test.WrapperTestResponse'> Content-Type: application/json
+        two real view functions, two genuinely different real return statements - one a bare dict, one an explicit jsonify(...) call - converted into the identical real kind of HTTP response either way
+      output_file: verification/phase-04/lab_flask_response_output.txt
+    connection_to_previous: >
+      The previous unit studied `request`, the real inbound half of a
+      request/response exchange; this unit studies `response`, the real
+      outbound half, and how loosely Flask lets a real view function
+      describe it.
+
+  - title: "Routing - Matching a Real URL Before Any Code Runs"
+    problem: >
+      This project's own real backend registers 112 real URL rules. When
+      a real request for `/api/machines/M-TEST-001` arrives, how does
+      Flask decide `get_machine`, specifically, is the real function that
+      should handle it?
+    socratic_prompt:
+      - >
+        `/api/machines` itself has two real, registered rules -
+        `['GET']` and `['POST']` - for the identical real URL. What real,
+        additional piece of information, beyond the URL alone, has to be
+        checked before Flask can pick the right real one?
+      - >
+        `/api/machines/<string:machine_id>` is a real, dynamic URL
+        pattern - it has to match `/api/machines/M-TEST-001` AND
+        `/api/machines/ANYTHING-ELSE`. What real, structural fact about
+        how this pattern is registered makes that possible?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:14-297` (every
+        real `@machines_bp.route(...)` registration in this file), read
+        again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: None.
+    new_code:
+      applicable: true
+      intro: >
+        This project's own real routing table, inspected directly, then
+        matched against one real URL by hand:
+      file: verification/phase-04/lab_flask_routing.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app
+
+        app = create_app("testing")
+
+        machine_rules = sorted(
+            (str(rule), sorted(rule.methods - {"HEAD", "OPTIONS"}))
+            for rule in app.url_map.iter_rules()
+            if rule.rule.startswith("/api/machines")
+        )
+        for rule, methods in machine_rules:
+            print(f"{rule:45s} -> {methods}")
+
+        print("real, total URL rules registered across this whole app:", len(list(app.url_map.iter_rules())))
+
+        with app.test_request_context():
+            adapter = app.url_map.bind("localhost")
+            endpoint, args = adapter.match("/api/machines/M-TEST-001", method="GET")
+            print("real URL match for /api/machines/M-TEST-001 (GET) -> endpoint:", endpoint, "args:", args)
+
+        assert ("/api/machines", ["GET"]) in machine_rules
+        assert ("/api/machines", ["POST"]) in machine_rules
+        assert endpoint == "machines.get_machine"
+        assert args == {"machine_id": "M-TEST-001"}
+        print("the identical real URL prefix, /api/machines, matched to two genuinely different real endpoints depending only on the real HTTP method - and a real, specific URL matched to the exact real Python function that will handle it, before that function is ever called")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'app.url_map.iter_rules()'
+          explanation: >
+            Enumerates every real, registered `Rule` this app knows
+            about - the real, complete result of every
+            `@blueprint.route(...)` call made anywhere during
+            `create_app`'s own real setup.
+        - element: 'rule.methods - {"HEAD", "OPTIONS"}'
+          explanation: >
+            Filters out `HEAD` and `OPTIONS`, two real methods Flask adds
+            to every real rule automatically - leaves only the real
+            method(s) this project's own code actually declared.
+        - element: 'adapter = app.url_map.bind("localhost"); adapter.match("/api/machines/M-TEST-001", method="GET")'
+          explanation: >
+            Performs the identical real matching step Flask itself runs
+            on every genuine incoming request - `.bind(...)` creates a
+            real matcher for a specific real host, and `.match(...)`
+            resolves one real URL and method to a real endpoint name and
+            any real, extracted URL parameters.
+        - element: 'assert endpoint == "machines.get_machine" / assert args == {"machine_id": "M-TEST-001"}'
+          explanation: >
+            Confirms, for real, that this exact real URL resolves to the
+            exact real function this curriculum has already studied
+            calling `get_machine`, with the real, dynamic `<string:machine_id>`
+            segment correctly extracted as a real keyword argument.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **URL-to-handler resolution**: a real, declarative mapping
+      from a real pattern (method plus path shape) to a specific real
+      piece of code, resolved once per real request before any of that
+      code runs. Also recognized in: a real compiler's own symbol table,
+      resolving a real function name to the exact real code it points to
+      before that code executes; a real DNS lookup, resolving a real
+      domain name to a real IP address as a distinct step before any
+      real connection is made; and, in this project's own domain, a
+      G-code program's own real `T` (tool) and `M6` (tool change)
+      commands resolving to a specific real tool in the carousel before
+      the spindle ever engages it.
+    se_lens: >
+      The design principle is resolving a real request to its handler as
+      one, real, separate, inspectable step - this lesson's own
+      `adapter.match(...)` call performs the identical real resolution
+      Flask does internally, provable independently of ever actually
+      calling `get_machine`. The real alternative not chosen: a single,
+      real, giant `if`/`elif` chain inside one function, checking the
+      real path and method by hand for every route; the honest cost of
+      the declarative routing table this project's own code actually
+      uses instead: 112 real, independent rules, spread across 18 real
+      files, with no single, real place a reader can see the entire real
+      routing decision tree at once - exactly why this unit's own
+      `app.url_map.iter_rules()` call is genuinely useful as a real,
+      direct way to inspect it.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-04/lab_flask_routing.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        /api/machines                                 -> ['GET']
+        /api/machines                                 -> ['POST']
+        /api/machines/<string:machine_id>             -> ['DELETE']
+        /api/machines/<string:machine_id>             -> ['GET']
+        /api/machines/<string:machine_id>             -> ['PATCH', 'PUT']
+        /api/machines/<string:machine_id>/duplicate   -> ['POST']
+        /api/machines/<string:machine_id>/status      -> ['PUT']
+        /api/machines/groups                          -> ['GET']
+        /api/machines/groups                          -> ['POST']
+        /api/machines/locations                       -> ['GET']
+        real, total URL rules registered across this whole app: 112
+        real URL match for /api/machines/M-TEST-001 (GET) -> endpoint: machines.get_machine args: {'machine_id': 'M-TEST-001'}
+        the identical real URL prefix, /api/machines, matched to two genuinely different real endpoints depending only on the real HTTP method - and a real, specific URL matched to the exact real Python function that will handle it, before that function is ever called
+      output_file: verification/phase-04/lab_flask_routing_output.txt
+    connection_to_previous: >
+      Every earlier unit in this lesson studied one real piece of a
+      single request/response exchange; this unit closes the lesson by
+      studying the real, first decision Flask makes before any of that
+      exchange even begins - which code gets to handle a request at all.
+
+closing:
+  connect_the_pieces: >
+    One real request, followed through every real piece of Flask this
+    lesson names. This project's own real `app` object, called directly
+    as a raw WSGI callable, answering `/health` with no test client
+    involved at all (WSGI). That identical real object, contrasted
+    against a bare `Flask(__name__)`, holding real configuration and all
+    18 real blueprints `create_app`'s own setup actually attached to it
+    (the application object). The real name `request`, genuinely failing
+    outside any active request and genuinely working inside one, with no
+    parameter ever threaded through a view function's own signature
+    (request context). Two real view functions - one returning a bare
+    dict, one calling `jsonify(...)` by hand - both converted into the
+    identical real HTTP response (response). And, closing the lesson,
+    one real URL, matched directly against this project's own real
+    routing table, resolving to the exact real function - `get_machine`
+    - and the exact real argument it will receive, before that function
+    is ever actually called (routing).
+  next_lesson_pointer: >
+    This lesson called `create_app("testing")` freely, without ever
+    asking why a config name is passed in at all; next, this curriculum
+    studies the application factory pattern itself - why `create_app`
+    is a function rather than a bare, module-level `app`, and what that
+    real choice actually buys this project.
