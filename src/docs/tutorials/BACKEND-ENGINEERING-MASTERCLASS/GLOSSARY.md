@@ -279,6 +279,9 @@ re-run the script after any lesson changes instead.
 ## configuration object
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real Python class - `Config`, and the three real classes that inherit from it - holding a real, named group of settings as plain real class attributes. It exists so an entire, real set of related settings can be selected together, by name, rather than individually assembled every time a real app is built.
 
+## consistency cost
+- **Term** in `LESSON-6.8-DENORMALIZATION` - The real, ongoing risk that a denormalized value and its own real source of truth quietly stop agreeing, because keeping them in sync depends on every real code path that changes the source actually remembering to also update the derived copy. It exists as the honest price of denormalization's own real benefit: the moment more than one real place in the codebase is capable of changing the source of truth, each one of those places becomes a real opportunity for the derived value to go stale, with nothing in the schema itself checking that it did not.
+
 ## Content-Type
 - **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
 
@@ -377,6 +380,9 @@ re-run the script after any lesson changes instead.
 
 ## delete_notification
 - **Object/method** in `LESSON-4.4-ROUTES` - Two real, existing Flask view functions, registered with a real `<int:notification_id>` URL parameter - the first real, typed URL converter this curriculum has studied.
+
+## denormalization
+- **Term** in `LESSON-6.8-DENORMALIZATION` - The deliberate choice to store a value that could instead be derived, on demand, from other columns already present - trading the normalization guarantee that a fact lives in exactly one place for the real, practical benefit of not having to recompute that fact every single time it is read. It exists as the honest counterpart to normalization: normalization's own real benefit (a fact stored once, never able to disagree with itself) is not free - it costs a real computation, every time, to reconstruct a derived value from its real sources, and denormalization is the name for choosing to pay a different cost instead.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -1040,6 +1046,9 @@ re-run the script after any lesson changes instead.
 ## sorted
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that returns a new, real list containing every element of a given iterable, in sorted order.
 
+## source of truth
+- **Term** in `LESSON-6.8-DENORMALIZATION` - The specific column, or columns, a derived value is actually computed from - the place a disagreement would be resolved in favor of, if the derived value and its real sources ever disagreed. It exists as a distinct idea from the derived value itself because a denormalized column's own stored value is only ever as trustworthy as the last time it was actually recomputed from its real source of truth - the stored value is a claim about the source of truth, not the source of truth itself.
+
 ## spy
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double - or a wrapper around a real object - that lets real behavior actually happen while also recording how it was called, for verification afterward. It exists to check real interactions without giving up the real behavior a stub or a mock would otherwise replace entirely.
 
@@ -1572,6 +1581,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `Dependency (of a function)` / `Pure function` - shares: function
+- `Dependency (of a function)` / `source of truth` - shares: of
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
 - `dictionary key access` / `foreign key` - shares: key
