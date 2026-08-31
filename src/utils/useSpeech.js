@@ -57,6 +57,8 @@ export function useSpeech() {
   const [voices, setVoices]     = useState([])
   const [voiceURI, setVoiceURIState] = useState(null)
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const callbacksRef = useRef({})
 
   // Persist voice choice
   const setVoiceURI = useCallback((uri) => {
@@ -91,9 +93,30 @@ export function useSpeech() {
   const stop = useCallback(() => {
     if (supported) speechSynthesis.cancel()
     setIsSpeaking(false)
+    setIsPaused(false)
   }, [supported])
 
-  const speak = useCallback((text) => {
+  const pause = useCallback(() => {
+    if (supported && speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause()
+      setIsPaused(true)
+      callbacksRef.current.onPause?.()
+    }
+  }, [supported])
+
+  const resume = useCallback(() => {
+    if (supported) {
+      // Some Windows voices briefly report `speaking: false`/`paused: false`
+      // after pausing. Resume is harmless when already running, so do it
+      // unconditionally and repeat next tick for that engine quirk.
+      speechSynthesis.resume()
+      setTimeout(() => speechSynthesis.resume(), 40)
+      setIsPaused(false)
+      callbacksRef.current.onResume?.()
+    }
+  }, [supported])
+
+  const speak = useCallback((text, callbacks = {}) => {
     if (!supported) return Promise.resolve()
     speechSynthesis.cancel()
 
@@ -101,6 +124,7 @@ export function useSpeech() {
     if (!cleaned || cleaned.length < 2) return Promise.resolve()
 
     return new Promise((resolve) => {
+      callbacksRef.current = callbacks
       const utt = new SpeechSynthesisUtterance(cleaned)
       utt.rate  = 1.05
       utt.pitch = 1.0
@@ -108,9 +132,10 @@ export function useSpeech() {
       const voice = speechSynthesis.getVoices().find(v => v.voiceURI === voiceURI)
       if (voice) utt.voice = voice
 
-      utt.onstart = () => setIsSpeaking(true)
-      utt.onend   = () => { setIsSpeaking(false); resolve() }
-      utt.onerror = () => { setIsSpeaking(false); resolve() }
+      utt.onstart = () => { setIsSpeaking(true); setIsPaused(false); callbacks.onStart?.() }
+      utt.onboundary = (event) => { if (event.name === 'word') callbacks.onBoundary?.(event) }
+      utt.onend   = () => { setIsSpeaking(false); setIsPaused(false); callbacksRef.current = {}; callbacks.onEnd?.(); resolve() }
+      utt.onerror = () => { setIsSpeaking(false); setIsPaused(false); callbacksRef.current = {}; callbacks.onError?.(); resolve() }
 
       speechSynthesis.speak(utt)
       setIsSpeaking(true)
@@ -122,5 +147,5 @@ export function useSpeech() {
     .filter(v => v.lang.startsWith('en'))
     .sort((a, b) => scoreVoice(b) - scoreVoice(a))
 
-  return { speak, stop, isSpeaking, supported, englishVoices, voiceURI, setVoiceURI }
+  return { speak, stop, pause, resume, isSpeaking, isPaused, supported, englishVoices, voiceURI, setVoiceURI }
 }
