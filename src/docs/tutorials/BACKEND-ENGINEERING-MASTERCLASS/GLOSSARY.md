@@ -165,6 +165,9 @@ re-run the script after any lesson changes instead.
 ## f-string
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A string literal written as `f"...{expression}..."`, where anything inside `{}` is evaluated as real Python and inserted into the string at the point the f-string itself runs. It exists so a value does not have to be manually converted to text and concatenated by hand to appear inside a message.
 
+## fake
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double with a real, working, simplified implementation of its own - genuine logic, just not the production version. It exists for a dependency whose actual behavior (not merely its interface) matters to what's being checked, without paying the real cost or risk of the true, production implementation.
+
 ## Fallback
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A backup behavior that runs only when a primary approach fails or is unavailable. It exists so a real failure in one dependency (a network call to a different real server) doesn't necessarily mean the whole request fails, if a real, working alternative exists.
 
@@ -195,6 +198,7 @@ re-run the script after any lesson changes instead.
 
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
+- **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real, existing function in this project's backend, responsible for producing a real, configured `GitLabService` instance.
 
 ## get_json)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The real response object Flask's test client returns from a simulated request.
@@ -278,6 +282,12 @@ re-run the script after any lesson changes instead.
 ## mark (pytest marker)
 - **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.X`, real pytest decorator syntax that attaches metadata to a test function for pytest itself (or a plugin) to inspect and act on - `parametrize` is one specific, built-in mark among several. It exists as one general mechanism for attaching many different real behaviors to a test (parametrizing it, skipping it, marking it as an expected failure) without a separate, one-off decorator syntax for each.
 
+## mock
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double programmed with canned return values, whose real point is verifying *how* it was called - which methods, how many times, with what real arguments - not just standing in silently. It exists to answer a checkable question a stub cannot: "did my code actually call its dependency correctly?"
+
+## monkeypatching
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - Replacing a real name's real binding - a function, a method, an attribute - with something else, at runtime, for the duration of a test, then restoring the original afterward. It exists so a test can substitute a real double for a real dependency without editing the actual source code that calls it.
+
 ## Mutable / immutable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
 
@@ -306,6 +316,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real static method, already investigated in this curriculum for its real fallback behavior - shown here for a different real question: what its own parameters actually promise.
 - **Object/method** in `LESSON-1.2-EXCEPTIONS` - The same real static method already investigated for its real fallback behavior and its real parameters - shown here for a third real question: which real domain condition each of its own two raised exceptions represents, and which real failure inside it is instead caught internally as an infrastructure one.
+
+## PDMService.get_history
+- **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real, existing static method on this project's own `PDMService`, retrieving a CAM file's commit history from GitLab.
 
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
@@ -430,6 +443,9 @@ re-run the script after any lesson changes instead.
 ## sorted
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that returns a new, real list containing every element of a given iterable, in sorted order.
 
+## spy
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double - or a wrapper around a real object - that lets real behavior actually happen while also recording how it was called, for verification afterward. It exists to check real interactions without giving up the real behavior a stub or a mock would otherwise replace entirely.
+
 ## Static analysis
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or `CodeLens`'s own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
 - **Term** in `LESSON-1.5-TYPE-HINTS` - Checking real code for problems by reading its source and its annotations - never by running it. It exists as its own concept because it's a genuinely different kind of check than this curriculum's own `verification` sections have used so far: every real output shown until this lesson came from actually executing code and reading what happened; a static analysis tool instead reads the code's own declared shape and reasons about what could go wrong before a single line of it ever runs - catching a real class of bug (a value that could be the wrong type) that might not show up in any one particular real run, only in some future run this lesson's own labs never happened to try.
@@ -449,6 +465,9 @@ re-run the script after any lesson changes instead.
 
 ## str.encode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - A method converting a Python text string into a real
+
+## stub
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double that returns pre-programmed, canned answers when called, with no real logic behind those answers and no verification of how it was called. It exists as the simplest possible double: just enough to let code under test keep running past a real dependency it doesn't need to actually exercise.
 
 ## subprocess.run
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - A standard-library function that runs a real, separate process and waits for it to finish.
@@ -470,6 +489,9 @@ re-run the script after any lesson changes instead.
 
 ## test discovery
 - **Term** in `LESSON-2.3-PYTEST` - pytest's own process of scanning a directory tree for files and functions matching a plain naming convention, and collecting them as real tests to run - without any author registering each one by hand. It exists so a project never needs a manually-maintained list of "here are all my tests"; the naming convention itself is the registration.
+
+## test double
+- **Term** in `LESSON-2.5-TEST-DOUBLES` - A real, general umbrella term for any object substituted for a real, production dependency during a test - a mock, a stub, a fake, and a spy are each one specific kind of it. It exists as the general vocabulary for "not the real thing, standing in for it," so each of the four specific kinds below can be named precisely instead of everything getting called "a mock" loosely, which is the single most common real confusion in this whole topic.
 
 ## test function
 - **Term** in `LESSON-2.3-PYTEST` - An ordinary Python function pytest recognizes, by its own naming convention, as a real test - called with no arguments (or with real fixtures injected as arguments), expected to raise nothing at all if what it checks holds true. It exists as the actual unit pytest's own discovery and reporting operate on - not a file, not a class, one specific function.
@@ -509,6 +531,12 @@ re-run the script after any lesson changes instead.
 
 ## unit test
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises exactly one piece of code - typically one function or method - in complete isolation from everything it doesn't itself define: no real database, no real network call, no other real service standing in the way. It exists to answer the narrowest possible question - does this one piece of logic do what it claims - as fast and as unambiguously as possible.
+
+## unittest.mock.MagicMock
+- **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real class from Python's standard library `unittest.mock` module, producing objects that automatically accept any method call or attribute access.
+
+## unittest.mock.patch
+- **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real function (usable as a context manager or a decorator) from Python's own standard library `unittest.mock` module, that performs real monkeypatching.
 
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
