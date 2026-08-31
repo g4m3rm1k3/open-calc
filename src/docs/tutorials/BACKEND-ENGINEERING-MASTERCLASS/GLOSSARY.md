@@ -101,6 +101,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a favorite record.
 
+## api
+- **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered through its own real blueprint, sharing its real Python function name with the bare `/health` route above (a genuine, harmless naming coincidence, since the two live in separate real modules).
+
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
 
@@ -215,6 +218,9 @@ re-run the script after any lesson changes instead.
 
 ## characterization test
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - A test that records what a piece of code's real, current behavior actually is, right now, rather than what it should be - passing, by definition, against the exact behavior observed at the moment it's written. It exists specifically for code nobody has full confidence describing correctly from memory, so a later change to it can be checked against a real, honest baseline instead of nothing at all.
+
+## characterization test (applied for real)
+- **Term** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, permanent test asserting exactly what a real, existing implementation currently does - not what it should do - written before that implementation changes, so any real deviation later is a deliberate, visible decision rather than an accidental, silent one. It exists, in this lesson specifically, as the first real application (not a lab exercise) of characterization testing anywhere in this curriculum - the real safety net this entire phase's own rebuild depends on.
 
 ## check_password_hash
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - The real matching function from `werkzeug.security` that verifies a real plaintext password against an already-generated real hash.
@@ -490,6 +496,12 @@ re-run the script after any lesson changes instead.
 ## header
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - One real line of an HTTP message, before its blank-line separator, carrying one real piece of metadata as a `Name: value` pair - `Content-Type: application/json`, in this lesson's own response unit. It exists so real information about a message (its format, its length) travels with the message itself, without being mixed into the actual body.
 
+## health route)
+- **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered directly on the `app` object itself - not through a blueprint - already read in an earlier phase, characterized here for the first time with real, permanent tests.
+
+## health route, health_bp)
+- **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered through its own real blueprint, sharing its real Python function name with the bare `/health` route above (a genuine, harmless naming coincidence, since the two live in separate real modules).
+
 ## health_check
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - Two real, existing Flask view functions, returning their real result two genuinely different real ways.
 
@@ -498,6 +510,12 @@ re-run the script after any lesson changes instead.
 
 ## health_check (direct route)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, existing Flask view function registered directly on the app object itself, not through any blueprint.
+
+## health_check (the
+- **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered through its own real blueprint, sharing its real Python function name with the bare `/health` route above (a genuine, harmless naming coincidence, since the two live in separate real modules).
+
+## health_check (the bare
+- **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered directly on the `app` object itself - not through a blueprint - already read in an earlier phase, characterized here for the first time with real, permanent tests.
 
 ## Host
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the address (here, `127.0.0.1`, meaning "this same
@@ -1101,6 +1119,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
+- `api` / `API contract` - shares: api
 - `API contract` / `unified error contract` - shares: contract
 - `app.register_blueprint` / `blueprint registration` - shares: blueprint
 - `app.register_blueprint` / `Blueprint.route` - shares: blueprint
@@ -1161,14 +1180,18 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `blueprint.route (the decorator itself)` / `Flask (the class, and this project's own app instance)` - shares: the
 - `blueprint.route (the decorator itself)` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `blueprint.route (the decorator itself)` / `health_check (blueprint route)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `health_check (the` - shares: the
+- `blueprint.route (the decorator itself)` / `health_check (the bare` - shares: the
 - `blueprint.route (the decorator itself)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `request (the real context-local proxy)` - shares: the
 - `body` / `JSON response body` - shares: body
 - `body` / `request body` - shares: body
 - `body` / `response body` - shares: body
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `characterization test (applied for real)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `Config (and its real subclasses)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `Dependency (of a function)` - shares: a
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `get_machine (revisited for its real decorator stack)` - shares: real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `health route, health_bp)` - shares: bp
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `health_check (blueprint route)` - shares: blueprint
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, blueprint, bp, real
@@ -1190,10 +1213,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `centralized error mapping` / `error code` - shares: error
 - `centralized error mapping` / `unified error contract` - shares: error
+- `characterization test` / `characterization test (applied for real)` - shares: characterization
+- `characterization test (applied for real)` / `Config (and its real subclasses)` - shares: real
+- `characterization test (applied for real)` / `get_machine (revisited for its real decorator stack)` - shares: for, real
+- `characterization test (applied for real)` / `get_machines (revisited for request.args)` - shares: for
+- `characterization test (applied for real)` / `HTTPException (Werkzeug's own real base class)` - shares: real
+- `characterization test (applied for real)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `check_password_hash` / `health_check` - shares: check
 - `check_password_hash` / `health_check (blueprint route)` - shares: check
 - `check_password_hash` / `health_check (direct route)` - shares: check
+- `check_password_hash` / `health_check (the` - shares: check
+- `check_password_hash` / `health_check (the bare` - shares: check
 - `Circular dependency` / `Dependency (of a function)` - shares: dependency
 - `Client` / `client` - shares: client
 - `Client` / `Flask.test_client` - shares: client
@@ -1339,6 +1371,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
 - `fixture scope` / `yield fixture` - shares: fixture
+- `Flask (the class, and this project's own app instance)` / `health_check (the` - shares: the
+- `Flask (the class, and this project's own app instance)` / `health_check (the bare` - shares: the
 - `Flask (the class, and this project's own app instance)` / `HTTPException (Werkzeug's own real base class)` - shares: class, own, s
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `FlaskClient (.post)` / `POST` - shares: post
@@ -1384,10 +1418,31 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Header` / `header` - shares: header
 - `Header` / `request header` - shares: header
 - `header` / `request header` - shares: header
+- `health route)` / `health route, health_bp)` - shares: health
+- `health route)` / `health_check` - shares: health
+- `health route)` / `health_check (blueprint route)` - shares: health
+- `health route)` / `health_check (direct route)` - shares: health
+- `health route)` / `health_check (the` - shares: health
+- `health route)` / `health_check (the bare` - shares: health
+- `health route, health_bp)` / `health_check` - shares: health
+- `health route, health_bp)` / `health_check (blueprint route)` - shares: health
+- `health route, health_bp)` / `health_check (direct route)` - shares: health
+- `health route, health_bp)` / `health_check (the` - shares: health
+- `health route, health_bp)` / `health_check (the bare` - shares: health
+- `health route, health_bp)` / `machines_bp (as a real, standalone Blueprint)` - shares: bp
 - `health_check` / `health_check (blueprint route)` - shares: check, health
 - `health_check` / `health_check (direct route)` - shares: check, health
+- `health_check` / `health_check (the` - shares: check, health
+- `health_check` / `health_check (the bare` - shares: check, health
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
+- `health_check (blueprint route)` / `health_check (the` - shares: check, health
+- `health_check (blueprint route)` / `health_check (the bare` - shares: check, health
 - `health_check (blueprint route)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
+- `health_check (direct route)` / `health_check (the` - shares: check, health
+- `health_check (direct route)` / `health_check (the bare` - shares: check, health
+- `health_check (the` / `health_check (the bare` - shares: check, health, the
+- `health_check (the` / `request (the real context-local proxy)` - shares: the
+- `health_check (the bare` / `request (the real context-local proxy)` - shares: the
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `HTTPException (Werkzeug's own real base class)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
