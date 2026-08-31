@@ -94,6 +94,12 @@ re-run the script after any lesson changes instead.
 ## Abstract Syntax Tree (AST)
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A tree structure representing a program's real grammatical structure - which function contains which decorator, which call has which arguments - built by parsing source code without running it. It exists so a program's own shape can be inspected mechanically and exactly, the same way every time, instead of a person reading it by eye and possibly missing something.
 
+## Accept
+- **Term** in `LESSON-3.4-HEADERS` - The real header a client uses to say what real response format it would prefer back. It exists as the real, standard mechanism for content negotiation - though, as this lesson's own third unit shows directly, a server is never obligated to honor it.
+
+## add_favorite
+- **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
+
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
 
@@ -142,6 +148,9 @@ re-run the script after any lesson changes instead.
 ## ast.walk
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A standard-library function that visits every node in a tree, in no particular guaranteed order, one at a time.
 
+## Authorization (header)
+- **Term** in `LESSON-3.4-HEADERS` - The real, standard header carrying a request's own claimed credentials - in this project, always `Bearer <token>`. It exists as the one real, conventional place a server looks for proof of identity, separate from a request's own body or URL.
+
 ## Authorization header
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A specific, real request header - `Authorization: Bearer <token>` - carrying real credentials. It exists as the real, standard place a client puts proof of who it is, so a server can check that proof before deciding what a request is even allowed to do.
 
@@ -159,6 +168,9 @@ re-run the script after any lesson changes instead.
 
 ## bytes.decode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - The reverse of `str.encode` — converts raw bytes back
+
+## caching header
+- **Term** in `LESSON-3.4-HEADERS` - A real header telling a client (or an intermediate cache) how long a real response may be reused without asking the server again - `Cache-Control`, in this project's own real `/uploads/` route. It exists so a server can make an explicit, real promise about a response's own freshness, rather than leaving every client to guess.
 
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
@@ -184,6 +196,9 @@ re-run the script after any lesson changes instead.
 ## confidence
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - In the sense this lesson uses it, the concrete, checkable knowledge that a change did not break existing behavior - as opposed to a personal hope or guess based on reading code or output. It exists as a distinct idea because "I think this still works" and "something just verified this still works" are different states, and only the second one is a safe basis for deciding to ship a change.
 
+## Content-Type
+- **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
+
 ## correctness
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The property of a piece of code producing the output its author actually intended for a given input - not "ran without crashing" or "looks plausible," but matches a specific, statable expectation. It exists as a concept because "the code executed" and "the code did the right thing" are two entirely different claims, and a program can satisfy the first while completely failing the second.
 
@@ -203,6 +218,9 @@ re-run the script after any lesson changes instead.
 
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
+
+## custom header
+- **Term** in `LESSON-3.4-HEADERS` - A real header this project invented itself - `X-User-Id`, in this lesson's own fourth unit - rather than one HTTP's own spec defines. It exists because a real application sometimes needs to carry information no standard header was built for; the real `X-` prefix is this project's own convention for marking one as non-standard.
 
 ## database effect
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, persisted change to the database that happened as a result of handling one request - the actual, independent proof an operation really did what its own response body merely claims. It exists because a response body is only what the route *says* happened; only a separate, real query against the database afterward can confirm it actually did.
@@ -325,6 +343,9 @@ re-run the script after any lesson changes instead.
 ## GET
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "read this resource, change nothing" - this lesson's own first unit calls it against this project's own real `/api/machines`. It exists as the one method every real HTTP client, cache, and proxy is allowed to assume causes no real side effects at all, without having to inspect what the request actually does.
 
+## get_favorites
+- **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
+
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real, existing function in this project's backend, responsible for producing a real, configured `GitLabService` instance.
@@ -335,6 +356,7 @@ re-run the script after any lesson changes instead.
 ## get_machine
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function retrieving one machine by ID.
+- **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function retrieving one machine by ID.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
@@ -584,6 +606,9 @@ re-run the script after any lesson changes instead.
 ## request.args.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method reading one real query parameter from the current request, by name, returning `None` if it wasn't given.
 
+## request.get_json
+- **Object/method** in `LESSON-3.4-HEADERS` - The real method Flask's own `Request` object provides for parsing a request's real body as JSON.
+
 ## requests.get (Response .status_code
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - `requests.get` is the real top-level function from the third-party `requests` library, sending a real HTTP `GET` request over an actual TCP connection; the object it returns is a real `Response`.
 
@@ -613,6 +638,9 @@ re-run the script after any lesson changes instead.
 
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
+
+## serve_uploads
+- **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function serving files from this project's own real upload storage.
 
 ## Server
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - the program that waits for a request and responds to
@@ -759,6 +787,7 @@ re-run the script after any lesson changes instead.
 ## token_required
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing decorator factory in this project's own backend, wrapping a view function with authentication and role-checking logic.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, existing decorator factory in this project's own backend, deciding whether a request is allowed to reach the view function it wraps at all.
+- **Object/method** in `LESSON-3.4-HEADERS` - The real, existing decorator factory in this project's own backend, deciding whether a request is allowed to reach the view function it wraps.
 
 ## traceback
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The block of text Python prints when an exception propagates all the way up without being caught: which line raised it, which function called which function to get there, and the exception's own type and message. It exists so a failure is not just "the program stopped" - it is a specific, readable record of exactly where and why.
@@ -817,6 +846,7 @@ re-run the script after any lesson changes instead.
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
 - `.content_type` / `204 (No Content)` - shares: content
+- `.content_type` / `Content-Type` - shares: content, type
 - `.content_type` / `Type annotation` - shares: type
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
@@ -829,6 +859,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.recv` / `socket.recv` - shares: recv
 - `.render` / `render_template` - shares: render
 - `.sendall` / `socket.sendall` - shares: sendall
+- `204 (No Content)` / `Content-Type` - shares: content
 - `2xx (success)` / `4xx (client error)` - shares: xx
 - `2xx (success)` / `5xx (server error)` - shares: xx
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
@@ -854,6 +885,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `ast.ImportFrom` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.parse` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
+- `Accept` / `socket.accept` - shares: accept
+- `add_favorite` / `db.session.add` - shares: add
 - `application context` / `Application layer` - shares: application
 - `application context` / `Application server` - shares: application
 - `Application layer` / `Application server` - shares: application
@@ -863,6 +896,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
+- `Authorization (header)` / `Authorization header` - shares: authorization, header
+- `Authorization (header)` / `caching header` - shares: header
+- `Authorization (header)` / `custom header` - shares: header
+- `Authorization (header)` / `Header` - shares: header
+- `Authorization (header)` / `header` - shares: header
+- `Authorization (header)` / `request header` - shares: header
+- `Authorization header` / `caching header` - shares: header
+- `Authorization header` / `custom header` - shares: header
 - `Authorization header` / `Header` - shares: header
 - `Authorization header` / `header` - shares: header
 - `Authorization header` / `request header` - shares: header
@@ -872,6 +913,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `body` / `response body` - shares: body
 - `Business logic` / `Domain logic` - shares: logic
 - `Byte string` / `f-string` - shares: string
+- `caching header` / `custom header` - shares: header
+- `caching header` / `Header` - shares: header
+- `caching header` / `header` - shares: header
+- `caching header` / `request header` - shares: header
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
@@ -886,6 +931,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `Content-Type` / `Type annotation` - shares: type
 - `create_app` / `create_machine` - shares: create
 - `create_app` / `create_machine_group` - shares: create
 - `create_machine` / `create_machine_group` - shares: create, machine
@@ -905,6 +951,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine_group` / `update_machine` - shares: machine
 - `create_machine_group` / `update_machine_status` - shares: machine
+- `custom header` / `Header` - shares: header
+- `custom header` / `header` - shares: header
+- `custom header` / `request header` - shares: header
 - `database effect` / `in-memory database` - shares: database
 - `database effect` / `Side effect` - shares: effect
 - `database effect` / `side effect` - shares: effect
