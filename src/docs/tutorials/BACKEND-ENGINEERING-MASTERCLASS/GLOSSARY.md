@@ -248,6 +248,9 @@ re-run the script after any lesson changes instead.
 ## golden behavior (golden master)
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
 
+## GREEN
+- **Term** in `LESSON-2.9-TDD` - The second real step of one TDD cycle: writing the smallest real amount of production code that makes the currently-failing test pass, and nothing more. It exists to keep every real line of code justified by a specific, already-failing test, rather than building more than what's actually required right now.
+
 ## Hashable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - A real property a value either has or doesn't: whether Python can compute a stable hash for it, usable as a dict key or a set member. Every immutable built-in value (a string, an int, a tuple whose own elements are all themselves hashable) is hashable; every mutable built-in value (a list, a dict, a set itself) is not. A tuple is the one case where immutability alone doesn't automatically guarantee it: `(1, 2, [3, 4])` is itself immutable (nothing can reassign its own elements) but still isn't hashable, since hashing it would require hashing its own contained list too, and a list can't be hashed at all - confirmed this session: `hash((1, 2, [3, 4]))` raises the identical real `TypeError: unhashable type: 'list'` this lesson's own Sets unit already produces. It exists as its own concept because a dict/set's own real lookup speed depends on that hash staying valid for as long as the value is stored - a value that could change after being stored would silently break that lookup, so Python refuses mutable values as keys/members outright rather than risk it.
 
@@ -297,6 +300,9 @@ re-run the script after any lesson changes instead.
 ## integration test
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises real code together with at least one real collaborator it actually depends on - most often a real database - to confirm the two genuinely work together, not just that each one works alone. It exists because a unit test can prove a function's own logic is right while saying nothing at all about whether that function correctly reads or writes whatever real system it was built to talk to.
 
+## is_valid_machine_status
+- **Object/method** in `LESSON-2.9-TDD` - A new, real, small function this lesson builds from nothing, through a real RED-GREEN-REFACTOR cycle - not a real, existing part of this project's backend, and never wired into it.
+
 ## itertools.groupby
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library function that groups consecutive real elements of an iterable sharing the identical real key.
 
@@ -333,6 +339,9 @@ re-run the script after any lesson changes instead.
 
 ## mock
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double programmed with canned return values, whose real point is verifying *how* it was called - which methods, how many times, with what real arguments - not just standing in silently. It exists to answer a checkable question a stub cannot: "did my code actually call its dependency correctly?"
+
+## ModuleNotFoundError
+- **Object/method** in `LESSON-2.9-TDD` - A real, built-in Python exception, raised when an `import` statement names a module Python cannot find anywhere on its search path.
 
 ## monkeypatching
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - Replacing a real name's real binding - a function, a method, an attribute - with something else, at runtime, for the duration of a test, then restoring the original afterward. It exists so a test can substitute a real double for a real dependency without editing the actual source code that calls it.
@@ -424,6 +433,12 @@ re-run the script after any lesson changes instead.
 
 ## random)
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - Python's own standard library `random` module, providing a real pseudo-random number generator.
+
+## RED
+- **Term** in `LESSON-2.9-TDD` - The first real step of one TDD cycle: writing a test for behavior that doesn't exist yet, and confirming, by actually running it, that it fails - not skipped, not silently wrong, a real, observed failure. It exists to prove the test itself is genuinely capable of failing, before it's ever trusted to prove anything passing.
+
+## REFACTOR
+- **Term** in `LESSON-2.9-TDD` - The third real step of one TDD cycle: improving the real, already-passing code's own internal structure, with the exact same test suite, unedited, confirming nothing about its external behavior moved. It exists as the identical real discipline an earlier lesson already proved under the name refactoring safety, now scheduled as a deliberate, required step in every single TDD cycle, not an occasional afterthought.
 
 ## refactoring safety
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The guarantee that restructuring code's internal shape (how it is written) without changing its external behavior (what it does) can actually be verified, not just assumed. It exists because a "refactor" that quietly changes behavior is not a refactor at all - it is an undetected bug - and only a check run both before and after the restructuring can tell the two apart.
@@ -585,6 +600,9 @@ re-run the script after any lesson changes instead.
 ## test session
 - **Term** in `LESSON-2.3-PYTEST` - One full run of pytest, from the moment collection starts to the final pass/fail summary line it prints across every test it collected. It exists as the real unit pytest itself reports on - `"X passed in Y seconds"` describes one whole session, never any single test in isolation.
 
+## test-driven development (TDD)
+- **Term** in `LESSON-2.9-TDD` - A real development discipline where a failing test for a specific, wanted behavior is written *before* the code that satisfies it, and that test is what drives what gets built next - never the reverse. It exists to keep every real line of production code traceable to a specific, already-stated requirement, rather than writing code first and hoping tests catch up to it afterward.
+
 ## test_parser
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A real, already-existing function in this project's own backend, named as though it tests the Mastercam XML parser.
 
@@ -687,6 +705,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
 - `create_app` / `create_machine` - shares: create
 - `create_machine` / `get_machine` - shares: machine
+- `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -739,6 +758,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
+- `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -755,6 +775,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.Parameter` / `Query parameter` - shares: parameter
 - `inspect.Parameter` / `URL path parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
+- `is_valid_machine_status` / `Machine` - shares: machine
+- `is_valid_machine_status` / `Query (Machine.query` - shares: machine
+- `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
+- `is_valid_machine_status` / `update_machine_status` - shares: machine
 - `Jinja2 Template` / `render_template` - shares: template
 - `JSON response body` / `request body` - shares: body
 - `JSON response body` / `response body` - shares: body
