@@ -2,7 +2,7 @@
 
 *File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
 
-**What you will build:** Four real scripts, finally writing the real language every earlier lesson in this phase has been running underneath its own ORM calls, directly, against this project's own real, already-familiar tables - `machines`, `parts`, `cam_files` - real, seeded through the same `Machine`/`Part`/`CAMFile` models this curriculum has used since Lesson 6.1. `SELECT` and `WHERE` read and filter real rows; `INSERT`, `UPDATE`, and `DELETE` write, change, and remove one, verified at each step by reading it back; `JOIN` combines `parts` and `cam_files` exactly the way `Part.cam_files`'s own real relationship, already studied in this curriculum's own Foreign Keys lesson, already did through the ORM; and `GROUP BY`, `ORDER BY`, and a real aggregate function summarize real machines by category.
+**What you will build:** Five real scripts, finally writing the real language every earlier lesson in this phase has been running underneath its own ORM calls, directly, against this project's own real, already-familiar tables - `machines`, `parts`, `cam_files` - real, seeded through the same `Machine`/`Part`/`CAMFile` models this curriculum has used since Lesson 6.1. `SELECT` and `WHERE` read and filter real rows; `INSERT`, `UPDATE`, and `DELETE` write, change, and remove one, verified at each step by reading it back; `JOIN` combines `parts` and `cam_files` exactly the way `Part.cam_files`'s own real relationship, already studied in this curriculum's own Foreign Keys lesson, already did through the ORM; `GROUP BY`, `ORDER BY`, and a real aggregate function summarize real machines by category; and a real subquery answers "CAM files belonging to a released part" by nesting one real `SELECT` inside another's own `WHERE` clause.
 
 **What you need to know first:** This curriculum's own Relational Model lesson - relation, tuple, attribute; this curriculum's own Foreign Keys and One-to-Many lessons - what a real parent/child relationship is, already navigated through the ORM; `sqlalchemy.text`, already used in this curriculum's own Foreign Keys and Indexes lessons for a single PRAGMA/diagnostic statement, now used for a real, complete SQL statement instead.
 
@@ -17,6 +17,7 @@
 - **GROUP BY** — A real clause that collapses many rows sharing the same real value in one or more columns into a single summary row per distinct value, so an aggregate function (below) can be computed once per group instead of once overall. It exists because some real questions ("how many machines per category") are not about any one row at all, but about a real count, sum, or other summary computed separately for each distinct real group.
 - **ORDER BY** — A real clause that sorts a statement's own result rows by one or more columns, in ascending or descending order. It exists because a real relation, this curriculum's own Relational Model lesson already established, has no guaranteed row order at all on its own - `ORDER BY` is the one real, explicit way to impose a specific, requested order on a result.
 - **aggregate function** — A real SQL function - `COUNT`, `SUM`, `AVG`, among others - that computes a single, real summary value from many rows at once, rather than returning one value per row. It exists so a real question like "how many" or "what is the total" can be answered by the database itself, computed directly over however many real rows actually match, instead of the calling application fetching every real row and computing the summary itself.
+- **subquery** — A complete real `SELECT` statement nested inside another real statement, most often inside a `WHERE` clause, whose own result is used by the OUTER statement rather than returned directly. It exists so a real condition on one relation ("belongs to a released part") can be expressed in terms of a real result computed from a DIFFERENT relation entirely (which parts are actually released), without the calling application first running that inner query itself and manually building a condition from its results.
 
 ## Objects and methods used
 
@@ -428,10 +429,122 @@ Full saved run: `verification/phase-06/lab_sql_group_by_aggregates_output.txt`.
 
 ### Connection to the previous unit
 
-The previous unit combined two real relations; this unit closes the lesson by summarizing many real rows into fewer, ordered ones - the last of the real statements this whole phase's own ORM calls have been running underneath since Lesson 6.1.
+The previous unit combined two real relations; this unit summarizes many real rows into fewer, ordered ones. The final unit nests one real statement inside another to answer a question spanning two relations without a `JOIN` at all.
+
+## Concept Unit: Subqueries - A Real Question Nested Inside Another
+
+### The Problem
+
+"Which CAM files belong to a released part" spans two real tables - `cam_files` and `parts` - but is not really a question about COMBINING their rows the way this lesson's own `JOIN` unit was; it only needs `parts` to decide which `part_id` values currently qualify. What real SQL shape answers a question like that, without returning any of `parts`'s own columns at all?
+
+Before reading on:
+
+- `SELECT id FROM parts WHERE status = 'released'` is itself a complete, real, valid `SELECT` on its own. What would it mean to use its own real result as the right-hand side of a real `WHERE part_id IN (...)` clause on a DIFFERENT table entirely?
+- This lesson's own `JOIN` unit returned columns from BOTH real tables at once. Does the subquery below return anything from `parts` at all?
+
+### Project Change
+
+- **Reference Source:** No real project file changes - this unit runs a real subquery directly against this project's own real `cam_files` and `parts` tables, both already fully studied earlier in this lesson and this curriculum.
+- **Files affected:** `verification/phase-06/lab_sql_subquery.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** This project's own real backend, and its already-installed `sqlalchemy`.
+
+### The New Code
+
+Two real parts (one released, one still a draft), two real CAM files, one per part - found by real status without a `JOIN` at all:
+
+**File:** `verification/phase-06/lab_sql_subquery.py` (new)
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+from sqlalchemy import text
+
+from app import create_app, db
+from app.models.part import Part
+from app.models.machine import Machine
+from app.models.cam_file import CAMFile
+
+app = create_app("testing")
+
+with app.app_context():
+    p1 = Part(id="P1", part_number="1111111", description="Bracket", status="released")
+    p2 = Part(id="P2", part_number="2222222", description="Housing", status="draft")
+    machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+    db.session.add_all([p1, p2, machine])
+    db.session.commit()
+
+    db.session.add_all([
+        CAMFile(id="cf1", part_id="P1", machine_id="m1", file_name="rev1.nc"),
+        CAMFile(id="cf2", part_id="P2", machine_id="m1", file_name="rev2.nc"),
+    ])
+    db.session.commit()
+
+    print("CAM files belonging to a released part, via a subquery in the WHERE clause:")
+    query = text(
+        "SELECT id, file_name FROM cam_files WHERE part_id IN "
+        "(SELECT id FROM parts WHERE status = 'released')"
+    )
+    for row in db.session.execute(query):
+        print(" ", row)
+```
+
+### Mechanical Walkthrough
+
+- `(SELECT id FROM parts WHERE status = 'released')` — The INNER, real `SELECT` - a subquery, fully treated in this lesson's own Header - runs first, conceptually: it is a complete, valid `SELECT`/`WHERE` statement on its own, already fully treated earlier in this lesson, here returning just one real column, `id`, from `parts`.
+- `WHERE part_id IN (...)` — The OUTER statement's own real `WHERE` clause, fully treated earlier in this lesson, using the basic-SQL `IN` operator to test whether each real `cam_files.part_id` value appears anywhere in the subquery's own real result set - `cf1`'s `part_id`, `'P1'`, does; `cf2`'s, `'P2'`, does not.
+- `SELECT id, file_name FROM cam_files (outer statement)` — The outer `SELECT`, already fully treated earlier in this lesson, returning columns ONLY from `cam_files` - unlike the previous unit's own `JOIN`, nothing from `parts` is returned at all; `parts` is used here only to decide which `cam_files` rows qualify.
+
+### Mental Model
+
+```text
+inner subquery:  SELECT id FROM parts WHERE status = 'released'
+                  -> ['P1']
+                        │
+                        ▼
+outer statement: SELECT id, file_name FROM cam_files
+                  WHERE part_id IN ['P1']
+                        │
+                        ▼
+                  [('cf1', 'rev1.nc')]
+
+The inner query's own real result becomes a real list the outer
+query's own WHERE clause tests each row against - no columns
+from parts ever appear in the final result.
+```
+
+### CS Lens
+
+This is a **subquery**, fully named in this lesson's own Header - one real question's own result used as input to a different real question, without ever combining the two relations' own rows side by side. Also recognized in: a spreadsheet formula referencing the result of a separate, named range computed elsewhere in the same sheet; a shell pipeline's own command substitution, `grep $(cat filter.txt)`, using one command's real output as another's real input; a function call passed directly as another function's own argument, evaluated first; and, in this project's own domain, this exact real question - which CAM files matter right now, decided entirely by a separate, real fact about their own parent parts.
+
+### SE Lens
+
+The design principle is expressing "decided by a fact about a DIFFERENT relation" without needing that other relation's own columns in the final result at all - exactly what a `JOIN`, this lesson's own previous unit, would return regardless of whether they were wanted. The real alternative NOT chosen here - a `JOIN` between `cam_files` and `parts`, then discarding `parts`'s own columns afterward - would work, but would return one result row per matching CAM-file/part PAIR, needing extra work to avoid duplicates if a part ever had more than one reason to match. The honest cost of a subquery instead: it can be genuinely harder to read for a deeply nested, multi-level version of the identical idea, and (a real, well-known real-world concern this lesson does not itself measure) a poorly-planned subquery can sometimes run once per outer row rather than once overall, depending entirely on how the real query planner - this curriculum's own next lesson's own subject - actually decides to execute it.
+
+### Commands needed
+
+- `backend\.venv\Scripts\python.exe verification\phase-06\lab_sql_subquery.py` — Run from the manufacturing-platform repository root, using this project's own real backend virtual environment.
+
+### Verification
+
+```text
+Seeding default users...
+CAM files belonging to a released part, via a subquery in the WHERE clause:
+  ('cf1', 'rev1.nc')
+```
+
+Full saved run: `verification/phase-06/lab_sql_subquery_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit summarized many real rows into fewer; this unit closes the lesson by nesting one real question inside another - the last of the real statements this whole phase's own ORM calls have been running underneath since Lesson 6.1.
 
 ## Connect the pieces
 
-Follow one real machine, `m1`, through every statement this lesson names. `INSERT` is how a real row like it first comes to exist at all; `SELECT`, filtered by a real `WHERE`, is how this lesson's own first unit found it again by `category = 'mill'`; `UPDATE` and `DELETE`, the second unit's own real subject, are how a row like it changes or stops existing, each scoped by its own real `WHERE`. A real `Part` and its real `CAMFile`s were combined with `JOIN`, matching `parts.id` against `cam_files.part_id` - the identical real condition this curriculum's own Foreign Keys lesson already studied through `Part.cam_files`'s own ORM relationship. And `m1`, alongside three other real machines, was finally summarized - `GROUP BY category`, counted with `COUNT(*)`, `ORDER BY`ed by that real count - the real, textual form of every ORM call this entire phase has made since Lesson 6.1's own real `Machine.query` began this curriculum's study of databases at all.
+Follow one real machine, `m1`, through every statement this lesson names. `INSERT` is how a real row like it first comes to exist at all; `SELECT`, filtered by a real `WHERE`, is how this lesson's own first unit found it again by `category = 'mill'`; `UPDATE` and `DELETE`, the second unit's own real subject, are how a row like it changes or stops existing, each scoped by its own real `WHERE`. A real `Part` and its real `CAMFile`s were combined with `JOIN`, matching `parts.id` against `cam_files.part_id` - the identical real condition this curriculum's own Foreign Keys lesson already studied through `Part.cam_files`'s own ORM relationship. `m1`, alongside three other real machines, was summarized - `GROUP BY category`, counted with `COUNT(*)`, `ORDER BY`ed by that real count. And a real CAM file belonging to `m1`'s own real part was found one final real way - a subquery, deciding which `cam_files` rows qualified by a real fact about `parts` without ever combining the two relations' own rows side by side - the real, textual form of every ORM call this entire phase has made since Lesson 6.1's own real `Machine.query` began this curriculum's study of databases at all.
 
 **Next lesson:** Next, the real question this lesson's own `EXPLAIN QUERY PLAN`- adjacent evidence in this curriculum's own Indexes lesson already hinted at: not just WHAT a real SQL statement returns, but HOW this project's own real database engine actually decides to execute it - which real index, if any, it chooses, and why.

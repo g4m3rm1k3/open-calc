@@ -1170,6 +1170,9 @@ re-run the script after any lesson changes instead.
 ## subprocess.run
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - A standard-library function that runs a real, separate process and waits for it to finish.
 
+## subquery
+- **Term** in `LESSON-6.12-SQL` - A complete real `SELECT` statement nested inside another real statement, most often inside a `WHERE` clause, whose own result is used by the OUTER statement rather than returned directly. It exists so a real condition on one relation ("belongs to a released part") can be expressed in terms of a real result computed from a DIFFERENT relation entirely (which parts are actually released), without the calling application first running that inner query itself and manually building a condition from its results.
+
 ## sum
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in Python function that adds together every item in an iterable and returns the total.
 
