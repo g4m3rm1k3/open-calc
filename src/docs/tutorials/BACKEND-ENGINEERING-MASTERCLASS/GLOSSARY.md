@@ -164,6 +164,9 @@ re-run the script after any lesson changes instead.
 ## body
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, optional data an HTTP message carries after its own blank-line separator - absent in this lesson's own request (a bare `GET` needs none), and a real JSON string in its response. It exists as the one part of the message meant to be read as content, not metadata.
 
+## build_error_response
+- **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, new, standalone Python function this lesson proposes - not yet wired into this project's own real backend, since Flask's own error-handling mechanics (`@app.errorhandler`) aren't taught until this curriculum's next phase.
+
 ## Business logic
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the actual decision-making specific to what this
 
@@ -264,6 +267,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function deleting a machine.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function deleting a machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions completing the real CRUD cycle this lesson's own fourth unit traces end to end.
+- **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, existing Flask view function deleting a machine - already studied earlier in this phase, revisited here for its real error shape.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -305,6 +309,9 @@ re-run the script after any lesson changes instead.
 ## encode_auth_token
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing function in this project's backend, producing a real, signed JWT for a given user.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, existing function in this project's backend producing a real, signed JWT for a given user.
+
+## error code
+- **Term** in `LESSON-3.7-API-ERROR-DESIGN` - A real, stable, machine-readable string identifying WHAT kind of failure occurred - `'MACHINE_NOT_FOUND'`, in this lesson's own proposed contract - kept separate from a real, human-readable message. It exists so a real caller's own code can branch on a failure's real kind (`if code == 'TOKEN_MISSING': ...`) without parsing a message string that might change wording at any time.
 
 ## Exception boundary
 - **Term** in `LESSON-1.2-EXCEPTIONS` - The specific, real place in a call chain where a `try`/`except` is deliberately placed to catch a propagating exception, chosen because that real location is where enough context exists to decide what response is correct - not chosen by default, and not necessarily the innermost function that could have caught it. It exists because a boundary placed too early can hide real information a caller further up would have needed; a boundary placed too late lets a real failure propagate further than necessary.
@@ -380,6 +387,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
+- **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, existing Flask view function retrieving one machine by ID - already studied earlier in this phase, revisited here specifically for its real error shape.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
@@ -838,6 +846,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing decorator factory in this project's own backend, wrapping a view function with authentication and role-checking logic.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, existing decorator factory in this project's own backend, deciding whether a request is allowed to reach the view function it wraps at all.
 - **Object/method** in `LESSON-3.4-HEADERS` - The real, existing decorator factory in this project's own backend, deciding whether a request is allowed to reach the view function it wraps.
+- **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - The real, existing decorator factory deciding whether a request is allowed to reach the view function it wraps - already studied extensively earlier in this curriculum, revisited here for its real error shape.
 
 ## traceback
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The block of text Python prints when an exception propagates all the way up without being caught: which line raised it, which function called which function to get there, and the exception's own type and message. It exists so a failure is not just "the program stopped" - it is a specific, readable record of exactly where and why.
@@ -859,6 +868,9 @@ re-run the script after any lesson changes instead.
 
 ## unhandled exception
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, genuine error that propagates past a system's own intended error handling entirely - not a deliberate `400` or `404` a route's own code chose to return, but a real crash. In production, Flask normally turns this into a real `500` response; under this app's own `"testing"` config, Flask's real `PROPAGATE_EXCEPTIONS` behavior (on by default whenever `TESTING` is `True`) instead lets the real Python exception itself surface directly, specifically so a test can see the real traceback rather than only a generic status code.
+
+## unified error contract
+- **Term** in `LESSON-3.7-API-ERROR-DESIGN` - A real, single, shared shape every error response in an API returns, regardless of which real route or failure produced it - this lesson's own proposed `build_error_response` function produces exactly one. It exists so a real caller writes one real block of error-handling code, once, instead of one per route.
 
 ## unit test
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises exactly one piece of code - typically one function or method - in complete isolation from everything it doesn't itself define: no real database, no real network call, no other real service standing in the way. It exists to answer the narrowest possible question - does this one piece of logic do what it claims - as fast and as unambiguously as possible.
@@ -925,18 +937,28 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `2xx (success)` / `5xx (server error)` - shares: xx
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
 - `4xx (client error)` / `5xx (server error)` - shares: error, xx
+- `4xx (client error)` / `build_error_response` - shares: error
 - `4xx (client error)` / `Client` - shares: client
 - `4xx (client error)` / `client` - shares: client
+- `4xx (client error)` / `error code` - shares: error
 - `4xx (client error)` / `Flask.test_client` - shares: client
+- `4xx (client error)` / `unified error contract` - shares: error
 - `500 (Internal Server Error)` / `5xx (server error)` - shares: error, server
 - `500 (Internal Server Error)` / `Application server` - shares: server
+- `500 (Internal Server Error)` / `build_error_response` - shares: error
+- `500 (Internal Server Error)` / `error code` - shares: error
 - `500 (Internal Server Error)` / `Server` - shares: server
 - `500 (Internal Server Error)` / `server` - shares: server
+- `500 (Internal Server Error)` / `unified error contract` - shares: error
 - `500 (Internal Server Error)` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `5xx (server error)` / `Application server` - shares: server
+- `5xx (server error)` / `build_error_response` - shares: error
+- `5xx (server error)` / `error code` - shares: error
 - `5xx (server error)` / `Server` - shares: server
 - `5xx (server error)` / `server` - shares: server
+- `5xx (server error)` / `unified error contract` - shares: error
 - `5xx (server error)` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `_build_export_data` / `build_error_response` - shares: build
 - `Abstract Syntax Tree (AST)` / `ast.alias` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Attribute` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Call` - shares: ast
@@ -948,6 +970,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
+- `API contract` / `unified error contract` - shares: contract
 - `application context` / `Application layer` - shares: application
 - `application context` / `Application server` - shares: application
 - `Application layer` / `Application server` - shares: application
@@ -972,6 +995,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `body` / `JSON response body` - shares: body
 - `body` / `request body` - shares: body
 - `body` / `response body` - shares: body
+- `build_error_response` / `error code` - shares: error
+- `build_error_response` / `unified error contract` - shares: error
 - `Business logic` / `Domain logic` - shares: logic
 - `Byte string` / `f-string` - shares: string
 - `caching header` / `custom header` - shares: header
@@ -1080,6 +1105,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
+- `error code` / `unified error contract` - shares: error
 - `Exception boundary` / `Exception handling (try/except)` - shares: exception
 - `Exception boundary` / `Infrastructure exception` - shares: exception
 - `Exception boundary` / `Package boundary` - shares: boundary
