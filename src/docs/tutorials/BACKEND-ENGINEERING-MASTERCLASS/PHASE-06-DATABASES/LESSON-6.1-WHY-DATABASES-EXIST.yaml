@@ -1,0 +1,1367 @@
+number: "6.1"
+title: "Why Databases Exist"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Five small, real, throwaway scripts - one per property this lesson
+  names - each directly demonstrating the exact problem a database
+  exists to solve, before this curriculum starts building the
+  relational model and SQL that actually solve it: a value surviving a
+  fresh process where an in-memory list does not (persistence); a
+  file's already-committed bytes surviving a process that crashes on
+  purpose immediately after writing them (durability); the real,
+  measured cost an application pays to answer one question over data it
+  has to scan by hand (querying); two real threads racing to claim the
+  same shared value, producing a real, silent lost update (concurrency);
+  and a plain data structure accepting a reference to something that
+  does not exist, with nothing to stop it (integrity). Each lab is
+  grounded in a real field this project's own `backend/config.py` or
+  `backend/app/models/machine.py` already carries today.
+
+what_you_need_to_know_first: >
+  Defining and calling plain Python functions; that a running process
+  has its own private memory, and that memory disappears the instant
+  the process exits; plain dict and list literals, and reading a value
+  out of either by key or index; comparing two values with `==`;
+  f-strings.
+
+terms:
+  - name: persistence
+    definition: >
+      The property of data continuing to exist after the specific
+      process that created it has ended. It exists as a named concept
+      because a running program's own memory - every plain variable,
+      list, or dict it holds - belongs only to that one process, and is
+      reclaimed by the operating system the instant the process exits,
+      whether that exit is intentional (a clean shutdown) or not; data
+      that needs to still be there afterward has to live somewhere else
+      entirely - on disk, or in a separate process that outlives it.
+  - name: durability
+    definition: >
+      The stronger guarantee that once a write has been confirmed as
+      complete, it survives even an abnormal interruption - a crash, a
+      power loss, a killed process - not merely an ordinary, clean exit.
+      It exists as a concept distinct from persistence because an
+      ordinary file write is not, by itself, durable: the operating
+      system is free to hold written bytes in a memory buffer for a
+      while before actually placing them on the physical storage
+      device, and a crash in that window loses data a program had
+      already been told was "written." Durability is what forces that
+      window shut - confirming a write only once the bytes are
+      genuinely, physically on the device, not just handed to a buffer.
+  - name: querying
+    definition: >
+      The ability to ask a specific question about stored data and get
+      back only the answer, without the thing asking having to
+      personally read and judge every single record itself. It exists
+      as a distinct concept from mere storage because being ABLE to
+      keep data somewhere says nothing about how expensive it is to
+      later ask "which of these match X" - without a real querying
+      capability, answering that question is the caller's own problem,
+      solved by manually inspecting everything it has, every time.
+  - name: concurrency
+    definition: >
+      More than one independent flow of execution - two threads, two
+      processes, two separate users' requests - being active over the
+      same shared data at the same time, with no guarantee about which
+      one's steps happen in which order relative to the other's. It
+      exists as a named concern because a single flow of execution
+      touching data by itself never has this problem; the instant a
+      second one can touch the same data before the first one finishes,
+      an operation that looks like one atomic step from the outside
+      (read the current value, decide, write a new value) can actually
+      happen as two separately-interleaved flows, each unaware of the
+      other's steps in between its own.
+  - name: integrity
+    definition: >
+      The property that stored data actually obeys the real-world rules
+      it is supposed to - a reference points at something that genuinely
+      exists, a required field is actually present, a value is actually
+      the kind of thing it claims to be - rather than merely being
+      whatever bytes happened to get written. It exists as a distinct
+      concern because storing a value and storing a CORRECT value are
+      different guarantees: nothing about the physical act of writing
+      data checks whether that data makes real-world sense, unless
+      something is specifically built to check it.
+  - name: "context manager (the `with` statement)"
+    definition: >
+      A Python construct, `with EXPR as NAME:`, that guarantees a
+      cleanup action runs when the indented block ends - whether it
+      ends normally or by an exception - without the caller having to
+      write that cleanup by hand. For a file opened with `open(...)`,
+      the object returned defines what happens on entry (the file is
+      already open by the time the block starts) and on exit (the file
+      is closed automatically, the instant the block ends, no matter
+      how it ends). It exists so "open a resource, use it, always
+      release it" does not depend on every caller remembering a matching
+      `.close()` call on every possible exit path.
+  - name: list comprehension
+    definition: >
+      The expression `[EXPR for NAME in ITERABLE if CONDITION]`,
+      building a brand-new, fully-realized list by evaluating `EXPR`
+      once for every item in `ITERABLE` that satisfies `CONDITION` (the
+      `if` clause is optional). It exists as a compact way to build a
+      filtered/transformed list without writing an explicit loop and an
+      empty list to `.append()` into by hand - but, as this lesson's own
+      querying unit shows, it still has to actually visit every item in
+      `ITERABLE` to decide which ones satisfy `CONDITION`; compactness of
+      syntax is not the same thing as cheapness of execution.
+
+objects_and_methods:
+  - name: "open() (file object)"
+    what_it_is: >
+      A built-in Python function that opens a real file on disk and
+      returns a file object representing an open connection to it.
+    implementation: >
+      `open(path, mode)`, where `mode` is a string such as `"a"`
+      (append - write at the end, creating the file if it does not
+      exist yet, without erasing what is already there) or the default
+      read mode. The returned file object supports `.read()` (returns
+      the file's entire remaining contents as one string), `.write(s)`
+      (appends the string `s` to the file, though not necessarily to
+      the physical disk immediately - see `flush()`/`os.fsync()`
+      below), and `.flush()` (pushes any bytes Python itself has been
+      holding in its own internal buffer out to the operating system;
+      this does not by itself guarantee the operating system has placed
+      them on the physical device).
+    its_use: >
+      This lesson's persistence and durability labs both use it as the
+      real mechanism for writing to, and reading back from, an actual
+      file on disk - the concrete, minimal stand-in for what a real
+      database's own on-disk storage does at a much larger scale.
+    type: A builtin function returning a file object; used here through the `with ... as f:` context-manager form.
+    responsibility: >
+      Representing one real, open connection to a file on disk, and
+      exposing the operations (`read`, `write`, `flush`) that actually
+      move bytes between this process's own memory and that file.
+    depends_on: >
+      A real, valid file path, and a mode string telling it whether to
+      read or append.
+    connects_to: >
+      Opened via the `with` statement (context manager) in both the
+      persistence and durability labs; its `.flush()` is called directly
+      before `os.fsync()` in the durability lab specifically to control
+      exactly when buffered bytes actually leave this process.
+    shape: >
+      Takes a path and mode string in, returns one file object whose
+      `.read()` returns a string and whose `.write()`/`.flush()` return
+      nothing - the object's real value is the side effect of moving
+      bytes to or from the real file, not a return value.
+  - name: os.path.exists
+    what_it_is: >
+      A function in Python's standard `os.path` module that checks
+      whether a given path currently refers to a real, existing file or
+      directory on disk.
+    implementation: >
+      `os.path.exists(path)` - asks the operating system directly
+      whether `path` currently exists, and returns `True` or `False`.
+      It does not open, read, or lock anything - a pure existence check.
+    its_use: >
+      Both the persistence and durability labs call this once, at the
+      very start of the script, specifically to detect whether a
+      PREVIOUS, separate run of this same script already wrote to the
+      real data file - the concrete way each lab tells "first run" apart
+      from "a later, fresh process, after an earlier one already ran."
+    type: A builtin standard-library function, called as `os.path.exists(...)`.
+    responsibility: >
+      Answering one true/false question - does this path exist right
+      now - without touching the file's actual contents.
+    depends_on: A real path string.
+    connects_to: >
+      Called once at the top of each lab, before either lab decides
+      whether to run its "first run" branch or its "later run" branch.
+    shape: Takes a path string in, returns a plain `bool` out.
+  - name: os.fsync
+    what_it_is: >
+      A standard-library function that tells the operating system to
+      force any of its own buffered writes for a given open file all
+      the way out to the physical storage device, before returning.
+    implementation: >
+      `os.fsync(fd)`, where `fd` is a real OS-level file descriptor
+      (obtained here via a file object's own `.fileno()`). Until this is
+      called, the operating system is free to hold recently-written
+      bytes in its own memory buffer for a while, for performance,
+      before actually placing them on the physical device - a normal,
+      ordinary `write()`/`flush()` from Python's own side does not, by
+      itself, force that.
+    its_use: >
+      The durability lab calls this immediately after writing and
+      `flush()`ing, specifically so the very next line - a deliberate,
+      simulated crash - happens only after the operating system has
+      already confirmed the bytes are physically on disk, not merely
+      sitting in a buffer that a real crash could still lose.
+    type: A builtin standard-library function operating on a real OS file descriptor.
+    responsibility: >
+      Forcing the gap between "written, as far as this process can
+      tell" and "physically on the storage device" closed, on demand,
+      rather than leaving it to the operating system's own timing.
+    depends_on: An open file's real OS-level file descriptor, obtained from `f.fileno()`.
+    connects_to: >
+      Called directly after `f.flush()` in the durability lab, and
+      immediately before `os._exit(1)` - the ordering is the entire
+      point of the lab.
+    shape: Takes a file descriptor integer in, returns nothing - its effect is entirely the side effect of forcing a real disk write.
+  - name: os._exit
+    what_it_is: >
+      A standard-library function that terminates the current process
+      immediately, at the operating-system level, skipping every normal
+      Python shutdown step.
+    implementation: >
+      `os._exit(code)` - unlike a normal script ending or Python's own
+      `sys.exit()`, this does not run any pending cleanup, does not
+      flush any output Python itself was still buffering, and does not
+      let any `finally` block or context manager's own exit logic run.
+      `code` becomes the process's real exit code, readable by whatever
+      shell or process launched it.
+    its_use: >
+      The durability lab calls this deliberately, right after the real
+      `os.fsync()` call, specifically to simulate a genuine, abnormal
+      crash immediately after a confirmed write - not a clean exit -
+      which is exactly the scenario durability (as opposed to mere
+      persistence) is a guarantee about.
+    type: A builtin standard-library function; called here as the very last statement this process ever executes.
+    responsibility: >
+      Ending the process instantly and unconditionally, standing in for
+      a real crash in a way this lesson's lab can trigger on purpose and
+      still observe the aftermath of.
+    depends_on: An integer exit code.
+    connects_to: >
+      Called only after `f.flush()` and `os.fsync()` have already run in
+      this lesson's own durability lab - the ordering proves the crash
+      happens strictly after the write was confirmed, not before.
+    shape: Takes an integer exit code in; never returns - the process it is called from ceases to exist at that line.
+  - name: threading.Thread
+    what_it_is: >
+      A class in Python's standard `threading` module representing one
+      separate, real thread of execution running inside the same
+      process as the one that created it.
+    implementation: >
+      `threading.Thread(target=callable, args=tuple)` constructs a
+      thread object that will run `callable(*args)` once started;
+      `.start()` actually begins running it concurrently with whatever
+      created it; `.join()` blocks the calling code until that thread
+      has finished running. Two `Thread` objects, both started before
+      either is joined, genuinely run at the same time, with the
+      operating system - not this lesson's own code - deciding the exact
+      order their individual steps actually interleave in.
+    its_use: >
+      The concurrency lab creates two real `Thread` objects, both
+      targeting the same function, `claim_machine`, and starts both
+      before joining either - the real mechanism this lesson uses to
+      make two independent flows of execution genuinely race over the
+      same shared dict at the same time, rather than merely describing
+      that race in prose.
+    type: A builtin standard-library class, instantiated twice in this lesson's own lab.
+    responsibility: >
+      Representing, and actually running, one independent, concurrently-
+      executing flow through Python code, sharing the same process
+      memory as every other thread in the same process.
+    depends_on: A callable to run, and optionally the arguments to call it with.
+    connects_to: >
+      `.start()` is called on both thread objects before `.join()` is
+      called on either, in this lesson's own lab - that specific
+      ordering is what allows both threads' `claim_machine` calls to
+      genuinely overlap in time.
+    shape: >
+      Constructed from a callable and its arguments; `.start()` and
+      `.join()` both return nothing - the real effect is entirely the
+      side effect of code in `target` actually running, concurrently
+      with the rest of the program.
+  - name: time.sleep
+    what_it_is: >
+      A standard-library function that pauses the calling thread for a
+      given number of seconds, without blocking any OTHER thread in the
+      same process.
+    implementation: >
+      `time.sleep(seconds)` - the specific thread that calls it stops
+      executing for approximately `seconds`, then resumes; every other
+      thread already running continues, unaffected.
+    its_use: >
+      The concurrency lab's own `claim_machine` function calls this
+      between checking whether the machine is free and actually writing
+      its own claim - a deliberately widened gap standing in for the
+      real, ordinary gap between "read the current state" and "write a
+      new state" that exists in any real concurrent system, made large
+      enough here to reliably force the race to actually happen instead
+      of leaving it to chance.
+    type: A builtin standard-library function.
+    responsibility: >
+      Deliberately widening the real window between two steps of
+      `claim_machine`, so this lesson's lab reliably demonstrates a race
+      instead of usually not showing one.
+    depends_on: A number of seconds to pause for.
+    connects_to: >
+      Called inside `claim_machine`, after the shared value has already
+      been read but before it is written - the exact gap a real
+      concurrency bug lives inside.
+    shape: Takes a number in, returns nothing - its only effect is the passage of time before the next line runs.
+  - name: time.perf_counter
+    what_it_is: >
+      A standard-library function returning a high-resolution timestamp,
+      suitable for measuring how long something took to run.
+    implementation: >
+      `time.perf_counter()` returns a floating-point number of seconds
+      from some arbitrary starting point - not tied to the wall clock -
+      so subtracting two calls to it gives an accurate elapsed duration
+      between them, unaffected by the system clock being adjusted.
+    its_use: >
+      The querying lab calls this once immediately before, and once
+      immediately after, scanning every machine record for a match - the
+      real mechanism this lesson uses to put an actual measured number
+      on the cost of that scan, rather than only asserting it has one.
+    type: A builtin standard-library function.
+    responsibility: >
+      Producing a timestamp precise and stable enough that the
+      difference between two calls is a trustworthy measurement of
+      elapsed time.
+    depends_on: Nothing - takes no arguments.
+    connects_to: >
+      Called once before, and once after, this lesson's own list
+      comprehension in the querying lab; the difference between the two
+      calls becomes `elapsed`.
+    shape: Takes nothing in, returns a single float out.
+  - name: dict.get
+    what_it_is: >
+      A dict method that looks up a key and returns a default value
+      instead of raising an exception when that key is not present.
+    implementation: >
+      `some_dict.get(key, default=None)` - if `key` exists in
+      `some_dict`, returns its value, exactly like `some_dict[key]`
+      would; if `key` does NOT exist, returns `default` (which itself
+      defaults to `None`) instead of raising `KeyError`.
+    its_use: >
+      The integrity lab's own resolution step calls `groups.get(...)`
+      with a machine's stored `group_id` - when that `group_id` points
+      at a real group, this returns the real group's dict; when it does
+      not (the deliberately broken reference this lab creates), it
+      returns `None`, silently, with no exception at all - which is
+      precisely how an unenforced, broken reference actually surfaces
+      downstream: not as an error at the moment it was written, but as a
+      quiet `None` the first time something later tries to use it.
+    type: A builtin dict method, called here as `groups.get(machine["group_id"])`.
+    responsibility: >
+      Answering "does this key exist, and if so what is its value" as
+      one call, without ever raising for a missing key itself.
+    depends_on: A dict to call it on, and a key to look up.
+    connects_to: >
+      Called on the `groups` dict, once per machine, using each
+      machine's own stored `group_id` - the same `group_id` that was
+      accepted with zero checking when the machine was first added.
+    shape: >
+      Takes a key (and an optional default) in; returns either the
+      real value stored under that key, or `None` - the same shape
+      either way, which is exactly why a caller cannot tell, just from
+      the return type, whether the reference it followed was ever real.
+
+concept_units:
+  - title: "Persistence - Data That Outlives the Process That Created It"
+    problem: >
+      `backend/config.py`'s own real `SQLALCHEMY_DATABASE_URI` points at
+      an actual file path on disk - `manufacturing.db` - not at any
+      Python variable inside the running Flask process. If this
+      backend's real machines, groups, and CAM files instead lived only
+      in ordinary Python variables inside the running server process,
+      what would happen to every one of them the instant that process
+      restarted - a deploy, a crash, a plain reboot?
+    socratic_prompt:
+      - >
+        If `backend/app/models/machine.py`'s real `Machine` rows lived
+        only in a plain Python list inside the running server process,
+        what would that list contain the instant after the process
+        restarted?
+      - >
+        `config.py`'s own real `SQLALCHEMY_DATABASE_URI` points at a
+        file path, not a Python variable. What does pointing at a real
+        file, specifically, buy this project that a variable inside the
+        running process cannot?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/config.py:21-26`:
+        ```
+        # DATABASE CONFIGURATION
+        DATA_PATH = os.environ.get('DATA_PATH', str(BASE_DIR / "data"))
+        SQLALCHEMY_DATABASE_URI = os.environ.get(
+            'DATABASE_URL',
+            f'sqlite:///{os.path.join(DATA_PATH, "manufacturing.db")}'
+        )
+        ```
+        This is the real, already-existing evidence that this project's
+        database lives at a real file path, not inside any Python
+        process's own memory. The lab below models the identical
+        underlying property - a real file outliving the process that
+        wrote to it - directly with plain file I/O, since SQL and the
+        relational model are later lessons' own subject.
+      files_affected:
+        - path: verification/phase-06/lab_persistence.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone throwaway script; no existing project structure to place it within.
+      dependencies: None beyond Python 3's own standard library (`os`).
+    new_code:
+      applicable: true
+      intro: >
+        One script, run twice as two genuinely separate processes,
+        holding the identical value two different ways - one in a
+        plain Python list, one written to a real file:
+      file: verification/phase-06/lab_persistence.py
+      status: new
+      language: python
+      code: |
+        import os
+
+        DATA_FILE = os.path.join(os.path.dirname(__file__), "persistence_data.txt")
+        DISPLAY_PATH = "verification/phase-06/persistence_data.txt"
+
+        in_memory_log = []  # exists only inside this one running process
+
+
+        def record_in_memory(value):
+            in_memory_log.append(value)
+            print(f"in-memory log now holds: {in_memory_log}")
+
+
+        def record_to_real_file(value):
+            with open(DATA_FILE, "a") as f:
+                f.write(f"{value}\n")
+
+
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE) as f:
+                existing = f.read().splitlines()
+            print(f"real file {DISPLAY_PATH!r} already contains: {existing}")
+        else:
+            print(f"no {DISPLAY_PATH!r} yet - this is this file's first run")
+
+        print(f"in-memory log at process start: {in_memory_log}")
+
+        record_in_memory(42)
+        record_to_real_file(42)
+        print("wrote 42 to the real file on disk; this process is about to exit normally")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "in_memory_log = []"
+          explanation: >
+            A plain list literal, bound to a name at module scope. This
+            list is real Python object, but it lives only inside this
+            one process's own memory - nothing about creating it writes
+            anything to disk, anywhere, ever. It is this unit's
+            deliberate contrast object: watch what it contains at the
+            start of each of this script's two separate runs.
+        - element: "os.path.exists(DATA_FILE)"
+          explanation: >
+            The real existence check described in this lesson's own
+            Header. Its result is what lets this single script tell
+            "this is the first time this file has ever run" apart from
+            "a separate, earlier process already ran and wrote
+            something real" - the concrete question persistence is
+            actually about.
+        - element: "with open(DATA_FILE) as f: existing = f.read().splitlines()"
+          explanation: >
+            A context manager, opening the real file for reading;
+            `.read()` returns its entire contents as one string, and the
+            basic-Python `str.splitlines()` splits that string back into
+            a list of lines - the same shape of value `record_to_real_file`
+            originally wrote, one number per line. The `with` block
+            closes the file automatically the instant this indented
+            block ends, whether or not anything inside it raises.
+        - element: "print(f\"in-memory log at process start: {in_memory_log}\")"
+          explanation: >
+            The line this whole unit hinges on: on the first run, this
+            prints `[]`, because the list was just created fresh and
+            nothing has appended to it yet; on the SECOND run - a
+            genuinely separate process - it prints `[]` again, for the
+            identical reason: a new process means a brand-new, empty
+            list, no matter what the previous process's own list ever
+            held.
+        - element: "record_in_memory(42) / in_memory_log.append(value)"
+          explanation: >
+            `list.append` (basic Python) mutates `in_memory_log` in
+            place, adding `42`. This changes what the CURRENT process's
+            own list contains - it does nothing whatsoever to any other,
+            past or future, process's copy of this same script.
+        - element: "record_to_real_file(42) / with open(DATA_FILE, \"a\") as f: f.write(...)"
+          explanation: >
+            Opens the real file in append mode (`"a"` - write at the
+            end, creating the file if it does not exist, never erasing
+            what is already there) and writes `"42\n"` to it. Unlike the
+            in-memory list, this line's effect is not confined to this
+            process - it is a real change to a real file on disk, which
+            is exactly why the SECOND run of this script is able to see
+            it at all.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: true
+      shape: timing
+      lines:
+        - >
+          `python verification/phase-06/lab_persistence.py` (run 1) -
+          `os.path.exists` reports `False`; `in_memory_log` starts as
+          `[]`; `record_in_memory(42)` and `record_to_real_file(42)` both
+          run; the process then exits normally. Its own `in_memory_log`,
+          now holding `[42]`, is discarded along with the rest of this
+          process's memory the instant it exits.
+        - >
+          The real file `persistence_data.txt` now contains `42` on
+          disk, entirely independent of the process that just ended.
+        - >
+          `python verification/phase-06/lab_persistence.py` (run 2, a
+          genuinely separate process) - `os.path.exists` now reports
+          `True`, and reading the real file back shows `['42']`, proving
+          it survived; meanwhile `in_memory_log` starts as a brand-new
+          `[]` all over again, proving the earlier run's in-memory state
+          did NOT survive the same way.
+    cs_lens: >
+      This is **persistence**: state that outlives the specific process
+      that produced it. Also recognized in: a web browser's own
+      `localStorage`, still readable the next time a tab opens, long
+      after the tab that wrote it closed; a git repository's committed
+      objects, still there the next time anyone opens a terminal in that
+      folder; a phone's photo library, unaffected by the phone being
+      rebooted; and, in this project's own domain, a machine's real,
+      recorded maintenance history needing to survive every single
+      server restart between now and whenever anyone actually looks it
+      up again.
+    se_lens: >
+      The design principle is choosing to store meaningful state outside
+      any one process's own memory, specifically so it survives that
+      process ending. The real alternative NOT chosen here is exactly
+      what `in_memory_log` models: keep everything in ordinary Python
+      variables, which is simpler to write and needs no separate storage
+      layer at all - right up until the process restarts, at which point
+      every bit of it is gone, unconditionally, with no warning and no
+      way back. The honest cost on the other side: choosing to persist
+      data at all is not free - it is real, additional design work
+      (deciding what to write, when, and in what form) that a purely
+      in-memory program never has to do.
+    commands:
+      - command: python verification/phase-06/lab_persistence.py
+        explanation: >
+          Runs the lab from the manufacturing-platform repository root.
+          Run a second time, unmodified, to see the real, separate-
+          process contrast this unit is about - no flags needed either
+          time.
+    verification:
+      applicable: true
+      real_output: |
+        === RUN 1 ===
+        no 'verification/phase-06/persistence_data.txt' yet - this is this file's first run
+        in-memory log at process start: []
+        in-memory log now holds: [42]
+        wrote 42 to the real file on disk; this process is about to exit normally
+        === RUN 2 (fresh process) ===
+        real file 'verification/phase-06/persistence_data.txt' already contains: ['42']
+        in-memory log at process start: []
+        in-memory log now holds: [42]
+        wrote 42 to the real file on disk; this process is about to exit normally
+      output_file: verification/phase-06/lab_persistence_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it establishes the running
+      distinction, real file versus in-memory Python state, that the
+      rest of this lesson builds on.
+
+  - title: "Durability - Surviving a Crash, Not Just an Exit"
+    problem: >
+      The previous unit showed a real file surviving a normal process
+      exit. But `backend/config.py`'s own `TestingConfig` deliberately
+      overrides `SQLALCHEMY_DATABASE_URI` to `'sqlite:///:memory:'` for
+      tests specifically - an entirely in-memory database, gone the
+      moment its connection closes, chosen ON PURPOSE for tests that
+      should never leave real data behind. That contrast raises a
+      sharper question than persistence alone answers: even for data
+      that IS written to a real file, is a write that has been
+      "written" always actually safe the instant a crash happens right
+      after it?
+    socratic_prompt:
+      - >
+        `backend/config.py`'s own `TestingConfig` chooses
+        `sqlite:///:memory:` specifically because tests should not
+        leave real, permanent data behind. What does that choice reveal
+        about what an in-memory database is actually giving up, compared
+        to the real, file-backed one `DevelopmentConfig` uses?
+      - >
+        If a program calls a file's `.write()` and the operating system
+        crashes one instant later, is there any guarantee those bytes
+        are actually on the physical disk yet - or could the crash have
+        happened before the operating system got around to actually
+        placing them there?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/config.py:58-62`:
+        ```
+        class TestingConfig(Config):
+            """Testing configuration (using in-memory database)."""
+            TESTING = True
+            SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+            DEBUG = False
+        ```
+        Real, already-existing evidence that this project itself treats
+        "backed by a real file" and "in-memory, gone on connection
+        close" as two genuinely different, deliberately-chosen
+        properties - not the same guarantee under two different names.
+        The lab below demonstrates the sharper property, durability,
+        directly: not merely that a file outlives a clean exit (already
+        shown), but that a CONFIRMED write survives even a process that
+        never shuts down cleanly at all.
+      files_affected:
+        - path: verification/phase-06/lab_durability.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone throwaway script; no existing project structure to place it within.
+      dependencies: None beyond Python 3's own standard library (`os`).
+    new_code:
+      applicable: true
+      intro: >
+        One script, run twice as two separate processes - the first
+        writes, confirms the write is physically on disk, then crashes
+        on purpose; the second, a genuinely fresh process, checks
+        whether the write actually survived that crash:
+      file: verification/phase-06/lab_durability.py
+      status: new
+      language: python
+      code: |
+        import os
+
+        DATA_FILE = os.path.join(os.path.dirname(__file__), "durability_data.txt")
+        DISPLAY_PATH = "verification/phase-06/durability_data.txt"
+
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE) as f:
+                survived = f.read().strip()
+            print(f"real file {DISPLAY_PATH!r} contains: {survived!r}")
+            print("the previous process that wrote this never shut down cleanly - it crashed on purpose, immediately after writing")
+        else:
+            with open(DATA_FILE, "w") as f:
+                f.write("committed-value")
+                f.flush()
+                os.fsync(f.fileno())
+            print("wrote 'committed-value', then flush() and os.fsync() - the operating system has now confirmed those bytes are physically on the storage device, not just sitting in this process's own memory buffer")
+            print("simulating a hard crash right here, immediately after that confirmed write")
+            os._exit(1)  # skips every normal shutdown step Python would otherwise run - no atexit, no cleanup
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "with open(DATA_FILE, \"w\") as f: f.write(\"committed-value\")"
+          explanation: >
+            Opens the real file for writing and writes the string
+            `"committed-value"`. At this exact point, Python itself may
+            still be holding those bytes in its own internal buffer,
+            not yet handed to the operating system at all - `.write()`
+            returning does not by itself mean the data is safe against a
+            crash.
+        - element: "f.flush()"
+          explanation: >
+            Forces Python's own internal buffer out to the operating
+            system. This closes one gap - the data is no longer sitting
+            only inside this Python process - but the operating system
+            itself may still be holding it in ITS OWN buffer, not yet on
+            the physical device; `flush()` alone does not close that
+            second gap.
+        - element: "os.fsync(f.fileno())"
+          explanation: >
+            The real construct this whole unit exists to teach: forces
+            the operating system to place those bytes on the actual
+            physical storage device before this line returns. Only
+            after this call has this lab's write earned the word
+            "durable" - confirmed as physically stored, not merely
+            handed somewhere.
+        - element: "os._exit(1)"
+          explanation: >
+            Ends the process immediately, skipping every normal
+            shutdown step - no cleanup, nothing else runs. Placed
+            deliberately as the very next line after `os.fsync()`
+            returns, so this simulated crash happens strictly AFTER the
+            write was confirmed durable, testing exactly the guarantee
+            durability makes: a crash here should not be able to lose
+            it.
+        - element: "os.path.exists(DATA_FILE) (second run)"
+          explanation: >
+            The same real existence check from the persistence unit,
+            here telling this script's second, later invocation that an
+            earlier process already ran - specifically, the one that
+            just crashed on purpose.
+        - element: "with open(DATA_FILE) as f: survived = f.read().strip()"
+          explanation: >
+            Opens the real file for reading in the second run; basic-
+            Python `str.strip()` removes any surrounding whitespace from
+            the read string. If durability actually held, this is the
+            exact same `"committed-value"` the crashed process wrote,
+            recovered by a completely different, later process that had
+            no memory of the first one at all.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: true
+      shape: timing
+      lines:
+        - >
+          `python -u verification/phase-06/lab_durability.py` (run 1) -
+          writes `"committed-value"`, calls `f.flush()`, then
+          `os.fsync(f.fileno())`; only once that real call returns does
+          `os._exit(1)` run, ending the process immediately with exit
+          code `1` and skipping every normal shutdown step.
+        - >
+          The real file `durability_data.txt` now holds
+          `"committed-value"` on the physical storage device - not
+          merely "written" from this now-dead process's point of view,
+          but confirmed there by the `os.fsync()` call that ran before
+          the crash.
+        - >
+          `python -u verification/phase-06/lab_durability.py` (run 2, a
+          genuinely separate, later process) - `os.path.exists` reports
+          `True`; reading the file back recovers `'committed-value'`
+          exactly, proving the confirmed write survived a process that
+          never shut down cleanly at all.
+    cs_lens: >
+      This is **durability**: a confirmed write surviving even an
+      abnormal interruption, not just an ordinary exit. Also recognized
+      in: a bank's own ledger system, which does not report a wire
+      transfer as complete to the sender until its own record of it is
+      confirmed durably written, specifically so a datacenter power loss
+      one instant later cannot un-happen an already-confirmed transfer;
+      a real database's write-ahead log, flushed and fsync'd before the
+      database ever tells a caller "committed"; a text editor's
+      write-to-a-temp-file-then-rename save pattern, chosen specifically
+      so a crash mid-save cannot corrupt the real file it is replacing;
+      and, in this project's own domain, a CNC program transfer that is
+      verified complete (a checksum, a re-read) before it is ever
+      trusted for a real production run - "the file appears to be there"
+      and "the file is confirmed, completely and correctly there" are
+      exactly as different for a toolpath as they are for this lab's own
+      single string.
+    se_lens: >
+      The design principle is forcing the gap between "the program was
+      told this succeeded" and "this is physically, verifiably true"
+      closed on purpose, rather than trusting an ordinary buffered write
+      to have already closed it. The real alternative NOT chosen here is
+      relying on an ordinary `write()` (or even a `flush()` alone) and
+      simply hoping no crash lands in the narrow window before the
+      operating system gets around to its own physical write - cheaper,
+      and correct almost all of the time, which is exactly why it is
+      dangerous: the one time it matters is the one time something
+      already went wrong. The honest cost on the other side, stated
+      plainly: `os.fsync()` is understood to be slower than an ordinary
+      buffered write - a design rationale this lesson did not itself
+      measure, but one that follows directly from what `os.fsync()`'s
+      own real contract requires: it cannot return until the hardware
+      itself confirms the write, where an ordinary buffered write
+      returns as soon as Python's own side is done. Genuine durability
+      is bought with real latency as a result, the same tradeoff this project's own choice
+      of `sqlite:///:memory:'` for `TestingConfig` deliberately opts out
+      of, on purpose, for tests that do not need it.
+    commands:
+      - command: python -u verification/phase-06/lab_durability.py
+        explanation: >
+          Runs the lab from the repository root; `-u` runs Python in
+          unbuffered mode so this script's own `print()` output is not
+          silently lost when `os._exit()` skips Python's normal
+          shutdown flush. Run a second time, unmodified, to see the
+          real, post-crash recovery this unit is about.
+    verification:
+      applicable: true
+      real_output: |
+        === RUN 1 (crashes on purpose) ===
+        wrote 'committed-value', then flush() and os.fsync() - the operating system has now confirmed those bytes are physically on the storage device, not just sitting in this process's own memory buffer
+        simulating a hard crash right here, immediately after that confirmed write
+        exit code: 1
+        === RUN 2 (fresh process, after the crash) ===
+        real file 'verification/phase-06/durability_data.txt' contains: 'committed-value'
+        the previous process that wrote this never shut down cleanly - it crashed on purpose, immediately after writing
+      output_file: verification/phase-06/lab_durability_output.txt
+    connection_to_previous: >
+      The previous unit showed a file surviving a clean exit; this unit
+      shows the sharper, real guarantee durability actually adds on top
+      of that - surviving a process that never got the chance to exit
+      cleanly at all.
+
+  - title: "Querying - Answering a Question Without Scanning Everything by Hand"
+    problem: >
+      `backend/app/models/machine.py`'s real `Machine` model declares a
+      real `status` column - `'available'`, `'down'`, and others. Suppose
+      this application needs to answer one real, ordinary question:
+      which machines are currently down? Without any real querying
+      capability, what does answering that question actually cost the
+      application itself, and does that cost depend on how many machines
+      actually happen to be down?
+    socratic_prompt:
+      - >
+        If the only way to find machines with `status == 'down'` is to
+        personally look at every single `Machine` record one at a time,
+        does the amount of WORK that takes depend on how many machines
+        are actually down - or on how many machines exist in total?
+      - >
+        The lab below finds exactly one matching record out of 200,000.
+        Before running it: does the code shown do any less work to find
+        that one match than it would to find, say, 100,000 matches out
+        of the same 200,000?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/machine.py:75`:
+        ```
+        status = db.Column(db.String(20), default='available')  # available, running, setup, offline, maintenance, down, issue
+        ```
+        This is the real, already-existing column this lesson's own
+        synthetic lab models the shape of - not this project's real
+        production rows, which the lab does not read at all, but a
+        realistically-sized, synthetic stand-in built specifically to
+        make the real cost of a manual scan actually measurable.
+      files_affected:
+        - path: verification/phase-06/lab_querying.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone throwaway script; no existing project structure to place it within.
+      dependencies: None beyond Python 3's own standard library (`time`).
+    new_code:
+      applicable: true
+      intro: >
+        200,000 synthetic machine-shaped records, all `'available'`
+        except one, deliberately placed last - answering "which ones are
+        down" the only way available without a real query capability:
+        by looking at every single one:
+      file: verification/phase-06/lab_querying.py
+      status: new
+      language: python
+      code: |
+        import time
+
+        machines = [{"id": f"m{i}", "status": "available"} for i in range(200_000)]
+        machines[199_999]["status"] = "down"  # the one real match sits at the very end, on purpose
+
+        start = time.perf_counter()
+        found = [m for m in machines if m["status"] == "down"]
+        elapsed = time.perf_counter() - start
+
+        print(f"scanned all {len(machines)} machine records to find {len(found)} matching status == 'down'")
+        print(f"elapsed: {elapsed:.6f} seconds")
+        print(f"even though only {len(found)} row(s) actually matched, every one of the {len(machines)} records still had to be read to find it")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "[{\"id\": f\"m{i}\", \"status\": \"available\"} for i in range(200_000)]"
+          explanation: >
+            A list comprehension building 200,000 dicts, each shaped
+            like this lesson's own real `Machine.status` column, every
+            one starting `"available"`. `range(200_000)` (basic Python)
+            supplies the 200,000 integers this comprehension iterates
+            over.
+        - element: "machines[199_999][\"status\"] = \"down\""
+          explanation: >
+            Ordinary list indexing and dict-key assignment (basic
+            Python), placing the single real match deliberately at the
+            very LAST position - specifically so a scan cannot get lucky
+            and stop early; it has to genuinely reach every record before
+            it can even find this one.
+        - element: "time.perf_counter() (before)"
+          explanation: >
+            Captures a precise timestamp immediately before the scan
+            begins, described fully in this lesson's own Header.
+        - element: "[m for m in machines if m[\"status\"] == \"down\"]"
+          explanation: >
+            A second list comprehension - the real scan itself. For
+            every one of the 200,000 dicts in `machines`, it evaluates
+            `m["status"] == "down"`, and only includes `m` in the result
+            when that comparison is `True`. There is no way for this
+            expression to know in advance which records will match - it
+            has to actually evaluate the condition against all 200,000
+            before it can be done.
+        - element: "time.perf_counter() (after) / elapsed = ... - ..."
+          explanation: >
+            A second timestamp, taken immediately after the scan
+            finishes; subtracting the first from the second gives a real,
+            measured elapsed duration for that specific scan - not an
+            estimate, an actual number this lesson's own verification
+            output shows.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **querying**: asking a declarative question - "which
+      records satisfy this condition" - versus the caller itself doing
+      linear, manual work to answer it. Also recognized in: a search
+      engine returning matches for a keyword without the person
+      searching having to read every page on the internet themselves; a
+      spreadsheet's own filter feature versus manually scrolling every
+      row by eye; a phone's contacts search box versus scrolling every
+      contact by hand; and, in this project's own domain, a shop
+      supervisor needing "every machine currently down" as a single,
+      fast answer rather than personally walking the floor and checking
+      each machine one at a time.
+    se_lens: >
+      The design principle is pushing the cost of finding a match down
+      to the system that actually holds the data, instead of the calling
+      application doing linear work by hand every single time it needs
+      an answer. The real alternative NOT chosen in this lab - and the
+      one this project's own application code would be stuck with,
+      absent a real query capability - is exactly what is shown: hold
+      everything in memory, and scan all of it, every time, no matter
+      how selective the real question actually is. The honest cost of
+      that alternative, made concrete by this lab's own measured
+      `elapsed` number: the work done scales with the TOTAL size of the
+      data, not with how many rows actually match - the list
+      comprehension's own shape, shown above, evaluates its `if`
+      condition once per record with no way to stop early, so doubling
+      the number of machines doubles how many records get inspected,
+      even if the number of down machines never changes at all. The
+      honest cost on the other side:
+      a real querying capability does not remove that underlying cost by
+      magic - it has to be built, and how well it avoids a full scan
+      depends entirely on what the system storing the data is actually
+      given to work with, which is exactly what a later lesson's own
+      indexes are for.
+    commands:
+      - command: python verification/phase-06/lab_querying.py
+        explanation: >
+          Runs the lab from the repository root; no flags needed. The
+          exact `elapsed` value will vary slightly run to run (real
+          machine timing, not a fixed constant) - the point this unit
+          makes is what scales with total record count, not the precise
+          number of seconds.
+    verification:
+      applicable: true
+      real_output: |
+        scanned all 200000 machine records to find 1 matching status == 'down'
+        elapsed: 0.003078 seconds
+        even though only 1 row(s) actually matched, every one of the 200000 records still had to be read to find it
+      output_file: verification/phase-06/lab_querying_output.txt
+    connection_to_previous: >
+      The previous two units established that data has to be stored
+      somewhere real and safely; this unit shows that being stored is
+      not the same problem as being efficiently ASKED ABOUT - a
+      completely different cost, paid by whoever has to answer the
+      question.
+
+  - title: "Concurrency - Two Flows of Execution, One Shared Value"
+    problem: >
+      `backend/app/models/machine.py`'s real `Machine` model carries
+      `current_operator_client_id` and `operator_last_heartbeat_at` -
+      real, already-existing fields for tracking which operator's client
+      currently "owns" a given machine. Real shop floors have more than
+      one operator; what actually happens if two different operators'
+      clients both try to claim the same real machine at nearly the same
+      instant?
+    socratic_prompt:
+      - >
+        Suppose two operators' clients both check `current_operator_client_id`,
+        both see it is empty, and both then decide to write their own ID
+        into it. Is there anything in that description alone that
+        guarantees only one of them actually succeeds?
+      - >
+        If both operators' writes "succeed" from each operator's own
+        point of view - neither gets an error - what does the shared
+        value actually end up holding, and does either operator have any
+        way to know, from their own side, that this happened?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/machine.py:78-80`:
+        ```
+        # Operator session routing (best-effort)
+        current_operator_client_id = db.Column(db.String(100), nullable=True)
+        operator_last_heartbeat_at = db.Column(db.DateTime, nullable=True)
+        ```
+        Real, already-existing evidence that this exact concern - more
+        than one operator's client potentially touching the same
+        machine's claim at once - is already a real part of this
+        project's own schema; its own comment, `"best-effort"`, is this
+        project's own honest admission that nothing here currently
+        coordinates that. The lab below reproduces the identical shape
+        of race directly, with two real threads sharing one plain dict
+        in place of the real, network-separated operator clients.
+      files_affected:
+        - path: verification/phase-06/lab_concurrency.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone throwaway script; no existing project structure to place it within.
+      dependencies: None beyond Python 3's own standard library (`threading`, `time`).
+    new_code:
+      applicable: true
+      intro: >
+        One shared dict, standing in for one real machine's row, and two
+        real threads - standing in for two operators' clients - both
+        racing to claim it:
+      file: verification/phase-06/lab_concurrency.py
+      status: new
+      language: python
+      code: |
+        import threading
+        import time
+
+        machine = {"current_operator_client_id": None}
+
+
+        def claim_machine(client_id):
+            current = machine["current_operator_client_id"]
+            print(f"{client_id} checked: machine is currently claimed by {current!r}")
+            if current is None:
+                time.sleep(0.05)  # the real-world gap between "checked it's free" and "wrote my own claim"
+                machine["current_operator_client_id"] = client_id
+                print(f"{client_id} claimed the machine")
+
+
+        t1 = threading.Thread(target=claim_machine, args=("operator-A",))
+        t2 = threading.Thread(target=claim_machine, args=("operator-B",))
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+
+        print(f"final current_operator_client_id = {machine['current_operator_client_id']!r}")
+        print("both operators believed they successfully claimed the machine - nothing raised an error for either one")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "machine = {\"current_operator_client_id\": None}"
+          explanation: >
+            One plain dict, shared by both threads - there is only ever
+            one of it - standing in for one real machine's row in this
+            project's own database, where `current_operator_client_id`
+            starts unclaimed.
+        - element: "current = machine[\"current_operator_client_id\"]"
+          explanation: >
+            Reads the shared value into a LOCAL name inside whichever
+            thread is running this line. This is the first half of the
+            real race: this read and the write further down are two
+            separate steps, not one atomic operation, and another thread
+            is free to run its own steps in between them.
+        - element: "time.sleep(0.05)"
+          explanation: >
+            Deliberately widens the real gap between the read above and
+            the write below, described fully in this lesson's own
+            Header - large enough that, with two threads both started
+            before either is joined, both reliably reach this point
+            having already both seen `current is None`, before either
+            has written anything back.
+        - element: "machine[\"current_operator_client_id\"] = client_id"
+          explanation: >
+            Writes this thread's own `client_id` into the shared dict.
+            Because BOTH threads already passed the `if current is None:`
+            check before either one reached this line, both threads
+            execute this write - the second one to actually run it
+            silently overwrites whatever the first one just wrote, with
+            no error, no exception, and no signal to either thread that
+            this happened.
+        - element: "threading.Thread(target=claim_machine, args=(\"operator-A\",)) / t1.start() / t2.start() / t1.join() / t2.join()"
+          explanation: >
+            Full treatment in this lesson's own Header. Starting BOTH
+            threads before joining EITHER is what actually allows their
+            two calls to `claim_machine` to run concurrently instead of
+            one strictly finishing before the other begins - the real
+            mechanism that makes the race in this lab genuinely
+            possible, not merely described.
+        - element: "print(f\"final current_operator_client_id = ...\")"
+          explanation: >
+            Only reached after both threads have fully finished
+            (`t1.join()` and `t2.join()` have both returned). Whichever
+            operator's write happened to run last is the one left
+            standing - and, as this unit's own two real captured runs
+            show, that is not the same operator every time.
+    mental_model:
+      applicable: true
+      diagram: |
+        operator-A thread                    operator-B thread
+        ------------------                    ------------------
+        read current -> None
+                                                read current -> None
+        sleep(0.05)
+                                                sleep(0.05)
+        write "operator-A"
+                                                write "operator-B"  <- overwrites A, silently
+
+        Both threads pass the "current is None" check before either
+        writes anything back - the sleep widens that shared window.
+        Whichever thread's write actually happens last wins; the other
+        thread's write is still executed, still believed successful by
+        that thread, and simply gone.
+    execution_trace:
+      applicable: true
+      shape: timing
+      lines:
+        - >
+          `t1.start()` then `t2.start()` - both real threads are now
+          running concurrently; the operating system, not this lesson's
+          own code, decides the exact order their individual print
+          statements actually interleave in.
+        - >
+          Both threads read `current` as `None` before either one writes
+          anything - this is true in every real run of this lab, because
+          each thread's own `time.sleep(0.05)` happens only AFTER its own
+          read, giving the other thread ample time to also complete its
+          own read first.
+        - >
+          Both threads then write their own `client_id` into the shared
+          dict - whichever one's write actually executes second (an
+          outcome this lesson's own two captured real runs show going
+          both ways) becomes the final value; the other thread's earlier
+          write is silently gone, with nothing anywhere reporting that it
+          was ever overwritten.
+    cs_lens: >
+      This is a **race condition**: the correctness of a result depending
+      on the precise, unguaranteed timing of two concurrent flows of
+      execution. Also recognized in: two people editing the same shared
+      spreadsheet cell at nearly the same instant, where the second save
+      silently wins; two shoppers both trying to buy the last unit of a
+      product at the same moment, both seeing "in stock" a moment before
+      either checkout is confirmed; two threads incrementing a shared
+      counter without a lock, losing one of the two increments entirely;
+      and, in this project's own domain, the exact scenario `machine.py`'s
+      own `current_operator_client_id` field already exists to represent
+      - two real operators' clients both able to reach the same real
+      machine's claim at once.
+    se_lens: >
+      The design principle at stake is recognizing that "read, decide,
+      write" is not automatically one indivisible step just because it
+      is written as consecutive lines of code - a second flow of
+      execution can run its own steps anywhere in between. The real
+      alternative NOT chosen in this lab - and, per `machine.py`'s own
+      `"best-effort"` comment, not fully chosen in this project's real
+      code either - is assuming only one operator ever touches a given
+      machine at a time and never actually coordinating that assumption.
+      The honest cost, made concrete by this lab's own two real runs:
+      the failure is completely silent - no exception, no error message,
+      no log entry - one operator's real, genuine claim on a real
+      machine simply vanishes, and nothing in the system, including the
+      operator who lost it, is ever told that it happened.
+    commands:
+      - command: python verification/phase-06/lab_concurrency.py
+        explanation: >
+          Runs the lab from the repository root; no flags needed. Run it
+          more than once, unmodified, to see the real, genuine
+          nondeterminism this unit's own two captured runs show - which
+          operator ends up "winning" is not fixed by the code at all.
+    verification:
+      applicable: true
+      real_output: |
+        === RUN 1 ===
+        operator-A checked: machine is currently claimed by None
+        operator-B checked: machine is currently claimed by None
+        operator-B claimed the machine
+        operator-A claimed the machine
+        final current_operator_client_id = 'operator-A'
+        both operators believed they successfully claimed the machine - nothing raised an error for either one
+        === RUN 2 ===
+        operator-A checked: machine is currently claimed by None
+        operator-B checked: machine is currently claimed by None
+        operator-A claimed the machine
+        operator-B claimed the machine
+        final current_operator_client_id = 'operator-B'
+        both operators believed they successfully claimed the machine - nothing raised an error for either one
+      output_file: verification/phase-06/lab_concurrency_output.txt
+    connection_to_previous: >
+      The previous unit showed the cost of ASKING a question over shared
+      data; this unit shows a completely different problem with that
+      same shared data - two independent flows of execution CHANGING it
+      at once, with no guarantee about which one's change actually
+      survives.
+
+  - title: "Integrity - Stored Data That Doesn't Actually Obey Its Own Rules"
+    problem: >
+      `backend/app/models/machine.py`'s real `group_id` column is
+      declared as a `db.ForeignKey('machine_groups.id')` - a real,
+      already-existing statement in this project's own schema that every
+      machine's `group_id` is SUPPOSED to point at a real, existing
+      group. What actually happens if something writes a `group_id` that
+      does not point at any real group at all, using only a plain data
+      structure with none of a real database's own enforcement behind
+      it?
+    socratic_prompt:
+      - >
+        `machine.py`'s own real `group_id` column names a real group's
+        `id` it is supposed to point to. If nothing is actually
+        CHECKING that at the moment a machine record is created, what
+        stops a typo, or a deleted group, from leaving a `group_id` that
+        points at nothing real at all?
+      - >
+        The lab below stores a machine pointing at a group_id that was
+        never real to begin with. At the exact moment that machine is
+        added, does anything about the code notice? If not, when -
+        and how - does the problem actually surface?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/machine.py:83`:
+        ```
+        group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)
+        ```
+        This is the real, already-existing declaration that a
+        `Machine`'s `group_id` is supposed to reference a real
+        `MachineGroup`. The lab below deliberately builds the identical
+        shape of relationship - a machine record holding a reference to
+        a group - using only plain Python dicts, with none of a real
+        `ForeignKey`'s own enforcement behind it, specifically to show
+        what that enforcement is actually protecting against.
+      files_affected:
+        - path: verification/phase-06/lab_integrity.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone throwaway script; no existing project structure to place it within.
+      dependencies: None beyond plain Python.
+    new_code:
+      applicable: true
+      intro: >
+        Two plain dicts modeling groups and machines, with nothing
+        checking whether a machine's `group_id` actually names a real
+        group before accepting it:
+      file: verification/phase-06/lab_integrity.py
+      status: new
+      language: python
+      code: |
+        groups = {"grp-1": {"name": "Mill Bay"}}
+        machines = {}
+
+
+        def add_machine(machine_id, group_id):
+            machines[machine_id] = {"group_id": group_id}
+            print(f"added {machine_id!r} pointing at group_id {group_id!r} - nothing checked whether that group actually exists")
+
+
+        add_machine("m1", "grp-1")               # points at a real, existing group
+        add_machine("m2", "grp-does-not-exist")  # points at nothing real - accepted anyway
+
+        print()
+        for machine_id, machine in machines.items():
+            group = groups.get(machine["group_id"])
+            if group is None:
+                print(f"{machine_id}: group_id {machine['group_id']!r} does not resolve to any real group - {machine_id} is now an orphaned reference")
+            else:
+                print(f"{machine_id}: belongs to real group {group['name']!r}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "groups = {\"grp-1\": {\"name\": \"Mill Bay\"}}"
+          explanation: >
+            A plain dict modeling this project's own real
+            `MachineGroup` table, with exactly one real, genuinely-
+            existing group - the only thing in this whole lab that a
+            `group_id` could ever legitimately point at.
+        - element: "def add_machine(machine_id, group_id): machines[machine_id] = {\"group_id\": group_id}"
+          explanation: >
+            Stores a new machine record with WHATEVER `group_id` string
+            it is given - there is no check anywhere in this function
+            for whether that `group_id` names a real key in `groups` at
+            all. This is the deliberate absence at the center of this
+            unit: a real `db.ForeignKey`, by contrast, is exactly the
+            declaration that this exact check should happen.
+        - element: "add_machine(\"m1\", \"grp-1\")"
+          explanation: >
+            Adds a machine whose `group_id` happens to name a real,
+            existing group - accepted, and, as the loop below shows,
+            correctly resolvable later.
+        - element: "add_machine(\"m2\", \"grp-does-not-exist\")"
+          explanation: >
+            Adds a second machine whose `group_id` names nothing that
+            exists in `groups` at all - accepted exactly the same way,
+            with the exact same "nothing checked" print, because nothing
+            in `add_machine` treats this case any differently at the
+            moment it happens.
+        - element: "group = groups.get(machine[\"group_id\"])"
+          explanation: >
+            `dict.get`, fully treated in this lesson's own Header. For
+            `m1`, this returns the real `Mill Bay` group's dict; for
+            `m2`, it returns `None` - silently, with no exception - which
+            is the exact moment this project's real, missing enforcement
+            would have needed to catch the problem, and did not.
+        - element: "if group is None: ... else: ..."
+          explanation: >
+            Basic Python conditional branching. The `is None` branch is
+            reached only for `m2` - the orphaned reference - and it is
+            reached here, in a completely different function, at a
+            completely different time, than the moment the bad
+            `group_id` was actually written; nothing connects the two
+            moments except this lab's own later attempt to resolve it.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **referential integrity**: the specific guarantee that a
+      stored reference actually points at something real. Also
+      recognized in: a shipping form rejecting a ZIP code that does not
+      match any real postal code, rather than accepting any five digits;
+      a spreadsheet's own data-validation dropdown, restricting a cell to
+      only real, listed values instead of any typed string; a compiler's
+      type system rejecting code that would construct an object
+      referencing something that does not exist; and, closer to this
+      project's own real, already-known findings, `create_machine`'s own
+      real, already-flagged acceptance of a non-numeric string for its
+      `axes` field with zero validation - the identical pattern this
+      lab shows, in this project's own real code, for a different
+      field.
+    se_lens: >
+      The design principle is enforcing a real-world rule (a reference
+      must point at something that exists) at the moment data is
+      written, rather than trusting every future caller to only ever
+      write valid references. The real alternative NOT chosen in this
+      lab - plain dicts, no `ForeignKey`, no check at write time - is
+      cheap and requires no enforcement code at all, which is exactly
+      why it is tempting. The honest cost, made concrete by this lab's
+      own `m2`: a broken reference is accepted silently, exists
+      undetected for as long as nothing happens to look at it, and only
+      surfaces later, somewhere else entirely, as a quiet `None` instead
+      of a loud error at the actual moment - and, unlike a real
+      database's own constraint violation, nothing here ever records
+      when or how the bad reference got there in the first place.
+    commands:
+      - command: python verification/phase-06/lab_integrity.py
+        explanation: >
+          Runs the lab from the repository root; no flags needed.
+    verification:
+      applicable: true
+      real_output: |
+        added 'm1' pointing at group_id 'grp-1' - nothing checked whether that group actually exists
+        added 'm2' pointing at group_id 'grp-does-not-exist' - nothing checked whether that group actually exists
+
+        m1: belongs to real group 'Mill Bay'
+        m2: group_id 'grp-does-not-exist' does not resolve to any real group - m2 is now an orphaned reference
+      output_file: verification/phase-06/lab_integrity_output.txt
+    connection_to_previous: >
+      The previous unit showed two flows of execution racing to CHANGE
+      shared data; this unit shows a different failure entirely - data
+      that was never racing anyone, written by one single, uncontested
+      call, that is simply wrong the moment it is written, because
+      nothing checked it against reality at all.
+
+closing:
+  connect_the_pieces: >
+    Follow one real machine, `m2`, through every property this lesson
+    named. Stored only as a plain Python list in a running process, it
+    would vanish the instant that process restarted - written instead to
+    a real file, it survives a clean exit, exactly as the persistence
+    unit's own two real runs proved. Written, `flush()`ed, and
+    `os.fsync()`ed before a deliberate, simulated crash, that same kind
+    of write survives even a process that never shuts down cleanly at
+    all - durability's own real guarantee, strictly stronger than mere
+    persistence. Once safely stored, asking "which machines are down"
+    still costs a real, measured amount of work that scales with how
+    much data exists in total, not with how selective the real question
+    is - querying's own real cost, paid by whoever has to answer it by
+    hand. If two operators' clients both reach for the same machine's
+    claim at once, whichever one's write happens to run last silently
+    wins, and the other is simply gone, with no error anywhere -
+    concurrency's own real, silent failure mode. And this same `m2`,
+    given a `group_id` that was never real to begin with, is accepted
+    without a single check at the moment it is written, only to surface
+    later, somewhere else entirely, as a quiet `None` instead of a loud
+    error - integrity's own real cost of enforcement never actually
+    built. Every one of these five real, measured failures is what a
+    real database exists specifically to prevent - which is exactly
+    where this curriculum goes next.
+  next_lesson_pointer: >
+    Next, this same real backend's own schema - `Machine`, `MachineGroup`,
+    and the real `group_id` reference this lesson's own integrity unit
+    modeled - gets named formally: rows, columns, and relations, the
+    actual vocabulary a real relational database uses to describe
+    exactly the kind of structured, related data this project already
+    has.

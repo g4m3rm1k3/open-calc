@@ -243,6 +243,9 @@ re-run the script after any lesson changes instead.
 ## collaborator (test scope)
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Anything a piece of code depends on but does not itself define - a database, a file on disk, another service, the current time. It exists as a precise way to talk about test scope: whether a check counts as unit, integration, or system is entirely a question of how many real collaborators it lets in, not how much code happens to run while it executes.
 
+## concurrency
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - More than one independent flow of execution - two threads, two processes, two separate users' requests - being active over the same shared data at the same time, with no guarantee about which one's steps happen in which order relative to the other's. It exists as a named concern because a single flow of execution touching data by itself never has this problem; the instant a second one can touch the same data before the first one finishes, an operation that looks like one atomic step from the outside (read the current value, decide, write a new value) can actually happen as two separately-interleaved flows, each unaware of the other's steps in between its own.
+
 ## confidence
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - In the sense this lesson uses it, the concrete, checkable knowledge that a change did not break existing behavior - as opposed to a personal hope or guess based on reading code or output. It exists as a distinct idea because "I think this still works" and "something just verified this still works" are different states, and only the second one is a safe basis for deciding to ship a change.
 
@@ -254,6 +257,9 @@ re-run the script after any lesson changes instead.
 
 ## Content-Type
 - **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
+
+## context manager (the `with` statement)
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - A Python construct, `with EXPR as NAME:`, that guarantees a cleanup action runs when the indented block ends - whether it ends normally or by an exception - without the caller having to write that cleanup by hand. For a file opened with `open(...)`, the object returned defines what happens on entry (the file is already open by the time the block starts) and on exit (the file is closed automatically, the instant the block ends, no matter how it ends). It exists so "open a resource, use it, always release it" does not depend on every caller remembering a matching `.close()` call on every possible exit path.
 
 ## context-local state
 - **Term** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, general mechanism (built on Python's own real `contextvars`) behind both `request` and `current_app` - a real name that resolves to a genuinely different real value depending on which real context is currently active, reachable from any real function, at any real depth, without being passed as an argument. It exists so deeply-nested real code (this project's own real service layer, for instance) can reach real, request- or app-specific state without every intermediate real function needing to accept and forward it.
@@ -346,6 +352,7 @@ re-run the script after any lesson changes instead.
 
 ## dict.get
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - A real built-in `dict` method that reads a key's value without raising if the key is absent.
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A dict method that looks up a key and returns a default value instead of raising an exception when that key is not present.
 
 ## dictionary key access
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `some_dict["key"]` syntax, which looks up and returns the value stored under the literal key `"key"`, raising `KeyError` if that exact key is not present. It exists as the direct, ordinary way to read one named field out of a dict, used throughout this lesson's own `op["minutes"]`.
@@ -368,6 +375,9 @@ re-run the script after any lesson changes instead.
 
 ## download_nc_file
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions returning two genuinely different real representations of the identical `NCFile` resource.
+
+## durability
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The stronger guarantee that once a write has been confirmed as complete, it survives even an abnormal interruption - a crash, a power loss, a killed process - not merely an ordinary, clean exit. It exists as a concept distinct from persistence because an ordinary file write is not, by itself, durable: the operating system is free to hold written bytes in a memory buffer for a while before actually placing them on the physical storage device, and a crash in that window loses data a program had already been told was "written." Durability is what forces that window shut - confirming a write only once the bytes are genuinely, physically on the device, not just handed to a buffer.
 
 ## edge case
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, valid-looking input that sits at or past the boundary of what a system's own logic was actually built to expect - not necessarily wrong on its face, but exactly where real behavior most often reveals a gap nobody planned for. It exists as its own category because the "normal" cases of a system are usually the ones already well understood; the edge cases are where a characterization actually earns its keep.
@@ -582,6 +592,9 @@ re-run the script after any lesson changes instead.
 ## integration test
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises real code together with at least one real collaborator it actually depends on - most often a real database - to confirm the two genuinely work together, not just that each one works alone. It exists because a unit test can prove a function's own logic is right while saying nothing at all about whether that function correctly reads or writes whatever real system it was built to talk to.
 
+## integrity
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The property that stored data actually obeys the real-world rules it is supposed to - a reference points at something that genuinely exists, a required field is actually present, a value is actually the kind of thing it claims to be - rather than merely being whatever bytes happened to get written. It exists as a distinct concern because storing a value and storing a CORRECT value are different guarantees: nothing about the physical act of writing data checks whether that data makes real-world sense, unless something is specifically built to check it.
+
 ## is_valid_machine_status
 - **Object/method** in `LESSON-2.9-TDD` - A new, real, small function this lesson builds from nothing, through a real RED-GREEN-REFACTOR cycle - not a real, existing part of this project's backend, and never wired into it.
 
@@ -606,6 +619,9 @@ re-run the script after any lesson changes instead.
 
 ## legacy code
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - Code without a trustworthy safety net around it - not "old" as a synonym, but specifically "risky to change, because nothing would notice if changing it broke something." It exists as a real, distinct category from either "correct" or "buggy" code - a piece of code worth characterizing might honestly be either, and the entire point is that nobody currently knows for certain which.
+
+## list comprehension
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The expression `[EXPR for NAME in ITERABLE if CONDITION]`, building a brand-new, fully-realized list by evaluating `EXPR` once for every item in `ITERABLE` that satisfies `CONDITION` (the `if` clause is optional). It exists as a compact way to build a filtered/transformed list without writing an explicit loop and an empty list to `.append()` into by hand - but, as this lesson's own querying unit shows, it still has to actually visit every item in `ITERABLE` to decide which ones satisfy `CONDITION`; compactness of syntax is not the same thing as cheapness of execution.
 
 ## list slicing
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `sequence[start:stop]` syntax, returning a new, separate sequence containing the elements from index `start` up to (but not including) index `stop`; omitting either side means "from the beginning" or "through the end." It exists as a compact way to select a contiguous sub-range of a sequence without writing an explicit loop.
@@ -655,6 +671,9 @@ re-run the script after any lesson changes instead.
 ## observed behavior vs. intended behavior
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - The real distinction a characterization test is built around: what code actually does, verified by running it, versus what its author meant, or what a docstring claims, which may or may not be the same thing. It exists because conflating the two is exactly what lets a well-meaning "fix" silently change real behavior nobody meant to touch.
 
+## open() (file object)
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A built-in Python function that opens a real file on disk and returns a file object representing an open connection to it.
+
 ## OperationScaffoldItem
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real, already-existing `@dataclass(frozen=True)` in this backend, the exact real fix this lesson's own third unit reaches for.
 
@@ -664,8 +683,17 @@ re-run the script after any lesson changes instead.
 ## ordering
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - Whether a collection of real results comes back in a specific, guaranteed sequence, or in whatever order happens to fall out of how the underlying system stores or retrieves them. It exists because "the same items, different order" can silently break a caller relying on position, even though every individual item is still, technically, correct.
 
+## os._exit
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A standard-library function that terminates the current process immediately, at the operating-system level, skipping every normal Python shutdown step.
+
 ## os.environ.get
 - **Object/method** in `LESSON-4.3-CONFIGURATION` - The real, standard library method this project's own `config.py` calls for every real, environment-driven setting.
+
+## os.fsync
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A standard-library function that tells the operating system to force any of its own buffered writes for a given open file all the way out to the physical storage device, before returning.
+
+## os.path.exists
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A function in Python's standard `os.path` module that checks whether a given path currently refers to a real, existing file or directory on disk.
 
 ## Package boundary
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
@@ -690,6 +718,9 @@ re-run the script after any lesson changes instead.
 ## Persistence
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - storing data somewhere that outlives the current
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - Storing data somewhere that survives past the current request and the current process. It exists as its own boundary so domain logic can be written and tested without caring whether the data it reads or writes actually lives in a real database, a test double, or an in-memory stand-in.
+
+## persistence
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The property of data continuing to exist after the specific process that created it has ended. It exists as a named concept because a running program's own memory - every plain variable, list, or dict it holds - belongs only to that one process, and is reclaimed by the operating system the instant the process exits, whether that exit is intentional (a clean shutdown) or not; data that needs to still be there afterward has to live somewhere else entirely - on disk, or in a separate process that outlives it.
 
 ## Port
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - a number identifying *which* listening socket on that
@@ -735,6 +766,9 @@ re-run the script after any lesson changes instead.
 
 ## Query.filter (Machine.query.filter)
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real SQLAlchemy method, narrowing a query to rows matching a real condition.
+
+## querying
+- **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The ability to ask a specific question about stored data and get back only the answer, without the thing asking having to personally read and judge every single record itself. It exists as a distinct concept from mere storage because being ABLE to keep data somewhere says nothing about how expensive it is to later ask "which of these match X" - without a real querying capability, answering that question is the caller's own problem, solved by manually inspecting everything it has, every time.
 
 ## Raising an exception
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
@@ -1008,8 +1042,15 @@ re-run the script after any lesson changes instead.
 ## test_xml_import
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A second real, already-existing "test" script in this project, similar in spirit to `test_xml_parser.py`'s `test_parser`, but for the database-import path specifically.
 
+## threading.Thread
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A class in Python's standard `threading` module representing one separate, real thread of execution running inside the same process as the one that created it.
+
 ## time.perf_counter
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real function from Python's standard library `time` module, used for measuring short, real elapsed durations.
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A standard-library function returning a high-resolution timestamp, suitable for measuring how long something took to run.
+
+## time.sleep
+- **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A standard-library function that pauses the calling thread for a given number of seconds, without blocking any OTHER thread in the same process.
 
 ## token_required
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing decorator factory in this project's own backend, wrapping a view function with authentication and role-checking logic.
@@ -1170,6 +1211,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `application context` / `Application layer` - shares: application
 - `application context` / `application object` - shares: application
 - `application context` / `Application server` - shares: application
+- `application context` / `context manager (the `with` statement)` - shares: context
 - `application context` / `context-local state` - shares: context
 - `application context` / `has_app_context` - shares: context
 - `application context` / `has_request_context` - shares: context
@@ -1185,6 +1227,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `Server` - shares: server
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `assert statement` / `context manager (the `with` statement)` - shares: statement
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
 - `Authorization (header)` / `Authorization header` - shares: authorization, header
@@ -1208,6 +1251,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Blueprint.route` / `health_check (blueprint route)` - shares: blueprint
 - `Blueprint.route` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `context manager (the `with` statement)` - shares: the
 - `blueprint.route (the decorator itself)` / `Decorator` - shares: decorator
 - `blueprint.route (the decorator itself)` / `Flask (the class, and this project's own app instance)` - shares: the
 - `blueprint.route (the decorator itself)` / `get_health_response (tested directly, for the first time)` - shares: the
@@ -1302,6 +1346,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
+- `context manager (the `with` statement)` / `context-local state` - shares: context
+- `context manager (the `with` statement)` / `Flask (the class, and this project's own app instance)` - shares: the
+- `context manager (the `with` statement)` / `get_health_response (tested directly, for the first time)` - shares: the
+- `context manager (the `with` statement)` / `has_app_context` - shares: context
+- `context manager (the `with` statement)` / `has_request_context` - shares: context
+- `context manager (the `with` statement)` / `health_check (the` - shares: the
+- `context manager (the `with` statement)` / `health_check (the bare` - shares: the
+- `context manager (the `with` statement)` / `request (the real context-local proxy)` - shares: context, the
+- `context manager (the `with` statement)` / `request context` - shares: context
 - `context-local state` / `has_app_context` - shares: context
 - `context-local state` / `has_request_context` - shares: context
 - `context-local state` / `request (the real context-local proxy)` - shares: context, local
@@ -1402,10 +1455,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `download_cam_file` / `download_nc_file` - shares: download, file
 - `download_cam_file` / `generate_nc_file` - shares: file
 - `download_cam_file` / `get_nc_file` - shares: file
+- `download_cam_file` / `open() (file object)` - shares: file
 - `download_cam_file` / `PDMService.download_file` - shares: download, file
 - `download_cam_file` / `send_file` - shares: file
 - `download_nc_file` / `generate_nc_file` - shares: file, nc
 - `download_nc_file` / `get_nc_file` - shares: file, nc
+- `download_nc_file` / `open() (file object)` - shares: file
 - `download_nc_file` / `PDMService.download_file` - shares: download, file
 - `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
@@ -1445,6 +1500,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `FlaskClient (.post)` / `POST` - shares: post
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
+- `generate_nc_file` / `open() (file object)` - shares: file
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
 - `get_health_response (real, now live)` / `get_health_response (tested directly, for the first time)` - shares: health
@@ -1478,6 +1534,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_health_response (tested directly, for the first time)` / `real_health_status (proposed prototype)` - shares: health
 - `get_health_response (tested directly, for the first time)` / `request (the real context-local proxy)` - shares: the
 - `get_health_response (tested directly, for the first time)` / `time.perf_counter` - shares: time
+- `get_health_response (tested directly, for the first time)` / `time.sleep` - shares: time
 - `get_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
@@ -1509,6 +1566,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machines` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `request.args.get` - shares: args
+- `get_nc_file` / `open() (file object)` - shares: file
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
@@ -1605,6 +1663,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `JSON response body` / `response body` - shares: body
 - `Key function` / `Pure function` - shares: function
 - `Key function` / `test function` - shares: function
+- `list comprehension` / `list slicing` - shares: list
 - `Machine` / `Query (Machine.query` - shares: machine
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
@@ -1637,6 +1696,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `open() (file object)` / `PDMService.download_file` - shares: file
+- `open() (file object)` / `send_file` - shares: file
+- `os.path.exists` / `URL path parameter` - shares: path
 - `Parameter` / `Query parameter` - shares: parameter
 - `Parameter` / `query parameter` - shares: parameter
 - `Parameter` / `URL parameter` - shares: parameter
@@ -1644,6 +1706,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file
+- `Persistence` / `persistence` - shares: persistence
 - `proof at every real level` / `real_health_status (proposed prototype)` - shares: real
 - `proof at every real level` / `rebuild (as this curriculum's own real term)` - shares: real
 - `proof at every real level` / `request (the real context-local proxy)` - shares: real
