@@ -456,6 +456,9 @@ re-run the script after any lesson changes instead.
 ## get_health_response (real, now live)
 - **Object/method** in `LESSON-5.3-REBUILD-THE-HEALTH-ENDPOINT` - The real function Lesson 5.2 only prototyped, now living for real in this project's own backend.
 
+## get_health_response (tested directly, for the first time)
+- **Object/method** in `LESSON-5.4-PROVE-THE-REBUILD` - The real, live function Lesson 5.3 wired into this project's own backend, tested here in genuine isolation for the first time - no real HTTP request, no real Flask routing involved at all.
+
 ## get_json)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The real response object Flask's test client returns from a simulated request.
 
@@ -696,6 +699,9 @@ re-run the script after any lesson changes instead.
 
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
+
+## proof at every real level
+- **Term** in `LESSON-5.4-PROVE-THE-REBUILD` - Confirming a real rebuild through more than one real kind of test - here, a real unit test (the check function alone) and real API tests (both live routes, end to end) - because each real level can catch a real mistake the other genuinely cannot: a unit test proves the check's own real logic is correct in isolation; an API test proves that logic is actually, correctly wired into every real route that's supposed to use it. It exists because this exact gap - individually-correct real pieces, never actually checked together - is precisely what let `/health` and `/api/health` disagree for as long as they did before this curriculum's own Phase 5 caught it.
 
 ## Propagation
 - **Term** in `LESSON-1.2-EXCEPTIONS` - What a raised exception does by default, with nothing extra required: it exits the function that raised it immediately, then exits whatever called that function, then whatever called that, one real stack frame at a time, until some code actually catches it or there's no caller left at all. It exists as its own concept because it's easy to assume an exception "goes" somewhere specific - it doesn't, until a real `except` block says otherwise; silence, not interception, is the default.
@@ -1204,6 +1210,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `blueprint.route (the decorator itself)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `Decorator` - shares: decorator
 - `blueprint.route (the decorator itself)` / `Flask (the class, and this project's own app instance)` - shares: the
+- `blueprint.route (the decorator itself)` / `get_health_response (tested directly, for the first time)` - shares: the
 - `blueprint.route (the decorator itself)` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `blueprint.route (the decorator itself)` / `health_check (blueprint route)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `health_check (the` - shares: the
@@ -1223,6 +1230,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `health_check (both real routes, now unified)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, blueprint, bp, real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `proof at every real level` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
@@ -1231,6 +1239,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `build_error_response` / `error code` - shares: error
 - `build_error_response` / `unified error contract` - shares: error
 - `build_health_response (proposed prototype)` / `get_health_response (real, now live)` - shares: health
+- `build_health_response (proposed prototype)` / `get_health_response (tested directly, for the first time)` - shares: health
 - `build_health_response (proposed prototype)` / `health check semantics` - shares: health
 - `build_health_response (proposed prototype)` / `health route)` - shares: health
 - `build_health_response (proposed prototype)` / `health route, health_bp)` - shares: health
@@ -1258,11 +1267,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `characterization test` / `characterization test (applied for real)` - shares: characterization
 - `characterization test (applied for real)` / `Config (and its real subclasses)` - shares: real
 - `characterization test (applied for real)` / `get_health_response (real, now live)` - shares: real
+- `characterization test (applied for real)` / `get_health_response (tested directly, for the first time)` - shares: for
 - `characterization test (applied for real)` / `get_machine (revisited for its real decorator stack)` - shares: for, real
 - `characterization test (applied for real)` / `get_machines (revisited for request.args)` - shares: for
 - `characterization test (applied for real)` / `health_check (both real routes, now unified)` - shares: real
 - `characterization test (applied for real)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `characterization test (applied for real)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `characterization test (applied for real)` / `proof at every real level` - shares: real
 - `characterization test (applied for real)` / `real_health_status (proposed prototype)` - shares: real
 - `characterization test (applied for real)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
@@ -1286,6 +1297,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `health_check (both real routes, now unified)` - shares: real
 - `Config (and its real subclasses)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `Config (and its real subclasses)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `Config (and its real subclasses)` / `proof at every real level` - shares: real
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
@@ -1350,6 +1362,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
+- `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
@@ -1423,6 +1436,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
 - `fixture scope` / `yield fixture` - shares: fixture
+- `Flask (the class, and this project's own app instance)` / `get_health_response (tested directly, for the first time)` - shares: the
 - `Flask (the class, and this project's own app instance)` / `health_check (the` - shares: the
 - `Flask (the class, and this project's own app instance)` / `health_check (the bare` - shares: the
 - `Flask (the class, and this project's own app instance)` / `HTTPException (Werkzeug's own real base class)` - shares: class, own, s
@@ -1433,6 +1447,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
+- `get_health_response (real, now live)` / `get_health_response (tested directly, for the first time)` - shares: health
 - `get_health_response (real, now live)` / `get_machine (revisited for its real decorator stack)` - shares: real
 - `get_health_response (real, now live)` / `health check semantics` - shares: health
 - `get_health_response (real, now live)` / `health route)` - shares: health
@@ -1445,9 +1460,24 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_health_response (real, now live)` / `health_check (the bare` - shares: health
 - `get_health_response (real, now live)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `get_health_response (real, now live)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `get_health_response (real, now live)` / `proof at every real level` - shares: real
 - `get_health_response (real, now live)` / `real_health_status (proposed prototype)` - shares: health, real
 - `get_health_response (real, now live)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `get_health_response (real, now live)` / `request (the real context-local proxy)` - shares: real
+- `get_health_response (tested directly, for the first time)` / `get_machine (revisited for its real decorator stack)` - shares: for
+- `get_health_response (tested directly, for the first time)` / `get_machines (revisited for request.args)` - shares: for
+- `get_health_response (tested directly, for the first time)` / `health check semantics` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health route)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health route, health_bp)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health_check` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health_check (blueprint route)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health_check (both real routes, now unified)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health_check (direct route)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `health_check (the` - shares: health, the
+- `get_health_response (tested directly, for the first time)` / `health_check (the bare` - shares: health, the
+- `get_health_response (tested directly, for the first time)` / `real_health_status (proposed prototype)` - shares: health
+- `get_health_response (tested directly, for the first time)` / `request (the real context-local proxy)` - shares: the
+- `get_health_response (tested directly, for the first time)` / `time.perf_counter` - shares: time
 - `get_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
@@ -1465,6 +1495,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `get_machine (revisited for its real decorator stack)` / `proof at every real level` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `Query (Machine.query` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `real_health_status (proposed prototype)` - shares: real
@@ -1531,6 +1562,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (both real routes, now unified)` / `health_check (the bare` - shares: check, health
 - `health_check (both real routes, now unified)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `health_check (both real routes, now unified)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `health_check (both real routes, now unified)` / `proof at every real level` - shares: real
 - `health_check (both real routes, now unified)` / `real_health_status (proposed prototype)` - shares: health, real
 - `health_check (both real routes, now unified)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `health_check (both real routes, now unified)` / `register_routes` - shares: routes
@@ -1546,6 +1578,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (the bare` / `request (the real context-local proxy)` - shares: the
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `HTTPException (Werkzeug's own real base class)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `HTTPException (Werkzeug's own real base class)` / `proof at every real level` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `real_health_status (proposed prototype)` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `rebuild (as this curriculum's own real term)` - shares: own, real, s
 - `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
@@ -1590,6 +1623,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
+- `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: as, real
 - `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
@@ -1610,6 +1644,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file
+- `proof at every real level` / `real_health_status (proposed prototype)` - shares: real
+- `proof at every real level` / `rebuild (as this curriculum's own real term)` - shares: real
+- `proof at every real level` / `request (the real context-local proxy)` - shares: real
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Pure function` / `test function` - shares: function
 - `PUT` / `update_machine_status (PUT)` - shares: put
