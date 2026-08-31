@@ -1,0 +1,431 @@
+# Lesson 4.4: Routes
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Four real, run checks against this project's own real routes, naming what route registration, URL parameters, query parameters, and request bodies actually are as Flask mechanics, not just HTTP concepts - and, along the way, two genuine real findings: the identical real `404` status code hides two structurally different real causes (one that never even reaches this project's own code, one that does), and `get_machines`'s own real code silently drops every repeated real query-parameter value but the first, even though the real object carrying them held every one.
+
+**What you need to know first:** What the real WSGI application object, request context, response, and routing table this project's own Flask app provides; what the real HTTP status codes, headers, and JSON shapes this project's own backend returns mean.
+
+## Terms used in this lesson
+
+- **route registration** — The real, one-time act of telling Flask's own routing table that a specific real URL pattern and method should reach a specific real Python function - `@blueprint.route(...)`, applied once, when the module is first imported. It exists as the real, structural link between a URL a client might request and the actual code that handles it.
+- **URL parameter** — A real, named, dynamic segment of a route's own URL pattern - `<int:notification_id>`, in this lesson's own second unit - extracted from the real, matched URL and handed to the view function as a real argument, already converted to the real type the pattern names. It exists so one real route definition can serve every real, matching value, with Werkzeug itself refusing to match a URL whose real segment doesn't fit the declared type.
+- **query parameter** — A real, optional key-value pair appended to a URL after a real `?` - `?status=running`, read through `request.args`, a real `ImmutableMultiDict` that can hold more than one real value under the identical key. It exists as the real, standard place a client puts optional real filters or options, separate from a URL's own real path.
+- **request body** — The real, optional data a request carries beyond its URL and headers, parsed by one of several genuinely different real Flask mechanisms (`request.form` for form-encoded data, `request.get_json()` for JSON) depending entirely on the real `Content-Type` header this curriculum has already studied. It exists to carry a real operation's own actual content, separate from which resource and method identify what operation is being requested.
+
+## Objects and methods used
+
+- **`blueprint.route (the decorator itself)`**
+  - *What it is:* The real, existing decorator this project's own route files call on every single view function - already used throughout this curriculum, examined here specifically for what it does to the function it decorates.
+  - *Implementation:* `Blueprint.route(rule, **options)` returns a real decorator that, applied to a real function, registers that function into the blueprint's own real, internal list of deferred URL rules, then returns the identical real function object, completely unmodified.
+  - *Its use:* This lesson applies it directly to a small, real, throwaway function, specifically to check whether the real object it returns is the same one that went in.
+  - *Type:* A real method on Flask's own `Blueprint` class.
+  - *Responsibility:* Recording a real URL pattern and method against a real function, with no real side effect on the function's own identity.
+  - *Depends on:* A real URL pattern string; a real, callable view function.
+  - *Connects to:* Every real view function this curriculum has studied was registered this identical real way; `@token_required`, applied separately on top, is what actually produces a new, real, wrapping function - this decorator itself does not.
+  - *Shape:* Takes a real function in; returns the identical real function object out, with a real, internal side effect on the blueprint's own state.
+
+- **`get_machine (revisited for its real decorator stack)`**
+  - *What it is:* The real, existing Flask view function this curriculum has already studied extensively, revisited here specifically for the real, visible effect of the two decorators stacked on top of it.
+  - *Implementation:* `@machines_bp.route('/<string:machine_id>', methods=['GET'])` `@token_required(allowed_roles=[...])` `def get_machine(current_user, machine_id: str): ...` (`backend/app/routes/machines.py:48-61`) - `token_required`'s own real implementation uses `@wraps(f)` internally, which is exactly why the real, final `get_machine` name carries a real `__wrapped__` attribute pointing back at the original function.
+  - *Its use:* This lesson checks its real `__wrapped__` attribute directly, to contrast against the plain route decorator's own real, non-wrapping behavior.
+  - *Type:* A Flask view function, decorated with both `@blueprint.route` and `@token_required`.
+  - *Responsibility:* Being the concrete, real proof that not every decorator in this project behaves like `@blueprint.route` - some genuinely wrap.
+  - *Depends on:* A real `machine_id` matched from the request URL.
+  - *Connects to:* Its own real `__wrapped__` attribute is the entire specimen this lesson's own registration unit contrasts against `blueprint.route`'s own real, non-wrapping behavior.
+  - *Shape:* Carries a real `__wrapped__` attribute, added by `@token_required`'s own use of `functools.wraps`, that `blueprint.route`'s own real output never adds on its own.
+
+- **`mark_as_read / delete_notification`**
+  - *What it is:* Two real, existing Flask view functions, registered with a real `<int:notification_id>` URL parameter - the first real, typed URL converter this curriculum has studied.
+  - *Implementation:* `@notifications_bp.route('/<int:notification_id>/read', methods=['POST']) def mark_as_read(notification_id): ...` (`backend/app/routes/notifications.py:38-40`) and `@notifications_bp.route('/<int:notification_id>', methods=['DELETE']) def delete_notification(notification_id): ...` (`:66-76`) - Werkzeug's own real `<int:...>` converter only matches a URL segment that parses as a real integer; a non-numeric real segment never matches this route at all.
+  - *Its use:* This lesson calls `delete_notification` with a real, non-numeric ID and a real, numeric-but-nonexistent one, specifically to contrast the two real ways this route can end in a `404`.
+  - *Type:* Two Flask view functions, neither wrapped by `@token_required`.
+  - *Responsibility:* Acting on exactly one real notification, identified by a real, integer ID - never even reached at all if the real URL segment isn't a real, valid integer to begin with.
+  - *Depends on:* A real URL segment matching Werkzeug's own real `<int:...>` pattern.
+  - *Connects to:* `delete_notification`'s own real `404` branch (`:70-71`) is the entire specimen this lesson's own URL-parameters unit contrasts against Werkzeug's own routing-level rejection.
+  - *Shape:* Both take a real `notification_id: int` in (already converted by Werkzeug before the function ever runs); `delete_notification` returns a real, `jsonify`-wrapped `{'success': bool, ...}` dict.
+
+- **`get_machines (revisited for request.args)`**
+  - *What it is:* The real, existing Flask view function this curriculum has already studied, revisited here specifically for how it reads its own real, optional query parameters.
+  - *Implementation:* `status = request.args.get('status')` (`backend/app/routes/machines.py:27`) reads a real, SINGLE value from `request.args` - a real `ImmutableMultiDict` that, given a real, repeated query key, actually holds every real value, not just one.
+  - *Its use:* This lesson sends it a real URL with the identical query key repeated twice, specifically to check whether its own real code notices the second value at all.
+  - *Type:* A Flask view function, decorated with `@token_required`.
+  - *Responsibility:* Reading a real, optional filter value from the request URL - by design, only ever the first one present, if more than one real value happens to share the identical key.
+  - *Depends on:* Zero or more real query-string parameters.
+  - *Connects to:* Its own real `request.args.get('status')` call is the entire specimen this lesson's own query-parameters unit is built around.
+  - *Shape:* `request.args.get('status')` returns a real `str` or `None`, never a real list, regardless of how many real values a query string actually carries under that key.
+
+## Concept Unit: Route Registration - What the Decorator Actually Returns
+
+### The Problem
+
+`@token_required` visibly changes what a decorated function looks like (a real `__wrapped__` attribute appears). Does `@blueprint.route(...)`, applied on every single real view function in this project, do the identical kind of thing?
+
+Before reading on:
+
+- If `@blueprint.route(...)` returned a genuinely different real function object than the one it decorated, would calling that real function directly (bypassing Flask's own routing entirely) still work the identical way?
+- Given that Flask needs to know, ahead of time, every real URL pattern this project registers, what would a route decorator's own real job actually have to be - modifying the function itself, or simply recording it somewhere?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:48-61` (`get_machine`), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+A real, throwaway blueprint and view function, decorated directly, next to this project's own real `get_machine`:
+
+**File:** `verification/phase-04/lab_routes_registration.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from flask import Blueprint
+from app.routes.machines import get_machine
+
+bp = Blueprint("demo", __name__)
+
+
+def plain_view():
+    return "ok"
+
+
+returned = bp.route("/demo")(plain_view)
+print("bp.route('/demo')(plain_view) is plain_view:", returned is plain_view)
+
+print("get_machine.__name__:", get_machine.__name__)
+print("get_machine has __wrapped__ (token_required's own real wrapping):", hasattr(get_machine, "__wrapped__"))
+
+assert returned is plain_view
+assert hasattr(get_machine, "__wrapped__")
+print("@blueprint.route(...) registers a real function into the URL map and hands back the identical real object; @token_required, applied separately, is what actually wraps it into a new, real function")
+```
+
+### Mechanical Walkthrough
+
+- `bp = Blueprint("demo", __name__); def plain_view(): return "ok"` — A real, minimal blueprint and view function - deliberately undecorated by anything except the one real decorator this unit studies.
+- `returned = bp.route("/demo")(plain_view)` — Calls `bp.route("/demo")` to get the real decorator, then immediately applies it to `plain_view` by hand - the identical real two-step process `@bp.route("/demo")` above a function performs in one, real, syntactic step.
+- `assert returned is plain_view` — Confirms, for real, that the route decorator's own real output is the identical object, not a new, wrapping one.
+- `assert hasattr(get_machine, "__wrapped__")` — Confirms the real, opposite fact about a genuinely different decorator - `token_required`, stacked on top of `@machines_bp.route(...)` on this project's own real `get_machine`, does wrap, leaving this real, telltale attribute behind.
+
+### CS Lens
+
+This is a **registration-only decorator**: a real decorator whose entire job is a side effect (recording something elsewhere), returning its input completely unchanged, unlike a real decorator that wraps behavior around a function's own call. Also recognized in: a real test framework's own `@pytest.fixture` (in some real usages, primarily registering rather than wrapping); a real plugin system's own `@register_plugin` decorator, adding an entry to a real, internal registry; and, in this project's own domain, a real G-code subprogram's own `O` number declaration, naming and registering a real, callable block without altering what runs inside it.
+
+### SE Lens
+
+The design principle is that Flask's own routing needs a real, complete picture of every registered URL before any real request ever arrives - `@blueprint.route(...)`'s own job is purely building that real, static table, never touching what actually happens when a real view function runs. The real alternative not chosen: a route decorator that also wraps its function (adding real, automatic behavior, the way `@token_required` does for authentication); the honest, real distinction this project's own code relies on, proven directly by this unit's own two real checks: stacking multiple real decorators on one view function (`@blueprint.route` outermost, `@token_required` beneath it) only works correctly because each one's own real job is genuinely different - one records, one wraps - and neither interferes with what the other does.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_routes_registration.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+bp.route('/demo')(plain_view) is plain_view: True
+get_machine.__name__: get_machine
+get_machine has __wrapped__ (token_required's own real wrapping): True
+@blueprint.route(...) registers a real function into the URL map and hands back the identical real object; @token_required, applied separately, is what actually wraps it into a new, real function
+```
+
+Full saved run: `verification/phase-04/lab_routes_registration_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it establishes exactly what one of the two decorators every protected real route in this project stacks actually does to the function underneath it.
+
+## Concept Unit: URL Parameters - Two Real Causes of the Same 404
+
+### The Problem
+
+`delete_notification`'s own real route, `/<int:notification_id>` (`notifications.py:66`), and its own real body both seem able to produce a real `404`. Are they actually the same kind of `404`?
+
+Before reading on:
+
+- A real URL segment like `"not-a-number"` doesn't parse as a real integer at all. Given Werkzeug's own real `<int:...>` converter, would a request to `/api/notifications/not-a-number` ever actually reach `delete_notification`'s own real code?
+- This curriculum already found one real `500` that wasn't valid JSON at all (this project's own unhandled `?type=` crash). Would you expect a `404` produced before any real route even matched to be JSON, or something else?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/notifications.py:66-76` (`delete_notification`), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+Two real requests to the identical real route pattern, one with a real segment that doesn't even parse as an integer:
+
+**File:** `verification/phase-04/lab_routes_url_params.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app import create_app
+
+app = create_app("testing")
+with app.app_context():
+    client = app.test_client()
+
+    r_non_numeric = client.delete("/api/notifications/not-a-number")
+    print("DELETE /api/notifications/not-a-number (int converter, non-numeric) -> status:", r_non_numeric.status_code, "Content-Type:", r_non_numeric.content_type)
+
+    r_numeric = client.delete("/api/notifications/999")
+    print("DELETE /api/notifications/999 (int converter, numeric, no such row) -> status:", r_numeric.status_code, "Content-Type:", r_numeric.content_type, "body:", r_numeric.get_json())
+
+    assert r_non_numeric.status_code == 404
+    assert r_numeric.status_code == 404
+    assert "html" in r_non_numeric.content_type
+    assert r_numeric.content_type == "application/json"
+    print("the identical real 404, two genuinely different real causes: one URL never even matched a real route (Werkzeug's own <int:...> converter rejected it, before delete_notification ever ran); the other matched cleanly and this project's own real code chose to report 404 itself")
+```
+
+### Mechanical Walkthrough
+
+- `client = app.test_client()` — Builds one real `FlaskClient` - this lesson's own first construction of it; the following two units build their own fresh copies the same way.
+- `r_non_numeric = client.delete("/api/notifications/not-a-number")` — `"not-a-number"` fails Werkzeug's own real `<int:...>` conversion - the URL never matches ANY real route at all, so Flask falls back to its own real, generic 404 handler, exactly like the unmatched-route case this curriculum's own earlier work already saw producing real HTML, not JSON.
+- `r_numeric = client.delete("/api/notifications/999")` — `"999"` DOES parse as a real integer, so the route matches and `delete_notification`'s own real body runs - its own explicit `if not notification: return jsonify(...), 404` (`notifications.py:70-71`) is what actually produces this second, real, JSON `404`.
+- `assert "html" in r_non_numeric.content_type / assert r_numeric.content_type == "application/json"` — Confirms both real, distinct causes together - the identical real status code, produced by two structurally different real code paths, only one of which is this project's own application logic.
+
+### Mental Model
+
+```text
+DELETE /api/notifications/not-a-number
+      |
+      v
+Werkzeug's own real routing: does "not-a-number" match <int:...>?  NO
+      |
+      v
+no route matched at all  ->  Flask's own generic 404  ->  real HTML
+
+DELETE /api/notifications/999
+      |
+      v
+Werkzeug's own real routing: does "999" match <int:...>?  YES
+      |
+      v
+delete_notification(999) runs  ->  Notification.query.get(999) is None
+      |
+      v
+this project's own real code returns 404  ->  real JSON
+```
+
+### CS Lens
+
+This is **typed URL matching as a real, early filter**: a route's own declared parameter type rejects an invalid real URL before any application code runs at all, the same way a real, statically-typed function signature rejects a wrong-typed real argument before the function body executes. Also recognized in: a real REST framework's own path-parameter validation, rejecting a malformed real ID before a database is ever queried; a real compiler's own type-checked function call, caught at compile time rather than at runtime; and, in this project's own domain, a machine control refusing to even parse a real G-code block whose real address format doesn't match what that command expects.
+
+### SE Lens
+
+The design principle is that a typed URL converter moves a real class of invalid request further left - rejected by Flask's own routing layer, before this project's own view function, its own database query, or its own error-handling logic ever run at all. The real alternative not chosen: a real, untyped `<string:notification_id>` (the pattern every other route in this project actually uses), checking and converting the value by hand inside the view function itself; the honest cost of the typed `<int:...>` converter this route actually uses, proven directly by this unit's own real run: the resulting `404` for a malformed real ID is genuinely different in kind from every other `404` this curriculum has studied - real HTML, not this project's own real, consistent JSON shape, because the request never reaches any of this project's own code at all.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_routes_url_params.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+DELETE /api/notifications/not-a-number (int converter, non-numeric) -> status: 404 Content-Type: text/html; charset=utf-8
+DELETE /api/notifications/999 (int converter, numeric, no such row) -> status: 404 Content-Type: application/json body: {'error': 'Notification not found', 'success': False}
+the identical real 404, two genuinely different real causes: one URL never even matched a real route (Werkzeug's own <int:...> converter rejected it, before delete_notification ever ran); the other matched cleanly and this project's own real code chose to report 404 itself
+```
+
+Full saved run: `verification/phase-04/lab_routes_url_params_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit studied a decorator that never touches a real request at all; this unit studies the real, first moment a specific request either does, or never does, reach a real view function to begin with.
+
+## Concept Unit: Query Parameters - A Real MultiDict, Read as if It Weren't
+
+### The Problem
+
+`get_machines`'s own real code reads `request.args.get('status')` (`machines.py:27`) - a single-value read. What happens to a real request that sends the identical query key more than once?
+
+Before reading on:
+
+- `request.args` is a real `ImmutableMultiDict`, not a plain `dict` - the "Multi" in its own real name suggests it can hold more than one real value per key. Does `.get('status')` return all of them, or just one?
+- If a real client sent `?status=available&status=running` genuinely intending "either status," would `get_machines`'s own real code, as written, actually honor that intent?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:14-45` (`get_machines`), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** Two real `Machine` rows with different real statuses.
+
+### The New Code
+
+A real, repeated query key, inspected directly, then sent through this project's own real route:
+
+**File:** `verification/phase-04/lab_routes_query_params.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app import create_app, db
+from app.models.machine import Machine
+from flask import request
+
+app = create_app("testing")
+with app.app_context():
+    m1 = Machine(id="M-1", name="A", category="mill", sub_type="3_axis", status="available")
+    m2 = Machine(id="M-2", name="B", category="mill", sub_type="3_axis", status="running")
+    db.session.add(m1)
+    db.session.add(m2)
+    db.session.commit()
+
+    with app.test_request_context("/api/machines?status=available&status=running"):
+        print("real request.args.get('status') (single-value access):", request.args.get("status"))
+        print("real request.args.getlist('status') (every value):", request.args.getlist("status"))
+        print("real type of request.args:", type(request.args).__name__)
+
+    client = app.test_client()
+    r = client.get("/api/machines?status=available&status=running")
+    print("real GET with two 'status' values -> real total returned:", r.get_json()["total"], "ids:", [m["id"] for m in r.get_json()["data"]])
+
+    assert r.get_json()["total"] == 1
+    print("get_machines's own real code calls request.args.get('status'), a single-value read - the second, real 'status=running' value is silently dropped, even though request.args itself, a real MultiDict, actually carried both")
+```
+
+### Mechanical Walkthrough
+
+- `request.args.get("status")` — Returns exactly one real value - the FIRST one present under this key - even though the real query string named it twice.
+- `request.args.getlist("status")` — The real, alternate method built specifically for this case - returns every real value under the key, in order, proving `request.args` itself never lost the second one.
+- `r = client.get("/api/machines?status=available&status=running")` — Sends the identical real, repeated query key through this project's own actual route - `get_machines`'s own real code still only ever calls `.get(...)`, so only the real machine with `status='available'` is returned.
+- `assert r.get_json()["total"] == 1` — Confirms, for real, the honest finding this unit exists to surface - a real, second filter value a caller might reasonably expect to matter is silently ignored.
+
+### CS Lens
+
+This is a **multi-value mapping, accessed as if single-valued**: the real container (`ImmutableMultiDict`) supports more than one real value per key, but the specific real method called (`.get`) only ever surfaces one. Also recognized in: a real HTTP headers object, which can legitimately carry a real header more than once, silently truncated by code that only ever calls a single-value accessor; a real `dict` built naively from a list of real key-value pairs, silently keeping only the last real value for a repeated key; and, in this project's own domain, a real, multi-line G-code comment block where only the first real line is ever actually read by a naive real parser.
+
+### SE Lens
+
+The design principle behind `request.args` being a real `MultiDict` at all is supporting real, legitimate cases where a repeated key is meaningful (multiple real tags, multiple real IDs to filter by). The real alternative this project's own code could have chosen: calling `request.args.getlist('status')` and filtering by ANY of the real values present; the honest cost of the single-value `.get(...)` call this project's own code actually uses, proven directly by this unit's own real run: a real client that reasonably expects `?status=a&status=b` to mean "either" gets silently, incorrectly narrowed to just the first real value, with no real error, no real warning - the second real filter simply never happened.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_routes_query_params.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+real request.args.get('status') (single-value access): available
+real request.args.getlist('status') (every value): ['available', 'running']
+real type of request.args: ImmutableMultiDict
+real GET with two 'status' values -> real total returned: 1 ids: ['M-1']
+get_machines's own real code calls request.args.get('status'), a single-value read - the second, real 'status=running' value is silently dropped, even though request.args itself, a real MultiDict, actually carried both
+```
+
+Full saved run: `verification/phase-04/lab_routes_query_params_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed a malformed URL segment stopped at Flask's own routing layer; this unit shows a real, well-formed query string reaching this project's own code cleanly, and still losing real information, this time to how that code chooses to read it.
+
+## Concept Unit: Request Bodies - Two Real, Separate Parsers
+
+### The Problem
+
+Every real route this curriculum has studied calls `request.get_json()`. Is that the only real way Flask can read a request's own body?
+
+Before reading on:
+
+- This curriculum already found that `request.get_json()` depends entirely on the real `Content-Type` header saying `application/json`. If a real client instead sent a real, form-encoded body (`Content-Type: application/x-www-form-urlencoded`), would `request.get_json()` find anything there at all?
+- Flask provides `request.form` specifically for real, form-encoded bodies. Would you expect it to find anything useful in a request whose real body is JSON instead?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - this unit demonstrates a real, general Flask mechanism directly, not one specific route; every real route in this project already commits to `request.get_json()` alone.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+Two real request bodies, two real parsers, each checked against both:
+
+**File:** `verification/phase-04/lab_routes_request_bodies.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app import create_app
+from flask import request
+
+app = create_app("testing")
+
+with app.test_request_context("/x", method="POST", data={"name": "form value"}, content_type="application/x-www-form-urlencoded"):
+    print("real, form-encoded body -> request.form:", dict(request.form))
+    print("real, form-encoded body -> request.get_json(silent=True):", request.get_json(silent=True))
+
+with app.test_request_context("/x", method="POST", json={"name": "json value"}):
+    print("real, JSON body        -> request.form:", dict(request.form))
+    print("real, JSON body        -> request.get_json():", request.get_json())
+
+with app.test_request_context("/x", method="POST", data={"name": "form value"}, content_type="application/x-www-form-urlencoded"):
+    assert dict(request.form) == {"name": "form value"}
+    assert request.get_json(silent=True) is None
+
+with app.test_request_context("/x", method="POST", json={"name": "json value"}):
+    assert dict(request.form) == {}
+    assert request.get_json() == {"name": "json value"}
+
+print("two real, separate parsers, gated by the identical real Content-Type header this curriculum already studied - a real form body populates .form and leaves .get_json() empty; a real JSON body does the exact opposite; every real route in this project relies on the second path only")
+```
+
+### Mechanical Walkthrough
+
+- `app.test_request_context("/x", method="POST", data={"name": "form value"}, content_type="application/x-www-form-urlencoded")` — Builds a real, active request context carrying a real, form-encoded body - the same real `Content-Type` value this curriculum's own earlier work already showed triggering a genuine `415` when sent to a route that calls `request.get_json()` without `silent=True`.
+- `request.form (with the form-encoded body active)` — Parses the real body as form data, returning a real `ImmutableMultiDict` (printed here as a plain `dict`) carrying the real, submitted field.
+- `request.get_json(silent=True) (with the form-encoded body active)` — Returns real `None` rather than raising - `silent=True` suppresses the real error this same call, without that argument, would raise on a mismatched `Content-Type` (already studied directly in an earlier lesson).
+- `app.test_request_context("/x", method="POST", json={"name": "json value"})` — Builds a second, real, active context, this time with a real JSON body - the identical real `json=` convenience this curriculum has used throughout.
+- `request.form (with the JSON body active) / request.get_json() (with the JSON body active)` — The exact opposite real result - `.form` finds nothing real to parse, while `.get_json()` succeeds cleanly.
+
+### CS Lens
+
+This is **content-type-gated parsing**: two real, independent parsers, each activated by a different real declared format, neither one aware of what the other would find. Also recognized in: a real email client choosing a plain-text or HTML real parser based on a message's own declared MIME type; a real image library selecting a decoder based on a real file's own format signature, not its extension; and, in this project's own domain, a machine control choosing between real G-code and real conversational programming parsers based on which real mode is currently active.
+
+### SE Lens
+
+The design principle is that Flask supports multiple real request body formats without forcing every route to commit to one in advance - `request.form` and `request.get_json()` simply return real, empty results for a body they weren't built to parse, rather than raising by default. The real alternative not chosen anywhere in this project's own code: ever actually using `request.form`; every real route this curriculum has studied commits to `request.get_json()` alone, which is exactly why a real, form-encoded request to any of them fails with a real `415` instead of degrading gracefully - the honest, real cost of a JSON-only API is that `request.form`'s own real, graceful fallback behavior never actually gets used to advantage anywhere in this codebase.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_routes_request_bodies.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+real, form-encoded body -> request.form: {'name': 'form value'}
+real, form-encoded body -> request.get_json(silent=True): None
+real, JSON body        -> request.form: {}
+real, JSON body        -> request.get_json(): {'name': 'json value'}
+two real, separate parsers, gated by the identical real Content-Type header this curriculum already studied - a real form body populates .form and leaves .get_json() empty; a real JSON body does the exact opposite; every real route in this project relies on the second path only
+```
+
+Full saved run: `verification/phase-04/lab_routes_request_bodies_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed one real accessor silently narrowing what a real container actually held; this unit closes the lesson on two real accessors that don't narrow anything - they simply don't look at data that was never in the format each one expects.
+
+## Connect the pieces
+
+One real, throwaway view function, decorated directly, proving `@blueprint.route(...)` hands back the identical real object it was given - unlike `@token_required`, stacked on this project's own real `get_machine`, which genuinely wraps it (route registration). A real URL segment that fails Werkzeug's own `<int:...>` conversion, never reaching `delete_notification` at all, next to a real, numeric segment that does - the identical real `404`, two structurally different real causes, one of them real HTML instead of this project's own real JSON (URL parameters). A real, repeated query key, genuinely held in full by `request.args` itself, but silently narrowed to one real value the moment `get_machines`'s own code calls `.get(...)` instead of `.getlist(...)` (query parameters). And, closing the lesson, two real, separate body parsers - `request.form` and `request.get_json()` - each finding exactly what its own real format expects, and nothing else, with this project's own real routes committing to only one of them (request bodies).
+
+**Next lesson:** Every real route this phase has studied lives in its own real file, grouped under its own real blueprint, without this curriculum ever naming why; next, this curriculum studies blueprints themselves - modular routing, blueprint registration, route prefixes, and how this project's own real 18 route files actually compose into one real app.

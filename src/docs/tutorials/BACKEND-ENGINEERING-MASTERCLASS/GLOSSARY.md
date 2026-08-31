@@ -170,6 +170,9 @@ re-run the script after any lesson changes instead.
 ## Blueprint.route
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method registering a URL rule on a Blueprint and returning a decorator for the function that handles it.
 
+## blueprint.route (the decorator itself)
+- **Object/method** in `LESSON-4.4-ROUTES` - The real, existing decorator this project's own route files call on every single view function - already used throughout this curriculum, examined here specifically for what it does to the function it decorates.
+
 ## body
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, optional data an HTTP message carries after its own blank-line separator - absent in this lesson's own request (a bare `GET` needs none), and a real JSON string in its response. It exists as the one part of the message meant to be read as content, not metadata.
 
@@ -291,6 +294,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function deleting a machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions completing the real CRUD cycle this lesson's own fourth unit traces end to end.
 - **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, existing Flask view function deleting a machine - already studied earlier in this phase, revisited here for its real error shape.
+
+## delete_notification
+- **Object/method** in `LESSON-4.4-ROUTES` - Two real, existing Flask view functions, registered with a real `<int:notification_id>` URL parameter - the first real, typed URL converter this curriculum has studied.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -419,12 +425,18 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, existing Flask view function retrieving one machine by ID - already studied earlier in this phase, revisited here specifically for its real error shape.
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - Two real, existing Flask view functions, returning their real result two genuinely different real ways.
 
+## get_machine (revisited for its real decorator stack)
+- **Object/method** in `LESSON-4.4-ROUTES` - The real, existing Flask view function this curriculum has already studied extensively, revisited here specifically for the real, visible effect of the two decorators stacked on top of it.
+
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function listing every machine in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function listing every machine, with optional real query-string filters.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
+
+## get_machines (revisited for request.args)
+- **Object/method** in `LESSON-4.4-ROUTES` - The real, existing Flask view function this curriculum has already studied, revisited here specifically for how it reads its own real, optional query parameters.
 
 ## get_nc_file
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions returning two genuinely different real representations of the identical `NCFile` resource.
@@ -540,6 +552,9 @@ re-run the script after any lesson changes instead.
 ## mark (pytest marker)
 - **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.X`, real pytest decorator syntax that attaches metadata to a test function for pytest itself (or a plugin) to inspect and act on - `parametrize` is one specific, built-in mark among several. It exists as one general mechanism for attaching many different real behaviors to a test (parametrizing it, skipping it, marking it as an expected failure) without a separate, one-off decorator syntax for each.
 
+## mark_as_read
+- **Object/method** in `LESSON-4.4-ROUTES` - Two real, existing Flask view functions, registered with a real `<int:notification_id>` URL parameter - the first real, typed URL converter this curriculum has studied.
+
 ## mock
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double programmed with canned return values, whose real point is verifying *how* it was called - which methods, how many times, with what real arguments - not just standing in silently. It exists to answer a checkable question a stub cannot: "did my code actually call its dependency correctly?"
 
@@ -633,6 +648,9 @@ re-run the script after any lesson changes instead.
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
 
+## query parameter
+- **Term** in `LESSON-4.4-ROUTES` - A real, optional key-value pair appended to a URL after a real `?` - `?status=running`, read through `request.args`, a real `ImmutableMultiDict` that can hold more than one real value under the identical key. It exists as the real, standard place a client puts optional real filters or options, separate from a URL's own real path.
+
 ## Query.filter (Machine.query.filter)
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real SQLAlchemy method, narrowing a query to rows matching a real condition.
 
@@ -678,6 +696,7 @@ re-run the script after any lesson changes instead.
 
 ## request body
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The real data a request carries beyond its URL and headers - here, real JSON - read by the server via `request.get_json()`. It exists so an operation like "update this machine's status" can carry the actual new value along with it, not just identify which machine to act on.
+- **Term** in `LESSON-4.4-ROUTES` - The real, optional data a request carries beyond its URL and headers, parsed by one of several genuinely different real Flask mechanisms (`request.form` for form-encoded data, `request.get_json()` for JSON) depending entirely on the real `Content-Type` header this curriculum has already studied. It exists to carry a real operation's own actual content, separate from which resource and method identify what operation is being requested.
 
 ## request context
 - **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, temporary state Flask activates for the exact duration of one real request, making `request` (and `current_app`) usable as if they were plain global variables, without actually being passed as an argument to every real view function. It exists so a real view function's own signature stays simple, while still having genuine, real access to the specific request it's handling.
@@ -727,6 +746,9 @@ re-run the script after any lesson changes instead.
 
 ## Return value
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
+
+## route registration
+- **Term** in `LESSON-4.4-ROUTES` - The real, one-time act of telling Flask's own routing table that a specific real URL pattern and method should reach a specific real Python function - `@blueprint.route(...)`, applied once, when the module is first imported. It exists as the real, structural link between a URL a client might request and the actual code that handles it.
 
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of
@@ -944,6 +966,9 @@ re-run the script after any lesson changes instead.
 ## update_machine_status (PUT)
 - **Object/method** in `LESSON-3.6-REST` - The same two real functions this lesson's own earlier units already used, revisited here specifically for their real retry-safety, from a real client's own point of view.
 
+## URL parameter
+- **Term** in `LESSON-4.4-ROUTES` - A real, named, dynamic segment of a route's own URL pattern - `<int:notification_id>`, in this lesson's own second unit - extracted from the real, matched URL and handed to the view function as a real argument, already converted to the real type the pattern names. It exists so one real route definition can serve every real, matching value, with Werkzeug itself refusing to match a URL whose real segment doesn't fit the declared type.
+
 ## URL path parameter
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, named segment of a route's own URL pattern - `<string:machine_id>`, for instance - that Flask matches against the actual request URL and hands to the view function as a real argument. It exists so one route definition can serve every real machine ID, rather than a route being written once per machine.
 
@@ -971,6 +996,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.content_type` / `Type annotation` - shares: type
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
+- `.delete)` / `delete_notification` - shares: delete
 - `.patch` / `PATCH` - shares: patch
 - `.patch` / `unittest.mock.patch` - shares: patch
 - `.patch` / `update_machine (PATCH)` - shares: patch
@@ -1054,6 +1080,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Authorization header` / `header` - shares: header
 - `Authorization header` / `request header` - shares: header
 - `Blueprint.route` / `health_check (blueprint route)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `Decorator` - shares: decorator
+- `blueprint.route (the decorator itself)` / `Flask (the class, and this project's own app instance)` - shares: the
+- `blueprint.route (the decorator itself)` / `get_machine (revisited for its real decorator stack)` - shares: decorator
+- `blueprint.route (the decorator itself)` / `health_check (blueprint route)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `request (the real context-local proxy)` - shares: the
 - `body` / `JSON response body` - shares: body
 - `body` / `request body` - shares: body
 - `body` / `response body` - shares: body
@@ -1069,6 +1100,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
+- `CAMFile.query.get` / `query parameter` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `check_password_hash` / `health_check` - shares: check
@@ -1081,6 +1113,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
+- `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
 - `create_app` / `create_machine` - shares: create
@@ -1090,6 +1123,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `create_machine_group (POST)` - shares: create, machine
 - `create_machine` / `delete_machine` - shares: machine
 - `create_machine` / `get_machine` - shares: machine
+- `create_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
 - `create_machine` / `Machine.to_dict` - shares: machine
@@ -1102,6 +1136,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `create_machine_group (POST)` - shares: create, group, machine
 - `create_machine_group` / `delete_machine` - shares: machine
 - `create_machine_group` / `get_machine` - shares: machine
+- `create_machine_group` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
 - `create_machine_group` / `Machine` - shares: machine
 - `create_machine_group` / `Machine.to_dict` - shares: machine
@@ -1114,6 +1149,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `delete_machine` - shares: machine
 - `create_machine_group (POST)` / `FlaskClient (.post)` - shares: post
 - `create_machine_group (POST)` / `get_machine` - shares: machine
+- `create_machine_group (POST)` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `create_machine_group (POST)` / `is_valid_machine_status` - shares: machine
 - `create_machine_group (POST)` / `Machine` - shares: machine
 - `create_machine_group (POST)` / `Machine.to_dict` - shares: machine
@@ -1141,8 +1177,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
+- `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
+- `DELETE` / `delete_notification` - shares: delete
+- `delete_machine` / `delete_notification` - shares: delete
 - `delete_machine` / `get_machine` - shares: machine
+- `delete_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `delete_machine` / `is_valid_machine_status` - shares: machine
 - `delete_machine` / `Machine` - shares: machine
 - `delete_machine` / `Machine.to_dict` - shares: machine
@@ -1203,6 +1243,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
+- `get_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
 - `get_machine` / `Machine.to_dict` - shares: machine
@@ -1212,6 +1253,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `update_machine (PATCH)` - shares: machine
 - `get_machine` / `update_machine_status` - shares: machine
 - `get_machine` / `update_machine_status (PUT)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `get_machines (revisited for request.args)` - shares: for, revisited
+- `get_machine (revisited for its real decorator stack)` / `is_valid_machine_status` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Query (Machine.query` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Query.filter (Machine.query.filter)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `request (the real context-local proxy)` - shares: real
+- `get_machine (revisited for its real decorator stack)` / `update_machine` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `update_machine (PATCH)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `update_machine_status` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `update_machine_status (PUT)` - shares: machine
+- `get_machines` / `get_machines (revisited for request.args)` - shares: machines
+- `get_machines (revisited for request.args)` / `request.args.get` - shares: args
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
@@ -1228,6 +1282,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Infrastructure exception` / `unhandled exception` - shares: exception
 - `inspect.Parameter` / `Parameter` - shares: parameter
 - `inspect.Parameter` / `Query parameter` - shares: parameter
+- `inspect.Parameter` / `query parameter` - shares: parameter
+- `inspect.Parameter` / `URL parameter` - shares: parameter
 - `inspect.Parameter` / `URL path parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
 - `is_valid_machine_status` / `Machine` - shares: machine
@@ -1258,14 +1314,20 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
+- `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `mark (pytest marker)` / `mark_as_read` - shares: mark
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
 - `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
+- `mark_as_read` / `pytest.mark.parametrize` - shares: mark
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
+- `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `Parameter` / `Query parameter` - shares: parameter
+- `Parameter` / `query parameter` - shares: parameter
+- `Parameter` / `URL parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
@@ -1276,13 +1338,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `pytest.fixture` / `yield fixture` - shares: fixture
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `Query parameter` - shares: query
+- `Query (Machine.query` / `query parameter` - shares: query
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine` - shares: machine
 - `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
 - `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
+- `Query parameter` / `query parameter` - shares: parameter, query
 - `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
+- `Query parameter` / `URL parameter` - shares: parameter
 - `Query parameter` / `URL path parameter` - shares: parameter
+- `query parameter` / `Query.filter (Machine.query.filter)` - shares: query
+- `query parameter` / `URL parameter` - shares: parameter
+- `query parameter` / `URL path parameter` - shares: parameter
 - `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine (PATCH)` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
@@ -1321,4 +1389,5 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `update_machine (PATCH)` / `update_machine_status` - shares: machine, update
 - `update_machine (PATCH)` / `update_machine_status (PUT)` - shares: machine, update
 - `update_machine_status` / `update_machine_status (PUT)` - shares: machine, update
+- `URL parameter` / `URL path parameter` - shares: parameter
 - `WSGI` / `WSGI (Web Server Gateway Interface)` - shares: wsgi
