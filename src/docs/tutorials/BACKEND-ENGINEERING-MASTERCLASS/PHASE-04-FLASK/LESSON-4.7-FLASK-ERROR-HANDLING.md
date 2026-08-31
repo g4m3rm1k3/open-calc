@@ -1,0 +1,358 @@
+# Lesson 4.7: Flask Error Handling
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Three real, run checks closing this phase - and finally closing a real thread this curriculum left open at the end of Phase 3: a minimal, real exception handler, proving `@app.errorhandler` only intercepts the exact real exception type it's registered for; a real handler for `HTTPException`, retrofitted onto this project's own, completely unmodified real app, converting the real, routing-level `404` this curriculum already found (Lesson 4.4) from HTML into consistent JSON; and, closing the lesson, two real handlers together, turning `get_machines`'s own real, already-documented `?type=` crash (first triggered in Lesson 3.3) from an inconsistent HTML `500` into real, structured JSON - with zero changes to a single line of `machines.py` itself.
+
+**What you need to know first:** What the real HTTP status codes and JSON error shapes this project's own backend already returns look like; what `current_app` and application context are; what the real, proposed, minimal error contract this curriculum designed (but never wired in) looks like.
+
+## Terms used in this lesson
+
+- **exception handler** — A real function, registered with `@app.errorhandler(ExceptionType)`, that Flask calls instead of its own default crash page whenever a real exception of that exact type (or a real subclass of it) is raised anywhere during a real request. It exists so a real application can intercept a specific real category of failure and decide, itself, how to respond - rather than always falling back to Flask's own generic behavior.
+- **centralized error mapping** — Registering a small, real, fixed set of exception handlers - one per real category of failure - so every real error this project's own backend can produce passes through the identical real, consistent transformation, no matter which of the 18 real route files actually raised it. It exists as the real, structural fix for the exact inconsistency this curriculum's own Phase 3 closing lesson could only catalog and propose, never actually apply.
+
+## Objects and methods used
+
+- **`app.errorhandler`**
+  - *What it is:* The real, existing Flask decorator this lesson uses to register every one of its own real exception handlers.
+  - *Implementation:* `Flask.errorhandler(code_or_exception)` returns a real decorator; applied to a function, it registers that function to run whenever a real exception matching the given real type (or a real, registered HTTP status code) occurs during request handling - confirmed directly this session to work correctly even when applied to an `app` object `create_app()` already fully built, with every one of its 18 real blueprints already registered.
+  - *Its use:* This lesson registers handlers for a real, custom exception type, for Werkzeug's own real `HTTPException`, and for the real, generic `Exception` base class.
+  - *Type:* A real method on Flask's own `Flask` class.
+  - *Responsibility:* Recording which real function should handle which real category of failure, checked by Flask itself the moment a real exception actually propagates out of a view function.
+  - *Depends on:* A real exception class, or a real, registered HTTP status code.
+  - *Connects to:* This lesson's own third unit registers two of these together, directly on this project's own real, unmodified `app` object, retroactively changing how already-existing real routes behave on failure.
+  - *Shape:* Takes a real exception class (or `int` status code) in; returns a real decorator that, applied to a function, registers it as that real category's own handler.
+
+- **`HTTPException (Werkzeug's own real base class)`**
+  - *What it is:* The real, shared base class every one of Flask's own built-in error responses - `404`, `405`, `415`, and others this curriculum has already triggered - is actually an instance of.
+  - *Implementation:* `werkzeug.exceptions.HTTPException` carries a real `.code` (the real HTTP status), `.name` (a real, short label like `"Not Found"`), and `.description` (a real, human-readable explanation) - registering a single real handler for this one base class intercepts every real subclass, including the real, routing-level `404` this curriculum already found bypassing this project's own application code entirely (Lesson 4.4).
+  - *Its use:* This lesson registers exactly one real handler for it, and proves that single real registration retroactively fixes a real, previously-inconsistent response - with no change to the route that produces it.
+  - *Type:* A real class from Werkzeug, the library Flask itself is built on.
+  - *Responsibility:* Representing every real, "normal" HTTP failure Flask or Werkzeug itself already knows how to name - as opposed to a genuinely unexpected real exception, which is never an instance of it.
+  - *Depends on:* Nothing; raised internally by Flask/Werkzeug itself.
+  - *Connects to:* This lesson's own second and third units both register a real handler for it; its own real `.code`/`.name`/`.description` attributes are exactly what those handlers read to build a real, consistent JSON response.
+  - *Shape:* Carries real `.code: int`, `.name: str`, and `.description: str` attributes on every real instance.
+
+## Concept Unit: Exception Handlers - Matched by Real, Exact Type
+
+### The Problem
+
+`@app.errorhandler(RealDomainError)`, registered for one specific real exception class, is applied to an app that can raise many genuinely different kinds of real exception. Does it intercept all of them, or only its own?
+
+Before reading on:
+
+- If a real view function raises `ValueError`, and the only real handler registered is for a completely unrelated real exception class, would you expect Flask to somehow still route it through that handler, or fall back to its own default behavior?
+- Given that a real exception handler is matched by real type, what real, structural fact would have to be true for ONE real handler to catch several genuinely different kinds of failure at once?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - this unit demonstrates a real, general Flask mechanism directly, using a small, real, standalone app, since this project's own real backend never registers a single exception handler anywhere today.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+One real, registered exception type, next to one that isn't:
+
+**File:** `verification/phase-04/lab_errorhandling_basic.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+
+class RealDomainError(Exception):
+    pass
+
+
+@app.errorhandler(RealDomainError)
+def handle_real_domain_error(e):
+    return jsonify({"success": False, "message": str(e)}), 400
+
+
+@app.route("/raises-handled")
+def raises_handled():
+    raise RealDomainError("this real exception type has a real handler registered")
+
+
+@app.route("/raises-unhandled")
+def raises_unhandled():
+    raise ValueError("this real exception type has no handler registered at all")
+
+
+app.config["PROPAGATE_EXCEPTIONS"] = False
+client = app.test_client()
+
+r_handled = client.get("/raises-handled")
+print("a real, registered exception type -> status:", r_handled.status_code, "body:", r_handled.get_json())
+
+r_unhandled = client.get("/raises-unhandled")
+print("a real, UNregistered exception type -> status:", r_unhandled.status_code, "Content-Type:", r_unhandled.content_type)
+
+assert r_handled.status_code == 400
+assert r_handled.get_json() == {"success": False, "message": "this real exception type has a real handler registered"}
+assert r_unhandled.status_code == 500
+assert "html" in r_unhandled.content_type
+print("@app.errorhandler(RealDomainError) only intercepts the exact real exception type (or a real subclass of it) it was registered for - a genuinely different real exception type still falls through to Flask's own generic real crash page")
+```
+
+### Mechanical Walkthrough
+
+- `class RealDomainError(Exception): pass` — A real, custom exception type - deliberately simple, so this unit's own point stays about matching, not about what a real domain exception should actually contain.
+- `@app.errorhandler(RealDomainError) def handle_real_domain_error(e): return jsonify(...), 400` — Registers a real handler specifically for this real type - `e` is the real, actual exception instance Flask caught, available to build a real, informative response from.
+- `raises_unhandled(): raise ValueError(...)` — Raises a real, genuinely different exception type - no handler matches it, so Flask's own default real behavior takes over, exactly as if no handler existed anywhere.
+- `client = app.test_client()` — Builds one real `FlaskClient` - this lesson's own first construction of it; every later unit in this lesson builds its own fresh copy the same way.
+- `assert r_unhandled.status_code == 500 / assert "html" in r_unhandled.content_type` — Confirms, for real, that registering ONE handler doesn't magically catch everything - real type-matching is strict.
+
+### CS Lens
+
+This is **type-based exception dispatch**: Flask walks a real exception's own class hierarchy, checking for a registered real handler at each level, the identical real mechanism a plain Python `try`/`except SpecificError` clause uses. Also recognized in: a real, ordinary Python `try` block with multiple `except` clauses, each catching a different real exception type; a real GUI framework's own event-handler registration, matched by real event type; and, in this project's own domain, a machine control's own real alarm-code table, mapping specific real fault conditions to specific real recovery procedures, with an unrecognized real fault falling through to a generic real E-stop.
+
+### SE Lens
+
+The design principle behind type-based matching is letting an application respond differently to genuinely different real categories of failure - a real validation error deserves a different real response than a real database outage. The real alternative not chosen anywhere in this project's own code today: registering any exception handler at all; the honest, real starting point this lesson's own later units directly address, proven by this unit's own real, unhandled case: this project's own real backend, exactly as it stands, would treat every single real, unanticipated exception - not just the one this curriculum already found - with Flask's own generic, real HTML crash page.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_errorhandling_basic.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+a real, registered exception type -> status: 400 body: {'message': 'this real exception type has a real handler registered', 'success': False}
+a real, UNregistered exception type -> status: 500 Content-Type: text/html; charset=utf-8
+@app.errorhandler(RealDomainError) only intercepts the exact real exception type (or a real subclass of it) it was registered for - a genuinely different real exception type still falls through to Flask's own generic real crash page
+```
+
+Full saved run: `verification/phase-04/lab_errorhandling_basic_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it establishes the basic real mechanic every later unit in this lesson builds directly on top of.
+
+## Concept Unit: API Errors - Fixing a Real Gap With Zero Changes to Its Own Route
+
+### The Problem
+
+Lesson 4.4 found a real, routing-level `404` - Werkzeug's own `<int:...>` converter rejecting `"not-a-number"` before `delete_notification` ever ran - returning real HTML instead of this project's own real JSON shape. Can a single, real, centralized handler fix that, without touching `notifications.py` at all?
+
+Before reading on:
+
+- That real, routing-level `404` never reaches any of this project's own real view functions. Given that, could a fix written INSIDE `delete_notification`'s own real code ever actually catch it?
+- `werkzeug.exceptions.HTTPException` is the real, shared base class behind every one of Flask's own built-in error pages. Would registering one real handler for it reach a failure that never even reaches application code?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/notifications.py:66-76` (`delete_notification`), already studied in Lesson 4.4, read again this session - this unit changes none of it.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** This project's own real, unmodified `create_app` output.
+
+### The New Code
+
+One real handler, registered directly on this project's own real, already-built app - the identical real routing-level failure Lesson 4.4 found, re-run:
+
+**File:** `verification/phase-04/lab_errorhandling_api_errors.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app import create_app
+from flask import jsonify
+from werkzeug.exceptions import HTTPException
+
+app = create_app("testing")
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    return jsonify({"success": False, "code": e.name.upper().replace(" ", "_"), "message": e.description}), e.code
+
+
+with app.app_context():
+    client = app.test_client()
+
+    r_routing_404 = client.delete("/api/notifications/not-a-number")
+    print("routing-level 404 (Werkzeug's own <int:...> rejection) -> status:", r_routing_404.status_code, "Content-Type:", r_routing_404.content_type, "body:", r_routing_404.get_json())
+
+    assert r_routing_404.status_code == 404
+    assert r_routing_404.content_type == "application/json"
+    print("with zero changes to notifications.py's own real code, the identical real routing-level 404 - real HTML in an earlier lesson - is now real, consistent JSON, because HTTPException is the real, shared base class every one of Flask's own built-in error pages (404, 405, 415, and more) actually raises")
+```
+
+### Mechanical Walkthrough
+
+- `app = create_app("testing")` — Builds this project's own real, complete, unmodified app - all 18 real blueprints, exactly as Lesson 4.5 studied them, already attached.
+- `@app.errorhandler(HTTPException) def handle_http_exception(e): return jsonify({...}), e.code` — Registered AFTER the app is already fully built - proof, per this lesson's own real Header entry, that error-handler registration order relative to blueprint registration doesn't matter; Flask checks for a matching real handler at request time, not at registration time.
+- `r_routing_404 = client.delete("/api/notifications/not-a-number")` — The identical real request Lesson 4.4 used to prove this failure never reaches `delete_notification`'s own code at all - still true here; what's different is what happens to it on the way back out.
+- `assert r_routing_404.content_type == "application/json"` — Confirms, for real, the fix actually took effect - the exact real gap Lesson 4.4 found is closed, with nothing in `notifications.py` touched.
+
+### CS Lens
+
+This is **cross-cutting concern handling**: a real behavior (consistent error formatting) that applies uniformly across every real route, implemented once, centrally, rather than repeated inside each one. Also recognized in: a real web framework's own middleware layer, applying real logging or real authentication checks to every request without each route implementing it separately; a real database ORM's own connection-pooling layer, applied transparently beneath every real query; and, in this project's own domain, a real shop-wide safety interlock, applying the identical real stop condition across every machine, rather than each machine's own program implementing it separately.
+
+### SE Lens
+
+The design principle is that a real, structural fix - registering one, real, central handler - reaches every real route automatically, including routes whose own real code never changes at all. The real alternative this project's own code would otherwise need: hand-editing all 18 real route files to format their own real errors identically, a real, repetitive, error-prone task Lesson 3.7's own proposed contract already anticipated needing; the honest, real value of the centralized approach this unit demonstrates, proven directly by its own real run: one real registration fixed a real gap that no route-level fix could ever have reached in the first place, since the failure never executes any route's own code at all.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_errorhandling_api_errors.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+routing-level 404 (Werkzeug's own <int:...> rejection) -> status: 404 Content-Type: application/json body: {'code': 'NOT_FOUND', 'message': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'success': False}
+with zero changes to notifications.py's own real code, the identical real routing-level 404 - real HTML in an earlier lesson - is now real, consistent JSON, because HTTPException is the real, shared base class every one of Flask's own built-in error pages (404, 405, 415, and more) actually raises
+```
+
+Full saved run: `verification/phase-04/lab_errorhandling_api_errors_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit proved a handler only catches its own exact real type; this unit picks the one real type - `HTTPException` - broad enough to catch an entire real category Lesson 4.4 already found slipping through.
+
+## Concept Unit: Centralized Error Mapping - Closing the Loop From Phase 3
+
+### The Problem
+
+Lesson 3.7 proposed a real, minimal error contract and proved it against three real, already-cataloged failures - but deliberately stopped short of wiring it into this project's own real backend, pending exactly the real tools this lesson has now built. Does it actually work, applied for real?
+
+Before reading on:
+
+- `get_machines`'s own real `?type=` crash (Lesson 3.3) is a real `AttributeError` - not an `HTTPException` at all. Would the previous unit's own real handler, registered only for `HTTPException`, catch it?
+- Given that, what real, second, broader handler would this lesson need to register to catch both real categories - Flask's own known failures, AND a genuinely unexpected real exception - together?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:35-36` (the real `?type=` crash, already triggered in Lesson 3.3) and `:48-61` (`get_machine`'s own, already-correct real `404`), both read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** This project's own real, unmodified `create_app` output.
+
+### The New Code
+
+Two real handlers together, against this project's own, completely unmodified real app:
+
+**File:** `verification/phase-04/lab_errorhandling_centralized.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app import create_app, db
+from app.models.machine import Machine
+from flask import jsonify
+from werkzeug.exceptions import HTTPException
+
+app = create_app("testing")
+app.config["PROPAGATE_EXCEPTIONS"] = False
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    return jsonify({"success": False, "code": e.name.upper().replace(" ", "_"), "message": e.description}), e.code
+
+
+@app.errorhandler(Exception)
+def handle_any_exception(e):
+    return jsonify({"success": False, "code": type(e).__name__.upper(), "message": str(e)}), 500
+
+
+with app.app_context():
+    machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+    db.session.add(machine)
+    db.session.commit()
+
+    client = app.test_client()
+
+    r_crash = client.get("/api/machines?type=3-axis")
+    print("get_machines's own real, already-documented ?type= crash -> status:", r_crash.status_code, "Content-Type:", r_crash.content_type, "body:", r_crash.get_json())
+
+    r_missing = client.get("/api/machines/DOES-NOT-EXIST")
+    print("get_machine's own, already-correct, JSON 404 -> status:", r_missing.status_code, "Content-Type:", r_missing.content_type, "body:", r_missing.get_json())
+
+    assert r_crash.status_code == 500
+    assert r_crash.content_type == "application/json"
+    assert r_crash.get_json()["code"] == "ATTRIBUTEERROR"
+    assert r_missing.status_code == 404
+    assert r_missing.get_json() == {"error": "Machine not found"}
+    print("two real handlers, registered once, with zero changes to machines.py's own real code - the real, already-documented AttributeError crash from Phase 3 is now real, consistent JSON, and every real route that already returned its own correct JSON keeps doing exactly what it already did")
+```
+
+### Mechanical Walkthrough
+
+- `@app.errorhandler(HTTPException) def handle_http_exception(e): ...` — Registered first - catches every real, Flask/Werkzeug-known failure, the identical real handler the previous unit already proved.
+- `@app.errorhandler(Exception) def handle_any_exception(e): ...` — Registered second - a real, genuinely broader net, catching any real exception `HTTPException`'s own, narrower handler wouldn't - including this project's own real `AttributeError`, which is not an `HTTPException` at all.
+- `r_crash = client.get("/api/machines?type=3-axis")` — The identical real request that first produced an uncaught, real, HTML `500` back in Lesson 3.3 - `get_machines`'s own real code still crashes identically; what changed is only what happens to that real crash on its way back out.
+- `r_missing = client.get("/api/machines/DOES-NOT-EXIST")` — A real, control case - `get_machine`'s own code already returns a real, deliberate `404` (no exception raised at all), so neither new real handler ever fires for it; its own real, existing behavior is completely unaffected.
+- `assert r_missing.get_json() == {"error": "Machine not found"}` — Confirms, for real, that centralizing error handling for genuine failures didn't accidentally change a route that was never failing to begin with.
+
+### Mental Model
+
+```text
+client.get("/api/machines?type=3-axis")
+      |
+      v
+get_machines's own real code raises AttributeError
+      |
+      v
+not an HTTPException -> falls through to @app.errorhandler(Exception)
+      |
+      v
+real, structured JSON 500 (this lesson's own fix)
+
+client.get("/api/machines/DOES-NOT-EXIST")
+      |
+      v
+get_machine's own real code returns jsonify({'error': ...}), 404
+      |
+      v
+no exception raised at all -> neither new handler ever runs
+      |
+      v
+the identical, already-correct real JSON 404 (unchanged)
+```
+
+### CS Lens
+
+This is **layered exception handling, most-specific first**: a narrower real handler (`HTTPException`) and a broader real fallback (`Exception`), together covering every real case without either one interfering with the other. Also recognized in: a real `try`/`except SpecificError`/`except Exception` chain, checked in real, declared order; a real logging framework's own handler chain, escalating from a specific real logger to a real, root catch-all; and, in this project's own domain, a real quality escalation path - a specific real inspector handling a known real issue type, with an unrecognized real issue escalating to a real supervisor instead.
+
+### SE Lens
+
+The design principle is that centralized, layered error handling closes an entire real category of gap in one, real, small change - proven directly by this unit's own real run, which fixes the identical real bug Lesson 3.3 first triggered, without touching `machines.py` at all. The real alternative this project's own code would otherwise need: a real `try`/`except` block added inside `get_machines` itself, and another inside every other real route that might someday raise something unexpected - real, repetitive work this lesson's own two, centralized handlers replace entirely. The honest, real limitation this unit doesn't solve: `get_machines`'s own real `?type=` filter is still genuinely broken - it still crashes on every real attempt to use it; this lesson only closes the real GAP in how that crash gets reported, exactly the real, deliberate boundary Lesson 3.7 already drew between designing a consistent error contract and fixing the underlying real bugs that produce errors in the first place.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_errorhandling_centralized.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+get_machines's own real, already-documented ?type= crash -> status: 500 Content-Type: application/json body: {'code': 'ATTRIBUTEERROR', 'message': "type object 'Machine' has no attribute 'type'", 'success': False}
+get_machine's own, already-correct, JSON 404 -> status: 404 Content-Type: application/json body: {'error': 'Machine not found'}
+two real handlers, registered once, with zero changes to machines.py's own real code - the real, already-documented AttributeError crash from Phase 3 is now real, consistent JSON, and every real route that already returned its own correct JSON keeps doing exactly what it already did
+```
+
+Full saved run: `verification/phase-04/lab_errorhandling_centralized_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit fixed one real category of gap; this unit closes the lesson - and this entire phase - by fixing the other, genuinely more severe one, side by side, with the two real handlers working together without stepping on each other, or on any route that was never broken to begin with.
+
+## Connect the pieces
+
+One real, custom exception type, caught by its own real, registered handler, while a genuinely different real type still fell through to Flask's own default page (exception handlers, matched by real type). One real handler for `HTTPException`, registered on this project's own completely unmodified real app, converting the real, routing-level `404` Lesson 4.4 found - real HTML - into real, consistent JSON (API errors, fixed with zero route changes). And, closing both this lesson and Phase 4 itself, that same real handler joined by one more, broader one, together turning `get_machines`'s own real, already-documented `?type=` crash - first triggered all the way back in Lesson 3.3 - from an inconsistent real HTML `500` into the exact real, structured JSON shape Lesson 3.7 proposed but never got to actually use (centralized error mapping) - while the one real route that was already correct, `get_machine`'s own `404`, kept behaving exactly as it always had.
+
+**Next lesson:** Every real concept this phase has studied - HTTP, JSON, REST, and now Flask itself - has been studied entirely by observing this project's own already-existing code; next, this curriculum builds something for the first time: a real, complete TDD slice, starting with this project's own smallest real feature, `/health`, and its own real, already-documented twin, `/api/health`.

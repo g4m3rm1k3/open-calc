@@ -104,6 +104,9 @@ re-run the script after any lesson changes instead.
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
 
+## app.errorhandler
+- **Object/method** in `LESSON-4.7-FLASK-ERROR-HANDLING` - The real, existing Flask decorator this lesson uses to register every one of its own real exception handlers.
+
 ## app.register_blueprint
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - The real, existing `Flask` method every one of this project's own 18 blueprints is attached through.
 
@@ -206,6 +209,9 @@ re-run the script after any lesson changes instead.
 
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
+
+## centralized error mapping
+- **Term** in `LESSON-4.7-FLASK-ERROR-HANDLING` - Registering a small, real, fixed set of exception handlers - one per real category of failure - so every real error this project's own backend can produce passes through the identical real, consistent transformation, no matter which of the 18 real route files actually raised it. It exists as the real, structural fix for the exact inconsistency this curriculum's own Phase 3 closing lesson could only catalog and propose, never actually apply.
 
 ## characterization test
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - A test that records what a piece of code's real, current behavior actually is, right now, rather than what it should be - passing, by definition, against the exact behavior observed at the moment it's written. It exists specifically for code nobody has full confidence describing correctly from memory, so a later change to it can be checked against a real, honest baseline instead of nothing at all.
@@ -367,6 +373,9 @@ re-run the script after any lesson changes instead.
 ## Exception boundary
 - **Term** in `LESSON-1.2-EXCEPTIONS` - The specific, real place in a call chain where a `try`/`except` is deliberately placed to catch a propagating exception, chosen because that real location is where enough context exists to decide what response is correct - not chosen by default, and not necessarily the innermost function that could have caught it. It exists because a boundary placed too early can hide real information a caller further up would have needed; a boundary placed too late lets a real failure propagate further than necessary.
 
+## exception handler
+- **Term** in `LESSON-4.7-FLASK-ERROR-HANDLING` - A real function, registered with `@app.errorhandler(ExceptionType)`, that Flask calls instead of its own default crash page whenever a real exception of that exact type (or a real subclass of it) is raised anywhere during a real request. It exists so a real application can intercept a specific real category of failure and decide, itself, how to respond - rather than always falling back to Flask's own generic behavior.
+
 ## Exception handling (try/except)
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - A way of running code that might fail, while stating in advance what should happen if it does, using Python's real `try`/`except` statement. It exists so a real failure (a bad template, a missing row) can be handled deliberately, in one place, instead of crashing whatever else happens to be running at the time.
 - **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately stopping propagation at one specific, chosen point, using Python's real `try`/`except` statement, naming which exception type(s) to intercept and what real code should run instead of letting the exception keep traveling. It exists so a real failure can be handled exactly once, at whichever real point in a call chain actually has enough information to decide what to do about it - not automatically at the place closest to where it happened.
@@ -505,6 +514,9 @@ re-run the script after any lesson changes instead.
 ## HTTP status code
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real three-digit number every HTTP response carries, stating in one compact, standardized value whether the request succeeded and, if not, roughly why - `200` means "succeeded, here is the result." It exists so a caller, or a test, can tell success from failure without first having to parse the response body at all.
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The real three-digit number every HTTP response carries, stating in one compact, standardized value whether the request succeeded and, if not, roughly why - `200` for success, `400` for a real, invalid request body, `404` for a real, nonexistent resource. It exists so a caller, or a test, can tell success from a specific kind of failure without first parsing the response body at all.
+
+## HTTPException (Werkzeug's own real base class)
+- **Object/method** in `LESSON-4.7-FLASK-ERROR-HANDLING` - The real, shared base class every one of Flask's own built-in error responses - `404`, `405`, `415`, and others this curriculum has already triggered - is actually an instance of.
 
 ## idempotency
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that calling a method N real times, with the identical real request, leaves the resource in exactly the same real end state as calling it once - a claim about the real state afterward, not about whether every real response looks identical. It exists so a real client, uncertain whether a request actually reached the server (a real timeout, a dropped connection), can safely resend it without worrying about doing something twice.
@@ -1054,6 +1066,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
 - `4xx (client error)` / `5xx (server error)` - shares: error, xx
 - `4xx (client error)` / `build_error_response` - shares: error
+- `4xx (client error)` / `centralized error mapping` - shares: error
 - `4xx (client error)` / `Client` - shares: client
 - `4xx (client error)` / `client` - shares: client
 - `4xx (client error)` / `error code` - shares: error
@@ -1062,6 +1075,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `500 (Internal Server Error)` / `5xx (server error)` - shares: error, server
 - `500 (Internal Server Error)` / `Application server` - shares: server
 - `500 (Internal Server Error)` / `build_error_response` - shares: error
+- `500 (Internal Server Error)` / `centralized error mapping` - shares: error
 - `500 (Internal Server Error)` / `error code` - shares: error
 - `500 (Internal Server Error)` / `Server` - shares: server
 - `500 (Internal Server Error)` / `server` - shares: server
@@ -1069,6 +1083,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `500 (Internal Server Error)` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `5xx (server error)` / `Application server` - shares: server
 - `5xx (server error)` / `build_error_response` - shares: error
+- `5xx (server error)` / `centralized error mapping` - shares: error
 - `5xx (server error)` / `error code` - shares: error
 - `5xx (server error)` / `Server` - shares: server
 - `5xx (server error)` / `server` - shares: server
@@ -1155,8 +1170,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `Dependency (of a function)` - shares: a
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `get_machine (revisited for its real decorator stack)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `health_check (blueprint route)` - shares: blueprint
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, blueprint, bp, real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
+- `build_error_response` / `centralized error mapping` - shares: error
 - `build_error_response` / `error code` - shares: error
 - `build_error_response` / `unified error contract` - shares: error
 - `Business logic` / `Domain logic` - shares: logic
@@ -1171,6 +1188,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `query parameter` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `centralized error mapping` / `error code` - shares: error
+- `centralized error mapping` / `unified error contract` - shares: error
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `check_password_hash` / `health_check` - shares: check
 - `check_password_hash` / `health_check (blueprint route)` - shares: check
@@ -1183,6 +1202,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
+- `Config (and its real subclasses)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `Config (and its real subclasses)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
@@ -1276,6 +1296,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
 - `Domain exception` / `Exception boundary` - shares: exception
+- `Domain exception` / `exception handler` - shares: exception
 - `Domain exception` / `Exception handling (try/except)` - shares: exception
 - `Domain exception` / `Infrastructure exception` - shares: exception
 - `Domain exception` / `Raising an exception` - shares: exception
@@ -1293,11 +1314,16 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
 - `error code` / `unified error contract` - shares: error
+- `Exception boundary` / `exception handler` - shares: exception
 - `Exception boundary` / `Exception handling (try/except)` - shares: exception
 - `Exception boundary` / `Infrastructure exception` - shares: exception
 - `Exception boundary` / `Package boundary` - shares: boundary
 - `Exception boundary` / `Raising an exception` - shares: exception
 - `Exception boundary` / `unhandled exception` - shares: exception
+- `exception handler` / `Exception handling (try/except)` - shares: exception
+- `exception handler` / `Infrastructure exception` - shares: exception
+- `exception handler` / `Raising an exception` - shares: exception
+- `exception handler` / `unhandled exception` - shares: exception
 - `Exception handling (try/except)` / `Infrastructure exception` - shares: exception
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
 - `Exception handling (try/except)` / `unhandled exception` - shares: exception
@@ -1313,6 +1339,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
 - `fixture scope` / `yield fixture` - shares: fixture
+- `Flask (the class, and this project's own app instance)` / `HTTPException (Werkzeug's own real base class)` - shares: class, own, s
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `FlaskClient (.post)` / `POST` - shares: post
 - `generate_nc_file` / `generate_password_hash` - shares: generate
@@ -1330,6 +1357,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `update_machine_status` - shares: machine
 - `get_machine` / `update_machine_status (PUT)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `get_machines (revisited for request.args)` - shares: for, revisited
+- `get_machine (revisited for its real decorator stack)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `is_valid_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
@@ -1361,6 +1389,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
 - `health_check (blueprint route)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
+- `HTTPException (Werkzeug's own real base class)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
 - `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
 - `Infrastructure exception` / `Raising an exception` - shares: exception
