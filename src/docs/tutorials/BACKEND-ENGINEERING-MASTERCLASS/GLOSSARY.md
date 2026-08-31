@@ -358,6 +358,9 @@ re-run the script after any lesson changes instead.
 ## database effect
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, persisted change to the database that happened as a result of handling one request - the actual, independent proof an operation really did what its own response body merely claims. It exists because a response body is only what the route *says* happened; only a separate, real query against the database afterward can confirm it actually did.
 
+## database-side vs application-side processing
+- **Term** in `LESSON-6.13-QUERY-PLANNING` - The general, recurring choice this whole phase has already shown in several real, different shapes: whether the database itself computes an answer (a filtered `SELECT`, a `JOIN`, a `GROUP BY`) or the calling application fetches raw rows and computes the identical answer itself, in its own code. It exists as the single idea underneath several of this phase's own separate real findings - this curriculum's own Querying, Indexes, and SQL lessons, and this lesson's own N+1 finding - each one, in its own way, a real instance of the identical underlying choice.
+
 ## dataclasses.dataclass
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real class decorator from the standard library `dataclasses` module that generates several real methods from a class's own field declarations.
 
@@ -666,6 +669,9 @@ re-run the script after any lesson changes instead.
 ## independent tests
 - **Term** in `LESSON-2.4-TEST-ISOLATION` - Tests whose outcome does not depend on whether, or in what order, any other test has already run. It exists because a suite where tests quietly depend on each other's side effects can pass or fail differently purely based on run order - a property invisible from reading any single test's own body in isolation.
 
+## index (recap)
+- **Term** in `LESSON-6.13-QUERY-PLANNING` - Fully treated in this curriculum's own Indexes lesson - a real, separate, sorted structure a database keeps so a lookup can rule out most candidates at once instead of checking every row. Named again here specifically because a query plan's own real choices - this lesson's own subject - only make sense in terms of which real indexes actually exist for it to choose between.
+
 ## Infrastructure
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real, concrete technical systems domain logic depends on but isn't itself about — which specific database engine, which filesystem, which network client library. It exists as a boundary separate from persistence and external services because "we store data somewhere" (persistence, a concept) and "we use SQLite specifically, at this file path" (infrastructure, a real, swappable detail) are different kinds of claims.
 
@@ -774,6 +780,9 @@ re-run the script after any lesson changes instead.
 
 ## Mutable / immutable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - Whether a real value can be changed in place after creation (mutable - lists, dicts, sets) or not (immutable - strings, ints, tuples). It exists as its own concept because it is a structural fact about the value itself, independent of what variable happens to reference it: two names bound to the same real mutable object can each see the other's in-place changes, while an immutable value can only ever be replaced wholesale, never altered underneath a name already holding it.
+
+## N+1 queries
+- **Term** in `LESSON-6.13-QUERY-PLANNING` - A real, measurable pattern where fetching N parent rows, then separately asking for each one's own children one at a time, produces N+1 real round trips to the database - one for the parents, one MORE per parent - instead of the single real statement (typically a `JOIN`) that could answer the identical logical question at once. It exists as a named antipattern because it is easy to write by accident: ordinary, correct-looking code, one real loop over already-fetched parent rows, each iteration innocently asking for "this one's children," with nothing about the code itself hinting how many real, separate database round trips that loop actually costs.
 
 ## name rebinding
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - What happens when a name - like a function's own name, `total_minutes` - is assigned to again: Python does not modify whatever the name previously pointed to; it simply makes the name point at the new object from that point in the code onward, and any later use of that name reaches the new object. It exists as a real mechanism (not just a phrase) because Python names are labels pointing at objects, not fixed slots holding one unchangeable value - writing `def total_minutes(ops):` a second time in the same scope produces a second, brand-new function object and re-points the name at it.
@@ -897,6 +906,9 @@ re-run the script after any lesson changes instead.
 
 ## query pattern
 - **Term** in `LESSON-6.10-INDEXES` - The actual, real shape of the questions an application asks its own database - which columns real code actually filters by, in which combinations - as distinct from the schema's own declared structure. It exists as its own idea because an index is only useful relative to a real query pattern: the identical column can be perfectly indexed for one real query and completely useless for a different real one, depending on what that query actually filters by.
+
+## query plan (recap)
+- **Term** in `LESSON-6.13-QUERY-PLANNING` - Fully treated in this curriculum's own Indexes lesson - the real, concrete steps a database engine actually decides to take to execute one specific statement, inspectable directly via SQLite's own `EXPLAIN QUERY PLAN`. Named again here because this lesson's own real N+1 finding is itself a fact about HOW a whole sequence of statements actually executes, not merely what each one, individually, returns.
 
 ## Query.filter (Machine.query.filter)
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real SQLAlchemy method, narrowing a query to rows matching a real condition.
@@ -1124,6 +1136,9 @@ re-run the script after any lesson changes instead.
 
 ## spy
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double - or a wrapper around a real object - that lets real behavior actually happen while also recording how it was called, for verification afterward. It exists to check real interactions without giving up the real behavior a stub or a mock would otherwise replace entirely.
+
+## sqlalchemy.event.listen (before_cursor_execute)
+- **Object/method** in `LESSON-6.13-QUERY-PLANNING` - A real SQLAlchemy function that registers a callback to run every time the underlying database driver is about to execute one real SQL statement.
 
 ## sqlalchemy.text
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy function that wraps a plain string as an executable statement, for the rare case a raw statement - not expressed through the ORM's own Python API - needs to run directly.
@@ -1418,12 +1433,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `application composition` / `Application layer` - shares: application
 - `application composition` / `application object` - shares: application
 - `application composition` / `Application server` - shares: application
+- `application composition` / `database-side vs application-side processing` - shares: application
 - `application context` / `application factory` - shares: application
 - `application context` / `Application layer` - shares: application
 - `application context` / `application object` - shares: application
 - `application context` / `Application server` - shares: application
 - `application context` / `context manager (the `with` statement)` - shares: context
 - `application context` / `context-local state` - shares: context
+- `application context` / `database-side vs application-side processing` - shares: application
 - `application context` / `has_app_context` - shares: context
 - `application context` / `has_request_context` - shares: context
 - `application context` / `request (the real context-local proxy)` - shares: context
@@ -1431,10 +1448,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `application factory` / `Application layer` - shares: application
 - `application factory` / `application object` - shares: application
 - `application factory` / `Application server` - shares: application
+- `application factory` / `database-side vs application-side processing` - shares: application
 - `Application layer` / `application object` - shares: application
 - `Application layer` / `Application server` - shares: application
+- `Application layer` / `database-side vs application-side processing` - shares: application
 - `Application layer` / `Transport layer` - shares: layer
 - `application object` / `Application server` - shares: application
+- `application object` / `database-side vs application-side processing` - shares: application
+- `Application server` / `database-side vs application-side processing` - shares: application
 - `Application server` / `Server` - shares: server
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
@@ -1528,6 +1549,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `query parameter` - shares: query
 - `CAMFile.query.get` / `query pattern` - shares: query
+- `CAMFile.query.get` / `query plan (recap)` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `cascading behavior` / `golden behavior (golden master)` - shares: behavior
 - `cascading behavior` / `observed behavior vs. intended behavior` - shares: behavior
@@ -1572,6 +1594,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `commit` / `db.session.commit` - shares: commit
 - `commit` / `db.session.commit()` - shares: commit
 - `composite index` / `composite uniqueness` - shares: composite
+- `composite index` / `index (recap)` - shares: index
 - `composite uniqueness` / `uniqueness` - shares: uniqueness
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_health_response (real, now live)` - shares: real
@@ -1655,9 +1678,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `custom header` / `Header` - shares: header
 - `custom header` / `header` - shares: header
 - `custom header` / `request header` - shares: header
+- `database effect` / `database-side vs application-side processing` - shares: database
 - `database effect` / `in-memory database` - shares: database
 - `database effect` / `Side effect` - shares: effect
 - `database effect` / `side effect` - shares: effect
+- `database-side vs application-side processing` / `in-memory database` - shares: database
+- `database-side vs application-side processing` / `observed behavior vs. intended behavior` - shares: vs
+- `database-side vs application-side processing` / `Side effect` - shares: side
+- `database-side vs application-side processing` / `side effect` - shares: side
 - `db` / `db (module-level SQLAlchemy instance)` - shares: db
 - `db` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
@@ -1672,6 +1700,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text (for a real SQL statement)` - shares: sqlalchemy
 - `db.ForeignKey` / `Session (db.session)` - shares: db
@@ -1940,6 +1969,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `Import graph` / `test_xml_import` - shares: import
+- `index (recap)` / `query plan (recap)` - shares: recap
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
 - `Infrastructure exception` / `Raising an exception` - shares: exception
 - `Infrastructure exception` / `unhandled exception` - shares: exception
@@ -1987,6 +2017,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query pattern` - shares: query
+- `MachineCAMPairing.query.get` / `query plan (recap)` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
 - `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
@@ -2008,6 +2039,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `query pattern` - shares: query
+- `NCTemplate.query.get` / `query plan (recap)` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `one-to-many relationship` / `parent/child relationship` - shares: relationship
 - `one-to-many relationship` / `relationship modeling` - shares: relationship
@@ -2035,6 +2067,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Query (Machine.query` / `Query parameter` - shares: query
 - `Query (Machine.query` / `query parameter` - shares: query
 - `Query (Machine.query` / `query pattern` - shares: query
+- `Query (Machine.query` / `query plan (recap)` - shares: query
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine` - shares: machine
 - `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
@@ -2042,14 +2075,18 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
 - `Query parameter` / `query parameter` - shares: parameter, query
 - `Query parameter` / `query pattern` - shares: query
+- `Query parameter` / `query plan (recap)` - shares: query
 - `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `URL parameter` - shares: parameter
 - `Query parameter` / `URL path parameter` - shares: parameter
 - `query parameter` / `query pattern` - shares: query
+- `query parameter` / `query plan (recap)` - shares: query
 - `query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `query parameter` / `URL parameter` - shares: parameter
 - `query parameter` / `URL path parameter` - shares: parameter
+- `query pattern` / `query plan (recap)` - shares: query
 - `query pattern` / `Query.filter (Machine.query.filter)` - shares: query
+- `query plan (recap)` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine (PATCH)` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
@@ -2086,6 +2123,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `set` / `set (builtin)` - shares: set
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
 - `Side effect` / `side effect` - shares: effect, side
+- `socket.listen` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: listen
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
