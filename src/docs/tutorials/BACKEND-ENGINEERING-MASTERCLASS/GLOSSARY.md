@@ -195,6 +195,9 @@ re-run the script after any lesson changes instead.
 ## Authorization header
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A specific, real request header - `Authorization: Bearer <token>` - carrying real credentials. It exists as the real, standard place a client puts proof of who it is, so a server can check that proof before deciding what a request is even allowed to do.
 
+## B-tree (conceptually)
+- **Term** in `LESSON-6.10-INDEXES` - A real, balanced, sorted tree structure - the actual data structure SQLite's own documentation states it uses for every real index - that lets a lookup rule out roughly half of the remaining candidates at each step, rather than checking every value in order. It exists specifically because a SORTED structure can be searched this way and an unsorted one cannot; an index is, concretely, this project's own real database keeping a real, separate, sorted copy of a column's values (plus a pointer back to the real row) purely so this kind of search becomes possible at all.
+
 ## blueprint registration
 - **Term** in `LESSON-4.5-BLUEPRINTS` - The real, explicit act of attaching an already-complete `Blueprint`'s own routes onto a specific real `Flask` app - `app.register_blueprint(bp, url_prefix=...)`. It exists as the one real, deliberate step separating "this group of routes exists" from "this group of routes is actually live on this specific real app."
 
@@ -269,6 +272,9 @@ re-run the script after any lesson changes instead.
 
 ## column
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word for exactly what the relational model formally calls an attribute: one named, single-valued property every row shares. It exists for the identical reason "row" does - it is the word real SQL, and this project's own real code (its `db.Column` declarations), actually uses, even though "attribute" is the formally precise term for the same idea.
+
+## composite index
+- **Term** in `LESSON-6.10-INDEXES` - An index built across more than one column together, in a specific, declared order - useful for narrowing a search using the FIRST (leftmost) column efficiently, but not necessarily useful for searching on a later column alone. It exists because some real queries filter on more than one column at once, and a single composite index, built in the right column order, can serve those queries directly - at the real cost that filtering by a column other than the leading one may not benefit from it at all, which this lesson's own final unit proves directly, in this project's own real schema.
 
 ## composite uniqueness
 - **Term** in `LESSON-6.9-CONSTRAINTS` - A `UNIQUE` constraint declared across more than one column together, guaranteeing no two rows share the identical COMBINATION of values, even though either column alone might repeat freely. It exists because some real facts are only genuinely required to be unique as a pair (or larger group) - a specific machine being paired with a specific CAM file should only exist once, even though the same machine legitimately appears in many other pairings, and the same CAM file legitimately appears in many others too.
@@ -696,6 +702,9 @@ re-run the script after any lesson changes instead.
 ## list.extend
 - **Object/method** in `LESSON-6.5-ONE-TO-MANY-RELATIONSHIPS` - A real Python list method that appends every item from another iterable onto an existing list, one at a time.
 
+## lookup cost
+- **Term** in `LESSON-6.10-INDEXES` - How much real work finding a specific row actually costs - how many values had to be inspected, or comparisons made - as a concrete, measurable number, not a vague sense of "fast" or "slow." It exists as its own idea because two ways of finding the identical real row can have wildly different real costs depending on whether the underlying structure lets most candidates be ruled out at once (an index) or must be checked one at a time in order (a scan).
+
 ## Machine
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real SQLAlchemy model representing one CNC machine row in this project's own database.
 
@@ -849,6 +858,9 @@ re-run the script after any lesson changes instead.
 ## query parameter
 - **Term** in `LESSON-4.4-ROUTES` - A real, optional key-value pair appended to a URL after a real `?` - `?status=running`, read through `request.args`, a real `ImmutableMultiDict` that can hold more than one real value under the identical key. It exists as the real, standard place a client puts optional real filters or options, separate from a URL's own real path.
 
+## query pattern
+- **Term** in `LESSON-6.10-INDEXES` - The actual, real shape of the questions an application asks its own database - which columns real code actually filters by, in which combinations - as distinct from the schema's own declared structure. It exists as its own idea because an index is only useful relative to a real query pattern: the identical column can be perfectly indexed for one real query and completely useless for a different real one, depending on what that query actually filters by.
+
 ## Query.filter (Machine.query.filter)
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real SQLAlchemy method, narrowing a query to rows matching a real condition.
 
@@ -993,6 +1005,9 @@ re-run the script after any lesson changes instead.
 
 ## secret
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real configuration value whose entire purpose depends on staying unknown to anyone outside the real deployment that uses it - `SECRET_KEY`, in this project's own real code, signs every real authentication token this curriculum has used. It exists because some real configuration values aren't just settings; their real security value comes specifically from not being real, public knowledge.
+
+## selectivity
+- **Term** in `LESSON-6.10-INDEXES` - How much a given column's own real value narrows down the rows that match it - a column where a single value matches nearly every row (like `Machine.status`, with only a handful of real distinct values) has LOW selectivity; a column where a single value matches close to one row (like `Part.part_number`, unique per real part) has HIGH selectivity. It exists because an index's own real payoff depends entirely on this: an index on a low-selectivity column still leaves most of the matching rows to sift through afterward, while an index on a high-selectivity column can jump almost directly to the one real row that matters.
 
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
@@ -1322,6 +1337,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `ast.ImportFrom` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.parse` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.walk` - shares: ast
+- `Abstract Syntax Tree (AST)` / `B-tree (conceptually)` - shares: tree
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
 - `api` / `API contract` - shares: api
@@ -1445,6 +1461,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `query parameter` - shares: query
+- `CAMFile.query.get` / `query pattern` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `cascading behavior` / `golden behavior (golden master)` - shares: behavior
 - `cascading behavior` / `observed behavior vs. intended behavior` - shares: behavior
@@ -1485,6 +1502,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `composite index` / `composite uniqueness` - shares: composite
 - `composite uniqueness` / `uniqueness` - shares: uniqueness
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_health_response (real, now live)` - shares: real
@@ -1496,6 +1514,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
+- `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
 - `Content-Type` / `tuple (Python builtin type)` - shares: type
 - `Content-Type` / `Type annotation` - shares: type
@@ -1875,6 +1894,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
+- `MachineCAMPairing.query.get` / `query pattern` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
 - `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
@@ -1894,6 +1914,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `query parameter` - shares: query
+- `NCTemplate.query.get` / `query pattern` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `one-to-many relationship` / `parent/child relationship` - shares: relationship
 - `one-to-many relationship` / `relationship modeling` - shares: relationship
@@ -1919,18 +1940,22 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `Query parameter` - shares: query
 - `Query (Machine.query` / `query parameter` - shares: query
+- `Query (Machine.query` / `query pattern` - shares: query
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine` - shares: machine
 - `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
 - `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
 - `Query parameter` / `query parameter` - shares: parameter, query
+- `Query parameter` / `query pattern` - shares: query
 - `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `URL parameter` - shares: parameter
 - `Query parameter` / `URL path parameter` - shares: parameter
+- `query parameter` / `query pattern` - shares: query
 - `query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `query parameter` / `URL parameter` - shares: parameter
 - `query parameter` / `URL path parameter` - shares: parameter
+- `query pattern` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine (PATCH)` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine

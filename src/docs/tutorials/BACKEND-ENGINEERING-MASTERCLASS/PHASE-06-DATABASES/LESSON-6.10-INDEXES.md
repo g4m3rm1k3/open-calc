@@ -1,0 +1,303 @@
+# Lesson 6.10: Indexes
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Three real scripts. The first measures the real, dramatic difference between scanning every row and jumping straight to one, the reason an index exists at all. The second measures which real columns in this project's own schema actually benefit from one - a real, already-indexed, highly selective column versus a real, unindexed, low- selectivity one. The third runs this project's own real database's own real query planner against `backend/app/models/machine_pairing.py`'s own real composite index, proving directly that `backend/app/routes/machine_pairings.py`'s own real, already-shipped `GET /api/machine-pairings?machineId=...` route cannot actually use it - a real, previously-undocumented missing-index finding.
+
+**What you need to know first:** This curriculum's own Querying lesson (Lesson 6.1) - that a linear scan's own cost scales with total row count, not with how selective a match is; this curriculum's own Constraints and Foreign Keys lessons - `MachineCAMPairing`'s own real composite `UNIQUE` constraint.
+
+## Terms used in this lesson
+
+- **B-tree (conceptually)** — A real, balanced, sorted tree structure - the actual data structure SQLite's own documentation states it uses for every real index - that lets a lookup rule out roughly half of the remaining candidates at each step, rather than checking every value in order. It exists specifically because a SORTED structure can be searched this way and an unsorted one cannot; an index is, concretely, this project's own real database keeping a real, separate, sorted copy of a column's values (plus a pointer back to the real row) purely so this kind of search becomes possible at all.
+- **lookup cost** — How much real work finding a specific row actually costs - how many values had to be inspected, or comparisons made - as a concrete, measurable number, not a vague sense of "fast" or "slow." It exists as its own idea because two ways of finding the identical real row can have wildly different real costs depending on whether the underlying structure lets most candidates be ruled out at once (an index) or must be checked one at a time in order (a scan).
+- **selectivity** — How much a given column's own real value narrows down the rows that match it - a column where a single value matches nearly every row (like `Machine.status`, with only a handful of real distinct values) has LOW selectivity; a column where a single value matches close to one row (like `Part.part_number`, unique per real part) has HIGH selectivity. It exists because an index's own real payoff depends entirely on this: an index on a low-selectivity column still leaves most of the matching rows to sift through afterward, while an index on a high-selectivity column can jump almost directly to the one real row that matters.
+- **composite index** — An index built across more than one column together, in a specific, declared order - useful for narrowing a search using the FIRST (leftmost) column efficiently, but not necessarily useful for searching on a later column alone. It exists because some real queries filter on more than one column at once, and a single composite index, built in the right column order, can serve those queries directly - at the real cost that filtering by a column other than the leading one may not benefit from it at all, which this lesson's own final unit proves directly, in this project's own real schema.
+- **query pattern** — The actual, real shape of the questions an application asks its own database - which columns real code actually filters by, in which combinations - as distinct from the schema's own declared structure. It exists as its own idea because an index is only useful relative to a real query pattern: the identical column can be perfectly indexed for one real query and completely useless for a different real one, depending on what that query actually filters by.
+
+## Objects and methods used
+
+None — this lesson introduces no new external class, interface, or method, only Terms.
+## Concept Unit: Lookup Cost and B-Trees - Why a Sorted Structure Beats a Scan
+
+### The Problem
+
+This curriculum's own Querying lesson already measured a real, linear scan's own cost across 200,000 synthetic records. Given a million real, already-SORTED values instead, and the fact that SQLite's own documentation states its indexes are real B-trees, what does having them sorted actually let a real search skip?
+
+Before reading on:
+
+- Given a sorted list of a million values, and a value known to sit near the very end, does a scan starting from the front have any way to know that in advance - or does it have to check every earlier value regardless?
+- A sorted structure lets a search rule out HALF the remaining candidates at each single step (check the middle; the answer is either in the half before it or the half after). Roughly how many steps would that take across a million values, compared to checking one at a time?
+
+### Project Change
+
+- **Reference Source:** No real project file changes - this unit measures the general, real cost difference a B-tree index makes possible, which this lesson's own final unit then verifies directly against this project's own real schema and real query planner.
+- **Files affected:** `verification/phase-06/lab_lookup_cost.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None beyond plain Python.
+
+### The New Code
+
+A million sorted, real string values, searched for one specific target two different real ways - a plain linear scan, and a binary search - each counting its own real comparisons:
+
+**File:** `verification/phase-06/lab_lookup_cost.py` (new)
+
+```python
+sorted_ids = [f"P-{i:07d}" for i in range(1_000_000)]
+target = "P-0999999"
+
+comparisons_scan = 0
+for value in sorted_ids:
+    comparisons_scan += 1
+    if value == target:
+        break
+print(f"linear scan: {comparisons_scan} comparisons to find {target!r} among {len(sorted_ids)} rows")
+
+comparisons_search = 0
+
+
+def counting_bisect(a, x):
+    lo, hi = 0, len(a)
+    global comparisons_search
+    while lo < hi:
+        comparisons_search += 1
+        mid = (lo + hi) // 2
+        if a[mid] < x:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+
+index = counting_bisect(sorted_ids, target)
+print(f"binary search (what a sorted index makes possible): {comparisons_search} comparisons, found at position {index}")
+```
+
+### Mechanical Walkthrough
+
+- `for value in sorted_ids: comparisons_scan += 1; if value == target: break` — A basic-Python `for` loop, checking every value in order until a match is found, incrementing a real counter once per check - this project's own real, minimal stand-in for a table scan.
+- `global comparisons_search` — Basic Python: declares that assignments to `comparisons_search` inside `counting_bisect` modify the module-level name, not a new, local one - needed because the function both reads and reassigns it across repeated calls to itself (the `while` loop).
+- `mid = (lo + hi) // 2` — Basic-Python integer division, computing the midpoint of the current real search range - the exact operation a B-tree index's own real structure makes possible directly, by keeping values sorted and organized for fast midpoint access, rather than requiring them to be re-sorted at search time.
+- `if a[mid] < x: lo = mid + 1 else: hi = mid` — Basic-Python comparison and reassignment, ruling out HALF of the remaining real candidates with each single comparison - the direct mechanism behind this lab's own dramatically lower comparison count.
+
+### CS Lens
+
+This is **lookup cost** and the real payoff of a **B-tree**, both fully named in this lesson's own Header - O(n) versus O(log n), made concrete with real, counted comparisons rather than an abstract claim. Also recognized in: looking up a word in a real, printed dictionary by opening to the middle and narrowing from there, never by reading every page from the front; a phone book, sorted by last name, letting a lookup skip directly to the right section; a binary search tree in general, of which SQLite's own real B-tree variant is a real, balanced, disk-oriented specialization; and, in this project's own domain, this exact real tradeoff behind every one of `backend/app/models/part.py`'s own `index=True` columns.
+
+### SE Lens
+
+The design principle is that a sorted, organized structure lets a search rule out most of the data at once, while an unsorted one forces checking candidates one at a time. The real alternative NOT chosen when a column has no index - relying on a plain scan, the real default this curriculum's own Querying lesson already measured - costs nothing extra to maintain, at the real price this unit's own lab makes concrete: 1,000,000 real comparisons instead of 20. The honest cost on the indexed side: a real index is not free either - it is a real, separate, sorted structure the database itself must keep up to date on every real write, which this lesson's own next two units study more precisely.
+
+### Commands needed
+
+- `python verification/phase-06/lab_lookup_cost.py` — Runs the lab from the manufacturing-platform repository root; no flags needed.
+
+### Verification
+
+```text
+linear scan: 1000000 comparisons to find 'P-0999999' among 1000000 rows
+binary search (what a sorted index makes possible): 20 comparisons, found at position 999999
+```
+
+Full saved run: `verification/phase-06/lab_lookup_cost_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it measures the real payoff an index makes possible in principle; the next unit studies which real columns in this project's own schema actually earn that payoff.
+
+## Concept Unit: Selectivity - Which Real Columns Actually Benefit From an Index
+
+### The Problem
+
+`backend/app/models/part.py`'s real `part_number` is declared `unique=True, index=True`; `backend/app/models/machine.py`'s real `status` is declared with neither. Given the previous unit's own real proof that an index only helps by ruling out MOST of the remaining candidates at once, what does an index on a column like `status` - where most rows share only a handful of real values - actually rule out?
+
+Before reading on:
+
+- If `Machine.status` only ever holds one of roughly five real values, and a real shop has a thousand machines, about how many real rows would still match after filtering by one specific real status - even with a perfect index on it?
+- `Part.part_number` is declared `unique=True`. Given that, exactly how many real rows could ever match one specific, real `part_number` value?
+
+### Project Change
+
+- **Reference Source:** Real, verbatim, read this session, `backend/app/models/part.py:218`, already cited in this curriculum's own Constraints lesson: ``` part_number = db.Column(db.String(20), unique=True, nullable=False, index=True) ``` and, real, verbatim, `backend/app/models/machine.py:75`, already cited in this curriculum's own Why Databases Exist lesson: ``` status = db.Column(db.String(20), default='available')  # available, running, setup, offline, maintenance, down, issue ``` Real, already-existing evidence of one real, indexed, high- selectivity column and one real, unindexed, low-selectivity column, already coexisting in this project's own schema.
+- **Files affected:** `verification/phase-06/lab_selectivity.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None beyond plain Python.
+
+### The New Code
+
+A thousand synthetic, real-shaped machine records, cycling through the real, small set of statuses this project's own schema names in its own comment, filtered two different real ways:
+
+**File:** `verification/phase-06/lab_selectivity.py` (new)
+
+```python
+machines = []
+statuses = ["available", "running", "down", "maintenance"]
+for i in range(1000):
+    machines.append({"id": f"m{i}", "status": statuses[i % len(statuses)]})
+
+target_status = "available"
+matches_by_status = [m for m in machines if m["status"] == target_status]
+print(f"filtering 1000 machines by status={target_status!r}: {len(matches_by_status)} rows match - low selectivity")
+
+target_id = "m500"
+matches_by_id = [m for m in machines if m["id"] == target_id]
+print(f"filtering 1000 machines by id={target_id!r}: {len(matches_by_id)} row matches - high selectivity")
+```
+
+### Mechanical Walkthrough
+
+- `statuses[i % len(statuses)]` — The modulo operator (basic Python), cycling repeatedly through only four real string values across all thousand records - modeling `Machine.status`'s own real, small, fixed set of realistic values directly.
+- `[m for m in machines if m["status"] == target_status]` — A list comprehension, already fully treated in this curriculum's own Why Databases Exist lesson, filtering by the LOW-selectivity column - roughly a quarter of all rows share any one given status, so even a perfect index here still leaves a real quarter of the table to sift through.
+- `[m for m in machines if m["id"] == target_id]` — The identical real construct, filtering by `id` instead - since every real `id` in this lab is unique, exactly one row can ever match, the real, concrete meaning of "high selectivity."
+
+### CS Lens
+
+This is **selectivity**, fully named in this lesson's own Header - how much a column's own real value actually narrows a search. Also recognized in: a phone book's own last-name index being far more useful than an index on "country," since nearly every real entry shares the same one; a search engine ranking a rare keyword's own results faster and more precisely than a extremely common one; a spreadsheet filter on a "yes/no" column leaving half the rows either way, versus a filter on a unique ID column leaving exactly one; and, in this project's own domain, this exact real contrast - `Machine.status`'s own handful of real values versus `Part.part_number`'s own genuinely unique one.
+
+### SE Lens
+
+The design principle is that an index's own real value depends entirely on how much it actually narrows a search, not merely on whether one exists. The real alternative this project's own real schema already demonstrates - indexing the high-selectivity `part_number` and leaving the low-selectivity `status` unindexed - is a real, reasonable choice: an index on `status` would still cost real space and real maintenance on every write, while narrowing a real search down to only about a quarter of the table, a far smaller real payoff than `part_number`'s own near-single-row precision. The honest cost of indexing a low-selectivity column anyway: real overhead, for comparatively little real benefit.
+
+### Commands needed
+
+- `python verification/phase-06/lab_selectivity.py` — Runs the lab from the repository root; no flags needed.
+
+### Verification
+
+```text
+filtering 1000 machines by status='available': 250 rows match - low selectivity
+filtering 1000 machines by id='m500': 1 row matches - high selectivity
+```
+
+Full saved run: `verification/phase-06/lab_selectivity_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit measured what an index buys in principle; this unit shows that payoff depends on the real column it is built on. The next unit studies a real index spanning more than one column at once, and this project's own real query pattern that cannot use it.
+
+## Concept Unit: Composite Indexes and Query Patterns - This Project's Own Real Missing Index
+
+### The Problem
+
+`backend/app/models/machine_pairing.py`'s real composite `UNIQUE` constraint, `('cam_file_id', 'machine_id')`, already cited in this curriculum's own Constraints lesson, creates a real, composite index behind the scenes - leading with `cam_file_id`. Given `backend/app/routes/machine_pairings.py`'s own real, already-shipped route filters by `machineId` alone (`query.filter_by(machine_id=machine_id)`), does this project's own real database actually get to use that composite index for this project's own real, most common query pattern?
+
+Before reading on:
+
+- A composite index on `(cam_file_id, machine_id)` is built the same way a phone book is sorted by last name, then first name. Could you efficiently find everyone with a given FIRST name alone using that same sorted structure - or would you have to check every entry?
+- Before running the lab below: do you expect `WHERE cam_file_id = ...` and `WHERE machine_id = ...` to get the identical real treatment from this project's own real query planner, given they use the same composite index?
+
+### Project Change
+
+- **Reference Source:** Real, verbatim, read this session, `backend/app/models/machine_pairing.py:52-55`, already cited in this curriculum's own Constraints lesson: ``` __table_args__ = (
+    db.UniqueConstraint('cam_file_id', 'machine_id', name='uq_cam_machine'),
+) ``` and, real, verbatim, `backend/app/routes/machine_pairings.py:38-40`: ``` machine_id = request.args.get('machineId') if machine_id:
+    query = query.filter_by(machine_id=machine_id)
+``` Real, already-existing evidence of a genuine mismatch between a real, declared index's own column order and a real, already- shipped route's own real query pattern.
+- **Files affected:** `verification/phase-06/lab_composite_index_query_pattern.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** This project's own real backend, and its already-installed `sqlalchemy`.
+
+### The New Code
+
+This project's own real database's own real query planner, asked directly, via SQLite's own `EXPLAIN QUERY PLAN` statement - a SQLite-specific diagnostic, not general SQL, since SQL itself is this curriculum's own later, dedicated lesson - for both real query shapes:
+
+**File:** `verification/phase-06/lab_composite_index_query_pattern.py` (new)
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+from sqlalchemy import text
+
+from app import create_app, db
+from app.models.part import Part
+from app.models.machine import Machine
+from app.models.cam_file import CAMFile
+from app.models.machine_pairing import MachineCAMPairing
+
+app = create_app("testing")
+
+with app.app_context():
+    part = Part(id="P1", part_number="1234567", description="Bracket")
+    machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+    db.session.add_all([part, machine])
+    db.session.commit()
+
+    cf1 = CAMFile(id="cf1", part_id="P1", machine_id="m1", file_name="rev1.nc")
+    db.session.add(cf1)
+    db.session.commit()
+
+    pairing = MachineCAMPairing(id="pair1", cam_file_id="cf1", machine_id="m1")
+    db.session.add(pairing)
+    db.session.commit()
+
+    print("real query plan: filtering by cam_file_id (the composite index's own leading column)")
+    for row in db.session.execute(text("EXPLAIN QUERY PLAN SELECT * FROM machine_cam_pairings WHERE cam_file_id = 'cf1'")):
+        print(" ", row)
+
+    print("real query plan: filtering by machine_id alone (the real query this project's own GET /api/machine-pairings route runs)")
+    for row in db.session.execute(text("EXPLAIN QUERY PLAN SELECT * FROM machine_cam_pairings WHERE machine_id = 'm1'")):
+        print(" ", row)
+```
+
+### Mechanical Walkthrough
+
+- `EXPLAIN QUERY PLAN SELECT * FROM machine_cam_pairings WHERE cam_file_id = 'cf1'` — A SQLite-specific diagnostic statement, wrapped in `sqlalchemy.text`, already fully treated in this curriculum's own Foreign Keys lesson - asks this project's own real database engine to report HOW it would actually execute this query, rather than running it and returning rows.
+- `SEARCH machine_cam_pairings USING INDEX sqlite_autoindex_machine_cam_pairings_2 (cam_file_id=?)` — The real, literal text SQLite itself reports: it found and used the real, automatically-created index backing the composite `UNIQUE` constraint, because `cam_file_id` is that index's own leading column.
+- `SCAN machine_cam_pairings` — The real, literal text SQLite reports for the SECOND query - no index mentioned at all. Filtering by `machine_id` alone cannot use the same composite index efficiently, because `machine_id` is not its leading column; SQLite falls back to examining every real row instead, exactly the real cost this lesson's own first unit already measured directly.
+
+### Mental Model
+
+```text
+composite index on (cam_file_id, machine_id)
+sorted first by cam_file_id, then by machine_id within each
+
+WHERE cam_file_id = 'cf1'        WHERE machine_id = 'm1'
+      │                                 │
+      ▼                                 ▼
+SEARCH ... USING INDEX            SCAN machine_cam_pairings
+(leading column matched -         (not the leading column -
+ index narrows straight to it)     index provides no shortcut)
+
+The identical real index serves one real query pattern well and
+the other not at all - the column ORDER in the index declaration
+is what decides which.
+```
+
+### CS Lens
+
+This is a **composite index** and this project's own real **query pattern**, both fully named in this lesson's own Header. Also recognized in: a phone book sorted by (last name, first name) - efficient for "find everyone named Smith," useless on its own for "find everyone named John" across all last names; a filing cabinet organized by (year, month) - fast for one year, still requiring a full pass to find everything from "March," any year; and, in this project's own domain, this exact real finding - a real, already- shipped API route whose own most natural query, "pairings for this machine," cannot use the one real index this table already has.
+
+### SE Lens
+
+The design principle is that an index's own column ORDER has to match how real queries actually filter, not merely which columns a query happens to touch. The real alternative NOT currently in place - a second, real index with `machine_id` leading (or a composite index reordered, or covering both directions) - would make this project's own real `GET /api/machine-pairings?machineId=...` route an efficient `SEARCH` instead of a `SCAN`. The honest, current cost, verified directly by this unit's own real query plan: every real call to that real, already-shipped route falls back to scanning the entire `machine_cam_pairings` table today, a real, previously- undocumented finding this lesson surfaces but does not fix here, since choosing and adding a new real index is a real schema change belonging to whichever later phase actually revisits this route.
+
+### Commands needed
+
+- `backend\.venv\Scripts\python.exe verification\phase-06\lab_composite_index_query_pattern.py` — Run from the manufacturing-platform repository root, using this project's own real backend virtual environment.
+
+### Verification
+
+```text
+Seeding default users...
+real query plan: filtering by cam_file_id (the composite index's own leading column)
+  (3, 0, 62, 'SEARCH machine_cam_pairings USING INDEX sqlite_autoindex_machine_cam_pairings_2 (cam_file_id=?)')
+real query plan: filtering by machine_id alone (the real query this project's own GET /api/machine-pairings route runs)
+  (2, 0, 216, 'SCAN machine_cam_pairings')
+```
+
+Full saved run: `verification/phase-06/lab_composite_index_query_pattern_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed which real columns benefit from an index at all; this unit shows that even a real, existing index only serves the real query pattern that matches its own declared column order - proven directly against this project's own real, already- shipped route.
+
+## Connect the pieces
+
+Follow one real question - "which pairings involve this machine" - through every unit. The first unit measured the raw payoff a sorted, B-tree-backed structure makes possible at all: 1,000,000 real comparisons collapsed to 20. The second unit showed that payoff isn't automatic - it depends on the real column's own selectivity, which is exactly why this project indexes `Part.part_number` (near-perfect selectivity) and does not index `Machine.status` (a handful of real, repeating values). And the third unit ran this project's own real database's own real query planner against the real question this lesson opened with - `backend/app/routes/machine_pairings.py`'s own real `?machineId=` filter - and got back `SCAN machine_cam_pairings`, not `SEARCH ... USING INDEX`, because `machine_id` is not the leading column of the one real composite index this table already has. A real index existing, and a real index actually helping the real questions an application asks, are two different, separately checkable facts.
+
+**Next lesson:** Next, a different real question about the same database: not how fast one query runs, but what happens when SEVERAL real writes need to succeed or fail together, as one indivisible unit - starting with this project's own real `db.session.commit()`, already used in every lab this phase has run so far, studied for what it actually guarantees.
