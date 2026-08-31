@@ -147,6 +147,9 @@ re-run the script after any lesson changes instead.
 ## AssertionError
 - **Object/method** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A built-in exception class that Python raises automatically when an `assert` statement's condition evaluates to `False`.
 
+## association table (also called a join table)
+- **Term** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - A real, separate table whose only job is connecting two other relations, holding nothing but a foreign key to each side - exactly what makes a many-to-many relationship representable at all, when no single foreign key column on either real relation could express it alone. It exists specifically because neither `Part` nor `Tag` can hold "more than one of the other" in a single column; a separate table, contributing one real row per real pairing, can hold as many of those pairings as actually exist, with neither `Part` nor `Tag` needing to change shape at all.
+
 ## ast.alias
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real AST node type representing one imported name within either an `ast.Import` or `ast.ImportFrom`.
 
@@ -332,11 +335,17 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, without itself adding a column to the database.
 - **Object/method** in `LESSON-6.5-ONE-TO-MANY-RELATIONSHIPS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, already fully treated in this curriculum's own Foreign Keys lesson.
 
+## db.relationship (secondary=)
+- **Object/method** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - The same real SQLAlchemy construct already fully treated in this curriculum's own Foreign Keys and One-to-Many Relationships lessons, here given a `secondary` argument specifically to represent a many-to-many relationship through an association table.
+
 ## db.session.add
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
 
 ## db.session.commit
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that actually writes every currently staged change to the real database.
+
+## db.Table
+- **Object/method** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - A real SQLAlchemy construct for declaring a table directly, by its real columns, without wrapping it in a full model class - used specifically for a table, like `part_tags`, that has no real data of its own beyond the two real foreign keys connecting it.
 
 ## Decorator
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Python syntax (`@something`) that wraps a function in another piece of behavior without changing the function's own body. It exists so "register this function as a route handler" can be stated once, directly above the function it applies to, instead of a separate registration call elsewhere in the file.
@@ -672,6 +681,9 @@ re-run the script after any lesson changes instead.
 ## machines_bp (as a real, standalone Blueprint)
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real `Blueprint` instance for every machine-related route, already studied extensively in this curriculum, examined here specifically as a self-contained real object, independent of any app.
 
+## many-to-many relationship
+- **Term** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - A relationship where EITHER side can legitimately be associated with more than one row of the other - unlike a one-to-many relationship, where only one side ever holds more than one. It exists as its own, distinct cardinality because a single foreign key column, holding one value, can only ever express "this row points at exactly one of those" - it has no way to express "this row points at several," which a genuine many-to-many relationship requires on BOTH sides at once.
+
 ## map
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that applies a real, given function to every element of a real iterable, one at a time.
 
@@ -855,6 +867,9 @@ re-run the script after any lesson changes instead.
 
 ## relation
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The formal, mathematical name - from the branch of set theory a relational database is literally built on - for what everyday SQL language calls a table: a named collection of tuples that all share the same declared attributes. It exists as a distinct word from "table" because the relational model itself, as originally defined, is a mathematical structure - a genuine set of tuples - and "table" is the informal, practical word SQL itself uses for the same idea, with (as this lesson's own rows-and-columns unit shows) a few real differences between the two.
+
+## relationship modeling
+- **Term** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - Declaring a many-to-many relationship in a way that lets real code navigate it directly - from either side - without that code ever having to name or query the association table itself. It exists because an association table's own real rows are not, by themselves, useful to read directly; what real calling code actually wants is "which Tags does this Part have" or "which Parts have this Tag," and relationship modeling is what makes asking either of those a single, direct attribute access.
 
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
@@ -1299,6 +1314,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `assert statement` / `context manager (the `with` statement)` - shares: statement
+- `association table (also called a join table)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: a
+- `association table (also called a join table)` / `db.Table` - shares: table
+- `association table (also called a join table)` / `Dependency (of a function)` - shares: a
+- `association table (also called a join table)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `ast.Attribute` / `attribute` - shares: attribute
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
@@ -1489,21 +1508,31 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.relationship` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.relationship (secondary=)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.Table` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db.ForeignKey` / `Session (db.session)` - shares: db
+- `db.relationship` / `many-to-many relationship` - shares: relationship
 - `db.relationship` / `one-to-many relationship` - shares: relationship
 - `db.relationship` / `parent/child relationship` - shares: relationship
+- `db.relationship` / `relationship modeling` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
+- `db.relationship (secondary=)` / `many-to-many relationship` - shares: relationship
+- `db.relationship (secondary=)` / `one-to-many relationship` - shares: relationship
+- `db.relationship (secondary=)` / `parent/child relationship` - shares: relationship
+- `db.relationship (secondary=)` / `relationship modeling` - shares: relationship
+- `db.relationship (secondary=)` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
+- `db.Table` / `Session (db.session)` - shares: db
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
 - `DELETE` / `delete_notification` - shares: delete
@@ -1763,6 +1792,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `update_machine (PATCH)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
+- `Machine.to_dict` / `many-to-many relationship` - shares: to
 - `Machine.to_dict` / `one-to-many relationship` - shares: to
 - `Machine.to_dict` / `Query (Machine.query` - shares: machine
 - `Machine.to_dict` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1780,6 +1810,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: as, real
 - `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
+- `many-to-many relationship` / `one-to-many relationship` - shares: many, relationship, to
+- `many-to-many relationship` / `parent/child relationship` - shares: relationship
+- `many-to-many relationship` / `relationship modeling` - shares: relationship
 - `mark (pytest marker)` / `mark_as_read` - shares: mark
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
@@ -1792,6 +1825,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `one-to-many relationship` / `parent/child relationship` - shares: relationship
+- `one-to-many relationship` / `relationship modeling` - shares: relationship
 - `open() (file object)` / `PDMService.download_file` - shares: file
 - `open() (file object)` / `send_file` - shares: file
 - `os.path.exists` / `URL path parameter` - shares: path
@@ -1799,6 +1833,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Parameter` / `query parameter` - shares: parameter
 - `Parameter` / `URL parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
+- `parent/child relationship` / `relationship modeling` - shares: relationship
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file

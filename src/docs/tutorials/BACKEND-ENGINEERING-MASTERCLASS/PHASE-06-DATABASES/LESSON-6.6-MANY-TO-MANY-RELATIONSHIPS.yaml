@@ -1,0 +1,427 @@
+number: "6.6"
+title: "Many-to-Many Relationships"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  One real script against this project's own real Flask app and
+  SQLAlchemy models, using a real relationship this project already
+  built but - confirmed this session by grepping every real route and
+  service file - never actually calls from anywhere: `backend/app/models/tag.py`'s
+  own `Tag`/`part_tags` design. It proves the one property a one-to-many
+  relationship can never have: BOTH sides holding more than one real
+  row at once - one real `Tag` applied to two real `Part`s, and that
+  same `Part` carrying a second real `Tag` too - and shows that neither
+  side of the real code ever has to name the real join table connecting
+  them, even once.
+
+what_you_need_to_know_first: >
+  This curriculum's own One-to-Many Relationships lesson - specifically,
+  that a plain foreign-key column can only ever hold a single value,
+  which is exactly what forced the "many" side of a one-to-many
+  relationship to be the side holding that column.
+
+terms:
+  - name: "many-to-many relationship"
+    definition: >
+      A relationship where EITHER side can legitimately be associated
+      with more than one row of the other - unlike a one-to-many
+      relationship, where only one side ever holds more than one. It
+      exists as its own, distinct cardinality because a single foreign
+      key column, holding one value, can only ever express "this row
+      points at exactly one of those" - it has no way to express "this
+      row points at several," which a genuine many-to-many relationship
+      requires on BOTH sides at once.
+  - name: "association table (also called a join table)"
+    definition: >
+      A real, separate table whose only job is connecting two other
+      relations, holding nothing but a foreign key to each side -
+      exactly what makes a many-to-many relationship representable at
+      all, when no single foreign key column on either real relation
+      could express it alone. It exists specifically because neither
+      `Part` nor `Tag` can hold "more than one of the other" in a single
+      column; a separate table, contributing one real row per real
+      pairing, can hold as many of those pairings as actually exist,
+      with neither `Part` nor `Tag` needing to change shape at all.
+  - name: "relationship modeling"
+    definition: >
+      Declaring a many-to-many relationship in a way that lets real code
+      navigate it directly - from either side - without that code ever
+      having to name or query the association table itself. It exists
+      because an association table's own real rows are not, by
+      themselves, useful to read directly; what real calling code
+      actually wants is "which Tags does this Part have" or "which Parts
+      have this Tag," and relationship modeling is what makes asking
+      either of those a single, direct attribute access.
+
+objects_and_methods:
+  - name: db.Table
+    what_it_is: >
+      A real SQLAlchemy construct for declaring a table directly, by its
+      real columns, without wrapping it in a full model class - used
+      specifically for a table, like `part_tags`, that has no real data
+      of its own beyond the two real foreign keys connecting it.
+    implementation: >
+      `db.Table('table_name', db.Column(...), db.Column(...))` - each
+      `db.Column` here is declared exactly the way a model's own column
+      would be, including `db.ForeignKey(...)` and `primary_key=True`,
+      already treated in this curriculum's own Foreign Keys and Primary
+      Keys lessons.
+    its_use: >
+      This project's own real `part_tags` association table is declared
+      this exact way - two foreign-key columns, both `primary_key=True`
+      together (this curriculum's own Primary Keys lesson already cited
+      this as a real composite key), and nothing else.
+    type: A real SQLAlchemy construct, called once at module level.
+    responsibility: >
+      Declaring a real table's own real columns directly, for a table
+      that will never need its own Python model class because nothing
+      ever queries it as an entity in its own right.
+    depends_on: A real table name, and the real column declarations that belong to it.
+    connects_to: >
+      Declared once, in `backend/app/models/tag.py`, then passed
+      directly as the `secondary=` argument to `db.relationship`, below.
+    shape: >
+      Takes a table name and column declarations; produces a real,
+      queryable table object, distinct from a `db.Model` subclass.
+  - name: "db.relationship (secondary=)"
+    what_it_is: >
+      The same real SQLAlchemy construct already fully treated in this
+      curriculum's own Foreign Keys and One-to-Many Relationships
+      lessons, here given a `secondary` argument specifically to
+      represent a many-to-many relationship through an association
+      table.
+    implementation: >
+      `db.relationship('OtherModel', secondary=association_table,
+      backref=db.backref('other_side_name', lazy='dynamic'))` -
+      `secondary` names the real association table SQLAlchemy should use
+      to find matching rows on the other side; SQLAlchemy handles every
+      real read and write to that table internally, so calling code
+      never issues a query against it directly.
+    its_use: >
+      `Tag.parts`, this lesson's own real subject, is declared exactly
+      this way - the direct, real mechanism that lets `tag.parts` and
+      its own real backref, `part.tag_objects`, both work without either
+      one ever naming `part_tags`.
+    type: A real SQLAlchemy construct, called once at class-definition time.
+    responsibility: >
+      Translating ordinary attribute access on either real model into
+      the real reads and writes a many-to-many relationship actually
+      requires against its own association table, entirely out of the
+      caller's sight.
+    depends_on: A real association table (a `db.Table`, or a full model), already declared.
+    connects_to: >
+      Declared on `Tag`, using the real `part_tags` table declared
+      immediately above it in the same file.
+    shape: >
+      Declared with a target model and a `secondary` table; produces,
+      on each side, an attribute behaving like an ordinary collection of
+      real related rows - appendable, iterable, and (depending on
+      `lazy`) either already-loaded or requiring `.all()`.
+
+concept_units:
+  - title: "Many-to-Many, Formally - When Neither Side Can Be a Single Foreign Key"
+    problem: >
+      A real `Part` can genuinely carry more than one real tag - `P-1234567`
+      might be both `"urgent"` and `"prototype"` at once. A real tag,
+      `"urgent"`, can genuinely apply to more than one real `Part` at
+      once, too. Given this curriculum's own One-to-Many lesson - a
+      foreign key column can only ever hold one value - which single
+      column, on either `Part` or `Tag`, could ever hold "more than one
+      of the other"?
+    socratic_prompt:
+      - >
+        If `Tag` had its own column trying to name every `Part` it
+        applies to, what would that column have to hold - and could a
+        single, real database column hold it at all?
+      - >
+        `backend/app/models/tag.py`'s own real `part_tags` table holds
+        only two foreign-key columns, one to `Part` and one to `Tag`,
+        together as a composite primary key. How does adding a real,
+        separate ROW to that table let both `Part` and `Tag` legitimately
+        hold "many" of the other, without either one growing a new
+        column at all?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/tag.py:11-15,31`:
+        ```
+        part_tags = db.Table(
+            'part_tags',
+            db.Column('part_id', db.String(50), db.ForeignKey('parts.id'), primary_key=True),
+            db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+        )
+        ...
+        parts = db.relationship('Part', secondary=part_tags, backref=db.backref('tag_objects', lazy='dynamic'))
+        ```
+        Real, already-existing evidence of this project's own, real,
+        fully-built many-to-many design - confirmed this session by
+        grepping every real file under `backend/app/routes/`,
+        `backend/app/services/`, and `backend/app/commands.py` for
+        `Tag`, `part_tags`, and `tag_objects`: zero matches anywhere.
+        This real relationship is fully functional, as this unit's own
+        lab proves directly, and completely disconnected from every
+        real route this application actually serves.
+      files_affected:
+        - path: verification/phase-06/lab_many_to_many.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        Two real `Part`s, two real `Tag`s, three real pairings between
+        them - one real `Tag` applied to two real `Part`s, and one real
+        `Part` carrying two real `Tag`s:
+      file: verification/phase-06/lab_many_to_many.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.tag import Tag
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part1 = Part(id="P-1234567", part_number="1234567", description="Bracket Assembly")
+            part2 = Part(id="P-7654321", part_number="7654321", description="Housing")
+            db.session.add_all([part1, part2])
+            db.session.commit()
+
+            urgent = Tag(name="urgent")
+            prototype = Tag(name="prototype")
+            db.session.add_all([urgent, prototype])
+            db.session.commit()
+
+            # part1 gets BOTH tags; part2 gets only 'urgent' - urgent ends up on BOTH parts
+            urgent.parts.append(part1)
+            urgent.parts.append(part2)
+            prototype.parts.append(part1)
+            db.session.commit()
+
+            print(f"one Tag, many Parts: urgent.parts = {[p.id for p in urgent.parts]}")
+            print(f"one Part, many Tags: part1.tag_objects.all() = {[t.name for t in part1.tag_objects.all()]}")
+            print(f"neither side ever mentions part_tags directly - not once, anywhere in this script")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "urgent.parts.append(part1) / urgent.parts.append(part2)"
+          explanation: >
+            Ordinary list-like `.append()` (basic Python) on `urgent.parts`
+            - `Tag.parts` is declared with no `lazy='dynamic'` option, so
+            it behaves as an already-loaded, real, mutable list;
+            appending a real `Part` to it is what actually creates the
+            real, underlying `part_tags` row - though nothing in this
+            line names `part_tags` at all.
+        - element: "prototype.parts.append(part1)"
+          explanation: >
+            The identical real operation, on a different `Tag`, pointing
+            at the SAME real `Part`, `part1` - proof that a single
+            `Part` can appear on more than one real `Tag`'s own side of
+            this relationship at once.
+        - element: "urgent.parts (read back)"
+          explanation: >
+            Reads back a real, genuine list of two real `Part` rows,
+            `P-1234567` and `P-7654321` - the concrete proof that ONE
+            side, `Tag`, really does hold more than one of the other.
+        - element: "part1.tag_objects.all()"
+          explanation: >
+            `part1`'s own real backref, declared `lazy='dynamic'` (a
+            required `.all()` call, unlike `urgent.parts`'s own plain
+            list) - reads back two real `Tag` rows, `urgent` and
+            `prototype` - the concrete proof that the OTHER side, `Part`,
+            also holds more than one of the other, at the very same
+            time. Neither side is limited to one, which is exactly what
+            a one-to-many relationship could never provide on both
+            sides at once.
+    mental_model:
+      applicable: true
+      diagram: |
+        Tag "urgent"  ──┐                    ┌── Part "P-1234567"
+                        ├── part_tags row ────┤
+        Tag "urgent"  ──┼── part_tags row ────┼── Part "P-7654321"
+                        │                     │
+        Tag "prototype" ┴── part_tags row ────┘
+
+        Three real rows in part_tags, each pairing one real Tag with one
+        real Part. "urgent" appears in two rows (many Parts); "P-1234567"
+        appears in two rows (many Tags) - the same real table making
+        both directions genuinely "many" at once.
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **many-to-many relationship**, fully named in this
+      lesson's own Header. Also recognized in: a student enrolled in
+      many real courses, while each course has many real students; a
+      movie having several real actors, while each actor appears in
+      several real movies; a music playlist containing many real songs,
+      while each song can belong to several real playlists; and, in this
+      project's own domain, this exact real design - one real part
+      genuinely needing several real tags (`"urgent"`, `"prototype"`),
+      while one real tag genuinely applies across several real parts.
+    se_lens: >
+      The design principle is introducing a third, real, minimal table
+      specifically to hold the pairings a single foreign key column
+      could never express on its own. The real alternative this
+      project's own `Part` model still uses instead, for its own
+      user-facing `tags` field (`backend/app/models/part.py:290`,
+      already read this session: `tags = db.Column(db.Text, nullable=True)`,
+      a single comma-separated string) avoids a join table entirely, at
+      the honest cost this curriculum's own later Normalization lesson
+      names directly. The honest cost of the association-table
+      alternative actually built here: it works, proven directly by this
+      unit's own real lab - and, confirmed this session by grepping this
+      project's real routes and services, nothing in the running
+      application actually uses it. A correct design that nothing calls
+      protects against nothing it was built to fix.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_many_to_many.py
+        explanation: >
+          Run from the manufacturing-platform repository root, using
+          this project's own real backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        one Tag, many Parts: urgent.parts = ['P-1234567', 'P-7654321']
+        one Part, many Tags: part1.tag_objects.all() = ['urgent', 'prototype']
+        neither side ever mentions part_tags directly - not once, anywhere in this script
+      output_file: verification/phase-06/lab_many_to_many_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it proves the one property a
+      one-to-many relationship, this curriculum's own previous lesson,
+      could never have on both sides at once; the next idea this same
+      real lab already demonstrates is exactly how that real association
+      table stays invisible to the code using it.
+
+  - title: "Relationship Modeling - Real Navigation Without Ever Naming the Join Table"
+    problem: >
+      The previous unit's own real lab never once referenced
+      `part_tags` by name - not to read from it, not to write to it -
+      and yet every real pairing it created is really stored there.
+      What real mechanism lets `urgent.parts.append(part1)` correctly
+      create a real row in a table neither `Tag` nor that line of code
+      ever names?
+    socratic_prompt:
+      - >
+        `Tag.parts` is declared with `secondary=part_tags`. Given that
+        `part_tags` never appears again anywhere in the previous unit's
+        own lab, what real work must `secondary=` be doing at the
+        moment `.append()` is actually called?
+      - >
+        If this project's own real routes never call any of this at
+        all - confirmed directly by this lesson's own grep - does that
+        change whether the underlying mechanism genuinely works? What
+        does "works" mean for code nothing calls?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/tag.py:31`,
+        already cited in this lesson's own previous unit:
+        ```
+        parts = db.relationship('Part', secondary=part_tags, backref=db.backref('tag_objects', lazy='dynamic'))
+        ```
+        The `secondary=part_tags` argument is this entire unit's real
+        subject - the one piece of this declaration responsible for
+        hiding the join table from every caller.
+      files_affected: []
+      change_type: none
+      location: N/A - this unit reasons about the same real lab and declaration the previous unit already ran; no new file is added.
+      dependencies: None beyond what the previous unit already established.
+    new_code:
+      applicable: false
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: false
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **relationship modeling**, fully named in this lesson's
+      own Header: an abstraction that lets calling code express "these
+      two things are related" without that code ever manipulating the
+      real structure making the relationship possible underneath. Also
+      recognized in: a filesystem's own directory abstraction, letting
+      a program create a file without directly writing raw disk blocks
+      or an inode table by hand; a programming language's own garbage
+      collector, letting code create objects without manual memory
+      bookkeeping; an ORM's own one-to-many `backref`, already fully
+      treated in this curriculum's own Foreign Keys lesson, hiding a
+      plain foreign-key column behind ordinary attribute access the same
+      way `secondary=` hides an entire extra table; and, in this
+      project's own domain, `part1.tag_objects.all()` reading exactly
+      like any other real relationship this curriculum has already
+      shown, even though a genuinely different real table sits behind
+      it.
+    se_lens: >
+      The design principle is letting real calling code think in terms
+      of "this Part's Tags" rather than "the rows in part_tags where
+      part_id matches this Part's id" - the same real payoff this
+      curriculum's own Foreign Keys lesson already named for an ordinary
+      `backref`, here extended across an entire extra table instead of
+      a single column. The real alternative NOT chosen - querying
+      `part_tags` directly by hand, every time real code needs a part's
+      tags - would work, but would force every caller to know the real
+      table's own two column names and write its own join logic
+      independently, each time. The honest cost, made concrete by this
+      lesson's own real grep: an abstraction this clean can be built
+      completely correctly, verified directly by a real, passing lab,
+      and still never be reached by a single real caller in the actual,
+      running application - the abstraction's own quality says nothing
+      about whether anything upstream ever decided to use it.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_many_to_many.py
+        explanation: >
+          The identical real command as the previous unit - this unit
+          reasons about the same real, already-run output, from a
+          different angle.
+    verification:
+      applicable: false
+      exemption_reason: >
+        This unit draws a different real conclusion from the exact same
+        already-run lab and its already-shown output in the previous
+        unit - re-running the identical script would only reproduce
+        the identical real output already shown and cited there.
+    connection_to_previous: >
+      The previous unit proved many-to-many's own defining property,
+      both sides holding several; this unit names the real mechanism
+      that let that happen without either side of the real code ever
+      touching the table making it possible.
+
+closing:
+  connect_the_pieces: >
+    Follow one real pairing, `urgent` and `P-1234567`, through this
+    lesson's own single real lab. Neither `Tag` nor `Part` could hold
+    this relationship in a single column - the first unit's own real
+    output shows `urgent` genuinely holding two real `Part`s
+    (`P-1234567` and `P-7654321`) while `P-1234567` genuinely holds two
+    real `Tag`s (`urgent` and `prototype`) at the very same time, the
+    one property a one-to-many relationship can never have on both
+    sides at once. That real property exists because
+    `backend/app/models/tag.py`'s own real `part_tags` association
+    table holds one separate row per real pairing, needing no new
+    column on either `Part` or `Tag`. And the second unit names why
+    calling code, `urgent.parts.append(part1)`, never once has to
+    mention `part_tags` at all: `secondary=part_tags`'s own real
+    relationship modeling handles every real read and write to that
+    table internally - real navigation this lesson's own grep confirms
+    no real route or service in this entire application has ever
+    actually used.
+  next_lesson_pointer: >
+    Next, a different real cost of schema design gets named directly:
+    `backend/app/models/machine_pairing.py`'s own real,
+    three-times-repeated approval-tracking columns - quality,
+    engineering, and programming, each with its own identical
+    `approved`/`approved_by`/`approved_email`/`approved_at` group,
+    instead of one shared shape stored once per real approval.
