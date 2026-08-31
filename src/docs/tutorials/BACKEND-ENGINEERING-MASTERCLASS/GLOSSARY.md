@@ -198,6 +198,9 @@ re-run the script after any lesson changes instead.
 ## build_error_response
 - **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, new, standalone Python function this lesson proposes - not yet wired into this project's own real backend, since Flask's own error-handling mechanics (`@app.errorhandler`) aren't taught until this curriculum's next phase.
 
+## build_health_response (proposed prototype)
+- **Object/method** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - A real, new, standalone Python function this lesson proposes - not yet wired into this project's own real backend, exactly matching the real pattern this curriculum's own Phase 3 closing lesson already established for a proposed-but-not-yet-applied real contract.
+
 ## Business logic
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - the actual decision-making specific to what this
 
@@ -212,6 +215,9 @@ re-run the script after any lesson changes instead.
 
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
+
+## canonical endpoint (decision)
+- **Term** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - The real, deliberate decision about which real URL(s) a resource lives at, and what real relationship multiple URLs answering the identical real question should have to each other - in this lesson's own case, keeping both real, existing URLs alive but making them share one real, unified implementation. It exists because "which URL is correct" and "should this URL even keep existing" are two genuinely different real questions, and conflating them risks breaking a real, legitimate caller for no real reason.
 
 ## centralized error mapping
 - **Term** in `LESSON-4.7-FLASK-ERROR-HANDLING` - Registering a small, real, fixed set of exception handlers - one per real category of failure - so every real error this project's own backend can produce passes through the identical real, consistent transformation, no matter which of the 18 real route files actually raised it. It exists as the real, structural fix for the exact inconsistency this curriculum's own Phase 3 closing lesson could only catalog and propose, never actually apply.
@@ -496,6 +502,9 @@ re-run the script after any lesson changes instead.
 ## header
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - One real line of an HTTP message, before its blank-line separator, carrying one real piece of metadata as a `Name: value` pair - `Content-Type: application/json`, in this lesson's own response unit. It exists so real information about a message (its format, its length) travels with the message itself, without being mixed into the actual body.
 
+## health check semantics
+- **Term** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - What "healthy" actually, verifiably means for a specific real endpoint - in this lesson's own design, whether this project's own real database is genuinely reachable right now, not merely whether the process can respond to an HTTP request at all. It exists because a health check that always reports success, regardless of real system state, provides no real, useful information to whatever real tool is asking.
+
 ## health route)
 - **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered directly on the `app` object itself - not through a blueprint - already read in an earlier phase, characterized here for the first time with real, permanent tests.
 
@@ -728,6 +737,9 @@ re-run the script after any lesson changes instead.
 ## random)
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - Python's own standard library `random` module, providing a real pseudo-random number generator.
 
+## real_health_status (proposed prototype)
+- **Object/method** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - A real, new, standalone function proposing this project's own actual health-check logic - the real decision `build_health_response` itself deliberately doesn't make.
+
 ## RED
 - **Term** in `LESSON-2.9-TDD` - The first real step of one TDD cycle: writing a test for behavior that doesn't exist yet, and confirming, by actually running it, that it fails - not skipped, not silently wrong, a real, observed failure. It exists to prove the test itself is genuinely capable of failing, before it's ever trusted to prove anything passing.
 
@@ -802,6 +814,9 @@ re-run the script after any lesson changes instead.
 
 ## response body
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The actual data an HTTP response carries back, written in JSON in this project - readable directly through `response.get_json()`. It exists as the real answer to whatever the request asked, separate from whether the request even succeeded at all.
+
+## response contract (shape)
+- **Term** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - The real, specific set of fields, and real value vocabulary, a response is guaranteed to carry - decided once, deliberately, rather than left to whichever real implementation happened to be written first. It exists so every real caller of this project's own health check, present or future, can rely on one real, documented shape, instead of needing to know which of two real, historical implementations they happened to hit.
 
 ## response envelope
 - **Term** in `LESSON-3.5-JSON-APIS` - The real, outer JSON structure wrapping a response's own actual content - `{'data': ...}`, `{'success': ..., 'data': ...}`, or any other real shape a route happens to choose. It exists to carry real metadata (like a `total` count, or a `success` flag) alongside a response's own real payload, separate from the payload itself.
@@ -1108,6 +1123,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `5xx (server error)` / `unified error contract` - shares: error
 - `5xx (server error)` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `_build_export_data` / `build_error_response` - shares: build
+- `_build_export_data` / `build_health_response (proposed prototype)` - shares: build
 - `Abstract Syntax Tree (AST)` / `ast.alias` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Attribute` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Call` - shares: ast
@@ -1120,6 +1136,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
 - `api` / `API contract` - shares: api
+- `API contract` / `response contract (shape)` - shares: contract
 - `API contract` / `unified error contract` - shares: contract
 - `app.register_blueprint` / `blueprint registration` - shares: blueprint
 - `app.register_blueprint` / `Blueprint.route` - shares: blueprint
@@ -1195,10 +1212,21 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `health_check (blueprint route)` - shares: blueprint
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, blueprint, bp, real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
+- `build_error_response` / `build_health_response (proposed prototype)` - shares: build
 - `build_error_response` / `centralized error mapping` - shares: error
 - `build_error_response` / `error code` - shares: error
 - `build_error_response` / `unified error contract` - shares: error
+- `build_health_response (proposed prototype)` / `health check semantics` - shares: health
+- `build_health_response (proposed prototype)` / `health route)` - shares: health
+- `build_health_response (proposed prototype)` / `health route, health_bp)` - shares: health
+- `build_health_response (proposed prototype)` / `health_check` - shares: health
+- `build_health_response (proposed prototype)` / `health_check (blueprint route)` - shares: health
+- `build_health_response (proposed prototype)` / `health_check (direct route)` - shares: health
+- `build_health_response (proposed prototype)` / `health_check (the` - shares: health
+- `build_health_response (proposed prototype)` / `health_check (the bare` - shares: health
+- `build_health_response (proposed prototype)` / `real_health_status (proposed prototype)` - shares: health, proposed, prototype
 - `Business logic` / `Domain logic` - shares: logic
 - `Byte string` / `f-string` - shares: string
 - `caching header` / `custom header` - shares: header
@@ -1219,8 +1247,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `characterization test (applied for real)` / `get_machines (revisited for request.args)` - shares: for
 - `characterization test (applied for real)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `characterization test (applied for real)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `characterization test (applied for real)` / `real_health_status (proposed prototype)` - shares: real
 - `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
+- `check_password_hash` / `health check semantics` - shares: check
 - `check_password_hash` / `health_check` - shares: check
 - `check_password_hash` / `health_check (blueprint route)` - shares: check
 - `check_password_hash` / `health_check (direct route)` - shares: check
@@ -1236,6 +1266,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
 - `Config (and its real subclasses)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `Config (and its real subclasses)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
 - `context-local state` / `has_app_context` - shares: context
@@ -1398,6 +1429,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `Query (Machine.query` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Query.filter (Machine.query.filter)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `real_health_status (proposed prototype)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `request (the real context-local proxy)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `update_machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine (PATCH)` - shares: machine
@@ -1418,33 +1450,49 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Header` / `header` - shares: header
 - `Header` / `request header` - shares: header
 - `header` / `request header` - shares: header
+- `health check semantics` / `health route)` - shares: health
+- `health check semantics` / `health route, health_bp)` - shares: health
+- `health check semantics` / `health_check` - shares: check, health
+- `health check semantics` / `health_check (blueprint route)` - shares: check, health
+- `health check semantics` / `health_check (direct route)` - shares: check, health
+- `health check semantics` / `health_check (the` - shares: check, health
+- `health check semantics` / `health_check (the bare` - shares: check, health
+- `health check semantics` / `real_health_status (proposed prototype)` - shares: health
 - `health route)` / `health route, health_bp)` - shares: health
 - `health route)` / `health_check` - shares: health
 - `health route)` / `health_check (blueprint route)` - shares: health
 - `health route)` / `health_check (direct route)` - shares: health
 - `health route)` / `health_check (the` - shares: health
 - `health route)` / `health_check (the bare` - shares: health
+- `health route)` / `real_health_status (proposed prototype)` - shares: health
 - `health route, health_bp)` / `health_check` - shares: health
 - `health route, health_bp)` / `health_check (blueprint route)` - shares: health
 - `health route, health_bp)` / `health_check (direct route)` - shares: health
 - `health route, health_bp)` / `health_check (the` - shares: health
 - `health route, health_bp)` / `health_check (the bare` - shares: health
 - `health route, health_bp)` / `machines_bp (as a real, standalone Blueprint)` - shares: bp
+- `health route, health_bp)` / `real_health_status (proposed prototype)` - shares: health
 - `health_check` / `health_check (blueprint route)` - shares: check, health
 - `health_check` / `health_check (direct route)` - shares: check, health
 - `health_check` / `health_check (the` - shares: check, health
 - `health_check` / `health_check (the bare` - shares: check, health
+- `health_check` / `real_health_status (proposed prototype)` - shares: health
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
 - `health_check (blueprint route)` / `health_check (the` - shares: check, health
 - `health_check (blueprint route)` / `health_check (the bare` - shares: check, health
 - `health_check (blueprint route)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
+- `health_check (blueprint route)` / `real_health_status (proposed prototype)` - shares: health
 - `health_check (direct route)` / `health_check (the` - shares: check, health
 - `health_check (direct route)` / `health_check (the bare` - shares: check, health
+- `health_check (direct route)` / `real_health_status (proposed prototype)` - shares: health
 - `health_check (the` / `health_check (the bare` - shares: check, health, the
+- `health_check (the` / `real_health_status (proposed prototype)` - shares: health
 - `health_check (the` / `request (the real context-local proxy)` - shares: the
+- `health_check (the bare` / `real_health_status (proposed prototype)` - shares: health
 - `health_check (the bare` / `request (the real context-local proxy)` - shares: the
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `HTTPException (Werkzeug's own real base class)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `HTTPException (Werkzeug's own real base class)` / `real_health_status (proposed prototype)` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
 - `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
@@ -1487,6 +1535,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
+- `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
 - `mark (pytest marker)` / `mark_as_read` - shares: mark
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
@@ -1531,6 +1580,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `random (seed` / `random seed` - shares: random, seed
 - `random (seed` / `random)` - shares: random
 - `random seed` / `random)` - shares: random
+- `real_health_status (proposed prototype)` / `request (the real context-local proxy)` - shares: real
 - `request (the real context-local proxy)` / `request context` - shares: context
 - `request body` / `response body` - shares: body
 - `Request line` / `Status line` - shares: line
@@ -1541,6 +1591,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `resource` / `resource identifier` - shares: resource
 - `resource` / `temporary resource` - shares: resource
 - `resource identifier` / `temporary resource` - shares: resource
+- `response contract (shape)` / `response shape` - shares: shape
+- `response contract (shape)` / `unified error contract` - shares: contract
 - `Return value` / `Value object` - shares: value
 - `safe (HTTP method property)` / `Static method` - shares: method
 - `safe (HTTP method property)` / `static method` - shares: method
