@@ -104,8 +104,14 @@ re-run the script after any lesson changes instead.
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
 
+## app.register_blueprint
+- **Object/method** in `LESSON-4.5-BLUEPRINTS` - The real, existing `Flask` method every one of this project's own 18 blueprints is attached through.
+
 ## app.url_map
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central routing table Flask (through Werkzeug) builds from every real `@app.route`/`@blueprint.route` call made during `create_app`'s own real setup.
+
+## application composition
+- **Term** in `LESSON-4.5-BLUEPRINTS` - The real, single act of assembling every real blueprint this project defines into one, real, working app - `register_routes(app)`, called once, inside `create_app`. It exists as the one real place a reader (or this lesson's own labs) can see the entire real backend's routing structure come together.
 
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
@@ -167,6 +173,9 @@ re-run the script after any lesson changes instead.
 ## Authorization header
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A specific, real request header - `Authorization: Bearer <token>` - carrying real credentials. It exists as the real, standard place a client puts proof of who it is, so a server can check that proof before deciding what a request is even allowed to do.
 
+## blueprint registration
+- **Term** in `LESSON-4.5-BLUEPRINTS` - The real, explicit act of attaching an already-complete `Blueprint`'s own routes onto a specific real `Flask` app - `app.register_blueprint(bp, url_prefix=...)`. It exists as the one real, deliberate step separating "this group of routes exists" from "this group of routes is actually live on this specific real app."
+
 ## Blueprint.route
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A method registering a URL rule on a Blueprint and returning a decorator for the function that handles it.
 
@@ -175,6 +184,9 @@ re-run the script after any lesson changes instead.
 
 ## body
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, optional data an HTTP message carries after its own blank-line separator - absent in this lesson's own request (a bare `GET` needs none), and a real JSON string in its response. It exists as the one part of the message meant to be read as content, not metadata.
+
+## bootstrap_bp (a real, self-prefixed Blueprint)
+- **Object/method** in `LESSON-4.5-BLUEPRINTS` - A real, existing Blueprint that sets its own real URL prefix at construction time, rather than at registration time.
 
 ## build_error_response
 - **Object/method** in `LESSON-3.7-API-ERROR-DESIGN` - A real, new, standalone Python function this lesson proposes - not yet wired into this project's own real backend, since Flask's own error-handling mechanics (`@app.errorhandler`) aren't taught until this curriculum's next phase.
@@ -546,6 +558,9 @@ re-run the script after any lesson changes instead.
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
 
+## machines_bp (as a real, standalone Blueprint)
+- **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real `Blueprint` instance for every machine-related route, already studied extensively in this curriculum, examined here specifically as a self-contained real object, independent of any app.
+
 ## map
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that applies a real, given function to every element of a real iterable, one at a time.
 
@@ -557,6 +572,9 @@ re-run the script after any lesson changes instead.
 
 ## mock
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double programmed with canned return values, whose real point is verifying *how* it was called - which methods, how many times, with what real arguments - not just standing in silently. It exists to answer a checkable question a stub cannot: "did my code actually call its dependency correctly?"
+
+## modular routing
+- **Term** in `LESSON-4.5-BLUEPRINTS` - Splitting a real application's own routes across multiple, real, independent files - one real `Blueprint` per related group - kept isolated from any specific app until registered. It exists so a real backend with many routes (this project's own 18 route files) never has to hold every real route definition in one, unmanageable module.
 
 ## ModuleNotFoundError
 - **Object/method** in `LESSON-2.9-TDD` - A real, built-in Python exception, raised when an `import` statement names a module Python cannot find anywhere on its search path.
@@ -679,6 +697,9 @@ re-run the script after any lesson changes instead.
 ## Reflection
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
 
+## register_routes
+- **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real, single function assembling every one of its 18 real blueprints into one real app.
+
 ## regression
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A previously-working piece of behavior that quietly stops working because of a later, often unrelated-looking, change elsewhere in the code. It exists as a named failure mode because software rarely breaks all at once - it breaks one small, later edit at a time - and without something re-checking the old behavior every time, nobody notices until the broken version has already shipped.
 
@@ -746,6 +767,9 @@ re-run the script after any lesson changes instead.
 
 ## Return value
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
+
+## route prefix
+- **Term** in `LESSON-4.5-BLUEPRINTS` - A real, shared URL segment automatically prepended to every real route a blueprint defines - `/api/machines`, for `machines_bp`'s own routes. It exists so an entire real blueprint's worth of routes can be relocated, or namespaced, by changing one real string in one real place, rather than editing every individual real route pattern.
 
 ## route registration
 - **Term** in `LESSON-4.4-ROUTES` - The real, one-time act of telling Flask's own routing table that a specific real URL pattern and method should reach a specific real Python function - `@blueprint.route(...)`, applied once, when the module is first imported. It exists as the real, structural link between a URL a client might request and the actual code that handles it.
@@ -1049,7 +1073,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
 - `API contract` / `unified error contract` - shares: contract
+- `app.register_blueprint` / `blueprint registration` - shares: blueprint
+- `app.register_blueprint` / `Blueprint.route` - shares: blueprint
+- `app.register_blueprint` / `blueprint.route (the decorator itself)` - shares: blueprint
+- `app.register_blueprint` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
+- `app.register_blueprint` / `health_check (blueprint route)` - shares: blueprint
+- `app.register_blueprint` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
+- `app.register_blueprint` / `register_routes` - shares: register
 - `app.url_map` / `map` - shares: map
+- `application composition` / `application context` - shares: application
+- `application composition` / `application factory` - shares: application
+- `application composition` / `Application layer` - shares: application
+- `application composition` / `application object` - shares: application
+- `application composition` / `Application server` - shares: application
 - `application context` / `application factory` - shares: application
 - `application context` / `Application layer` - shares: application
 - `application context` / `application object` - shares: application
@@ -1079,15 +1115,31 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Authorization header` / `Header` - shares: header
 - `Authorization header` / `header` - shares: header
 - `Authorization header` / `request header` - shares: header
+- `blueprint registration` / `Blueprint.route` - shares: blueprint
+- `blueprint registration` / `blueprint.route (the decorator itself)` - shares: blueprint
+- `blueprint registration` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
+- `blueprint registration` / `health_check (blueprint route)` - shares: blueprint
+- `blueprint registration` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
+- `blueprint registration` / `route registration` - shares: registration
+- `Blueprint.route` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
 - `Blueprint.route` / `health_check (blueprint route)` - shares: blueprint
+- `Blueprint.route` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `Decorator` - shares: decorator
 - `blueprint.route (the decorator itself)` / `Flask (the class, and this project's own app instance)` - shares: the
 - `blueprint.route (the decorator itself)` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `blueprint.route (the decorator itself)` / `health_check (blueprint route)` - shares: blueprint
+- `blueprint.route (the decorator itself)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `blueprint.route (the decorator itself)` / `request (the real context-local proxy)` - shares: the
 - `body` / `JSON response body` - shares: body
 - `body` / `request body` - shares: body
 - `body` / `response body` - shares: body
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `Config (and its real subclasses)` - shares: real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `Dependency (of a function)` - shares: a
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `get_machine (revisited for its real decorator stack)` - shares: real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `health_check (blueprint route)` - shares: blueprint
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, blueprint, bp, real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
 - `build_error_response` / `error code` - shares: error
 - `build_error_response` / `unified error contract` - shares: error
 - `Business logic` / `Domain logic` - shares: logic
@@ -1114,6 +1166,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
+- `Config (and its real subclasses)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
 - `create_app` / `create_machine` - shares: create
@@ -1193,6 +1246,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `update_machine_status` - shares: machine
 - `delete_machine` / `update_machine_status (PUT)` - shares: machine
 - `Dependency (of a function)` / `Key function` - shares: function
+- `Dependency (of a function)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
@@ -1257,6 +1311,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `is_valid_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `Query (Machine.query` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `request (the real context-local proxy)` - shares: real
@@ -1265,6 +1320,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `update_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine_status (PUT)` - shares: machine
 - `get_machines` / `get_machines (revisited for request.args)` - shares: machines
+- `get_machines` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
+- `get_machines (revisited for request.args)` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `request.args.get` - shares: args
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
@@ -1275,6 +1332,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check` / `health_check (blueprint route)` - shares: check, health
 - `health_check` / `health_check (direct route)` - shares: check, health
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
+- `health_check (blueprint route)` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
@@ -1316,6 +1374,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
+- `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
 - `mark (pytest marker)` / `mark_as_read` - shares: mark
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest

@@ -1,0 +1,417 @@
+# Lesson 4.5: Blueprints
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Four real, run checks against this project's own real, 18-blueprint backend, naming what has quietly held every earlier lesson's own routes together: a real `Blueprint` object as a self-contained, reusable module of routes; two genuinely different real mechanisms this project's own code actually uses for setting a route prefix; real proof that registering the identical blueprint twice under the same name fails, while registering it again under a different name succeeds; and, closing the lesson, a real, direct count of exactly how this project's own 18 real route files compose into its one, real, 112-rule routing table.
+
+**What you need to know first:** What real route registration, URL parameters, query parameters, and request bodies are as Flask mechanics; what the real application factory pattern is.
+
+## Terms used in this lesson
+
+- **modular routing** — Splitting a real application's own routes across multiple, real, independent files - one real `Blueprint` per related group - kept isolated from any specific app until registered. It exists so a real backend with many routes (this project's own 18 route files) never has to hold every real route definition in one, unmanageable module.
+- **blueprint registration** — The real, explicit act of attaching an already-complete `Blueprint`'s own routes onto a specific real `Flask` app - `app.register_blueprint(bp, url_prefix=...)`. It exists as the one real, deliberate step separating "this group of routes exists" from "this group of routes is actually live on this specific real app."
+- **route prefix** — A real, shared URL segment automatically prepended to every real route a blueprint defines - `/api/machines`, for `machines_bp`'s own routes. It exists so an entire real blueprint's worth of routes can be relocated, or namespaced, by changing one real string in one real place, rather than editing every individual real route pattern.
+- **application composition** — The real, single act of assembling every real blueprint this project defines into one, real, working app - `register_routes(app)`, called once, inside `create_app`. It exists as the one real place a reader (or this lesson's own labs) can see the entire real backend's routing structure come together.
+
+## Objects and methods used
+
+- **`machines_bp (as a real, standalone Blueprint)`**
+  - *What it is:* This project's own real `Blueprint` instance for every machine-related route, already studied extensively in this curriculum, examined here specifically as a self-contained real object, independent of any app.
+  - *Implementation:* `machines_bp = Blueprint('machines', __name__)` (`backend/app/routes/machines.py:11`) - every real `@machines_bp.route(...)` call anywhere in that same file adds a real, deferred registration onto this one object, real and complete, before `create_app` is ever called.
+  - *Its use:* This lesson imports it directly, before building any real app at all, to confirm its own real routes already exist independently.
+  - *Type:* A real `flask.Blueprint` instance.
+  - *Responsibility:* Holding every real route this project's own `machines.py` defines, ready to be attached to any real Flask app that registers it.
+  - *Depends on:* Nothing, to exist with its own real routes already defined; a real `Flask` app, via `register_blueprint`, to actually become live.
+  - *Connects to:* Registered by `register_routes` (`backend/app/routes/__init__.py:31`, `app.register_blueprint(machines_bp, url_prefix='/api/machines')`).
+  - *Shape:* Carries a real, internal list of deferred route registrations, each applied to whichever real app later registers this blueprint.
+
+- **`bootstrap_bp (a real, self-prefixed Blueprint)`**
+  - *What it is:* A real, existing Blueprint that sets its own real URL prefix at construction time, rather than at registration time.
+  - *Implementation:* `bootstrap_bp = Blueprint('bootstrap', __name__, url_prefix='/api/bootstrap')` (`backend/app/routes/bootstrap.py:24`) - the real prefix is baked directly into the `Blueprint(...)` call itself; its own real registration, `app.register_blueprint(bootstrap_bp)` (`backend/app/__init__.py:299`), passes no `url_prefix` argument at all.
+  - *Its use:* This lesson contrasts its own real construction-time prefix directly against `machines_bp`'s own real, registration-time prefix.
+  - *Type:* A real `flask.Blueprint` instance.
+  - *Responsibility:* Carrying its own real URL prefix as part of its own identity, rather than depending on whoever registers it to supply one.
+  - *Depends on:* Nothing beyond its own real construction call.
+  - *Connects to:* Registered separately from `register_routes`'s own real 17 blueprints, directly in `create_app` (`backend/app/__init__.py:296-299`).
+  - *Shape:* `Blueprint(name, import_name, url_prefix=...)` - the real, optional `url_prefix` keyword this project's own `bootstrap_bp` uses, and every other real blueprint in this project does not.
+
+- **`app.register_blueprint`**
+  - *What it is:* The real, existing `Flask` method every one of this project's own 18 blueprints is attached through.
+  - *Implementation:* `app.register_blueprint(blueprint, url_prefix=None, name=None)` - attaches a real blueprint's own deferred routes onto this specific real app; raises a real `ValueError` if the identical real blueprint name is registered twice without a real, explicit `name=` override, confirmed directly this session.
+  - *Its use:* This lesson calls it multiple times against the identical real blueprint object, specifically to observe both its real success and real failure paths.
+  - *Type:* A real instance method on Flask's own `Flask` class.
+  - *Responsibility:* Merging one real blueprint's own routes into one real app's own routing table, under one real, unique name.
+  - *Depends on:* A real `Blueprint` instance; a real, unique name (the blueprint's own default name, or an explicit real override).
+  - *Connects to:* Called once per real blueprint inside `register_routes` (`backend/app/routes/__init__.py:9-57`), and once more, separately, for `bootstrap_bp`, inside `create_app` itself.
+  - *Shape:* Takes a real `Blueprint` in (plus optional real `url_prefix`/`name` keywords); returns nothing, mutating the real app's own routing table in place.
+
+- **`register_routes`**
+  - *What it is:* This project's own real, single function assembling every one of its 18 real blueprints into one real app.
+  - *Implementation:* `def register_routes(app: Flask): ...` (`backend/app/routes/__init__.py:9-57`) - imports and registers 17 real blueprints, each with its own real `url_prefix`; `bootstrap_bp`, the 18th, is registered separately, directly inside `create_app` (`backend/app/__init__.py:296-299`), relying on its own construction-time prefix instead.
+  - *Its use:* This lesson calls `create_app` and inspects the real, resulting `app.blueprints` and `app.url_map` directly, to count exactly what this one real function (plus the one separate call) actually produces.
+  - *Type:* A real, module-level function.
+  - *Responsibility:* Being the one real, central place every real route in this project gets attached to the app - the real, single point a reader (or this lesson's own lab) can inspect to see the whole real routing structure at once.
+  - *Depends on:* A real, already-constructed `Flask` app instance; every real blueprint module it imports.
+  - *Connects to:* Called once, inside `create_app` (`backend/app/__init__.py:298`), immediately before `bootstrap_bp`'s own separate, real registration.
+  - *Shape:* Takes a real `Flask` app in; returns nothing, leaving that real app holding every one of this project's own 18 real blueprints when it finishes.
+
+## Concept Unit: Modular Routing - A Blueprint Is Real, Complete, Before Any App Exists
+
+### The Problem
+
+`machines_bp`'s own real routes are all defined with `@machines_bp.route(...)`, inside `machines.py`, with no real `Flask` app anywhere in that file. Does `machines_bp` actually need one to already hold its own real routes?
+
+Before reading on:
+
+- Every real `@machines_bp.route(...)` call in `machines.py` happens the moment that module is first imported - before `create_app()` is ever called anywhere. What does that suggest about whether `machines_bp` already "knows" its own real routes by the time `create_app` even starts running?
+- If you imported `machines_bp` directly, on its own, with no real app built at all, would you expect it to already carry real, useful information - or would it be empty until something attaches it to an app?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:11-297` (the whole file, defining `machines_bp` and every real route on it), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+This project's own real `machines_bp`, inspected before any real app exists, then registered onto a bare one:
+
+**File:** `verification/phase-04/lab_blueprints_modular.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app.routes.machines import machines_bp
+
+print("real machines_bp is a real Blueprint:", type(machines_bp).__name__)
+print("real machines_bp.name:", machines_bp.name)
+print("real number of routes registered on machines_bp, before any app exists:", len(machines_bp.deferred_functions))
+
+from flask import Flask
+bare_app = Flask(__name__)
+print("real, bare Flask app has zero knowledge of machines_bp until registered -> url rules:", len(list(bare_app.url_map.iter_rules())))
+
+bare_app.register_blueprint(machines_bp, url_prefix="/api/machines")
+print("after registering the identical real blueprint -> url rules:", len(list(bare_app.url_map.iter_rules())))
+
+assert len(machines_bp.deferred_functions) > 0
+assert len(list(bare_app.url_map.iter_rules())) > 1
+print("machines_bp already held every one of its own real routes before this script ever built an app - registering it onto a real app just attaches that already-complete real module to one specific app's own real routing table")
+```
+
+### Mechanical Walkthrough
+
+- `from app.routes.machines import machines_bp` — Importing this real module alone - with no `create_app()` call anywhere in this script - is enough to fully populate `machines_bp`'s own real, internal route list, since every real `@machines_bp.route(...)` call runs the moment this module is first imported.
+- `len(machines_bp.deferred_functions)` — Reads the real, internal count directly - proof this project's own blueprint object is already a real, complete module of routes, independent of any specific app.
+- `bare_app = Flask(__name__)` — A genuinely fresh, real `Flask` app, built without `create_app` at all - has no knowledge of `machines_bp`, or any of this project's own routes, until told to.
+- `bare_app.register_blueprint(machines_bp, url_prefix="/api/machines")` — The one real, explicit step connecting the two - after this real call, `bare_app`'s own routing table gains every real route `machines_bp` already carried.
+
+### CS Lens
+
+This is a **module of behavior, decoupled from its host**: a real blueprint is complete and self-contained the moment it's defined, genuinely independent of which real app (if any) eventually uses it. Also recognized in: a real Python package, fully importable and usable on its own, regardless of which real application eventually depends on it; a real dynamic library (`.so`/`.dll`), complete on disk before any real process loads it; and, in this project's own domain, a real, pre-built tool assembly, complete and ready, before any specific real machine ever loads it into a turret.
+
+### SE Lens
+
+The design principle is that decoupling a blueprint's own real definition from its eventual real registration lets the identical real module of routes be reused, tested, or even registered more than once (this lesson's own later unit proves that directly), without ever touching the file that defines it. The real alternative not chosen: defining every real route directly on the app object itself, the way `health_check` in `__init__.py` still does; the honest cost of that simpler, real alternative, which this project's own code overwhelmingly avoids: every real route would have to live in one, real, monolithic file, or be manually attached to a shared `app` object threaded through every real module - exactly the real complexity blueprints exist to avoid.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_blueprints_modular.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+real machines_bp is a real Blueprint: Blueprint
+real machines_bp.name: machines
+real number of routes registered on machines_bp, before any app exists: 10
+real, bare Flask app has zero knowledge of machines_bp until registered -> url rules: 1
+after registering the identical real blueprint -> url rules: 11
+machines_bp already held every one of its own real routes before this script ever built an app - registering it onto a real app just attaches that already-complete real module to one specific app's own real routing table
+```
+
+Full saved run: `verification/phase-04/lab_blueprints_modular_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it establishes that a blueprint is real, complete, and independent, before any of this lesson's later units touch how it actually gets attached to an app.
+
+## Concept Unit: Route Prefixes - Two Real Mechanisms, One Real Outcome
+
+### The Problem
+
+`bootstrap_bp`'s own real construction (`backend/app/routes/bootstrap.py:24`) names its own real `url_prefix` directly; `machines_bp`'s own real construction (`machines.py:11`) names none at all. Do both blueprints still end up with a real, working prefix?
+
+Before reading on:
+
+- `app.register_blueprint(bootstrap_bp)` (`backend/app/__init__.py:299`) passes no `url_prefix` argument. Given what `bootstrap_bp`'s own construction already set, would you expect its real routes to end up with no prefix at all, or the one it already carries?
+- `app.register_blueprint(machines_bp, url_prefix='/api/machines')` (`routes/__init__.py:31`) passes the real prefix explicitly, at registration time instead. Which of these two real, genuinely different mechanisms would let the SAME blueprint object be registered under two different real prefixes later?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/bootstrap.py:24` and `backend/app/__init__.py:296-299`, plus `backend/app/routes/machines.py:11` and `backend/app/routes/__init__.py:31`, all read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+Two real blueprints, two real prefix mechanisms, compared directly:
+
+**File:** `verification/phase-04/lab_blueprints_prefixes.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from app.routes.bootstrap import bootstrap_bp
+from app.routes.machines import machines_bp
+
+print("real bootstrap_bp.url_prefix (set at Blueprint() construction time):", bootstrap_bp.url_prefix)
+print("real machines_bp.url_prefix (nothing set at construction time):", machines_bp.url_prefix)
+
+from app import create_app
+app = create_app("testing")
+
+bootstrap_rules = sorted({str(r) for r in app.url_map.iter_rules() if r.endpoint.startswith("bootstrap.")})
+machines_rules = sorted({str(r) for r in app.url_map.iter_rules() if r.endpoint.startswith("machines.") and r.rule == "/api/machines"})
+
+print("real, final bootstrap route(s):", bootstrap_rules)
+print("real, final machines route (list endpoint):", machines_rules)
+
+assert bootstrap_bp.url_prefix == "/api/bootstrap"
+assert machines_bp.url_prefix is None
+assert bootstrap_rules == ["/api/bootstrap"]
+assert machines_rules == ["/api/machines"]
+print("two real, different mechanisms reach the identical real outcome - bootstrap_bp bakes its own prefix in at construction time; machines_bp carries none of its own, and gets one only when register_routes(app) passes url_prefix='/api/machines' at registration time")
+```
+
+### Mechanical Walkthrough
+
+- `bootstrap_bp.url_prefix` — Reads the real, already-set prefix directly off the blueprint object itself - present the moment `bootstrap.py`'s own module-level `Blueprint(...)` call ran.
+- `machines_bp.url_prefix` — Reads the identical real attribute off `machines_bp` - genuinely `None`, since its own real construction call never named one.
+- `app = create_app("testing")` — Runs this project's own real, full setup - both real mechanisms converge here, one supplying its own prefix, one receiving it from `register_routes`'s own explicit real `url_prefix=` argument.
+- `assert bootstrap_rules == ["/api/bootstrap"] / assert machines_rules == ["/api/machines"]` — Confirms, for real, both real blueprints ended up with the identical kind of working prefix, despite reaching it two genuinely different real ways.
+
+### CS Lens
+
+This is a **default supplied at one of two real points**: a configuration value that can be baked into an object's own real construction, or supplied later, by whoever actually uses it. Also recognized in: a real Python function's own default argument value (set once, at definition) versus a caller passing an explicit real value at call time; a real class's own `__init__`-time defaults versus a factory function overriding them per instance; and, in this project's own domain, a real machine's own manufacturer-set default feed rate versus a specific real program overriding it for one operation.
+
+### SE Lens
+
+The design principle behind supporting both real mechanisms is flexibility - a blueprint MEANT to live at one, fixed, real URL forever (`bootstrap_bp`) can say so once, at its own definition; a blueprint meant to be genuinely reusable at different real prefixes (proven directly in this lesson's own next unit) should leave that decision to whoever registers it. The real alternative not chosen: forcing every real blueprint to declare its own fixed prefix at construction time, the way `bootstrap_bp` does; the honest, real inconsistency this project's own code actually has, proven directly by this unit's own two real checks: 17 of this project's own 18 real blueprints rely on the registration-time mechanism, and exactly one - `bootstrap_bp` - uses the other, with nothing in the code itself explaining why that one, real blueprint is different.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_blueprints_prefixes.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+real bootstrap_bp.url_prefix (set at Blueprint() construction time): /api/bootstrap
+real machines_bp.url_prefix (nothing set at construction time): None
+Seeding default users...
+real, final bootstrap route(s): ['/api/bootstrap']
+real, final machines route (list endpoint): ['/api/machines']
+two real, different mechanisms reach the identical real outcome - bootstrap_bp bakes its own prefix in at construction time; machines_bp carries none of its own, and gets one only when register_routes(app) passes url_prefix='/api/machines' at registration time
+```
+
+Full saved run: `verification/phase-04/lab_blueprints_prefixes_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit established a blueprint as a real, complete module before registration; this unit shows one real detail - its own prefix - can be decided at either end of that same real handoff.
+
+## Concept Unit: Blueprint Registration - A Reusable Real Template, Not a One-Time Use
+
+### The Problem
+
+Every real blueprint in this project is registered exactly once. Is registering the identical real `Blueprint` object a SECOND time even possible - and if so, under what real condition?
+
+Before reading on:
+
+- If `app.register_blueprint(bp, url_prefix='/first')` already ran once, what would you expect to happen if the identical real line ran again, unchanged, against the same real app?
+- Given that a blueprint is a real, reusable module of routes (the previous unit's own finding), what real, additional piece of information would Flask need from you to let the SAME blueprint serve a second, genuinely different real prefix?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - this project's own real code never registers the same blueprint twice; this unit demonstrates the real, general mechanism directly.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+The identical real blueprint, registered three real times:
+
+**File:** `verification/phase-04/lab_blueprints_registration.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from flask import Flask, Blueprint
+
+app = Flask(__name__)
+bp = Blueprint("demo", __name__)
+
+
+@bp.route("/x")
+def view():
+    return "ok"
+
+
+app.register_blueprint(bp, url_prefix="/first")
+print("real first registration -> succeeded, endpoint: demo.view")
+
+try:
+    app.register_blueprint(bp, url_prefix="/second")
+    print("real second registration (same name) succeeded (unexpected)")
+except ValueError as e:
+    print("real second registration (identical name) raised:", type(e).__name__, "-", str(e))
+
+app.register_blueprint(bp, url_prefix="/third", name="demo_again")
+print("real third registration (explicit different name) -> succeeded")
+
+real_rules = sorted((str(r), r.endpoint) for r in app.url_map.iter_rules() if "demo" in r.endpoint)
+for rule, endpoint in real_rules:
+    print(f"{rule:15s} -> {endpoint}")
+
+assert real_rules == [("/first/x", "demo.view"), ("/third/x", "demo_again.view")]
+print("the identical real Blueprint object, registered twice under two different real names, now serves two genuinely separate real URL prefixes - a blueprint is a reusable real template, not a one-time registration")
+```
+
+### Mechanical Walkthrough
+
+- `app.register_blueprint(bp, url_prefix="/first")` — The real, first registration - succeeds, attaching `bp`'s own real route under `/first`, registered internally under its own real, default name, `"demo"`.
+- `app.register_blueprint(bp, url_prefix="/second") (inside try/except ValueError)` — Attempts the identical real registration again - Flask itself refuses, since the real name `"demo"` is already taken on this app, raising a genuine `ValueError` naming the real fix (`name=`).
+- `app.register_blueprint(bp, url_prefix="/third", name="demo_again")` — The real, third registration - supplies the real, explicit `name=` Flask's own error message asked for, succeeding this time.
+- `assert real_rules == [("/first/x", "demo.view"), ("/third/x", "demo_again.view")]` — Confirms, for real, the direct payoff - the identical real blueprint object now genuinely serves two, separate, live real URL prefixes at once.
+
+### CS Lens
+
+This is **instance reuse gated by identity**: the real underlying object can be reused freely, but each real, distinct use needs its own real, unique name to avoid colliding with an earlier one. Also recognized in: a real Python class instantiated multiple times, each real instance needing no special naming, contrasted with a real module-level singleton, which genuinely can't be "registered" twice under the same real name; a real database table alias, letting the identical real table be joined against itself twice in one real query, under two different real names; and, in this project's own domain, the identical real tool assembly definition loaded into two different real turret positions, each needing its own real, distinct slot identity.
+
+### SE Lens
+
+The design principle behind requiring a unique real name per registration is that Flask's own real endpoint names (`blueprint_name.function_name`, already seen in this curriculum's own earlier `app.url_map` work) have to stay genuinely unique across the whole real app, since `url_for(...)` and Flask's own internal dispatch both rely on that real name resolving to exactly one real route. The real alternative not chosen: silently allowing a duplicate real name, and letting whichever registration happened last simply win; the honest, real value of Flask's own strict, real refusal here, proven directly by this unit's own real `ValueError`: a genuine naming collision is caught immediately, loudly, and by name, rather than silently producing two real routes no one could reliably tell apart later.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_blueprints_registration.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+real first registration -> succeeded, endpoint: demo.view
+real second registration (identical name) raised: ValueError - The name 'demo' is already registered for this blueprint. Use 'name=' to provide a unique name.
+real third registration (explicit different name) -> succeeded
+/first/x        -> demo.view
+/third/x        -> demo_again.view
+the identical real Blueprint object, registered twice under two different real names, now serves two genuinely separate real URL prefixes - a blueprint is a reusable real template, not a one-time registration
+```
+
+Full saved run: `verification/phase-04/lab_blueprints_registration_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed two real ways to set a prefix; this unit shows why a blueprint needing a real, unique name matters at all - it's what makes registering the same one more than once even possible.
+
+## Concept Unit: Application Composition - 18 Real Files, One Real App
+
+### The Problem
+
+This project's own real backend has 18 real route files. Does `register_routes(app)` alone account for all of them, and how much does each one actually contribute to the real, final app?
+
+Before reading on:
+
+- `register_routes` (`backend/app/routes/__init__.py:9-57`) itself registers 17 real blueprints. Given this project's own real backend has 18, where would the 18th have to be registered instead?
+- Would you expect every real blueprint to contribute the identical real number of routes, or would some real route files naturally carry more real endpoints than others?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/__init__.py:9-57` (`register_routes`) and `backend/app/__init__.py:296-299` (`bootstrap_bp`'s own separate registration), both read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+This project's own real, fully-composed app, broken down by which real blueprint contributed what:
+
+**File:** `verification/phase-04/lab_blueprints_composition.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from collections import Counter
+from app import create_app
+
+app = create_app("testing")
+
+counts = Counter()
+for rule in app.url_map.iter_rules():
+    bp_name = rule.endpoint.split(".")[0] if "." in rule.endpoint else "(app-level, no blueprint)"
+    counts[bp_name] += 1
+
+for name, count in counts.most_common(6):
+    print(f"{name:28s} -> {count} real URL rules")
+
+print("real total blueprints registered:", len(app.blueprints))
+print("real total URL rules across the whole app:", sum(counts.values()))
+
+assert len(app.blueprints) == 18
+assert sum(counts.values()) == len(list(app.url_map.iter_rules()))
+print("18 real, independently-written route files, each contributing its own real slice of the total - register_routes(app) is the one real place that composes every one of them into a single, real, working application")
+```
+
+### Mechanical Walkthrough
+
+- `for rule in app.url_map.iter_rules(): bp_name = rule.endpoint.split(".")[0] ...` — Reads every real endpoint name's own real `blueprint_name.function_name` shape (already studied in an earlier lesson) and takes just the real blueprint half, tallying how many real routes each one actually registered.
+- `assert len(app.blueprints) == 18` — Confirms, for real, this project's own real blueprint count - 17 from `register_routes`'s own real body, plus `bootstrap_bp`'s own separate, real registration.
+- `assert sum(counts.values()) == len(list(app.url_map.iter_rules()))` — Confirms every real URL rule this app carries is accounted for by exactly one real blueprint's own contribution - no real rule left uncounted.
+
+### CS Lens
+
+This is **composition over a monolith**: a real, complete application assembled from many independently-authored real parts, each with its own real, bounded responsibility. Also recognized in: a real operating system's own kernel, composed of independently-loadable real modules; a real microservice architecture's own opposite extreme, splitting even further into separately-deployed real services; and, in this project's own domain, a complete real machining program composed of many real, independently-written subprograms, each handling one real operation.
+
+### SE Lens
+
+The design principle behind one, real, central composition point (`register_routes`, plus the one real exception for `bootstrap_bp`) is that a reader has exactly one real place to look to see the whole real routing structure, rather than hunting across 18 real files for scattered `app.register_blueprint` calls. The real alternative not chosen: having each real route file register itself directly onto a real, shared `app` object, the way `bootstrap_bp` partially does; the honest, real cost of that one exception, proven directly by this unit's own real run: a reader checking only `register_routes` would undercount this project's own real blueprints by exactly one, and would have to already know to look inside `create_app` itself to find the real, 18th registration.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_blueprints_composition.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+nc_files                     -> 14 real URL rules
+machines                     -> 10 real URL rules
+machine_pairings             -> 10 real URL rules
+operation_manager            -> 10 real URL rules
+parts                        -> 9 real URL rules
+cam_files                    -> 9 real URL rules
+real total blueprints registered: 18
+real total URL rules across the whole app: 112
+18 real, independently-written route files, each contributing its own real slice of the total - register_routes(app) is the one real place that composes every one of them into a single, real, working application
+```
+
+Full saved run: `verification/phase-04/lab_blueprints_composition_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit proved one real blueprint could be reused safely, under distinct real names; this unit closes the lesson by showing what this project's own real code actually does with 18 real, independent blueprints instead - never reused, each registered exactly once, composed together into one real, complete app.
+
+## Connect the pieces
+
+One real blueprint, `machines_bp`, already holding every one of its own real routes the moment its own file is imported - genuinely independent of any app (modular routing). Two real, different mechanisms for the identical real outcome - a prefix baked in at construction (`bootstrap_bp`) or supplied at registration (`machines_bp`, and 16 others) (route prefixes). The identical real blueprint object, registered under two different real names, now genuinely serving two separate real URL prefixes at once - real, direct proof a blueprint is a reusable template, not a one-time registration (blueprint registration). And, closing the lesson, this project's own real, complete picture: 18 real blueprints, 112 real URL rules, composed almost entirely through one real function, `register_routes`, with exactly one real, unexplained exception (application composition).
+
+**Next lesson:** Every real request this phase has studied has been treated as a single, isolated event; next, this curriculum studies Flask's own real request and application contexts more deeply - what context-local state actually persists across a single real request, and where this project's own code already depends on that.
