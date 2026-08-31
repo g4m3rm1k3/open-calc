@@ -330,6 +330,7 @@ re-run the script after any lesson changes instead.
 
 ## db.relationship
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, without itself adding a column to the database.
+- **Object/method** in `LESSON-6.5-ONE-TO-MANY-RELATIONSHIPS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, already fully treated in this curriculum's own Foreign Keys lesson.
 
 ## db.session.add
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
@@ -656,6 +657,9 @@ re-run the script after any lesson changes instead.
 ## list slicing
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `sequence[start:stop]` syntax, returning a new, separate sequence containing the elements from index `start` up to (but not including) index `stop`; omitting either side means "from the beginning" or "through the end." It exists as a compact way to select a contiguous sub-range of a sequence without writing an explicit loop.
 
+## list.extend
+- **Object/method** in `LESSON-6.5-ONE-TO-MANY-RELATIONSHIPS` - A real Python list method that appends every item from another iterable onto an existing list, one at a time.
+
 ## Machine
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real SQLAlchemy model representing one CNC machine row in this project's own database.
 
@@ -703,6 +707,9 @@ re-run the script after any lesson changes instead.
 
 ## observed behavior vs. intended behavior
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - The real distinction a characterization test is built around: what code actually does, verified by running it, versus what its author meant, or what a docstring claims, which may or may not be the same thing. It exists because conflating the two is exactly what lets a well-meaning "fix" silently change real behavior nobody meant to touch.
+
+## one-to-many relationship
+- **Term** in `LESSON-6.5-ONE-TO-MANY-RELATIONSHIPS` - The specific cardinality a foreign key creates by default: one row of the parent relation can be associated with zero, one, or many rows of the child relation, while each child row is associated with exactly one parent row, never more than one. It exists as a named, precise cardinality - distinct from a one-to-one relationship (each side limited to exactly one) or a many-to-many relationship (either side able to associate with several of the other, this curriculum's own next lesson) - because a foreign key column, by itself, only ever holds a single value, which is exactly what forces the "many" side to be the one holding that column, never the "one" side.
 
 ## open() (file object)
 - **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A built-in Python function that opens a real file on disk and returns a file object representing an open connection to it.
@@ -1490,6 +1497,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db.ForeignKey` / `Session (db.session)` - shares: db
+- `db.relationship` / `one-to-many relationship` - shares: relationship
 - `db.relationship` / `parent/child relationship` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
@@ -1747,12 +1755,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Key function` / `surrogate key` - shares: key
 - `Key function` / `test function` - shares: function
 - `list comprehension` / `list slicing` - shares: list
+- `list comprehension` / `list.extend` - shares: list
+- `list slicing` / `list.extend` - shares: list
 - `Machine` / `Query (Machine.query` - shares: machine
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
 - `Machine` / `update_machine (PATCH)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
+- `Machine.to_dict` / `one-to-many relationship` - shares: to
 - `Machine.to_dict` / `Query (Machine.query` - shares: machine
 - `Machine.to_dict` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine.to_dict` / `update_machine` - shares: machine
@@ -1780,6 +1791,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `one-to-many relationship` / `parent/child relationship` - shares: relationship
 - `open() (file object)` / `PDMService.download_file` - shares: file
 - `open() (file object)` / `send_file` - shares: file
 - `os.path.exists` / `URL path parameter` - shares: path

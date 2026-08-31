@@ -1,0 +1,463 @@
+number: "6.5"
+title: "One-to-Many Relationships"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Two real scripts against this project's own real Flask app and
+  SQLAlchemy models. The first names the one-to-many cardinality itself,
+  directly: one real `CAMFile` with three real child `Sequence` rows,
+  proving the "many" side holds real, multiple rows while every one of
+  those children names exactly one real parent, never more than one. The
+  second walks this project's own real four-level chain -
+  `Part` → `CAMFile` → `Sequence` → `Operation`, already diagrammed in
+  `backend/app/models/part.py`'s own tutorial comments - all the way
+  down from one real part to its real operations, and all the way back
+  up from one real operation to its own real part, three real hops
+  either direction.
+
+what_you_need_to_know_first: >
+  This curriculum's own Foreign Keys lesson - what a foreign key is,
+  what a parent/child relationship is, and how `db.relationship`'s own
+  `backref` creates real navigation in both directions from a single
+  declaration; a `for` loop building up a list across multiple
+  iterations.
+
+terms:
+  - name: "one-to-many relationship"
+    definition: >
+      The specific cardinality a foreign key creates by default: one row
+      of the parent relation can be associated with zero, one, or many
+      rows of the child relation, while each child row is associated
+      with exactly one parent row, never more than one. It exists as a
+      named, precise cardinality - distinct from a one-to-one
+      relationship (each side limited to exactly one) or a many-to-many
+      relationship (either side able to associate with several of the
+      other, this curriculum's own next lesson) - because a foreign key
+      column, by itself, only ever holds a single value, which is
+      exactly what forces the "many" side to be the one holding that
+      column, never the "one" side.
+
+objects_and_methods:
+  - name: db.relationship
+    what_it_is: >
+      A real SQLAlchemy construct that adds a Python-level, virtual
+      attribute connecting two real models, already fully treated in
+      this curriculum's own Foreign Keys lesson.
+    implementation: >
+      `db.relationship('OtherModel', backref='name', lazy='dynamic')` -
+      `backref` creates the reverse attribute on the other model
+      automatically; `lazy='dynamic'` makes the "many" side return a
+      query object rather than already-loaded rows, requiring `.all()`
+      to actually fetch them.
+    its_use: >
+      This lesson's own two units use three separate, real, already-
+      declared relationships of this exact shape -
+      `CAMFile.sequences`, `Sequence.operations`, and (already cited in
+      this curriculum's own Foreign Keys lesson) `Part.cam_files` - to
+      walk this project's own real chain in both directions.
+    type: A real SQLAlchemy construct, called once per relationship, at class-definition time.
+    responsibility: >
+      Providing real, Python-level navigation between a parent and its
+      children in both directions, from a single declaration on one
+      side.
+    depends_on: A real, already-declared target model class, and a real foreign key connecting the two tables.
+    connects_to: >
+      This lesson cites `CAMFile.sequences` (`backend/app/models/cam_file.py:73`)
+      and `Sequence.operations` (`backend/app/models/sequence.py:37`),
+      chained directly with `Part.cam_files` from this curriculum's own
+      previous lesson to walk all four real levels.
+    shape: >
+      Takes a model name and keyword options; produces a virtual
+      attribute whose own shape - a single object, or a query/list of
+      several - depends on which side of the one-to-many relationship it
+      is declared on.
+  - name: "list.extend"
+    what_it_is: >
+      A real Python list method that appends every item from another
+      iterable onto an existing list, one at a time.
+    implementation: >
+      `some_list.extend(other_iterable)` - unlike `list.append`, which
+      would add `other_iterable` itself as one single new item,
+      `.extend` adds each of ITS items individually, growing `some_list`
+      by however many items `other_iterable` actually contains.
+    its_use: >
+      This lesson's own chain-walking lab calls this once per real
+      `Sequence`, to build up one single, flat list of every real
+      `Operation` found across every real `Sequence` under every real
+      `CAMFile` belonging to one real `Part`.
+    type: A builtin list method.
+    responsibility: >
+      Flattening several separate real query results into one single,
+      combined list, without nesting a list of lists.
+    depends_on: An existing list to extend, and any real iterable of items to add.
+    connects_to: >
+      Called inside this lesson's own nested `for` loop, once per real
+      `sequence.operations.all()` result.
+    shape: Takes one iterable in, returns nothing - mutates the list it is called on in place.
+
+concept_units:
+  - title: "One-to-Many, Formally - One Real Parent, Many Real Children"
+    problem: >
+      `backend/app/models/cam_file.py`'s real
+      `sequences = db.relationship('Sequence', backref='cam_file', lazy='dynamic', cascade='all, delete-orphan')`,
+      already partly cited in this curriculum's own Foreign Keys lesson,
+      lets one real `CAMFile` be associated with several real `Sequence`
+      rows. Given that a foreign key column can only ever hold a single
+      value, which side of this relationship - the `CAMFile` or the
+      `Sequence` - could ever legitimately hold MORE than one of the
+      other, and which side is mathematically forced to hold exactly
+      one?
+    socratic_prompt:
+      - >
+        `Sequence.cam_file_id` is one real column, holding one real
+        value. Could a single `Sequence` row's own `cam_file_id` ever
+        legitimately name more than one real `CAMFile` at once?
+      - >
+        Given that a `CAMFile` has no equivalent column pointing back at
+        a single `Sequence`, is there anything stopping one real
+        `CAMFile` from having many real `Sequence` rows referencing it?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/sequence.py:18-19`:
+        ```
+        id = db.Column(db.String(50), primary_key=True)
+        cam_file_id = db.Column(db.String(50), db.ForeignKey('cam_files.id'), nullable=False, index=True)
+        ```
+        Real, already-existing evidence that `Sequence`'s own foreign
+        key column holds exactly one `cam_file_id` value per row - the
+        real, structural reason the "many" side of this relationship
+        has to be `Sequence`, never `CAMFile`.
+      files_affected:
+        - path: verification/phase-06/lab_one_to_many_cardinality.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        One real `CAMFile`, three real child `Sequence` rows, each one's
+        own `cam_file_id` checked directly:
+      file: verification/phase-06/lab_one_to_many_cardinality.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.machine import Machine
+        from app.models.cam_file import CAMFile
+        from app.models.sequence import Sequence
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part = Part(id="P-1234567", part_number="1234567", description="Bracket Assembly")
+            machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add_all([part, machine])
+            db.session.commit()
+
+            cf1 = CAMFile(id="cf1", part_id="P-1234567", machine_id="m1", file_name="rev1.nc")
+            db.session.add(cf1)
+            db.session.commit()
+
+            for i in range(1, 4):
+                db.session.add(Sequence(id=f"seq{i}", cam_file_id="cf1", sequence_number=i, tool_number=i))
+            db.session.commit()
+
+            many_side = cf1.sequences.all()
+            print(f"one CAMFile -> many Sequences: cf1.sequences.all() has {len(many_side)} real row(s): {[s.id for s in many_side]}")
+
+            for seq in many_side:
+                print(f"each Sequence -> exactly one CAMFile: {seq.id}.cam_file_id = {seq.cam_file_id!r} (never a list)")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'for i in range(1, 4): db.session.add(Sequence(id=f"seq{i}", cam_file_id="cf1", ...))'
+          explanation: >
+            A basic-Python `for` loop creating three separate, real
+            `Sequence` rows, each one's own `cam_file_id` set to the
+            identical value, `"cf1"` - the concrete, minimal case of
+            "many real children, one real parent."
+        - element: "cf1.sequences.all()"
+          explanation: >
+            The "many" side of the relationship, fully treated in this
+            lesson's own Header. Returns a real, genuine list of all
+            three `Sequence` rows - proof this side of the relationship
+            really does hold more than one.
+        - element: "seq.cam_file_id (inside the second loop)"
+          explanation: >
+            A plain column read (basic Python attribute access), checked
+            once per real `Sequence`. Every single one reports the
+            identical value, `'cf1'` - never a list, never more than
+            one - because the column itself is declared to hold exactly
+            one string.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the **one-to-many** cardinality, fully named in this
+      lesson's own Header. Also recognized in: one real customer with
+      many real orders, where every order names exactly one customer;
+      one folder containing many files, where every file's own path
+      names exactly one containing folder; a `git` commit having one
+      real parent (in the ordinary case) while that same parent commit
+      can be the parent of many later commits; and, in this project's
+      own domain, one real `CAMFile` proven on many real machines via
+      `MachineCAMPairing`, while each pairing row names exactly one real
+      `CAMFile`.
+    se_lens: >
+      The design principle is that a relationship's own cardinality
+      falls directly out of WHERE the foreign key column physically
+      lives, not out of a separate, independent decision. The real
+      alternative that would change this - giving `CAMFile` its own
+      column naming a single `Sequence` - is not available here at all,
+      because a real `CAMFile` genuinely can have more than one real
+      `Sequence`; a single column could never hold that. The honest cost
+      of this shape: nothing about `CAMFile`'s own row shows how many
+      children it has without a separate, real query - `cf1.sequences.all()`
+      - unlike `Sequence`'s own `cam_file_id`, which shows its one real
+      parent directly, in the row itself.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_one_to_many_cardinality.py
+        explanation: >
+          Run from the manufacturing-platform repository root, using
+          this project's own real backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        one CAMFile -> many Sequences: cf1.sequences.all() has 3 real row(s): ['seq1', 'seq2', 'seq3']
+        each Sequence -> exactly one CAMFile: seq1.cam_file_id = 'cf1' (never a list)
+        each Sequence -> exactly one CAMFile: seq2.cam_file_id = 'cf1' (never a list)
+        each Sequence -> exactly one CAMFile: seq3.cam_file_id = 'cf1' (never a list)
+      output_file: verification/phase-06/lab_one_to_many_cardinality_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it names the exact cardinality
+      this curriculum's own Foreign Keys lesson already demonstrated
+      without naming, which the next unit applies across this project's
+      own full, real four-level chain.
+
+  - title: "Chaining One-to-Many Across Multiple Real Levels"
+    problem: >
+      `backend/app/models/part.py`'s own tutorial comments diagram a
+      real four-level chain: a `Part` has many `CAMFile`s, each `CAMFile`
+      has many `Sequence`s, each `Sequence` has many `Operation`s. Given
+      that each of those is its own separate one-to-many relationship,
+      what does it actually take, in real code, to get from one real
+      `Part` all the way down to every real `Operation` beneath it - and
+      back the other way, from one real `Operation` up to its own real
+      `Part`?
+    socratic_prompt:
+      - >
+        Three separate one-to-many relationships stand between a `Part`
+        and an `Operation`. Is there a single, direct attribute
+        connecting them, or does reaching an `Operation` from a `Part`
+        require passing through every real level in between?
+      - >
+        Given `op.sequence` (an `Operation`'s own real backref to its
+        parent `Sequence`), what would the equivalent real chain look
+        like walking from `Operation` all the way back up to `Part`?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/part.py:70-77`
+        (this project's own real, already-existing tutorial comment):
+        ```
+        Part (this class)
+         │
+         ├── has many CAMFiles (one part can have multiple programs)
+         │       │
+         │       └── each CAMFile has many Sequences (tool changes)
+         │               │
+         │               └── each Sequence has many Operations (machining steps)
+        ```
+        Real, already-existing documentation, inside this project's own
+        model file, of the exact chain this unit walks for real.
+      files_affected:
+        - path: verification/phase-06/lab_one_to_many_chain.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        One real `Part`, one real `CAMFile`, one real `Sequence`, two
+        real `Operation`s - walked down three real hops, then walked
+        back up the same three hops from one specific real `Operation`:
+      file: verification/phase-06/lab_one_to_many_chain.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.machine import Machine
+        from app.models.cam_file import CAMFile
+        from app.models.sequence import Sequence
+        from app.models.operation import Operation
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part = Part(id="P-1234567", part_number="1234567", description="Bracket Assembly")
+            machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add_all([part, machine])
+            db.session.commit()
+
+            cf1 = CAMFile(id="cf1", part_id="P-1234567", machine_id="m1", file_name="rev1.nc")
+            db.session.add(cf1)
+            db.session.commit()
+
+            seq1 = Sequence(id="seq1", cam_file_id="cf1", sequence_number=1, tool_number=1)
+            db.session.add(seq1)
+            db.session.commit()
+
+            op1 = Operation(id="op1", sequence_id="seq1", operation_number=1, operation_type="Drill", name="Drill hole", tool_number=1)
+            op2 = Operation(id="op2", sequence_id="seq1", operation_number=2, operation_type="Contour", name="Finish contour", tool_number=1)
+            db.session.add_all([op1, op2])
+            db.session.commit()
+
+            # Walk DOWN: one real Part, all the way to every real Operation, three hops
+            all_operations = []
+            for cam_file in part.cam_files.all():
+                for sequence in cam_file.sequences.all():
+                    all_operations.extend(sequence.operations.all())
+            print(f"walking down from Part {part.id!r}: {[o.id for o in all_operations]}")
+
+            # Walk UP: one real Operation, back to its own real Part, the same three hops reversed
+            op = db.session.get(Operation, "op2")
+            print(f"walking up from Operation {op.id!r}: op.sequence.id={op.sequence.id!r} -> op.sequence.cam_file.id={op.sequence.cam_file.id!r} -> op.sequence.cam_file.part.id={op.sequence.cam_file.part.id!r}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "all_operations = [] / for cam_file in part.cam_files.all(): for sequence in cam_file.sequences.all(): all_operations.extend(sequence.operations.all())"
+          explanation: >
+            A nested `for` loop (basic Python), one level per real
+            one-to-many hop this project's schema actually has. Nothing
+            here is a single, direct query from `Part` to `Operation` -
+            each level's own real `.all()` call has to run before the
+            next level even knows what to iterate over, since each
+            relationship is declared, and only navigable, one real hop
+            at a time.
+        - element: "all_operations.extend(sequence.operations.all())"
+          explanation: >
+            `list.extend`, fully treated in this lesson's own Header,
+            called once per real `Sequence` - here, exactly once, since
+            this real `Part` has exactly one real `CAMFile` and one real
+            `Sequence` in this lab - flattening `sequence.operations.all()`'s
+            own two real rows directly into the running list, rather
+            than nesting a separate list per sequence.
+        - element: "db.session.get(Operation, 'op2')"
+          explanation: >
+            A real, direct query for one specific `Operation` row,
+            already established in this curriculum's own Foreign Keys
+            lesson - the real starting point for walking back UP the
+            chain.
+        - element: "op.sequence.id -> op.sequence.cam_file.id -> op.sequence.cam_file.part.id"
+          explanation: >
+            Three real backref attributes, chained directly: `op.sequence`
+            (this project's own real `Sequence.operations`'s own reverse
+            direction), `.cam_file` (`CAMFile.sequences`'s own reverse),
+            and `.part` (`Part.cam_files`'s own reverse, already cited
+            in this curriculum's own Foreign Keys lesson). Each one is a
+            real, separate attribute access - there is no single
+            shortcut spanning all three hops at once.
+    mental_model:
+      applicable: true
+      diagram: |
+        Part  ──has many──>  CAMFile  ──has many──>  Sequence  ──has many──>  Operation
+        (down: part.cam_files.all() -> cam_file.sequences.all() -> sequence.operations.all())
+
+        Part  <──.part──  CAMFile  <──.cam_file──  Sequence  <──.sequence──  Operation
+        (up: op.sequence -> op.sequence.cam_file -> op.sequence.cam_file.part)
+
+        Three separate one-to-many relationships, each with its own
+        real foreign key living on the child side - reaching either end
+        from the other always passes through every real level between
+        them.
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **transitive traversal** across a chain of one-to-many
+      relationships - reaching a distant relative only by passing
+      through every real relationship in between, one hop at a time.
+      Also recognized in: a filesystem path, `/a/b/c`, resolved one
+      directory at a time, never as a single jump; an org chart's own
+      chain of command, where a request from the top reaches the bottom
+      only by passing through every real manager in between; a DNS
+      lookup resolving a domain through a real chain of delegated
+      nameservers; and, in this project's own domain, this exact real
+      chain - a shop supervisor asking "what operations does this part
+      require," genuinely needing to pass through every real CAM file
+      and sequence in between to get a real answer.
+    se_lens: >
+      The design principle is keeping each real relationship
+      independently declared and independently navigable, rather than
+      building one shortcut attribute spanning every level at once. The
+      real alternative NOT chosen here - a direct `part.operations`
+      attribute, skipping `CAMFile` and `Sequence` entirely - would make
+      the common "give me everything under this part" query one line
+      instead of a nested loop, at the real cost of a second, separate
+      declaration that has to be kept in sync with the three real
+      relationships already defining the same structure; nothing in
+      this project's own schema currently declares that shortcut. The
+      honest cost paid instead, made concrete by this lab's own nested
+      loop: any code that wants "every real operation under this part"
+      has to know, and correctly walk, every real level of this chain
+      itself.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_one_to_many_chain.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        walking down from Part 'P-1234567': ['op1', 'op2']
+        walking up from Operation 'op2': op.sequence.id='seq1' -> op.sequence.cam_file.id='cf1' -> op.sequence.cam_file.part.id='P-1234567'
+      output_file: verification/phase-06/lab_one_to_many_chain_output.txt
+    connection_to_previous: >
+      The previous unit named one-to-many at a single real hop; this
+      unit applies it across every real hop this project's own schema
+      actually chains together, in both real directions.
+
+closing:
+  connect_the_pieces: >
+    Follow one real `Operation`, `op2`, back through every real level
+    this lesson names. It is the "many" side of its own one-to-many
+    relationship with `Sequence` `seq1` - the first unit's own lab
+    already proved that shape directly, showing one real parent can hold
+    several real children while each child names exactly one parent, via
+    `cam_file_id` never holding more than a single value. The second
+    unit then chains three of those real relationships together at
+    once: `op2.sequence` resolves to `seq1`, `seq1.cam_file` resolves to
+    `cf1`, and `cf1.part` resolves to `'P-1234567'` - the identical real
+    `Part` that, walked the other direction, reaches `op2` again through
+    `part.cam_files.all()`, then `cam_file.sequences.all()`, then
+    `sequence.operations.all()`. Every real hop in either direction is
+    the same one-to-many shape, repeated - never a single shortcut
+    spanning the whole chain at once.
+  next_lesson_pointer: >
+    Next, a relationship this project's own schema also already has,
+    built but never actually connected to the running application - one
+    where EITHER side can legitimately relate to several of the other at
+    once, which a single foreign key column, by itself, can never
+    express.
