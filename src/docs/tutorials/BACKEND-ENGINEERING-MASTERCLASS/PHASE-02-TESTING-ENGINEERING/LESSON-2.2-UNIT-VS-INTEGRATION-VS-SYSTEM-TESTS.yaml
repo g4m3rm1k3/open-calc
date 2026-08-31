@@ -1036,6 +1036,22 @@ concept_units:
       blueprints, view functions - by using the one real interface that
       forces all of them to actually participate: a real HTTP request.
 
+
+      Real, dated update: the two real, quoted route bodies above, and
+      this unit's own real, captured output, reflect this project's own
+      real state at the time this lesson was written - genuinely true
+      then, and kept exactly as an honest historical record. Phase 5
+      (Lessons 5.1-5.3) later characterized this same real disagreement
+      as a genuine bug and deliberately fixed it, unifying both real
+      routes around one, shared, real health check. This lesson's own
+      live lab (`verification/phase-02/lab_system_test.py`) has been
+      updated to assert the two real endpoints now agree, matching this
+      project's own current, real behavior - its own teaching point
+      (system tests cross real HTTP routing, which neither a unit test
+      nor an integration test can do) never depended on the two bodies
+      staying different forever, only on them being genuinely,
+      independently reachable, which they still are.
+
   - title: "Choosing the Right Level - What the Real Numbers Say"
     problem: >
       Given three real ways to check this project's behavior - a direct
