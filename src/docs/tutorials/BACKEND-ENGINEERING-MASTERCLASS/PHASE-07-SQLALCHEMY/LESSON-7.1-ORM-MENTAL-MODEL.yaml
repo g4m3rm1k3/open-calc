@@ -1,0 +1,668 @@
+number: "7.1"
+title: "ORM Mental Model"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Two real, run labs against this project's own real `Machine` model and
+  its own real SQLite database, using a real SQLAlchemy event hook to
+  capture the literal SQL text and bound parameters as they're actually
+  sent - the first isolating exactly which of `db.session.add()`,
+  `.flush()`, or `.commit()` is the real moment a Python object becomes a
+  real `INSERT`; the second showing what `Machine.query.get()` - this
+  project's own real, already-shipped call - actually returns when a real
+  row comes back. The transferable problem: every `db.session`/`.query`
+  call this curriculum's own database work has already made has been
+  doing exactly this same real translation, in one direction or the
+  other, unexamined until now.
+
+what_you_need_to_know_first: >
+  What a Python class instance and its attributes are; what a real SQL
+  `INSERT`/`SELECT` statement's actual shape looks like, real column
+  names and real bound placeholder values; what a database transaction's
+  commit actually finalizes and what a rollback actually discards; what a
+  raw database connection is - a real, open channel a client uses to send
+  real commands and receive real results back.
+
+terms:
+  - name: ORM
+    definition: >
+      Object-Relational Mapper - the real layer translating between a
+      program's real, in-memory Python objects and the real SQL
+      statements a relational database actually understands. It exists
+      so application code manipulates real objects and real attributes
+      directly, instead of composing SQL strings by hand for every read
+      and write - exactly what every earlier concept unit's own
+      `db.session` and `Machine.query` calls (used throughout this
+      curriculum's own database work, including
+      `Machine.query.get(machine_id)` in this project's own real
+      `backend/app/routes/machines.py:56`) have already been doing since
+      this curriculum first started building and querying real rows,
+      examined directly, by name, for the first time in this lesson.
+  - name: Session
+    definition: >
+      The real, stateful object - this project's own `db.session` - that
+      tracks every real Python object a program has added, modified, or
+      asked to load, and decides when those changes actually become real
+      SQL sent to the real database. It exists as the one real place that
+      state lives between "an object was changed" and "the database
+      actually knows about it" - never the same instant, unless
+      explicitly told to be.
+  - name: Engine
+    definition: >
+      The real object - this project's own `db.engine` - owning the
+      real, actual connection(s) to one specific real database (here,
+      this project's own real SQLite file) and knowing how to translate
+      SQLAlchemy's own internally-built SQL into that specific real
+      database's own SQL dialect. It exists as the one real component
+      that actually knows which database is being talked to; a `Session`
+      itself does not speak to the database directly - it goes through
+      the `Engine`.
+  - name: flush
+    definition: >
+      The real, specific `Session` operation that compiles every
+      currently pending real object change into real SQL and actually
+      sends it to the real database, inside the current real
+      transaction - distinct from `commit`, which finalizes that same
+      real transaction, and distinct from `rollback`, which discards it.
+      It exists as the
+      real boundary between "described as a pending change" and "sent as
+      real SQL," which `commit` alone does not make visible on its own -
+      `commit` triggers a flush first if one is still pending, then
+      finalizes.
+
+objects_and_methods:
+  - name: Machine (db.Model)
+    what_it_is: >
+      A real, existing SQLAlchemy model class in this project's own
+      backend, mapping the real `machines` database table to a real
+      Python class.
+    implementation: >
+      `class Machine(db.Model): __tablename__ = 'machines'`
+      (`backend/app/models/machine.py:41-86`) - declares 23 real columns
+      via real `db.Column(...)` calls, including
+      `id = db.Column(db.String(50), primary_key=True)` and
+      `name = db.Column(db.String(100), nullable=False)`.
+    its_use: >
+      This lesson builds and commits a real, new `Machine` instance in
+      its first unit, then reads a real row back as a `Machine` instance
+      in its second - the identical real class this project's own
+      `get_machine`, `create_machine`, and every other machine route
+      already use.
+    type: A real class, declared as a subclass of Flask-SQLAlchemy's own `db.Model`.
+    responsibility: >
+      Declaring, once, the real mapping between a Python class's real
+      attributes and a real database table's real columns, so every real
+      instance of it automatically participates in that mapping.
+    depends_on: >
+      A real, live SQLAlchemy `db` extension instance, already bound to
+      this app's own real configured database.
+    connects_to: >
+      Every real machine route in `backend/app/routes/machines.py` (e.g.
+      `get_machine`, `create_machine`) already builds, queries, or
+      updates real instances of this exact class.
+    shape: >
+      A real class; each real instance's real attributes (`.id`, `.name`,
+      ...) hold real Python values; `db.session.add`/`.flush`/`.commit`
+      and `Machine.query.get` are what actually move real instances of it
+      to and from the real database.
+
+  - name: Session (.add / .flush / .commit) and Machine.query.get
+    what_it_is: >
+      The real, live session object this project's own `db` extension
+      exposes as `db.session` - a real instance of SQLAlchemy's own
+      `Session` class - together with `Machine.query.get`, the real,
+      class-bound query interface Flask-SQLAlchemy attaches to every real
+      model.
+    implementation: >
+      `db.session.add(machine)` registers a real, new object as pending;
+      `db.session.flush()` compiles every real pending change into real
+      SQL and sends it, still inside the current real transaction;
+      `db.session.commit()` finalizes that real transaction, making it
+      durable. `Machine.query.get(machine_id)` - this project's own real,
+      already-shipped call, at `backend/app/routes/machines.py:56` -
+      issues a real `SELECT ... WHERE id = ?` and returns a real
+      `Machine` instance, or `None`. Running it this session, against
+      this project's own real, installed SQLAlchemy 2.0.51, also raises a
+      real `LegacyAPIWarning`: `"The Query.get() method is considered
+      legacy as of the 1.x series of SQLAlchemy and becomes a legacy
+      construct in 2.0. The method is now available as Session.get()"` -
+      a genuine, currently-real fact about this exact, already-shipped
+      call, not a hypothetical.
+    its_use: >
+      This lesson's own first unit calls `.add`, `.flush`, and `.commit`,
+      one at a time, specifically to isolate which real call actually
+      triggers real SQL; its second unit calls the identical, real
+      `Machine.query.get` this project's own `get_machine` route already
+      runs in production.
+    type: >
+      A real instance of SQLAlchemy's `Session` class (`db.session`), and
+      a real class-bound query attribute (`Machine.query`).
+    responsibility: >
+      Tracking every real pending object change and deciding, on
+      `flush`/`commit`, when that state actually becomes real SQL; on
+      `Machine.query.get`, translating a real primary-key lookup into a
+      real `SELECT` and a real returned object.
+    depends_on: >
+      A real, open connection from this app's own real `Engine`; a real,
+      active database transaction.
+    connects_to: >
+      Every Concept Unit in this lesson calls one of these; this
+      project's own real machine routes (`get_machine`, `create_machine`,
+      and others) already call the identical real methods, unexamined
+      until now.
+    shape: >
+      `.add` takes a real object in, returns nothing; `.flush`/`.commit`
+      take no arguments, return nothing, but have the real, observable
+      side effect of sending SQL or finalizing a transaction;
+      `Machine.query.get` takes a real primary-key value in, returns a
+      real `Machine` instance or `None`.
+
+  - name: sqlalchemy.event.listens_for
+    what_it_is: >
+      A real, top-level function from SQLAlchemy's own `sqlalchemy.event`
+      module, used here as a decorator, registering a real callback
+      against one specific real event a given real object (here, an
+      `Engine`) can fire.
+    implementation: >
+      `@event.listens_for(engine, "before_cursor_execute") def
+      capture_sql(conn, cursor, statement, parameters, context,
+      executemany): captured.append((statement, parameters))` - registers
+      `capture_sql` to run immediately before the real `Engine`'s
+      underlying DBAPI cursor actually executes any real SQL, receiving
+      the real, exact statement text and real bound parameters as
+      arguments, among the six real, fixed arguments SQLAlchemy always
+      supplies for this specific event.
+    its_use: >
+      This lesson uses it, in both units, as the one real, direct way to
+      observe the literal real SQL SQLAlchemy's ORM layer actually
+      sends - nothing about the ORM's own real translation is guessed or
+      described from memory; this callback captures it as it actually
+      happens.
+    type: A real function from SQLAlchemy's own `sqlalchemy.event` module, used as a decorator.
+    responsibility: >
+      Firing a real, user-supplied callback at one specific real, named
+      moment in the real `Engine`'s own execution - here, the instant
+      before real SQL is sent, not before or after.
+    depends_on: >
+      A real `Engine` instance (`db.engine`) and a real, named, valid
+      event string (`"before_cursor_execute"`, one of several real events
+      SQLAlchemy's `Engine` fires).
+    connects_to: >
+      The real, module-level `captured` list this lesson's own script
+      defines - every real statement/parameters pair this callback
+      observes gets appended there, for both units.
+    shape: >
+      Takes a real target object and a real event name string in (plus
+      the function it decorates); the decorated callback itself takes six
+      real, fixed positional arguments SQLAlchemy always supplies for
+      this specific event.
+
+concept_units:
+  - title: "Python Object to SQL - What add(), flush(), and commit() Actually Do"
+    problem: >
+      Every earlier concept unit's own database work already called
+      `db.session.add(...)` and `.commit()` and got a real row in the
+      real database - without ever
+      asking what happens between those two calls, or which one actually
+      sends the real SQL. Is a real `INSERT` statement sent the moment
+      `add()` runs, or only later - and if later, exactly which real call
+      is the one that does it?
+    socratic_prompt:
+      - >
+        This curriculum's own earlier, direct SQL work already ran a real
+        `INSERT INTO machines (...) VALUES (...)` statement directly,
+        with real column names and real bound values. Given `Machine`'s
+        own real columns
+        (`backend/app/models/machine.py:41-86`), what would you expect an
+        ORM-generated `INSERT` for a new `Machine` object to actually
+        look like, before seeing it?
+      - >
+        `db.session.add(machine)` and `db.session.commit()` are two
+        separate real calls. If you had to prove - not guess - which one
+        actually sends the real SQL, what real, observable evidence would
+        settle it, given nothing in this project prints the SQL SQLAlchemy
+        generates anywhere?
+      - >
+        This curriculum's own earlier transaction work already proved a
+        real transaction can hold more than one pending change before
+        either committing or rolling all of them back together. If
+        `add()` doesn't send SQL immediately, what does it do instead, in
+        the meantime?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:41-86` (`Machine`),
+        read again this session; `backend/config.py:58-62`
+        (`TestingConfig`, `SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'`),
+        confirming which real database this lesson's own lab writes into.
+        No reference counterpart for the event-capture mechanism itself -
+        this project's own real code never logs or inspects the SQL its
+        ORM calls generate anywhere; this lab is the first place that SQL
+        is actually made visible.
+      files_affected:
+        - path: verification/phase-07/lab_orm_object_to_sql.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine` model; SQLAlchemy's own real
+        `event.listens_for` hook; the real, in-memory SQLite database this
+        app's own `TestingConfig` already configures.
+    new_code:
+      applicable: true
+      intro: >
+        A real `Machine` object, staged, flushed, and committed one real
+        call at a time, with the real SQL captured the instant it's sent:
+      file: verification/phase-07/lab_orm_object_to_sql.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from sqlalchemy import event
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        captured = []
+
+        with app.app_context():
+            engine = db.engine
+
+            @event.listens_for(engine, "before_cursor_execute")
+            def capture_sql(conn, cursor, statement, parameters, context, executemany):
+                captured.append((statement, parameters))
+
+            machine = Machine(
+                id="M-ORM-001",
+                name="ORM Test Mill",
+                category="mill",
+                sub_type="3_axis",
+                manufacturer="Haas",
+                model="VF-2",
+            )
+
+            print("captured SQL statements so far:", len(captured))
+
+            db.session.add(machine)
+            print("after add():   captured SQL statements so far:", len(captured))
+
+            db.session.flush()
+            print("after flush(): captured SQL statements so far:", len(captured))
+
+            db.session.commit()
+            print("after commit():captured SQL statements so far:", len(captured))
+
+            for statement, parameters in captured:
+                print("statement:", " ".join(statement.split()))
+                print("parameters:", parameters)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'engine = db.engine'
+          explanation: >
+            Gets a real reference to this app's own real `Engine` - the
+            one real object that actually owns the real connection to
+            this app's own real, in-memory SQLite database, needed here
+            only because `event.listens_for` needs a real target object
+            to attach its callback to.
+        - element: '@event.listens_for(engine, "before_cursor_execute") def capture_sql(conn, cursor, statement, parameters, context, executemany): captured.append((statement, parameters))'
+          explanation: >
+            Registers a real callback that fires the instant before this
+            `Engine`'s own real cursor executes any real SQL - the one
+            real hook that makes the ORM's own internal SQL generation
+            observable at all, rather than trusted on faith.
+        - element: 'machine = Machine(id="M-ORM-001", name="ORM Test Mill", ...)'
+          explanation: >
+            Builds a real, plain Python object - `Machine.__init__` (the
+            real, default constructor every `db.Model` subclass gets)
+            just assigns the given keyword arguments as real instance
+            attributes; nothing about this line touches the database at
+            all, confirmed directly below by `captured` still being empty.
+        - element: 'db.session.add(machine)'
+          explanation: >
+            Registers `machine` with the real `Session` as pending - a
+            real, in-memory bookkeeping step, not a database call; the
+            real, printed count of `captured` statements stays at zero
+            immediately after this line runs.
+        - element: 'db.session.flush()'
+          explanation: >
+            The real moment everything changes: `flush()` compiles every
+            real pending change into a real SQL statement and sends it to
+            the real database, still inside the current real, open
+            transaction - the real, printed count jumps from zero to one
+            here, and nowhere else.
+        - element: 'db.session.commit()'
+          explanation: >
+            Finalizes the already-open real transaction, making the row
+            `flush()` already sent durable - the real, printed count
+            stays at one, proving `commit()` itself sent no additional
+            real SQL statement of its own in this case; it only finalized
+            what `flush()` had already sent.
+        - element: 'for statement, parameters in captured: print(...)'
+          explanation: >
+            Prints the real, literal SQL text and real bound parameters
+            this lesson's own callback actually captured - the real
+            proof of exactly what `Machine(...)` became, with no part of
+            it guessed or paraphrased.
+    mental_model:
+      applicable: true
+      diagram: |
+        Machine(id=..., name=...)     <- real Python object, in memory only
+                |
+                | db.session.add(machine)      (staged - captured stays 0)
+                v
+          Session's pending state
+                |
+                | db.session.flush()           (captured becomes 1, here)
+                v
+          INSERT INTO machines (...) VALUES (?, ?, ...)   <- real SQL, real bound params
+                |
+                | db.session.commit()          (captured stays 1)
+                v
+          real, durable row in this app's own real database
+    execution_trace:
+      applicable: true
+      shape: timing
+      lines:
+        - >
+          `db.session.add(machine)` runs - `captured` stays at `0`; the
+          real object is now tracked by the `Session` as pending, but no
+          real SQL has been generated or sent yet.
+        - >
+          `db.session.flush()` runs - `captured` becomes `1`; this is the
+          real call that compiles the pending `Machine` object into a
+          real `INSERT` statement and actually sends it over the real,
+          already-open connection.
+        - >
+          `db.session.commit()` runs - `captured` stays at `1`; no new
+          real SQL statement is sent by this call in this case, since
+          `flush()` already sent the one real pending statement -
+          `commit()`'s own real work here is finalizing the already-open
+          transaction, not generating more SQL.
+    cs_lens: >
+      This is **deferred (lazy) execution with batched writes**: a
+      sequence of real operations is recorded first, and only actually
+      carried out at one distinct, later trigger point, rather than the
+      instant each one is described. Also recognized in: `git add`
+      staging a real file's changes without writing anything to the real
+      repository until a later, separate `git commit`; a spreadsheet
+      holding every changed cell before a recalculation pass actually
+      runs; a text editor holding real edits in an in-memory buffer,
+      never touching the real file on disk until an explicit save; and,
+      already proven at the SQL level itself, in this project's own real,
+      earlier transaction work - one or more pending statements, held
+      open, before either a real `commit` or `rollback` decides their
+      fate together.
+    se_lens: >
+      This is the **Unit of Work** pattern: a `Session` tracks every real
+      pending change and sends them as one real, coordinated operation,
+      rather than writing each one to the database the instant it's
+      described. The real alternative not chosen here - executing and
+      committing each real change immediately, the way this curriculum's
+      own earlier, direct raw `sqlite3` work did, one statement at a
+      time - is simpler to
+      reason about moment-to-moment, since nothing is ever "pending"; the
+      honest cost of the `Session`'s deferred approach, proven directly by
+      this unit's own real trace: a reader (or a maintainer of this exact
+      project) cannot tell, from `add()` alone, whether a change has
+      actually reached the database yet - a real source of the "why isn't
+      my change there" confusion this lesson's own real proof exists to
+      resolve, in exchange for the real benefit of committing several
+      pending objects together as one real, atomic unit.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_orm_object_to_sql.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses this
+          app's own real `"testing"` config (`sqlite:///:memory:`), so it
+          leaves no real file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        captured SQL statements so far: 0
+        after add():   captured SQL statements so far: 0
+        after flush(): captured SQL statements so far: 1
+        after commit():captured SQL statements so far: 1
+        statement: INSERT INTO machines (id, name, category, sub_type, manufacturer, model, serial_number, location, axes, x_travel, y_travel, z_travel, max_spindle_speed, spindle_taper, has_tool_changer, tool_changer_capacity, status, current_part_id, current_operator_client_id, operator_last_heartbeat_at, group_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        parameters: ('M-ORM-001', 'ORM Test Mill', 'mill', '3_axis', 'Haas', 'VF-2', None, None, 3, None, None, None, None, None, 0, None, 'available', None, None, None, None, '2026-08-31 22:31:24.717065', '2026-08-31 22:31:24.717067')
+      output_file: verification/phase-07/lab_orm_object_to_sql_output.txt
+    connection_to_previous: >
+      This lesson's own first unit; it establishes, with real, captured
+      proof, the exact real boundary this curriculum's own earlier
+      database work already pointed toward without naming - that every
+      ORM call this curriculum has made since its own database work began
+      is running real SQL underneath, at one specific real moment, not
+      continuously.
+
+  - title: "SQL to Python Object - What a Real Query Actually Returns"
+    problem: >
+      The previous unit proved a real Python object becomes a real
+      `INSERT`. Once a real row already exists in the real database, how
+      does a call like `Machine.query.get(machine_id)` - this project's
+      own real, already-shipped call, used nine separate times across
+      `backend/app/routes/machines.py` - actually turn that row's raw,
+      flat values back into a real, usable Python object with real
+      attributes?
+    socratic_prompt:
+      - >
+        This curriculum's own earlier, direct SQL work already proved a
+        real SQLite row comes back as a plain tuple of raw values, in
+        column order, with no names attached. Given
+        that, what would have to happen for `result.manufacturer` to work
+        as real Python attribute access afterward?
+      - >
+        Given the previous unit's own real `INSERT` named every one of
+        `Machine`'s 23 real columns explicitly, what would you expect the
+        real `SELECT` this unit is about to capture to select, given the
+        identical real model?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:50-61`
+        (`get_machine`), specifically line 56,
+        `machine = Machine.query.get(machine_id)` - this project's own
+        real, already-shipped call, read again this session. This exact
+        call, run against this project's own real, installed SQLAlchemy
+        2.0.51, raises a real `LegacyAPIWarning` recommending
+        `Session.get()` instead - a genuine, currently-real fact about
+        this project's own shipped code, surfaced here for the first
+        time.
+      files_affected:
+        - path: verification/phase-07/lab_orm_sql_to_object.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        A real, already-committed `Machine` row (built the same way as
+        this lesson's first unit); the same real `event.listens_for`
+        mechanism, registered fresh in this unit's own script.
+    new_code:
+      applicable: true
+      intro: >
+        A real row, already committed, read back through the identical
+        real call this project's own `get_machine` route already runs in
+        production:
+      file: verification/phase-07/lab_orm_sql_to_object.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from sqlalchemy import event
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        captured = []
+
+        with app.app_context():
+            engine = db.engine
+
+            db.session.add(Machine(
+                id="M-ORM-002",
+                name="ORM Test Lathe",
+                category="lathe",
+                sub_type="single_turret",
+                manufacturer="Mazak",
+                model="QT-250",
+            ))
+            db.session.commit()
+
+            @event.listens_for(engine, "before_cursor_execute")
+            def capture_sql(conn, cursor, statement, parameters, context, executemany):
+                captured.append((statement, parameters))
+
+            result = Machine.query.get("M-ORM-002")
+
+            for statement, parameters in captured:
+                print("statement:", " ".join(statement.split()))
+                print("parameters:", parameters)
+
+            print("type:", type(result))
+            print("result.id:", repr(result.id))
+            print("result.name:", repr(result.name))
+            print("result.manufacturer:", repr(result.manufacturer))
+            print("isinstance(result, Machine):", isinstance(result, Machine))
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'db.session.add(Machine(id="M-ORM-002", ...)); db.session.commit()'
+          explanation: >
+            Stages and commits a second real row, the identical real
+            sequence this lesson's own first unit already proved - the
+            event listener below is registered only after this commit, so
+            only the real `SELECT` this unit cares about gets captured,
+            not the `INSERT` that set it up.
+        - element: '@event.listens_for(engine, "before_cursor_execute") def capture_sql(...): captured.append(...)'
+          explanation: >
+            The identical real capture mechanism as this lesson's first
+            unit, registered fresh in this script - the same real proof
+            technique, now pointed at the opposite real direction.
+        - element: 'result = Machine.query.get("M-ORM-002")'
+          explanation: >
+            The real, already-shipped call this project's own
+            `get_machine` route runs (`backend/app/routes/machines.py:56`)
+            - looks up a real row by its real primary key and hands back
+            a real `Machine` instance, or `None` if no such row exists.
+        - element: 'for statement, parameters in captured: print(...)'
+          explanation: >
+            Prints the real, literal `SELECT` text and real bound
+            parameter this call actually sent - the real proof of exactly
+            what `Machine.query.get` compiles down to, mirroring the
+            previous unit's own `INSERT` proof.
+        - element: 'print("result.id:", repr(result.id)) / print("result.manufacturer:", repr(result.manufacturer))'
+          explanation: >
+            Reads real, named Python attributes directly off `result` -
+            the real row's raw, flat, unnamed tuple values (already
+            proven directly, earlier in this curriculum's own SQL work)
+            have already become real, named attributes on a real object
+            by this point.
+        - element: 'isinstance(result, Machine)'
+          explanation: >
+            Confirms `result` is a genuine instance of this project's own
+            real `Machine` class, not a plain `dict` or tuple standing in
+            for one - real proof the ORM's own translation completed all
+            the way back to a real, usable Python object.
+    mental_model:
+      applicable: true
+      diagram: |
+        real row in this app's own real database
+                |
+                | Machine.query.get("M-ORM-002")
+                v
+          SELECT machines.id, machines.name, ... FROM machines WHERE machines.id = ?   <- real SQL, captured
+                |
+                v
+          Machine(id='M-ORM-002', name='ORM Test Lathe', ...)   <- real Python object, real named attributes
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **marshalling**: translating a real, flat, positional data
+      shape (a database row - a plain tuple of raw values, no names, as
+      this curriculum's own earlier SQL work already proved directly)
+      into a real, structured representation
+      a program can address by name (`result.manufacturer`, not "the
+      fifth value"). Also recognized in: this project's own real JSON
+      responses, where a Python `dict` becomes a real, named-field JSON
+      body a frontend reads by key; a CSV reader turning one flat,
+      comma-separated line into a real, named-field record; and, in this
+      project's own domain, a G-code parser turning one flat text line
+      into a real, structured command object with named fields (a motion
+      type, real coordinate values) rather than an unlabeled string.
+    se_lens: >
+      The design principle is that the ORM acts as a real translation
+      boundary - code on either side of `Machine.query.get` only ever
+      deals with real Python objects, never raw rows. The real
+      alternative not chosen anywhere in this project - hand-writing raw
+      SQL and manually mapping each real tuple back to named values, the
+      way this curriculum's own earlier, direct SQL labs did - gives
+      full, explicit control over exactly what SQL runs; the honest cost
+      of the convenience this project's real code chose instead is
+      exactly what this curriculum's own real, counted N+1 finding and
+      its own real missing-index finding already proved, both against
+      this same real schema: the ORM decides what SQL to generate, and
+      that real, generated SQL is not always the real SQL a hand-written
+      query would have chosen.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_orm_sql_to_object.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses this
+          app's own real `"testing"` config, so it leaves no real file
+          behind.
+    verification:
+      applicable: true
+      real_output: |
+        verification/phase-07/lab_orm_sql_to_object.py:30: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+          result = Machine.query.get("M-ORM-002")
+        Seeding default users...
+        statement: SELECT machines.id AS machines_id, machines.name AS machines_name, machines.category AS machines_category, machines.sub_type AS machines_sub_type, machines.manufacturer AS machines_manufacturer, machines.model AS machines_model, machines.serial_number AS machines_serial_number, machines.location AS machines_location, machines.axes AS machines_axes, machines.x_travel AS machines_x_travel, machines.y_travel AS machines_y_travel, machines.z_travel AS machines_z_travel, machines.max_spindle_speed AS machines_max_spindle_speed, machines.spindle_taper AS machines_spindle_taper, machines.has_tool_changer AS machines_has_tool_changer, machines.tool_changer_capacity AS machines_tool_changer_capacity, machines.status AS machines_status, machines.current_part_id AS machines_current_part_id, machines.current_operator_client_id AS machines_current_operator_client_id, machines.operator_last_heartbeat_at AS machines_operator_last_heartbeat_at, machines.group_id AS machines_group_id, machines.created_at AS machines_created_at, machines.updated_at AS machines_updated_at FROM machines WHERE machines.id = ?
+        parameters: ('M-ORM-002',)
+        type: <class 'app.models.machine.Machine'>
+        result.id: 'M-ORM-002'
+        result.name: 'ORM Test Lathe'
+        result.manufacturer: 'Mazak'
+        isinstance(result, Machine): True
+      output_file: verification/phase-07/lab_orm_sql_to_object_output.txt
+    connection_to_previous: >
+      The previous unit proved a real Python object becomes real SQL on
+      `flush()`; this unit proves the identical translation runs in
+      reverse, through this project's own real, already-shipped query
+      call - completing the full, real round trip this lesson's title
+      names.
+
+closing:
+  connect_the_pieces: >
+    One real round trip, traced through both real directions: a plain
+    Python `Machine(id="M-ORM-001", ...)` object, staged by
+    `db.session.add()` with zero real SQL sent (`captured` still `0`),
+    becomes a real, literal `INSERT INTO machines (...) VALUES (...)`
+    statement - with `machine.id` and every other real attribute as real
+    bound parameters - the instant `db.session.flush()` runs, then made
+    durable by `db.session.commit()`, which sends no further real SQL of
+    its own. Then, the identical real translation in reverse: a second
+    real row, already committed, read back through
+    `Machine.query.get("M-ORM-002")` - this project's own real,
+    already-shipped call - becomes a real, literal `SELECT ... WHERE
+    machines.id = ?` statement, captured the same way, and comes back as
+    a genuine `Machine` instance whose `.manufacturer` is real Python
+    attribute access, not a raw tuple position. Every `db.session`/
+    `.query` call this curriculum's own database work has ever made has
+    been running exactly this same real translation, in one direction or
+    the other - only now made visible.
+  next_lesson_pointer: >
+    This lesson treated `Machine` as already fully built. Next, this
+    curriculum looks at exactly how a class like `Machine` gets mapped to
+    a real table in the first place - the real columns, types, and keys
+    the declarative model itself is built from.

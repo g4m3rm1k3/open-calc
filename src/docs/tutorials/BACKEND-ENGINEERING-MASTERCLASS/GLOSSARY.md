@@ -6,6 +6,9 @@ re-run the script after any lesson changes instead.
 ## .close)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, raw networking class from Python's own standard library `socket` module - the actual mechanism both `requests` and Flask's own real server are themselves built on top of, used directly in this lesson with no HTTP-specific library at all.
 
+## .commit) and Machine.query.get
+- **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
+
 ## .content_type
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
 
@@ -15,6 +18,9 @@ re-run the script after any lesson changes instead.
 ## .delete)
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
+
+## .flush
+- **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
 
 ## .get_json())
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
@@ -466,6 +472,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing function in this project's backend, producing a real, signed JWT for a given user.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, existing function in this project's backend producing a real, signed JWT for a given user.
 
+## Engine
+- **Term** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real object - this project's own `db.engine` - owning the real, actual connection(s) to one specific real database (here, this project's own real SQLite file) and knowing how to translate SQLAlchemy's own internally-built SQL into that specific real database's own SQL dialect. It exists as the one real component that actually knows which database is being talked to; a `Session` itself does not speak to the database directly - it goes through the `Engine`.
+
 ## environment variable
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real, named value set outside a Python process entirely - in the real shell, or by whatever real system launches it - read inside this project's own code via `os.environ.get(...)`. It exists so a real deployment's own configuration (a real secret, a real database location) can change without editing a single line of this project's own real, checked-in source code.
 
@@ -522,6 +531,9 @@ re-run the script after any lesson changes instead.
 
 ## FlaskClient (.post)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real test client this project's own `app.test_client()` returns - the same real class already used to test HTTP routes in this curriculum, this time sending a real `POST`.
+
+## flush
+- **Term** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, specific `Session` operation that compiles every currently pending real object change into real SQL and actually sends it to the real database, inside the current real transaction - distinct from `commit`, which finalizes that same real transaction, and distinct from `rollback`, which discards it. It exists as the real boundary between "described as a pending change" and "sent as real SQL," which `commit` alone does not make visible on its own - `commit` triggers a flush first if one is still pending, then finalizes.
 
 ## foreign key
 - **Term** in `LESSON-6.4-FOREIGN-KEYS` - A column in one relation whose declared job is to hold a real value from ANOTHER relation's own primary key - not a copy of that row, only a pointer to it. It exists so one relation can refer to a specific row of a different relation without duplicating that row's own data everywhere it needs to be referenced.
@@ -745,6 +757,9 @@ re-run the script after any lesson changes instead.
 ## Machine
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real SQLAlchemy model representing one CNC machine row in this project's own database.
 
+## Machine (db.Model)
+- **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
+
 ## Machine.to_dict
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing instance method on this project's own `Machine` model, converting a real database row into a real, JSON-safe dict.
 
@@ -816,6 +831,9 @@ re-run the script after any lesson changes instead.
 
 ## ordering
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - Whether a collection of real results comes back in a specific, guaranteed sequence, or in whatever order happens to fall out of how the underlying system stores or retrieves them. It exists because "the same items, different order" can silently break a caller relying on position, even though every individual item is still, technically, correct.
+
+## ORM
+- **Term** in `LESSON-7.1-ORM-MENTAL-MODEL` - Object-Relational Mapper - the real layer translating between a program's real, in-memory Python objects and the real SQL statements a relational database actually understands. It exists so application code manipulates real objects and real attributes directly, instead of composing SQL strings by hand for every read and write - exactly what every earlier concept unit's own `db.session` and `Machine.query` calls (used throughout this curriculum's own database work, including `Machine.query.get(machine_id)` in this project's own real `backend/app/routes/machines.py:56`) have already been doing since this curriculum first started building and querying real rows, examined directly, by name, for the first time in this lesson.
 
 ## os._exit
 - **Object/method** in `LESSON-6.1-WHY-DATABASES-EXIST` - A standard-library function that terminates the current process immediately, at the operating-system level, skipping every normal Python shutdown step.
@@ -1079,6 +1097,12 @@ re-run the script after any lesson changes instead.
 ## server
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, separate program (here, this project's own Flask app, run via `run.py`) that listens on a real, known network port and waits for a client to connect, before sending back exactly one real response per real request. It exists as the other half of that same split - nothing happens on the server's side of this exchange until a client actually asks.
 
+## Session
+- **Term** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, stateful object - this project's own `db.session` - that tracks every real Python object a program has added, modified, or asked to load, and decides when those changes actually become real SQL sent to the real database. It exists as the one real place that state lives between "an object was changed" and "the database actually knows about it" - never the same instant, unless explicitly told to be.
+
+## Session (.add
+- **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
+
 ## Session (db.session)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
 - **Object/method** in `LESSON-2.3-PYTEST` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
@@ -1142,6 +1166,9 @@ re-run the script after any lesson changes instead.
 
 ## sqlalchemy.event.listen (before_cursor_execute)
 - **Object/method** in `LESSON-6.13-QUERY-PLANNING` - A real SQLAlchemy function that registers a callback to run every time the underlying database driver is about to execute one real SQL statement.
+
+## sqlalchemy.event.listens_for
+- **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - A real, top-level function from SQLAlchemy's own `sqlalchemy.event` module, used here as a decorator, registering a real callback against one specific real event a given real object (here, an `Engine`) can fire.
 
 ## sqlalchemy.text
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy function that wraps a plain string as an executable statement, for the rare case a raw statement - not expressed through the ORM's own Python API - needs to run directly.
@@ -1357,6 +1384,34 @@ re-run the script after any lesson changes instead.
 
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
+- `.commit) and Machine.query.get` / `CAMFile.query.get` - shares: query
+- `.commit) and Machine.query.get` / `commit` - shares: commit
+- `.commit) and Machine.query.get` / `Config (and its real subclasses)` - shares: and
+- `.commit) and Machine.query.get` / `create_machine` - shares: machine
+- `.commit) and Machine.query.get` / `create_machine_group` - shares: machine
+- `.commit) and Machine.query.get` / `create_machine_group (POST)` - shares: machine
+- `.commit) and Machine.query.get` / `db.session.commit` - shares: commit
+- `.commit) and Machine.query.get` / `db.session.commit()` - shares: commit
+- `.commit) and Machine.query.get` / `delete_machine` - shares: machine
+- `.commit) and Machine.query.get` / `Flask (the class, and this project's own app instance)` - shares: and
+- `.commit) and Machine.query.get` / `get_machine` - shares: machine
+- `.commit) and Machine.query.get` / `get_machine (revisited for its real decorator stack)` - shares: machine
+- `.commit) and Machine.query.get` / `is_valid_machine_status` - shares: machine
+- `.commit) and Machine.query.get` / `Machine` - shares: machine
+- `.commit) and Machine.query.get` / `Machine (db.Model)` - shares: machine
+- `.commit) and Machine.query.get` / `Machine.to_dict` - shares: machine
+- `.commit) and Machine.query.get` / `MachineCAMPairing.query.get` - shares: query
+- `.commit) and Machine.query.get` / `NCTemplate.query.get` - shares: query
+- `.commit) and Machine.query.get` / `Query (Machine.query` - shares: machine, query
+- `.commit) and Machine.query.get` / `Query parameter` - shares: query
+- `.commit) and Machine.query.get` / `query parameter` - shares: query
+- `.commit) and Machine.query.get` / `query pattern` - shares: query
+- `.commit) and Machine.query.get` / `query plan (recap)` - shares: query
+- `.commit) and Machine.query.get` / `Query.filter (Machine.query.filter)` - shares: machine, query
+- `.commit) and Machine.query.get` / `update_machine` - shares: machine
+- `.commit) and Machine.query.get` / `update_machine (PATCH)` - shares: machine
+- `.commit) and Machine.query.get` / `update_machine_status` - shares: machine
+- `.commit) and Machine.query.get` / `update_machine_status (PUT)` - shares: machine
 - `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `Content-Type` - shares: content, type
 - `.content_type` / `tuple (Python builtin type)` - shares: type
@@ -1365,6 +1420,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
 - `.delete)` / `delete_notification` - shares: delete
+- `.flush` / `flush` - shares: flush
 - `.patch` / `PATCH` - shares: patch
 - `.patch` / `unittest.mock.patch` - shares: patch
 - `.patch` / `update_machine (PATCH)` - shares: patch
@@ -1426,6 +1482,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `B-tree (conceptually)` - shares: tree
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
+- `add_favorite` / `Session (.add` - shares: add
 - `aggregate function` / `Dependency (of a function)` - shares: function
 - `aggregate function` / `Key function` - shares: function
 - `aggregate function` / `Pure function` - shares: function
@@ -1583,6 +1640,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `characterization test (applied for real)` / `real_health_status (proposed prototype)` - shares: real
 - `characterization test (applied for real)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
+- `characterization test (applied for real)` / `sqlalchemy.event.listens_for` - shares: for
 - `characterization test (applied for real)` / `sqlalchemy.text (for a real SQL statement)` - shares: for, real
 - `CHECK` / `check_password_hash` - shares: check
 - `CHECK` / `health check semantics` - shares: check
@@ -1654,6 +1712,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
+- `create_machine` / `Machine (db.Model)` - shares: machine
 - `create_machine` / `Machine.to_dict` - shares: machine
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1668,6 +1727,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `GROUP BY` - shares: group
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
 - `create_machine_group` / `Machine` - shares: machine
+- `create_machine_group` / `Machine (db.Model)` - shares: machine
 - `create_machine_group` / `Machine.to_dict` - shares: machine
 - `create_machine_group` / `Query (Machine.query` - shares: machine
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1683,6 +1743,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `GROUP BY` - shares: group
 - `create_machine_group (POST)` / `is_valid_machine_status` - shares: machine
 - `create_machine_group (POST)` / `Machine` - shares: machine
+- `create_machine_group (POST)` / `Machine (db.Model)` - shares: machine
 - `create_machine_group (POST)` / `Machine.to_dict` - shares: machine
 - `create_machine_group (POST)` / `POST` - shares: post
 - `create_machine_group (POST)` / `Query (Machine.query` - shares: machine
@@ -1704,6 +1765,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `database-side vs application-side processing` / `Side effect` - shares: side
 - `database-side vs application-side processing` / `side effect` - shares: side
 - `db` / `db (module-level SQLAlchemy instance)` - shares: db
+- `db` / `Machine (db.Model)` - shares: db
 - `db` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.relationship` - shares: db
@@ -1714,32 +1776,50 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `db.session.rollback()` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.Table` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
+- `db (module-level SQLAlchemy instance)` / `Machine (db.Model)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: sqlalchemy
+- `db (module-level SQLAlchemy instance)` / `sqlalchemy.event.listens_for` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text (for a real SQL statement)` - shares: sqlalchemy
+- `db.ForeignKey` / `Machine (db.Model)` - shares: db
 - `db.ForeignKey` / `Session (db.session)` - shares: db
+- `db.relationship` / `Machine (db.Model)` - shares: db
 - `db.relationship` / `many-to-many relationship` - shares: relationship
 - `db.relationship` / `one-to-many relationship` - shares: relationship
 - `db.relationship` / `parent/child relationship` - shares: relationship
 - `db.relationship` / `relationship modeling` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
+- `db.relationship (secondary=)` / `Machine (db.Model)` - shares: db
 - `db.relationship (secondary=)` / `many-to-many relationship` - shares: relationship
 - `db.relationship (secondary=)` / `one-to-many relationship` - shares: relationship
 - `db.relationship (secondary=)` / `parent/child relationship` - shares: relationship
 - `db.relationship (secondary=)` / `relationship modeling` - shares: relationship
 - `db.relationship (secondary=)` / `Session (db.session)` - shares: db
+- `db.session.add` / `Machine (db.Model)` - shares: db
+- `db.session.add` / `Session` - shares: session
+- `db.session.add` / `Session (.add` - shares: add, session
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
+- `db.session.commit` / `Machine (db.Model)` - shares: db
+- `db.session.commit` / `Session` - shares: session
+- `db.session.commit` / `Session (.add` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
+- `db.session.commit()` / `Machine (db.Model)` - shares: db
+- `db.session.commit()` / `Session` - shares: session
+- `db.session.commit()` / `Session (.add` - shares: session
 - `db.session.commit()` / `Session (db.session)` - shares: db, session
 - `db.session.commit()` / `test session` - shares: session
+- `db.session.rollback()` / `Machine (db.Model)` - shares: db
 - `db.session.rollback()` / `rollback` - shares: rollback
+- `db.session.rollback()` / `Session` - shares: session
+- `db.session.rollback()` / `Session (.add` - shares: session
 - `db.session.rollback()` / `Session (db.session)` - shares: db, session
 - `db.session.rollback()` / `test session` - shares: session
+- `db.Table` / `Machine (db.Model)` - shares: db
 - `db.Table` / `Session (db.session)` - shares: db
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
@@ -1749,6 +1829,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `delete_machine` / `is_valid_machine_status` - shares: machine
 - `delete_machine` / `Machine` - shares: machine
+- `delete_machine` / `Machine (db.Model)` - shares: machine
 - `delete_machine` / `Machine.to_dict` - shares: machine
 - `delete_machine` / `Query (Machine.query` - shares: machine
 - `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1792,6 +1873,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
+- `Engine` / `SQLite (as a specific engine)` - shares: engine
 - `error code` / `unified error contract` - shares: error
 - `Exception boundary` / `exception handler` - shares: exception
 - `Exception boundary` / `Exception handling (try/except)` - shares: exception
@@ -1873,12 +1955,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_health_response (tested directly, for the first time)` / `health_check (the bare` - shares: health, the
 - `get_health_response (tested directly, for the first time)` / `real_health_status (proposed prototype)` - shares: health
 - `get_health_response (tested directly, for the first time)` / `request (the real context-local proxy)` - shares: the
+- `get_health_response (tested directly, for the first time)` / `sqlalchemy.event.listens_for` - shares: for
 - `get_health_response (tested directly, for the first time)` / `sqlalchemy.text (for a real SQL statement)` - shares: for
 - `get_health_response (tested directly, for the first time)` / `time.perf_counter` - shares: time
 - `get_health_response (tested directly, for the first time)` / `time.sleep` - shares: time
 - `get_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
+- `get_machine` / `Machine (db.Model)` - shares: machine
 - `get_machine` / `Machine.to_dict` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1891,6 +1975,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `is_valid_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Machine (db.Model)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `proof at every real level` - shares: real
@@ -1899,6 +1984,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `real_health_status (proposed prototype)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `request (the real context-local proxy)` - shares: real
+- `get_machine (revisited for its real decorator stack)` / `sqlalchemy.event.listens_for` - shares: for
 - `get_machine (revisited for its real decorator stack)` / `sqlalchemy.text (for a real SQL statement)` - shares: for, real
 - `get_machine (revisited for its real decorator stack)` / `update_machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine (PATCH)` - shares: machine
@@ -1908,6 +1994,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machines` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `request.args.get` - shares: args
+- `get_machines (revisited for request.args)` / `sqlalchemy.event.listens_for` - shares: for
 - `get_machines (revisited for request.args)` / `sqlalchemy.text (for a real SQL statement)` - shares: for
 - `get_nc_file` / `open() (file object)` - shares: file
 - `get_nc_file` / `PDMService.download_file` - shares: file
@@ -2000,6 +2087,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.signature` / `Signature.parameters` - shares: signature
 - `integrity` / `referential integrity` - shares: integrity
 - `is_valid_machine_status` / `Machine` - shares: machine
+- `is_valid_machine_status` / `Machine (db.Model)` - shares: machine
 - `is_valid_machine_status` / `Machine.to_dict` - shares: machine
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -2017,12 +2105,21 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `list comprehension` / `list slicing` - shares: list
 - `list comprehension` / `list.extend` - shares: list
 - `list slicing` / `list.extend` - shares: list
+- `Machine` / `Machine (db.Model)` - shares: machine
 - `Machine` / `Query (Machine.query` - shares: machine
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
 - `Machine` / `update_machine (PATCH)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
+- `Machine (db.Model)` / `Machine.to_dict` - shares: machine
+- `Machine (db.Model)` / `Query (Machine.query` - shares: machine
+- `Machine (db.Model)` / `Query.filter (Machine.query.filter)` - shares: machine
+- `Machine (db.Model)` / `Session (db.session)` - shares: db
+- `Machine (db.Model)` / `update_machine` - shares: machine
+- `Machine (db.Model)` / `update_machine (PATCH)` - shares: machine
+- `Machine (db.Model)` / `update_machine_status` - shares: machine
+- `Machine (db.Model)` / `update_machine_status (PUT)` - shares: machine
 - `Machine.to_dict` / `many-to-many relationship` - shares: to
 - `Machine.to_dict` / `one-to-many relationship` - shares: to
 - `Machine.to_dict` / `Query (Machine.query` - shares: machine
@@ -2141,6 +2238,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Server` / `server` - shares: server
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `server` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `Session` / `Session (.add` - shares: session
+- `Session` / `Session (db.session)` - shares: session
+- `Session` / `test session` - shares: session
+- `Session (.add` / `Session (db.session)` - shares: session
+- `Session (.add` / `test session` - shares: session
 - `Session (db.session)` / `test session` - shares: session
 - `set` / `set (builtin)` - shares: set
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
