@@ -94,6 +94,9 @@ re-run the script after any lesson changes instead.
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
 
+## characterization test
+- **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - A test that records what a piece of code's real, current behavior actually is, right now, rather than what it should be - passing, by definition, against the exact behavior observed at the moment it's written. It exists specifically for code nobody has full confidence describing correctly from memory, so a later change to it can be checked against a real, honest baseline instead of nothing at all.
+
 ## check_password_hash
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - The real matching function from `werkzeug.security` that verifies a real plaintext password against an already-generated real hash.
 
@@ -295,6 +298,9 @@ re-run the script after any lesson changes instead.
 ## Key function
 - **Term** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, callable argument - a lambda, a named function, or a real pre-built extractor like `operator.itemgetter` - that a tool calls once per real element to decide what that element should be compared or grouped BY, without changing the element itself. It exists as its own concept because both this lesson's own real sorting and real grouping tools share the identical real parameter for it, `key=...`, and because a key function's own real return value is only ever used for comparison/grouping - the real element passed through unchanged into the actual result either way.
 
+## legacy code
+- **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - Code without a trustworthy safety net around it - not "old" as a synonym, but specifically "risky to change, because nothing would notice if changing it broke something." It exists as a real, distinct category from either "correct" or "buggy" code - a piece of code worth characterizing might honestly be either, and the entire point is that nobody currently knows for certain which.
+
 ## list slicing
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The `sequence[start:stop]` syntax, returning a new, separate sequence containing the elements from index `start` up to (but not including) index `stop`; omitting either side means "from the beginning" or "through the end." It exists as a compact way to select a contiguous sub-range of a sequence without writing an explicit loop.
 
@@ -324,6 +330,9 @@ re-run the script after any lesson changes instead.
 
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
+
+## observed behavior vs. intended behavior
+- **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - The real distinction a characterization test is built around: what code actually does, verified by running it, versus what its author meant, or what a docstring claims, which may or may not be the same thing. It exists because conflating the two is exactly what lets a well-meaning "fix" silently change real behavior nobody meant to touch.
 
 ## OperationScaffoldItem
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real, already-existing `@dataclass(frozen=True)` in this backend, the exact real fix this lesson's own third unit reaches for.
@@ -505,9 +514,13 @@ re-run the script after any lesson changes instead.
 ## STLScaffoldService._extract_operation_num
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real, existing static method on this project's own `STLScaffoldService`, extracting a subprogram's leading operation-number digit from a string.
 - **Object/method** in `LESSON-2.3-PYTEST` - A real, existing static method on this project's own `STLScaffoldService`, extracting a subprogram's leading operation-number digit from a string.
+- **Object/method** in `LESSON-2.7-CHARACTERIZATION-TESTING` - The same real, existing static method on this project's own `STLScaffoldService` this curriculum has reused since it was first introduced - still, confirmed again this session, referenced nowhere in the whole backend except its own definition.
 
 ## str.encode
 - **Object/method** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - A method converting a Python text string into a real
+
+## str.lstrip
+- **Object/method** in `LESSON-2.7-CHARACTERIZATION-TESTING` - A real, built-in Python string method, removing leading characters from a string.
 
 ## stub
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double that returns pre-programmed, canned answers when called, with no real logic behind those answers and no verification of how it was called. It exists as the simplest possible double: just enough to let code under test keep running past a real dependency it doesn't need to actually exercise.
