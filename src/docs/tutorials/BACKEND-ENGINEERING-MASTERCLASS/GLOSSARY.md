@@ -1101,6 +1101,9 @@ re-run the script after any lesson changes instead.
 ## Signature.parameters
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real, ordered, read-only mapping from each parameter's real name to a `Parameter` object describing it.
 
+## single-writer concurrency
+- **Term** in `LESSON-6.14-SQLITE` - SQLite's own real, specific limitation that only one real connection may hold an open write transaction against a given database at a time - a second, real, concurrent attempt to write is refused outright until the first one's own transaction ends, rather than both being allowed to proceed at once. It exists as a real, direct consequence of SQLite's own embedded, serverless design: with no separate server process to coordinate multiple real writers the way a client-server database's own server process can, SQLite instead locks the entire real database file for the duration of one real write transaction at a time.
+
 ## Socket
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - a real, addressable endpoint a process opens so another
 
@@ -1145,6 +1148,9 @@ re-run the script after any lesson changes instead.
 
 ## sqlalchemy.text (for a real SQL statement)
 - **Object/method** in `LESSON-6.12-SQL` - The same real SQLAlchemy function already used in this curriculum's own Foreign Keys and Indexes lessons for a single PRAGMA or diagnostic statement, here used for the first time for a real, complete SQL statement - `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
+
+## SQLite (as a specific engine)
+- **Term** in `LESSON-6.14-SQLITE` - A real, specific relational database engine - not a generic stand-in for "a database" - that runs embedded directly inside the same process as the application using it, storing an entire real database as one ordinary file (or, this curriculum's own real `TestingConfig`, entirely in memory), with no separate database server process involved at all. It exists as its own real, distinct thing from a client-server database (like PostgreSQL or MySQL) because embedding the engine directly removes an entire real layer - no server to install, configure, or connect to over a network - at the real cost of the specific limitations this lesson's own two units demonstrate directly.
 
 ## statelessness
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real property that a server keeps no memory of any earlier request once that request's own response has been sent - proven directly in this lesson's own last unit, where the same real client, on the very next real request, gets rejected unless it resends its own credentials. It exists, as a deliberate constraint HTTP is built on, so any server can handle any client's request without needing to first recall anything about that client's past.
@@ -1267,8 +1273,14 @@ re-run the script after any lesson changes instead.
 ## tuple (relational sense)
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - One single, complete member of a relation - one real fact, made up of exactly one value for each of the relation's declared attributes, taken together as a single unit. It exists as the relational model's own name for "one row's worth of data" because, formally, a relation is defined as a SET of these - which is exactly why two relational tuples with identical values are considered the same tuple, not two different ones (this lesson's own Relations unit demonstrates this directly). This is not a coincidence of naming: Python's own built-in `tuple` type - an ordered, fixed set of values - is a real, practical stand-in for exactly this idea, which is why this lesson's own labs use real Python tuples to model it.
 
+## type affinity
+- **Term** in `LESSON-6.14-SQLITE` - SQLite's own real, specific rule for how strictly a column's declared type is actually enforced: a declared type is a strong preference for how a value SHOULD be stored, not a hard guarantee of what CAN be - a column declared `INTEGER` will genuinely accept, and store, a real value that is not numeric at all. It exists because SQLite's own real, documented type system was designed around flexibility rather than the strict type enforcement a client-server database more commonly provides for the identical declared column type - a real, specific SQLite behavior, not a general SQL guarantee.
+
 ## Type annotation
 - **Term** in `LESSON-1.5-TYPE-HINTS` - Real, optional syntax attached to a parameter or return value - `text: str`, `-> float` - stating what type a value is meant to be. It exists as its own concept because Python itself never checks it: the annotation is stored (real, inspectable metadata) but nothing in the language stops a caller from passing a value of a different type anyway, and nothing in the function's own body is affected by it - the annotation is a real claim a human or a separate tool can check, not a runtime guard the language enforces on its own.
+
+## typeof()
+- **Object/method** in `LESSON-6.14-SQLITE` - A real, built-in SQLite SQL function that returns the actual, real runtime type SQLite is storing for a given value - `'integer'`, `'text'`, `'real'`, `'null'`, or `'blob'` - regardless of what type the column holding it was declared with.
 
 ## typing.Optional
 - **Object/method** in `LESSON-1.5-TYPE-HINTS` - A real generic alias from Python's standard library `typing` module, meaning 'this type, or `None`.'
@@ -1348,6 +1360,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `Content-Type` - shares: content, type
 - `.content_type` / `tuple (Python builtin type)` - shares: type
+- `.content_type` / `type affinity` - shares: type
 - `.content_type` / `Type annotation` - shares: type
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
@@ -1468,6 +1481,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `association table (also called a join table)` / `JOIN` - shares: join
 - `association table (also called a join table)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `association table (also called a join table)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
+- `association table (also called a join table)` / `SQLite (as a specific engine)` - shares: a
 - `ast.Attribute` / `attribute` - shares: attribute
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
@@ -1521,6 +1535,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a, real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `SQLite (as a specific engine)` - shares: a
 - `build_error_response` / `build_health_response (proposed prototype)` - shares: build
 - `build_error_response` / `centralized error mapping` - shares: error
 - `build_error_response` / `error code` - shares: error
@@ -1596,6 +1611,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `composite index` / `composite uniqueness` - shares: composite
 - `composite index` / `index (recap)` - shares: index
 - `composite uniqueness` / `uniqueness` - shares: uniqueness
+- `concurrency` / `single-writer concurrency` - shares: concurrency
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_health_response (real, now live)` - shares: real
 - `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
@@ -1611,6 +1627,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
 - `Content-Type` / `tuple (Python builtin type)` - shares: type
+- `Content-Type` / `type affinity` - shares: type
 - `Content-Type` / `Type annotation` - shares: type
 - `context manager (the `with` statement)` / `context-local state` - shares: context
 - `context manager (the `with` statement)` / `Flask (the class, and this project's own app instance)` - shares: the
@@ -1745,6 +1762,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `source of truth` - shares: of
 - `Dependency (of a function)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
+- `Dependency (of a function)` / `SQLite (as a specific engine)` - shares: a
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
 - `dictionary key access` / `foreign key` - shares: key
@@ -1817,6 +1835,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `foreign key (as a constraint)` / `natural key` - shares: key
 - `foreign key (as a constraint)` / `rebuild (as this curriculum's own real term)` - shares: as
 - `foreign key (as a constraint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
+- `foreign key (as a constraint)` / `SQLite (as a specific engine)` - shares: a, as
 - `foreign key (as a constraint)` / `surrogate key` - shares: key
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
@@ -2025,6 +2044,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `machines_bp (as a real, standalone Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: as, real
 - `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a, real
+- `machines_bp (as a real, standalone Blueprint)` / `SQLite (as a specific engine)` - shares: a, as
 - `many-to-many relationship` / `one-to-many relationship` - shares: many, relationship, to
 - `many-to-many relationship` / `parent/child relationship` - shares: relationship
 - `many-to-many relationship` / `relationship modeling` - shares: relationship
@@ -2034,6 +2054,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
 - `mark_as_read` / `pytest.mark.parametrize` - shares: mark
 - `mark_as_read` / `rebuild (as this curriculum's own real term)` - shares: as
+- `mark_as_read` / `SQLite (as a specific engine)` - shares: as
 - `natural key` / `surrogate key` - shares: key
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
@@ -2100,6 +2121,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `real_health_status (proposed prototype)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `request (the real context-local proxy)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
+- `rebuild (as this curriculum's own real term)` / `SQLite (as a specific engine)` - shares: as
 - `request (the real context-local proxy)` / `request context` - shares: context
 - `request (the real context-local proxy)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `request body` / `response body` - shares: body
@@ -2124,6 +2146,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
 - `Side effect` / `side effect` - shares: effect, side
 - `socket.listen` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: listen
+- `sqlalchemy.text (for a real SQL statement)` / `SQLite (as a specific engine)` - shares: a
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
@@ -2132,7 +2155,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `tuple` / `tuple (Python builtin type)` - shares: tuple
 - `tuple` / `tuple (relational sense)` - shares: tuple
 - `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
+- `tuple (Python builtin type)` / `type affinity` - shares: type
 - `tuple (Python builtin type)` / `Type annotation` - shares: type
+- `type affinity` / `Type annotation` - shares: type
 - `unittest.mock.patch` / `update_machine (PATCH)` - shares: patch
 - `UPDATE` / `update anomaly` - shares: update
 - `UPDATE` / `update_machine` - shares: update
