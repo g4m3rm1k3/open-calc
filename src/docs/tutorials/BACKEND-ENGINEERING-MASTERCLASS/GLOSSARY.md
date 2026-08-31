@@ -174,6 +174,9 @@ re-run the script after any lesson changes instead.
 ## ast.walk
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A standard-library function that visits every node in a tree, in no particular guaranteed order, one at a time.
 
+## attribute
+- **Term** in `LESSON-6.2-RELATIONAL-MODEL` - One named, single-valued property every tuple in a relation has - the formal name for what a declared column actually is: a name (like `category`) paired with a domain, the set of values it is allowed to hold (like a maximum-length string). It exists as a distinct idea from a tuple's raw position (its first value, its second value, ...) because a real relation's own columns are identified by NAME, not by position - `backend/app/models/machine.py`'s own real `category` column is always reached by that name, never by "the third value in the row."
+
 ## Authorization (header)
 - **Term** in `LESSON-3.4-HEADERS` - The real, standard header carrying a request's own claimed credentials - in this project, always `Bearer <token>`. It exists as the one real, conventional place a server looks for proof of identity, separate from a request's own body or URL.
 
@@ -242,6 +245,12 @@ re-run the script after any lesson changes instead.
 
 ## collaborator (test scope)
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Anything a piece of code depends on but does not itself define - a database, a file on disk, another service, the current time. It exists as a precise way to talk about test scope: whether a check counts as unit, integration, or system is entirely a question of how many real collaborators it lets in, not how much code happens to run while it executes.
+
+## collections.namedtuple
+- **Object/method** in `LESSON-6.2-RELATIONAL-MODEL` - A function in Python's standard `collections` module that builds a brand-new tuple subclass whose positions can also be accessed by a real, given name, in addition to plain position.
+
+## column
+- **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word for exactly what the relational model formally calls an attribute: one named, single-valued property every row shares. It exists for the identical reason "row" does - it is the word real SQL, and this project's own real code (its `db.Column` declarations), actually uses, even though "attribute" is the formally precise term for the same idea.
 
 ## concurrency
 - **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - More than one independent flow of execution - two threads, two processes, two separate users' requests - being active over the same shared data at the same time, with no guarantee about which one's steps happen in which order relative to the other's. It exists as a named concern because a single flow of execution touching data by itself never has this problem; the instant a second one can touch the same data before the first one finishes, an operation that looks like one atomic step from the outside (read the current value, decide, write a new value) can actually happen as two separately-interleaved flows, each unaware of the other's steps in between its own.
@@ -620,6 +629,9 @@ re-run the script after any lesson changes instead.
 ## legacy code
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - Code without a trustworthy safety net around it - not "old" as a synonym, but specifically "risky to change, because nothing would notice if changing it broke something." It exists as a real, distinct category from either "correct" or "buggy" code - a piece of code worth characterizing might honestly be either, and the entire point is that nobody currently knows for certain which.
 
+## len
+- **Object/method** in `LESSON-6.2-RELATIONAL-MODEL` - A built-in Python function returning how many items a collection currently holds.
+
 ## list comprehension
 - **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The expression `[EXPR for NAME in ITERABLE if CONDITION]`, building a brand-new, fully-realized list by evaluating `EXPR` once for every item in `ITERABLE` that satisfies `CONDITION` (the `if` clause is optional). It exists as a compact way to build a filtered/transformed list without writing an explicit loop and an empty list to `.append()` into by hand - but, as this lesson's own querying unit shows, it still has to actually visit every item in `ITERABLE` to decide which ones satisfy `CONDITION`; compactness of syntax is not the same thing as cheapness of execution.
 
@@ -807,6 +819,9 @@ re-run the script after any lesson changes instead.
 ## regression
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A previously-working piece of behavior that quietly stops working because of a later, often unrelated-looking, change elsewhere in the code. It exists as a named failure mode because software rarely breaks all at once - it breaks one small, later edit at a time - and without something re-checking the old behavior every time, nobody notices until the broken version has already shipped.
 
+## relation
+- **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The formal, mathematical name - from the branch of set theory a relational database is literally built on - for what everyday SQL language calls a table: a named collection of tuples that all share the same declared attributes. It exists as a distinct word from "table" because the relational model itself, as originally defined, is a mathematical structure - a genuine set of tuples - and "table" is the informal, practical word SQL itself uses for the same idea, with (as this lesson's own rows-and-columns unit shows) a few real differences between the two.
+
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
 
@@ -888,6 +903,9 @@ re-run the script after any lesson changes instead.
 ## routing
 - **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, internal table Flask (through Werkzeug) builds from every `@app.route`/`@blueprint.route` call, matching a real incoming URL and method against the exact real Python function that should handle it. It exists so a real request's own URL can be resolved to real code before any of that code actually runs.
 
+## row
+- **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word - used throughout real SQL, this project's own code, and ordinary conversation about databases - for exactly what the relational model formally calls a tuple: one single record's worth of data. It exists alongside the formal term because SQL itself, and the people who write it, overwhelmingly say "row," not "tuple," in practice - this lesson's own rows-and-columns unit is specifically about where that everyday word and the formal model it stands in for actually agree, and where they do not.
+
 ## safe (HTTP method property)
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that a method's own definition promises zero side effects on the server - calling it changes nothing, no matter how many real times it's called. It exists so real tooling (browsers prefetching a link, a proxy caching a response) can treat a safe method specially, without ever having to inspect what a specific real route actually does.
 
@@ -915,6 +933,9 @@ re-run the script after any lesson changes instead.
 
 ## set
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in unordered collection type, holding only hashable values, each stored at most once.
+
+## set (builtin)
+- **Object/method** in `LESSON-6.2-RELATIONAL-MODEL` - Python's built-in collection type representing an unordered collection of distinct elements - no two elements it holds are ever equal to each other.
 
 ## shared state
 - **Term** in `LESSON-2.4-TEST-ISOLATION` - Data or a resource more than one test can read or write, where a value one test leaves behind can affect another test's own outcome. It exists to name exactly the property that makes two tests fail to be independent - not shared *code* (which is fine), but a shared, mutable, persisted resource sitting between them.
@@ -1067,6 +1088,12 @@ re-run the script after any lesson changes instead.
 ## tuple
 - **Object/method** in `LESSON-1.4-DATA-STRUCTURES` - Python's real built-in fixed-size, immutable sequence type.
 
+## tuple (Python builtin type)
+- **Object/method** in `LESSON-6.2-RELATIONAL-MODEL` - Python's built-in, immutable, ordered sequence type, written as `(value1, value2, ...)`.
+
+## tuple (relational sense)
+- **Term** in `LESSON-6.2-RELATIONAL-MODEL` - One single, complete member of a relation - one real fact, made up of exactly one value for each of the relation's declared attributes, taken together as a single unit. It exists as the relational model's own name for "one row's worth of data" because, formally, a relation is defined as a SET of these - which is exactly why two relational tuples with identical values are considered the same tuple, not two different ones (this lesson's own Relations unit demonstrates this directly). This is not a coincidence of naming: Python's own built-in `tuple` type - an ordered, fixed set of values - is a real, practical stand-in for exactly this idea, which is why this lesson's own labs use real Python tuples to model it.
+
 ## Type annotation
 - **Term** in `LESSON-1.5-TYPE-HINTS` - Real, optional syntax attached to a parameter or return value - `text: str`, `-> float` - stating what type a value is meant to be. It exists as its own concept because Python itself never checks it: the annotation is stored (real, inspectable metadata) but nothing in the language stops a caller from passing a value of a different type anyway, and nothing in the function's own body is affected by it - the annotation is a real claim a human or a separate tool can check, not a runtime guard the language enforces on its own.
 
@@ -1132,6 +1159,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 
 - `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `Content-Type` - shares: content, type
+- `.content_type` / `tuple (Python builtin type)` - shares: type
 - `.content_type` / `Type annotation` - shares: type
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
@@ -1228,6 +1256,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `assert statement` / `context manager (the `with` statement)` - shares: statement
+- `ast.Attribute` / `attribute` - shares: attribute
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
 - `Authorization (header)` / `Authorization header` - shares: authorization, header
@@ -1345,6 +1374,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
+- `Content-Type` / `tuple (Python builtin type)` - shares: type
 - `Content-Type` / `Type annotation` - shares: type
 - `context manager (the `with` statement)` / `context-local state` - shares: context
 - `context manager (the `with` statement)` / `Flask (the class, and this project's own app instance)` - shares: the
@@ -1759,12 +1789,18 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Session (db.session)` / `test session` - shares: session
+- `set` / `set (builtin)` - shares: set
+- `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
 - `Side effect` / `side effect` - shares: effect, side
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
 - `Status line` / `status line` - shares: line
 - `TCP (Transmission Control Protocol)` / `TCP connection` - shares: tcp
+- `tuple` / `tuple (Python builtin type)` - shares: tuple
+- `tuple` / `tuple (relational sense)` - shares: tuple
+- `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
+- `tuple (Python builtin type)` / `Type annotation` - shares: type
 - `unittest.mock.patch` / `update_machine (PATCH)` - shares: patch
 - `update_machine` / `update_machine (PATCH)` - shares: machine, update
 - `update_machine` / `update_machine_status` - shares: machine, update
