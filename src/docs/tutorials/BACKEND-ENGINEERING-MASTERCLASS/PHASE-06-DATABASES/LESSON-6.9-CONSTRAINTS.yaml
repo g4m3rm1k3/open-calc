@@ -1,0 +1,696 @@
+number: "6.9"
+title: "Constraints"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Three real scripts against this project's own real Flask app and
+  SQLAlchemy models, plus one already-established real finding from this
+  curriculum's own Foreign Keys lesson. The first proves two real
+  constraints this project already declares - `NOT NULL` on
+  `Machine.name`, `UNIQUE` on `Part.part_number` - genuinely reject an
+  invalid write. The second proves a real, composite `UNIQUE` constraint
+  across TWO columns at once, on `MachineCAMPairing`. The third proves a
+  real, honest gap: this project declares no `CHECK` constraint
+  anywhere at all, confirmed by grepping its own real code, and a real
+  `Operation` with a physically nonsensical negative `feedrate` commits
+  without complaint today.
+
+what_you_need_to_know_first: >
+  This curriculum's own Foreign Keys lesson - real referential
+  integrity, and that this project's own real foreign keys are not
+  currently enforced without `PRAGMA foreign_keys = ON`; catching a real
+  `IntegrityError` with `try`/`except`.
+
+terms:
+  - name: "NOT NULL"
+    definition: >
+      A real, database-enforced rule that a given column must hold an
+      actual value on every row - never the SQL null value standing in
+      for "nothing was ever provided here." It exists as the most basic
+      real constraint because some facts a relation records are not
+      optional - `Machine.name`, for instance, is not a real machine
+      record at all without one - and `NOT NULL` is what makes the
+      database itself refuse to store a row missing one.
+  - name: UNIQUE
+    definition: >
+      A real, database-enforced rule that no two rows may hold the same
+      value in a given column (or, for a composite `UNIQUE` constraint,
+      the same COMBINATION of values across several columns at once).
+      It exists as the general-purpose form of the same uniqueness
+      guarantee this curriculum's own Primary Keys lesson already
+      studied for a table's own key - `UNIQUE` lets that identical
+      guarantee apply to any other column, or combination of columns,
+      that also needs to be one-of-a-kind, without making it the row's
+      own primary identity.
+  - name: CHECK
+    definition: >
+      A real, database-enforced rule that a column's own value must
+      satisfy a stated condition - not merely "present" (`NOT NULL`) or
+      "not a duplicate" (`UNIQUE`), but a real, specific fact about the
+      value itself, like "must be greater than zero." It exists to let
+      the database itself reject a value that is technically the right
+      TYPE (a real number, correctly stored) but not a real, valid
+      instance of what that column is supposed to represent.
+  - name: "composite uniqueness"
+    definition: >
+      A `UNIQUE` constraint declared across more than one column
+      together, guaranteeing no two rows share the identical COMBINATION
+      of values, even though either column alone might repeat freely. It
+      exists because some real facts are only genuinely required to be
+      unique as a pair (or larger group) - a specific machine being
+      paired with a specific CAM file should only exist once, even
+      though the same machine legitimately appears in many other
+      pairings, and the same CAM file legitimately appears in many
+      others too.
+  - name: "foreign key (as a constraint)"
+    definition: >
+      Fully treated in this curriculum's own Foreign Keys lesson - a
+      column declared to reference another relation's own primary key.
+      Named again here specifically as one member of the same real
+      family as `NOT NULL`, `UNIQUE`, and `CHECK`: a rule the database
+      itself can be made to enforce on a column's own real value, though
+      this curriculum's own Foreign Keys lesson already proved this
+      particular one is not actually turned on anywhere in this
+      project's own real configuration.
+  - name: constraint
+    definition: >
+      A real rule attached directly to a column or table that the
+      database itself checks on every write, refusing any write that
+      would violate it - as opposed to a rule that only lives in
+      application code, checked (or not) by whichever code path happens
+      to run. It exists as the general category `NOT NULL`, `UNIQUE`,
+      `CHECK`, and a foreign key's own referential-integrity rule all
+      belong to: enforcement the database provides for free, once
+      declared, rather than enforcement every calling code path must
+      separately remember to perform.
+
+objects_and_methods: []
+
+concept_units:
+  - title: "NOT NULL and UNIQUE - Two Real Constraints Already at Work in This Schema"
+    problem: >
+      `backend/app/models/machine.py`'s real `name` column is declared
+      `nullable=False`; `backend/app/models/part.py`'s real
+      `part_number` column is declared `unique=True`. Given that both are
+      real, already-declared constraints, what does this project's own
+      real, running database actually do the moment either one is
+      genuinely violated?
+    socratic_prompt:
+      - >
+        If a real `Machine` were committed with no `name` at all, would
+        this project's own real database silently accept it, the way
+        this curriculum's own Foreign Keys lesson showed an invalid
+        `part_id` being silently accepted - or is `NOT NULL` enforced
+        differently?
+      - >
+        `Part.part_number` is declared `unique=True`. If two real,
+        separate `Part` rows were committed with the identical
+        `part_number`, does this project's own real database notice?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/machine.py:50`:
+        ```
+        name = db.Column(db.String(100), nullable=False)
+        ```
+        and, real, verbatim, `backend/app/models/part.py:218`:
+        ```
+        part_number = db.Column(db.String(20), unique=True, nullable=False, index=True)
+        ```
+        Real, already-existing evidence of two different real
+        constraints this project's schema already declares.
+      files_affected:
+        - path: verification/phase-06/lab_not_null_unique.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        A real `Machine` committed with no `name`, then a second real
+        `Part` committed with a `part_number` already used by the first:
+      file: verification/phase-06/lab_not_null_unique.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy.exc import IntegrityError
+
+        from app import create_app, db
+        from app.models.machine import Machine
+        from app.models.part import Part
+
+        app = create_app("testing")
+
+        with app.app_context():
+            missing_name = Machine(id="m1", category="mill", sub_type="3_axis")  # no name given
+            db.session.add(missing_name)
+            try:
+                db.session.commit()
+                print("committed anyway - no error")
+            except IntegrityError as e:
+                print(f"NOT NULL on Machine.name: IntegrityError raised - {e.orig}")
+            db.session.rollback()
+
+        with app.app_context():
+            part1 = Part(id="P1", part_number="1234567", description="Bracket")
+            db.session.add(part1)
+            db.session.commit()
+
+            part2 = Part(id="P2", part_number="1234567", description="A different, unrelated part")
+            db.session.add(part2)
+            try:
+                db.session.commit()
+                print("committed anyway - no error")
+            except IntegrityError as e:
+                print(f"UNIQUE on Part.part_number: IntegrityError raised - {e.orig}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'Machine(id="m1", category="mill", sub_type="3_axis")  # no name given'
+          explanation: >
+            Constructs a real `Machine` instance with every required
+            field EXCEPT `name`, the one column declared `nullable=False`
+            - deliberately omitted to test the real constraint directly.
+        - element: "except IntegrityError as e: ... e.orig (first block)"
+          explanation: >
+            `IntegrityError`, already fully treated in this curriculum's
+            own Foreign Keys lesson, raised here by the real, always-on
+            `NOT NULL` enforcement SQLite itself provides - unlike the
+            foreign-key case, this needs no `PRAGMA` at all to be
+            enforced.
+        - element: "db.session.rollback()"
+          explanation: >
+            A real SQLAlchemy session method, undoing the failed,
+            partially-staged transaction so the SAME session object can
+            be reused cleanly for the next real block, rather than
+            carrying a broken transaction state forward.
+        - element: 'Part(id="P2", part_number="1234567", ...)'
+          explanation: >
+            Constructs a second, real `Part` whose `part_number`
+            deliberately duplicates the first real `Part`'s own value -
+            testing the real `unique=True` declaration directly.
+        - element: "except IntegrityError as e: ... e.orig (second block)"
+          explanation: >
+            The identical real exception type, this time raised by
+            SQLite's own always-on `UNIQUE` enforcement - like `NOT
+            NULL`, and unlike a foreign key, requiring no `PRAGMA` to be
+            real.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **NOT NULL** and **UNIQUE**, both fully named in this
+      lesson's own Header - two of the most common real constraints a
+      relational database enforces. Also recognized in: a signup form's
+      own required-field validation, mirrored at the database level so
+      even a bug in that form cannot store an empty required field; a
+      username field rejecting a second real account trying to reuse an
+      already-taken name; a spreadsheet's own data-validation rule
+      refusing a blank cell in a required column; and, in this project's
+      own domain, exactly these two real columns - a machine record that
+      is not genuinely a machine record without a real `name`, a part
+      number that would be meaningless as a lookup key if two real parts
+      could share it.
+    se_lens: >
+      The design principle is letting the database itself refuse an
+      invalid write, rather than trusting every application code path to
+      independently remember to check first. The real alternative NOT
+      relied on here - checking `name` is present, or `part_number` is
+      unused, only in application code before ever reaching the database
+      - is exactly the situation this curriculum's own Foreign Keys
+      lesson found for referential integrity: real, but silently
+      bypassable the moment one real code path forgets. The honest
+      difference this unit's own lab proves directly: unlike that real
+      foreign-key gap, `NOT NULL` and `UNIQUE` are enforced by SQLite
+      itself with no extra `PRAGMA` required at all - a real, structural
+      difference in how much these particular constraints can be trusted
+      compared to this project's own currently-off foreign keys.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_not_null_unique.py
+        explanation: >
+          Run from the manufacturing-platform repository root, using
+          this project's own real backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        NOT NULL on Machine.name: IntegrityError raised - NOT NULL constraint failed: machines.name
+        UNIQUE on Part.part_number: IntegrityError raised - UNIQUE constraint failed: parts.part_number
+      output_file: verification/phase-06/lab_not_null_unique_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it shows two real constraints
+      genuinely enforced with no extra configuration; the next unit
+      recaps the one this curriculum already found is NOT enforced that
+      way.
+
+  - title: "Foreign Key - The One Constraint This Curriculum Already Found Isn't Real Yet"
+    problem: >
+      This curriculum's own Foreign Keys lesson already ran a real
+      script proving `backend/app/models/cam_file.py`'s own real
+      `db.ForeignKey('parts.id')` accepts a `part_id` matching nothing
+      real, with zero error - and that turning on `PRAGMA foreign_keys = ON`
+      is what actually makes the identical write fail. Given this
+      unit's own previous unit just proved `NOT NULL` and `UNIQUE` need
+      no such extra step at all, what does that difference say about how
+      much a `ForeignKey(...)` declaration, by itself, can actually be
+      trusted?
+    socratic_prompt:
+      - >
+        `NOT NULL` and `UNIQUE` were both enforced with zero extra
+        configuration in the previous unit. Foreign keys were not, in
+        this curriculum's own earlier lesson. Does "declared as a
+        constraint" mean "enforced as a constraint," for every kind of
+        constraint equally?
+    project_change:
+      reference_source: >
+        No new reference source - this unit recaps the real, already-run
+        finding from this curriculum's own Foreign Keys lesson
+        (`verification/phase-06/lab_foreign_key_integrity.py`), rather
+        than re-running the identical script here.
+      files_affected: []
+      change_type: none
+      location: N/A - this unit reasons about a real result already established and shown in an earlier lesson; no new file is added.
+      dependencies: None beyond what this curriculum's own Foreign Keys lesson already established.
+    new_code:
+      applicable: false
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: false
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **foreign key**, fully treated as its own constraint in
+      this curriculum's own Foreign Keys lesson, and named again here
+      specifically as one member of the same real family as `NOT NULL`,
+      `UNIQUE`, and `CHECK`. Also recognized in: a driver's license
+      number required to match a real, issued license, versus merely
+      required to be present at all; a shipping address's own postal
+      code required to be a real, known code, a stronger real check than
+      merely "some text was entered." The four kinds of constraint this
+      lesson names are not all equally automatic just because they are
+      all declared the same way, in the same schema.
+    se_lens: >
+      The design principle this unit reinforces is that "constraint" is
+      a category, not a guarantee of equal real strength - `NOT NULL`
+      and `UNIQUE` are enforced by SQLite with no further step; a foreign
+      key, in this exact same database engine, is not, unless a separate,
+      real setting is turned on. The real, honest cost this project
+      currently carries, unchanged since this curriculum's own Foreign
+      Keys lesson: every real `db.ForeignKey(...)` in this schema reads,
+      to anyone skimming the code, as equally enforced as the `NOT NULL`
+      and `UNIQUE` constraints sitting right next to it - and, verified
+      directly, it is not.
+    commands: []
+    verification:
+      applicable: false
+      exemption_reason: >
+        This unit draws its own conclusion from the real script and real
+        output already run and shown in this curriculum's own Foreign
+        Keys lesson - re-running the identical script here would only
+        reproduce output already cited there.
+    connection_to_previous: >
+      The previous unit showed two constraints enforced automatically;
+      this unit names the one this curriculum already found is not,
+      before the next two units study the remaining real constraint
+      types.
+
+  - title: "CHECK - The One Constraint Type This Schema Never Uses at All"
+    problem: >
+      `backend/app/models/operation.py`'s real `feedrate` column is
+      declared `db.Column(db.Float, nullable=True)` - no rule at all
+      about what a REAL feedrate value can actually be. Confirmed this
+      session by grepping every real file under `backend/app/` for
+      `CheckConstraint`: zero matches, anywhere. What actually happens,
+      today, if a real `Operation` is committed with a feedrate no real
+      machine could ever run - a negative number?
+    socratic_prompt:
+      - >
+        A negative feedrate is not a real, physically possible
+        machining parameter. Is there anything, at the database level,
+        currently stopping one from being stored in a real `Operation`
+        row?
+      - >
+        `NOT NULL` and `UNIQUE` are both real, enforced constraints in
+        this exact schema. Why might `CHECK` - checking that a NUMBER is
+        actually a sensible one - be a harder rule for a project to
+        remember to add than either of those?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/operation.py:30`:
+        ```
+        feedrate = db.Column(db.Float, nullable=True)  # inch/min or mm/min
+        ```
+        Real, confirmed this session by grepping `backend/app/` for
+        `CheckConstraint` and `db.Check`: zero matches anywhere in this
+        project's own real schema. This is a real, honest gap, not an
+        invented one - and connects directly to this project's own
+        already-documented, separate finding that `create_machine`
+        accepts a non-numeric string for its `axes` field with zero
+        validation, the identical real pattern, on a different column.
+      files_affected:
+        - path: verification/phase-06/lab_missing_check.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        A real `Operation`, committed with a real, physically
+        nonsensical negative `feedrate` - followed by a small, explicitly
+        illustrative Python function standing in for what a real `CHECK`
+        constraint would enforce, since this project's own real schema
+        has none to cite directly:
+      file: verification/phase-06/lab_missing_check.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.machine import Machine
+        from app.models.cam_file import CAMFile
+        from app.models.sequence import Sequence
+        from app.models.operation import Operation
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part = Part(id="P1", part_number="1234567", description="Bracket")
+            machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add_all([part, machine])
+            db.session.commit()
+
+            cf1 = CAMFile(id="cf1", part_id="P1", machine_id="m1", file_name="rev1.nc")
+            db.session.add(cf1)
+            db.session.commit()
+
+            seq1 = Sequence(id="seq1", cam_file_id="cf1", sequence_number=1, tool_number=1)
+            db.session.add(seq1)
+            db.session.commit()
+
+            op = Operation(
+                id="op1", sequence_id="seq1", operation_number=1,
+                operation_type="Drill", name="Drill hole", tool_number=1,
+                feedrate=-500.0,  # a real, physically nonsensical negative feedrate
+            )
+            db.session.add(op)
+            db.session.commit()
+            print("committed a real Operation with feedrate=-500.0 - no CHECK constraint exists to reject it")
+            print(f"real row still exists: feedrate={db.session.get(Operation, 'op1').feedrate}")
+
+
+        def is_valid_feedrate(value):
+            """What a real CHECK constraint would enforce, if this project declared one."""
+            return value is None or value > 0
+
+
+        print(f"a real CHECK constraint would have rejected this: is_valid_feedrate(-500.0) = {is_valid_feedrate(-500.0)}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'Operation(..., feedrate=-500.0, ...)'
+          explanation: >
+            Constructs a real `Operation` row with a deliberately
+            invalid, negative `feedrate` - `db.Float` accepts any real
+            floating-point number, positive or negative, since nothing
+            in the column's own declaration restricts its range.
+        - element: "db.session.commit() (no exception)"
+          explanation: >
+            Unlike this lesson's own first unit, nothing raises here at
+            all - the write genuinely succeeds, proving directly that no
+            real constraint currently protects this column's own value
+            from being physically nonsensical.
+        - element: "def is_valid_feedrate(value): return value is None or value > 0"
+          explanation: >
+            A small, explicitly illustrative Python function (basic
+            Python), standing in for the CONDITION a real `CHECK`
+            constraint would express - not real SQL, since SQL itself is
+            this curriculum's own later, dedicated lesson, but the exact
+            real logic such a constraint would need to enforce.
+        - element: "is_valid_feedrate(-500.0)"
+          explanation: >
+            Evaluates `False`, confirming the value this unit's own
+            `Operation` was just committed with would have been rejected
+            immediately, had a real `CHECK` constraint expressing this
+            exact condition actually existed on this column.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **CHECK**, fully named in this lesson's own Header - a
+      constraint on a value's own content, not merely its presence or
+      uniqueness. Also recognized in: an age field rejecting a negative
+      number even though `NOT NULL` and a numeric type are both already
+      satisfied; a percentage column restricted to `0-100`; a real
+      `CHECK (quantity > 0)` on an order-line table, common in real
+      inventory schemas; and, in this project's own domain, this exact
+      real gap - a feedrate, spindle speed, or `axes` count that this
+      schema's own real columns currently accept at any value at all,
+      including physically impossible ones.
+    se_lens: >
+      The design principle `CHECK` protects is catching a value that is
+      the right TYPE but the wrong FACT - a real number, correctly
+      stored, that still cannot be true of anything real. The real
+      alternative this project currently relies on instead - trusting
+      application code to validate `feedrate` before it ever reaches the
+      database - is exactly the same real risk this curriculum's own
+      Normalization lesson already named for other columns: correct only
+      as long as every real code path that writes this column remembers
+      to check first. The honest cost, made concrete by this unit's own
+      lab: nothing did, here, and nothing had to - the write simply
+      succeeded.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_missing_check.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        committed a real Operation with feedrate=-500.0 - no CHECK constraint exists to reject it
+        real row still exists: feedrate=-500.0
+        a real CHECK constraint would have rejected this: is_valid_feedrate(-500.0) = False
+      output_file: verification/phase-06/lab_missing_check_output.txt
+    connection_to_previous: >
+      The previous unit recapped a constraint this schema declares but
+      does not enforce; this unit shows a constraint type this schema
+      never even attempts to declare at all, anywhere. The next unit
+      studies the last real constraint shape - one guarantee spanning
+      more than one column at once.
+
+  - title: "Composite Uniqueness - One Guarantee, Two Real Columns Together"
+    problem: >
+      `backend/app/models/machine_pairing.py`'s real `MachineCAMPairing`
+      declares `db.UniqueConstraint('cam_file_id', 'machine_id', name='uq_cam_machine')`
+      - not a `unique=True` on either column alone, but on the pairing of
+      both together. Given that the same real `machine_id` legitimately
+      appears in many real pairings, and the same real `cam_file_id`
+      does too, what exactly does this constraint guarantee, and what
+      would guaranteeing it on either column ALONE have broken?
+    socratic_prompt:
+      - >
+        If `machine_id` alone were declared `unique=True` on this table,
+        could a single real machine ever be paired with more than one
+        real CAM file at all? Is that the real rule this table is
+        supposed to enforce?
+      - >
+        Given `db.UniqueConstraint('cam_file_id', 'machine_id', ...)`,
+        should committing the SAME `cam_file_id` with a DIFFERENT
+        `machine_id` succeed? What about the identical pairing of both,
+        twice?
+    project_change:
+      reference_source: >
+        Real, verbatim, read this session, `backend/app/models/machine_pairing.py:52-55`:
+        ```
+        # Unique constraint: one pairing per cam_file + machine combo
+        __table_args__ = (
+            db.UniqueConstraint('cam_file_id', 'machine_id', name='uq_cam_machine'),
+        )
+        ```
+        Real, already-existing evidence of a genuine composite `UNIQUE`
+        constraint, already partly cited in this curriculum's own
+        Foreign Keys lesson for its two real foreign-key columns, here
+        studied for what it guarantees ACROSS both of them together.
+      files_affected:
+        - path: verification/phase-06/lab_composite_uniqueness.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        One real pairing committed successfully, then the identical real
+        pairing of the same `cam_file_id` and `machine_id` attempted a
+        second time:
+      file: verification/phase-06/lab_composite_uniqueness.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy.exc import IntegrityError
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.machine import Machine
+        from app.models.cam_file import CAMFile
+        from app.models.machine_pairing import MachineCAMPairing
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part = Part(id="P1", part_number="1234567", description="Bracket")
+            machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add_all([part, machine])
+            db.session.commit()
+
+            cf1 = CAMFile(id="cf1", part_id="P1", machine_id="m1", file_name="rev1.nc")
+            db.session.add(cf1)
+            db.session.commit()
+
+            pairing1 = MachineCAMPairing(id="pair1", cam_file_id="cf1", machine_id="m1")
+            db.session.add(pairing1)
+            db.session.commit()
+            print("committed the first real pairing of cf1 + m1")
+
+            pairing2 = MachineCAMPairing(id="pair2", cam_file_id="cf1", machine_id="m1")
+            db.session.add(pairing2)
+            try:
+                db.session.commit()
+                print("committed a second, duplicate pairing anyway - no error")
+            except IntegrityError as e:
+                print(f"composite UNIQUE on (cam_file_id, machine_id): IntegrityError raised - {e.orig}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'MachineCAMPairing(id="pair1", cam_file_id="cf1", machine_id="m1")'
+          explanation: >
+            Constructs the first real pairing row. Note its own real
+            `id`, `"pair1"`, is a SEPARATE surrogate primary key, already
+            treated in this curriculum's own Primary Keys lesson - the
+            composite constraint being tested here is declared
+            independently, via `__table_args__`, not through the primary
+            key at all.
+        - element: 'MachineCAMPairing(id="pair2", cam_file_id="cf1", machine_id="m1")'
+          explanation: >
+            A second, real row with a DIFFERENT surrogate `id`,
+            `"pair2"`, but the IDENTICAL `cam_file_id`/`machine_id` pair
+            as the first - deliberately, to test whether the composite
+            constraint (not the primary key, which is satisfied by the
+            two different `id` values) actually catches this.
+        - element: "except IntegrityError as e: ... e.orig"
+          explanation: >
+            `IntegrityError`, already fully treated in this curriculum's
+            own Foreign Keys lesson, raised here specifically because the
+            two real columns TOGETHER repeat - even though each real
+            `id` value is itself unique, and even though `machine_id`
+            and `cam_file_id` each individually repeat freely elsewhere
+            in this real table.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **composite uniqueness**, fully named in this lesson's own
+      Header. Also recognized in: a seating chart's own
+      `(row, seat)` pair, already named as a composite key in this
+      curriculum's own Relational Model lesson, here as a composite
+      UNIQUE CONSTRAINT rather than the primary key itself; a calendar
+      system refusing to double-book the identical `(room, time_slot)`
+      pair while happily allowing the same room at a different time, or
+      the same time in a different room; and, in this project's own real
+      domain, exactly this real table - one real machine legitimately
+      paired with many real CAM files, one real CAM file legitimately
+      paired with many real machines, but never the identical pairing of
+      both at once, twice.
+    se_lens: >
+      The design principle is declaring uniqueness on exactly the
+      combination that actually needs to be one-of-a-kind, rather than
+      on either column alone (which would be too strict - it would
+      wrongly forbid a real machine from ever appearing in more than one
+      real pairing) or on neither (too loose - nothing would stop the
+      identical real pairing from being recorded twice). The real
+      alternative NOT chosen - `unique=True` on `machine_id` alone, or on
+      `cam_file_id` alone - would actively break this project's own real,
+      intended use: one real CAM file proven on several real machines,
+      one real machine running several real CAM files over its
+      lifetime. The honest cost of getting a composite `UNIQUE`
+      constraint's own column list wrong: it is a schema-level decision,
+      not adjustable per-row, and this project's own real primary key
+      (`id`) still had to be declared separately, since a composite
+      `UNIQUE` constraint and a primary key are two different real
+      declarations serving two different real jobs.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_composite_uniqueness.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        committed the first real pairing of cf1 + m1
+        composite UNIQUE on (cam_file_id, machine_id): IntegrityError raised - UNIQUE constraint failed: machine_cam_pairings.cam_file_id, machine_cam_pairings.machine_id
+      output_file: verification/phase-06/lab_composite_uniqueness_output.txt
+    connection_to_previous: >
+      The previous unit showed a constraint type this schema never
+      declares at all; this unit closes the lesson with a constraint
+      type this schema DOES declare, correctly, spanning more than one
+      column at once.
+
+closing:
+  connect_the_pieces: >
+    Follow one real pairing, `cf1` and `m1`, through every constraint
+    this lesson names. A `Machine` without a real `name`, and a `Part`
+    reusing an already-taken `part_number`, are both refused outright by
+    this project's own real, always-on `NOT NULL` and `UNIQUE`
+    enforcement - the first unit's own real proof. A `CAMFile` pointing
+    at a `Part` that never existed, by contrast, is NOT refused, because
+    this curriculum's own Foreign Keys lesson already found that
+    particular constraint declared but not enforced - the second unit's
+    own honest recap. A real `Operation` with a negative `feedrate` is
+    ALSO not refused - not because this project made a deliberate,
+    documented choice the way it did for foreign keys, but because no
+    `CHECK` constraint exists anywhere in this schema to even attempt it
+    - the third unit's own real, verified gap. And the real pairing of
+    `cf1` and `m1` together IS protected, correctly, the moment the
+    identical combination is attempted twice - not because either column
+    alone is unique, but because this project's own real, composite
+    `UNIQUE` constraint spans both at once. Four real constraint types,
+    the identical real schema, three different real answers to "is this
+    actually enforced."
+  next_lesson_pointer: >
+    Next, a different real question about the very same schema: not
+    whether a write is valid, but how fast a real read actually is -
+    starting with this project's own real, already-declared `index=True`
+    columns, and one real column this curriculum will show is missing
+    one.

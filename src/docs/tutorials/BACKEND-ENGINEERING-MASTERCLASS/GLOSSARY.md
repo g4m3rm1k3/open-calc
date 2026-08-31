@@ -246,6 +246,9 @@ re-run the script after any lesson changes instead.
 ## characterization test (applied for real)
 - **Term** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, permanent test asserting exactly what a real, existing implementation currently does - not what it should do - written before that implementation changes, so any real deviation later is a deliberate, visible decision rather than an accidental, silent one. It exists, in this lesson specifically, as the first real application (not a lab exercise) of characterization testing anywhere in this curriculum - the real safety net this entire phase's own rebuild depends on.
 
+## CHECK
+- **Term** in `LESSON-6.9-CONSTRAINTS` - A real, database-enforced rule that a column's own value must satisfy a stated condition - not merely "present" (`NOT NULL`) or "not a duplicate" (`UNIQUE`), but a real, specific fact about the value itself, like "must be greater than zero." It exists to let the database itself reject a value that is technically the right TYPE (a real number, correctly stored) but not a real, valid instance of what that column is supposed to represent.
+
 ## check_password_hash
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - The real matching function from `werkzeug.security` that verifies a real plaintext password against an already-generated real hash.
 
@@ -267,6 +270,9 @@ re-run the script after any lesson changes instead.
 ## column
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word for exactly what the relational model formally calls an attribute: one named, single-valued property every row shares. It exists for the identical reason "row" does - it is the word real SQL, and this project's own real code (its `db.Column` declarations), actually uses, even though "attribute" is the formally precise term for the same idea.
 
+## composite uniqueness
+- **Term** in `LESSON-6.9-CONSTRAINTS` - A `UNIQUE` constraint declared across more than one column together, guaranteeing no two rows share the identical COMBINATION of values, even though either column alone might repeat freely. It exists because some real facts are only genuinely required to be unique as a pair (or larger group) - a specific machine being paired with a specific CAM file should only exist once, even though the same machine legitimately appears in many other pairings, and the same CAM file legitimately appears in many others too.
+
 ## concurrency
 - **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - More than one independent flow of execution - two threads, two processes, two separate users' requests - being active over the same shared data at the same time, with no guarantee about which one's steps happen in which order relative to the other's. It exists as a named concern because a single flow of execution touching data by itself never has this problem; the instant a second one can touch the same data before the first one finishes, an operation that looks like one atomic step from the outside (read the current value, decide, write a new value) can actually happen as two separately-interleaved flows, each unaware of the other's steps in between its own.
 
@@ -281,6 +287,9 @@ re-run the script after any lesson changes instead.
 
 ## consistency cost
 - **Term** in `LESSON-6.8-DENORMALIZATION` - The real, ongoing risk that a denormalized value and its own real source of truth quietly stop agreeing, because keeping them in sync depends on every real code path that changes the source actually remembering to also update the derived copy. It exists as the honest price of denormalization's own real benefit: the moment more than one real place in the codebase is capable of changing the source of truth, each one of those places becomes a real opportunity for the derived value to go stale, with nothing in the schema itself checking that it did not.
+
+## constraint
+- **Term** in `LESSON-6.9-CONSTRAINTS` - A real rule attached directly to a column or table that the database itself checks on every write, refusing any write that would violate it - as opposed to a rule that only lives in application code, checked (or not) by whichever code path happens to run. It exists as the general category `NOT NULL`, `UNIQUE`, `CHECK`, and a foreign key's own referential-integrity rule all belong to: enforcement the database provides for free, once declared, rather than enforcement every calling code path must separately remember to perform.
 
 ## Content-Type
 - **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
@@ -488,6 +497,9 @@ re-run the script after any lesson changes instead.
 
 ## foreign key
 - **Term** in `LESSON-6.4-FOREIGN-KEYS` - A column in one relation whose declared job is to hold a real value from ANOTHER relation's own primary key - not a copy of that row, only a pointer to it. It exists so one relation can refer to a specific row of a different relation without duplicating that row's own data everywhere it needs to be referenced.
+
+## foreign key (as a constraint)
+- **Term** in `LESSON-6.9-CONSTRAINTS` - Fully treated in this curriculum's own Foreign Keys lesson - a column declared to reference another relation's own primary key. Named again here specifically as one member of the same real family as `NOT NULL`, `UNIQUE`, and `CHECK`: a rule the database itself can be made to enforce on a column's own real value, though this curriculum's own Foreign Keys lesson already proved this particular one is not actually turned on anywhere in this project's own real configuration.
 
 ## generate_nc_file
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
@@ -731,6 +743,9 @@ re-run the script after any lesson changes instead.
 
 ## NCTemplate.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The same real kind of ORM lookup as `MachineCAMPairing.query.get`, above, applied to a different real table.
+
+## NOT NULL
+- **Term** in `LESSON-6.9-CONSTRAINTS` - A real, database-enforced rule that a given column must hold an actual value on every row - never the SQL null value standing in for "nothing was ever provided here." It exists as the most basic real constraint because some facts a relation records are not optional - `Machine.name`, for instance, is not a real machine record at all without one - and `NOT NULL` is what makes the database itself refuse to store a row missing one.
 
 ## observed behavior vs. intended behavior
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - The real distinction a characterization test is built around: what code actually does, verified by running it, versus what its author meant, or what a docstring claims, which may or may not be the same thing. It exists because conflating the two is exactly what lets a well-meaning "fix" silently change real behavior nobody meant to touch.
@@ -1185,6 +1200,9 @@ re-run the script after any lesson changes instead.
 ## unified error contract
 - **Term** in `LESSON-3.7-API-ERROR-DESIGN` - A real, single, shared shape every error response in an API returns, regardless of which real route or failure produced it - this lesson's own proposed `build_error_response` function produces exactly one. It exists so a real caller writes one real block of error-handling code, once, instead of one per route.
 
+## UNIQUE
+- **Term** in `LESSON-6.9-CONSTRAINTS` - A real, database-enforced rule that no two rows may hold the same value in a given column (or, for a composite `UNIQUE` constraint, the same COMBINATION of values across several columns at once). It exists as the general-purpose form of the same uniqueness guarantee this curriculum's own Primary Keys lesson already studied for a table's own key - `UNIQUE` lets that identical guarantee apply to any other column, or combination of columns, that also needs to be one-of-a-kind, without making it the row's own primary identity.
+
 ## uniqueness
 - **Term** in `LESSON-6.3-PRIMARY-KEYS` - The guarantee that no two rows in a relation ever hold the same value for a given column - specifically the one a primary key is declared on. It exists as a distinct, checkable property because a column can hold real, meaningful values (a machine's `name`, a part's `description`) without anything ever enforcing that no two rows share one - uniqueness has to be a deliberate, separate guarantee, never a side effect of a column simply existing.
 
@@ -1266,6 +1284,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `2NF (Second Normal Form)` / `3NF (Third Normal Form)` - shares: form, nf, normal
 - `2xx (success)` / `4xx (client error)` - shares: xx
 - `2xx (success)` / `5xx (server error)` - shares: xx
+- `404 (Not Found)` / `NOT NULL` - shares: not
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
 - `4xx (client error)` / `5xx (server error)` - shares: error, xx
 - `4xx (client error)` / `build_error_response` - shares: error
@@ -1345,6 +1364,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `association table (also called a join table)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: a
 - `association table (also called a join table)` / `db.Table` - shares: table
 - `association table (also called a join table)` / `Dependency (of a function)` - shares: a
+- `association table (also called a join table)` / `foreign key (as a constraint)` - shares: a
 - `association table (also called a join table)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `ast.Attribute` / `attribute` - shares: attribute
 - `ast.Import` / `Import graph` - shares: import
@@ -1386,6 +1406,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `characterization test (applied for real)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `Config (and its real subclasses)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `Dependency (of a function)` - shares: a
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `foreign key (as a constraint)` - shares: a
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `get_health_response (real, now live)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `get_machine (revisited for its real decorator stack)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `health route, health_bp)` - shares: bp
@@ -1442,6 +1463,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `characterization test (applied for real)` / `real_health_status (proposed prototype)` - shares: real
 - `characterization test (applied for real)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
+- `CHECK` / `check_password_hash` - shares: check
+- `CHECK` / `health check semantics` - shares: check
+- `CHECK` / `health_check` - shares: check
+- `CHECK` / `health_check (blueprint route)` - shares: check
+- `CHECK` / `health_check (both real routes, now unified)` - shares: check
+- `CHECK` / `health_check (direct route)` - shares: check
+- `CHECK` / `health_check (the` - shares: check
+- `CHECK` / `health_check (the bare` - shares: check
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `check_password_hash` / `health check semantics` - shares: check
 - `check_password_hash` / `health_check` - shares: check
@@ -1456,6 +1485,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `composite uniqueness` / `uniqueness` - shares: uniqueness
 - `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
 - `Config (and its real subclasses)` / `get_health_response (real, now live)` - shares: real
 - `Config (and its real subclasses)` / `get_machine (revisited for its real decorator stack)` - shares: its, real
@@ -1466,6 +1496,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
+- `constraint` / `foreign key (as a constraint)` - shares: constraint
 - `Content-Type` / `tuple (Python builtin type)` - shares: type
 - `Content-Type` / `Type annotation` - shares: type
 - `context manager (the `with` statement)` / `context-local state` - shares: context
@@ -1578,6 +1609,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `update_machine (PATCH)` - shares: machine
 - `delete_machine` / `update_machine_status` - shares: machine
 - `delete_machine` / `update_machine_status (PUT)` - shares: machine
+- `Dependency (of a function)` / `foreign key (as a constraint)` - shares: a
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `Dependency (of a function)` / `Pure function` - shares: function
@@ -1585,6 +1617,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
 - `dictionary key access` / `foreign key` - shares: key
+- `dictionary key access` / `foreign key (as a constraint)` - shares: key
 - `dictionary key access` / `Key function` - shares: key
 - `dictionary key access` / `natural key` - shares: key
 - `dictionary key access` / `surrogate key` - shares: key
@@ -1643,9 +1676,16 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Flask (the class, and this project's own app instance)` / `rebuild (as this curriculum's own real term)` - shares: own, s, this
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `FlaskClient (.post)` / `POST` - shares: post
+- `foreign key` / `foreign key (as a constraint)` - shares: foreign, key
 - `foreign key` / `Key function` - shares: key
 - `foreign key` / `natural key` - shares: key
 - `foreign key` / `surrogate key` - shares: key
+- `foreign key (as a constraint)` / `Key function` - shares: key
+- `foreign key (as a constraint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, as
+- `foreign key (as a constraint)` / `mark_as_read` - shares: as
+- `foreign key (as a constraint)` / `natural key` - shares: key
+- `foreign key (as a constraint)` / `rebuild (as this curriculum's own real term)` - shares: as
+- `foreign key (as a constraint)` / `surrogate key` - shares: key
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `open() (file object)` - shares: file
