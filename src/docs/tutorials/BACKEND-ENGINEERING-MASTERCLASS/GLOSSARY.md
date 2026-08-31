@@ -110,6 +110,9 @@ re-run the script after any lesson changes instead.
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
 
+## application factory
+- **Term** in `LESSON-4.2-APPLICATION-FACTORY` - A real, plain function - `create_app`, in this project - that builds and returns a fully-configured `Flask` instance, rather than a bare, module-level `app` object existing the moment the module is imported. It exists so a real, independent app instance can be built fresh, on demand, as many real times as needed, instead of every part of a codebase sharing the identical real, single instance by default.
+
 ## Application layer
 - **Term** in `LESSON-0.3-BACKEND-BOUNDARIES` - The part of a backend that decides which piece of code should run for a given request — routing a parsed request to a handler — without itself containing the actual business decision that handler makes. It exists as a separate boundary from domain logic (below) so the *routing* decision (which function runs) can change independently of the *business* decision (what that function actually does).
 
@@ -221,6 +224,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.3-PYTEST` - This project's real Flask application factory function.
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - This project's real Flask application factory function.
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - This project's own real application factory function, already read in earlier lessons, revisited here specifically for what it actually builds onto the `app` object step by step.
+- **Object/method** in `LESSON-4.2-APPLICATION-FACTORY` - This project's own real application factory function, already studied in the previous lesson, revisited here specifically for why it exists as a function at all.
 
 ## create_machine
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
@@ -254,6 +258,9 @@ re-run the script after any lesson changes instead.
 ## db
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, module-level SQLAlchemy instance every model in this application is built on - created once, in `app/__init__.py`, before `create_app`, below, is even defined.
 
+## db (module-level SQLAlchemy instance)
+- **Object/method** in `LESSON-4.2-APPLICATION-FACTORY` - This project's own real, single `SQLAlchemy` instance, created at module level in `backend/app/__init__.py`, before `create_app` is ever called.
+
 ## db.session.add
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
 
@@ -265,6 +272,9 @@ re-run the script after any lesson changes instead.
 
 ## default
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The real value or behavior a system falls back to when a caller specifies nothing. It exists because "optional" only fully means something once the real, specific fallback behavior is actually known - "optional, defaults to nothing" and "optional, defaults to everything" are two completely different real systems.
+
+## deferred initialization
+- **Term** in `LESSON-4.2-APPLICATION-FACTORY` - The real, two-step pattern this project's own code follows for its `db` object - created once, real, at module level, with no real app attached yet (`db = SQLAlchemy()`), then bound to a specific real app later, inside the factory (`db.init_app(app)`). It exists so real model files can import `db` directly, at any time, without needing a real, already-built `app` to exist first.
 
 ## DELETE
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this resource should no longer exist" - this lesson's own last unit calls it against this project's own real `/api/machines/<id>`. It exists as its own named method, distinct from an update, because "this resource is gone" is a real, different kind of change than any modification to its content.
@@ -999,11 +1009,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `add_favorite` / `db.session.add` - shares: add
 - `API contract` / `unified error contract` - shares: contract
 - `app.url_map` / `map` - shares: map
+- `application context` / `application factory` - shares: application
 - `application context` / `Application layer` - shares: application
 - `application context` / `application object` - shares: application
 - `application context` / `Application server` - shares: application
 - `application context` / `request (the real context-local proxy)` - shares: context
 - `application context` / `request context` - shares: context
+- `application factory` / `Application layer` - shares: application
+- `application factory` / `application object` - shares: application
+- `application factory` / `Application server` - shares: application
 - `Application layer` / `application object` - shares: application
 - `Application layer` / `Application server` - shares: application
 - `Application layer` / `Transport layer` - shares: layer
@@ -1099,7 +1113,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `database effect` / `in-memory database` - shares: database
 - `database effect` / `Side effect` - shares: effect
 - `database effect` / `side effect` - shares: effect
+- `db` / `db (module-level SQLAlchemy instance)` - shares: db
 - `db` / `Session (db.session)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
+- `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
+- `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
+- `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
