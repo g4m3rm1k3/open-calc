@@ -12,11 +12,23 @@ re-run the script after any lesson changes instead.
 ## .count())
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - SQLAlchemy's real query interface, reached through a model class's own `.query` attribute.
 
+## .delete)
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+
 ## .get_json())
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
 
 ## .json())
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - `requests.get` is the real top-level function from the third-party `requests` library, sending a real HTTP `GET` request over an actual TCP connection; the object it returns is a real `Response`.
+
+## .patch
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+
+## .post
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+
+## .put
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 
 ## .put)
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
@@ -143,6 +155,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - A real, existing Flask view function creating a new machine row in the database.
 
+## create_machine_group
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function creating a new machine group.
+
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
 
@@ -166,6 +181,12 @@ re-run the script after any lesson changes instead.
 
 ## default
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The real value or behavior a system falls back to when a caller specifies nothing. It exists because "optional" only fully means something once the real, specific fallback behavior is actually known - "optional, defaults to nothing" and "optional, defaults to everything" are two completely different real systems.
+
+## DELETE
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this resource should no longer exist" - this lesson's own last unit calls it against this project's own real `/api/machines/<id>`. It exists as its own named method, distinct from an update, because "this resource is gone" is a real, different kind of change than any modification to its content.
+
+## delete_machine
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -241,6 +262,7 @@ re-run the script after any lesson changes instead.
 
 ## FlaskClient (.get
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 
 ## FlaskClient (.post)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real test client this project's own `app.test_client()` returns - the same real class already used to test HTTP routes in this curriculum, this time sending a real `POST`.
@@ -255,6 +277,9 @@ re-run the script after any lesson changes instead.
 ## generator expression
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A compact expression of the shape `EXPR for NAME in ITERABLE`, producing values one at a time, on demand, rather than building a whole list in memory up front. It exists so an aggregating call like `sum(...)` can consume items one at a time without a separate, fully-built intermediate list ever needing to exist.
 
+## GET
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "read this resource, change nothing" - this lesson's own first unit calls it against this project's own real `/api/machines`. It exists as the one method every real HTTP client, cache, and proxy is allowed to assume causes no real side effects at all, without having to inspect what the request actually does.
+
 ## get_gitlab_service
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real function returning a configured client for talking to a different, real, external GitLab server.
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real, existing function in this project's backend, responsible for producing a real, configured `GitLabService` instance.
@@ -267,6 +292,7 @@ re-run the script after any lesson changes instead.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function listing every machine in the database.
 
 ## golden behavior (golden master)
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
@@ -304,6 +330,9 @@ re-run the script after any lesson changes instead.
 ## HTTP status code
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real three-digit number every HTTP response carries, stating in one compact, standardized value whether the request succeeded and, if not, roughly why - `200` means "succeeded, here is the result." It exists so a caller, or a test, can tell success from failure without first having to parse the response body at all.
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The real three-digit number every HTTP response carries, stating in one compact, standardized value whether the request succeeded and, if not, roughly why - `200` for success, `400` for a real, invalid request body, `404` for a real, nonexistent resource. It exists so a caller, or a test, can tell success from a specific kind of failure without first parsing the response body at all.
+
+## idempotency
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that calling a method N real times, with the identical real request, leaves the resource in exactly the same real end state as calling it once - a claim about the real state afterward, not about whether every real response looks identical. It exists so a real client, uncertain whether a request actually reached the server (a real timeout, a dropped connection), can safely resend it without worrying about doing something twice.
 
 ## Import graph
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, directed structure formed by every "this file imports that file" relationship across a whole project - not drawn by hand, but implied automatically by every real `import`/ `from ... import` statement already in the source. It exists as its own concept because a project's real files depend on each other in a specific, real shape, and that shape can be traced mechanically from the source itself rather than assumed from a folder structure alone.
@@ -405,6 +434,9 @@ re-run the script after any lesson changes instead.
 ## parametrization
 - **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.parametrize`, a real pytest decorator that runs one test function's body once per set of arguments supplied to it, generating a separate, individually-reported test case for each set. It exists so checking the same logic against several different real inputs never requires writing the same test body over and over, once per input.
 
+## PATCH
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "apply this real, partial change, leaving everything else alone" - this lesson's own fourth unit calls it against the identical real route its `PUT` unit used. It exists for the real, common case where a client wants to change one specific real fact about a resource without having to first know, and resend, every other real fact about it.
+
 ## PDMService.download_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real static method, already investigated in this curriculum for its real fallback behavior - shown here for a different real question: what its own parameters actually promise.
@@ -420,6 +452,9 @@ re-run the script after any lesson changes instead.
 ## Port
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - a number identifying *which* listening socket on that
 
+## POST
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "create something new, at a real identity the server itself decides" - this lesson's own second unit calls it against this project's own real `/api/machines/groups`. It exists for exactly the case a client doesn't yet know, and can't supply, the real identity of the thing it's asking to create.
+
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
 
@@ -431,6 +466,9 @@ re-run the script after any lesson changes instead.
 
 ## Pure function
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A function whose real result depends only on its real arguments, and that produces no side effects at all - calling it twice with the same arguments always produces the same real result, with nothing outside it ever different afterward. It exists as a named, recognizable category because it's the most testable and most safely reusable kind of function there is - its real behavior can be verified completely just by checking arguments in against a return value out, with nothing else to account for.
+
+## PUT
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this is now the complete, real state of this resource" - a full replacement, at a real identity the CLIENT already names in the URL. It exists so a client that already knows exactly what a resource should look like can say so in one real request, and safely repeat that same real request without changing the outcome.
 
 ## pytest.fixture
 - **Object/method** in `LESSON-2.3-PYTEST` - A real decorator, provided by the `pytest` package, that marks a function as a fixture pytest can inject into any test naming it.
@@ -522,6 +560,9 @@ re-run the script after any lesson changes instead.
 
 ## Routing
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - matching a request's method and path against a table of
+
+## safe (HTTP method property)
+- **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that a method's own definition promises zero side effects on the server - calling it changes nothing, no matter how many real times it's called. It exists so real tooling (browsers prefetching a link, a proxy caching a response) can treat a safe method specially, without ever having to inspect what a specific real route actually does.
 
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
@@ -702,6 +743,9 @@ re-run the script after any lesson changes instead.
 ## unittest.mock.patch
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real function (usable as a context manager or a decorator) from Python's own standard library `unittest.mock` module, that performs real monkeypatching.
 
+## update_machine
+- **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function updating an existing machine's fields - the real specimen this lesson's own `PUT` and `PATCH` units both call, against the identical real route.
+
 ## update_machine_status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function updating a machine's real status in the database.
 
@@ -725,6 +769,14 @@ re-run the script after any lesson changes instead.
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
 - `.content_type` / `Type annotation` - shares: type
+- `.delete)` / `DELETE` - shares: delete
+- `.delete)` / `delete_machine` - shares: delete
+- `.patch` / `PATCH` - shares: patch
+- `.patch` / `unittest.mock.patch` - shares: patch
+- `.post` / `FlaskClient (.post)` - shares: post
+- `.post` / `POST` - shares: post
+- `.put` / `PUT` - shares: put
+- `.put)` / `PUT` - shares: put
 - `.recv` / `socket.recv` - shares: recv
 - `.render` / `render_template` - shares: render
 - `.sendall` / `socket.sendall` - shares: sendall
@@ -770,12 +822,24 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
 - `create_app` / `create_machine` - shares: create
+- `create_app` / `create_machine_group` - shares: create
+- `create_machine` / `create_machine_group` - shares: create, machine
+- `create_machine` / `delete_machine` - shares: machine
 - `create_machine` / `get_machine` - shares: machine
 - `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine` / `update_machine` - shares: machine
 - `create_machine` / `update_machine_status` - shares: machine
+- `create_machine_group` / `delete_machine` - shares: machine
+- `create_machine_group` / `get_machine` - shares: machine
+- `create_machine_group` / `is_valid_machine_status` - shares: machine
+- `create_machine_group` / `Machine` - shares: machine
+- `create_machine_group` / `Query (Machine.query` - shares: machine
+- `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine_group` / `update_machine` - shares: machine
+- `create_machine_group` / `update_machine_status` - shares: machine
 - `database effect` / `in-memory database` - shares: database
 - `database effect` / `Side effect` - shares: effect
 - `database effect` / `side effect` - shares: effect
@@ -784,6 +848,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
+- `DELETE` / `delete_machine` - shares: delete
+- `delete_machine` / `get_machine` - shares: machine
+- `delete_machine` / `is_valid_machine_status` - shares: machine
+- `delete_machine` / `Machine` - shares: machine
+- `delete_machine` / `Query (Machine.query` - shares: machine
+- `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `delete_machine` / `update_machine` - shares: machine
+- `delete_machine` / `update_machine_status` - shares: machine
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `test function` - shares: function
@@ -821,6 +893,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
 - `fixture scope` / `yield fixture` - shares: fixture
+- `FlaskClient (.post)` / `POST` - shares: post
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
@@ -828,6 +901,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `Machine` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `get_machine` / `update_machine` - shares: machine
 - `get_machine` / `update_machine_status` - shares: machine
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
 - `Header` / `header` - shares: header
@@ -846,6 +920,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `is_valid_machine_status` / `Machine` - shares: machine
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
+- `is_valid_machine_status` / `update_machine` - shares: machine
 - `is_valid_machine_status` / `update_machine_status` - shares: machine
 - `Jinja2 Template` / `render_template` - shares: template
 - `JSON response body` / `request body` - shares: body
@@ -854,6 +929,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Key function` / `test function` - shares: function
 - `Machine` / `Query (Machine.query` - shares: machine
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `Machine` / `update_machine` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
@@ -867,6 +943,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `Parameter` / `Query parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
+- `PATCH` / `unittest.mock.patch` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Pure function` / `test function` - shares: function
@@ -874,9 +951,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `Query parameter` - shares: query
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
+- `Query (Machine.query` / `update_machine` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
 - `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `URL path parameter` - shares: parameter
+- `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
 - `Raising an exception` / `unhandled exception` - shares: exception
 - `random (seed` / `random seed` - shares: random, seed
@@ -885,9 +964,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `request body` / `response body` - shares: body
 - `Request line` / `Status line` - shares: line
 - `Request line` / `status line` - shares: line
+- `request method` / `safe (HTTP method property)` - shares: method
 - `request method` / `Static method` - shares: method
 - `request method` / `static method` - shares: method
 - `Return value` / `Value object` - shares: value
+- `safe (HTTP method property)` / `Static method` - shares: method
+- `safe (HTTP method property)` / `static method` - shares: method
 - `Server` / `server` - shares: server
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `server` / `WSGI (Web Server Gateway Interface)` - shares: server
@@ -898,3 +980,4 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Static method` / `static method` - shares: method, static
 - `Status line` / `status line` - shares: line
 - `TCP (Transmission Control Protocol)` / `TCP connection` - shares: tcp
+- `update_machine` / `update_machine_status` - shares: machine, update
