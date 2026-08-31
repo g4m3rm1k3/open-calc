@@ -222,6 +222,9 @@ re-run the script after any lesson changes instead.
 ## canonical endpoint (decision)
 - **Term** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - The real, deliberate decision about which real URL(s) a resource lives at, and what real relationship multiple URLs answering the identical real question should have to each other - in this lesson's own case, keeping both real, existing URLs alive but making them share one real, unified implementation. It exists because "which URL is correct" and "should this URL even keep existing" are two genuinely different real questions, and conflating them risks breaking a real, legitimate caller for no real reason.
 
+## cascading behavior
+- **Term** in `LESSON-6.4-FOREIGN-KEYS` - What a real system is configured to do to a child row when its real parent row is deleted - automatically delete the child too (cascade), leave it referencing nothing (an orphan), or refuse the parent's own deletion outright until the child is dealt with. It exists as a deliberate, configured choice because a parent's deletion always has to resolve one of these three ways for every real child that still references it - there is no default that avoids picking one.
+
 ## centralized error mapping
 - **Term** in `LESSON-4.7-FLASK-ERROR-HANDLING` - Registering a small, real, fixed set of exception handlers - one per real category of failure - so every real error this project's own backend can produce passes through the identical real, consistent transformation, no matter which of the 18 real route files actually raised it. It exists as the real, structural fix for the exact inconsistency this curriculum's own Phase 3 closing lesson could only catalog and propose, never actually apply.
 
@@ -321,6 +324,12 @@ re-run the script after any lesson changes instead.
 
 ## db (module-level SQLAlchemy instance)
 - **Object/method** in `LESSON-4.2-APPLICATION-FACTORY` - This project's own real, single `SQLAlchemy` instance, created at module level in `backend/app/__init__.py`, before `create_app` is ever called.
+
+## db.ForeignKey
+- **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct, passed as an argument to `db.Column`, declaring that a column's own values are meant to reference another table's primary key.
+
+## db.relationship
+- **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, without itself adding a column to the database.
 
 ## db.session.add
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real method on SQLAlchemy's `Session` object that stages a new or modified object to be written on the next commit.
@@ -451,6 +460,9 @@ re-run the script after any lesson changes instead.
 
 ## FlaskClient (.post)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real test client this project's own `app.test_client()` returns - the same real class already used to test HTTP routes in this curriculum, this time sending a real `POST`.
+
+## foreign key
+- **Term** in `LESSON-6.4-FOREIGN-KEYS` - A column in one relation whose declared job is to hold a real value from ANOTHER relation's own primary key - not a copy of that row, only a pointer to it. It exists so one relation can refer to a specific row of a different relation without duplicating that row's own data everywhere it needs to be referenced.
 
 ## generate_nc_file
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - The real route this whole unit exists to investigate - the concrete evidence this unit's own SE Lens is built on.
@@ -607,6 +619,9 @@ re-run the script after any lesson changes instead.
 ## integrity
 - **Term** in `LESSON-6.1-WHY-DATABASES-EXIST` - The property that stored data actually obeys the real-world rules it is supposed to - a reference points at something that genuinely exists, a required field is actually present, a value is actually the kind of thing it claims to be - rather than merely being whatever bytes happened to get written. It exists as a distinct concern because storing a value and storing a CORRECT value are different guarantees: nothing about the physical act of writing data checks whether that data makes real-world sense, unless something is specifically built to check it.
 
+## IntegrityError
+- **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real exception class SQLAlchemy raises when a real database operation violates a constraint the database itself enforces - a `UNIQUE`, `NOT NULL`, `CHECK`, or (when actually turned on) foreign key constraint.
+
 ## is_valid_machine_status
 - **Object/method** in `LESSON-2.9-TDD` - A new, real, small function this lesson builds from nothing, through a real RED-GREEN-REFACTOR cycle - not a real, existing part of this project's backend, and never wired into it.
 
@@ -722,6 +737,9 @@ re-run the script after any lesson changes instead.
 ## parametrization
 - **Term** in `LESSON-2.3-PYTEST` - `@pytest.mark.parametrize`, a real pytest decorator that runs one test function's body once per set of arguments supplied to it, generating a separate, individually-reported test case for each set. It exists so checking the same logic against several different real inputs never requires writing the same test body over and over, once per input.
 
+## parent/child relationship
+- **Term** in `LESSON-6.4-FOREIGN-KEYS` - The relationship a foreign key creates between two relations: the relation being pointed AT is the parent, and the relation holding the pointing column is the child - one parent row can have many real child rows, but each child row points at exactly one real parent. It exists as directional vocabulary because a foreign key only lives on one side of the relationship (the child), which is exactly why navigating from parent to children and from child to parent are two genuinely different real operations, not the same one read backward.
+
 ## PATCH
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "apply this real, partial change, leaving everything else alone" - this lesson's own fourth unit calls it against the identical real route its `PUT` unit used. It exists for the real, common case where a client wants to change one specific real fact about a resource without having to first know, and resend, every other real fact about it.
 
@@ -815,6 +833,9 @@ re-run the script after any lesson changes instead.
 
 ## refactoring safety
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The guarantee that restructuring code's internal shape (how it is written) without changing its external behavior (what it does) can actually be verified, not just assumed. It exists because a "refactor" that quietly changes behavior is not a refactor at all - it is an undetected bug - and only a check run both before and after the restructuring can tell the two apart.
+
+## referential integrity
+- **Term** in `LESSON-6.4-FOREIGN-KEYS` - The specific guarantee that every value stored in a foreign-key column actually matches a real, currently-existing row in the relation it points at - never a value that resolves to nothing. It exists as a distinct, checkable property from merely declaring a column `ForeignKey(...)`: as this lesson's own first unit proves directly, declaring where a column is SUPPOSED to point and a real system actually CHECKING that it does are two separate things, and one does not automatically imply the other.
 
 ## Reflection
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A program examining its own real, already-defined objects - a function, a class - directly, at runtime, by asking the object itself, rather than by parsing source text before anything has run. It exists as its own term, distinct from reading source code as text, because reflection works on whatever the language has already built and loaded into memory - a real `Signature` object, real `Parameter` objects - not on the text that produced them; the same real function can be reflected on this way even if its original source text is nowhere on disk to read.
@@ -987,6 +1008,9 @@ re-run the script after any lesson changes instead.
 
 ## spy
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double - or a wrapper around a real object - that lets real behavior actually happen while also recording how it was called, for verification afterward. It exists to check real interactions without giving up the real behavior a stub or a mock would otherwise replace entirely.
+
+## sqlalchemy.text
+- **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy function that wraps a plain string as an executable statement, for the rare case a raw statement - not expressed through the ORM's own Python API - needs to run directly.
 
 ## statelessness
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real property that a server keeps no memory of any earlier request once that request's own response has been sent - proven directly in this lesson's own last unit, where the same real client, on the very next real request, gets rejected unless it resends its own credentials. It exists, as a deliberate constraint HTTP is built on, so any server can handle any client's request without needing to first recall anything about that client's past.
@@ -1347,6 +1371,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `query parameter` - shares: query
 - `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `cascading behavior` / `golden behavior (golden master)` - shares: behavior
+- `cascading behavior` / `observed behavior vs. intended behavior` - shares: behavior
 - `centralized error mapping` / `error code` - shares: error
 - `centralized error mapping` / `unified error contract` - shares: error
 - `characterization test` / `characterization test (applied for real)` - shares: characterization
@@ -1454,12 +1480,18 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `database effect` / `side effect` - shares: effect
 - `db` / `db (module-level SQLAlchemy instance)` - shares: db
 - `db` / `Session (db.session)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.relationship` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
+- `db.ForeignKey` / `Session (db.session)` - shares: db
+- `db.relationship` / `parent/child relationship` - shares: relationship
+- `db.relationship` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
@@ -1484,6 +1516,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
+- `dictionary key access` / `foreign key` - shares: key
 - `dictionary key access` / `Key function` - shares: key
 - `dictionary key access` / `natural key` - shares: key
 - `dictionary key access` / `surrogate key` - shares: key
@@ -1542,6 +1575,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Flask (the class, and this project's own app instance)` / `rebuild (as this curriculum's own real term)` - shares: own, s, this
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `FlaskClient (.post)` / `POST` - shares: post
+- `foreign key` / `Key function` - shares: key
+- `foreign key` / `natural key` - shares: key
+- `foreign key` / `surrogate key` - shares: key
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `open() (file object)` - shares: file
@@ -1694,6 +1730,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.Parameter` / `URL parameter` - shares: parameter
 - `inspect.Parameter` / `URL path parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
+- `integrity` / `referential integrity` - shares: integrity
 - `is_valid_machine_status` / `Machine` - shares: machine
 - `is_valid_machine_status` / `Machine.to_dict` - shares: machine
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
