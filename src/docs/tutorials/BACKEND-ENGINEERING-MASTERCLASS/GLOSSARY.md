@@ -217,12 +217,20 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - A real, existing Flask view function creating a new machine row in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function creating a new machine.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a new machine.
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions creating two different kinds of resource, using two different real identifier strategies.
 
 ## create_machine_group
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function creating a new machine group.
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions creating two different kinds of resource, using two different real identifier strategies.
+
+## create_machine_group (POST)
+- **Object/method** in `LESSON-3.6-REST` - The same two real functions this lesson's own earlier units already used, revisited here specifically for their real retry-safety, from a real client's own point of view.
 
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
+
+## CRUD
+- **Term** in `LESSON-3.6-REST` - The real, standard shorthand for the four basic real operations a resource supports - Create, Read, Update, Delete - mapped in this project onto real `POST`, `GET`, `PATCH`/`PUT`, and `DELETE`. It exists as a real, common vocabulary for describing a resource's entire real lifecycle in four words.
 
 ## custom header
 - **Term** in `LESSON-3.4-HEADERS` - A real header this project invented itself - `X-User-Id`, in this lesson's own fourth unit - rather than one HTTP's own spec defines. It exists because a real application sometimes needs to carry information no standard header was built for; the real `X-` prefix is this project's own convention for marking one as non-standard.
@@ -255,6 +263,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function deleting a machine.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function deleting a machine.
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions completing the real CRUD cycle this lesson's own fourth unit traces end to end.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -286,6 +295,9 @@ re-run the script after any lesson changes instead.
 ## download_cam_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real route this whole unit exists to investigate end to end - one of the six real routes the tool built in the unit above already found and printed, this time shown and walked through in full rather than only named.
 - **Object/method** in `LESSON-1.2-EXCEPTIONS` - The real Flask route that calls `PDMService.download_file` and is the one place in this real call chain that actually catches whatever it raises.
+
+## download_nc_file
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions returning two genuinely different real representations of the identical `NCFile` resource.
 
 ## edge case
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, valid-looking input that sits at or past the boundary of what a system's own logic was actually built to expect - not necessarily wrong on its face, but exactly where real behavior most often reveals a gap nobody planned for. It exists as its own category because the "normal" cases of a system are usually the ones already well understood; the edge cases are where a characterization actually earns its keep.
@@ -367,12 +379,17 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function listing every machine in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function listing every machine, with optional real query-string filters.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
+
+## get_nc_file
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions returning two genuinely different real representations of the identical `NCFile` resource.
 
 ## golden behavior (golden master)
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
@@ -413,6 +430,7 @@ re-run the script after any lesson changes instead.
 
 ## idempotency
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that calling a method N real times, with the identical real request, leaves the resource in exactly the same real end state as calling it once - a claim about the real state afterward, not about whether every real response looks identical. It exists so a real client, uncertain whether a request actually reached the server (a real timeout, a dropped connection), can safely resend it without worrying about doing something twice.
+- **Term** in `LESSON-3.6-REST` - The real property that repeating an identical request leaves a resource in the same real end state as making it once - checked in this lesson's own last unit specifically from a real client's own point of view: which real methods are safe to blindly retry after an uncertain failure, and which aren't. It exists because a real network is unreliable, and a real client needs to know which requests it can resend without fear of a second, unintended real effect.
 
 ## Import graph
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, directed structure formed by every "this file imports that file" relationship across a whole project - not drawn by hand, but implied automatically by every real `import`/ `from ... import` statement already in the source. It exists as its own concept because a project's real files depend on each other in a specific, real shape, and that shape can be traced mechanically from the source itself rather than assumed from a folder structure alone.
@@ -605,6 +623,9 @@ re-run the script after any lesson changes instead.
 ## render_template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - Flask's own real function for rendering a template stored as a real file on disk, instead of a string already in memory.
 
+## representation
+- **Term** in `LESSON-3.6-REST` - A real, concrete format a resource can be rendered as - JSON metadata, or a real, raw file download, for the identical underlying resource, in this lesson's own second unit. It exists because a resource itself is an abstract, real thing; a client only ever actually receives one of its possible representations.
+
 ## request
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, complete message a client sends to a server, structured as a start line (naming the method and URL), one or more header lines, a blank line, and an optional body - this lesson's own request unit sends exactly that shape, by hand, over a raw socket. It exists as the one real, agreed-upon shape a server can always parse the same way, regardless of who wrote the client.
 
@@ -628,6 +649,12 @@ re-run the script after any lesson changes instead.
 
 ## requests.get (Response .status_code
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - `requests.get` is the real top-level function from the third-party `requests` library, sending a real HTTP `GET` request over an actual TCP connection; the object it returns is a real `Response`.
+
+## resource
+- **Term** in `LESSON-3.6-REST` - A real, named thing an API exposes - identified by a real URL, independent of any one specific representation of it. It exists as REST's own central noun: everything a real API does is framed as an operation on a resource, not a remote function call.
+
+## resource identifier
+- **Term** in `LESSON-3.6-REST` - The real, unique string (usually embedded in a URL) naming exactly one resource - a machine's own `id`, or a group's own server-generated `id`. It exists so a real URL alone, without any other context, can name one specific real thing unambiguously.
 
 ## response
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, complete message a server sends back, structured the same way a request is - a status line (naming the real outcome), header lines, a blank line, and an optional body. It exists so a client gets back not just data, but a real, structured account of what happened, in a shape it can parse exactly as reliably as the server parsed the request.
@@ -845,10 +872,16 @@ re-run the script after any lesson changes instead.
 ## update_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function updating an existing machine's fields - the real specimen this lesson's own `PUT` and `PATCH` units both call, against the identical real route.
 
+## update_machine (PATCH)
+- **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions completing the real CRUD cycle this lesson's own fourth unit traces end to end.
+
 ## update_machine_status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function updating a machine's real status in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function updating a machine's status.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function updating a machine's status.
+
+## update_machine_status (PUT)
+- **Object/method** in `LESSON-3.6-REST` - The same two real functions this lesson's own earlier units already used, revisited here specifically for their real retry-safety, from a real client's own point of view.
 
 ## URL path parameter
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, named segment of a route's own URL pattern - `<string:machine_id>`, for instance - that Flask matches against the actual request URL and hands to the view function as a real argument. It exists so one route definition can serve every real machine ID, rather than a route being written once per machine.
@@ -876,10 +909,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.delete)` / `delete_machine` - shares: delete
 - `.patch` / `PATCH` - shares: patch
 - `.patch` / `unittest.mock.patch` - shares: patch
+- `.patch` / `update_machine (PATCH)` - shares: patch
+- `.post` / `create_machine_group (POST)` - shares: post
 - `.post` / `FlaskClient (.post)` - shares: post
 - `.post` / `POST` - shares: post
 - `.put` / `PUT` - shares: put
+- `.put` / `update_machine_status (PUT)` - shares: put
 - `.put)` / `PUT` - shares: put
+- `.put)` / `update_machine_status (PUT)` - shares: put
 - `.recv` / `socket.recv` - shares: recv
 - `.render` / `render_template` - shares: render
 - `.sendall` / `socket.sendall` - shares: sendall
@@ -958,7 +995,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Content-Type` / `Type annotation` - shares: type
 - `create_app` / `create_machine` - shares: create
 - `create_app` / `create_machine_group` - shares: create
+- `create_app` / `create_machine_group (POST)` - shares: create
 - `create_machine` / `create_machine_group` - shares: create, machine
+- `create_machine` / `create_machine_group (POST)` - shares: create, machine
 - `create_machine` / `delete_machine` - shares: machine
 - `create_machine` / `get_machine` - shares: machine
 - `create_machine` / `is_valid_machine_status` - shares: machine
@@ -967,7 +1006,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine` / `update_machine` - shares: machine
+- `create_machine` / `update_machine (PATCH)` - shares: machine
 - `create_machine` / `update_machine_status` - shares: machine
+- `create_machine` / `update_machine_status (PUT)` - shares: machine
+- `create_machine_group` / `create_machine_group (POST)` - shares: create, group, machine
 - `create_machine_group` / `delete_machine` - shares: machine
 - `create_machine_group` / `get_machine` - shares: machine
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
@@ -976,7 +1018,22 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `Query (Machine.query` - shares: machine
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine_group` / `update_machine` - shares: machine
+- `create_machine_group` / `update_machine (PATCH)` - shares: machine
 - `create_machine_group` / `update_machine_status` - shares: machine
+- `create_machine_group` / `update_machine_status (PUT)` - shares: machine
+- `create_machine_group (POST)` / `delete_machine` - shares: machine
+- `create_machine_group (POST)` / `FlaskClient (.post)` - shares: post
+- `create_machine_group (POST)` / `get_machine` - shares: machine
+- `create_machine_group (POST)` / `is_valid_machine_status` - shares: machine
+- `create_machine_group (POST)` / `Machine` - shares: machine
+- `create_machine_group (POST)` / `Machine.to_dict` - shares: machine
+- `create_machine_group (POST)` / `POST` - shares: post
+- `create_machine_group (POST)` / `Query (Machine.query` - shares: machine
+- `create_machine_group (POST)` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine_group (POST)` / `update_machine` - shares: machine
+- `create_machine_group (POST)` / `update_machine (PATCH)` - shares: machine
+- `create_machine_group (POST)` / `update_machine_status` - shares: machine
+- `create_machine_group (POST)` / `update_machine_status (PUT)` - shares: machine
 - `custom header` / `Header` - shares: header
 - `custom header` / `header` - shares: header
 - `custom header` / `request header` - shares: header
@@ -996,7 +1053,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `Query (Machine.query` - shares: machine
 - `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `delete_machine` / `update_machine` - shares: machine
+- `delete_machine` / `update_machine (PATCH)` - shares: machine
 - `delete_machine` / `update_machine_status` - shares: machine
+- `delete_machine` / `update_machine_status (PUT)` - shares: machine
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `test function` - shares: function
@@ -1010,9 +1069,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Domain exception` / `Raising an exception` - shares: exception
 - `Domain exception` / `unhandled exception` - shares: exception
 - `Domain logic` / `Domain object` - shares: domain
+- `download_cam_file` / `download_nc_file` - shares: download, file
 - `download_cam_file` / `generate_nc_file` - shares: file
+- `download_cam_file` / `get_nc_file` - shares: file
 - `download_cam_file` / `PDMService.download_file` - shares: download, file
 - `download_cam_file` / `send_file` - shares: file
+- `download_nc_file` / `generate_nc_file` - shares: file, nc
+- `download_nc_file` / `get_nc_file` - shares: file, nc
+- `download_nc_file` / `PDMService.download_file` - shares: download, file
+- `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
 - `Exception boundary` / `Exception handling (try/except)` - shares: exception
@@ -1037,6 +1102,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture scope` / `yield fixture` - shares: fixture
 - `FlaskClient (.post)` / `POST` - shares: post
 - `generate_nc_file` / `generate_password_hash` - shares: generate
+- `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
 - `get_machine` / `is_valid_machine_status` - shares: machine
@@ -1045,7 +1111,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine` / `update_machine` - shares: machine
+- `get_machine` / `update_machine (PATCH)` - shares: machine
 - `get_machine` / `update_machine_status` - shares: machine
+- `get_machine` / `update_machine_status (PUT)` - shares: machine
+- `get_nc_file` / `PDMService.download_file` - shares: file
+- `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
 - `Header` / `header` - shares: header
 - `Header` / `request header` - shares: header
@@ -1065,7 +1135,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
 - `is_valid_machine_status` / `update_machine` - shares: machine
+- `is_valid_machine_status` / `update_machine (PATCH)` - shares: machine
 - `is_valid_machine_status` / `update_machine_status` - shares: machine
+- `is_valid_machine_status` / `update_machine_status (PUT)` - shares: machine
 - `Jinja2 Template` / `render_template` - shares: template
 - `JSON response body` / `request body` - shares: body
 - `JSON response body` / `response body` - shares: body
@@ -1074,11 +1146,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `Query (Machine.query` - shares: machine
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
+- `Machine` / `update_machine (PATCH)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
+- `Machine` / `update_machine_status (PUT)` - shares: machine
 - `Machine.to_dict` / `Query (Machine.query` - shares: machine
 - `Machine.to_dict` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine.to_dict` / `update_machine` - shares: machine
+- `Machine.to_dict` / `update_machine (PATCH)` - shares: machine
 - `Machine.to_dict` / `update_machine_status` - shares: machine
+- `Machine.to_dict` / `update_machine_status (PUT)` - shares: machine
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
@@ -1092,19 +1168,25 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Parameter` / `Query parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
 - `PATCH` / `unittest.mock.patch` - shares: patch
+- `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Pure function` / `test function` - shares: function
+- `PUT` / `update_machine_status (PUT)` - shares: put
 - `pytest.fixture` / `yield fixture` - shares: fixture
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `Query parameter` - shares: query
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine` - shares: machine
+- `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
+- `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
 - `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `URL path parameter` - shares: parameter
 - `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
+- `Query.filter (Machine.query.filter)` / `update_machine (PATCH)` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
+- `Query.filter (Machine.query.filter)` / `update_machine_status (PUT)` - shares: machine
 - `Raising an exception` / `unhandled exception` - shares: exception
 - `random (seed` / `random seed` - shares: random, seed
 - `random (seed` / `random)` - shares: random
@@ -1115,6 +1197,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `request method` / `safe (HTTP method property)` - shares: method
 - `request method` / `Static method` - shares: method
 - `request method` / `static method` - shares: method
+- `resource` / `resource identifier` - shares: resource
+- `resource` / `temporary resource` - shares: resource
+- `resource identifier` / `temporary resource` - shares: resource
 - `Return value` / `Value object` - shares: value
 - `safe (HTTP method property)` / `Static method` - shares: method
 - `safe (HTTP method property)` / `static method` - shares: method
@@ -1128,4 +1213,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Static method` / `static method` - shares: method, static
 - `Status line` / `status line` - shares: line
 - `TCP (Transmission Control Protocol)` / `TCP connection` - shares: tcp
+- `unittest.mock.patch` / `update_machine (PATCH)` - shares: patch
+- `update_machine` / `update_machine (PATCH)` - shares: machine, update
 - `update_machine` / `update_machine_status` - shares: machine, update
+- `update_machine` / `update_machine_status (PUT)` - shares: machine, update
+- `update_machine (PATCH)` / `update_machine_status` - shares: machine, update
+- `update_machine (PATCH)` / `update_machine_status (PUT)` - shares: machine, update
+- `update_machine_status` / `update_machine_status (PUT)` - shares: machine, update

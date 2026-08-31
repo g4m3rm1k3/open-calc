@@ -1,0 +1,959 @@
+number: "3.6"
+title: "REST"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Five real, run checks against this project's own real backend, naming
+  the architectural pattern every earlier lesson in this phase has
+  already been using without naming it - resources, representations,
+  resource identifiers, CRUD, and idempotency - and, along the way, a
+  genuine real finding: this project's own `NCFile` resource has two
+  real, different representations (a JSON metadata object and a raw
+  `text/plain` file download), selected not by the real `Accept` header
+  this curriculum already found this API ignores, but by two entirely
+  separate real URLs.
+
+what_you_need_to_know_first: >
+  What the real HTTP methods, status codes, headers, and JSON shapes
+  this project's own backend actually uses mean; what a Flask view
+  function and blueprint are.
+
+terms:
+  - name: resource
+    definition: >
+      A real, named thing an API exposes - identified by a real URL,
+      independent of any one specific representation of it. It exists as
+      REST's own central noun: everything a real API does is framed as
+      an operation on a resource, not a remote function call.
+  - name: representation
+    definition: >
+      A real, concrete format a resource can be rendered as - JSON
+      metadata, or a real, raw file download, for the identical
+      underlying resource, in this lesson's own second unit. It exists
+      because a resource itself is an abstract, real thing; a client
+      only ever actually receives one of its possible representations.
+  - name: resource identifier
+    definition: >
+      The real, unique string (usually embedded in a URL) naming exactly
+      one resource - a machine's own `id`, or a group's own
+      server-generated `id`. It exists so a real URL alone, without any
+      other context, can name one specific real thing unambiguously.
+  - name: CRUD
+    definition: >
+      The real, standard shorthand for the four basic real operations a
+      resource supports - Create, Read, Update, Delete - mapped in this
+      project onto real `POST`, `GET`, `PATCH`/`PUT`, and `DELETE`. It
+      exists as a real, common vocabulary for describing a resource's
+      entire real lifecycle in four words.
+  - name: idempotency
+    definition: >
+      The real property that repeating an identical request leaves a
+      resource in the same real end state as making it once - checked in
+      this lesson's own last unit specifically from a real client's own
+      point of view: which real methods are safe to blindly retry after
+      an uncertain failure, and which aren't. It exists because a real
+      network is unreliable, and a real client needs to know which
+      requests it can resend without fear of a second, unintended real
+      effect.
+
+objects_and_methods:
+  - name: get_machine / get_machines
+    what_it_is: >
+      Two real, existing Flask view functions - one returning a single
+      real machine resource, one returning the real collection.
+    implementation: >
+      `def get_machine(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:48-61`) is reached at
+      `/api/machines/<machine_id>`; `def get_machines(current_user): ...`
+      (`:14-45`) is reached at `/api/machines` - the identical real URL
+      prefix, distinguished only by whether a real identifier is present
+      in the path.
+    its_use: >
+      This lesson calls both, specifically to contrast a real,
+      individually-identified resource against the real collection it
+      belongs to.
+    type: Two Flask view functions, both decorated with
+      `@token_required`.
+    responsibility: >
+      Reading either exactly one real machine, or every real machine -
+      genuinely different real scopes, reached through genuinely
+      different real URLs built from the same real prefix.
+    depends_on: >
+      A real `machine_id` (for `get_machine`); the real rows already in
+      the database (for `get_machines`).
+    connects_to: >
+      Both call `Machine.to_dict()`; their own real, differing URL
+      shapes are the entire specimen this lesson's own resources unit is
+      built around.
+    shape: >
+      `get_machine` returns `{'data': dict}`; `get_machines` returns
+      `{'data': list, 'total': int}`.
+
+  - name: get_nc_file / download_nc_file
+    what_it_is: >
+      Two real, existing Flask view functions returning two genuinely
+      different real representations of the identical `NCFile` resource.
+    implementation: >
+      `def get_nc_file(nc_file_id: str): ...`
+      (`backend/app/routes/nc_files.py:50-62`) returns
+      `jsonify({'data': nc_file.to_dict()})`; `def
+      download_nc_file(nc_file_id: str): ...` (`:394-420`) reads the real
+      `file_content` column, wraps it in a real `io.BytesIO`, and returns
+      it via `send_file(..., mimetype='text/plain', as_attachment=True)`
+      (`:415-420`) - the real, raw G-code text, not a JSON description
+      of it.
+    its_use: >
+      This lesson calls both against the identical real NC file,
+      specifically to observe two genuinely different real response
+      bodies and `Content-Type` values for the same underlying resource.
+    type: Two Flask view functions, neither wrapped by `@token_required`.
+    responsibility: >
+      Serving the identical underlying `NCFile` resource two genuinely
+      different real ways - as data describing it, and as the real file
+      itself.
+    depends_on: >
+      A real, existing `NCFile` row; for `download_nc_file`, a real,
+      non-empty `file_content` value.
+    connects_to: >
+      Their own real, separate URLs (`/<id>` versus `/<id>/download`)
+      are the entire specimen this lesson's own representations unit is
+      built around.
+    shape: >
+      `get_nc_file` returns a real, `jsonify`-wrapped dict with
+      `Content-Type: application/json`; `download_nc_file` returns a
+      real, raw byte stream with `Content-Type: text/plain`.
+
+  - name: create_machine / create_machine_group
+    what_it_is: >
+      Two real, existing Flask view functions creating two different
+      kinds of resource, using two different real identifier strategies.
+    implementation: >
+      `def create_machine(current_user): ...`
+      (`backend/app/routes/machines.py:118-169`) reads a real, required
+      `data['id']` (`:141`) straight from the request body; `def
+      create_machine_group(current_user): ...` (`:214-254`) never reads
+      an `id` from the body at all, instead building one from
+      `data['name']` (`:230`) with a real collision-avoidance loop
+      (`:235-237`).
+    its_use: >
+      This lesson calls both, specifically to contrast a real,
+      client-chosen identifier against a real, server-generated one.
+    type: Two Flask view functions, both decorated with
+      `@token_required`.
+    responsibility: >
+      Creating a real new resource, each trusting a genuinely different
+      real party (the client, or the server itself) to decide that
+      resource's own real identity.
+    depends_on: >
+      For `create_machine`, a real, client-supplied `id`; for
+      `create_machine_group`, only a real `name`.
+    connects_to: >
+      Their own real, opposite identifier strategies are the entire
+      specimen this lesson's own resource-identifiers unit is built
+      around.
+    shape: >
+      Both return a real, `jsonify`-wrapped `{'data': dict}` with an
+      explicit `201`.
+
+  - name: update_machine (PATCH) / delete_machine
+    what_it_is: >
+      Two real, existing Flask view functions completing the real CRUD
+      cycle this lesson's own fourth unit traces end to end.
+    implementation: >
+      `def update_machine(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:172-211`) applies whichever real
+      fields a `PATCH` body names; `def delete_machine(current_user,
+      machine_id: str): ...` (`:274-297`) removes the real row entirely.
+    its_use: >
+      This lesson calls both, immediately after `create_machine` and
+      `get_machine`, to trace one real resource through its entire real
+      lifecycle in a single, continuous script.
+    type: Two Flask view functions, both decorated with
+      `@token_required`.
+    responsibility: >
+      Changing, and then ending, one real resource's own real existence.
+    depends_on: >
+      A real, existing `Machine` row.
+    connects_to: >
+      Together with `create_machine` and `get_machine`, these four real
+      functions are the entire real specimen this lesson's own CRUD unit
+      is built around.
+    shape: >
+      `update_machine` returns a real, `jsonify`-wrapped `{'data': dict}`
+      with an implicit `200`; `delete_machine` returns a real
+      `{'success': bool, 'message': str}` with an implicit `200`, or a
+      real `404` on a second call.
+
+  - name: update_machine_status (PUT) / create_machine_group (POST)
+    what_it_is: >
+      The same two real functions this lesson's own earlier units
+      already used, revisited here specifically for their real
+      retry-safety, from a real client's own point of view.
+    implementation: >
+      `update_machine_status` (`machines.py:80-115`) is idempotent by
+      real, verified end state; `create_machine_group`
+      (`:214-254`) is not, by its own real, verified ID-collision
+      behavior.
+    its_use: >
+      This lesson calls each one twice in immediate succession,
+      simulating a real client that can't tell whether its first real
+      call actually reached the server, specifically to check which real
+      method that client could safely resend.
+    type: Two Flask view functions, both decorated with
+      `@token_required`.
+    responsibility: >
+      Behaving, under an identical real retry, in two genuinely
+      different real ways - one real method leaves the resource
+      unchanged on a repeat; the other creates a real second one.
+    depends_on: >
+      A real, existing `Machine` row (for `update_machine_status`); a
+      real `name` in the body (for `create_machine_group`).
+    connects_to: >
+      Their own real, opposite retry behavior is the entire specimen
+      this lesson's own closing idempotency unit is built around.
+    shape: >
+      Both return a real, `jsonify`-wrapped `{'data': dict}`.
+
+concept_units:
+  - title: "Resources - What a Real URL Actually Names"
+    problem: >
+      `/api/machines/M-TEST-001` and `/api/machines` share the identical
+      real prefix. What real, different thing does each one actually
+      name?
+    socratic_prompt:
+      - >
+        `get_machine`'s own real code returns one real dict; `get_machines`'s
+        own real code returns a real list. Does the URL alone - before
+        any real code even runs - already tell you which shape to
+        expect?
+      - >
+        If a resource is "a real, named thing an API exposes,"
+        is the real COLLECTION of all machines itself a resource too, or
+        only each individual real machine?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:14-45`
+        (`get_machines`) and `:48-61` (`get_machine`), both read again
+        this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: Two real `Machine` rows.
+    new_code:
+      applicable: true
+      intro: >
+        The identical real URL prefix, with and without a real
+        identifier:
+      file: verification/phase-03/lab_rest_resources.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+        with app.app_context():
+            m1 = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            m2 = Machine(id="M-TEST-002", name="Test Lathe", category="lathe", sub_type="2_axis", status="available")
+            db.session.add(m1)
+            db.session.add(m2)
+            db.session.commit()
+
+            client = app.test_client()
+
+            r_one = client.get("/api/machines/M-TEST-001")
+            print("GET /api/machines/M-TEST-001 (one real resource)   -> real data:", r_one.get_json()["data"]["id"])
+
+            r_collection = client.get("/api/machines")
+            print("GET /api/machines          (the real collection)   -> real ids:", [m["id"] for m in r_collection.get_json()["data"]])
+
+            assert r_one.status_code == 200
+            assert isinstance(r_one.get_json()["data"], dict)
+            assert isinstance(r_collection.get_json()["data"], list)
+            print("the identical real URL prefix names two genuinely different real things - one specific machine, and the real set of every machine")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'client = app.test_client()'
+          explanation: >
+            Builds one real `FlaskClient` - this lesson's own first
+            construction of it; every later unit in this lesson builds
+            its own fresh copy the same way.
+        - element: 'r_one = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            Names one specific real resource by its own real identifier
+            - Werkzeug's own real routing matches this against
+            `get_machine`'s real route pattern.
+        - element: 'r_collection = client.get("/api/machines")'
+          explanation: >
+            Names the real collection resource - no identifier at all in
+            the path, matched instead against `get_machines`'s own real,
+            shorter route pattern.
+        - element: 'assert isinstance(r_one.get_json()["data"], dict) / assert isinstance(r_collection.get_json()["data"], list)'
+          explanation: >
+            Confirms, for real, the structural difference this unit
+            exists to name - a single resource's own real shape, versus
+            a real collection's shape, decided entirely by which real
+            URL was requested.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **resource-oriented addressing**: every real, meaningful
+      thing an API exposes gets its own real URL, rather than one fixed
+      URL taking a real operation name as a parameter. Also recognized
+      in: a filesystem's own real path hierarchy (`/machines/M-001` reads
+      like a real file inside a real folder); a database's own real
+      table-versus-row distinction; and, in this project's own domain, a
+      real machine's own tool table addressed as a whole versus one
+      specific real tool slot within it.
+    se_lens: >
+      The design principle is that a resource's own real identity lives
+      in the URL, not in a request body or a query parameter - `GET
+      /api/machines/M-TEST-001` names the same real thing no matter what
+      real method is used against it. The real alternative not chosen -
+      a single real endpoint like `/api/getMachine?id=M-TEST-001`,
+      naming an operation rather than a resource - would work, but
+      loses the real, consistent pattern this project's own routes
+      already follow: the same real URL shape, varying only by real
+      method, for every resource this curriculum has studied; the honest
+      cost of the resource-oriented shape this project's own code
+      actually uses: a caller has to construct a genuinely different
+      real URL per resource type, rather than one flexible endpoint
+      taking real parameters.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_rest_resources.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        GET /api/machines/M-TEST-001 (one real resource)   -> real data: M-TEST-001
+        GET /api/machines          (the real collection)   -> real ids: ['M-TEST-002', 'M-TEST-001']
+        the identical real URL prefix names two genuinely different real things - one specific machine, and the real set of every machine
+      output_file: verification/phase-03/lab_rest_resources_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it names the real pattern every
+      earlier lesson in this phase has already been using without
+      calling it by name.
+
+  - title: "Representations - One Resource, Two Real Real Formats"
+    problem: >
+      `get_nc_file` and `download_nc_file`
+      (`backend/app/routes/nc_files.py:50-62`, `:394-420`) both operate
+      on the identical real `NCFile` resource. Do they return the same
+      real thing?
+    socratic_prompt:
+      - >
+        `get_nc_file`'s own real code calls `nc_file.to_dict()`;
+        `download_nc_file`'s own real code reads `nc_file.file_content`
+        directly and wraps it in `send_file(...)`. Are those two real
+        code paths describing the resource, or delivering it?
+      - >
+        This curriculum already found this project's own real routes
+        never honor a real `Accept` header. Given that, how does a real
+        client actually choose between these two representations, if
+        not by content negotiation?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/nc_files.py:50-62`
+        (`get_nc_file`) and `:394-420` (`download_nc_file`), both read
+        again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: A real `NCFile` row with real `file_content`.
+    new_code:
+      applicable: true
+      intro: >
+        The identical real NC file, requested two real ways:
+      file: verification/phase-03/lab_rest_representations.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.nc_file import NCFile
+
+        app = create_app("testing")
+        with app.app_context():
+            nc_file = NCFile(id="NC-TEST-001", cam_file_id="CAM-FAKE", program_number="O1000001", file_name="O1000001.nc", file_content="O1000001\nG00 X0 Y0\nM30\n")
+            db.session.add(nc_file)
+            db.session.commit()
+
+            client = app.test_client()
+
+            r_json = client.get("/api/nc-files/NC-TEST-001")
+            print("GET /api/nc-files/NC-TEST-001           -> real Content-Type:", r_json.content_type, "body:", r_json.get_json())
+
+            r_download = client.get("/api/nc-files/NC-TEST-001/download")
+            print("GET /api/nc-files/NC-TEST-001/download  -> real Content-Type:", r_download.content_type, "body:", r_download.get_data(as_text=True))
+
+            assert r_json.content_type == "application/json"
+            assert r_download.content_type.startswith("text/plain")
+            assert r_json.get_json()["data"]["id"] == "NC-TEST-001"
+            assert r_download.get_data(as_text=True) == "O1000001\nG00 X0 Y0\nM30\n"
+            print("the identical real underlying NC file, two genuinely different real representations - metadata as JSON, real content as plain text - selected by a different real URL, not a real Accept header")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r_json = client.get("/api/nc-files/NC-TEST-001")'
+          explanation: >
+            Requests the real, JSON metadata representation -
+            `get_nc_file`'s own real `to_dict()` call describes the
+            resource without delivering its real content.
+        - element: 'r_download = client.get("/api/nc-files/NC-TEST-001/download")'
+          explanation: >
+            Requests the real, raw-content representation, at a
+            genuinely separate real URL - `download_nc_file`'s own real
+            `send_file(...)` call delivers the real G-code text itself.
+        - element: 'assert r_json.content_type == "application/json" / assert r_download.content_type.startswith("text/plain")'
+          explanation: >
+            Confirms both real, distinct `Content-Type` values - the
+            direct, verified proof these are genuinely different real
+            representations, not just different real field selections
+            of the same shape.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **multiple representations of one resource**: the real
+      underlying thing (an NC program) stays singular, while what a
+      client can actually receive about it varies by real format. Also
+      recognized in: a Wikipedia article's own real HTML page versus its
+      real, separate REST API JSON representation of the identical real
+      content; a PDF document's own real text-extraction API alongside
+      its real, original binary download; and, in this project's own
+      domain, a machine's own real tool table represented both as a real
+      JSON object for the UI and as a real, raw offset file a control
+      actually loads.
+    se_lens: >
+      The design principle real content negotiation would follow is one
+      real URL, varying its real representation based on a real `Accept`
+      header. The real alternative this project's own code actually
+      takes: two entirely separate real URLs, one per representation -
+      simpler to implement (no real negotiation logic needed at all),
+      but the honest cost, proven directly by this unit's own two real
+      calls: a caller has to already know, in advance, which of two real
+      URLs to hit for which real format - there's no real, single
+      "give me this resource" request that adapts to what the caller
+      actually wants.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_rest_representations.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        GET /api/nc-files/NC-TEST-001           -> real Content-Type: application/json body: {'data': {'camFileId': 'CAM-FAKE', 'checkedOutBy': None, 'checkoutStatus': 'available', 'createdAt': '2026-08-31T09:23:38.179835', 'createdBy': 'system', 'estimatedCycleTime': None, 'fileName': 'O1000001.nc', 'filePath': None, 'fileSize': None, 'hasContent': True, 'id': 'NC-TEST-001', 'previousVersionId': None, 'programNumber': 'O1000001', 'programType': 'main', 'updatedAt': '2026-08-31T09:23:38.179837', 'uploadStatus': 'expected', 'version': '1.000'}}
+        GET /api/nc-files/NC-TEST-001/download  -> real Content-Type: text/plain; charset=utf-8 body: O1000001
+        G00 X0 Y0
+        M30
+
+        the identical real underlying NC file, two genuinely different real representations - metadata as JSON, real content as plain text - selected by a different real URL, not a real Accept header
+      output_file: verification/phase-03/lab_rest_representations_output.txt
+    connection_to_previous: >
+      The previous unit distinguished one resource from a collection of
+      them; this unit shows that even one single resource can look
+      genuinely different depending on which real representation is
+      actually requested.
+
+  - title: "Resource Identifiers - Who Decides a Real Name"
+    problem: >
+      `create_machine` reads a real, required `id` from the request
+      body; `create_machine_group` never does. What real, different
+      strategy does each one use to decide a new resource's own name?
+    socratic_prompt:
+      - >
+        If a client sends `create_machine` a real `id` that already
+        belongs to another machine, this curriculum already found the
+        real result: a `400`. What would happen if `create_machine_group`
+        tried to reuse an already-taken real `group_id` the identical
+        way?
+      - >
+        Given `create_machine_group`'s own real
+        `while MachineGroup.query.get(group_id): ...` loop
+        (`machines.py:235-237`), could that same real collision ever
+        actually reach a caller as an error at all?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:118-169`
+        (`create_machine`) and `:214-254` (`create_machine_group`), both
+        read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `User` row with a `programming` role and token.
+    new_code:
+      applicable: true
+      intro: >
+        Two real creations, two real identifier strategies:
+      file: verification/phase-03/lab_rest_identifiers.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            db.session.add(user)
+            db.session.commit()
+
+            token = encode_auth_token("U-TEST-001", "programming")
+            headers = {"Authorization": f"Bearer {token}"}
+            client = app.test_client()
+
+            r_machine = client.post(
+                "/api/machines",
+                json={"id": "M-WHATEVER-I-WANT", "name": "Test Mill", "category": "mill", "subType": "3_axis", "manufacturer": "Haas", "model": "VF-2"},
+                headers=headers,
+            )
+            print("POST /api/machines, client-chosen id 'M-WHATEVER-I-WANT' -> real, actual stored id:", r_machine.get_json()["data"]["id"])
+
+            r_group = client.post("/api/machines/groups", json={"name": "CNC Mills"}, headers=headers)
+            print("POST /api/machines/groups, no id in the real request body -> real, server-assigned id:", r_group.get_json()["data"]["id"])
+
+            assert r_machine.get_json()["data"]["id"] == "M-WHATEVER-I-WANT"
+            assert r_group.get_json()["data"]["id"] == "GRP-CNC-MILLS"
+            print("two real, genuinely different identifier strategies, live in the same API: the client picks a machine's real id; the server derives a group's real id from data it was never asked to name directly")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r_machine = client.post("/api/machines", json={"id": "M-WHATEVER-I-WANT", ...}, headers=headers)'
+          explanation: >
+            Sends a real, arbitrary string as the machine's own real
+            `id` - `create_machine`'s own code stores it exactly as
+            given, with no real derivation of its own.
+        - element: 'r_group = client.post("/api/machines/groups", json={"name": "CNC Mills"}, headers=headers)'
+          explanation: >
+            Sends no real `id` at all - `create_machine_group`'s own
+            real code has to derive one itself, from `data['name']`.
+        - element: 'assert r_machine.get_json()["data"]["id"] == "M-WHATEVER-I-WANT"'
+          explanation: >
+            Confirms, for real, that the client's own arbitrary real
+            choice survived unchanged.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **identifier assignment strategy**: whether the party
+      creating a resource, or the system storing it, decides that
+      resource's own real name. Also recognized in: a Git commit's own
+      real, content-derived SHA hash (the system decides) versus a
+      branch's own real, human-chosen name (the client decides); a
+      database's own real choice between a natural key (client-supplied)
+      and a surrogate key (system-generated); and, in this project's own
+      domain, a real part number a programmer assigns by hand versus a
+      real, auto-incrementing revision number the system tracks on its
+      own.
+    se_lens: >
+      The design principle behind letting a client choose an identifier
+      is that the client often already has a real, meaningful name ready
+      (a real machine's own real-world asset tag); the design principle
+      behind a server-generated one is removing any real chance of two
+      real clients racing to pick the same value. The real, honest cost
+      of `create_machine`'s own real, client-chosen approach - already
+      surfaced by this curriculum's own earlier work with `create_machine`'s
+      real duplicate-ID `400` - is exactly the real coordination problem
+      `create_machine_group`'s own server-generated approach avoids
+      entirely, proven directly by this unit's own second real call
+      never needing to check for a collision the caller could even cause.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_rest_identifiers.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        POST /api/machines, client-chosen id 'M-WHATEVER-I-WANT' -> real, actual stored id: M-WHATEVER-I-WANT
+        POST /api/machines/groups, no id in the real request body -> real, server-assigned id: GRP-CNC-MILLS
+        two real, genuinely different identifier strategies, live in the same API: the client picks a machine's real id; the server derives a group's real id from data it was never asked to name directly
+      output_file: verification/phase-03/lab_rest_identifiers_output.txt
+    connection_to_previous: >
+      The previous unit showed one resource with two real
+      representations; this unit shows two real resources with two
+      opposite real strategies for the one thing every resource needs -
+      a name.
+
+  - title: "CRUD - One Real Resource, Its Entire Real Lifecycle"
+    problem: >
+      This lesson's earlier units, and every earlier lesson in this
+      phase, have each touched one real operation on a machine in
+      isolation. What does a single real machine's entire real lifecycle
+      actually look like, traced end to end?
+    socratic_prompt:
+      - >
+        `create_machine`, `get_machine`, `update_machine`, and
+        `delete_machine` each operate on the identical real resource
+        shape. Would you expect a real machine created by the first to
+        be immediately visible to the second, without any real delay?
+      - >
+        After a real `DELETE` succeeds, what would you expect a real,
+        subsequent `GET` for the identical real ID to return - and does
+        that match what this curriculum already found `404` means?
+    project_change:
+      reference_source: >
+        Real specimens: `backend/app/routes/machines.py:118-169`
+        (`create_machine`), `:48-61` (`get_machine`), `:172-211`
+        (`update_machine`), and `:274-297` (`delete_machine`), all read
+        again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `User` row with a `programming` role, and a second with
+        an `admin` role.
+    new_code:
+      applicable: true
+      intro: >
+        One real machine, through Create, Read, Update, and Delete, in
+        one continuous real script:
+      file: verification/phase-03/lab_rest_crud.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            prog_user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            admin_user = User(id="U-TEST-002", email="test-admin@example.com", name="Test Admin", role="admin")
+            db.session.add(prog_user)
+            db.session.add(admin_user)
+            db.session.commit()
+
+            prog_token = encode_auth_token("U-TEST-001", "programming")
+            admin_token = encode_auth_token("U-TEST-002", "admin")
+            prog_headers = {"Authorization": f"Bearer {prog_token}"}
+            admin_headers = {"Authorization": f"Bearer {admin_token}"}
+            client = app.test_client()
+
+            r_create = client.post(
+                "/api/machines",
+                json={"id": "M-TEST-001", "name": "Test Mill", "category": "mill", "subType": "3_axis", "manufacturer": "Haas", "model": "VF-2"},
+                headers=prog_headers,
+            )
+            print("CREATE (POST)         -> status:", r_create.status_code, "name:", r_create.get_json()["data"]["name"])
+
+            r_read = client.get("/api/machines/M-TEST-001")
+            print("READ   (GET)          -> status:", r_read.status_code, "name:", r_read.get_json()["data"]["name"])
+
+            r_update = client.patch("/api/machines/M-TEST-001", json={"name": "Renamed Mill"}, headers=prog_headers)
+            print("UPDATE (PATCH)        -> status:", r_update.status_code, "name:", r_update.get_json()["data"]["name"])
+
+            r_delete = client.delete("/api/machines/M-TEST-001", headers=admin_headers)
+            print("DELETE (DELETE)       -> status:", r_delete.status_code, "body:", r_delete.get_json())
+
+            r_read_again = client.get("/api/machines/M-TEST-001")
+            print("READ again (GET)      -> status:", r_read_again.status_code)
+
+            assert r_create.status_code == 201
+            assert r_read.status_code == 200
+            assert r_update.get_json()["data"]["name"] == "Renamed Mill"
+            assert r_delete.status_code == 200
+            assert r_read_again.status_code == 404
+            print("one real resource, through its entire real lifecycle: created, read, updated, deleted, and genuinely gone")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r_create = client.post("/api/machines", json={...}, headers=prog_headers)'
+          explanation: >
+            Create - a real resource begins to exist.
+        - element: 'r_read = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            Read - confirms the real resource just created is genuinely,
+            immediately visible, not merely claimed by the create
+            response.
+        - element: 'r_update = client.patch("/api/machines/M-TEST-001", json={"name": "Renamed Mill"}, headers=prog_headers)'
+          explanation: >
+            Update - changes one real field, real proof the resource's
+            own real identity (`M-TEST-001`) persists across a real
+            modification.
+        - element: 'r_delete = client.delete("/api/machines/M-TEST-001", headers=admin_headers)'
+          explanation: >
+            Delete - ends the real resource's own real existence.
+        - element: 'r_read_again = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            A final, real read - confirms the real resource is genuinely
+            gone, not merely marked deleted while still readable.
+    mental_model:
+      applicable: true
+      diagram: |
+        POST /api/machines            -> Create  -> resource exists
+              |
+              v
+        GET  /api/machines/<id>       -> Read    -> resource visible
+              |
+              v
+        PATCH /api/machines/<id>      -> Update  -> resource changed, same id
+              |
+              v
+        DELETE /api/machines/<id>     -> Delete  -> resource gone
+              |
+              v
+        GET  /api/machines/<id>       -> 404     -> confirmed gone
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the **CRUD lifecycle**: every resource this project's own
+      API manages passes through some real subset of these four real
+      operations, in this same real order, whenever its full lifecycle
+      is exercised. Also recognized in: a version-control object's own
+      real create-read-amend-remove cycle; an operating system's own
+      real file lifecycle (`open`/`read`/`write`/`unlink`); and, in this
+      project's own domain, a real part's own routing - created when a
+      job starts, read throughout production, updated as operations
+      complete, and archived once the job closes.
+    se_lens: >
+      The design principle is that naming these four real operations
+      consistently, across every resource, gives a real, predictable
+      shape any new resource in this API can be expected to follow. The
+      real alternative not chosen: designing each resource's own
+      lifecycle independently, with whatever real operations happen to
+      make sense for it; the honest cost of the shared CRUD shape this
+      project's own code actually follows, proven directly by this
+      unit's own real run: real machine-specific behavior (like
+      `update_machine_status`'s own separate `PUT`, distinct from a
+      general-purpose update) has to be bolted on as an extra real route
+      alongside CRUD, rather than fitting neatly inside it.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_rest_crud.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        CREATE (POST)         -> status: 201 name: Test Mill
+        READ   (GET)          -> status: 200 name: Test Mill
+        UPDATE (PATCH)        -> status: 200 name: Renamed Mill
+        DELETE (DELETE)       -> status: 200 body: {'message': 'Machine Renamed Mill deleted', 'success': True}
+        READ again (GET)      -> status: 404
+        one real resource, through its entire real lifecycle: created, read, updated, deleted, and genuinely gone
+      output_file: verification/phase-03/lab_rest_crud_output.txt
+    connection_to_previous: >
+      The previous unit contrasted two real resources' own identifier
+      strategies; this unit follows one real resource, and its one real
+      identifier, through every real operation this API supports.
+
+  - title: "Idempotency - Which Real Retries Are Actually Safe"
+    problem: >
+      A real client, unsure whether its first real request actually
+      reached the server (a real, dropped connection, a real timeout),
+      has to decide whether resending it is safe. Does that decision
+      depend on which real method it used?
+    socratic_prompt:
+      - >
+        This curriculum already found `update_machine_status`'s own real
+        `PUT` idempotent by end state, and `create_machine_group`'s own
+        real `POST` genuinely not. If a real client auto-retries both
+        the identical way after an uncertain failure, what real,
+        different consequence would each one actually have?
+      - >
+        Is there anything in `create_machine_group`'s own real code that
+        could tell a legitimate retry apart from a real, second,
+        intentional request for a different group with the same real
+        name?
+    project_change:
+      reference_source: >
+        Real specimens: `backend/app/routes/machines.py:80-115`
+        (`update_machine_status`) and `:214-254` (`create_machine_group`),
+        both read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `Machine` row; a real `User` row with a `programming`
+        role and token.
+    new_code:
+      applicable: true
+      intro: >
+        A real, simulated client retry - the identical request, sent
+        twice in immediate succession - run against one idempotent
+        method and one that isn't:
+      file: verification/phase-03/lab_rest_idempotency.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            db.session.add(machine)
+            db.session.add(user)
+            db.session.commit()
+
+            token = encode_auth_token("U-TEST-001", "programming")
+            headers = {"Authorization": f"Bearer {token}"}
+            client = app.test_client()
+
+            def real_retry_is_safe(method_name, call):
+                real_response = call()
+                simulated_retry = call()
+                return real_response, simulated_retry
+
+            put_body = {"status": "running"}
+            r1, r2 = real_retry_is_safe(
+                "PUT",
+                lambda: client.put("/api/machines/M-TEST-001/status", json=put_body, headers=headers),
+            )
+            print("PUT, called twice as a real client retry would  -> real end states match:", r1.get_json()["data"]["status"] == r2.get_json()["data"]["status"] == "running")
+
+            post_body = {"name": "CNC Mills"}
+            r3, r4 = real_retry_is_safe(
+                "POST",
+                lambda: client.post("/api/machines/groups", json=post_body, headers=headers),
+            )
+            print("POST, called twice as a real client retry would -> real ids created:", r3.get_json()["data"]["id"], "and", r4.get_json()["data"]["id"])
+
+            assert r1.get_json()["data"] == r2.get_json()["data"]
+            assert r3.get_json()["data"]["id"] != r4.get_json()["data"]["id"]
+            print("a real client that auto-retries a PUT after an uncertain timeout is safe; a real client that auto-retries a POST the identical way just created a second, real, unwanted resource")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'def real_retry_is_safe(method_name, call): real_response = call(); simulated_retry = call(); return real_response, simulated_retry'
+          explanation: >
+            A small, real helper simulating exactly what a real client
+            does when it can't tell whether its first request landed -
+            it just sends the identical real request again.
+        - element: 'r1, r2 = real_retry_is_safe("PUT", lambda: client.put(...))'
+          explanation: >
+            Runs the real simulated retry against `update_machine_status` -
+            two real calls, identical real body.
+        - element: 'r3, r4 = real_retry_is_safe("POST", lambda: client.post(...))'
+          explanation: >
+            Runs the identical real simulated-retry pattern against
+            `create_machine_group` - the same real helper, a genuinely
+            different real method underneath it.
+        - element: 'assert r1.get_json()["data"] == r2.get_json()["data"] / assert r3.get_json()["data"]["id"] != r4.get_json()["data"]["id"]'
+          explanation: >
+            Confirms both real, opposite outcomes from the identical real
+            retry pattern - proof the safety of a retry depends entirely
+            on which real method was retried, not on how the retry
+            itself was performed.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **retry safety as a real consequence of idempotency**: a
+      real client's own decision about whether to auto-retry a failed
+      request can be made purely from the real HTTP method, without
+      knowing anything about what a specific route actually does
+      internally. Also recognized in: a real distributed system's own
+      "at-least-once delivery" guarantee, which only stays safe for real,
+      idempotent operations; a real shell script's own `mkdir -p`
+      (idempotent - safe to rerun) versus a bare `mkdir` (fails the
+      second real time, in its own different way); and, in this
+      project's own domain, re-sending a real "set spindle speed to
+      2000" command safely, versus re-sending a real "advance tool
+      offset by 0.001" command, which would apply the real offset twice.
+    se_lens: >
+      The design principle is that idempotency isn't just an internal
+      implementation detail - it's a real, load-bearing promise a client
+      depends on to make its own real retry decisions safely. The real
+      alternative some real APIs use instead: a client-supplied real
+      idempotency key, letting even a `POST` be safely retried by having
+      the server recognize a repeated real key and return the original
+      real result instead of creating a second one; the honest cost of
+      not having that here, proven directly by this unit's own real run:
+      a real client talking to `create_machine_group` has no real, safe
+      way to retry after an uncertain failure at all - it has to either
+      risk a real duplicate, or manually check whether the first real
+      attempt actually succeeded before ever resending.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_rest_idempotency.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        PUT, called twice as a real client retry would  -> real end states match: True
+        POST, called twice as a real client retry would -> real ids created: GRP-CNC-MILLS and GRP-CNC-MILLS-1
+        a real client that auto-retries a PUT after an uncertain timeout is safe; a real client that auto-retries a POST the identical way just created a second, real, unwanted resource
+      output_file: verification/phase-03/lab_rest_idempotency_output.txt
+    connection_to_previous: >
+      The previous unit traced one resource through every real
+      operation; this unit closes the lesson by asking which of those
+      real operations a real, uncertain client could ever safely repeat
+      without first checking whether it needed to.
+
+closing:
+  connect_the_pieces: >
+    One real family of machine resources, addressed by real URLs that
+    distinguish one specific resource from the real collection it
+    belongs to (resources). One real NC file, delivered two genuinely
+    different real ways - JSON metadata, or its own raw real content -
+    at two separate real URLs, since this project's own API never
+    negotiates by `Accept` (representations). Two real creations, one
+    letting the client name its own resource, one deriving a real name
+    the server itself guarantees is unique (resource identifiers). One
+    real machine, created, read, updated, deleted, and confirmed
+    genuinely gone by a final real `404` (CRUD). And, closing the
+    lesson, the one real property tying every earlier unit together: a
+    real client's own decision about which of these real operations it
+    could ever safely repeat without asking first, proven to depend
+    entirely on the real method, not on hope (idempotency).
+  next_lesson_pointer: >
+    Every real error this phase has surfaced so far has been reported a
+    slightly different real way - a bare error string, a real `code`
+    field, sometimes neither; next, this curriculum studies how this
+    project's own real errors should be represented consistently,
+    closing Phase 3 by addressing the legacy backend's own,
+    already-documented inconsistent error handling directly.
