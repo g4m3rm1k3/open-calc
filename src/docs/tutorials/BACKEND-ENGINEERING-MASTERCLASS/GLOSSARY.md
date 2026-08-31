@@ -14,6 +14,7 @@ re-run the script after any lesson changes instead.
 
 ## .delete)
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 
 ## .get_json())
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
@@ -26,9 +27,11 @@ re-run the script after any lesson changes instead.
 
 ## .post
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 
 ## .put
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 
 ## .put)
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
@@ -44,6 +47,45 @@ re-run the script after any lesson changes instead.
 
 ## .status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
+
+## 200 (OK)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real, generic success status: the request worked, and the real response body carries what was asked for. It exists as the default, unmarked "it worked" - used when nothing more specific (like a new resource being created) needs to be said.
+
+## 201 (Created)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real success status specifically for "a new real resource now exists because of this request" - this lesson's own real `create_machine` call returns it. It exists as a more specific real claim than a bare `200`: not just "this worked," but "this worked, and it made something new."
+
+## 204 (No Content)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real success status for "this worked, and there is genuinely nothing to send back" - a real response with this code carries no real body at all. It exists for exactly the case a `200`'s own real body would otherwise be empty or pointless, and this project's own real `DELETE` route, checked directly in this lesson, never actually uses it.
+
+## 2xx (success)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real family of status codes whose first digit tells a caller, without reading anything else, that a request genuinely succeeded. It exists so a caller can branch on "did this work at all" using one digit, before ever inspecting a real response body.
+
+## 400 (Bad Request)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "this request's own body or shape is wrong" - this lesson's own real `update_machine_status` calls return it for two genuinely different real reasons. It exists as the general, real catch-all for "I can't even process what you sent," whether that's a missing field or a value that doesn't parse.
+
+## 401 (Unauthorized)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "I don't know who you are" - no real credentials were presented at all, or the ones presented don't verify. It exists as a distinct real claim from `403`: the server genuinely cannot establish an identity to check permissions against yet.
+
+## 403 (Forbidden)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "I know exactly who you are, and the answer is still no" - a real, verified identity that simply isn't allowed to do this. It exists as the real, distinct case from `401` where authentication already succeeded and authorization is what failed.
+
+## 404 (Not Found)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "the specific resource this URL names genuinely doesn't exist." It exists as a claim about one specific real resource's real absence, distinct from a `400`'s claim about a malformed request.
+
+## 409 (Conflict)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "this request conflicts with the current real state of the resource" - the standard, real code for a duplicate creation attempt. It exists as its own real category, distinct from a generic `400`, and this lesson's own real `create_machine` call, checked directly, shows this project's code never actually uses it, even where a real conflict genuinely exists.
+
+## 422 (Unprocessable Entity)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real status for "this request is syntactically valid, but its real content doesn't make sense" - a well-formed real JSON body carrying a semantically invalid value. It exists as a more specific real claim than `400`'s generic "malformed," and this lesson's own real `update_machine_status` call, checked directly, shows this project's code never actually distinguishes the two.
+
+## 4xx (client error)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real family of status codes whose first digit tells a caller the real problem is with the request itself - a malformed body, a missing credential, a resource that doesn't exist - not with the server. It exists so a caller knows retrying the identical real request, unchanged, will fail again every time.
+
+## 500 (Internal Server Error)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real, generic status for "the server itself hit an error it never anticipated" while handling an otherwise valid real request - this lesson's own last unit triggers a genuine one. It exists as the real catch-all for a server-side failure a client had no way to predict or avoid, unlike any `4xx`.
+
+## 5xx (server error)
+- **Term** in `LESSON-3.3-HTTP-STATUS-CODES` - The real family of status codes whose first digit tells a caller the server itself failed to handle an otherwise valid real request - this lesson's own last unit triggers a genuine one. It exists so a caller knows the problem isn't necessarily its own request; retrying later, or reporting a bug, may be the right real response, unlike a `4xx`.
 
 ## _build_export_data
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - One of four real, substantial functions this lesson's own investigation already found living directly in this routes file, instead of in the service file that exists for exactly this kind of logic.
@@ -154,6 +196,7 @@ re-run the script after any lesson changes instead.
 ## create_machine
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - A real, existing Flask view function creating a new machine row in the database.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function creating a new machine.
 
 ## create_machine_group
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function creating a new machine group.
@@ -187,6 +230,7 @@ re-run the script after any lesson changes instead.
 
 ## delete_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function deleting a machine.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -263,6 +307,7 @@ re-run the script after any lesson changes instead.
 ## FlaskClient (.get
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 
 ## FlaskClient (.post)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real test client this project's own `app.test_client()` returns - the same real class already used to test HTTP routes in this curriculum, this time sending a real `POST`.
@@ -289,10 +334,12 @@ re-run the script after any lesson changes instead.
 
 ## get_machine
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function retrieving one machine by ID.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function retrieving one machine by ID.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function listing every machine in the database.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function listing every machine, with optional real query-string filters.
 
 ## golden behavior (golden master)
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
@@ -748,6 +795,7 @@ re-run the script after any lesson changes instead.
 
 ## update_machine_status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function updating a machine's real status in the database.
+- **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function updating a machine's status.
 
 ## URL path parameter
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, named segment of a route's own URL pattern - `<string:machine_id>`, for instance - that Flask matches against the actual request URL and hands to the view function as a real argument. It exists so one route definition can serve every real machine ID, rather than a route being written once per machine.
@@ -768,6 +816,7 @@ re-run the script after any lesson changes instead.
 
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
+- `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `Type annotation` - shares: type
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
@@ -780,6 +829,22 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.recv` / `socket.recv` - shares: recv
 - `.render` / `render_template` - shares: render
 - `.sendall` / `socket.sendall` - shares: sendall
+- `2xx (success)` / `4xx (client error)` - shares: xx
+- `2xx (success)` / `5xx (server error)` - shares: xx
+- `4xx (client error)` / `500 (Internal Server Error)` - shares: error
+- `4xx (client error)` / `5xx (server error)` - shares: error, xx
+- `4xx (client error)` / `Client` - shares: client
+- `4xx (client error)` / `client` - shares: client
+- `4xx (client error)` / `Flask.test_client` - shares: client
+- `500 (Internal Server Error)` / `5xx (server error)` - shares: error, server
+- `500 (Internal Server Error)` / `Application server` - shares: server
+- `500 (Internal Server Error)` / `Server` - shares: server
+- `500 (Internal Server Error)` / `server` - shares: server
+- `500 (Internal Server Error)` / `WSGI (Web Server Gateway Interface)` - shares: server
+- `5xx (server error)` / `Application server` - shares: server
+- `5xx (server error)` / `Server` - shares: server
+- `5xx (server error)` / `server` - shares: server
+- `5xx (server error)` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Abstract Syntax Tree (AST)` / `ast.alias` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Attribute` - shares: ast
 - `Abstract Syntax Tree (AST)` / `ast.Call` - shares: ast
