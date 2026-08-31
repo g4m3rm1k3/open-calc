@@ -99,6 +99,10 @@ re-run the script after any lesson changes instead.
 
 ## add_favorite
 - **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a favorite record.
+
+## API contract
+- **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
 
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
@@ -212,6 +216,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - A real, existing Flask view function creating a new machine row in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function creating a new machine.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a new machine.
 
 ## create_machine_group
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function creating a new machine group.
@@ -249,9 +254,13 @@ re-run the script after any lesson changes instead.
 ## delete_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function deleting a machine.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function deleting a machine.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
+
+## deserialization
+- **Term** in `LESSON-3.5-JSON-APIS` - The real, reverse process - turning the real bytes of a JSON request body back into real Python values a route can use. It exists as the necessary first step before any of this project's own real route logic can act on what a client actually sent.
 
 ## deterministic test
 - **Term** in `LESSON-2.4-TEST-ISOLATION` - A test that, given the same real code, produces the same real result every single time it runs - regardless of when, how many times, or in what order it runs. It exists because a test whose result depends on something outside anyone's control (the current time, an unseeded random number, unordered iteration) cannot reliably distinguish "this broke" from "this was never guaranteed to begin with."
@@ -357,11 +366,13 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function retrieving one machine by ID.
 - **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function retrieving one machine by ID.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 
 ## get_machines
 - **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function listing every machine in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function listing every machine, with optional real query-string filters.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 
 ## golden behavior (golden master)
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
@@ -439,6 +450,9 @@ re-run the script after any lesson changes instead.
 ## JSON response body
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The actual data an HTTP response carries, written in JSON (JavaScript Object Notation) - a plain-text format built from the same nested objects, arrays, strings, numbers, and booleans Python's own dicts and lists already represent. It exists as this project's real, chosen format for handing structured data back to a caller, because it reads as plain text and nearly every mainstream language already knows how to parse it.
 
+## JSON types
+- **Term** in `LESSON-3.5-JSON-APIS` - The real, fixed set of value shapes JSON itself defines - object, array, string, number, boolean, and `null` - nothing else, and critically, only one real number type, with no distinction between a real integer and a real decimal. It exists as the actual, complete vocabulary a JSON body can ever be built from, regardless of what a receiving language's own type system supports.
+
 ## jsonify
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function converting a Python value into a real HTTP response with a correct `application/json` `Content-Type`.
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real function from the Flask package that converts a Python value into a real Flask `Response` carrying a JSON body.
@@ -454,6 +468,9 @@ re-run the script after any lesson changes instead.
 
 ## Machine
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real SQLAlchemy model representing one CNC machine row in this project's own database.
+
+## Machine.to_dict
+- **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing instance method on this project's own `Machine` model, converting a real database row into a real, JSON-safe dict.
 
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
@@ -624,6 +641,9 @@ re-run the script after any lesson changes instead.
 ## response body
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The actual data an HTTP response carries back, written in JSON in this project - readable directly through `response.get_json()`. It exists as the real answer to whatever the request asked, separate from whether the request even succeeded at all.
 
+## response envelope
+- **Term** in `LESSON-3.5-JSON-APIS` - The real, outer JSON structure wrapping a response's own actual content - `{'data': ...}`, `{'success': ..., 'data': ...}`, or any other real shape a route happens to choose. It exists to carry real metadata (like a `total` count, or a `success` flag) alongside a response's own real payload, separate from the payload itself.
+
 ## response shape
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real structure of a response body - every top-level key, every nested field, not just the ones a particular check happens to look at. It exists because a caller depending on a field a test never checked can be broken by a real change nobody noticed, precisely because nothing ever characterized that field existed at all.
 
@@ -638,6 +658,9 @@ re-run the script after any lesson changes instead.
 
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
+
+## serialization
+- **Term** in `LESSON-3.5-JSON-APIS` - The real process of converting an in-memory Python object into a real, JSON-safe shape - this lesson's own first unit watches a real `datetime` become a real string. It exists because JSON's own real type system is smaller than Python's; a real value has to be converted to something JSON can actually represent before it can be sent anywhere.
 
 ## serve_uploads
 - **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function serving files from this project's own real upload storage.
@@ -825,6 +848,7 @@ re-run the script after any lesson changes instead.
 ## update_machine_status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function updating a machine's real status in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function updating a machine's status.
+- **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function updating a machine's status.
 
 ## URL path parameter
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, named segment of a route's own URL pattern - `<string:machine_id>`, for instance - that Flask matches against the actual request URL and hands to the view function as a real argument. It exists so one route definition can serve every real machine ID, rather than a route being written once per machine.
@@ -939,6 +963,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `get_machine` - shares: machine
 - `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
+- `create_machine` / `Machine.to_dict` - shares: machine
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine` / `update_machine` - shares: machine
@@ -947,6 +972,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `get_machine` - shares: machine
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
 - `create_machine_group` / `Machine` - shares: machine
+- `create_machine_group` / `Machine.to_dict` - shares: machine
 - `create_machine_group` / `Query (Machine.query` - shares: machine
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine_group` / `update_machine` - shares: machine
@@ -966,6 +992,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `get_machine` - shares: machine
 - `delete_machine` / `is_valid_machine_status` - shares: machine
 - `delete_machine` / `Machine` - shares: machine
+- `delete_machine` / `Machine.to_dict` - shares: machine
 - `delete_machine` / `Query (Machine.query` - shares: machine
 - `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `delete_machine` / `update_machine` - shares: machine
@@ -973,6 +1000,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `test function` - shares: function
+- `dict.get` / `Machine.to_dict` - shares: dict
 - `dictionary key access` / `Key function` - shares: key
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
@@ -1013,6 +1041,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `send_file` - shares: file
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
+- `get_machine` / `Machine.to_dict` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine` / `update_machine` - shares: machine
@@ -1032,6 +1061,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `inspect.Parameter` / `URL path parameter` - shares: parameter
 - `inspect.signature` / `Signature.parameters` - shares: signature
 - `is_valid_machine_status` / `Machine` - shares: machine
+- `is_valid_machine_status` / `Machine.to_dict` - shares: machine
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
 - `is_valid_machine_status` / `update_machine` - shares: machine
@@ -1045,6 +1075,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
+- `Machine.to_dict` / `Query (Machine.query` - shares: machine
+- `Machine.to_dict` / `Query.filter (Machine.query.filter)` - shares: machine
+- `Machine.to_dict` / `update_machine` - shares: machine
+- `Machine.to_dict` / `update_machine_status` - shares: machine
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query

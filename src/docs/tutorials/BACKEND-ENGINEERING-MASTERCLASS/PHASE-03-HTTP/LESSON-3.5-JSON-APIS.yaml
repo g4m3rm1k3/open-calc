@@ -1,0 +1,982 @@
+number: "3.5"
+title: "JSON APIs"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Five real, run checks against this project's own real backend, one per
+  real JSON-API concept - serialization, deserialization, JSON's own
+  limited type system, API contracts, and response envelopes - and,
+  along the way, a genuine, previously-undocumented finding more severe
+  than anything this curriculum has surfaced so far: sending a real,
+  non-numeric string as `axes` to `create_machine` is silently accepted,
+  producing a real `Machine` row whose `axes` column - declared
+  `db.Integer` - actually holds the real Python string `'five'`, because
+  neither this project's own code nor SQLite itself ever checks.
+
+what_you_need_to_know_first: >
+  What the real HTTP methods, status codes, and headers this project's
+  own backend uses actually do; what a Flask view function is; what a
+  SQLAlchemy model and its own real columns are.
+
+terms:
+  - name: serialization
+    definition: >
+      The real process of converting an in-memory Python object into a
+      real, JSON-safe shape - this lesson's own first unit watches a
+      real `datetime` become a real string. It exists because JSON's own
+      real type system is smaller than Python's; a real value has to be
+      converted to something JSON can actually represent before it can
+      be sent anywhere.
+  - name: deserialization
+    definition: >
+      The real, reverse process - turning the real bytes of a JSON
+      request body back into real Python values a route can use. It
+      exists as the necessary first step before any of this project's
+      own real route logic can act on what a client actually sent.
+  - name: JSON types
+    definition: >
+      The real, fixed set of value shapes JSON itself defines - object,
+      array, string, number, boolean, and `null` - nothing else, and
+      critically, only one real number type, with no distinction between
+      a real integer and a real decimal. It exists as the actual,
+      complete vocabulary a JSON body can ever be built from, regardless
+      of what a receiving language's own type system supports.
+  - name: API contract
+    definition: >
+      A real, implicit promise about what a response will contain - not
+      merely what it happens to contain once. It exists so a caller can
+      write real code against an endpoint's own shape with confidence -
+      though, as this lesson's own fourth unit shows directly, nothing
+      forces a real backend to actually keep that promise consistently.
+  - name: response envelope
+    definition: >
+      The real, outer JSON structure wrapping a response's own actual
+      content - `{'data': ...}`, `{'success': ..., 'data': ...}`, or any
+      other real shape a route happens to choose. It exists to carry
+      real metadata (like a `total` count, or a `success` flag) alongside
+      a response's own real payload, separate from the payload itself.
+
+objects_and_methods:
+  - name: Machine.to_dict
+    what_it_is: >
+      A real, existing instance method on this project's own `Machine`
+      model, converting a real database row into a real, JSON-safe dict.
+    implementation: >
+      `def to_dict(self) -> dict: return {...}`
+      (`backend/app/models/machine.py:88-113`) - maps each real column to
+      a real, camelCase JSON key (`sub_type` becomes `'subType'`,
+      `x_travel` becomes `'xTravel'`), and explicitly calls
+      `.isoformat()` on every real `datetime` column
+      (`created_at`, `updated_at`,
+      `operator_last_heartbeat_at`), each guarded by a real
+      `if ... else None` for a column that might not be set.
+    its_use: >
+      This lesson calls it directly, before any HTTP request is even
+      involved, specifically to compare a real machine's own in-memory
+      Python values against what this method actually hands back.
+    type: A real instance method on the `Machine` SQLAlchemy model.
+    responsibility: >
+      Producing a real, complete, JSON-safe representation of one
+      `Machine` row - every real value converted to a shape `jsonify`
+      can actually serialize, nothing left as a raw Python object JSON
+      itself has no representation for.
+    depends_on: >
+      A real, already-loaded `Machine` instance, with its own real
+      column values already set.
+    connects_to: >
+      Called by every real route in this project that returns machine
+      data - `get_machine`, `get_machines`, `create_machine`, and
+      `update_machine` alike all return its real output, wrapped in
+      `jsonify`.
+    shape: >
+      Takes no arguments beyond `self`; returns a real, plain Python
+      `dict` whose every real value is already JSON-safe - a `str`, an
+      `int`, a `float`, a `bool`, or `None`.
+
+  - name: update_machine_status
+    what_it_is: >
+      A real, existing Flask view function updating a machine's status.
+    implementation: >
+      `@machines_bp.route('/<string:machine_id>/status', methods=['PUT'])`
+      `def update_machine_status(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:80-115`) - reads
+      `request.get_json()`'s own real, deserialized dict directly, and
+      assigns `data['status']` straight onto `machine.status`
+      (`:102`) with no real type check of any kind.
+    its_use: >
+      This lesson calls it once, specifically to trace one real string
+      value from the request body's own real JSON, through
+      deserialization, into the database, and back out again unchanged.
+    type: A Flask view function, decorated with `@token_required`.
+    responsibility: >
+      Applying a real, deserialized value directly to a real database
+      column, trusting `request.get_json()`'s own real output completely.
+    depends_on: >
+      A real, existing `Machine` row; a real JSON body.
+    connects_to: >
+      `request.get_json()`'s own real return value is exactly what this
+      function's own body reads and stores, with nothing in between.
+    shape: >
+      Reads a real dict in; returns a real, `jsonify`-wrapped dict with
+      an implicit `200` on success.
+
+  - name: create_machine
+    what_it_is: >
+      A real, existing Flask view function creating a new machine.
+    implementation: >
+      `@machines_bp.route('', methods=['POST'])`
+      `def create_machine(current_user): ...`
+      (`backend/app/routes/machines.py:118-169`) - passes
+      `data.get('axes', 3)` (`:149`) directly into `Machine`'s own real
+      constructor, with no real check that the real value is even a
+      number at all, before SQLAlchemy hands it to SQLite.
+    its_use: >
+      This lesson calls it with `axes` sent as a real numeric JSON
+      string and, separately, as a real non-numeric JSON string,
+      specifically to observe what this project's own real code - and
+      SQLite underneath it - actually does with each.
+    type: A Flask view function, decorated with `@token_required`.
+    responsibility: >
+      Creating exactly one real `Machine` row from whatever real values
+      a request body happens to contain, with no real validation of
+      their types.
+    depends_on: >
+      A real, valid JSON body; SQLite's own real, permissive handling of
+      a mismatched real value.
+    connects_to: >
+      This lesson's own `create_machine_group` (contracts unit) and
+      `delete_machine` (contracts unit) are the two real routes its own
+      `{'data': ...}` shape is compared against.
+    shape: >
+      Reads a real dict in; returns a real, `jsonify`-wrapped dict with
+      an explicit `201` on success.
+
+  - name: get_machine / get_machines
+    what_it_is: >
+      Two real, existing Flask view functions - one returning a single
+      real machine, one returning every real machine.
+    implementation: >
+      `def get_machine(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:48-61`) returns
+      `jsonify({'data': machine.to_dict()})`; `def
+      get_machines(current_user): ...` (`:14-45`) returns
+      `jsonify({'data': [...], 'total': len(machines)})` - a real,
+      genuinely different set of real top-level keys for a single
+      resource versus a real collection.
+    its_use: >
+      This lesson calls both, specifically to compare their real,
+      top-level response keys directly against each other and against a
+      third, real route's own shape.
+    type: Two Flask view functions, both decorated with
+      `@token_required`.
+    responsibility: >
+      Reading and returning real machine data, in two genuinely
+      different real real shapes depending on whether one or many are
+      being returned.
+    depends_on: >
+      A real `machine_id` (for `get_machine`); the real rows already in
+      the database (for `get_machines`).
+    connects_to: >
+      Both call `Machine.to_dict()`; their own real, differing top-level
+      keys (`'total'` present only on the list route) are the entire
+      real specimen this lesson's own envelopes unit is built around.
+    shape: >
+      `get_machine` returns `{'data': dict}`; `get_machines` returns
+      `{'data': list, 'total': int}` - two real, different shapes for
+      the identical underlying real serialized machine data.
+
+  - name: delete_machine
+    what_it_is: >
+      A real, existing Flask view function deleting a machine.
+    implementation: >
+      `@machines_bp.route('/<string:machine_id>', methods=['DELETE'])`
+      `def delete_machine(current_user, machine_id: str): ...`
+      (`backend/app/routes/machines.py:274-297`) - returns
+      `jsonify({'success': True, 'message': f'Machine {machine_name} deleted'})`
+      on success (`:294`) - a real response with no `'data'` key at all,
+      genuinely unlike every other real route this lesson studies.
+    its_use: >
+      This lesson calls it specifically to check whether its own real
+      response shape matches the real `{'data': ...}` convention
+      `get_machine` and `create_machine` both follow.
+    type: A Flask view function, decorated with `@token_required`.
+    responsibility: >
+      Removing a real `Machine` row and reporting a real, human-readable
+      confirmation - never a real, structured copy of what was deleted.
+    depends_on: A real `machine_id` matched from the request URL.
+    connects_to: >
+      Its own real, `'data'`-less shape is the entire specimen this
+      lesson's own API-contracts unit is built around.
+    shape: >
+      Returns a real, `jsonify`-wrapped `{'success': bool, 'message': str}`
+      dict - no `'data'` key, genuinely unlike `get_machine`'s or
+      `create_machine`'s own real shape.
+
+  - name: add_favorite
+    what_it_is: >
+      A real, existing Flask view function creating a favorite record.
+    implementation: >
+      `@favorites_bp.route('/', methods=['POST']) def add_favorite():
+      ...` (`backend/app/routes/favorites.py:33-58`) - returns
+      `jsonify({'success': True, 'data': favorite.to_dict()}), 201`
+      (`:58`) - a real, third top-level shape, carrying BOTH a
+      `'success'` key AND a `'data'` key together.
+    its_use: >
+      This lesson calls it specifically to add a third, genuinely
+      distinct real envelope shape to the two `get_machines`/`get_machine`
+      already show.
+    type: A Flask view function, with no `@token_required` decorator.
+    responsibility: >
+      Creating a real `UserFavorite` row and returning both a real
+      success flag and the real, created record together.
+    depends_on: >
+      A real, valid JSON body naming a real, existing `pairingId`.
+    connects_to: >
+      Its own real, `{'success', 'data'}` shape is this lesson's own
+      third, distinct real envelope specimen.
+    shape: >
+      Returns a real, `jsonify`-wrapped `{'success': bool, 'data': dict}`
+      dict with an explicit `201`.
+
+concept_units:
+  - title: "Serialization - Turning a Real Python Object Into Real JSON"
+    problem: >
+      `Machine.to_dict()`'s own real code
+      (`backend/app/models/machine.py:88-113`) calls `.isoformat()` on
+      every real `datetime` column it touches. What real problem does
+      that solve - what would happen without it?
+    socratic_prompt:
+      - >
+        A real `Machine` row's own `created_at` attribute is a real
+        Python `datetime` object. Does JSON, as a real format, have any
+        native way to represent a `datetime` at all?
+      - >
+        `to_dict()`'s own real code renames `self.sub_type` to
+        `'subType'` in its returned dict. Is that change necessary for
+        JSON serialization itself to work, or is it a real, separate
+        design choice about what the JSON API's own keys should look
+        like?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:88-113`
+        (`Machine.to_dict`), read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: A real `Machine` row.
+    new_code:
+      applicable: true
+      intro: >
+        A real machine's own real Python attributes, next to what
+        `to_dict()` actually turns them into:
+      file: verification/phase-03/lab_json_serialization.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from datetime import datetime
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            db.session.add(machine)
+            db.session.commit()
+
+            print("real Python attribute:", "machine.created_at ->", type(machine.created_at), repr(machine.created_at))
+            print("real Python attribute:", "machine.axes ->", type(machine.axes), repr(machine.axes))
+            print("real Python attribute:", "machine.has_tool_changer ->", type(machine.has_tool_changer), repr(machine.has_tool_changer))
+
+            serialized = machine.to_dict()
+            print("real serialized value:", "serialized['createdAt'] ->", type(serialized["createdAt"]), repr(serialized["createdAt"]))
+            print("real serialized value:", "serialized['axes'] ->", type(serialized["axes"]), repr(serialized["axes"]))
+            print("real serialized value:", "serialized['subType'] (was machine.sub_type) ->", serialized["subType"])
+
+            assert isinstance(machine.created_at, datetime)
+            assert isinstance(serialized["createdAt"], str)
+            assert isinstance(serialized["axes"], int)
+            print("a real Python datetime became a real JSON-safe string; a real Python int stayed a real int; snake_case became camelCase")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'machine.created_at'
+          explanation: >
+            Reads the real, in-memory attribute directly - a genuine
+            Python `datetime` object, set by the column's own real
+            `default=datetime.utcnow` (`machine.py:85`), not yet touched
+            by `to_dict()` at all.
+        - element: 'serialized = machine.to_dict()'
+          explanation: >
+            Calls the real method under study - produces a real, plain
+            dict where every value is already something JSON itself can
+            represent.
+        - element: 'serialized["createdAt"]'
+          explanation: >
+            The real, converted value - a plain `str`, produced by
+            `to_dict()`'s own real `.isoformat()` call, not the raw
+            `datetime` object anymore.
+        - element: 'assert isinstance(machine.created_at, datetime) / assert isinstance(serialized["createdAt"], str)'
+          explanation: >
+            Confirms both real facts together - the same real moment in
+            time, represented two genuinely different real ways, before
+            and after serialization.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **serialization**: converting an in-memory real value into
+      a real, transportable representation whose own format is agreed on
+      by both sides. Also recognized in: `pickle`'s own real byte
+      encoding of an arbitrary Python object; a database driver's own
+      real conversion of a `datetime` column into whatever wire format
+      the underlying protocol actually supports; and, in this project's
+      own domain, a G-code post-processor converting an internal,
+      real toolpath data structure into the real, flat text format a
+      machine control can actually read.
+    se_lens: >
+      The design principle is that a real API's own boundary is where
+      internal representation ends and a real, agreed external format
+      begins - `to_dict()` is exactly that boundary for this project's
+      own `Machine` model. The real alternative not chosen: returning
+      Python objects directly and letting `jsonify` attempt to serialize
+      them itself, which would genuinely fail on a raw `datetime`
+      (`jsonify` has no real, built-in rule for it); the honest cost of
+      the explicit `to_dict()` approach this project's own code actually
+      takes: every new real column added to `Machine` needs a
+      matching, real, hand-written line in `to_dict()`, or it silently
+      never appears in the JSON API at all.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_json_serialization.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        real Python attribute: machine.created_at -> <class 'datetime.datetime'> datetime.datetime(2026, 8, 31, 9, 18, 23, 169785)
+        real Python attribute: machine.axes -> <class 'int'> 3
+        real Python attribute: machine.has_tool_changer -> <class 'bool'> False
+        real serialized value: serialized['createdAt'] -> <class 'str'> '2026-08-31T09:18:23.169785'
+        real serialized value: serialized['axes'] -> <class 'int'> 3
+        real serialized value: serialized['subType'] (was machine.sub_type) -> 3_axis
+        a real Python datetime became a real JSON-safe string; a real Python int stayed a real int; snake_case became camelCase
+      output_file: verification/phase-03/lab_json_serialization_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it establishes the real,
+      outbound half of every JSON exchange this lesson studies.
+
+  - title: "Deserialization - Turning Real JSON Back Into a Real Python Value"
+    problem: >
+      `update_machine_status`'s own real code
+      (`machines.py:93-102`) reads `request.get_json()` and assigns
+      `data['status']` straight onto `machine.status`. What real journey
+      does one real string value take, from the request's own real bytes
+      to the database and back?
+    socratic_prompt:
+      - >
+        A real request body of `{"status": "running"}` arrives as real,
+        raw bytes over the wire. What real Python value does
+        `request.get_json()` actually hand back for the `"status"` key -
+        and is there any real check, anywhere in this route's own code,
+        that the value is one of the four real allowed strings before
+        it's assigned to `machine.status`?
+      - >
+        If deserialization just means "turn real JSON text into a real
+        Python value," is `update_machine_status`'s own separate,
+        earlier check
+        (`machines.py:98-100`, `if data['status'] not in valid_statuses`)
+        part of deserialization itself, or something that happens after
+        it?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:80-115`
+        (`update_machine_status`), read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `Machine` row; a real `User` row with a `programming`
+        role and token.
+    new_code:
+      applicable: true
+      intro: >
+        One real string, traced from a real JSON request body through to
+        the database and back:
+      file: verification/phase-03/lab_json_deserialization.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            db.session.add(machine)
+            db.session.add(user)
+            db.session.commit()
+
+            token = encode_auth_token("U-TEST-001", "programming")
+            headers = {"Authorization": f"Bearer {token}"}
+            client = app.test_client()
+
+            r = client.put("/api/machines/M-TEST-001/status", json={"status": "running"}, headers=headers)
+            print("real request body sent as a real Python dict:", {"status": "running"})
+            print("real, deserialized value inside update_machine_status:", "data['status'] ->", type(r.get_json()["data"]["status"]), repr(r.get_json()["data"]["status"]))
+
+            r_check = client.get("/api/machines/M-TEST-001")
+            print("real, re-fetched value from the database:", "status ->", r_check.get_json()["data"]["status"])
+
+            assert r.status_code == 200
+            assert r_check.get_json()["data"]["status"] == "running"
+            print("the real string in the JSON request body became the real string stored in the database, with nothing in between actually checking its real type")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'client = app.test_client()'
+          explanation: >
+            Builds one real `FlaskClient` - this lesson's own first
+            construction of it; every later unit in this lesson builds
+            its own fresh copy the same way.
+        - element: 'r = client.put("/api/machines/M-TEST-001/status", json={"status": "running"}, headers=headers)'
+          explanation: >
+            `FlaskClient`'s own `json=` argument serializes the real
+            Python dict into real JSON bytes on the way out; on the
+            server side, `request.get_json()` deserializes those same
+            real bytes back into a real Python dict, which is what
+            `update_machine_status`'s own code actually reads.
+        - element: 'r_check = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            A real, separate, independent fetch - confirms the real
+            deserialized value didn't just appear correct in the
+            immediate response, but was genuinely persisted.
+        - element: 'assert r_check.get_json()["data"]["status"] == "running"'
+          explanation: >
+            Confirms the real string survived the entire real round
+            trip - serialized out, deserialized in, stored, re-read, and
+            serialized out again - unchanged.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **deserialization**: reconstructing a real, usable
+      in-memory value from a real, transportable representation. Also
+      recognized in: `pickle.loads`, the real reverse of `pickle.dumps`;
+      a database driver parsing a real wire-protocol response back into
+      real Python objects; and, in this project's own domain, a CAM
+      import service reading a real, exported XML file back into real
+      Python objects this project's own code can actually work with.
+    se_lens: >
+      The design principle is that deserialization and validation are
+      two genuinely separate real steps - `request.get_json()` only
+      answers "is this real text valid JSON," never "is this real value
+      the right kind of value for what I'm about to do with it."
+      `update_machine_status`'s own real, separate `if data['status'] not
+      in valid_statuses` check (`machines.py:98-100`) is validation,
+      running strictly after deserialization already succeeded. The real
+      alternative not chosen: a single combined step that deserializes
+      and validates together (a real JSON Schema validator, for
+      instance); the honest cost of keeping them separate, the way this
+      project's own code does: every route has to remember to add its
+      own real validation after deserializing, by hand, and nothing
+      forces it to - exactly the real gap this lesson's own next unit
+      shows going unenforced.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_json_deserialization.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        real request body sent as a real Python dict: {'status': 'running'}
+        real, deserialized value inside update_machine_status: data['status'] -> <class 'str'> 'running'
+        real, re-fetched value from the database: status -> running
+        the real string in the JSON request body became the real string stored in the database, with nothing in between actually checking its real type
+      output_file: verification/phase-03/lab_json_deserialization_output.txt
+    connection_to_previous: >
+      The previous unit watched a real Python value become real JSON;
+      this unit watches the identical real journey run in reverse.
+
+  - title: "JSON Types - A Real, Smaller Vocabulary Than Python's Own"
+    problem: >
+      JSON's own real type system has exactly one real number type - no
+      distinction between an integer and a decimal. `create_machine`'s
+      own real code (`machines.py:149`) passes `data.get('axes', 3)`
+      straight into a column declared `db.Integer`, with no real check
+      at all. What happens when the real JSON value isn't even a number?
+    socratic_prompt:
+      - >
+        A JSON body can send `"axes": 5` (a real JSON number) or
+        `"axes": "5"` (a real JSON string that happens to look
+        numeric). Does `create_machine`'s own real code, or SQLite
+        itself, distinguish between the two before storing either one?
+      - >
+        If a real client sent `"axes": "five"` - a real JSON string with
+        no numeric meaning at all - what real, structural fact about
+        `create_machine`'s own code (or lack of one) would determine
+        whether that request succeeds or fails?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:118-169`
+        (`create_machine`), read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `User` row with a `programming` role and token.
+    new_code:
+      applicable: true
+      intro: >
+        Two real requests, two real JSON strings for `axes` - one
+        numeric-looking, one not:
+      file: verification/phase-03/lab_json_types.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            db.session.add(user)
+            db.session.commit()
+
+            token = encode_auth_token("U-TEST-001", "programming")
+            headers = {"Authorization": f"Bearer {token}"}
+            client = app.test_client()
+
+            body_numeric_string = {"id": "M-TEST-001", "name": "Test Mill", "category": "mill", "subType": "3_axis", "manufacturer": "Haas", "model": "VF-2", "axes": "5"}
+            r1 = client.post("/api/machines", json=body_numeric_string, headers=headers)
+            print("real JSON body sent axes as the real JSON string \"5\" -> stored real Python type:", type(r1.get_json()["data"]["axes"]), "value:", r1.get_json()["data"]["axes"])
+
+            body_non_numeric_string = {"id": "M-TEST-002", "name": "Test Lathe", "category": "lathe", "subType": "2_axis", "manufacturer": "Haas", "model": "ST-10", "axes": "five"}
+            r2 = client.post("/api/machines", json=body_non_numeric_string, headers=headers)
+            print("real JSON body sent axes as the real JSON string \"five\" -> status:", r2.status_code, "stored real Python type:", type(r2.get_json()["data"]["axes"]), "value:", r2.get_json()["data"]["axes"])
+
+            assert r1.status_code == 201
+            assert isinstance(r1.get_json()["data"]["axes"], int)
+            assert r2.status_code == 201
+            assert r2.get_json()["data"]["axes"] == "five"
+            print("a real Machine row now exists in this database with the real Python string 'five' sitting in a column declared db.Integer - nothing in this project's own real code, or SQLite itself, ever stopped it")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'body_numeric_string = {..., "axes": "5"}'
+          explanation: >
+            A real JSON string that looks like a number - deserialized
+            by `request.get_json()` as the real Python string `"5"`, not
+            an `int`, since JSON itself has no way to mark it as one.
+        - element: 'r1 = client.post("/api/machines", json=body_numeric_string, headers=headers)'
+          explanation: >
+            `create_machine`'s own real code passes this real string
+            straight to `Machine`'s constructor with no conversion at
+            all; SQLite's own real, permissive type affinity silently
+            coerces it into a real `int` on the way into the database.
+        - element: 'body_non_numeric_string = {..., "axes": "five"}'
+          explanation: >
+            A real JSON string SQLite genuinely cannot coerce into a
+            number - the same real code path as the previous request,
+            with no different real handling anywhere.
+        - element: 'r2 = client.post("/api/machines", json=body_non_numeric_string, headers=headers)'
+          explanation: >
+            The identical real route, the identical real lack of type
+            checking - SQLite's own real, permissive column typing
+            simply stores the string as-is, since nothing in this
+            project's own real code, or SQLite itself, ever rejects it.
+        - element: 'assert r2.get_json()["data"]["axes"] == "five"'
+          explanation: >
+            Confirms, for real, the honest finding this unit exists to
+            surface: a real, committed database row now holds a string
+            in a column its own real schema declares as an integer.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **JSON's own limited type system meeting an unvalidated
+      boundary**: JSON can only ever describe six real shapes, and a
+      real backend that trusts a deserialized value's real Python type
+      without checking it inherits whatever real ambiguity JSON itself
+      allows. Also recognized in: a CSV file's own real lack of any type
+      information at all (every real value is text until something
+      downstream decides otherwise); a dynamically-typed language's own
+      real willingness to accept any value anywhere, deferring a real
+      type error until the value is actually used wrong; and, in this
+      project's own domain, a G-code parameter that's syntactically just
+      a real number in a text file, with no real unit or type attached
+      until a specific, real command interprets it.
+    se_lens: >
+      The design principle real input validation exists for is refusing
+      a real value BEFORE it reaches storage, specifically because a
+      database's own real type coercion (SQLite's especially permissive
+      real behavior) can't be trusted to catch a genuinely wrong real
+      value. The real alternative not implemented here: a real,
+      explicit `isinstance(data.get('axes'), int)` check (or a real
+      schema validator) before `Machine(...)` is ever constructed; the
+      honest cost of skipping it, proven directly by this unit's own two
+      real calls: this project's real database now contains at least one
+      real row where a column's own declared type and its actual real
+      stored value directly disagree - a fact no later real read of that
+      row would have any way to detect on its own.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_json_types.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        real JSON body sent axes as the real JSON string "5" -> stored real Python type: <class 'int'> value: 5
+        real JSON body sent axes as the real JSON string "five" -> status: 201 stored real Python type: <class 'str'> value: five
+        a real Machine row now exists in this database with the real Python string 'five' sitting in a column declared db.Integer - nothing in this project's own real code, or SQLite itself, ever stopped it
+      output_file: verification/phase-03/lab_json_types_output.txt
+    connection_to_previous: >
+      The previous unit traced one real, correctly-typed value through
+      deserialization; this unit sends a real value of the wrong kind
+      entirely, and finds nothing in this project's own code catches it.
+
+  - title: "API Contracts - A Real Promise, Held By Two Routes and Broken By a Third"
+    problem: >
+      `get_machine` and `create_machine` both return
+      `{'data': machine.to_dict()}`. Is that a real, enforced contract,
+      or a real coincidence that happens to hold - until it doesn't?
+    socratic_prompt:
+      - >
+        If a caller writes real code that always reads a machine's real
+        fields from `response['data']`, would that real code work
+        against `get_machine`'s response? Against `create_machine`'s?
+      - >
+        `delete_machine` also operates on one real machine, the same way
+        `get_machine` does. Before reading below, would you expect its
+        real response to follow the identical real `{'data': ...}`
+        shape?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:48-61`
+        (`get_machine`), `:118-169` (`create_machine`), and `:274-297`
+        (`delete_machine`), all read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `Machine` row; a real `User` row with a `programming`
+        role, and a second with an `admin` role.
+    new_code:
+      applicable: true
+      intro: >
+        Three real requests against the identical real resource,
+        compared by their own real, top-level keys:
+      file: verification/phase-03/lab_json_contracts.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+        from app.models.user import User
+        from app.utils.auth_utils import encode_auth_token
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", manufacturer="Haas", model="VF-2", status="available")
+            prog_user = User(id="U-TEST-001", email="test-prog@example.com", name="Test Programmer", role="programming")
+            admin_user = User(id="U-TEST-002", email="test-admin@example.com", name="Test Admin", role="admin")
+            db.session.add(machine)
+            db.session.add(prog_user)
+            db.session.add(admin_user)
+            db.session.commit()
+
+            prog_token = encode_auth_token("U-TEST-001", "programming")
+            client = app.test_client()
+
+            r_get = client.get("/api/machines/M-TEST-001")
+            print("GET response keys:", sorted(r_get.get_json().keys()))
+
+            r_create = client.post(
+                "/api/machines",
+                json={"id": "M-TEST-002", "name": "Test Lathe", "category": "lathe", "subType": "2_axis", "manufacturer": "Haas", "model": "ST-10"},
+                headers={"Authorization": f"Bearer {prog_token}"},
+            )
+            print("POST (create) response keys:", sorted(r_create.get_json().keys()))
+
+            admin_token = encode_auth_token("U-TEST-002", "admin")
+            r_delete = client.delete("/api/machines/M-TEST-002", headers={"Authorization": f"Bearer {admin_token}"})
+            print("DELETE response keys:", sorted(r_delete.get_json().keys()))
+
+            assert "data" in r_get.get_json()
+            assert "data" in r_create.get_json()
+            assert "data" not in r_delete.get_json()
+            print("two real routes share the real 'data' key every caller could learn to rely on; a third real route, doing the identical real kind of operation (returning the outcome of one machine), breaks that same real convention entirely")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r_get = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            A real read - returns `{'data': {...}}`.
+        - element: 'r_create = client.post("/api/machines", json={...}, headers={...})'
+          explanation: >
+            A real write, creating a new resource - also returns
+            `{'data': {...}}`, the identical real top-level key as the
+            read.
+        - element: 'r_delete = client.delete("/api/machines/M-TEST-002", headers={...})'
+          explanation: >
+            A real write, removing a resource - returns
+            `{'success': True, 'message': ...}` instead, with no `'data'`
+            key anywhere.
+        - element: 'assert "data" in r_get.get_json() / assert "data" in r_create.get_json() / assert "data" not in r_delete.get_json()'
+          explanation: >
+            Confirms all three real facts together - a real contract two
+            routes both honor, and one real route, operating on the
+            identical kind of resource, that doesn't.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is an **implicit, unenforced contract**: a shape multiple
+      real callers come to depend on, without anything actually
+      guaranteeing it holds. Also recognized in: a library's own real
+      public function whose return shape changes between versions with
+      no real type system to catch every caller that broke; a
+      database's own real schema-less document store, where two real
+      records in the "same" collection can have genuinely different real
+      fields; and, in this project's own domain, two real G-code
+      post-processors for the "same" control that emit subtly different
+      real block formats, because nothing enforces one canonical shape.
+    se_lens: >
+      The design principle a real, enforced API contract would provide
+      is that a caller could rely on `response['data']` existing, for
+      any real route describing one resource, without checking first.
+      The real alternative not implemented here: a real, shared response
+      builder function (or a real schema this curriculum's own later
+      lessons will introduce) that every route calls, guaranteeing the
+      identical real shape; the honest cost of the ad hoc approach this
+      project's own code actually takes, proven directly by this unit's
+      own three real calls: any real frontend code written against
+      `response.data.X` for a delete operation would fail immediately -
+      not because the delete itself failed, but because the real
+      response shape it depended on was never actually guaranteed.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_json_contracts.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        GET response keys: ['data']
+        POST (create) response keys: ['data']
+        DELETE response keys: ['message', 'success']
+        two real routes share the real 'data' key every caller could learn to rely on; a third real route, doing the identical real kind of operation (returning the outcome of one machine), breaks that same real convention entirely
+      output_file: verification/phase-03/lab_json_contracts_output.txt
+    connection_to_previous: >
+      The previous unit found an unvalidated real VALUE slipping through
+      this project's own code; this unit finds an unvalidated real SHAPE
+      doing the identical kind of thing, one level up.
+
+  - title: "Response Envelopes - Three Real Shapes, All Live at Once"
+    problem: >
+      `get_machines` returns `{'data': [...], 'total': N}`; `get_machine`
+      returns `{'data': {...}}`; `add_favorite` returns
+      `{'success': True, 'data': {...}}`. Are these three real,
+      different wrapper shapes, or the same real shape read three
+      different ways?
+    socratic_prompt:
+      - >
+        `get_machines`'s own real `'total'` key only makes sense for a
+        real collection - would a single-resource route like
+        `get_machine` have any real, meaningful value to put there?
+      - >
+        `add_favorite`'s own real response carries both `'success'` AND
+        `'data'` together - genuinely different from both of
+        `get_machines`'s and `get_machine`'s own shapes. Is there a real,
+        principled reason for a THIRD shape to exist, or is it simply a
+        different real author's own convention?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:14-45`
+        (`get_machines`), `:48-61` (`get_machine`), and
+        `backend/app/routes/favorites.py:33-58` (`add_favorite`), all
+        read again this session.
+      files_affected: []
+      change_type: none
+      location: >
+        N/A - a new, standalone script; no existing project structure to
+        place it within.
+      dependencies: >
+        A real `Machine` row; a real `MachineCAMPairing` row.
+    new_code:
+      applicable: true
+      intro: >
+        Three real requests, three real, top-level response shapes:
+      file: verification/phase-03/lab_json_envelopes.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+        from app.models.machine_pairing import MachineCAMPairing
+        from app.models.user_favorite import UserFavorite
+
+        app = create_app("testing")
+        with app.app_context():
+            machine = Machine(id="M-TEST-001", name="Test Mill", category="mill", sub_type="3_axis", status="available")
+            pairing = MachineCAMPairing(id="PAIR-001", cam_file_id="CAM-FAKE", machine_id="MACH-FAKE")
+            db.session.add(machine)
+            db.session.add(pairing)
+            db.session.commit()
+
+            client = app.test_client()
+
+            r_list = client.get("/api/machines")
+            print("list envelope    (GET /api/machines)      ->", sorted(r_list.get_json().keys()))
+
+            r_single = client.get("/api/machines/M-TEST-001")
+            print("single envelope  (GET /api/machines/<id>)  ->", sorted(r_single.get_json().keys()))
+
+            r_favorite = client.post("/api/favorites/", json={"userId": "alice", "pairingId": "PAIR-001"})
+            print("mixed envelope   (POST /api/favorites/)    ->", sorted(r_favorite.get_json().keys()))
+
+            assert set(r_list.get_json().keys()) == {"data", "total"}
+            assert set(r_single.get_json().keys()) == {"data"}
+            assert set(r_favorite.get_json().keys()) == {"success", "data"}
+            print("three real, genuinely different envelope shapes, all live in this same API at once - none of them is 'the' contract")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r_list = client.get("/api/machines")'
+          explanation: >
+            A real collection response - carries `'total'` alongside
+            `'data'`, real metadata that only makes sense for a list.
+        - element: 'r_single = client.get("/api/machines/M-TEST-001")'
+          explanation: >
+            A real single-resource response - `'data'` alone; no
+            `'total'`, since counting one resource tells a caller
+            nothing real a `200` status code doesn't already.
+        - element: 'r_favorite = client.post("/api/favorites/", json={"userId": "alice", "pairingId": "PAIR-001"})'
+          explanation: >
+            A real, third shape - `add_favorite`'s own real code adds a
+            `'success'` key neither of the other two real routes uses at
+            all, alongside the same `'data'` key both of them do use.
+        - element: 'assert set(r_list.get_json().keys()) == {"data", "total"} / assert set(r_single.get_json().keys()) == {"data"} / assert set(r_favorite.get_json().keys()) == {"success", "data"}'
+          explanation: >
+            Confirms all three real, genuinely different envelope shapes
+            together, in the identical real API.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **envelope design**: the real, outer structure carrying a
+      response's own payload plus whatever real metadata a specific
+      response needs, distinct from the payload's own real shape. Also
+      recognized in: an email's own real header block, wrapping a
+      message body separate from routing metadata; a shipping
+      container's own real manifest, describing what's inside without
+      being part of the cargo itself; and, in this project's own domain,
+      a G-code program's own real header comments (part number, revision)
+      wrapping the actual, real machining instructions that follow.
+    se_lens: >
+      The design principle a single, real, consistent envelope would
+      provide is that a caller learns one real shape and reuses that
+      knowledge everywhere - real metadata fields either always present
+      (even `null`/omitted meaningfully) or governed by one, real,
+      documented rule for when they appear. The real alternative not
+      chosen here: exactly that - one shared, real envelope shape,
+      decided once; the honest cost of the three, real, independently-evolved
+      shapes this project's own code actually has, proven directly by
+      this unit's own three real calls: a caller has to already know,
+      route by route, whether to look for `'total'`, whether `'success'`
+      will be present, and whether `'data'` will be there at all - real
+      knowledge this project's own API gives no caller any way to
+      discover except by reading the actual real route code, or,
+      as this lesson does, running it.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-03/lab_json_envelopes.py
+        explanation: >
+          Runs this as a plain script, from the repository root.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        list envelope    (GET /api/machines)      -> ['data', 'total']
+        single envelope  (GET /api/machines/<id>)  -> ['data']
+        mixed envelope   (POST /api/favorites/)    -> ['data', 'success']
+        three real, genuinely different envelope shapes, all live in this same API at once - none of them is 'the' contract
+      output_file: verification/phase-03/lab_json_envelopes_output.txt
+    connection_to_previous: >
+      The previous unit found one real route breaking a shared shape two
+      others honored; this unit closes the lesson by showing this
+      project's own API was never actually built around just one shared
+      shape to begin with - three genuinely different real ones coexist,
+      each locally reasonable, none of them universal.
+
+closing:
+  connect_the_pieces: >
+    One real machine, followed through every real JSON concept this
+    lesson studies. A real Python `datetime`, converted by
+    `Machine.to_dict()` into a real, JSON-safe string, its real key
+    renamed from `sub_type` to `subType` along the way (serialization).
+    A real JSON string, `"running"`, deserialized by
+    `request.get_json()` and written straight to the database with no
+    real check in between (deserialization) - which, pushed one step
+    further, let a genuinely non-numeric real string, `"five"`, land in
+    a column declared `db.Integer`, because nothing in this project's
+    own real code, or SQLite itself, actually enforces the type JSON
+    only loosely suggests (JSON types). Three real routes touching the
+    identical real machine resource, two of them sharing a real `'data'`
+    contract, one of them - `delete_machine` - breaking it outright (API
+    contracts). And, last, three real, independently-evolved response
+    shapes - list, single, and mixed - all coexisting in this same real
+    API at once, each locally sensible, none of them the one real
+    contract every caller could actually depend on (response envelopes).
+  next_lesson_pointer: >
+    Every real route this lesson studied already treated a machine as
+    "a resource" without ever naming that word directly; next, this
+    curriculum studies REST itself - what a resource actually is, how
+    its real representations relate to its real identifier, and how
+    close this project's own real routes actually come to the real
+    conventions REST names.
