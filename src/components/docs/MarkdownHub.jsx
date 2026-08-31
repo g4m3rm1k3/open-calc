@@ -40,8 +40,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
+  Pause,
+  Play,
   Volume2,
-  Square,
   Type,
   Settings,
   Check,
@@ -2063,6 +2064,44 @@ function splitMarkdownSections(markdown, startLine = 1) {
   return sections;
 }
 
+function highlightSpokenWord(root, spokenText, charIndex, searchState, id) {
+  if (!root || !window.CSS?.highlights) return
+  const word = spokenText.slice(charIndex).match(/[\p{L}\p{N}_'-]+/u)?.[0]
+  if (!word) return
+  const plain = root.textContent ?? ''
+  const lower = plain.toLocaleLowerCase()
+  const needle = word.toLocaleLowerCase()
+  const from = searchState.current[id] ?? 0
+  let offset = lower.indexOf(needle, from)
+  if (offset === -1) offset = lower.indexOf(needle)
+  if (offset === -1) return
+  searchState.current[id] = offset + needle.length
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  let cursor = 0
+  let startNode = null, endNode = null, startOffset = 0, endOffset = 0
+  while (walker.nextNode()) {
+    const node = walker.currentNode
+    const next = cursor + node.textContent.length
+    if (!startNode && offset >= cursor && offset < next) {
+      startNode = node
+      startOffset = offset - cursor
+    }
+    const end = offset + needle.length
+    if (startNode && end <= next) {
+      endNode = node
+      endOffset = end - cursor
+      break
+    }
+    cursor = next
+  }
+  if (!startNode || !endNode) return
+  const range = document.createRange()
+  range.setStart(startNode, startOffset)
+  range.setEnd(endNode, endOffset)
+  CSS.highlights.set('markdown-reader-word', new Highlight(range))
+}
+
 // Memoized so that a parent re-render triggered by something this component
 // doesn't care about (MarkdownHub's scroll-driven `activeHeadingId`, ticking
 // on nearly every scroll frame while reading) doesn't force this whole tree
@@ -2093,9 +2132,11 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   // chosen settings.
   embedded = false,
 }) {
-  const { speak, stop } = useSpeech();
+  const { speak, stop, pause, resume, isPaused } = useSpeech();
   const [playingIdx, setPlayingIdx] = useState(null);
   const playingIdxRef = useRef(null);
+  const sectionRefs = useRef(new Map());
+  const readerSearchRef = useRef({});
 
   const [collapsedPages, setCollapsedPages] = useState({});
 
@@ -2130,6 +2171,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   useEffect(
     () => () => {
       stop();
+      window.CSS?.highlights?.delete('markdown-reader-word');
     },
     [content, stop],
   ); // eslint-disable-line react-hooks/exhaustive-deps
@@ -2137,21 +2179,25 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   const handlePlay = useCallback(
     async (idx, text) => {
       if (playingIdxRef.current === idx) {
-        stop();
-        playingIdxRef.current = null;
-        setPlayingIdx(null);
+        if (isPaused) resume();
+        else pause();
         return;
       }
       stop();
       playingIdxRef.current = idx;
+      readerSearchRef.current[idx] = 0;
       setPlayingIdx(idx);
-      await speak(cleanForSpeech(text));
+      const spokenText = cleanForSpeech(text);
+      await speak(spokenText, {
+        onBoundary: (event) => highlightSpokenWord(sectionRefs.current.get(idx), spokenText, event.charIndex, readerSearchRef, idx),
+      });
       if (playingIdxRef.current === idx) {
         playingIdxRef.current = null;
         setPlayingIdx(null);
+        window.CSS?.highlights?.delete('markdown-reader-word');
       }
     },
-    [speak, stop],
+    [speak, stop, pause, resume, isPaused],
   );
 
   return (
@@ -2182,6 +2228,11 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         }
         .dark .curled-shadow-wrapper::before, .dark .curled-shadow-wrapper::after {
           box-shadow: 0 15px 15px rgba(0,0,0,0.4);
+        }
+        ::highlight(markdown-reader-word) {
+          background: rgba(34, 211, 238, .38);
+          color: inherit;
+          border-radius: 3px;
         }
         .md-body h1 {
           position: relative;
@@ -2428,10 +2479,10 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                 }
                 const isPlaying = playingIdx === globalIdx;
                 return (
-                  <div key={globalIdx} className={`relative group ${secIdx === 0 ? "" : "mt-4"}`}>
+                  <div ref={node => { if (node) sectionRefs.current.set(globalIdx, node); else sectionRefs.current.delete(globalIdx); }} key={globalIdx} className={`relative group ${secIdx === 0 ? "" : "mt-4"}`}>
                     <button
                       onClick={() => handlePlay(globalIdx, section.content)}
-                      title={isPlaying ? "Stop reading" : "Read aloud"}
+                      title={isPlaying ? (isPaused ? "Resume reading" : "Pause reading") : "Read aloud"}
                       className={`absolute -top-3 -right-3 z-10 flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md border transition-all shadow-sm ${
                         isPlaying
                           ? "opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20"
@@ -2440,8 +2491,8 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                     >
                       {isPlaying ? (
                         <>
-                          <Square className="w-2.5 h-2.5 fill-current" />
-                          &nbsp;Stop
+                          {isPaused ? <Play className="w-3 h-3 fill-current" /> : <Pause className="w-3 h-3 fill-current" />}
+                          &nbsp;{isPaused ? "Resume" : "Pause"}
                         </>
                       ) : (
                         <>
