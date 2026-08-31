@@ -1,0 +1,749 @@
+number: "6.12"
+title: "SQL"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Four real scripts, finally writing the real language every earlier
+  lesson in this phase has been running underneath its own ORM calls,
+  directly, against this project's own real, already-familiar tables -
+  `machines`, `parts`, `cam_files` - real, seeded through the same
+  `Machine`/`Part`/`CAMFile` models this curriculum has used since
+  Lesson 6.1. `SELECT` and `WHERE` read and filter real rows; `INSERT`,
+  `UPDATE`, and `DELETE` write, change, and remove one, verified at each
+  step by reading it back; `JOIN` combines `parts` and `cam_files`
+  exactly the way `Part.cam_files`'s own real relationship, already
+  studied in this curriculum's own Foreign Keys lesson, already did
+  through the ORM; and `GROUP BY`, `ORDER BY`, and a real aggregate
+  function summarize real machines by category.
+
+what_you_need_to_know_first: >
+  This curriculum's own Relational Model lesson - relation, tuple,
+  attribute; this curriculum's own Foreign Keys and One-to-Many lessons -
+  what a real parent/child relationship is, already navigated through
+  the ORM; `sqlalchemy.text`, already used in this curriculum's own
+  Foreign Keys and Indexes lessons for a single PRAGMA/diagnostic
+  statement, now used for a real, complete SQL statement instead.
+
+terms:
+  - name: SELECT
+    definition: >
+      The real SQL statement that reads rows from one or more relations,
+      naming exactly which real attributes to return. It exists as the
+      one real statement responsible for every kind of read this whole
+      curriculum has performed indirectly through the ORM since Lesson
+      6.1 - `Part.query.all()`, `cf1.sequences.all()`, and every other
+      real ORM call this phase has used all ultimately become some real
+      `SELECT` statement underneath.
+  - name: WHERE
+    definition: >
+      A real clause on `SELECT` (and on `UPDATE`/`DELETE`, below) that
+      restricts which real rows a statement actually applies to, by
+      naming a condition each row's own values must satisfy. It exists
+      because, without it, a statement applies to every real row in the
+      relation - `WHERE` is what turns "every machine" into "only the
+      real machines matching this specific condition."
+  - name: INSERT
+    definition: >
+      The real SQL statement that adds one new row to a relation, naming
+      the real columns being given a value and the real values
+      themselves. It exists as the direct, textual equivalent of
+      `db.session.add(...)` followed by `db.session.commit()`, already
+      used throughout this curriculum without the real statement
+      underneath it ever being shown until now.
+  - name: UPDATE
+    definition: >
+      The real SQL statement that changes one or more existing rows'
+      own values, always paired with a real `WHERE` clause naming which
+      rows to change - omitting `WHERE` changes every real row in the
+      relation at once. It exists as the real, textual equivalent of
+      reassigning an attribute on an already-loaded ORM object before
+      calling `db.session.commit()`.
+  - name: DELETE
+    definition: >
+      The real SQL statement that removes one or more existing rows
+      entirely, also always paired with a real `WHERE` clause naming
+      which rows to remove. It exists as the real, textual equivalent of
+      `db.session.delete(...)`, already used in this curriculum's own
+      Foreign Keys lesson to demonstrate real cascading behavior.
+  - name: JOIN
+    definition: >
+      A real clause that combines rows from two relations into one
+      result, matching rows from each side using a stated real
+      condition - typically a foreign key equalling the primary key it
+      references. It exists as the real, textual mechanism behind every
+      parent/child navigation this curriculum's own ORM relationships
+      have performed since Lesson 6.4 - `cf1.part`, `part.cam_files.all()`,
+      and every other real backref this phase has used are all,
+      underneath, some real `JOIN`.
+  - name: "GROUP BY"
+    definition: >
+      A real clause that collapses many rows sharing the same real value
+      in one or more columns into a single summary row per distinct
+      value, so an aggregate function (below) can be computed once per
+      group instead of once overall. It exists because some real
+      questions ("how many machines per category") are not about any
+      one row at all, but about a real count, sum, or other summary
+      computed separately for each distinct real group.
+  - name: "ORDER BY"
+    definition: >
+      A real clause that sorts a statement's own result rows by one or
+      more columns, in ascending or descending order. It exists because
+      a real relation, this curriculum's own Relational Model lesson
+      already established, has no guaranteed row order at all on its
+      own - `ORDER BY` is the one real, explicit way to impose a
+      specific, requested order on a result.
+  - name: "aggregate function"
+    definition: >
+      A real SQL function - `COUNT`, `SUM`, `AVG`, among others - that
+      computes a single, real summary value from many rows at once,
+      rather than returning one value per row. It exists so a real
+      question like "how many" or "what is the total" can be answered by
+      the database itself, computed directly over however many real rows
+      actually match, instead of the calling application fetching every
+      real row and computing the summary itself.
+
+objects_and_methods:
+  - name: "sqlalchemy.text (for a real SQL statement)"
+    what_it_is: >
+      The same real SQLAlchemy function already used in this curriculum's
+      own Foreign Keys and Indexes lessons for a single PRAGMA or
+      diagnostic statement, here used for the first time for a real,
+      complete SQL statement - `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
+    implementation: >
+      `text("...")` wraps a real SQL string so `db.session.execute(...)`
+      can run it directly against the real, current database connection,
+      returning real result rows for a `SELECT`, or nothing for a
+      successful `INSERT`/`UPDATE`/`DELETE` (whose real effect is the
+      write itself).
+    its_use: >
+      Every unit in this lesson calls this once per real statement -
+      the direct, textual alternative to the ORM's own Python calls this
+      curriculum has used since Lesson 6.1.
+    type: A real SQLAlchemy function.
+    responsibility: >
+      Letting a real, complete SQL statement run directly against the
+      database connection, exactly as written, with no ORM translation
+      in between.
+    depends_on: A real, valid SQL statement string, and an open real database connection to run it against.
+    connects_to: >
+      Passed directly to `db.session.execute(...)` in every one of this
+      lesson's own real labs.
+    shape: Takes a string in, returns an executable statement object; `db.session.execute(...)` runs it and returns real rows, or nothing, depending on the statement.
+
+concept_units:
+  - title: "SELECT and WHERE - Reading and Filtering Real Rows Directly"
+    problem: >
+      Every earlier lesson in this phase read real rows through the ORM
+      - `Machine.query.all()`, `cf1.sequences.all()`. What does the real
+      statement underneath one of those calls actually look like, written
+      out directly, and how does it express "only the rows matching a
+      condition"?
+    socratic_prompt:
+      - >
+        `SELECT id, name, category FROM machines` names three real
+        columns and one real table. What would change about its result
+        if `category` were left out of the column list entirely?
+      - >
+        Given `WHERE category = 'mill'`, would this same real statement,
+        with no `WHERE` clause at all, return MORE rows, FEWER rows, or
+        the identical rows in a different order?
+    project_change:
+      reference_source: >
+        No real project file changes - this unit runs real `SELECT`
+        statements directly against this project's own real `machines`
+        table, already fully studied through its own model,
+        `backend/app/models/machine.py`, in this curriculum's own Why
+        Databases Exist and Constraints lessons.
+      files_affected:
+        - path: verification/phase-06/lab_sql_select_where.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        Three real machines, seeded through the real `Machine` model,
+        then read back with two real, direct `SELECT` statements:
+      file: verification/phase-06/lab_sql_select_where.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy import text
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        with app.app_context():
+            db.session.add_all([
+                Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis"),
+                Machine(id="m2", name="Okuma Genos", category="lathe", sub_type="single_turret"),
+                Machine(id="m3", name="Haas UMC-750", category="mill", sub_type="5_axis"),
+            ])
+            db.session.commit()
+
+            print("SELECT id, name, category FROM machines:")
+            for row in db.session.execute(text("SELECT id, name, category FROM machines")):
+                print(" ", row)
+
+            print("SELECT id, name FROM machines WHERE category = 'mill':")
+            for row in db.session.execute(text("SELECT id, name FROM machines WHERE category = 'mill'")):
+                print(" ", row)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "SELECT id, name, category FROM machines"
+          explanation: >
+            `SELECT`, fully treated in this lesson's own Header, naming
+            exactly three real columns to return, `FROM` naming the real
+            table to read them from - no `WHERE` at all, so every real
+            row in `machines` is returned.
+        - element: "SELECT id, name FROM machines WHERE category = 'mill'"
+          explanation: >
+            The identical real statement shape, now with `WHERE`, fully
+            treated in this lesson's own Header, restricting the result
+            to only rows whose real `category` column equals the literal
+            string `'mill'` - two of the three real machines seeded
+            above.
+        - element: "db.session.execute(text(...)) (both calls)"
+          explanation: >
+            `sqlalchemy.text`, fully treated in this lesson's own Header,
+            running each real statement directly; iterating the returned
+            result (basic Python `for`) yields one real tuple per
+            matching row.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **SELECT** and **WHERE**, both fully named in this
+      lesson's own Header - the two real statements/clauses behind every
+      read this curriculum has performed since Lesson 6.1. Also
+      recognized in: a spreadsheet's own filter feature, already named
+      as this curriculum's own Why Databases Exist lesson's real analogy
+      for querying; a search engine's own query box, narrowing "every
+      page" down to "pages matching this term"; and, in this project's
+      own domain, this exact real statement pair - the direct, textual
+      form of what `Machine.query.filter_by(category='mill').all()`
+      already does through the ORM.
+    se_lens: >
+      The design principle is naming exactly what to read and exactly
+      which rows qualify, in one real, declarative statement, rather than
+      the application fetching everything and filtering it manually -
+      the identical real payoff this curriculum's own Why Databases
+      Exist lesson already named for querying in general. The real
+      alternative NOT chosen here - reading every row via `SELECT * FROM
+      machines` with no `WHERE`, then filtering in Python - would work,
+      at the real cost this curriculum's own Querying unit already
+      measured: work that scales with total row count, not with how
+      selective the real question is.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_sql_select_where.py
+        explanation: >
+          Run from the manufacturing-platform repository root, using
+          this project's own real backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        SELECT id, name, category FROM machines:
+          ('m1', 'Haas VF-2', 'mill')
+          ('m2', 'Okuma Genos', 'lathe')
+          ('m3', 'Haas UMC-750', 'mill')
+        SELECT id, name FROM machines WHERE category = 'mill':
+          ('m1', 'Haas VF-2')
+          ('m3', 'Haas UMC-750')
+      output_file: verification/phase-06/lab_sql_select_where_output.txt
+    connection_to_previous: >
+      This is the lesson's first unit - it shows the real statement
+      behind every ORM read this phase has performed; the next unit shows
+      the three real statements behind every ORM write.
+
+  - title: "INSERT, UPDATE, and DELETE - Writing, Changing, and Removing Real Rows Directly"
+    problem: >
+      This curriculum's own Transactions lesson already ran
+      `db.session.add(...)` followed by `db.session.commit()`, and
+      `db.session.delete(...)`. What do the real SQL statements
+      underneath those two ORM calls - plus the one for CHANGING a row
+      that already exists - actually look like, written directly?
+    socratic_prompt:
+      - >
+        `INSERT INTO parts (id, part_number, description, status)
+        VALUES (...)` names both the real columns and the real values
+        together. Why might a real database need both named explicitly,
+        rather than just the values alone?
+      - >
+        `UPDATE parts SET status = 'released' WHERE id = 'P1'` and
+        `DELETE FROM parts WHERE id = 'P1'` both include a real `WHERE`
+        clause. What would happen to every OTHER real row in `parts` if
+        either one omitted it?
+    project_change:
+      reference_source: >
+        No real project file changes - this unit runs real `INSERT`,
+        `UPDATE`, and `DELETE` statements directly against this project's
+        own real `parts` table, already fully studied through
+        `backend/app/models/part.py` earlier in this curriculum.
+      files_affected:
+        - path: verification/phase-06/lab_sql_insert_update_delete.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        One real `Part` row, inserted, updated, and deleted, each step
+        verified by a real `SELECT` immediately after:
+      file: verification/phase-06/lab_sql_insert_update_delete.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy import text
+
+        from app import create_app, db
+
+        app = create_app("testing")
+
+        with app.app_context():
+            db.session.execute(text(
+                "INSERT INTO parts (id, part_number, description, status) "
+                "VALUES ('P1', '1234567', 'Bracket Assembly', 'draft')"
+            ))
+            db.session.commit()
+            print("INSERT: real row now exists:")
+            for row in db.session.execute(text("SELECT id, part_number, status FROM parts WHERE id = 'P1'")):
+                print(" ", row)
+
+            db.session.execute(text("UPDATE parts SET status = 'released' WHERE id = 'P1'"))
+            db.session.commit()
+            print("UPDATE: real row's status changed:")
+            for row in db.session.execute(text("SELECT id, part_number, status FROM parts WHERE id = 'P1'")):
+                print(" ", row)
+
+            db.session.execute(text("DELETE FROM parts WHERE id = 'P1'"))
+            db.session.commit()
+            print("DELETE: real row is gone:")
+            remaining = list(db.session.execute(text("SELECT id FROM parts WHERE id = 'P1'")))
+            print(f"  rows found: {remaining}")
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "INSERT INTO parts (id, part_number, description, status) VALUES (...)"
+          explanation: >
+            `INSERT`, fully treated in this lesson's own Header - names
+            the real table, the real columns being given a value (in
+            order), and the real literal values matching that same
+            order. Every OTHER real column on `parts` not named here (like
+            `material`, nullable per this curriculum's own Constraints
+            lesson) is left at its own real declared default or `NULL`.
+        - element: "UPDATE parts SET status = 'released' WHERE id = 'P1'"
+          explanation: >
+            `UPDATE`, fully treated in this lesson's own Header - `SET`
+            names the real column being changed and its real new value;
+            `WHERE` restricts this change to exactly the one real row
+            whose `id` is `'P1'` - every other real row in `parts`, had
+            there been any, would be untouched.
+        - element: "DELETE FROM parts WHERE id = 'P1'"
+          explanation: >
+            `DELETE`, fully treated in this lesson's own Header - removes
+            the real row matching `WHERE id = 'P1'` entirely; the table
+            itself, `parts`, is untouched - only this one real row is
+            gone.
+        - element: "db.session.commit() (after each statement)"
+          explanation: >
+            Already fully treated in this curriculum's own Transactions
+            lesson - each real write is made permanent separately here,
+            specifically so this unit's own real, intermediate `SELECT`
+            checks reflect each step in order.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: true
+      shape: timing
+      lines:
+        - "INSERT INTO parts (...) VALUES (...) - one real row, 'P1', now exists with status 'draft'"
+        - "SELECT ... WHERE id = 'P1' -> ('P1', '1234567', 'draft') - confirms the real insert"
+        - "UPDATE parts SET status = 'released' WHERE id = 'P1' - the SAME real row, status changed in place"
+        - "SELECT ... WHERE id = 'P1' -> ('P1', '1234567', 'released') - confirms only status changed"
+        - "DELETE FROM parts WHERE id = 'P1' - the real row no longer exists at all"
+        - "SELECT id FROM parts WHERE id = 'P1' -> [] - confirms it is genuinely gone, not merely altered"
+    cs_lens: >
+      This is **INSERT**, **UPDATE**, and **DELETE**, all fully named in
+      this lesson's own Header - the three real statements behind every
+      write this curriculum has performed since Lesson 6.1. Also
+      recognized in: a spreadsheet's own "add row," "edit cell," and
+      "delete row" actions, each a genuinely different real operation
+      even though all three modify the identical sheet; a version-control
+      commit that adds, modifies, or removes a file, three distinct real
+      operations tracked separately; and, in this project's own domain,
+      this exact real triplet - the direct, textual form of
+      `db.session.add(...)`, an ORM attribute reassignment, and
+      `db.session.delete(...)`, already used throughout this curriculum.
+    se_lens: >
+      The design principle is that changing data is not one operation
+      but three genuinely different real ones - adding something that
+      did not exist, changing something that does, and removing something
+      entirely - each with its own real statement, rather than one
+      generic "save" verb papering over which of the three actually
+      happened. The real alternative this curriculum has used instead,
+      throughout every earlier lesson - `db.session.add`/reassigning an
+      attribute/`db.session.delete`, then one shared `db.session.commit()`
+      - is the identical real distinction, expressed through the ORM
+      rather than written directly; this unit shows the real SQL both
+      forms ultimately produce.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_sql_insert_update_delete.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        INSERT: real row now exists:
+          ('P1', '1234567', 'draft')
+        UPDATE: real row's status changed:
+          ('P1', '1234567', 'released')
+        DELETE: real row is gone:
+          rows found: []
+      output_file: verification/phase-06/lab_sql_insert_update_delete_output.txt
+    connection_to_previous: >
+      The previous unit showed reading and filtering directly; this unit
+      showed writing, changing, and removing directly. The next unit
+      shows the real statement behind combining two relations at once.
+
+  - title: "JOIN - Combining Two Real Relations Directly"
+    problem: >
+      This curriculum's own Foreign Keys lesson already navigated
+      `part.cam_files.all()` through the ORM - real `Part` rows connected
+      to their real `CAMFile` children via `part_id`. What does the real
+      SQL statement combining those same two real tables directly, in one
+      single result, actually look like?
+    socratic_prompt:
+      - >
+        `Part.cam_files`'s own real relationship, already studied in this
+        curriculum's own Foreign Keys lesson, matches `parts.id` against
+        `cam_files.part_id`. Given `JOIN cam_files ON parts.id =
+        cam_files.part_id`, what real condition is actually deciding
+        which rows from each table get combined together?
+      - >
+        One real `Part` has two real `CAMFile`s in the lab below. How
+        many real rows should the joined result contain - one, two, or
+        some other number?
+    project_change:
+      reference_source: >
+        No real project file changes - this unit runs a real `JOIN`
+        directly against this project's own real `parts` and `cam_files`
+        tables, whose real relationship (`CAMFile.part_id`, a real
+        foreign key to `parts.id`) this curriculum's own Foreign Keys
+        lesson already fully studied through the ORM.
+      files_affected:
+        - path: verification/phase-06/lab_sql_join.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        One real `Part`, two real `CAMFile`s, combined with a real
+        `JOIN`:
+      file: verification/phase-06/lab_sql_join.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy import text
+
+        from app import create_app, db
+        from app.models.part import Part
+        from app.models.machine import Machine
+        from app.models.cam_file import CAMFile
+
+        app = create_app("testing")
+
+        with app.app_context():
+            part = Part(id="P1", part_number="1234567", description="Bracket Assembly")
+            machine = Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add_all([part, machine])
+            db.session.commit()
+
+            db.session.add_all([
+                CAMFile(id="cf1", part_id="P1", machine_id="m1", file_name="rev1.nc"),
+                CAMFile(id="cf2", part_id="P1", machine_id="m1", file_name="rev2.nc"),
+            ])
+            db.session.commit()
+
+            print("JOIN parts to cam_files on parts.id = cam_files.part_id:")
+            query = text(
+                "SELECT parts.part_number, cam_files.file_name "
+                "FROM parts JOIN cam_files ON parts.id = cam_files.part_id"
+            )
+            for row in db.session.execute(query):
+                print(" ", row)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "FROM parts JOIN cam_files ON parts.id = cam_files.part_id"
+          explanation: >
+            `JOIN`, fully treated in this lesson's own Header - `FROM
+            parts` names the first real table; `JOIN cam_files` names the
+            second; `ON parts.id = cam_files.part_id` states the real
+            condition deciding which rows from each side actually get
+            combined - exactly the same real foreign-key relationship
+            this curriculum's own Foreign Keys lesson already studied.
+        - element: "SELECT parts.part_number, cam_files.file_name"
+          explanation: >
+            `SELECT`, already fully treated in this lesson's own Header,
+            here naming columns from BOTH real tables at once, qualified
+            by table name (`parts.part_number`, `cam_files.file_name`)
+            since both tables are involved in the same real statement.
+        - element: "for row in db.session.execute(query): (result)"
+          explanation: >
+            Two real result rows, one per real `CAMFile` - the identical
+            real `part_number`, `'1234567'`, paired with each real
+            `file_name` in turn, because the single real `Part` row
+            matches BOTH real `CAMFile` rows under the stated `ON`
+            condition.
+    mental_model:
+      applicable: true
+      diagram: |
+        parts                    cam_files
+        -----                    ---------
+        id='P1', part_number=... part_id='P1', file_name='rev1.nc'
+                                  part_id='P1', file_name='rev2.nc'
+
+        ON parts.id = cam_files.part_id
+              │
+              ▼
+        ('1234567', 'rev1.nc')
+        ('1234567', 'rev2.nc')
+
+        One real parts row, matched against every real cam_files row
+        satisfying the ON condition - here, both of them.
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **JOIN**, fully named in this lesson's own Header - the
+      real textual mechanism behind every parent/child navigation this
+      curriculum has performed through the ORM since Lesson 6.4. Also
+      recognized in: a spreadsheet's own VLOOKUP, matching rows across
+      two separate sheets by a shared key column; a mail-merge combining
+      a letter template with a separate contacts table by matching a
+      shared ID; and, in this project's own domain, this exact real
+      relationship - `cf1.part` and `part.cam_files.all()`, already
+      studied through the ORM in this curriculum's own Foreign Keys
+      lesson, both ultimately real `JOIN`s underneath.
+    se_lens: >
+      The design principle is combining two real relations by a stated,
+      explicit condition, rather than requiring the calling application
+      to fetch both separately and match them up itself in code. The
+      real alternative NOT chosen here - reading every real `Part` and
+      every real `CAMFile` into the application separately, then
+      matching `part_id` by hand in a loop - is exactly the kind of
+      manual work this curriculum's own Why Databases Exist lesson
+      already named as querying's own real cost when the database itself
+      does not help; `JOIN` is the real, declarative alternative,
+      computed by the database directly.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_sql_join.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        JOIN parts to cam_files on parts.id = cam_files.part_id:
+          ('1234567', 'rev1.nc')
+          ('1234567', 'rev2.nc')
+      output_file: verification/phase-06/lab_sql_join_output.txt
+    connection_to_previous: >
+      The previous unit showed writing directly; this unit showed
+      combining two real relations directly. The final unit shows
+      summarizing many real rows into fewer, ordered ones.
+
+  - title: "GROUP BY, ORDER BY, and Aggregates - Summarizing Many Real Rows"
+    problem: >
+      Suppose the real question is not "which machines," but "how MANY
+      machines, per category." Neither `SELECT`, `WHERE`, nor `JOIN`,
+      all already shown in this lesson, answers a question shaped like
+      that on their own. What real clause groups rows together before
+      counting them, and what real function does the counting itself?
+    socratic_prompt:
+      - >
+        Given four real machines across three real categories, would
+        `SELECT category, COUNT(*) FROM machines` - with no `GROUP BY` -
+        report one real count per category, or a single real count for
+        the whole table?
+      - >
+        This curriculum's own Relational Model lesson already
+        established that a relation has no guaranteed row order at all.
+        What real clause would make "highest count first" an actual,
+        reliable, requested outcome?
+    project_change:
+      reference_source: >
+        No real project file changes - this unit runs a real
+        `GROUP BY`/`ORDER BY`/aggregate statement directly against this
+        project's own real `machines` table.
+      files_affected:
+        - path: verification/phase-06/lab_sql_group_by_aggregates.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: This project's own real backend, and its already-installed `sqlalchemy`.
+    new_code:
+      applicable: true
+      intro: >
+        Four real machines across three real categories, summarized by
+        category and sorted by how many:
+      file: verification/phase-06/lab_sql_group_by_aggregates.py
+      status: new
+      language: python
+      code: |
+        import sys
+        from pathlib import Path
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+
+        from sqlalchemy import text
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        with app.app_context():
+            db.session.add_all([
+                Machine(id="m1", name="Haas VF-2", category="mill", sub_type="3_axis"),
+                Machine(id="m2", name="Haas UMC-750", category="mill", sub_type="5_axis"),
+                Machine(id="m3", name="Okuma Genos", category="lathe", sub_type="single_turret"),
+                Machine(id="m4", name="Swiss Type A", category="swiss", sub_type="single_turret"),
+            ])
+            db.session.commit()
+
+            print("SELECT category, COUNT(*) FROM machines GROUP BY category ORDER BY COUNT(*) DESC:")
+            query = text(
+                "SELECT category, COUNT(*) AS machine_count FROM machines "
+                "GROUP BY category ORDER BY machine_count DESC"
+            )
+            for row in db.session.execute(query):
+                print(" ", row)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "COUNT(*)"
+          explanation: >
+            An aggregate function, fully treated in this lesson's own
+            Header - counts real rows rather than returning any one
+            row's own value; `AS machine_count` (basic SQL, naming the
+            computed result column) gives this real, computed value a
+            name to reference later.
+        - element: "GROUP BY category"
+          explanation: >
+            `GROUP BY`, fully treated in this lesson's own Header -
+            collapses the four real machine rows into three real groups,
+            one per distinct `category` value, so `COUNT(*)` is computed
+            once PER GROUP rather than once for the whole table.
+        - element: "ORDER BY machine_count DESC"
+          explanation: >
+            `ORDER BY`, fully treated in this lesson's own Header, sorting
+            the three real summary rows by the computed `machine_count`
+            column, descending (`DESC`) - highest real count first,
+            imposing a specific, requested order this curriculum's own
+            Relational Model lesson already established a relation never
+            guarantees on its own.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **GROUP BY**, **ORDER BY**, and an **aggregate function**,
+      all fully named in this lesson's own Header. Also recognized in: a
+      spreadsheet's own pivot table, collapsing many rows into one
+      summary row per distinct category; a shop-floor report totaling
+      real machine hours per category instead of listing every real
+      machine individually; a leaderboard, sorted by score, the real,
+      everyday version of `ORDER BY`; and, in this project's own domain,
+      this exact real question - how many real machines this shop has,
+      broken down by category, sorted by which category has the most.
+    se_lens: >
+      The design principle is letting the database itself compute a real
+      summary directly, rather than the application fetching every real
+      row and tallying categories in its own code. The real alternative
+      NOT chosen here - fetching all four real machines and counting
+      categories in a Python dict - would work at this small scale, at
+      the real cost this curriculum's own Querying lesson already
+      measured: the application doing real, linear work the database
+      itself is positioned to do far more directly, especially as the
+      real number of rows grows far past four.
+    commands:
+      - command: backend\.venv\Scripts\python.exe verification\phase-06\lab_sql_group_by_aggregates.py
+        explanation: >
+          Run from the repository root, using this project's own real
+          backend virtual environment.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        SELECT category, COUNT(*) FROM machines GROUP BY category ORDER BY COUNT(*) DESC:
+          ('mill', 2)
+          ('swiss', 1)
+          ('lathe', 1)
+      output_file: verification/phase-06/lab_sql_group_by_aggregates_output.txt
+    connection_to_previous: >
+      The previous unit combined two real relations; this unit closes
+      the lesson by summarizing many real rows into fewer, ordered ones -
+      the last of the real statements this whole phase's own ORM calls
+      have been running underneath since Lesson 6.1.
+
+closing:
+  connect_the_pieces: >
+    Follow one real machine, `m1`, through every statement this lesson
+    names. `INSERT` is how a real row like it first comes to exist at
+    all; `SELECT`, filtered by a real `WHERE`, is how this lesson's own
+    first unit found it again by `category = 'mill'`; `UPDATE` and
+    `DELETE`, the second unit's own real subject, are how a row like it
+    changes or stops existing, each scoped by its own real `WHERE`. A
+    real `Part` and its real `CAMFile`s were combined with `JOIN`,
+    matching `parts.id` against `cam_files.part_id` - the identical real
+    condition this curriculum's own Foreign Keys lesson already studied
+    through `Part.cam_files`'s own ORM relationship. And `m1`, alongside
+    three other real machines, was finally summarized - `GROUP BY
+    category`, counted with `COUNT(*)`, `ORDER BY`ed by that real
+    count - the real, textual form of every ORM call this entire phase
+    has made since Lesson 6.1's own real `Machine.query` began this
+    curriculum's study of databases at all.
+  next_lesson_pointer: >
+    Next, the real question this lesson's own `EXPLAIN QUERY PLAN`-
+    adjacent evidence in this curriculum's own Indexes lesson already
+    hinted at: not just WHAT a real SQL statement returns, but HOW this
+    project's own real database engine actually decides to execute it -
+    which real index, if any, it chooses, and why.

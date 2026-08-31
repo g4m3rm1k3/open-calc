@@ -110,6 +110,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a favorite record.
 
+## aggregate function
+- **Term** in `LESSON-6.12-SQL` - A real SQL function - `COUNT`, `SUM`, `AVG`, among others - that computes a single, real summary value from many rows at once, rather than returning one value per row. It exists so a real question like "how many" or "what is the total" can be answered by the database itself, computed directly over however many real rows actually match, instead of the calling application fetching every real row and computing the summary itself.
+
 ## api
 - **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered through its own real blueprint, sharing its real Python function name with the bare `/health` route above (a genuine, harmless naming coincidence, since the two live in separate real modules).
 
@@ -400,6 +403,7 @@ re-run the script after any lesson changes instead.
 
 ## DELETE
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this resource should no longer exist" - this lesson's own last unit calls it against this project's own real `/api/machines/<id>`. It exists as its own named method, distinct from an update, because "this resource is gone" is a real, different kind of change than any modification to its content.
+- **Term** in `LESSON-6.12-SQL` - The real SQL statement that removes one or more existing rows entirely, also always paired with a real `WHERE` clause naming which rows to remove. It exists as the real, textual equivalent of `db.session.delete(...)`, already used in this curriculum's own Foreign Keys lesson to demonstrate real cascading behavior.
 
 ## delete_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
@@ -582,6 +586,9 @@ re-run the script after any lesson changes instead.
 ## GREEN
 - **Term** in `LESSON-2.9-TDD` - The second real step of one TDD cycle: writing the smallest real amount of production code that makes the currently-failing test pass, and nothing more. It exists to keep every real line of code justified by a specific, already-failing test, rather than building more than what's actually required right now.
 
+## GROUP BY
+- **Term** in `LESSON-6.12-SQL` - A real clause that collapses many rows sharing the same real value in one or more columns into a single summary row per distinct value, so an aggregate function (below) can be computed once per group instead of once overall. It exists because some real questions ("how many machines per category") are not about any one row at all, but about a real count, sum, or other summary computed separately for each distinct real group.
+
 ## has_app_context
 - **Object/method** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - Two real, existing functions from `flask` this lesson uses to directly check whether each real kind of context is currently active, without triggering a real `RuntimeError` the way reading `request`/`current_app` directly would.
 
@@ -665,6 +672,9 @@ re-run the script after any lesson changes instead.
 ## Infrastructure exception
 - **Term** in `LESSON-1.2-EXCEPTIONS` - An exception representing a failure in a real, external, technical dependency the code relies on but doesn't control - a network timeout, an unreachable service, a broken connection - rather than a business decision about the current request. It exists as its own category, distinct from a domain exception, because the correct response is usually different: retry, fall back, or report a real operational problem - not tell the caller their request itself was invalid.
 
+## INSERT
+- **Term** in `LESSON-6.12-SQL` - The real SQL statement that adds one new row to a relation, naming the real columns being given a value and the real values themselves. It exists as the direct, textual equivalent of `db.session.add(...)` followed by `db.session.commit()`, already used throughout this curriculum without the real statement underneath it ever being shown until now.
+
 ## inspect.Parameter
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real class representing one parameter within a `Signature` - what `Signature.parameters` maps each real parameter name to.
 
@@ -691,6 +701,9 @@ re-run the script after any lesson changes instead.
 
 ## Jinja2 Template
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real class from the Jinja2 templating library, and the real method that fills in a template's placeholders with real values.
+
+## JOIN
+- **Term** in `LESSON-6.12-SQL` - A real clause that combines rows from two relations into one result, matching rows from each side using a stated real condition - typically a foreign key equalling the primary key it references. It exists as the real, textual mechanism behind every parent/child navigation this curriculum's own ORM relationships have performed since Lesson 6.4 - `cf1.part`, `part.cam_files.all()`, and every other real backref this phase has used are all, underneath, some real `JOIN`.
 
 ## JSON response body
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - The actual data an HTTP response carries, written in JSON (JavaScript Object Notation) - a plain-text format built from the same nested objects, arrays, strings, numbers, and booleans Python's own dicts and lists already represent. It exists as this project's real, chosen format for handing structured data back to a caller, because it reads as plain text and nearly every mainstream language already knows how to parse it.
@@ -788,6 +801,9 @@ re-run the script after any lesson changes instead.
 
 ## operator.itemgetter
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library callable factory that builds a real key function extracting one named or indexed real value from each element.
+
+## ORDER BY
+- **Term** in `LESSON-6.12-SQL` - A real clause that sorts a statement's own result rows by one or more columns, in ascending or descending order. It exists because a real relation, this curriculum's own Relational Model lesson already established, has no guaranteed row order at all on its own - `ORDER BY` is the one real, explicit way to impose a specific, requested order on a result.
 
 ## ordering
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - Whether a collection of real results comes back in a specific, guaranteed sequence, or in whatever order happens to fall out of how the underlying system stores or retrieves them. It exists because "the same items, different order" can silently break a caller relying on position, even though every individual item is still, technically, correct.
@@ -1030,6 +1046,9 @@ re-run the script after any lesson changes instead.
 ## secret
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real configuration value whose entire purpose depends on staying unknown to anyone outside the real deployment that uses it - `SECRET_KEY`, in this project's own real code, signs every real authentication token this curriculum has used. It exists because some real configuration values aren't just settings; their real security value comes specifically from not being real, public knowledge.
 
+## SELECT
+- **Term** in `LESSON-6.12-SQL` - The real SQL statement that reads rows from one or more relations, naming exactly which real attributes to return. It exists as the one real statement responsible for every kind of read this whole curriculum has performed indirectly through the ORM since Lesson 6.1 - `Part.query.all()`, `cf1.sequences.all()`, and every other real ORM call this phase has used all ultimately become some real `SELECT` statement underneath.
+
 ## selectivity
 - **Term** in `LESSON-6.10-INDEXES` - How much a given column's own real value narrows down the rows that match it - a column where a single value matches nearly every row (like `Machine.status`, with only a handful of real distinct values) has LOW selectivity; a column where a single value matches close to one row (like `Part.part_number`, unique per real part) has HIGH selectivity. It exists because an index's own real payoff depends entirely on this: an index on a low-selectivity column still leaves most of the matching rows to sift through afterward, while an index on a high-selectivity column can jump almost directly to the one real row that matters.
 
@@ -1108,6 +1127,9 @@ re-run the script after any lesson changes instead.
 
 ## sqlalchemy.text
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy function that wraps a plain string as an executable statement, for the rare case a raw statement - not expressed through the ORM's own Python API - needs to run directly.
+
+## sqlalchemy.text (for a real SQL statement)
+- **Object/method** in `LESSON-6.12-SQL` - The same real SQLAlchemy function already used in this curriculum's own Foreign Keys and Indexes lessons for a single PRAGMA or diagnostic statement, here used for the first time for a real, complete SQL statement - `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
 
 ## statelessness
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real property that a server keeps no memory of any earlier request once that request's own response has been sent - proven directly in this lesson's own last unit, where the same real client, on the very next real request, gets rejected unless it resends its own credentials. It exists, as a deliberate constraint HTTP is built on, so any server can handle any client's request without needing to first recall anything about that client's past.
@@ -1257,6 +1279,9 @@ re-run the script after any lesson changes instead.
 ## unittest.mock.patch
 - **Object/method** in `LESSON-2.5-TEST-DOUBLES` - A real function (usable as a context manager or a decorator) from Python's own standard library `unittest.mock` module, that performs real monkeypatching.
 
+## UPDATE
+- **Term** in `LESSON-6.12-SQL` - The real SQL statement that changes one or more existing rows' own values, always paired with a real `WHERE` clause naming which rows to change - omitting `WHERE` changes every real row in the relation at once. It exists as the real, textual equivalent of reassigning an attribute on an already-loaded ORM object before calling `db.session.commit()`.
+
 ## update anomaly
 - **Term** in `LESSON-6.7-NORMALIZATION` - A situation where a single real-world fact is stored in more than one place, so correcting it requires finding and editing every copy by hand - and missing even one leaves the data self-contradictory, with nothing in the schema itself flagging that anything is wrong. It exists as the concrete, practical cost that makes normalization worth doing at all: a repeating group or a non-atomic value is not wrong in the abstract - it is wrong because of this specific, real consequence.
 
@@ -1285,6 +1310,9 @@ re-run the script after any lesson changes instead.
 
 ## Value object
 - **Term** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real bundle of data whose own identity IS its values - two value objects holding the identical real data are considered the same, interchangeably, with no separate real identity tracked beyond what they actually hold. It exists as its own concept because a real program often needs to distinguish this case (a computed result, a coordinate, a fixed set of related fields describing one real thing) from a case where two objects holding identical data right now are still genuinely different real things - the next unit's own real contrast.
+
+## WHERE
+- **Term** in `LESSON-6.12-SQL` - A real clause on `SELECT` (and on `UPDATE`/`DELETE`, below) that restricts which real rows a statement actually applies to, by naming a condition each row's own values must satisfy. It exists because, without it, a statement applies to every real row in the relation - `WHERE` is what turns "every machine" into "only the real machines matching this specific condition."
 
 ## WSGI
 - **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, standard interface between a Python web application and the real server running it - a single, agreed-upon real calling convention (`app(environ, start_response)`) any compliant real server can use against any compliant real application. It exists so a real Python web framework and a real production server (or a real development server) can be written independently, by different people, and still work together.
@@ -1367,6 +1395,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Abstract Syntax Tree (AST)` / `B-tree (conceptually)` - shares: tree
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
+- `aggregate function` / `Dependency (of a function)` - shares: function
+- `aggregate function` / `Key function` - shares: function
+- `aggregate function` / `Pure function` - shares: function
+- `aggregate function` / `test function` - shares: function
 - `api` / `API contract` - shares: api
 - `API contract` / `response contract (shape)` - shares: contract
 - `API contract` / `unified error contract` - shares: contract
@@ -1404,11 +1436,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Application server` / `server` - shares: server
 - `Application server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `assert statement` / `context manager (the `with` statement)` - shares: statement
+- `assert statement` / `sqlalchemy.text (for a real SQL statement)` - shares: statement
 - `association table (also called a join table)` / `bootstrap_bp (a real, self-prefixed Blueprint)` - shares: a
 - `association table (also called a join table)` / `db.Table` - shares: table
 - `association table (also called a join table)` / `Dependency (of a function)` - shares: a
 - `association table (also called a join table)` / `foreign key (as a constraint)` - shares: a
+- `association table (also called a join table)` / `JOIN` - shares: join
 - `association table (also called a join table)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
+- `association table (also called a join table)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
 - `ast.Attribute` / `attribute` - shares: attribute
 - `ast.Import` / `Import graph` - shares: import
 - `ast.Import` / `test_xml_import` - shares: import
@@ -1461,6 +1496,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `bootstrap_bp (a real, self-prefixed Blueprint)` / `request (the real context-local proxy)` - shares: real
+- `bootstrap_bp (a real, self-prefixed Blueprint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a, real
 - `build_error_response` / `build_health_response (proposed prototype)` - shares: build
 - `build_error_response` / `centralized error mapping` - shares: error
 - `build_error_response` / `error code` - shares: error
@@ -1507,6 +1543,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `characterization test (applied for real)` / `real_health_status (proposed prototype)` - shares: real
 - `characterization test (applied for real)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `characterization test (applied for real)` / `request (the real context-local proxy)` - shares: real
+- `characterization test (applied for real)` / `sqlalchemy.text (for a real SQL statement)` - shares: for, real
 - `CHECK` / `check_password_hash` - shares: check
 - `CHECK` / `health check semantics` - shares: check
 - `CHECK` / `health_check` - shares: check
@@ -1543,6 +1580,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `real_health_status (proposed prototype)` - shares: real
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
+- `Config (and its real subclasses)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `consistency` / `consistency cost` - shares: consistency
 - `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
@@ -1557,6 +1595,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `context manager (the `with` statement)` / `health_check (the bare` - shares: the
 - `context manager (the `with` statement)` / `request (the real context-local proxy)` - shares: context, the
 - `context manager (the `with` statement)` / `request context` - shares: context
+- `context manager (the `with` statement)` / `sqlalchemy.text (for a real SQL statement)` - shares: statement
 - `context-local state` / `has_app_context` - shares: context
 - `context-local state` / `has_request_context` - shares: context
 - `context-local state` / `request (the real context-local proxy)` - shares: context, local
@@ -1583,6 +1622,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `delete_machine` - shares: machine
 - `create_machine_group` / `get_machine` - shares: machine
 - `create_machine_group` / `get_machine (revisited for its real decorator stack)` - shares: machine
+- `create_machine_group` / `GROUP BY` - shares: group
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
 - `create_machine_group` / `Machine` - shares: machine
 - `create_machine_group` / `Machine.to_dict` - shares: machine
@@ -1597,6 +1637,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `FlaskClient (.post)` - shares: post
 - `create_machine_group (POST)` / `get_machine` - shares: machine
 - `create_machine_group (POST)` / `get_machine (revisited for its real decorator stack)` - shares: machine
+- `create_machine_group (POST)` / `GROUP BY` - shares: group
 - `create_machine_group (POST)` / `is_valid_machine_status` - shares: machine
 - `create_machine_group (POST)` / `Machine` - shares: machine
 - `create_machine_group (POST)` / `Machine.to_dict` - shares: machine
@@ -1629,6 +1670,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
+- `db (module-level SQLAlchemy instance)` / `sqlalchemy.text (for a real SQL statement)` - shares: sqlalchemy
 - `db.ForeignKey` / `Session (db.session)` - shares: db
 - `db.relationship` / `many-to-many relationship` - shares: relationship
 - `db.relationship` / `one-to-many relationship` - shares: relationship
@@ -1670,6 +1712,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Dependency (of a function)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
 - `Dependency (of a function)` / `Pure function` - shares: function
 - `Dependency (of a function)` / `source of truth` - shares: of
+- `Dependency (of a function)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
 - `Dependency (of a function)` / `test function` - shares: function
 - `dict.get` / `Machine.to_dict` - shares: dict
 - `dictionary key access` / `foreign key` - shares: key
@@ -1741,6 +1784,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `foreign key (as a constraint)` / `mark_as_read` - shares: as
 - `foreign key (as a constraint)` / `natural key` - shares: key
 - `foreign key (as a constraint)` / `rebuild (as this curriculum's own real term)` - shares: as
+- `foreign key (as a constraint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
 - `foreign key (as a constraint)` / `surrogate key` - shares: key
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
@@ -1764,6 +1808,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_health_response (real, now live)` / `real_health_status (proposed prototype)` - shares: health, real
 - `get_health_response (real, now live)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `get_health_response (real, now live)` / `request (the real context-local proxy)` - shares: real
+- `get_health_response (real, now live)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `get_health_response (tested directly, for the first time)` / `get_machine (revisited for its real decorator stack)` - shares: for
 - `get_health_response (tested directly, for the first time)` / `get_machines (revisited for request.args)` - shares: for
 - `get_health_response (tested directly, for the first time)` / `health check semantics` - shares: health
@@ -1777,6 +1822,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_health_response (tested directly, for the first time)` / `health_check (the bare` - shares: health, the
 - `get_health_response (tested directly, for the first time)` / `real_health_status (proposed prototype)` - shares: health
 - `get_health_response (tested directly, for the first time)` / `request (the real context-local proxy)` - shares: the
+- `get_health_response (tested directly, for the first time)` / `sqlalchemy.text (for a real SQL statement)` - shares: for
 - `get_health_response (tested directly, for the first time)` / `time.perf_counter` - shares: time
 - `get_health_response (tested directly, for the first time)` / `time.sleep` - shares: time
 - `get_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
@@ -1802,6 +1848,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `real_health_status (proposed prototype)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `request (the real context-local proxy)` - shares: real
+- `get_machine (revisited for its real decorator stack)` / `sqlalchemy.text (for a real SQL statement)` - shares: for, real
 - `get_machine (revisited for its real decorator stack)` / `update_machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine (PATCH)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine_status` - shares: machine
@@ -1810,10 +1857,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machines` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `machines_bp (as a real, standalone Blueprint)` - shares: machines
 - `get_machines (revisited for request.args)` / `request.args.get` - shares: args
+- `get_machines (revisited for request.args)` / `sqlalchemy.text (for a real SQL statement)` - shares: for
 - `get_nc_file` / `open() (file object)` - shares: file
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
+- `GROUP BY` / `ORDER BY` - shares: by
+- `GROUP BY` / `repeating group` - shares: group
 - `has_app_context` / `has_request_context` - shares: context, has
 - `has_app_context` / `request (the real context-local proxy)` - shares: context
 - `has_app_context` / `request context` - shares: context
@@ -1869,6 +1919,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (both real routes, now unified)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `health_check (both real routes, now unified)` / `register_routes` - shares: routes
 - `health_check (both real routes, now unified)` / `request (the real context-local proxy)` - shares: real
+- `health_check (both real routes, now unified)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `health_check (both real routes, now unified)` / `unified error contract` - shares: unified
 - `health_check (direct route)` / `health_check (the` - shares: check, health
 - `health_check (direct route)` / `health_check (the bare` - shares: check, health
@@ -1884,6 +1935,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `HTTPException (Werkzeug's own real base class)` / `real_health_status (proposed prototype)` - shares: real
 - `HTTPException (Werkzeug's own real base class)` / `rebuild (as this curriculum's own real term)` - shares: own, real, s
 - `HTTPException (Werkzeug's own real base class)` / `request (the real context-local proxy)` - shares: real
+- `HTTPException (Werkzeug's own real base class)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
 - `Infrastructure exception` / `Raising an exception` - shares: exception
@@ -1938,6 +1990,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `rebuild (as this curriculum's own real term)` - shares: as, real
 - `machines_bp (as a real, standalone Blueprint)` / `request (the real context-local proxy)` - shares: real
+- `machines_bp (as a real, standalone Blueprint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a, real
 - `many-to-many relationship` / `one-to-many relationship` - shares: many, relationship, to
 - `many-to-many relationship` / `parent/child relationship` - shares: relationship
 - `many-to-many relationship` / `relationship modeling` - shares: relationship
@@ -1970,6 +2023,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `proof at every real level` / `real_health_status (proposed prototype)` - shares: real
 - `proof at every real level` / `rebuild (as this curriculum's own real term)` - shares: real
 - `proof at every real level` / `request (the real context-local proxy)` - shares: real
+- `proof at every real level` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `Public/private module interface` / `WSGI (Web Server Gateway Interface)` - shares: interface
 - `Pure function` / `test function` - shares: function
 - `PUT` / `update_machine_status (PUT)` - shares: put
@@ -2003,8 +2057,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `random seed` / `random)` - shares: random
 - `real_health_status (proposed prototype)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `real_health_status (proposed prototype)` / `request (the real context-local proxy)` - shares: real
+- `real_health_status (proposed prototype)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `request (the real context-local proxy)` - shares: real
+- `rebuild (as this curriculum's own real term)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `request (the real context-local proxy)` / `request context` - shares: context
+- `request (the real context-local proxy)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `request body` / `response body` - shares: body
 - `Request line` / `Status line` - shares: line
 - `Request line` / `status line` - shares: line
@@ -2036,6 +2093,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
 - `tuple (Python builtin type)` / `Type annotation` - shares: type
 - `unittest.mock.patch` / `update_machine (PATCH)` - shares: patch
+- `UPDATE` / `update anomaly` - shares: update
+- `UPDATE` / `update_machine` - shares: update
+- `UPDATE` / `update_machine (PATCH)` - shares: update
+- `UPDATE` / `update_machine_status` - shares: update
+- `UPDATE` / `update_machine_status (PUT)` - shares: update
 - `update anomaly` / `update_machine` - shares: update
 - `update anomaly` / `update_machine (PATCH)` - shares: update
 - `update anomaly` / `update_machine_status` - shares: update
