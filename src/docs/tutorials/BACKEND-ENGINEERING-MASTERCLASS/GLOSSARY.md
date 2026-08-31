@@ -121,6 +121,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-2.3-PYTEST` - This project's real Flask application factory function.
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - This project's real Flask application factory function.
 
+## create_machine
+- **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function creating a new machine in this project's own database.
+
 ## CRLF
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - (`\r\n`) — the specific two-character sequence HTTP requires
 
@@ -141,6 +144,9 @@ re-run the script after any lesson changes instead.
 
 ## Decorator
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Python syntax (`@something`) that wraps a function in another piece of behavior without changing the function's own body. It exists so "register this function as a route handler" can be stated once, directly above the function it applies to, instead of a separate registration call elsewhere in the file.
+
+## default
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The real value or behavior a system falls back to when a caller specifies nothing. It exists because "optional" only fully means something once the real, specific fallback behavior is actually known - "optional, defaults to nothing" and "optional, defaults to everything" are two completely different real systems.
 
 ## Dependency (of a function)
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Anything a function needs from outside itself to do its real job that isn't one of its own declared parameters - a real, already-configured database connection reached through a module-level import, a global, an ambient resource, even the real system clock. It exists because a function with a hidden dependency can't be fully understood, or safely tested, from its own signature alone - its real requirements extend past what its parameters state.
@@ -169,6 +175,9 @@ re-run the script after any lesson changes instead.
 ## download_cam_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - The real route this whole unit exists to investigate end to end - one of the six real routes the tool built in the unit above already found and printed, this time shown and walked through in full rather than only named.
 - **Object/method** in `LESSON-1.2-EXCEPTIONS` - The real Flask route that calls `PDMService.download_file` and is the one place in this real call chain that actually catches whatever it raises.
+
+## edge case
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, valid-looking input that sits at or past the boundary of what a system's own logic was actually built to expect - not necessarily wrong on its face, but exactly where real behavior most often reveals a gap nobody planned for. It exists as its own category because the "normal" cases of a system are usually the ones already well understood; the edge cases are where a characterization actually earns its keep.
 
 ## encode_auth_token
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing function in this project's backend, producing a real, signed JWT for a given user.
@@ -232,6 +241,12 @@ re-run the script after any lesson changes instead.
 
 ## get_machine
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function retrieving one machine by ID.
+
+## get_machines
+- **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, existing Flask view function listing this project's real machines, with optional real filtering.
+
+## golden behavior (golden master)
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real, characterized record of everything a piece of software actually does for a given input - not one field, one status code, or one path through it, but the full, real picture, precise enough that any future run can be compared against it directly. It exists as the fully-characterized end state a characterization test only starts toward - a name for "done recording what this does," not partial notes.
 
 ## Hashable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - A real property a value either has or doesn't: whether Python can compute a stable hash for it, usable as a dict key or a set member. Every immutable built-in value (a string, an int, a tuple whose own elements are all themselves hashable) is hashable; every mutable built-in value (a list, a dict, a set itself) is not. A tuple is the one case where immutability alone doesn't automatically guarantee it: `(1, 2, [3, 4])` is itself immutable (nothing can reassign its own elements) but still isn't hashable, since hashing it would require hashing its own contained list too, and a list can't be hashed at all - confirmed this session: `hash((1, 2, [3, 4]))` raises the identical real `TypeError: unhashable type: 'list'` this lesson's own Sets unit already produces. It exists as its own concept because a dict/set's own real lookup speed depends on that hash staying valid for as long as the value is stored - a value that could change after being stored would silently break that lookup, so Python refuses mutable values as keys/members outright rather than risk it.
@@ -340,6 +355,9 @@ re-run the script after any lesson changes instead.
 ## operator.itemgetter
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, standard-library callable factory that builds a real key function extracting one named or indexed real value from each element.
 
+## ordering
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - Whether a collection of real results comes back in a specific, guaranteed sequence, or in whatever order happens to fall out of how the underlying system stores or retrieves them. It exists because "the same items, different order" can silently break a caller relying on position, even though every individual item is still, technically, correct.
+
 ## Package boundary
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
 
@@ -391,6 +409,9 @@ re-run the script after any lesson changes instead.
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
 
+## Query.filter (Machine.query.filter)
+- **Object/method** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real SQLAlchemy method, narrowing a query to rows matching a real condition.
+
 ## Raising an exception
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Deliberately signaling that something has gone wrong, using Python's `raise` statement with a specific, named exception type - `ValueError`, `FileNotFoundError` - rather than a generic, unnamed failure. It exists so calling code (or, ultimately, a route's own `except` block) can distinguish *what kind* of problem occurred and decide what to do about it, rather than only knowing that *something* did.
 - **Term** in `LESSON-1.2-EXCEPTIONS` - Deliberately signaling that something has gone wrong using Python's own `raise` statement, naming a specific exception type - `ValueError`, `FileNotFoundError` - rather than continuing as if nothing happened. It exists so a function that cannot do its real job can say so immediately, in a form the language itself will keep passing upward until something actually deals with it - propagation, below.
@@ -440,6 +461,9 @@ re-run the script after any lesson changes instead.
 ## response body
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - The actual data an HTTP response carries back, written in JSON in this project - readable directly through `response.get_json()`. It exists as the real answer to whatever the request asked, separate from whether the request even succeeded at all.
 
+## response shape
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - The complete, real structure of a response body - every top-level key, every nested field, not just the ones a particular check happens to look at. It exists because a caller depending on a field a test never checked can be broken by a real change nobody noticed, precisely because nothing ever characterized that field existed at all.
+
 ## Return value
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - The real Python value a function's own `return` statement hands back to whatever called it. It exists as a concept distinct from a side effect (below) because it's the one channel a caller can inspect directly, by name, without needing to check anything else the function might have changed.
 
@@ -464,6 +488,9 @@ re-run the script after any lesson changes instead.
 
 ## Side effect
 - **Term** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - Any real, observable change a function makes to something outside its own local variables and its own return value - writing a real row to a real database, mutating an object passed in, printing to the console. It exists as its own term because two functions with identical parameters and identical return values can still behave completely differently once side effects are counted - one changes nothing outside itself, the other changes real, persistent state.
+
+## side effect
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, observable change a request causes somewhere other than its own direct response - a row written to a database, a file created, an event emitted. It exists as a distinct thing to characterize because a response can claim success while a real side effect silently failed, or vice versa - the two are genuinely separate real facts.
 
 ## Signature.parameters
 - **Object/method** in `LESSON-1.1-FUNCTIONS-AS-BACKEND-UNITS` - A real, ordered, read-only mapping from each parameter's real name to a `Parameter` object describing it.
@@ -588,6 +615,9 @@ re-run the script after any lesson changes instead.
 ## typing.Union
 - **Object/method** in `LESSON-1.5-TYPE-HINTS` - A real generic alias from the standard library `typing` module, meaning 'one of these types, but genuinely could be any of them.'
 
+## unhandled exception
+- **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - A real, genuine error that propagates past a system's own intended error handling entirely - not a deliberate `400` or `404` a route's own code chose to return, but a real crash. In production, Flask normally turns this into a real `500` response; under this app's own `"testing"` config, Flask's real `PROPAGATE_EXCEPTIONS` behavior (on by default whenever `TESTING` is `True`) instead lets the real Python exception itself surface directly, specifically so a test can see the real traceback rather than only a generic status code.
+
 ## unit test
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A check that exercises exactly one piece of code - typically one function or method - in complete isolation from everything it doesn't itself define: no real database, no real network call, no other real service standing in the way. It exists to answer the narrowest possible question - does this one piece of logic do what it claims - as fast and as unambiguously as possible.
 
@@ -647,6 +677,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
+- `CAMFile.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `check_password_hash` / `generate_password_hash` - shares: hash, password
 - `check_password_hash` / `health_check (blueprint route)` - shares: check
 - `check_password_hash` / `health_check (direct route)` - shares: check
@@ -654,8 +685,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `create_app` / `create_machine` - shares: create
+- `create_machine` / `get_machine` - shares: machine
+- `create_machine` / `Machine` - shares: machine
+- `create_machine` / `Query (Machine.query` - shares: machine
+- `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `create_machine` / `update_machine_status` - shares: machine
 - `database effect` / `in-memory database` - shares: database
 - `database effect` / `Side effect` - shares: effect
+- `database effect` / `side effect` - shares: effect
 - `db` / `Session (db.session)` - shares: db
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
@@ -671,6 +709,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Domain exception` / `Exception handling (try/except)` - shares: exception
 - `Domain exception` / `Infrastructure exception` - shares: exception
 - `Domain exception` / `Raising an exception` - shares: exception
+- `Domain exception` / `unhandled exception` - shares: exception
 - `Domain logic` / `Domain object` - shares: domain
 - `download_cam_file` / `generate_nc_file` - shares: file
 - `download_cam_file` / `PDMService.download_file` - shares: download, file
@@ -681,8 +720,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Exception boundary` / `Infrastructure exception` - shares: exception
 - `Exception boundary` / `Package boundary` - shares: boundary
 - `Exception boundary` / `Raising an exception` - shares: exception
+- `Exception boundary` / `unhandled exception` - shares: exception
 - `Exception handling (try/except)` / `Infrastructure exception` - shares: exception
 - `Exception handling (try/except)` / `Raising an exception` - shares: exception
+- `Exception handling (try/except)` / `unhandled exception` - shares: exception
 - `fixture` / `fixture injection` - shares: fixture
 - `fixture` / `fixture scope` - shares: fixture
 - `fixture` / `pytest.fixture` - shares: fixture
@@ -700,13 +741,16 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `send_file` - shares: file
 - `get_machine` / `Machine` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
+- `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine` / `update_machine_status` - shares: machine
+- `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
 - `Header` / `request header` - shares: header
 - `health_check (blueprint route)` / `health_check (direct route)` - shares: check, health
 - `HTTP (HyperText Transfer Protocol)` / `TCP (Transmission Control Protocol)` - shares: protocol
 - `Import graph` / `test_xml_import` - shares: import
 - `Infrastructure` / `Infrastructure exception` - shares: infrastructure
 - `Infrastructure exception` / `Raising an exception` - shares: exception
+- `Infrastructure exception` / `unhandled exception` - shares: exception
 - `inspect.Parameter` / `Parameter` - shares: parameter
 - `inspect.Parameter` / `Query parameter` - shares: parameter
 - `inspect.Parameter` / `URL path parameter` - shares: parameter
@@ -717,15 +761,18 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Key function` / `Pure function` - shares: function
 - `Key function` / `test function` - shares: function
 - `Machine` / `Query (Machine.query` - shares: machine
+- `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
+- `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
 - `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
+- `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `Parameter` / `Query parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
 - `PDMService.download_file` / `send_file` - shares: file
@@ -734,8 +781,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `pytest.fixture` / `yield fixture` - shares: fixture
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `Query parameter` - shares: query
+- `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine_status` - shares: machine
+- `Query parameter` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `URL path parameter` - shares: parameter
+- `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
+- `Raising an exception` / `unhandled exception` - shares: exception
 - `random (seed` / `random seed` - shares: random, seed
 - `random (seed` / `random)` - shares: random
 - `random seed` / `random)` - shares: random
@@ -746,6 +797,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Return value` / `Value object` - shares: value
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Session (db.session)` / `test session` - shares: session
+- `Side effect` / `side effect` - shares: effect, side
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
