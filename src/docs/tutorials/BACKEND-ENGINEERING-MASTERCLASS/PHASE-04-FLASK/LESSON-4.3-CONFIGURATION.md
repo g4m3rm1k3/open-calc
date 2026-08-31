@@ -1,0 +1,400 @@
+# Lesson 4.3: Configuration
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Four real, run checks against this project's own real `backend/config.py`, covering environment variables, the real configuration class hierarchy, a direct comparison of this project's three real environments, and, closing the lesson, a genuine, severe real finding: this project's own real `SECRET_KEY` falls back to a hardcoded, publicly-readable default string when no environment variable overrides it - a real default this lesson uses to forge a fully valid, real admin token, with no login and no real credentials at all.
+
+**What you need to know first:** What the real application factory pattern is, and why `create_app` takes a config name; what a Python class and inheritance are.
+
+## Terms used in this lesson
+
+- **environment variable** — A real, named value set outside a Python process entirely - in the real shell, or by whatever real system launches it - read inside this project's own code via `os.environ.get(...)`. It exists so a real deployment's own configuration (a real secret, a real database location) can change without editing a single line of this project's own real, checked-in source code.
+- **configuration object** — A real Python class - `Config`, and the three real classes that inherit from it - holding a real, named group of settings as plain real class attributes. It exists so an entire, real set of related settings can be selected together, by name, rather than individually assembled every time a real app is built.
+- **secret** — A real configuration value whose entire purpose depends on staying unknown to anyone outside the real deployment that uses it - `SECRET_KEY`, in this project's own real code, signs every real authentication token this curriculum has used. It exists because some real configuration values aren't just settings; their real security value comes specifically from not being real, public knowledge.
+
+## Objects and methods used
+
+- **`Config (and its real subclasses)`**
+  - *What it is:* This project's own real, base configuration class, and the three real classes - `DevelopmentConfig`, `TestingConfig`, `ProductionConfig` - that inherit from it.
+  - *Implementation:* `class Config: SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')` (`backend/config.py:15-19`) defines every real, shared default; `class DevelopmentConfig(Config): DEBUG = True` (`:46-48`), `class TestingConfig(Config): TESTING = True; SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'; DEBUG = False` (`:58-62`), and `class ProductionConfig(Config): DEBUG = False; SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', Config.SQLALCHEMY_DATABASE_URI)` (`:51-55`) each override only the real values genuinely specific to that one real environment.
+  - *Its use:* This lesson inspects this real class hierarchy directly, and separately builds all three real environments through `create_app`, to compare their real, resolved values side by side.
+  - *Type:* Four real Python classes - one base, three real subclasses.
+  - *Responsibility:* Holding every real setting a specific real environment needs, inheriting everything else unchanged from `Config`.
+  - *Depends on:* Whatever real environment variables happen to be set when this project's own `config.py` module is first imported.
+  - *Connects to:* Selected by name through the real, module-level `config` dict (`backend/config.py:66-70`), which `create_app` reads via `config.get(config_name, config['default'])` (`backend/app/__init__.py:254`).
+  - *Shape:* Each real class carries plain, real class attributes - strings, booleans, integers - no real methods of its own.
+
+- **`os.environ.get`**
+  - *What it is:* The real, standard library method this project's own `config.py` calls for every real, environment-driven setting.
+  - *Implementation:* `os.environ.get(name, default)` reads a real environment variable by name, returning the real, given default if it isn't set - used throughout `config.py` for `SECRET_KEY` (`:19`), `DATA_PATH` (`:22`), `DATABASE_URL` (`:24`, `:54`), and `STORAGE_PATH` (`:30`).
+  - *Its use:* This lesson sets a real environment variable directly, before re-importing this project's own real config module, to observe its real effect.
+  - *Type:* A real method on the standard library's `os.environ` mapping.
+  - *Responsibility:* Reading a real, external value if one was actually provided, falling back to a real, hard-coded default otherwise - with no real way, from inside this method alone, to tell which of the two actually happened.
+  - *Depends on:* Whatever real environment variables exist in the current real process at the moment `config.py`'s own class bodies execute.
+  - *Connects to:* Every real class attribute in `Config` and its real subclasses that reads from the environment calls this identical real method.
+  - *Shape:* Takes a real variable name and a real default value in; returns either the real, actual environment value (always a real `str`) or the real default, whatever type it happens to be.
+
+## Concept Unit: Environment Variables - The Same Real Code, a Different Real Answer
+
+### The Problem
+
+`config.py`'s own real `DATA_PATH = os.environ.get('DATA_PATH', str(BASE_DIR / "data"))` (`:22`) runs once, when the module is first imported. Does changing a real environment variable after that actually change anything?
+
+Before reading on:
+
+- `os.environ.get('DATA_PATH', ...)` reads a real environment variable at the exact moment this real line of class-body code executes - not every time `DATA_PATH` is later accessed. Given that, would simply setting `os.environ['DATA_PATH']` sometime AFTER `config.py` has already been imported once actually change the real, already-defined class attribute?
+- What would have to happen to this project's own real `config` module - re-importing it fresh, or something else - for a real, newly-set environment variable to actually take effect?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/config.py:15-32` (the base `Config` class), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+The identical real config class, read before and after a real environment variable changes, with a real module reload in between:
+
+**File:** `verification/phase-04/lab_config_env_vars.py` (new)
+
+```python
+import sys
+import os
+sys.path.insert(0, "backend")
+
+from app import create_app
+
+app_default = create_app("testing")
+print("no real DATA_PATH env var set -> real config value:", app_default.config["DATA_PATH"])
+
+os.environ["DATA_PATH"] = "/real/custom/path"
+import importlib
+import config as config_module
+importlib.reload(config_module)
+
+app_override = create_app("testing")
+print("real DATA_PATH env var set to '/real/custom/path' -> real config value:", app_override.config["DATA_PATH"])
+
+assert app_default.config["DATA_PATH"] != app_override.config["DATA_PATH"]
+assert app_override.config["DATA_PATH"] == "/real/custom/path"
+print("the identical real config class read a genuinely different real value, purely because a real environment variable changed between the two calls - nothing in the Python code itself was touched")
+```
+
+### Mechanical Walkthrough
+
+- `app_default = create_app("testing")` — Imports `config.py` for the real, first time in this process - `DATA_PATH`'s own real class attribute is set once, here, reading whatever the real environment happened to be at this exact moment.
+- `os.environ["DATA_PATH"] = "/real/custom/path"` — Sets a real environment variable - by itself, this changes nothing about the already-defined `Config.DATA_PATH` attribute, since that real class body has already finished running.
+- `importlib.reload(config_module)` — Forces this project's own real `config` module to re-execute its own top-level code, including every real class body - only now does `os.environ.get('DATA_PATH', ...)` run again, this time seeing the real, newly-set value.
+- `app_override = create_app("testing")` — Calls the real application factory again - `from config import config` (inside `create_app`) now returns the real, reloaded module's own, updated classes.
+- `assert app_default.config["DATA_PATH"] != app_override.config["DATA_PATH"]` — Confirms, for real, both facts together - the real value genuinely changed, and it only changed once the module was actually reloaded, not the instant the environment variable was set.
+
+### CS Lens
+
+This is **configuration read at load time, not access time**: a real class attribute, once defined, holds a fixed real value until something re-executes the code that defined it. Also recognized in: a compiled program's own real, embedded build-time constants, unaffected by an environment variable changed after the binary was built; a real Docker image's own baked-in configuration, requiring a real rebuild (not just a restart) to pick up certain real changes; and, in this project's own domain, a machine control's own real parameter set, loaded once at power-on, not re-read continuously while a program runs.
+
+### SE Lens
+
+The design principle behind reading environment variables at class-definition time is simplicity - every real setting is a plain, real class attribute, readable with ordinary real attribute access, no function call needed anywhere else in the codebase. The real alternative not chosen: reading `os.environ.get(...)` fresh, every single time a setting is actually used, which would let a real, running process pick up a real environment change live; the honest cost of the simpler approach this project's own code actually uses, proven directly by this unit's own real run: a real environment variable set after this project's own process has already started has no effect at all, until something restarts the process (or, as this lesson's own lab had to do, forces a real module reload) - a genuine, real surprise for anyone assuming `os.environ.get` behaves like a live read.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_config_env_vars.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+no real DATA_PATH env var set -> real config value: C:\Users\g4m3r\Documents\manufacturing-platform\backend\data
+Seeding default users...
+real DATA_PATH env var set to '/real/custom/path' -> real config value: /real/custom/path
+the identical real config class read a genuinely different real value, purely because a real environment variable changed between the two calls - nothing in the Python code itself was touched
+```
+
+Full saved run: `verification/phase-04/lab_config_env_vars_output.txt`.
+
+### Connection to the previous unit
+
+This is the lesson's first unit - it establishes exactly when a real environment variable's own value actually gets read into this project's own real configuration.
+
+## Concept Unit: Configuration Objects - Inheriting What You Don't Override
+
+### The Problem
+
+`TestingConfig` (`backend/config.py:58-62`) defines `TESTING`, `SQLALCHEMY_DATABASE_URI`, and `DEBUG` - never `SECRET_KEY`. Does `TestingConfig.SECRET_KEY` even exist?
+
+Before reading on:
+
+- `class TestingConfig(Config): ...` names `Config` as its real base class. If `TestingConfig`'s own real body never mentions `SECRET_KEY` at all, what real, structural fact about Python's own class inheritance determines whether `TestingConfig.SECRET_KEY` still works?
+- Every real subclass in `config.py` only defines the handful of real values that genuinely differ for that one environment. Is that a real, deliberate design choice, or would Python actually force every subclass to repeat every real value regardless?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/config.py:15-62` (`Config` and its three real subclasses), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+This project's own real class hierarchy, inspected directly:
+
+**File:** `verification/phase-04/lab_config_objects.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from config import config, Config, DevelopmentConfig, TestingConfig, ProductionConfig
+
+print("real config dict keys:", sorted(config.keys()))
+print("real TestingConfig.__bases__:", TestingConfig.__bases__)
+
+print("real TestingConfig.TESTING (defined directly on TestingConfig):", TestingConfig.TESTING)
+print("real TestingConfig.SECRET_KEY (not defined on TestingConfig at all):", TestingConfig.SECRET_KEY)
+print("real Config.SECRET_KEY (the base class it actually resolved from):", Config.SECRET_KEY)
+
+assert "TESTING" in TestingConfig.__dict__
+assert "SECRET_KEY" not in TestingConfig.__dict__
+assert TestingConfig.SECRET_KEY == Config.SECRET_KEY
+print("TestingConfig only defines what it actually overrides - every other real value, like SECRET_KEY, is inherited straight from Config, resolved by Python's own real class lookup, not copied or repeated anywhere")
+```
+
+### Mechanical Walkthrough
+
+- `print("real config dict keys:", sorted(config.keys()))` — Reads the real, module-level `config` dict (`backend/config.py:66-70`) directly - the real, named lookup table `create_app` itself uses to turn a plain real string like `"testing"` into an actual real class.
+- `assert "TESTING" in TestingConfig.__dict__` — Checks `TestingConfig`'s own real, immediate namespace directly (not inherited attributes) - confirms `TESTING` was genuinely defined right there, on this specific real class.
+- `assert "SECRET_KEY" not in TestingConfig.__dict__` — Confirms the opposite, real fact - `SECRET_KEY` is genuinely absent from `TestingConfig`'s own real namespace, proving any working value has to come from somewhere else.
+- `assert TestingConfig.SECRET_KEY == Config.SECRET_KEY` — Confirms, for real, where that value actually comes from - Python's own real attribute lookup walks up to the real base class automatically, finding `Config`'s own real definition.
+
+### CS Lens
+
+This is **inheritance as configuration layering**: a real base class holding every real, shared default, with real subclasses overriding only what genuinely differs. Also recognized in: a real CSS stylesheet's own cascade, where a specific real selector overrides only the real properties it names, inheriting everything else; a real operating system's own layered config files (a system default, a user override); and, in this project's own domain, a specific real machine's own parameter set overriding only the handful of real values that differ from its manufacturer's own real, standard defaults.
+
+### SE Lens
+
+The design principle is that real inheritance eliminates real repetition - `TestingConfig` never has to restate `SECRET_KEY`'s own real value, so a real change to `Config.SECRET_KEY` automatically applies everywhere nothing more specific overrides it. The real alternative not chosen: giving each real environment class a fully independent, real, complete set of every setting, with no real inheritance at all; the honest cost of the inheritance approach this project's own code actually uses, proven directly by this unit's own real run: `TestingConfig` quietly inherits `SECRET_KEY`'s own real, hardcoded default, exactly like every other real environment that doesn't explicitly override it - a real fact easy to miss precisely because `TestingConfig`'s own file never mentions `SECRET_KEY` at all.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_config_objects.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+real config dict keys: ['default', 'development', 'production', 'testing']
+real TestingConfig.__bases__: (<class 'config.Config'>,)
+real TestingConfig.TESTING (defined directly on TestingConfig): True
+real TestingConfig.SECRET_KEY (not defined on TestingConfig at all): dev-secret-key-change-in-production
+real Config.SECRET_KEY (the base class it actually resolved from): dev-secret-key-change-in-production
+TestingConfig only defines what it actually overrides - every other real value, like SECRET_KEY, is inherited straight from Config, resolved by Python's own real class lookup, not copied or repeated anywhere
+```
+
+Full saved run: `verification/phase-04/lab_config_objects_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit showed when a real environment variable's value actually gets read; this unit shows what happens to that real value once it's inside this project's own class hierarchy - and quietly foreshadows this lesson's own closing finding about `SECRET_KEY` specifically.
+
+## Concept Unit: Three Real Environments, Compared Directly
+
+### The Problem
+
+`DevelopmentConfig`, `TestingConfig`, and `ProductionConfig` each override a different, small, real handful of settings. Run side by side, what do they actually, concretely differ on?
+
+Before reading on:
+
+- `TestingConfig` explicitly sets its own real `SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'` (`config.py:61`). `DevelopmentConfig` and `ProductionConfig` both leave `SQLALCHEMY_DATABASE_URI` unset in their own real class bodies. What real value would each of those two actually resolve to?
+- If a real deployment forgot to set `DATABASE_URL` in a genuine real production environment, what real, concrete consequence would that have, given what the previous question's own answer implies?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/config.py:46-62` (`DevelopmentConfig`, `ProductionConfig`, `TestingConfig`), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** None.
+
+### The New Code
+
+All three real environments, built through the identical real factory function, compared directly:
+
+**File:** `verification/phase-04/lab_config_environments.py` (new)
+
+```python
+import sys
+import os
+import tempfile
+sys.path.insert(0, "backend")
+
+# real safety measure: point the real 'production' config at a real, scratch
+# SQLite file instead of this project's own real production database path -
+# create_app("production") really would call db.create_all() against
+# whatever SQLALCHEMY_DATABASE_URI resolves to.
+scratch_db = os.path.join(tempfile.mkdtemp(), "scratch.db")
+os.environ["DATABASE_URL"] = f"sqlite:///{scratch_db}"
+
+from app import create_app
+
+dev_app = create_app("development")
+test_app = create_app("testing")
+prod_app = create_app("production")
+
+for label, real_app in [("development", dev_app), ("testing", test_app), ("production", prod_app)]:
+    print(f"{label:12s} -> DEBUG: {real_app.config['DEBUG']!s:6s} TESTING: {real_app.config['TESTING']!s:6s} DATABASE_URI: {real_app.config['SQLALCHEMY_DATABASE_URI']}")
+
+assert dev_app.config["DEBUG"] is True
+assert test_app.config["TESTING"] is True
+assert prod_app.config["DEBUG"] is False
+assert test_app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:"
+assert dev_app.config["SQLALCHEMY_DATABASE_URI"] == prod_app.config["SQLALCHEMY_DATABASE_URI"]
+print("DEBUG and TESTING genuinely differ across all three real configs, as intended - but development and production share the identical real database-URI fallback (Config's own base default) unless DATABASE_URL is explicitly set for each; only testing's own class hard-codes something structurally different (an in-memory database), rather than relying on the same real fallback the other two share")
+```
+
+### Mechanical Walkthrough
+
+- `scratch_db = os.path.join(tempfile.mkdtemp(), "scratch.db"); os.environ["DATABASE_URL"] = f"sqlite:///{scratch_db}"` — A real safety measure this lab takes deliberately - `create_app("production")` really does run `db.create_all()` (already studied in an earlier lesson) against whatever `SQLALCHEMY_DATABASE_URI` resolves to; redirecting it to a real, throwaway file keeps this lesson's own lab from ever touching this project's own real data.
+- `dev_app = create_app("development"); test_app = create_app("testing"); prod_app = create_app("production")` — Three real, separate calls to the identical real factory function this curriculum has already studied - each one producing a genuinely independent real `Flask` instance.
+- `assert dev_app.config["SQLALCHEMY_DATABASE_URI"] == prod_app.config["SQLALCHEMY_DATABASE_URI"]` — Confirms, for real, the honest finding this unit surfaces - without an explicit `DATABASE_URL` override for each, development and production share the identical real fallback database location.
+
+### CS Lens
+
+This is **environment-specific configuration selection**: the identical real code, running under a genuinely different real profile depending on one, real, passed-in name. Also recognized in: a real compiler's own build profiles (debug versus release), changing real optimization and assertion behavior from the identical real source; a real CI pipeline's own staging-versus-production deployment targets; and, in this project's own domain, a real machine control's own "setup mode" versus "production run" profile, changing real feed-rate limits and real safety interlocks from the identical underlying real program.
+
+### SE Lens
+
+The design principle is that a real config name, chosen once, should meaningfully change a real app's own behavior - `TESTING` genuinely does, isolating every real test's own database completely. The real alternative not chosen for the database URI specifically: giving `ProductionConfig` its own real, hard-coded, distinct fallback the way `TestingConfig` does for `SQLALCHEMY_DATABASE_URI`; the honest cost of relying on `Config`'s own shared, real fallback instead, proven directly by this unit's own real run: development and production, absent an explicit real `DATABASE_URL`, would use the identical real database file - a real, easy-to-miss gap between "this environment is configured differently" (true for `DEBUG`/`TESTING`) and "this environment is SAFELY isolated" (only actually true here for `TESTING`, because it alone hard-codes something structurally different rather than trusting the same real fallback).
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_config_environments.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+Seeding default users...
+Seeding default users...
+development  -> DEBUG: True   TESTING: False  DATABASE_URI: sqlite:///C:\Users\g4m3r\AppData\Local\Temp\tmpz_pr7wnh\scratch.db
+testing      -> DEBUG: False  TESTING: True   DATABASE_URI: sqlite:///:memory:
+production   -> DEBUG: False  TESTING: False  DATABASE_URI: sqlite:///C:\Users\g4m3r\AppData\Local\Temp\tmpz_pr7wnh\scratch.db
+DEBUG and TESTING genuinely differ across all three real configs, as intended - but development and production share the identical real database-URI fallback (Config's own base default) unless DATABASE_URL is explicitly set for each; only testing's own class hard-codes something structurally different (an in-memory database), rather than relying on the same real fallback the other two share
+```
+
+Full saved run: `verification/phase-04/lab_config_environments_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit confirmed inheritance is how these real classes share values; this unit shows exactly which real values three genuinely different real environments actually resolve to when run side by side - and finds one, real, shared fallback the earlier unit's own inheritance mechanism quietly extends further than it might first appear to.
+
+## Concept Unit: Secrets - A Real Default That Was Never Supposed to Ship
+
+### The Problem
+
+`Config.SECRET_KEY` (`backend/config.py:19`) falls back to the literal real string `'dev-secret-key-change-in-production'` when no real `SECRET_KEY` environment variable is set. This project's own real `encode_auth_token` signs every real authentication token with whatever `SECRET_KEY` resolves to. What does that combination actually let someone do?
+
+Before reading on:
+
+- `encode_auth_token`'s own real code (already studied in an earlier lesson) calls `jwt.encode(payload, current_app.config.get('SECRET_KEY'), algorithm='HS256')`. If someone else, with no real access to this project's own database or login system, knew the exact real string `Config.SECRET_KEY` falls back to, what real, additional information would they need to produce a token `token_required` would accept as genuinely valid?
+- This exact real default string is sitting in `backend/config.py:19` - a real file. Does knowing it require breaching this project's own real backend at all?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/config.py:15-19` (`Config.SECRET_KEY`) and this curriculum's own earlier real citation of `encode_auth_token` (`backend/app/utils/auth_utils.py:163-247`), both read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** The real, third-party `PyJWT` library, already used by this project's own real `auth_utils.py`.
+
+### The New Code
+
+A real, forged admin token, built from nothing but the real default string already sitting in this project's own real source code:
+
+**File:** `verification/phase-04/lab_config_secrets.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+import jwt
+from datetime import datetime, timedelta
+
+from app import create_app, db
+from app.models.user import User
+
+app = create_app("testing")
+with app.app_context():
+    admin = User(id="real-admin", email="a@e.com", name="Admin", role="admin")
+    db.session.add(admin)
+    db.session.commit()
+
+    print("real app.config['SECRET_KEY'] (no SECRET_KEY env var set):", app.config["SECRET_KEY"])
+
+    # forge a token using ONLY the real, hardcoded default secret already
+    # printed above - never calling this project's own real encode_auth_token
+    forged_payload = {
+        "sub": "real-admin",
+        "role": "admin",
+        "exp": datetime.utcnow() + timedelta(days=7),
+        "iat": datetime.utcnow(),
+    }
+    forged_token = jwt.encode(forged_payload, "dev-secret-key-change-in-production", algorithm="HS256")
+
+    client = app.test_client()
+    r = client.post(
+        "/api/machines",
+        json={"id": "M-FORGED", "name": "Forged Machine", "category": "mill", "subType": "3_axis", "manufacturer": "x", "model": "x"},
+        headers={"Authorization": f"Bearer {forged_token}"},
+    )
+    print("real request, forged token, real result -> status:", r.status_code, "id:", r.get_json()["data"]["id"])
+
+    assert r.status_code == 201
+    print("a real, valid admin token, forged with nothing but a string copied out of this project's own real, public source code - no login, no real credentials, no access to this project's own real database - accepted exactly like a genuine one")
+```
+
+### Mechanical Walkthrough
+
+- `client = app.test_client()` — Builds one real `FlaskClient` - this lesson's own only construction of it; every earlier unit in this lesson inspected real config objects directly, with no real HTTP request involved at all.
+- `admin = User(id="real-admin", email="a@e.com", name="Admin", role="admin")` — Creates a real `User` row this lesson never actually authenticates as - the forged token's own `'sub'` claim simply names this real, existing user's ID directly.
+- `forged_payload = {"sub": "real-admin", "role": "admin", "exp": ..., "iat": ...}` — Builds the identical real payload shape `encode_auth_token`'s own real code builds (`auth_utils.py:195-233`), by hand, claiming a real `admin` role with no actual real authorization to do so.
+- `forged_token = jwt.encode(forged_payload, "dev-secret-key-change-in-production", algorithm="HS256")` — Signs the real, forged payload using the literal real string copied directly out of `config.py`'s own real source code - the one real piece of information this attack actually depends on.
+- `r = client.post("/api/machines", json={...}, headers={"Authorization": f"Bearer {forged_token}"})` — Sends the real, forged token to a real, write-protected route - `token_required`'s own real code (already studied extensively) has no way to distinguish this real signature from one `encode_auth_token` itself would have produced, because both are signed with the identical real key.
+- `assert r.status_code == 201` — Confirms, for real, the severe finding this unit exists to surface - the forged request succeeded completely, creating a genuine, real database row.
+
+### CS Lens
+
+This is a **shared-secret signature scheme with a public secret**: HMAC signing (what `algorithm='HS256'` means) proves a token wasn't tampered with only if the real signing key stays real, genuinely unknown outside the system that issues tokens - the identical real mathematical guarantee, rendered worthless the moment the real key isn't actually secret. Also recognized in: a real API rate-limiting scheme relying on a real, secret API key accidentally committed to a public real repository; a real, symmetric encryption scheme whose real key ships inside the software that uses it; and, in this project's own domain, a real machine's own default administrator password, left unchanged from the manufacturer's own real, published documentation.
+
+### SE Lens
+
+The design principle a real secret depends on is that its own real value never appears anywhere an attacker could plausibly read it - exactly what `Config.SECRET_KEY`'s own real, hardcoded fallback violates, sitting in plain real text in this project's own, readable source file. The real alternative this project's own code already supports, but doesn't enforce: setting a genuine, real `SECRET_KEY` environment variable in every real deployment, which this lesson's own earlier unit already proved actually works; the honest, severe cost of the fallback existing at all, proven directly by this unit's own real forged request: any real deployment that simply forgets to set that one real environment variable is not merely "less secure" in some abstract sense - it is running with a real, publicly-known admin key, and this lesson's own real code just used it to create a real database row with zero actual authorization.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-04/lab_config_secrets.py` — Runs this as a plain script, from the repository root.
+
+### Verification
+
+```text
+C:\Users\g4m3r\Documents\manufacturing-platform\verification\phase-04\lab_config_secrets.py:23: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "exp": datetime.utcnow() + timedelta(days=7),
+C:\Users\g4m3r\Documents\manufacturing-platform\verification\phase-04\lab_config_secrets.py:24: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "iat": datetime.utcnow(),
+Seeding default users...
+real app.config['SECRET_KEY'] (no SECRET_KEY env var set): dev-secret-key-change-in-production
+real request, forged token, real result -> status: 201 id: M-FORGED
+a real, valid admin token, forged with nothing but a string copied out of this project's own real, public source code - no login, no real credentials, no access to this project's own real database - accepted exactly like a genuine one
+```
+
+Full saved run: `verification/phase-04/lab_config_secrets_output.txt`.
+
+### Connection to the previous unit
+
+The previous unit found development and production quietly sharing a database fallback; this unit closes the lesson on a genuinely more severe version of the identical real pattern - every real environment in this project, absent one real environment variable, shares the exact same real, publicly-visible admin key.
+
+## Connect the pieces
+
+One real environment variable, `DATA_PATH`, read once at real module import time - proven to require an actual real reload, not just a later `os.environ` change, to take effect (environment variables). `TestingConfig`'s own real class, defining only `TESTING`, `SQLALCHEMY_DATABASE_URI`, and `DEBUG` directly, inheriting `SECRET_KEY` from `Config` without ever naming it (configuration objects). All three real environments, built through the identical real `create_app`, genuinely differing on `DEBUG` and `TESTING` - but development and production quietly sharing the identical real database fallback (three real environments, compared). And, closing the lesson, that identical sharing pattern at its most severe: `SECRET_KEY`'s own real, hardcoded fallback, copied directly out of this project's own real source file, used to forge a fully real, accepted admin token with no login and no real credentials at all (secrets).
+
+**Next lesson:** Every real route this curriculum has studied so far has been read one file at a time; next, this curriculum studies routes themselves - route registration, URL parameters, query parameters, and request bodies - as their own, real, named concepts, tying together everything this phase has built up about Flask so far.

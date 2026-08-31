@@ -212,6 +212,12 @@ re-run the script after any lesson changes instead.
 ## confidence
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - In the sense this lesson uses it, the concrete, checkable knowledge that a change did not break existing behavior - as opposed to a personal hope or guess based on reading code or output. It exists as a distinct idea because "I think this still works" and "something just verified this still works" are different states, and only the second one is a safe basis for deciding to ship a change.
 
+## Config (and its real subclasses)
+- **Object/method** in `LESSON-4.3-CONFIGURATION` - This project's own real, base configuration class, and the three real classes - `DevelopmentConfig`, `TestingConfig`, `ProductionConfig` - that inherit from it.
+
+## configuration object
+- **Term** in `LESSON-4.3-CONFIGURATION` - A real Python class - `Config`, and the three real classes that inherit from it - holding a real, named group of settings as plain real class attributes. It exists so an entire, real set of related settings can be selected together, by name, rather than individually assembled every time a real app is built.
+
 ## Content-Type
 - **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
 
@@ -326,6 +332,9 @@ re-run the script after any lesson changes instead.
 ## encode_auth_token
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing function in this project's backend, producing a real, signed JWT for a given user.
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, existing function in this project's backend producing a real, signed JWT for a given user.
+
+## environment variable
+- **Term** in `LESSON-4.3-CONFIGURATION` - A real, named value set outside a Python process entirely - in the real shell, or by whatever real system launches it - read inside this project's own code via `os.environ.get(...)`. It exists so a real deployment's own configuration (a real secret, a real database location) can change without editing a single line of this project's own real, checked-in source code.
 
 ## error code
 - **Term** in `LESSON-3.7-API-ERROR-DESIGN` - A real, stable, machine-readable string identifying WHAT kind of failure occurred - `'MACHINE_NOT_FOUND'`, in this lesson's own proposed contract - kept separate from a real, human-readable message. It exists so a real caller's own code can branch on a failure's real kind (`if code == 'TOKEN_MISSING': ...`) without parsing a message string that might change wording at any time.
@@ -561,6 +570,9 @@ re-run the script after any lesson changes instead.
 ## ordering
 - **Term** in `LESSON-2.8-GOLDEN-BEHAVIOR` - Whether a collection of real results comes back in a specific, guaranteed sequence, or in whatever order happens to fall out of how the underlying system stores or retrieves them. It exists because "the same items, different order" can silently break a caller relying on position, even though every individual item is still, technically, correct.
 
+## os.environ.get
+- **Object/method** in `LESSON-4.3-CONFIGURATION` - The real, standard library method this project's own `config.py` calls for every real, environment-driven setting.
+
 ## Package boundary
 - **Term** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real organizational unit a Python package forms - a real directory carrying an `__init__.py`, grouping related real modules under one importable namespace (`app.routes`, `app.models`) and exposing them to the rest of a project only through real import statements crossing that boundary. It exists as its own concept because Python enforces the namespace itself (you import `app.routes`, not any arbitrary file on disk) but enforces nothing about which *direction* real imports should flow across it - two packages can import each other, and Python permits that just as readily as a clean, one-way dependency.
 
@@ -724,6 +736,9 @@ re-run the script after any lesson changes instead.
 
 ## safe (HTTP method property)
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that a method's own definition promises zero side effects on the server - calling it changes nothing, no matter how many real times it's called. It exists so real tooling (browsers prefetching a link, a proxy caching a response) can treat a safe method specially, without ever having to inspect what a specific real route actually does.
+
+## secret
+- **Term** in `LESSON-4.3-CONFIGURATION` - A real configuration value whose entire purpose depends on staying unknown to anyone outside the real deployment that uses it - `SECRET_KEY`, in this project's own real code, signs every real authentication token this curriculum has used. It exists because some real configuration values aren't just settings; their real security value comes specifically from not being real, public knowledge.
 
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
@@ -1065,6 +1080,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `Config (and its real subclasses)` / `Flask (the class, and this project's own app instance)` - shares: and
+- `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
 - `create_app` / `create_machine` - shares: create
 - `create_app` / `create_machine_group` - shares: create
