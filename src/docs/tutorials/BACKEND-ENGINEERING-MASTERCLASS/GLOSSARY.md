@@ -115,6 +115,7 @@ re-run the script after any lesson changes instead.
 
 ## application context
 - **Term** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - Flask's own `with app.app_context(): ...` block, which makes one specific app instance "current" for the code running inside it, so app-bound resources like a database connection can be looked up without being passed around explicitly. It exists because a single Python process can build more than one Flask app (this project's own `create_app` is called fresh in every lab in this lesson), so any code that needs "the current app's" resources needs an explicit, temporary way to say which app that actually is.
+- **Term** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, active state making `current_app` (and `g`, though this project never uses it) resolve correctly - activated by `app.app_context()` directly, or automatically, as part of a real request context. It exists so real code needs a currently-active real app to resolve `current_app` against, the identical real problem `request` solves for the current request.
 
 ## application factory
 - **Term** in `LESSON-4.2-APPLICATION-FACTORY` - A real, plain function - `create_app`, in this project - that builds and returns a fully-configured `Flask` instance, rather than a bare, module-level `app` object existing the moment the module is imported. It exists so a real, independent app instance can be built fresh, on demand, as many real times as needed, instead of every part of a codebase sharing the identical real, single instance by default.
@@ -236,6 +237,9 @@ re-run the script after any lesson changes instead.
 ## Content-Type
 - **Term** in `LESSON-3.4-HEADERS` - The real header naming the actual real format of a request's own body - `application/json` for every write in this project. It exists so a server knows how to parse the real bytes that follow, before it ever tries.
 
+## context-local state
+- **Term** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, general mechanism (built on Python's own real `contextvars`) behind both `request` and `current_app` - a real name that resolves to a genuinely different real value depending on which real context is currently active, reachable from any real function, at any real depth, without being passed as an argument. It exists so deeply-nested real code (this project's own real service layer, for instance) can reach real, request- or app-specific state without every intermediate real function needing to accept and forward it.
+
 ## correctness
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The property of a piece of code producing the output its author actually intended for a given input - not "ran without crashing" or "looks plausible," but matches a specific, statable expectation. It exists as a concept because "the code executed" and "the code did the right thing" are two entirely different claims, and a program can satisfy the first while completely failing the second.
 
@@ -266,6 +270,9 @@ re-run the script after any lesson changes instead.
 
 ## CRUD
 - **Term** in `LESSON-3.6-REST` - The real, standard shorthand for the four basic real operations a resource supports - Create, Read, Update, Delete - mapped in this project onto real `POST`, `GET`, `PATCH`/`PUT`, and `DELETE`. It exists as a real, common vocabulary for describing a resource's entire real lifecycle in four words.
+
+## current_app
+- **Object/method** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, importable name from `flask`, already used throughout this project's own real service and model layer, resolving to whichever real `Flask` app is currently active.
 
 ## custom header
 - **Term** in `LESSON-3.4-HEADERS` - A real header this project invented itself - `X-User-Id`, in this lesson's own fourth unit - rather than one HTTP's own spec defines. It exists because a real application sometimes needs to carry information no standard header was built for; the real `X-` prefix is this project's own convention for marking one as non-standard.
@@ -458,6 +465,12 @@ re-run the script after any lesson changes instead.
 
 ## GREEN
 - **Term** in `LESSON-2.9-TDD` - The second real step of one TDD cycle: writing the smallest real amount of production code that makes the currently-failing test pass, and nothing more. It exists to keep every real line of code justified by a specific, already-failing test, rather than building more than what's actually required right now.
+
+## has_app_context
+- **Object/method** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - Two real, existing functions from `flask` this lesson uses to directly check whether each real kind of context is currently active, without triggering a real `RuntimeError` the way reading `request`/`current_app` directly would.
+
+## has_request_context
+- **Object/method** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - Two real, existing functions from `flask` this lesson uses to directly check whether each real kind of context is currently active, without triggering a real `RuntimeError` the way reading `request`/`current_app` directly would.
 
 ## Hashable
 - **Term** in `LESSON-1.4-DATA-STRUCTURES` - A real property a value either has or doesn't: whether Python can compute a stable hash for it, usable as a dict key or a set member. Every immutable built-in value (a string, an int, a tuple whose own elements are all themselves hashable) is hashable; every mutable built-in value (a list, a dict, a set itself) is not. A tuple is the one case where immutability alone doesn't automatically guarantee it: `(1, 2, [3, 4])` is itself immutable (nothing can reassign its own elements) but still isn't hashable, since hashing it would require hashing its own contained list too, and a list can't be hashed at all - confirmed this session: `hash((1, 2, [3, 4]))` raises the identical real `TypeError: unhashable type: 'list'` this lesson's own Sets unit already produces. It exists as its own concept because a dict/set's own real lookup speed depends on that hash staying valid for as long as the value is stored - a value that could change after being stored would silently break that lookup, so Python refuses mutable values as keys/members outright rather than risk it.
@@ -721,6 +734,7 @@ re-run the script after any lesson changes instead.
 
 ## request context
 - **Term** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, temporary state Flask activates for the exact duration of one real request, making `request` (and `current_app`) usable as if they were plain global variables, without actually being passed as an argument to every real view function. It exists so a real view function's own signature stays simple, while still having genuine, real access to the specific request it's handling.
+- **Term** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, active state making `request` resolve correctly for exactly one real, in-flight request - already studied in an earlier lesson, revisited here specifically for its own real relationship to application context. It exists as the more specific of the two real contexts: a request always happens against some real, active app, so activating a request context always activates an application context too.
 
 ## request header
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - Real key-value metadata sent alongside a request, separate from its body - information *about* the request, not the request's own payload. It exists because some real information (who's asking, what format they want back) belongs with every request regardless of what that request's own body happens to contain.
@@ -1090,6 +1104,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `application context` / `Application layer` - shares: application
 - `application context` / `application object` - shares: application
 - `application context` / `Application server` - shares: application
+- `application context` / `context-local state` - shares: context
+- `application context` / `has_app_context` - shares: context
+- `application context` / `has_request_context` - shares: context
 - `application context` / `request (the real context-local proxy)` - shares: context
 - `application context` / `request context` - shares: context
 - `application factory` / `Application layer` - shares: application
@@ -1169,6 +1186,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Content-Type` / `Type annotation` - shares: type
+- `context-local state` / `has_app_context` - shares: context
+- `context-local state` / `has_request_context` - shares: context
+- `context-local state` / `request (the real context-local proxy)` - shares: context, local
+- `context-local state` / `request context` - shares: context
+- `context-local state` / `shared state` - shares: state
 - `create_app` / `create_machine` - shares: create
 - `create_app` / `create_machine_group` - shares: create
 - `create_app` / `create_machine_group (POST)` - shares: create
@@ -1326,6 +1348,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
+- `has_app_context` / `has_request_context` - shares: context, has
+- `has_app_context` / `request (the real context-local proxy)` - shares: context
+- `has_app_context` / `request context` - shares: context
+- `has_request_context` / `request (the real context-local proxy)` - shares: context
+- `has_request_context` / `request context` - shares: context
 - `Header` / `header` - shares: header
 - `Header` / `request header` - shares: header
 - `header` / `request header` - shares: header
