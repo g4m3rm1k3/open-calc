@@ -386,6 +386,9 @@ re-run the script after any lesson changes instead.
 ## context-local state
 - **Term** in `LESSON-4.6-FLASK-REQUEST-CONTEXT` - The real, general mechanism (built on Python's own real `contextvars`) behind both `request` and `current_app` - a real name that resolves to a genuinely different real value depending on which real context is currently active, reachable from any real function, at any real depth, without being passed as an argument. It exists so deeply-nested real code (this project's own real service layer, for instance) can reach real, request- or app-specific state without every intermediate real function needing to accept and forward it.
 
+## Control flow
+- **Term** in `LESSON-0.7-A-DECORATOR-THAT-ISNT-WHAT-IT-CLAIMS` - The real, actual order a program's statements execute in and the real conditions that decide which branch runs - as opposed to what a comment or docstring claims happens. It exists as a concept because the two can genuinely diverge: code can be accurately documented for the case its author had in mind while still reaching further, or narrower, than that documentation implies once every real caller is accounted for.
+
 ## correctness
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - The property of a piece of code producing the output its author actually intended for a given input - not "ran without crashing" or "looks plausible," but matches a specific, statable expectation. It exists as a concept because "the code executed" and "the code did the right thing" are two entirely different claims, and a program can satisfy the first while completely failing the second.
 
@@ -971,6 +974,22 @@ re-run the script after any lesson changes instead.
 ## PATCH
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "apply this real, partial change, leaving everything else alone" - this lesson's own fourth unit calls it against the identical real route its `PUT` unit used. It exists for the real, common case where a client wants to change one specific real fact about a resource without having to first know, and resend, every other real fact about it.
 
+## Path
+- **Object/method** in `LESSON-0.5-VERIFICATION-OVER-MEMORY` - The standard-library class representing a real filesystem path, from Python's `pathlib` module.
+- **Object/method** in `LESSON-0.6-SAME-FILE-TWO-FATES` - The standard-library class representing a real filesystem path, from Python's `pathlib` module.
+- **Object/method** in `LESSON-0.7-A-DECORATOR-THAT-ISNT-WHAT-IT-CLAIMS` - The standard-library class representing a real filesystem path, from Python's `pathlib` module.
+
+## Path.glob
+- **Object/method** in `LESSON-0.5-VERIFICATION-OVER-MEMORY` - A method listing every real file in a directory whose name matches a given pattern.
+
+## Path.read_text
+- **Object/method** in `LESSON-0.6-SAME-FILE-TWO-FATES` - A method reading a real file's entire content as one plain string.
+- **Object/method** in `LESSON-0.7-A-DECORATOR-THAT-ISNT-WHAT-IT-CLAIMS` - A method reading a real file's entire content as one plain string.
+
+## Path.rglob
+- **Object/method** in `LESSON-0.6-SAME-FILE-TWO-FATES` - A method listing every real file matching a pattern, searching a directory and every real subdirectory beneath it.
+- **Object/method** in `LESSON-0.7-A-DECORATOR-THAT-ISNT-WHAT-IT-CLAIMS` - A method listing every real file matching a pattern, searching a directory and every real subdirectory beneath it.
+
 ## PDMService.checkout_file
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, existing, actively-used static method on this project's own `PDMService` class (`backend/app/services/pdm_service.py`), orchestrating a real CAM-file check-out.
 
@@ -1071,6 +1090,9 @@ re-run the script after any lesson changes instead.
 ## random)
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - Python's own standard library `random` module, providing a real pseudo-random number generator.
 
+## re.findall
+- **Object/method** in `LESSON-0.7-A-DECORATOR-THAT-ISNT-WHAT-IT-CLAIMS` - A standard-library function returning every real match of a pattern found in a string.
+
 ## real_health_status (proposed prototype)
 - **Object/method** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - A real, new, standalone function proposing this project's own actual health-check logic - the real decision `build_health_response` itself deliberately doesn't make.
 
@@ -1094,6 +1116,9 @@ re-run the script after any lesson changes instead.
 
 ## register_routes
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real, single function assembling every one of its 18 real blueprints into one real app.
+
+## Registry
+- **Term** in `LESSON-0.5-VERIFICATION-OVER-MEMORY` - A single, named place a system declares everything that officially belongs to some category, so other code can rely on that declaration being complete - `__all__` in a Python package's `__init__.py` is one common form of this. It exists so callers don't have to independently rediscover what's available every time; the risk it creates is exactly what this lesson tests: a registry is only trustworthy if something keeps it in sync with reality, and nothing about writing one guarantees that on its own.
 
 ## regression
 - **Term** in `LESSON-2.1-WHY-SOFTWARE-TESTS-EXIST` - A previously-working piece of behavior that quietly stops working because of a later, often unrelated-looking, change elsewhere in the code. It exists as a named failure mode because software rarely breaks all at once - it breaks one small, later edit at a time - and without something re-checking the old behavior every time, nobody notices until the broken version has already shipped.
@@ -1200,6 +1225,9 @@ re-run the script after any lesson changes instead.
 
 ## safe (HTTP method property)
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real property that a method's own definition promises zero side effects on the server - calling it changes nothing, no matter how many real times it's called. It exists so real tooling (browsers prefetching a link, a proxy caching a response) can treat a safe method specially, without ever having to inspect what a specific real route actually does.
+
+## Scope
+- **Term** in `LESSON-0.9-WHAT-THIS-BACKEND-IS-STILL-HIDING` - A deliberate boundary on what one piece of work will and won't attempt to settle. It exists because naming a real problem precisely and explaining or fixing it are genuinely different amounts of work - a habit-building phase can locate four real, serious things without owing a full treatment of any of them yet, as long as that boundary is stated honestly rather than implied away.
 
 ## secret
 - **Term** in `LESSON-4.3-CONFIGURATION` - A real configuration value whose entire purpose depends on staying unknown to anyone outside the real deployment that uses it - `SECRET_KEY`, in this project's own real code, signs every real authentication token this curriculum has used. It exists because some real configuration values aren't just settings; their real security value comes specifically from not being real, public knowledge.
@@ -1310,6 +1338,9 @@ re-run the script after any lesson changes instead.
 ## spy
 - **Term** in `LESSON-2.5-TEST-DOUBLES` - A test double - or a wrapper around a real object - that lets real behavior actually happen while also recording how it was called, for verification afterward. It exists to check real interactions without giving up the real behavior a stub or a mock would otherwise replace entirely.
 
+## SQL dialect
+- **Term** in `LESSON-0.8-REPRODUCE-BEFORE-YOU-TOUCH` - The specific real variant of SQL syntax one particular database engine actually accepts - PostgreSQL, MySQL, and SQLite each support a real, overlapping but not identical grammar. It exists because "valid SQL" isn't one single fixed standard every engine implements identically; code written and tested against one real engine can be syntactically invalid against a different real one, even when the underlying intent (add two columns to a table) is the same.
+
 ## sqlalchemy.event.listen (before_cursor_execute)
 - **Object/method** in `LESSON-6.13-QUERY-PLANNING` - A real SQLAlchemy function that registers a callback to run every time the underlying database driver is about to execute one real SQL statement.
 
@@ -1326,6 +1357,12 @@ re-run the script after any lesson changes instead.
 ## SQLite (as a specific engine)
 - **Term** in `LESSON-6.14-SQLITE` - A real, specific relational database engine - not a generic stand-in for "a database" - that runs embedded directly inside the same process as the application using it, storing an entire real database as one ordinary file (or, this curriculum's own real `TestingConfig`, entirely in memory), with no separate database server process involved at all. It exists as its own real, distinct thing from a client-server database (like PostgreSQL or MySQL) because embedding the engine directly removes an entire real layer - no server to install, configure, or connect to over a network - at the real cost of the specific limitations this lesson's own two units demonstrate directly.
 
+## sqlite3.OperationalError
+- **Object/method** in `LESSON-0.8-REPRODUCE-BEFORE-YOU-TOUCH` - The real exception SQLite's Python driver raises when a database operation can't be carried out as requested.
+
+## sqlite_master
+- **Term** in `LESSON-0.5-VERIFICATION-OVER-MEMORY` - SQLite's own built-in system table, present in every real SQLite database file, listing every real table, index, and view that database actually contains - its `name` and `type` columns name each one. It exists so a program can ask the database itself what it contains, mechanically, instead of trusting a separate description of it written somewhere else.
+
 ## sqlite_master (queried via db.session.execute)
 - **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - SQLite's own real, built-in table, recording every other real table's name and the literal, real DDL text SQLite used to create it.
 
@@ -1334,6 +1371,7 @@ re-run the script after any lesson changes instead.
 
 ## Static analysis
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run (a real execution trace, like a debugger or `CodeLens`'s own Pyodide-based tracer) - static analysis can find every route a file defines even for code paths that never actually run during any single execution.
+- **Term** in `LESSON-0.6-SAME-FILE-TWO-FATES` - Examining what source code says, structurally, without executing it. It exists as a distinct approach from watching a program actually run - static analysis can answer real, mechanical questions like "does this file's text contain this module's real name" for every file in a whole codebase, without running a single one of them, and without missing a rarely-executed code path the way only-ever-running-and-observing would.
 - **Term** in `LESSON-1.5-TYPE-HINTS` - Checking real code for problems by reading its source and its annotations - never by running it. It exists as its own concept because it's a genuinely different kind of check than this curriculum's own `verification` sections have used so far: every real output shown until this lesson came from actually executing code and reading what happened; a static analysis tool instead reads the code's own declared shape and reasons about what could go wrong before a single line of it ever runs - catching a real class of bug (a value that could be the wrong type) that might not show up in any one particular real run, only in some future run this lesson's own labs never happened to try.
 
 ## Static method
@@ -1873,6 +1911,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `collaborator (test scope)` / `Scope` - shares: scope
 - `column` / `column type` - shares: column
 - `column` / `db.Column` - shares: column
 - `column type` / `Content-Type` - shares: type
@@ -1920,6 +1959,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `context-local state` / `request (the real context-local proxy)` - shares: context, local
 - `context-local state` / `request context` - shares: context
 - `context-local state` / `shared state` - shares: state
+- `Control flow` / `TCP (Transmission Control Protocol)` - shares: control
 - `create_app` / `create_machine` - shares: create
 - `create_app` / `create_machine_group` - shares: create
 - `create_app` / `create_machine_group (POST)` - shares: create
@@ -2175,6 +2215,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `fixture injection` / `yield fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture` - shares: fixture
 - `fixture scope` / `pytest.fixture(scope=...)` - shares: fixture, scope
+- `fixture scope` / `Scope` - shares: scope
 - `fixture scope` / `yield fixture` - shares: fixture
 - `Flask (the class, and this project's own app instance)` / `get_health_response (tested directly, for the first time)` - shares: the
 - `Flask (the class, and this project's own app instance)` / `health_check (the` - shares: the
@@ -2292,6 +2333,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
+- `golden behavior (golden master)` / `sqlite_master` - shares: master
 - `golden behavior (golden master)` / `sqlite_master (queried via db.session.execute)` - shares: master
 - `GROUP BY` / `ORDER BY` - shares: by
 - `GROUP BY` / `repeating group` - shares: group
@@ -2483,6 +2525,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
 - `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
 - `mark (pytest marker)` / `pytest.raises` - shares: pytest
+- `mark_as_read` / `Path.read_text` - shares: read
 - `mark_as_read` / `pytest.mark.parametrize` - shares: mark
 - `mark_as_read` / `rebuild (as this curriculum's own real term)` - shares: as
 - `mark_as_read` / `SQLite (as a specific engine)` - shares: as
@@ -2501,6 +2544,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `open() (file object)` / `PDMService.checkout_file` - shares: file
 - `open() (file object)` / `PDMService.download_file` - shares: file
 - `open() (file object)` / `send_file` - shares: file
+- `os.path.exists` / `Path` - shares: path
+- `os.path.exists` / `Path.glob` - shares: path
+- `os.path.exists` / `Path.read_text` - shares: path
+- `os.path.exists` / `Path.rglob` - shares: path
 - `os.path.exists` / `URL path parameter` - shares: path
 - `Parameter` / `Query parameter` - shares: parameter
 - `Parameter` / `query parameter` - shares: parameter
@@ -2512,6 +2559,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `parts (routes)` / `update_machine (routes)` - shares: routes
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
+- `Path` / `URL path parameter` - shares: path
+- `Path.glob` / `URL path parameter` - shares: path
+- `Path.read_text` / `sqlalchemy.text` - shares: text
+- `Path.read_text` / `sqlalchemy.text (for a real SQL statement)` - shares: text
+- `Path.read_text` / `URL path parameter` - shares: path
+- `Path.rglob` / `URL path parameter` - shares: path
 - `PDMService.checkout_file` / `send_file` - shares: file
 - `PDMService.download_file` / `send_file` - shares: file
 - `Persistence` / `persistence` - shares: persistence
@@ -2524,6 +2577,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Pure function` / `test function` - shares: function
 - `PUT` / `update_machine_status (PUT)` - shares: put
 - `pytest.fixture` / `yield fixture` - shares: fixture
+- `pytest.fixture(scope=...)` / `Scope` - shares: scope
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
 - `Query (Machine.query` / `query object` - shares: query
 - `Query (Machine.query` / `Query parameter` - shares: query
@@ -2608,9 +2662,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
 - `Side effect` / `side effect` - shares: effect, side
 - `socket.listen` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: listen
+- `SQL dialect` / `sqlalchemy.text (for a real SQL statement)` - shares: sql
 - `sqlalchemy.event.listen (before_cursor_execute)` / `sqlite_master (queried via db.session.execute)` - shares: execute
 - `sqlalchemy.text (for a real SQL statement)` / `SQLite (as a specific engine)` - shares: a
+- `SQLite (as a specific engine)` / `sqlite3.OperationalError` - shares: sqlite
+- `SQLite (as a specific engine)` / `sqlite_master` - shares: sqlite
 - `SQLite (as a specific engine)` / `sqlite_master (queried via db.session.execute)` - shares: sqlite
+- `sqlite3.OperationalError` / `sqlite_master` - shares: sqlite
+- `sqlite3.OperationalError` / `sqlite_master (queried via db.session.execute)` - shares: sqlite
+- `sqlite_master` / `sqlite_master (queried via db.session.execute)` - shares: master, sqlite
 - `sqlite_master (queried via db.session.execute)` / `test session` - shares: session
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
