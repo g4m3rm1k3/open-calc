@@ -1,0 +1,124 @@
+# Lesson 0.5: Verification Over Memory
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** A real, small tool comparing what `app/models/__init__.py` claims is the complete registry of every database model in this application against two independent, real sources of truth: the actual files on disk, and the actual live database's own tables - to test one specific claim rather than assume it. The transferable problem: no engineer holds a real codebase in memory - this one alone has 21 model files, 26 live tables, and dozens of routes - so the actual professional skill is a repeatable habit for proving a claim on demand, not recalling one.
+
+**What you need to know first:** Reading an existing backend's entry points, imports, models, and database as real evidence rather than assumption; a real, live SQLite database backing this same application.
+
+## Terms used in this lesson
+
+- **Registry** — A single, named place a system declares everything that officially belongs to some category, so other code can rely on that declaration being complete - `__all__` in a Python package's `__init__.py` is one common form of this. It exists so callers don't have to independently rediscover what's available every time; the risk it creates is exactly what this lesson tests: a registry is only trustworthy if something keeps it in sync with reality, and nothing about writing one guarantees that on its own.
+- **sqlite_master** — SQLite's own built-in system table, present in every real SQLite database file, listing every real table, index, and view that database actually contains - its `name` and `type` columns name each one. It exists so a program can ask the database itself what it contains, mechanically, instead of trusting a separate description of it written somewhere else.
+
+## Objects and methods used
+
+- **`Path`**
+  - *What it is:* The standard-library class representing a real filesystem path, from Python's `pathlib` module.
+  - *Implementation:* `pathlib.Path(path_string)`
+  - *Its use:* This lesson's lab constructs one pointing at `backend/app/models`, the real directory holding every real model file, to list its actual contents.
+  - *Type:* A class, in Python's standard library `pathlib` module.
+  - *Responsibility:* Represent a filesystem location and provide real methods for inspecting or navigating it, without itself reading any file's content.
+  - *Depends on:* A string naming the path - real or not; `Path` itself doesn't check existence until a method that touches the filesystem is called.
+  - *Connects to:* Its `glob` method, below, is called directly on the constructed instance.
+  - *Shape:* Takes one string; returns one `Path` object representing that location, ready for further real filesystem operations.
+
+- **`Path.glob`**
+  - *What it is:* A method listing every real file in a directory whose name matches a given pattern.
+  - *Implementation:* `Path.glob(pattern: str) -> Iterator[Path]`
+  - *Its use:* This lesson's lab calls it with `"*.py"` to list every real Python file directly inside `backend/app/models`, one `Path` per match.
+  - *Type:* An instance method on `Path`.
+  - *Responsibility:* Scan the real directory this `Path` represents and yield one `Path` object for every real entry whose name matches the given pattern - not a guess, an actual directory read.
+  - *Depends on:* The `Path` it's called on actually existing as a real directory.
+  - *Connects to:* Each yielded `Path`'s own `.stem` attribute (a plain string, the filename without its extension) is read directly by this lab's list comprehension.
+  - *Shape:* Takes one pattern string; returns a generator yielding one `Path` per real matching file - not a list, though this lab immediately wraps the result in `sorted()`, which consumes it into one.
+
+## Concept Unit: Checking a Registry Against Reality, Two Ways
+
+### The Problem
+
+`backend/app/models/__init__.py` declares `__all__` as 22 names - `Part`, `Machine`, `MachineGroup`, `CAMFile`, `CAMFileHistory`, `NCFile`, `Sequence`, `Operation`, `OperationImage`, `ToolAssembly`, `Tool`, `ToolHolder`, `MachineCAMPairing`, `CAMDocument`, `PartModel`, `OperationOrder`, `Inspection`, `Issue`, `UserFavorite`, `Notification`, `Tag`, `part_tags` - and its own docstring calls it "all SQLAlchemy models for the Manufacturing Platform." Nothing about writing that list actually checked it against the real files on disk or the real live database - it's a claim, sitting right next to the code, that could be true, stale, or simply wrong, and reading it again more carefully wouldn't settle which.
+
+Before reading on:
+
+- If you wanted to know every table this application's real, live database has right now, would you trust a list written by hand in a `.py` file, or would you ask the database itself? What could make those two answers disagree?
+- Python lets a package import a name internally without adding it to `__all__`. Given that, what real difference is there between 'this file exists in `app/models/`' and 'this file's class is actually declared in `__all__`'?
+
+### Project Change
+
+- **Reference Source:** `backend/app/models/__init__.py`, read in full this session. Lines 7-24 import 21 real names from 18 real files; line 12 specifically reads `from .nc_template import NCTemplate`. Lines 27-50 then declare `__all__` as exactly 22 names - and `NCTemplate` is not one of them, despite being imported two lines above. `settings.py` and `user.py` are real files in the same directory that are never imported by this file at all, in any form.
+- **Files affected:** `verification/phase-00/lab_verify_model_registry.py` (new)
+- **Change type:** add
+- **Location:** New file, no existing project to place it within.
+- **Dependencies:** Python's standard library `pathlib` and `sqlite3` modules only; a real, already-existing copy of this application's live database at `backend/data/manufacturing.db`.
+
+### The New Code
+
+New code, typed into a new throwaway file - the whole file at once, since there's no existing structure to return to for something this small:
+
+**File:** `verification/phase-00/lab_verify_model_registry.py` (new)
+
+```python
+from pathlib import Path
+import sqlite3
+
+real_files = sorted(
+    f.stem for f in Path("backend/app/models").glob("*.py")
+    if f.stem != "__init__"
+)
+
+conn = sqlite3.connect("backend/data/manufacturing.db")
+live_tables = sorted(
+    row[0] for row in conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+    )
+)
+conn.close()
+
+print("real files in app/models/:", len(real_files))
+print(real_files)
+print()
+print("real tables in the live database:", len(live_tables))
+print(live_tables)
+```
+
+### Mechanical Walkthrough
+
+- `real_files = sorted(f.stem for f in Path("backend/app/models").glob("*.py") if f.stem != "__init__")` — `Path` builds a real handle on the models directory; `Path.glob(\"*.py\")` reads that real directory and yields one `Path` per real `.py` file in it; `.stem` (a plain string attribute, the filename without its `.py` extension) is read off each one; `__init__` is excluded since it's the package file itself, not a model; `sorted()` (basic Python) gives a stable, readable order. This is the real, current list of every model file that actually exists on disk - not a copy of anyone's claim about what exists.
+- `conn = sqlite3.connect("backend/data/manufacturing.db")` — Opens a real connection directly to this application's own live SQLite database file - the same file `config.py` configures the real Flask app to use - with no Flask or SQLAlchemy involved at all, just the standard library talking to the real file.
+- `live_tables = sorted(row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'") )` — Runs a real SQL query against `sqlite_master`, this database's own built-in catalog of every real table it contains; `type='table'` excludes indexes and views also listed there; `NOT LIKE 'sqlite_%'` excludes SQLite's own internal bookkeeping tables, which aren't part of this application's schema. Each yielded row is a one-element tuple, so `row[0]` reads the real table name out of it.
+- `conn.close()` — Releases the real database connection - basic resource cleanup, not specific to what this lab is testing.
+
+### CS Lens
+
+This is cross-checking independent sources of truth that are supposed to describe the same real thing - here, a declared registry, the real files on disk, and the real database's own catalog. The same idea recurs constantly: a database migration tool diffing its recorded schema history against a database's actual current structure; a compiler cross-checking a header file's declarations against a source file's real definitions; a package manager's lock file being checked against what's actually installed. In every case, the declared description and the real thing it describes can drift apart silently, and only actually comparing them - not re-reading the description more carefully - can catch it.
+
+### SE Lens
+
+The real alternative not chosen here: `__all__` could be computed automatically at import time, by introspecting every real subclass of `db.Model` this package actually imports, instead of being a hand-maintained list. The real tradeoff: a hand-maintained list is more explicit and readable at a glance - it states, directly, "this is the intended public surface" - while a computed one would always match reality but could silently include something not meant to be public. The honest cost this project is actually carrying with the hand-maintained approach, made visible by this lab's own real output: `NCTemplate` is imported by this file but missing from `__all__` entirely, and `settings.py`/`user.py` are real, live-table- backed model files this package doesn't import at all - three real gaps nothing has caught because nothing ever mechanically checked.
+
+### Commands needed
+
+- `python verification/phase-00/lab_verify_model_registry.py` — Run from the manufacturing-platform repository root, so the relative paths to `backend/app/models` and `backend/data/manufacturing.db` resolve correctly.
+
+### Verification
+
+```text
+real files in app/models/: 21
+['cam_file', 'cam_file_history', 'inspection', 'issue', 'machine', 'machine_pairing', 'nc_file', 'nc_file_history', 'nc_template', 'notification', 'operation', 'operation_image', 'operation_manager', 'part', 'part_model', 'sequence', 'settings', 'tag', 'tool_assembly', 'user', 'user_favorite']
+
+real tables in the live database: 26
+['cam_documents', 'cam_file_history', 'cam_files', 'inspections', 'issues', 'machine_cam_pairings', 'machine_groups', 'machines', 'nc_file_history', 'nc_files', 'nc_templates', 'notifications', 'operation_images', 'operation_orders', 'operations', 'part_models', 'part_tags', 'parts', 'sequences', 'settings', 'tags', 'tool_assemblies', 'tool_holders', 'tools', 'user_favorites', 'users']
+```
+
+Full saved run: `verification/phase-00/lab_verify_model_registry_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first and only unit in this lesson.
+
+## Connect the pieces
+
+One real claim, checked two independent ways instead of trusted: the `__all__` list in `backend/app/models/__init__.py` names 22 models - but the real directory it describes holds 21 real files (`settings` and `user` never imported at all; `nc_template` imported but left out of `__all__`), and the real live database it's meant to describe holds 26 real tables. Neither number matches the other, and neither would have been caught by reading the registry file again, more carefully - only by asking the filesystem and the database themselves, directly, which is exactly what this lesson's real, small tool did.
+
+**Next lesson:** Applying this same "don't trust the name, check the real callers" habit to a sharper, single question: given two files that both claim to parse the same real format, which one does this application actually run?
