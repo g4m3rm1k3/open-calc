@@ -18,6 +18,7 @@ re-run the script after any lesson changes instead.
 ## .commit)
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
+- **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
 
 ## .commit) and Machine.query.get
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
@@ -931,8 +932,14 @@ re-run the script after any lesson changes instead.
 ## parent/child relationship
 - **Term** in `LESSON-6.4-FOREIGN-KEYS` - The relationship a foreign key creates between two relations: the relation being pointed AT is the parent, and the relation holding the pointing column is the child - one parent row can have many real child rows, but each child row points at exactly one real parent. It exists as directional vocabulary because a foreign key only lives on one side of the relationship (the child), which is exactly why navigating from parent to children and from child to parent are two genuinely different real operations, not the same one read backward.
 
+## PartService (dead)
+- **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, existing, fully-written class in this project's own backend (`backend/app/services/part_service.py`), structured as a repository/service-shaped layer for the `Part` model.
+
 ## PATCH
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "apply this real, partial change, leaving everything else alone" - this lesson's own fourth unit calls it against the identical real route its `PUT` unit used. It exists for the real, common case where a client wants to change one specific real fact about a resource without having to first know, and resend, every other real fact about it.
+
+## PDMService.checkout_file
+- **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, existing, actively-used static method on this project's own `PDMService` class (`backend/app/services/pdm_service.py`), orchestrating a real CAM-file check-out.
 
 ## PDMService.download_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real static method holding the entire actual behavior behind downloading a CAM file - the real database read, the real external attempt, and the real fallback.
@@ -993,6 +1000,7 @@ re-run the script after any lesson changes instead.
 
 ## query object
 - **Term** in `LESSON-7.4-QUERYING` - A real, structured Python object (SQLAlchemy's own `Query` class, or a further-narrowed version of one) representing a real, not-yet-executed database read - built up by chaining real methods (`.filter(...)`, `.order_by(...)`) that each return a new, real query object, rather than executing anything immediately. It exists so a query can be assembled conditionally, piece by piece (exactly the way this project's own real `get_machines` route already does, adding a real `.filter(...)` only when a given query parameter is actually present), with the real SQL compiled only once, at the end, from whatever pieces actually got added.
+- **Term** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, structured object representing a real, not-yet-executed database read, built by chaining real methods - this project's own real `Machine.query.filter(...)` already returns and re-uses one. It exists as its own, real architectural layer, distinct from the model itself, because a query's own shape (what to select, how to filter it) is a genuinely different concern than what a single real row's own data or behavior is.
 
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
@@ -1063,6 +1071,9 @@ re-run the script after any lesson changes instead.
 
 ## repeating group
 - **Term** in `LESSON-6.7-NORMALIZATION` - A set of attributes, sharing the same real shape, that appears more than once in a single row under different names (a prefix, typically) instead of appearing once per real occurrence as its own separate row. It exists as its own named failure, distinct from a single non-atomic cell, because a repeating group hides a real one-to-many relationship - one row genuinely needing several of the same kind of fact - inside a FIXED number of columns instead of a variable number of rows.
+
+## repository
+- **Term** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, dedicated layer whose entire real job is translating between the database's own real representation of data and the application's own in-memory representation of it - fetching, constructing, and converting real objects, with no real business rules of its own. It exists, in principle, to let application code depend on a stable, real interface for "get me this data" without knowing anything about how it's actually stored - though this project's own real `PartService` shows what happens when this layer is added without anything in the application actually needing that abstraction yet: it existed, real and complete, and was never once called.
 
 ## representation
 - **Term** in `LESSON-3.6-REST` - A real, concrete format a resource can be rendered as - JSON metadata, or a real, raw file download, for the identical underlying resource, in this lesson's own second unit. It exists because a resource itself is an abstract, real thing; a client only ever actually receives one of its possible representations.
@@ -1176,6 +1187,9 @@ re-run the script after any lesson changes instead.
 ## server
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, separate program (here, this project's own Flask app, run via `run.py`) that listens on a real, known network port and waits for a client to connect, before sending back exactly one real response per real request. It exists as the other half of that same split - nothing happens on the server's side of this exchange until a client actually asks.
 
+## service
+- **Term** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, dedicated layer holding real, application-specific business logic and orchestration - coordinating more than one real step (validating state, mutating several real fields, calling out to a real external system) that doesn't belong entirely inside a single model's own method or a single route's own handler. It exists so that real, multi-step behavior has one, real, testable place to live - this project's own real `PDMService.checkout_file` is exactly this: a real lock-state check, five real field mutations, and a real commit, all in one real, callable place.
+
 ## Session
 - **Term** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, stateful object - this project's own `db.session` - that tracks every real Python object a program has added, modified, or asked to load, and decides when those changes actually become real SQL sent to the real database. It exists as the one real place that state lives between "an object was changed" and "the database actually knows about it" - never the same instant, unless explicitly told to be.
 
@@ -1183,6 +1197,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
+- **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
 
 ## Session (.add_all
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
@@ -2019,11 +2034,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `download_cam_file` / `generate_nc_file` - shares: file
 - `download_cam_file` / `get_nc_file` - shares: file
 - `download_cam_file` / `open() (file object)` - shares: file
+- `download_cam_file` / `PDMService.checkout_file` - shares: file
 - `download_cam_file` / `PDMService.download_file` - shares: download, file
 - `download_cam_file` / `send_file` - shares: file
 - `download_nc_file` / `generate_nc_file` - shares: file, nc
 - `download_nc_file` / `get_nc_file` - shares: file, nc
 - `download_nc_file` / `open() (file object)` - shares: file
+- `download_nc_file` / `PDMService.checkout_file` - shares: file
 - `download_nc_file` / `PDMService.download_file` - shares: download, file
 - `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
@@ -2080,8 +2097,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `generate_nc_file` / `generate_password_hash` - shares: generate
 - `generate_nc_file` / `get_nc_file` - shares: file, nc
 - `generate_nc_file` / `open() (file object)` - shares: file
+- `generate_nc_file` / `PDMService.checkout_file` - shares: file
 - `generate_nc_file` / `PDMService.download_file` - shares: file
 - `generate_nc_file` / `send_file` - shares: file
+- `get_gitlab_service` / `service` - shares: service
 - `get_health_response (real, now live)` / `get_health_response (tested directly, for the first time)` - shares: health
 - `get_health_response (real, now live)` / `get_machine (revisited for its real decorator stack)` - shares: real
 - `get_health_response (real, now live)` / `health check semantics` - shares: health
@@ -2157,6 +2176,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machines (revisited for request.args)` / `sqlalchemy.event.listens_for` - shares: for
 - `get_machines (revisited for request.args)` / `sqlalchemy.text (for a real SQL statement)` - shares: for
 - `get_nc_file` / `open() (file object)` - shares: file
+- `get_nc_file` / `PDMService.checkout_file` - shares: file
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
@@ -2342,6 +2362,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `one-to-many relationship` / `parent/child relationship` - shares: relationship
 - `one-to-many relationship` / `relationship modeling` - shares: relationship
+- `open() (file object)` / `PDMService.checkout_file` - shares: file
 - `open() (file object)` / `PDMService.download_file` - shares: file
 - `open() (file object)` / `send_file` - shares: file
 - `os.path.exists` / `URL path parameter` - shares: path
@@ -2352,6 +2373,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `parent/child relationship` / `relationship modeling` - shares: relationship
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
+- `PDMService.checkout_file` / `send_file` - shares: file
 - `PDMService.download_file` / `send_file` - shares: file
 - `Persistence` / `persistence` - shares: persistence
 - `primary key` / `surrogate key` - shares: key
