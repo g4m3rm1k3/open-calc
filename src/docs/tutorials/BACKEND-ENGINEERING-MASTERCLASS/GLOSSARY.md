@@ -448,6 +448,9 @@ re-run the script after any lesson changes instead.
 ## db.session.commit()
 - **Object/method** in `LESSON-6.11-TRANSACTIONS` - The real SQLAlchemy session method that ends the current transaction by making every staged change permanent, already used throughout this curriculum without being separately named.
 
+## db.session.rollback
+- **Object/method** in `LESSON-7.7-SQLALCHEMY-TRANSACTIONS` - A real method on this project's own live `db.session` object - SQLAlchemy's own `Session.rollback` - discarding every real pending change in the current transaction.
+
 ## db.session.rollback()
 - **Object/method** in `LESSON-6.11-TRANSACTIONS` - The real SQLAlchemy session method that discards every staged change in the current transaction, already used once in this curriculum's own Constraints lesson without being explained.
 
@@ -1143,6 +1146,7 @@ re-run the script after any lesson changes instead.
 
 ## rollback
 - **Term** in `LESSON-6.11-TRANSACTIONS` - The real, explicit action that discards every operation staged in the current transaction, returning the database to the state it was in before that transaction began. It exists as commit's own real counterpart - the way a transaction that cannot, or should not, be made permanent is undone cleanly, rather than left half-applied or leaving the session unable to do anything further at all.
+- **Term** in `LESSON-7.7-SQLALCHEMY-TRANSACTIONS` - The real, specific operation that discards every real, pending change the current real transaction was holding, restoring the real database to the state it was in before that transaction began - and, on this project's own real `Session`, also clears the session's own pending/failed state so it can be used again for new, real work. It exists as the real, necessary counterpart to `commit`: without it, a real transaction that already failed has no real way to be un-stuck.
 
 ## route prefix
 - **Term** in `LESSON-4.5-BLUEPRINTS` - A real, shared URL segment automatically prepended to every real route a blueprint defines - `/api/machines`, for `machines_bp`'s own routes. It exists so an entire real blueprint's worth of routes can be relocated, or namespaced, by changing one real string in one real place, rather than editing every individual real route pattern.
@@ -1925,6 +1929,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `db.session.add` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.commit()` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.session.rollback` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.session.rollback()` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.Table` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
@@ -1978,6 +1983,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.commit()` / `Session (.add_all` - shares: session
 - `db.session.commit()` / `Session (db.session)` - shares: db, session
 - `db.session.commit()` / `test session` - shares: session
+- `db.session.rollback` / `Machine (db.Model)` - shares: db
+- `db.session.rollback` / `MachineGroup (db.Model)` - shares: db
+- `db.session.rollback` / `rollback` - shares: rollback
+- `db.session.rollback` / `Session` - shares: session
+- `db.session.rollback` / `Session (.add` - shares: session
+- `db.session.rollback` / `Session (.add_all` - shares: session
+- `db.session.rollback` / `Session (db.session)` - shares: db, session
+- `db.session.rollback` / `test session` - shares: session
 - `db.session.rollback()` / `Machine (db.Model)` - shares: db
 - `db.session.rollback()` / `MachineGroup (db.Model)` - shares: db
 - `db.session.rollback()` / `rollback` - shares: rollback
