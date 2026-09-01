@@ -1213,6 +1213,9 @@ re-run the script after any lesson changes instead.
 ## send_file
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A Flask function building a real HTTP response whose body is a file's actual binary content.
 
+## Sequence.operations (relationship)
+- **Object/method** in `LESSON-8.5-REBUILD-PARENT-CHILD-PERSISTENCE` - A real, existing `db.relationship` declaration on this project's own real `Sequence` model (`backend/app/models/sequence.py:37`).
+
 ## serialization
 - **Term** in `LESSON-3.5-JSON-APIS` - The real process of converting an in-memory Python object into a real, JSON-safe shape - this lesson's own first unit watches a real `datetime` become a real string. It exists because JSON's own real type system is smaller than Python's; a real value has to be converted to something JSON can actually represent before it can be sent anywhere.
 - **Term** in `LESSON-7.5-SERIALIZATION` - The real process of converting an in-memory object - here, a real Python object with real attributes - into a real, flat format (JSON text, in this lesson) that can actually be sent somewhere else and reconstructed. It exists because a real, live Python object - with its own internal state, real methods, and real references to other objects - has no defined meaning outside the real Python process it lives in; JSON is a real, much narrower format both a Python backend and a JavaScript frontend already agree how to read.
@@ -2026,6 +2029,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.relationship` / `one-to-many relationship` - shares: relationship
 - `db.relationship` / `parent/child relationship` - shares: relationship
 - `db.relationship` / `relationship modeling` - shares: relationship
+- `db.relationship` / `Sequence.operations (relationship)` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
 - `db.relationship` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.relationship (secondary=)` / `Machine (db.Model)` - shares: db
@@ -2034,6 +2038,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.relationship (secondary=)` / `one-to-many relationship` - shares: relationship
 - `db.relationship (secondary=)` / `parent/child relationship` - shares: relationship
 - `db.relationship (secondary=)` / `relationship modeling` - shares: relationship
+- `db.relationship (secondary=)` / `Sequence.operations (relationship)` - shares: relationship
 - `db.relationship (secondary=)` / `Session (db.session)` - shares: db
 - `db.relationship (secondary=)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.session.add` / `Machine (db.Model)` - shares: db
@@ -2472,6 +2477,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `many-to-many relationship` / `one-to-many relationship` - shares: many, relationship, to
 - `many-to-many relationship` / `parent/child relationship` - shares: relationship
 - `many-to-many relationship` / `relationship modeling` - shares: relationship
+- `many-to-many relationship` / `Sequence.operations (relationship)` - shares: relationship
 - `mark (pytest marker)` / `mark_as_read` - shares: mark
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
@@ -2491,6 +2497,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `NCTemplate.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `one-to-many relationship` / `parent/child relationship` - shares: relationship
 - `one-to-many relationship` / `relationship modeling` - shares: relationship
+- `one-to-many relationship` / `Sequence.operations (relationship)` - shares: relationship
 - `open() (file object)` / `PDMService.checkout_file` - shares: file
 - `open() (file object)` / `PDMService.download_file` - shares: file
 - `open() (file object)` / `send_file` - shares: file
@@ -2500,6 +2507,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Parameter` / `URL parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
 - `parent/child relationship` / `relationship modeling` - shares: relationship
+- `parent/child relationship` / `Sequence.operations (relationship)` - shares: relationship
 - `parts (routes)` / `register_routes` - shares: routes
 - `parts (routes)` / `update_machine (routes)` - shares: routes
 - `PATCH` / `unittest.mock.patch` - shares: patch
@@ -2563,6 +2571,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `rebuild (as this curriculum's own real term)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `SQLite (as a specific engine)` - shares: as
 - `register_routes` / `update_machine (routes)` - shares: routes
+- `relationship modeling` / `Sequence.operations (relationship)` - shares: relationship
 - `request (the real context-local proxy)` / `request context` - shares: context
 - `request (the real context-local proxy)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `request body` / `response body` - shares: body
