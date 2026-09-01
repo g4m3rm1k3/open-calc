@@ -20,6 +20,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
 - **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods every test in this lesson's own file uses to build the real rows each real assertion checks.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own `auth_headers` fixture uses to persist the real `User` row every request needs.
 
 ## .commit) and Machine.query.get
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
@@ -37,9 +38,13 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - This project's own real `app.test_client()` return value, already used throughout this curriculum, and four of its real HTTP-verb methods used together for the first time in this lesson.
 
 ## .flush
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
+
+## .get
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - This project's own real `app.test_client()` return value, already used throughout this curriculum, and four of its real HTTP-verb methods used together for the first time in this lesson.
 
 ## .get_json())
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
@@ -60,6 +65,7 @@ re-run the script after any lesson changes instead.
 ## .put
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - This project's own real `app.test_client()` return value, already used throughout this curriculum, and four of its real HTTP-verb methods used together for the first time in this lesson.
 
 ## .put)
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
@@ -149,6 +155,7 @@ re-run the script after any lesson changes instead.
 
 ## api
 - **Object/method** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, existing Flask view function, registered through its own real blueprint, sharing its real Python function name with the bare `/health` route above (a genuine, harmless naming coincidence, since the two live in separate real modules).
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
 
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
@@ -474,6 +481,7 @@ re-run the script after any lesson changes instead.
 ## DELETE
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this resource should no longer exist" - this lesson's own last unit calls it against this project's own real `/api/machines/<id>`. It exists as its own named method, distinct from an update, because "this resource is gone" is a real, different kind of change than any modification to its content.
 - **Term** in `LESSON-6.12-SQL` - The real SQL statement that removes one or more existing rows entirely, also always paired with a real `WHERE` clause naming which rows to remove. It exists as the real, textual equivalent of `db.session.delete(...)`, already used in this curriculum's own Foreign Keys lesson to demonstrate real cascading behavior.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
 
 ## delete_machine
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function deleting a machine from the database.
@@ -593,6 +601,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
 
+## FlaskClient (.post
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - This project's own real `app.test_client()` return value, already used throughout this curriculum, and four of its real HTTP-verb methods used together for the first time in this lesson.
+
 ## FlaskClient (.post)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real test client this project's own `app.test_client()` returns - the same real class already used to test HTTP routes in this curriculum, this time sending a real `POST`.
 
@@ -618,6 +629,7 @@ re-run the script after any lesson changes instead.
 
 ## GET
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "read this resource, change nothing" - this lesson's own first unit calls it against this project's own real `/api/machines`. It exists as the one method every real HTTP client, cache, and proxy is allowed to assume causes no real side effects at all, without having to inspect what the request actually does.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
 
 ## get_favorites
 - **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
@@ -937,6 +949,9 @@ re-run the script after any lesson changes instead.
 ## parent/child relationship
 - **Term** in `LESSON-6.4-FOREIGN-KEYS` - The relationship a foreign key creates between two relations: the relation being pointed AT is the parent, and the relation holding the pointing column is the child - one parent row can have many real child rows, but each child row points at exactly one real parent. It exists as directional vocabulary because a foreign key only lives on one side of the relationship (the child), which is exactly why navigating from parent to children and from child to parent are two genuinely different real operations, not the same one read backward.
 
+## parts (routes)
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
+
 ## PartService (dead)
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - A real, existing, fully-written class in this project's own backend (`backend/app/services/part_service.py`), structured as a repository/service-shaped layer for the `Part` model.
 
@@ -969,6 +984,7 @@ re-run the script after any lesson changes instead.
 
 ## POST
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "create something new, at a real identity the server itself decides" - this lesson's own second unit calls it against this project's own real `/api/machines/groups`. It exists for exactly the case a client doesn't yet know, and can't supply, the real identity of the thing it's asking to create.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
 
 ## primary key
 - **Term** in `LESSON-7.2-SQLALCHEMY-MODELS` - The real column (or set of columns) a relational table declares as uniquely identifying every one of its own real rows - no two real rows may ever share the same real primary-key value, and a table has exactly one. It exists so every other real table that needs to refer to a specific row of this one has one real, guaranteed-unique value to refer to it by, instead of guessing at some other column that merely happens, today, to hold different values per row.
@@ -990,6 +1006,7 @@ re-run the script after any lesson changes instead.
 
 ## PUT
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "this is now the complete, real state of this resource" - a full replacement, at a real identity the CLIENT already names in the URL. It exists so a client that already knows exactly what a resource should look like can say so in one real request, and safely repeat that same real request without changing the outcome.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - Five real, existing Flask view functions in this project's own backend (`backend/app/routes/parts.py:18-200`), together forming the complete real CRUD surface for `Part` rows.
 
 ## pytest.fixture
 - **Object/method** in `LESSON-2.3-PYTEST` - A real decorator, provided by the `pytest` package, that marks a function as a fixture pytest can inject into any test naming it.
@@ -1208,6 +1225,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
 - **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods every test in this lesson's own file uses to build the real rows each real assertion checks.
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own `auth_headers` fixture uses to persist the real `User` row every request needs.
 
 ## Session (.add_all
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
@@ -1263,6 +1281,9 @@ re-run the script after any lesson changes instead.
 
 ## socket.socket (.connect
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, raw networking class from Python's own standard library `socket` module - the actual mechanism both `requests` and Flask's own real server are themselves built on top of, used directly in this lesson with no HTTP-specific library at all.
+
+## soft delete
+- **Term** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - A real deletion that doesn't remove a row at all - it changes a real status field (here, `Part.status` to `'archived'`) so the row still genuinely exists and is still genuinely queryable, just excluded from whatever real logic treats `'archived'` as effectively gone. It exists so real, historical data - past parts, their real revisions, whatever real rows reference them - isn't actually destroyed by a real delete request, and can be restored or audited later.
 
 ## sorted
 - **Object/method** in `LESSON-1.7-ITERATION-AND-TRANSFORMATION` - A real, built-in function that returns a new, real list containing every element of a given iterable, in sorted order.
@@ -1475,6 +1496,9 @@ re-run the script after any lesson changes instead.
 ## URL path parameter
 - **Term** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, named segment of a route's own URL pattern - `<string:machine_id>`, for instance - that Flask matches against the actual request URL and hands to the view function as a real argument. It exists so one route definition can serve every real machine ID, rather than a route being written once per machine.
 
+## User and encode_auth_token
+- **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT for a given real user - both required to build the real, valid `Authorization` header this lesson's own tests send on every request, so every real request exercises the identical, authenticated path regardless of which of the five routes happens to also permit the real operator-bypass.
+
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
 
@@ -1538,6 +1562,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.commit) and Machine.query.get` / `update_machine (PATCH)` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine_status` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine_status (PUT)` - shares: machine
+- `.commit) and Machine.query.get` / `User and encode_auth_token` - shares: and
 - `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `AppenderQuery (type(group.machines))` - shares: type
 - `.content_type` / `column type` - shares: type
@@ -1548,6 +1573,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.delete)` / `DELETE` - shares: delete
 - `.delete)` / `delete_machine` - shares: delete
 - `.delete)` / `delete_notification` - shares: delete
+- `.delete)` / `soft delete` - shares: delete
 - `.flush` / `flush` - shares: flush
 - `.order_by` / `GROUP BY` - shares: by
 - `.order_by` / `ORDER BY` - shares: by, order
@@ -1555,6 +1581,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.patch` / `unittest.mock.patch` - shares: patch
 - `.patch` / `update_machine (PATCH)` - shares: patch
 - `.post` / `create_machine_group (POST)` - shares: post
+- `.post` / `FlaskClient (.post` - shares: post
 - `.post` / `FlaskClient (.post)` - shares: post
 - `.post` / `POST` - shares: post
 - `.put` / `PUT` - shares: put
@@ -1841,6 +1868,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `rebuild (as this curriculum's own real term)` - shares: real
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Config (and its real subclasses)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
+- `Config (and its real subclasses)` / `User and encode_auth_token` - shares: and
 - `consistency` / `consistency cost` - shares: consistency
 - `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
@@ -1899,6 +1927,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `update_machine_status` - shares: machine
 - `create_machine_group` / `update_machine_status (PUT)` - shares: machine
 - `create_machine_group (POST)` / `delete_machine` - shares: machine
+- `create_machine_group (POST)` / `FlaskClient (.post` - shares: post
 - `create_machine_group (POST)` / `FlaskClient (.post)` - shares: post
 - `create_machine_group (POST)` / `get_machine` - shares: machine
 - `create_machine_group (POST)` / `get_machine (revisited for its real decorator stack)` - shares: machine
@@ -2026,6 +2055,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
 - `DELETE` / `delete_notification` - shares: delete
+- `DELETE` / `soft delete` - shares: delete
 - `delete_machine` / `delete_notification` - shares: delete
 - `delete_machine` / `get_machine` - shares: machine
 - `delete_machine` / `get_machine (revisited for its real decorator stack)` - shares: machine
@@ -2036,10 +2066,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `Machine.to_dict` - shares: machine
 - `delete_machine` / `Query (Machine.query` - shares: machine
 - `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
+- `delete_machine` / `soft delete` - shares: delete
 - `delete_machine` / `update_machine` - shares: machine
 - `delete_machine` / `update_machine (PATCH)` - shares: machine
 - `delete_machine` / `update_machine_status` - shares: machine
 - `delete_machine` / `update_machine_status (PUT)` - shares: machine
+- `delete_notification` / `soft delete` - shares: delete
 - `Dependency (of a function)` / `foreign key (as a constraint)` - shares: a
 - `Dependency (of a function)` / `Key function` - shares: function
 - `Dependency (of a function)` / `machines_bp (as a real, standalone Blueprint)` - shares: a
@@ -2079,6 +2111,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `download_nc_file` / `send_file` - shares: file
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
+- `encode_auth_token` / `User and encode_auth_token` - shares: auth, encode, token
 - `Engine` / `SQLite (as a specific engine)` - shares: engine
 - `error code` / `unified error contract` - shares: error
 - `Exception boundary` / `exception handler` - shares: exception
@@ -2112,7 +2145,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Flask (the class, and this project's own app instance)` / `HTTPException (Werkzeug's own real base class)` - shares: class, own, s
 - `Flask (the class, and this project's own app instance)` / `rebuild (as this curriculum's own real term)` - shares: own, s, this
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
+- `Flask (the class, and this project's own app instance)` / `User and encode_auth_token` - shares: and
 - `flask.jsonify` / `jsonify` - shares: jsonify
+- `FlaskClient (.post` / `POST` - shares: post
 - `FlaskClient (.post)` / `POST` - shares: post
 - `foreign key` / `foreign key (as a constraint)` - shares: foreign, key
 - `foreign key` / `Key function` - shares: key
@@ -2267,6 +2302,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (both real routes, now unified)` / `health_check (the bare` - shares: check, health
 - `health_check (both real routes, now unified)` / `HTTPException (Werkzeug's own real base class)` - shares: real
 - `health_check (both real routes, now unified)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
+- `health_check (both real routes, now unified)` / `parts (routes)` - shares: routes
 - `health_check (both real routes, now unified)` / `proof at every real level` - shares: real
 - `health_check (both real routes, now unified)` / `real_health_status (proposed prototype)` - shares: health, real
 - `health_check (both real routes, now unified)` / `rebuild (as this curriculum's own real term)` - shares: real
@@ -2409,6 +2445,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Parameter` / `URL parameter` - shares: parameter
 - `Parameter` / `URL path parameter` - shares: parameter
 - `parent/child relationship` / `relationship modeling` - shares: relationship
+- `parts (routes)` / `register_routes` - shares: routes
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.checkout_file` / `send_file` - shares: file
@@ -2511,7 +2548,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
 - `Status line` / `status line` - shares: line
+- `str.encode` / `User and encode_auth_token` - shares: encode
 - `TCP (Transmission Control Protocol)` / `TCP connection` - shares: tcp
+- `token_required` / `User and encode_auth_token` - shares: token
 - `tuple` / `tuple (Python builtin type)` - shares: tuple
 - `tuple` / `tuple (relational sense)` - shares: tuple
 - `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
