@@ -17,6 +17,7 @@ re-run the script after any lesson changes instead.
 
 ## .commit)
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
+- **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 
 ## .commit) and Machine.query.get
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
@@ -149,6 +150,9 @@ re-run the script after any lesson changes instead.
 
 ## API contract
 - **Term** in `LESSON-3.5-JSON-APIS` - A real, implicit promise about what a response will contain - not merely what it happens to contain once. It exists so a caller can write real code against an endpoint's own shape with confidence - though, as this lesson's own fourth unit shows directly, nothing forces a real backend to actually keep that promise consistently.
+
+## API representation
+- **Term** in `LESSON-7.5-SERIALIZATION` - The real, specific shape of data an API actually sends or receives - real field names, real value types, real structure - as opposed to whatever real, internal shape the same data happens to have inside the database or the application's own code. It exists as a deliberately separate, real contract because a database schema is designed for real storage and query concerns (this project's own real, snake_case column names, real foreign keys, real internal-only fields like `current_operator_client_id`) that a real API consumer neither needs nor should be coupled to.
 
 ## app.errorhandler
 - **Object/method** in `LESSON-4.7-FLASK-ERROR-HANDLING` - The real, existing Flask decorator this lesson uses to register every one of its own real exception handlers.
@@ -410,6 +414,9 @@ re-run the script after any lesson changes instead.
 ## dataclasses.dataclass
 - **Object/method** in `LESSON-1.6-DATACLASSES-AND-VALUE-OBJECTS` - A real class decorator from the standard library `dataclasses` module that generates several real methods from a class's own field declarations.
 
+## datetime.isoformat
+- **Object/method** in `LESSON-7.5-SERIALIZATION` - A real, existing instance method on Python's own standard-library `datetime.datetime` class, producing a real, specific string representation of a real datetime value.
+
 ## db
 - **Object/method** in `LESSON-1.3-MODULES-AND-PACKAGES` - The real, module-level SQLAlchemy instance every model in this application is built on - created once, in `app/__init__.py`, before `create_app`, below, is even defined.
 
@@ -568,6 +575,9 @@ re-run the script after any lesson changes instead.
 
 ## Flask (the class, and this project's own app instance)
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central class this entire framework is built around - `app = Flask(__name__)` (`backend/app/__init__.py:244`) is the one real object this project's own `create_app()` configures.
+
+## flask.jsonify
+- **Object/method** in `LESSON-7.5-SERIALIZATION` - A real, top-level function from Flask itself, converting a real Python value into a real, complete JSON `Response` object.
 
 ## Flask.test_client
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - A real method on Flask's own `Flask` class, returning a test client that can make requests against the app without a real network socket.
@@ -819,6 +829,7 @@ re-run the script after any lesson changes instead.
 
 ## Machine.to_dict
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing instance method on this project's own `Machine` model, converting a real database row into a real, JSON-safe dict.
+- **Object/method** in `LESSON-7.5-SERIALIZATION` - A real, existing instance method on this project's own real `Machine` model, converting a real `Machine` instance into a real, plain Python `dict`.
 
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
@@ -1154,6 +1165,7 @@ re-run the script after any lesson changes instead.
 
 ## serialization
 - **Term** in `LESSON-3.5-JSON-APIS` - The real process of converting an in-memory Python object into a real, JSON-safe shape - this lesson's own first unit watches a real `datetime` become a real string. It exists because JSON's own real type system is smaller than Python's; a real value has to be converted to something JSON can actually represent before it can be sent anywhere.
+- **Term** in `LESSON-7.5-SERIALIZATION` - The real process of converting an in-memory object - here, a real Python object with real attributes - into a real, flat format (JSON text, in this lesson) that can actually be sent somewhere else and reconstructed. It exists because a real, live Python object - with its own internal state, real methods, and real references to other objects - has no defined meaning outside the real Python process it lives in; JSON is a real, much narrower format both a Python backend and a JavaScript frontend already agree how to read.
 
 ## serve_uploads
 - **Object/method** in `LESSON-3.4-HEADERS` - A real, existing Flask view function serving files from this project's own real upload storage.
@@ -1170,6 +1182,7 @@ re-run the script after any lesson changes instead.
 ## Session (.add
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
+- **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 
 ## Session (.add_all
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
@@ -1580,8 +1593,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `aggregate function` / `Pure function` - shares: function
 - `aggregate function` / `test function` - shares: function
 - `api` / `API contract` - shares: api
+- `api` / `API representation` - shares: api
+- `API contract` / `API representation` - shares: api
 - `API contract` / `response contract (shape)` - shares: contract
 - `API contract` / `unified error contract` - shares: contract
+- `API representation` / `representation` - shares: representation
 - `app.register_blueprint` / `blueprint registration` - shares: blueprint
 - `app.register_blueprint` / `Blueprint.route` - shares: blueprint
 - `app.register_blueprint` / `blueprint.route (the decorator itself)` - shares: blueprint
@@ -2045,6 +2061,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Flask (the class, and this project's own app instance)` / `HTTPException (Werkzeug's own real base class)` - shares: class, own, s
 - `Flask (the class, and this project's own app instance)` / `rebuild (as this curriculum's own real term)` - shares: own, s, this
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
+- `flask.jsonify` / `jsonify` - shares: jsonify
 - `FlaskClient (.post)` / `POST` - shares: post
 - `foreign key` / `foreign key (as a constraint)` - shares: foreign, key
 - `foreign key` / `Key function` - shares: key

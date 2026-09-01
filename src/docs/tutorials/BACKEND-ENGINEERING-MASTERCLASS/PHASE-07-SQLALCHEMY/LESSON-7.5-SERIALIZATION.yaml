@@ -1,0 +1,673 @@
+number: "7.5"
+title: "Serialization"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Three real, run labs proving `database object ≠ API representation`
+  as a real, observable fact, not an abstract design slogan: the first
+  shows a real `Machine` ORM instance genuinely cannot be JSON-encoded
+  at all, while this project's own real `Machine.to_dict()`
+  (`backend/app/models/machine.py:88-113`) can; the second shows every
+  real key `to_dict()` produces is a different, real string than the
+  real Python attribute it came from; the third shows a real Python
+  `datetime` *can* actually be JSON-encoded automatically, in a real,
+  different format than the one this project's own code deliberately
+  chooses instead. The transferable problem: a database row and its
+  JSON representation are not the same shape by necessity - `to_dict()`
+  is real, deliberate translation work, not a formality worked around a
+  technical limitation.
+
+what_you_need_to_know_first: >
+  What a real SQLAlchemy model instance is; what JSON's own real,
+  limited set of value types is (strings, numbers, booleans, null,
+  objects, arrays - nothing else); what a Python `datetime` object is;
+  what snake_case and camelCase naming conventions are.
+
+terms:
+  - name: serialization
+    definition: >
+      The real process of converting an in-memory object - here, a real
+      Python object with real attributes - into a real, flat format
+      (JSON text, in this lesson) that can actually be sent somewhere
+      else and reconstructed. It exists because a real, live Python
+      object - with its own internal state, real methods, and real
+      references to other objects - has no defined meaning outside the
+      real Python process it lives in; JSON is a real, much narrower
+      format both a Python backend and a JavaScript frontend already
+      agree how to read.
+  - name: API representation
+    definition: >
+      The real, specific shape of data an API actually sends or
+      receives - real field names, real value types, real structure -
+      as opposed to whatever real, internal shape the same data happens
+      to have inside the database or the application's own code. It
+      exists as a deliberately separate, real contract because a
+      database schema is designed for real storage and query concerns
+      (this project's own real, snake_case column names, real foreign
+      keys, real internal-only fields like `current_operator_client_id`)
+      that a real API consumer neither needs nor should be coupled to.
+
+objects_and_methods:
+  - name: Machine.to_dict
+    what_it_is: >
+      A real, existing instance method on this project's own real
+      `Machine` model, converting a real `Machine` instance into a real,
+      plain Python `dict`.
+    implementation: >
+      `def to_dict(self) -> dict: return {'id': self.id, ...,
+      'subType': self.sub_type, ..., 'operatorLastHeartbeatAt':
+      self.operator_last_heartbeat_at.isoformat() if
+      self.operator_last_heartbeat_at else None, ...}`
+      (`backend/app/models/machine.py:88-113`) - builds one real,
+      literal `dict`, one key at a time, with every real key a
+      deliberately chosen, camelCase string, and every real
+      `datetime`-typed value explicitly converted via `.isoformat()`
+      before being included.
+    its_use: >
+      Every one of this lesson's own three labs calls this real method
+      directly, either to succeed where a raw `Machine` instance fails,
+      or to inspect exactly which real keys and real values it actually
+      produces.
+    type: A real instance method on this project's own `Machine` class.
+    responsibility: >
+      Producing one real, complete, JSON-safe `dict` representation of
+      a `Machine` instance - deliberately naming every real key and
+      deliberately converting every real, non-JSON-safe value type,
+      rather than exposing the instance's own real attributes as-is.
+    depends_on: >
+      A real, already-populated `Machine` instance (`self`); Python's
+      own real `datetime.isoformat` method, for the one real datetime
+      field it converts.
+    connects_to: >
+      Called throughout this project's own real routes (e.g.
+      `backend/app/routes/machines.py`, `jsonify({'data': [m.to_dict()
+      for m in machines], ...})`) every time a real `Machine` row is
+      actually sent back to a real API caller.
+    shape: >
+      Takes nothing in beyond `self`; returns one real, flat `dict` with
+      23 real keys, every value a real, JSON-safe type (`str`, `int`,
+      `float`, `bool`, or `None` - never a raw `datetime`).
+
+  - name: flask.jsonify
+    what_it_is: >
+      A real, top-level function from Flask itself, converting a real
+      Python value into a real, complete JSON `Response` object.
+    implementation: >
+      `jsonify(value)` calls Flask's own real, configured JSON encoder
+      on `value`, and, if that succeeds, wraps the real, resulting JSON
+      text in a real `Response` with `Content-Type: application/json`
+      already set. If `value` (or anything nested inside it) is a real
+      type the encoder doesn't know how to convert, it raises a real
+      `TypeError`, confirmed directly this session:
+      `jsonify(machine_instance)` raises `TypeError('Object of type
+      Machine is not JSON serializable')`; `jsonify({'ts':
+      real_datetime})`, by contrast, succeeds - Flask's own real encoder
+      already knows how to convert a plain `datetime`, on its own.
+    its_use: >
+      This lesson's own first and third labs call this directly, to
+      observe exactly which real Python values it can and cannot
+      convert on its own, before any of this project's own `to_dict()`
+      methods get involved at all.
+    type: A real, top-level function in the `flask` package.
+    responsibility: >
+      Converting a real Python value into real JSON text, and raising a
+      real, specific `TypeError` the instant it encounters a real value
+      it has no built-in rule for converting.
+    depends_on: >
+      An active real Flask request or app context (this lesson's own
+      labs use `app.test_request_context()` to provide one without a
+      real, running server).
+    connects_to: >
+      This project's own real routes call it constantly, always on an
+      already-built real `dict` (frequently the real output of a
+      `to_dict()` call), never on a raw ORM instance.
+    shape: >
+      Takes one real Python value in (or several positional/keyword
+      values, wrapped into a `dict`); returns one real `Response` object,
+      or raises a real `TypeError` for a value it can't convert. That
+      real `Response` object's own real `.get_data(as_text=True)` method
+      - used directly in this lesson's own labs to actually inspect what
+      `jsonify` produced - takes one real `bool` in and returns the real,
+      decoded response body as a real `str`.
+
+  - name: Session (.add / .commit)
+    what_it_is: >
+      The real, live session object this project's own `db` extension
+      exposes as `db.session`, and two of its real methods this
+      lesson's own labs use to set up real rows before serializing them.
+    implementation: >
+      `db.session.add(instance)` registers one real, new object as
+      pending; `db.session.commit()` flushes every real pending change
+      into real SQL and finalizes the real transaction.
+    its_use: >
+      Every one of this lesson's own three labs uses this identical
+      real pair to build the real `Machine` rows each lab then
+      serializes.
+    type: A real instance of SQLAlchemy's `Session` class (`db.session`).
+    responsibility: >
+      Staging a real, new object as pending, then, on `commit`,
+      compiling and sending the real SQL that actually persists it.
+    depends_on: >
+      A real, open connection from this app's own real `Engine`.
+    connects_to: >
+      Every real `Machine` instance this lesson's own labs then call
+      `.to_dict()` on was built and persisted by this identical pair.
+    shape: >
+      `.add` takes a real object in, returns nothing; `.commit` takes
+      nothing, returns nothing, but has the real, observable side
+      effect of persisting every pending change.
+
+  - name: datetime.isoformat
+    what_it_is: >
+      A real, existing instance method on Python's own standard-library
+      `datetime.datetime` class, producing a real, specific string
+      representation of a real datetime value.
+    implementation: >
+      `some_datetime.isoformat()` returns a real string in ISO 8601
+      format - confirmed directly this session:
+      `datetime(2026, 1, 1, 12, 0, 0).isoformat()` returns
+      `'2026-01-01T12:00:00'` - a real, different format than the one
+      `flask.jsonify` produces automatically for the identical real
+      value (`'Thu, 01 Jan 2026 12:00:00 GMT'`, a real HTTP-date-style
+      format).
+    its_use: >
+      This project's own real `Machine.to_dict()` calls this explicitly
+      on every real `datetime`-typed field it includes; this lesson's
+      own third lab calls it directly, side by side with `jsonify`'s own
+      real, automatic conversion, to prove the two real formats
+      genuinely differ.
+    type: A real instance method on the standard-library `datetime.datetime` class.
+    responsibility: >
+      Producing one real, specific, standard string format for a real
+      datetime value - not the only real format that could represent
+      it, just the one this method is named for.
+    depends_on: >
+      A real, already-constructed `datetime` instance.
+    connects_to: >
+      This project's own real `to_dict()` methods call it directly on
+      every real `datetime` field they include, rather than passing the
+      raw `datetime` object through to `jsonify` and accepting whatever
+      real format it would choose automatically.
+    shape: >
+      Takes nothing in beyond `self`; returns one real `str`.
+
+concept_units:
+  - title: "A Real ORM Instance Cannot Be Sent As JSON At All"
+    problem: >
+      A real, committed `Machine` instance has every real value a
+      caller would want - `.name`, `.status`, `.category`, all of it.
+      Given that, what actually happens if this project's own code
+      tried to hand a real `Machine` instance directly to `jsonify`,
+      skipping `to_dict()` entirely?
+    socratic_prompt:
+      - >
+        JSON's own real value types are strings, numbers, booleans,
+        `null`, objects, and arrays - nothing else. A real `Machine`
+        instance is a real Python object with real, internal
+        SQLAlchemy state (tracking which fields have changed, which
+        session it belongs to) that isn't any of those six things.
+        Before running it, what real, specific kind of error would you
+        expect `jsonify(machine_instance)` to raise?
+      - >
+        `machine_instance.to_dict()` returns a real, plain `dict` -
+        itself one of JSON's own real allowed types. Given that, what
+        real, structural difference between a `Machine` instance and
+        its own `to_dict()` output actually explains why one converts
+        and the other doesn't?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:88-113`
+        (`Machine.to_dict`), read again this session.
+      files_affected:
+        - path: verification/phase-07/lab_serialize_raw_object_fails.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine` model; a real Flask request
+        context, since `jsonify` requires one.
+    new_code:
+      applicable: true
+      intro: >
+        A real, committed `Machine` instance, handed to `jsonify`
+        directly, then again through its own real `to_dict()`:
+      file: verification/phase-07/lab_serialize_raw_object_fails.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        with app.app_context():
+            m = Machine(id="M-SER-001", name="Haas VF-2", category="mill", sub_type="3_axis")
+            db.session.add(m)
+            db.session.commit()
+
+            with app.test_request_context():
+                from flask import jsonify
+
+                try:
+                    jsonify(m)
+                    print("jsonify(raw Machine object) succeeded")
+                except TypeError as e:
+                    print("jsonify(raw Machine object) raised TypeError:", repr(e))
+
+                resp = jsonify(m.to_dict())
+                print("jsonify(m.to_dict()) succeeded:")
+                print(" ", resp.get_data(as_text=True))
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'with app.test_request_context():'
+          explanation: >
+            Provides the real, active request context `jsonify` requires
+            to run at all outside of an actual, real HTTP request -
+            without this, calling `jsonify` here would raise a
+            different real error before ever reaching the question this
+            unit is actually asking.
+        - element: 'jsonify(m)'
+          explanation: >
+            Hands the real, live `Machine` instance directly to Flask's
+            own real JSON encoder - no `to_dict()` call anywhere in this
+            line.
+        - element: 'except TypeError as e: print(repr(e))'
+          explanation: >
+            Catches and prints the real, exact exception Flask's own
+            encoder actually raises - direct, real proof of what "can't
+            be serialized" means concretely, not an assumption about
+            what probably happens.
+        - element: 'jsonify(m.to_dict())'
+          explanation: >
+            The identical real instance, but this time the real,
+            already-converted `dict` `to_dict()` produces is what's
+            handed to `jsonify` - a real, plain `dict` of real strings,
+            numbers, and booleans, which Flask's own encoder already
+            knows how to convert.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **type boundary**: JSON's own real, fixed set of value
+      types is narrower than what a real, running Python object can
+      actually be, so crossing from one to the other requires a real,
+      explicit conversion step - it cannot happen implicitly just
+      because the two seem conceptually related. Also recognized in: a
+      real network protocol that can only carry bytes, requiring a real
+      object to be explicitly encoded before it can be sent at all; a
+      real relational database column with a fixed, declared type,
+      rejecting a real Python object that doesn't fit it; and, in this
+      project's own domain, this project's own real Jinja2 NC-file
+      template rendering, which can only ever produce real, flat text -
+      never a real Python object handed back out.
+    se_lens: >
+      The design principle is that the boundary between "how this
+      project stores and manipulates data internally" and "what this
+      project's API actually sends" should be explicit and real, not
+      implicit. The real alternative not chosen anywhere in this
+      project - giving `Machine` a custom real JSON encoder hook so a
+      raw instance *could* be passed to `jsonify` directly - would make
+      this exact `TypeError` disappear, but the honest cost of removing
+      it: the real, exact shape sent to every real API caller would then
+      be controlled by however SQLAlchemy's own internal attributes
+      happen to be named and typed, rather than by a real, deliberate
+      `to_dict()` method this project's own code fully controls.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_serialize_raw_object_fails.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        jsonify(raw Machine object) raised TypeError: TypeError('Object of type Machine is not JSON serializable')
+        jsonify(m.to_dict()) succeeded:
+          {"axes":3,"category":"mill","createdAt":"2026-09-01T04:54:23.886669","currentOperatorClientId":null,"currentPartId":null,"groupId":null,"hasToolChanger":false,"id":"M-SER-001","location":null,"manufacturer":null,"maxSpindleSpeed":null,"model":null,"name":"Haas VF-2","operatorLastHeartbeatAt":null,"serialNumber":null,"spindleTaper":null,"status":"available","subType":"3_axis","toolChangerCapacity":null,"updatedAt":"2026-09-01T04:54:23.886671","xTravel":null,"yTravel":null,"zTravel":null}
+      output_file: verification/phase-07/lab_serialize_raw_object_fails_output.txt
+    connection_to_previous: >
+      This lesson's own first unit; it establishes the real, hard
+      boundary `to_dict()` exists to cross - the next unit examines
+      exactly what `to_dict()` actually changes once it does.
+
+  - title: "Field Renaming - Every Real Key Is a Deliberate Choice"
+    problem: >
+      `to_dict()`'s own real output has a key `'subType'`. `Machine`'s
+      own real column, and the real Python attribute holding that same
+      value, is `sub_type`. Given Python never renames an attribute on
+      its own, what real, deliberate work is actually producing that
+      different, real string?
+    socratic_prompt:
+      - >
+        Every real key in `to_dict()`'s own returned `dict`
+        (`backend/app/models/machine.py:88-113`) is written as a
+        literal string, by hand - `'subType'`, not
+        `self.sub_type.__name__` or any other real, automatic
+        derivation. What does that tell you about whether this renaming
+        could break silently if `Machine`'s own real column were ever
+        renamed?
+      - >
+        Given `to_dict()` already returns a real key named `'id'`, the
+        identical string as the real attribute `self.id`, what would
+        you expect to happen to a hypothetical new column added to
+        `Machine` if nobody remembered to add a matching line inside
+        `to_dict()` at all?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:88-113`
+        (`Machine.to_dict`), read again this session - the exact real
+        method every key/value pair below is copied from, verbatim.
+      files_affected:
+        - path: verification/phase-07/lab_serialize_field_renaming.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine` model and its own real
+        `to_dict()` method.
+    new_code:
+      applicable: true
+      intro: >
+        A real `Machine` instance's own real, snake_case Python
+        attributes, read directly and printed side by side with the
+        real, camelCase keys its own `to_dict()` actually produces:
+      file: verification/phase-07/lab_serialize_field_renaming.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        with app.app_context():
+            m = Machine(id="M-SER-002", name="Haas UMC-750", category="mill", sub_type="5_axis", serial_number="SN-12345", max_spindle_speed=12000, has_tool_changer=True, tool_changer_capacity=40)
+            db.session.add(m)
+            db.session.commit()
+
+            d = m.to_dict()
+
+            print("real column attribute (Python, snake_case)  ->  real API dict key (camelCase)")
+            for column_name in ("sub_type", "serial_number", "max_spindle_speed", "has_tool_changer", "tool_changer_capacity"):
+                python_value = getattr(m, column_name)
+                print(f"  m.{column_name} = {python_value!r}")
+
+            print()
+            print("real dict keys m.to_dict() actually produced:")
+            for key in ("subType", "serialNumber", "maxSpindleSpeed", "hasToolChanger", "toolChangerCapacity"):
+                print(f"  {key!r}: {d[key]!r}")
+
+            print()
+            print("'sub_type' in d:", "sub_type" in d)
+            print("'subType' in d:", "subType" in d)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'getattr(m, column_name)'
+          explanation: >
+            Reads each real column's own real, current value directly
+            off the real `Machine` instance, by its real, snake_case
+            Python attribute name - the exact same real value
+            `to_dict()` itself reads internally.
+        - element: 'd[key] for key in ("subType", "serialNumber", ...)'
+          explanation: >
+            Reads the identical real values back out of `to_dict()`'s
+            own real, returned `dict`, but by a completely different,
+            real camelCase string - proof the values themselves didn't
+            change, only the real name attached to each one.
+        - element: '"sub_type" in d / "subType" in d'
+          explanation: >
+            Directly confirms the real, snake_case name never appears
+            in `to_dict()`'s own output at all - only the real,
+            deliberately-chosen camelCase name does.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **naming convention translation**: the identical real
+      value, addressed by two entirely different, real string keys,
+      depending on which side of a real boundary is reading it. Also
+      recognized in: a real i18n system mapping one internal message key
+      to different real, displayed strings per locale; a real database
+      view renaming a table's own real columns for a reporting tool
+      that expects different names; and, in this project's own domain,
+      this project's own real `Machine.to_dict()` sitting right next to
+      `Part.to_dict()` (`backend/app/models/part.py`) and `NCTemplate
+      .to_dict()` (`backend/app/models/nc_template.py`) - the identical
+      real renaming pattern, independently repeated once per real
+      model, with no single shared helper doing it for all of them.
+    se_lens: >
+      The design principle is that a backend's own internal naming
+      convention (this project's real, snake_case Python/SQL
+      convention) and a frontend's own expected convention (real,
+      camelCase JavaScript) are allowed to differ, with one explicit,
+      real translation layer reconciling them, rather than forcing one
+      side to adopt the other's convention throughout. The real
+      alternative not chosen here - naming `Machine`'s own real
+      database columns in camelCase directly, so no renaming step is
+      needed at all - would remove this translation step entirely; the
+      honest cost of that real alternative: every other real place this
+      project's own code (and every real SQL statement, matching this
+      curriculum's own already-established SQL conventions) references
+      these columns would carry an unconventional, camelCase name for a
+      relational column, fighting SQL's own real, standard naming
+      convention instead of Python's or JavaScript's.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_serialize_field_renaming.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        real column attribute (Python, snake_case)  ->  real API dict key (camelCase)
+          m.sub_type = '5_axis'
+          m.serial_number = 'SN-12345'
+          m.max_spindle_speed = 12000
+          m.has_tool_changer = True
+          m.tool_changer_capacity = 40
+
+        real dict keys m.to_dict() actually produced:
+          'subType': '5_axis'
+          'serialNumber': 'SN-12345'
+          'maxSpindleSpeed': 12000
+          'hasToolChanger': True
+          'toolChangerCapacity': 40
+
+        'sub_type' in d: False
+        'subType' in d: True
+      output_file: verification/phase-07/lab_serialize_field_renaming_output.txt
+    connection_to_previous: >
+      The previous unit proved `to_dict()`'s own output is what actually
+      crosses the JSON boundary; this unit proves every real key on the
+      other side of that boundary was deliberately renamed, not copied.
+
+  - title: "Type Transformation Is a Deliberate Choice, Not Just a Requirement"
+    problem: >
+      The first unit's own real crash suggested `to_dict()` exists
+      because raw values genuinely can't cross into JSON. But a real
+      Python `datetime` - confirmed directly this session - actually
+      *can* be handed to `jsonify` and succeed, entirely on its own.
+      Given that, why does this project's own `to_dict()` still call
+      `.isoformat()` on every real datetime field by hand, instead of
+      just letting `jsonify` handle it automatically?
+    socratic_prompt:
+      - >
+        `flask.jsonify` already has a real, built-in rule for
+        converting a plain `datetime.datetime` object. Given that rule
+        already exists, what real reason - other than "it wouldn't
+        work otherwise" - might this project's own code still have for
+        calling `.isoformat()` explicitly first?
+      - >
+        Before seeing it run, would you expect `jsonify`'s own,
+        automatic real datetime format and Python's own real
+        `.isoformat()` output to be the identical string, or two
+        genuinely different real formats for the same real value?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:109`
+        (`'operatorLastHeartbeatAt':
+        self.operator_last_heartbeat_at.isoformat() if
+        self.operator_last_heartbeat_at else None`), read again this
+        session - the exact real line this unit's own claim is about.
+      files_affected:
+        - path: verification/phase-07/lab_serialize_datetime_choice.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        Python's own standard-library `datetime` module; a real Flask
+        request context, since `jsonify` requires one.
+    new_code:
+      applicable: true
+      intro: >
+        The identical real `datetime` value, converted two real,
+        different ways - once by Flask's own automatic encoder, once by
+        Python's own explicit `.isoformat()`:
+      file: verification/phase-07/lab_serialize_datetime_choice.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from datetime import datetime
+
+        from app import create_app
+
+        app = create_app("testing")
+
+        with app.app_context():
+            with app.test_request_context():
+                from flask import jsonify
+
+                real_datetime = datetime(2026, 1, 1, 12, 0, 0)
+
+                resp = jsonify({"ts": real_datetime})
+                print("jsonify({'ts': raw datetime}) - Flask's own automatic format:")
+                print(" ", resp.get_data(as_text=True))
+
+                print()
+                print("real_datetime.isoformat() - what this project's own to_dict() methods actually call instead:")
+                print(" ", real_datetime.isoformat())
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'real_datetime = datetime(2026, 1, 1, 12, 0, 0)'
+          explanation: >
+            Builds one real, plain `datetime` object - the identical
+            real kind of value `Machine.operator_last_heartbeat_at`
+            holds, with nothing project-specific about it yet.
+        - element: 'jsonify({"ts": real_datetime})'
+          explanation: >
+            Hands the raw, real `datetime` straight to `jsonify`, with
+            no `.isoformat()` call anywhere - and, unlike the first
+            unit's own raw `Machine` instance, this real value succeeds,
+            proving Flask's own real encoder does have a built-in rule
+            for this specific real type.
+        - element: 'real_datetime.isoformat()'
+          explanation: >
+            Calls the identical real value's own real `.isoformat()`
+            method directly - the exact same real method call this
+            project's own `Machine.to_dict()` already makes, on the
+            identical real value, producing a real, different string
+            than `jsonify` chose on its own.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **default versus explicit format**: a value can have
+      more than one valid, real string representation, and a system
+      that "just works" is silently picking one of them for you,
+      whether or not it's the one you actually wanted. Also recognized
+      in: a real `print()` call on a Python float choosing its own
+      real, default precision, different from `f"{x:.2f}"`'s explicit
+      one; a real spreadsheet program's own default date display format,
+      different from a cell explicitly formatted as ISO 8601; and, in
+      this project's own domain, this project's own real NC-file
+      program-number formatting, chosen explicitly by
+      `final_parser.py`'s own real numbering rules rather than left to
+      whatever a generic default would have produced.
+    se_lens: >
+      The design principle is that an API's own real response format
+      should be a deliberate, stable contract, not whatever a library's
+      own convenient default happens to produce today. The real
+      alternative this project's own code did not choose - relying on
+      `jsonify`'s own automatic datetime handling, letting every real
+      timestamp come back as `'Thu, 01 Jan 2026 12:00:00 GMT'` - saves
+      writing `.isoformat()` by hand; the honest cost of that real
+      alternative: ISO 8601 (`'2026-01-01T12:00:00'`) is the real,
+      standard format most real frontend JavaScript `Date` parsing and
+      most real API conventions actually expect, and nothing guarantees
+      a library's own convenient default stays the same real format
+      across a future real upgrade, the way an explicit `.isoformat()`
+      call does.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_serialize_datetime_choice.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        jsonify({'ts': raw datetime}) - Flask's own automatic format:
+          {"ts":"Thu, 01 Jan 2026 12:00:00 GMT"}
+
+        real_datetime.isoformat() - what this project's own to_dict() methods actually call instead:
+          2026-01-01T12:00:00
+      output_file: verification/phase-07/lab_serialize_datetime_choice_output.txt
+    connection_to_previous: >
+      The previous two units proved `to_dict()` renames and converts
+      real values that genuinely cannot cross into JSON unchanged; this
+      unit closes the lesson by proving it also deliberately overrides
+      a real value that technically could have crossed over on its
+      own, in a format nobody actually chose on purpose.
+
+closing:
+  connect_the_pieces: >
+    One real `Machine` instance, traced across the real boundary between
+    "how this project stores it" and "what an API caller actually
+    receives": handed to `jsonify` directly, it fails with a real,
+    exact `TypeError` - proof the raw object genuinely cannot cross at
+    all. Handed to `jsonify` through its own real `to_dict()` instead,
+    every real value survives, but under a real, different name -
+    `sub_type` becomes `'subType'`, `has_tool_changer` becomes
+    `'hasToolChanger'`, confirmed directly by checking `'sub_type' in d`
+    is `False` while `'subType' in d` is `True`. And even a real value
+    that technically *could* have crossed unchanged - a plain
+    `datetime`, which `jsonify` already knows how to convert on its
+    own - gets deliberately intercepted by `to_dict()`'s own explicit
+    `.isoformat()` call instead, producing `'2026-01-01T12:00:00'`
+    rather than the real, different `'Thu, 01 Jan 2026 12:00:00 GMT'`
+    Flask's own default would have chosen. `database object ≠ API
+    representation` isn't a slogan - it's three real, different, all
+    deliberate translations happening in the same eight-line method.
+  next_lesson_pointer: >
+    This lesson examined `to_dict()` as a plain method sitting on the
+    model itself. Next, this curriculum looks at whether that's actually
+    the right place for it to live at all, once a real project has more
+    than one real way of talking to its own data.
