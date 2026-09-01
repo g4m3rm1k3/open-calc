@@ -19,6 +19,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
+- **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods every test in this lesson's own file uses to build the real rows each real assertion checks.
 
 ## .commit) and Machine.query.get
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
@@ -299,6 +300,7 @@ re-run the script after any lesson changes instead.
 
 ## characterization test
 - **Term** in `LESSON-2.7-CHARACTERIZATION-TESTING` - A test that records what a piece of code's real, current behavior actually is, right now, rather than what it should be - passing, by definition, against the exact behavior observed at the moment it's written. It exists specifically for code nobody has full confidence describing correctly from memory, so a later change to it can be checked against a real, honest baseline instead of nothing at all.
+- **Term** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - A real, permanent test asserting what a real, existing system actually does right now, run against the real system to find out - not a test derived from a specification of what it should do. It exists so a later rebuild has a real, objective, already-passing contract to keep passing, rather than relying on memory or documentation of what the old behavior supposedly was.
 
 ## characterization test (applied for real)
 - **Term** in `LESSON-5.1-INVESTIGATING-HEALTH` - A real, permanent test asserting exactly what a real, existing implementation currently does - not what it should do - written before that implementation changes, so any real deviation later is a deliberate, visible decision rather than an accidental, silent one. It exists, in this lesson specifically, as the first real application (not a lab exercise) of characterization testing anywhere in this curriculum - the real safety net this entire phase's own rebuild depends on.
@@ -998,6 +1000,9 @@ re-run the script after any lesson changes instead.
 ## pytest.mark.parametrize
 - **Object/method** in `LESSON-2.3-PYTEST` - A real decorator, provided by the `pytest` package, that runs one test function once per real set of arguments supplied to it.
 
+## pytest.raises
+- **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - A real, top-level context-manager function from pytest itself, asserting that the code inside its own `with` block raises a real, specific exception.
+
 ## Query (Machine.query
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - SQLAlchemy's real query interface, reached through a model class's own `.query` attribute.
 
@@ -1202,6 +1207,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
 - **Object/method** in `LESSON-7.5-SERIALIZATION` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before serializing them.
 - **Object/method** in `LESSON-7.6-REPOSITORY-VS-ORM` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own second lab uses to set up real rows before calling the real service method under test.
+- **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods every test in this lesson's own file uses to build the real rows each real assertion checks.
 
 ## Session (.add_all
 - **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
@@ -1282,6 +1288,9 @@ re-run the script after any lesson changes instead.
 
 ## SQLite (as a specific engine)
 - **Term** in `LESSON-6.14-SQLITE` - A real, specific relational database engine - not a generic stand-in for "a database" - that runs embedded directly inside the same process as the application using it, storing an entire real database as one ordinary file (or, this curriculum's own real `TestingConfig`, entirely in memory), with no separate database server process involved at all. It exists as its own real, distinct thing from a client-server database (like PostgreSQL or MySQL) because embedding the engine directly removes an entire real layer - no server to install, configure, or connect to over a network - at the real cost of the specific limitations this lesson's own two units demonstrate directly.
+
+## sqlite_master (queried via db.session.execute)
+- **Object/method** in `LESSON-8.1-CHARACTERIZE-THE-EXISTING-SCHEMA` - SQLite's own real, built-in table, recording every other real table's name and the literal, real DDL text SQLite used to create it.
 
 ## statelessness
 - **Term** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real property that a server keeps no memory of any earlier request once that request's own response has been sent - proven directly in this lesson's own last unit, where the same real client, on the very next real request, gets rejected unless it resends its own credentials. It exists, as a deliberate constraint HTTP is built on, so any server can handle any client's request without needing to first recall anything about that client's past.
@@ -1922,6 +1931,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db` / `Machine (db.Model)` - shares: db
 - `db` / `MachineGroup (db.Model)` - shares: db
 - `db` / `Session (db.session)` - shares: db
+- `db` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.Column` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.relationship` - shares: db
@@ -1942,12 +1952,15 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.event.listens_for` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text (for a real SQL statement)` - shares: sqlalchemy
+- `db (module-level SQLAlchemy instance)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.Column` / `Machine (db.Model)` - shares: db
 - `db.Column` / `MachineGroup (db.Model)` - shares: db
 - `db.Column` / `Session (db.session)` - shares: db
+- `db.Column` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.ForeignKey` / `Machine (db.Model)` - shares: db
 - `db.ForeignKey` / `MachineGroup (db.Model)` - shares: db
 - `db.ForeignKey` / `Session (db.session)` - shares: db
+- `db.ForeignKey` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.relationship` / `Machine (db.Model)` - shares: db
 - `db.relationship` / `MachineGroup (db.Model)` - shares: db
 - `db.relationship` / `many-to-many relationship` - shares: relationship
@@ -1955,6 +1968,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.relationship` / `parent/child relationship` - shares: relationship
 - `db.relationship` / `relationship modeling` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
+- `db.relationship` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.relationship (secondary=)` / `Machine (db.Model)` - shares: db
 - `db.relationship (secondary=)` / `MachineGroup (db.Model)` - shares: db
 - `db.relationship (secondary=)` / `many-to-many relationship` - shares: relationship
@@ -1962,12 +1976,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.relationship (secondary=)` / `parent/child relationship` - shares: relationship
 - `db.relationship (secondary=)` / `relationship modeling` - shares: relationship
 - `db.relationship (secondary=)` / `Session (db.session)` - shares: db
+- `db.relationship (secondary=)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `db.session.add` / `Machine (db.Model)` - shares: db
 - `db.session.add` / `MachineGroup (db.Model)` - shares: db
 - `db.session.add` / `Session` - shares: session
 - `db.session.add` / `Session (.add` - shares: add, session
 - `db.session.add` / `Session (.add_all` - shares: add, session
 - `db.session.add` / `Session (db.session)` - shares: db, session
+- `db.session.add` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Machine (db.Model)` - shares: db
 - `db.session.commit` / `MachineGroup (db.Model)` - shares: db
@@ -1975,6 +1991,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.commit` / `Session (.add` - shares: session
 - `db.session.commit` / `Session (.add_all` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
+- `db.session.commit` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
 - `db.session.commit()` / `Machine (db.Model)` - shares: db
 - `db.session.commit()` / `MachineGroup (db.Model)` - shares: db
@@ -1982,6 +1999,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.commit()` / `Session (.add` - shares: session
 - `db.session.commit()` / `Session (.add_all` - shares: session
 - `db.session.commit()` / `Session (db.session)` - shares: db, session
+- `db.session.commit()` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `db.session.commit()` / `test session` - shares: session
 - `db.session.rollback` / `Machine (db.Model)` - shares: db
 - `db.session.rollback` / `MachineGroup (db.Model)` - shares: db
@@ -1990,6 +2008,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.rollback` / `Session (.add` - shares: session
 - `db.session.rollback` / `Session (.add_all` - shares: session
 - `db.session.rollback` / `Session (db.session)` - shares: db, session
+- `db.session.rollback` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `db.session.rollback` / `test session` - shares: session
 - `db.session.rollback()` / `Machine (db.Model)` - shares: db
 - `db.session.rollback()` / `MachineGroup (db.Model)` - shares: db
@@ -1998,10 +2017,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.rollback()` / `Session (.add` - shares: session
 - `db.session.rollback()` / `Session (.add_all` - shares: session
 - `db.session.rollback()` / `Session (db.session)` - shares: db, session
+- `db.session.rollback()` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `db.session.rollback()` / `test session` - shares: session
 - `db.Table` / `Machine (db.Model)` - shares: db
 - `db.Table` / `MachineGroup (db.Model)` - shares: db
 - `db.Table` / `Session (db.session)` - shares: db
+- `db.Table` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
 - `DELETE` / `delete_notification` - shares: delete
@@ -2193,6 +2214,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_nc_file` / `PDMService.download_file` - shares: file
 - `get_nc_file` / `send_file` - shares: file
 - `golden behavior (golden master)` / `observed behavior vs. intended behavior` - shares: behavior
+- `golden behavior (golden master)` / `sqlite_master (queried via db.session.execute)` - shares: master
 - `GROUP BY` / `ORDER BY` - shares: by
 - `GROUP BY` / `repeating group` - shares: group
 - `has_app_context` / `has_request_context` - shares: context, has
@@ -2313,6 +2335,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine (db.Model)` / `Query (Machine.query` - shares: machine
 - `Machine (db.Model)` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine (db.Model)` / `Session (db.session)` - shares: db
+- `Machine (db.Model)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `Machine (db.Model)` / `update_machine` - shares: machine
 - `Machine (db.Model)` / `update_machine (PATCH)` - shares: machine
 - `Machine (db.Model)` / `update_machine_status` - shares: machine
@@ -2347,6 +2370,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `query plan (recap)` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `MachineGroup (db.Model)` / `Session (db.session)` - shares: db
+- `MachineGroup (db.Model)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
 - `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
@@ -2361,6 +2385,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `mark (pytest marker)` / `pytest.fixture` - shares: pytest
 - `mark (pytest marker)` / `pytest.fixture(scope=...)` - shares: pytest
 - `mark (pytest marker)` / `pytest.mark.parametrize` - shares: mark, pytest
+- `mark (pytest marker)` / `pytest.raises` - shares: pytest
 - `mark_as_read` / `pytest.mark.parametrize` - shares: mark
 - `mark_as_read` / `rebuild (as this curriculum's own real term)` - shares: as
 - `mark_as_read` / `SQLite (as a specific engine)` - shares: as
@@ -2464,17 +2489,24 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Session` / `Session (.add` - shares: session
 - `Session` / `Session (.add_all` - shares: session
 - `Session` / `Session (db.session)` - shares: session
+- `Session` / `sqlite_master (queried via db.session.execute)` - shares: session
 - `Session` / `test session` - shares: session
 - `Session (.add` / `Session (db.session)` - shares: session
+- `Session (.add` / `sqlite_master (queried via db.session.execute)` - shares: session
 - `Session (.add` / `test session` - shares: session
 - `Session (.add_all` / `Session (db.session)` - shares: session
+- `Session (.add_all` / `sqlite_master (queried via db.session.execute)` - shares: session
 - `Session (.add_all` / `test session` - shares: session
+- `Session (db.session)` / `sqlite_master (queried via db.session.execute)` - shares: db, session
 - `Session (db.session)` / `test session` - shares: session
 - `set` / `set (builtin)` - shares: set
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin
 - `Side effect` / `side effect` - shares: effect, side
 - `socket.listen` / `sqlalchemy.event.listen (before_cursor_execute)` - shares: listen
+- `sqlalchemy.event.listen (before_cursor_execute)` / `sqlite_master (queried via db.session.execute)` - shares: execute
 - `sqlalchemy.text (for a real SQL statement)` / `SQLite (as a specific engine)` - shares: a
+- `SQLite (as a specific engine)` / `sqlite_master (queried via db.session.execute)` - shares: sqlite
+- `sqlite_master (queried via db.session.execute)` / `test session` - shares: session
 - `Static analysis` / `Static method` - shares: static
 - `Static analysis` / `static method` - shares: static
 - `Static method` / `static method` - shares: method, static
