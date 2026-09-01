@@ -61,6 +61,7 @@ re-run the script after any lesson changes instead.
 ## .post
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here sending real requests specifically to observe which real status code each one gets back.
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT; `FlaskClient` is the real class `app.test_client()` returns, already used throughout this curriculum - together, what this lesson's own permanent test file uses to authenticate and send every real HTTP request.
 
 ## .put
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
@@ -69,6 +70,7 @@ re-run the script after any lesson changes instead.
 
 ## .put)
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real test client Flask's own `app.test_client()` returns, used throughout this lesson to send real, simulated requests.
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT; `FlaskClient` is the real class `app.test_client()` returns, already used throughout this curriculum - together, what this lesson's own permanent test file uses to authenticate and send every real HTTP request.
 
 ## .recv
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, raw networking class from Python's own standard library `socket` module - the actual mechanism both `requests` and Flask's own real server are themselves built on top of, used directly in this lesson with no HTTP-specific library at all.
@@ -395,6 +397,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function creating a new machine.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a new machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions creating two different kinds of resource, using two different real identifier strategies.
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - Three real, existing Flask view functions in this project's own backend (`backend/app/routes/machines.py`), all three rebuilt in this lesson.
 
 ## create_machine_group
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - A real, existing Flask view function creating a new machine group.
@@ -665,6 +668,7 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function listing every machine, with optional real query-string filters.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - Two real, existing Flask view functions - one returning a single real machine, one returning every real machine.
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions - one returning a single real machine resource, one returning the real collection.
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - Three real, existing Flask view functions in this project's own backend (`backend/app/routes/machines.py`), all three rebuilt in this lesson.
 
 ## get_machines (revisited for request.args)
 - **Object/method** in `LESSON-4.4-ROUTES` - The real, existing Flask view function this curriculum has already studied, revisited here specifically for how it reads its own real, optional query parameters.
@@ -855,6 +859,9 @@ re-run the script after any lesson changes instead.
 ## MachineGroup (db.Model)
 - **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machine_groups` database table to a real Python class - the real table `Machine.group_id`'s own foreign key references.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machine_groups` database table to a real Python class - the real parent side of this lesson's own relationship.
+
+## MachineGroup.query.get
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - This project's own real, already-existing class-bound query method, called on `MachineGroup` for the first time in this lesson's own rebuilt code.
 
 ## machines_bp (as a real, standalone Blueprint)
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real `Blueprint` instance for every machine-related route, already studied extensively in this curriculum, examined here specifically as a self-contained real object, independent of any app.
@@ -1482,6 +1489,9 @@ re-run the script after any lesson changes instead.
 ## update_machine (PATCH)
 - **Object/method** in `LESSON-3.6-REST` - Two real, existing Flask view functions completing the real CRUD cycle this lesson's own fourth unit traces end to end.
 
+## update_machine (routes)
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - Three real, existing Flask view functions in this project's own backend (`backend/app/routes/machines.py`), all three rebuilt in this lesson.
+
 ## update_machine_status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - A real, existing Flask view function updating a machine's real status in the database.
 - **Object/method** in `LESSON-3.3-HTTP-STATUS-CODES` - A real, existing Flask view function updating a machine's status.
@@ -1498,6 +1508,9 @@ re-run the script after any lesson changes instead.
 
 ## User and encode_auth_token
 - **Object/method** in `LESSON-8.2-REBUILD-PART-PERSISTENCE` - `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT for a given real user - both required to build the real, valid `Authorization` header this lesson's own tests send on every request, so every real request exercises the identical, authenticated path regardless of which of the five routes happens to also permit the real operator-bypass.
+
+## User, encode_auth_token, and FlaskClient (.get
+- **Object/method** in `LESSON-8.3-REBUILD-MACHINE-PERSISTENCE` - `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT; `FlaskClient` is the real class `app.test_client()` returns, already used throughout this curriculum - together, what this lesson's own permanent test file uses to authenticate and send every real HTTP request.
 
 ## Validation
 - **Term** in `LESSON-0.2-REQUEST-TO-RESPONSE-THINKING` - checking that a request's actual content (its body,
@@ -1550,6 +1563,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.commit) and Machine.query.get` / `Machine.query (.filter` - shares: machine, query
 - `.commit) and Machine.query.get` / `Machine.to_dict` - shares: machine
 - `.commit) and Machine.query.get` / `MachineCAMPairing.query.get` - shares: query
+- `.commit) and Machine.query.get` / `MachineGroup.query.get` - shares: query
 - `.commit) and Machine.query.get` / `NCTemplate.query.get` - shares: query
 - `.commit) and Machine.query.get` / `Query (Machine.query` - shares: machine, query
 - `.commit) and Machine.query.get` / `query object` - shares: query
@@ -1560,9 +1574,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.commit) and Machine.query.get` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `.commit) and Machine.query.get` / `update_machine` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine (PATCH)` - shares: machine
+- `.commit) and Machine.query.get` / `update_machine (routes)` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine_status` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine_status (PUT)` - shares: machine
 - `.commit) and Machine.query.get` / `User and encode_auth_token` - shares: and
+- `.commit) and Machine.query.get` / `User, encode_auth_token, and FlaskClient (.get` - shares: and
 - `.content_type` / `204 (No Content)` - shares: content
 - `.content_type` / `AppenderQuery (type(group.machines))` - shares: type
 - `.content_type` / `column type` - shares: type
@@ -1795,6 +1811,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `caching header` / `request header` - shares: header
 - `CAMFile.query.get` / `Machine.query (.filter` - shares: query
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
+- `CAMFile.query.get` / `MachineGroup.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
 - `CAMFile.query.get` / `query object` - shares: query
@@ -1869,6 +1886,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Config (and its real subclasses)` / `request (the real context-local proxy)` - shares: real
 - `Config (and its real subclasses)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `Config (and its real subclasses)` / `User and encode_auth_token` - shares: and
+- `Config (and its real subclasses)` / `User, encode_auth_token, and FlaskClient (.get` - shares: and
 - `consistency` / `consistency cost` - shares: consistency
 - `consistency cost` / `lookup cost` - shares: cost
 - `constraint` / `foreign key (as a constraint)` - shares: constraint
@@ -1907,6 +1925,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `create_machine` / `update_machine` - shares: machine
 - `create_machine` / `update_machine (PATCH)` - shares: machine
+- `create_machine` / `update_machine (routes)` - shares: machine
 - `create_machine` / `update_machine_status` - shares: machine
 - `create_machine` / `update_machine_status (PUT)` - shares: machine
 - `create_machine_group` / `create_machine_group (POST)` - shares: create, group, machine
@@ -1924,6 +1943,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `repeating group` - shares: group
 - `create_machine_group` / `update_machine` - shares: machine
 - `create_machine_group` / `update_machine (PATCH)` - shares: machine
+- `create_machine_group` / `update_machine (routes)` - shares: machine
 - `create_machine_group` / `update_machine_status` - shares: machine
 - `create_machine_group` / `update_machine_status (PUT)` - shares: machine
 - `create_machine_group (POST)` / `delete_machine` - shares: machine
@@ -1943,6 +1963,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `repeating group` - shares: group
 - `create_machine_group (POST)` / `update_machine` - shares: machine
 - `create_machine_group (POST)` / `update_machine (PATCH)` - shares: machine
+- `create_machine_group (POST)` / `update_machine (routes)` - shares: machine
 - `create_machine_group (POST)` / `update_machine_status` - shares: machine
 - `create_machine_group (POST)` / `update_machine_status (PUT)` - shares: machine
 - `custom header` / `Header` - shares: header
@@ -2069,6 +2090,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `soft delete` - shares: delete
 - `delete_machine` / `update_machine` - shares: machine
 - `delete_machine` / `update_machine (PATCH)` - shares: machine
+- `delete_machine` / `update_machine (routes)` - shares: machine
 - `delete_machine` / `update_machine_status` - shares: machine
 - `delete_machine` / `update_machine_status (PUT)` - shares: machine
 - `delete_notification` / `soft delete` - shares: delete
@@ -2112,6 +2134,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `encode_auth_token` / `str.encode` - shares: encode
 - `encode_auth_token` / `token_required` - shares: token
 - `encode_auth_token` / `User and encode_auth_token` - shares: auth, encode, token
+- `encode_auth_token` / `User, encode_auth_token, and FlaskClient (.get` - shares: auth, encode, token
 - `Engine` / `SQLite (as a specific engine)` - shares: engine
 - `error code` / `unified error contract` - shares: error
 - `Exception boundary` / `exception handler` - shares: exception
@@ -2146,9 +2169,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Flask (the class, and this project's own app instance)` / `rebuild (as this curriculum's own real term)` - shares: own, s, this
 - `Flask (the class, and this project's own app instance)` / `request (the real context-local proxy)` - shares: the
 - `Flask (the class, and this project's own app instance)` / `User and encode_auth_token` - shares: and
+- `Flask (the class, and this project's own app instance)` / `User, encode_auth_token, and FlaskClient (.get` - shares: and
 - `flask.jsonify` / `jsonify` - shares: jsonify
+- `FlaskClient (.get` / `User, encode_auth_token, and FlaskClient (.get` - shares: flaskclient
 - `FlaskClient (.post` / `POST` - shares: post
+- `FlaskClient (.post` / `User, encode_auth_token, and FlaskClient (.get` - shares: flaskclient
 - `FlaskClient (.post)` / `POST` - shares: post
+- `FlaskClient (.post)` / `User, encode_auth_token, and FlaskClient (.get` - shares: flaskclient
 - `foreign key` / `foreign key (as a constraint)` - shares: foreign, key
 - `foreign key` / `Key function` - shares: key
 - `foreign key` / `natural key` - shares: key
@@ -2215,6 +2242,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `get_machine` / `update_machine` - shares: machine
 - `get_machine` / `update_machine (PATCH)` - shares: machine
+- `get_machine` / `update_machine (routes)` - shares: machine
 - `get_machine` / `update_machine_status` - shares: machine
 - `get_machine` / `update_machine_status (PUT)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `get_machines (revisited for request.args)` - shares: for, revisited
@@ -2236,6 +2264,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `sqlalchemy.text (for a real SQL statement)` - shares: for, real
 - `get_machine (revisited for its real decorator stack)` / `update_machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine (PATCH)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `update_machine (routes)` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `update_machine_status (PUT)` - shares: machine
 - `get_machines` / `get_machines (revisited for request.args)` - shares: machines
@@ -2310,6 +2339,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `health_check (both real routes, now unified)` / `request (the real context-local proxy)` - shares: real
 - `health_check (both real routes, now unified)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `health_check (both real routes, now unified)` / `unified error contract` - shares: unified
+- `health_check (both real routes, now unified)` / `update_machine (routes)` - shares: routes
 - `health_check (direct route)` / `health_check (the` - shares: check, health
 - `health_check (direct route)` / `health_check (the bare` - shares: check, health
 - `health_check (direct route)` / `real_health_status (proposed prototype)` - shares: health
@@ -2345,6 +2375,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
 - `is_valid_machine_status` / `update_machine` - shares: machine
 - `is_valid_machine_status` / `update_machine (PATCH)` - shares: machine
+- `is_valid_machine_status` / `update_machine (routes)` - shares: machine
 - `is_valid_machine_status` / `update_machine_status` - shares: machine
 - `is_valid_machine_status` / `update_machine_status (PUT)` - shares: machine
 - `Jinja2 Template` / `render_template` - shares: template
@@ -2363,6 +2394,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine` / `update_machine` - shares: machine
 - `Machine` / `update_machine (PATCH)` - shares: machine
+- `Machine` / `update_machine (routes)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
 - `Machine (db.Model)` / `Machine.query (.filter` - shares: machine
@@ -2374,9 +2406,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine (db.Model)` / `sqlite_master (queried via db.session.execute)` - shares: db
 - `Machine (db.Model)` / `update_machine` - shares: machine
 - `Machine (db.Model)` / `update_machine (PATCH)` - shares: machine
+- `Machine (db.Model)` / `update_machine (routes)` - shares: machine
 - `Machine (db.Model)` / `update_machine_status` - shares: machine
 - `Machine (db.Model)` / `update_machine_status (PUT)` - shares: machine
 - `Machine.query (.filter` / `MachineCAMPairing.query.get` - shares: query
+- `Machine.query (.filter` / `MachineGroup.query.get` - shares: query
 - `Machine.query (.filter` / `NCTemplate.query.get` - shares: query
 - `Machine.query (.filter` / `Query (Machine.query` - shares: machine, query
 - `Machine.query (.filter` / `query object` - shares: query
@@ -2387,6 +2421,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine.query (.filter` / `Query.filter (Machine.query.filter)` - shares: filter, machine, query
 - `Machine.query (.filter` / `update_machine` - shares: machine
 - `Machine.query (.filter` / `update_machine (PATCH)` - shares: machine
+- `Machine.query (.filter` / `update_machine (routes)` - shares: machine
 - `Machine.query (.filter` / `update_machine_status` - shares: machine
 - `Machine.query (.filter` / `update_machine_status (PUT)` - shares: machine
 - `Machine.to_dict` / `many-to-many relationship` - shares: to
@@ -2395,8 +2430,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine.to_dict` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine.to_dict` / `update_machine` - shares: machine
 - `Machine.to_dict` / `update_machine (PATCH)` - shares: machine
+- `Machine.to_dict` / `update_machine (routes)` - shares: machine
 - `Machine.to_dict` / `update_machine_status` - shares: machine
 - `Machine.to_dict` / `update_machine_status (PUT)` - shares: machine
+- `MachineCAMPairing.query.get` / `MachineGroup.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
 - `MachineCAMPairing.query.get` / `query object` - shares: query
@@ -2405,8 +2442,17 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `query pattern` - shares: query
 - `MachineCAMPairing.query.get` / `query plan (recap)` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `MachineGroup (db.Model)` / `MachineGroup.query.get` - shares: machinegroup
 - `MachineGroup (db.Model)` / `Session (db.session)` - shares: db
 - `MachineGroup (db.Model)` / `sqlite_master (queried via db.session.execute)` - shares: db
+- `MachineGroup.query.get` / `NCTemplate.query.get` - shares: query
+- `MachineGroup.query.get` / `Query (Machine.query` - shares: query
+- `MachineGroup.query.get` / `query object` - shares: query
+- `MachineGroup.query.get` / `Query parameter` - shares: query
+- `MachineGroup.query.get` / `query parameter` - shares: query
+- `MachineGroup.query.get` / `query pattern` - shares: query
+- `MachineGroup.query.get` / `query plan (recap)` - shares: query
+- `MachineGroup.query.get` / `Query.filter (Machine.query.filter)` - shares: query
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
 - `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
@@ -2446,6 +2492,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Parameter` / `URL path parameter` - shares: parameter
 - `parent/child relationship` / `relationship modeling` - shares: relationship
 - `parts (routes)` / `register_routes` - shares: routes
+- `parts (routes)` / `update_machine (routes)` - shares: routes
 - `PATCH` / `unittest.mock.patch` - shares: patch
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.checkout_file` / `send_file` - shares: file
@@ -2469,6 +2516,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Query (Machine.query` / `Query.filter (Machine.query.filter)` - shares: machine, query
 - `Query (Machine.query` / `update_machine` - shares: machine
 - `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
+- `Query (Machine.query` / `update_machine (routes)` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
 - `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
 - `query object` / `Query parameter` - shares: query
@@ -2492,6 +2540,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `query plan (recap)` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query.filter (Machine.query.filter)` / `update_machine` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine (PATCH)` - shares: machine
+- `Query.filter (Machine.query.filter)` / `update_machine (routes)` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status` - shares: machine
 - `Query.filter (Machine.query.filter)` / `update_machine_status (PUT)` - shares: machine
 - `Raising an exception` / `unhandled exception` - shares: exception
@@ -2504,6 +2553,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `rebuild (as this curriculum's own real term)` / `request (the real context-local proxy)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `rebuild (as this curriculum's own real term)` / `SQLite (as a specific engine)` - shares: as
+- `register_routes` / `update_machine (routes)` - shares: routes
 - `request (the real context-local proxy)` / `request context` - shares: context
 - `request (the real context-local proxy)` / `sqlalchemy.text (for a real SQL statement)` - shares: real
 - `request body` / `response body` - shares: body
@@ -2549,8 +2599,10 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Static method` / `static method` - shares: method, static
 - `Status line` / `status line` - shares: line
 - `str.encode` / `User and encode_auth_token` - shares: encode
+- `str.encode` / `User, encode_auth_token, and FlaskClient (.get` - shares: encode
 - `TCP (Transmission Control Protocol)` / `TCP connection` - shares: tcp
 - `token_required` / `User and encode_auth_token` - shares: token
+- `token_required` / `User, encode_auth_token, and FlaskClient (.get` - shares: token
 - `tuple` / `tuple (Python builtin type)` - shares: tuple
 - `tuple` / `tuple (relational sense)` - shares: tuple
 - `tuple (Python builtin type)` / `tuple (relational sense)` - shares: tuple
@@ -2561,17 +2613,24 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `UPDATE` / `update anomaly` - shares: update
 - `UPDATE` / `update_machine` - shares: update
 - `UPDATE` / `update_machine (PATCH)` - shares: update
+- `UPDATE` / `update_machine (routes)` - shares: update
 - `UPDATE` / `update_machine_status` - shares: update
 - `UPDATE` / `update_machine_status (PUT)` - shares: update
 - `update anomaly` / `update_machine` - shares: update
 - `update anomaly` / `update_machine (PATCH)` - shares: update
+- `update anomaly` / `update_machine (routes)` - shares: update
 - `update anomaly` / `update_machine_status` - shares: update
 - `update anomaly` / `update_machine_status (PUT)` - shares: update
 - `update_machine` / `update_machine (PATCH)` - shares: machine, update
+- `update_machine` / `update_machine (routes)` - shares: machine, update
 - `update_machine` / `update_machine_status` - shares: machine, update
 - `update_machine` / `update_machine_status (PUT)` - shares: machine, update
+- `update_machine (PATCH)` / `update_machine (routes)` - shares: machine, update
 - `update_machine (PATCH)` / `update_machine_status` - shares: machine, update
 - `update_machine (PATCH)` / `update_machine_status (PUT)` - shares: machine, update
+- `update_machine (routes)` / `update_machine_status` - shares: machine, update
+- `update_machine (routes)` / `update_machine_status (PUT)` - shares: machine, update
 - `update_machine_status` / `update_machine_status (PUT)` - shares: machine, update
 - `URL parameter` / `URL path parameter` - shares: parameter
+- `User and encode_auth_token` / `User, encode_auth_token, and FlaskClient (.get` - shares: and, auth, encode, token, user
 - `WSGI` / `WSGI (Web Server Gateway Interface)` - shares: wsgi

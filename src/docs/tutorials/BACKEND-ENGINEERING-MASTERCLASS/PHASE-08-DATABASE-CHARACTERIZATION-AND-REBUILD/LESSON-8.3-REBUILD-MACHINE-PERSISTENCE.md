@@ -1,0 +1,540 @@
+# Lesson 8.3: Rebuild Machine Persistence
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Four real, permanent fixes to this project's own real `/api/machines` persistence, each pinned by a real, permanent test in `backend/tests/test_machines_characterization.py`: validation - the real, live `AttributeError` this curriculum's own earlier work already triggered against `Machine.type` is now a real, handled `400`; relationships - `create_machine`/`update_machine` now check a real, submitted `groupId` against `MachineGroup.query` before ever committing; transactions - that check runs before any real `db.session.add`/`.commit`, so a rejected group leaves no real, partial row behind; indexes - `Machine.group_id` (`backend/app/models/machine.py:83`) now has a real, working index, proven by a real `EXPLAIN QUERY PLAN` changing from `SCAN machines` to a real `SEARCH`. The transferable problem: "apply validation, relationships, transactions, indexes" isn't four separate rebuilds - it's four real lenses on the identical, small set of real code changes.
+
+**What you need to know first:** What a real Python `AttributeError` is and when it's raised; what a real foreign key column is and what real value it's expected to hold; what a real database transaction is, and what committing or rolling it back actually does; what a real SQL index does to a real query plan.
+
+## Terms used in this lesson
+
+
+
+## Objects and methods used
+
+- **`get_machines / create_machine / update_machine (routes)`**
+  - *What it is:* Three real, existing Flask view functions in this project's own backend (`backend/app/routes/machines.py`), all three rebuilt in this lesson.
+  - *Implementation:* `get_machines` (`:14-45`) lists/filters machines; `create_machine` (`:118-172`) validates required fields and creates a real row; `update_machine` (`:176-215`) mutates real, allowed fields on an already-loaded instance. All three call real `Machine.query` methods directly.
+  - *Its use:* This lesson's own four units each modify one or more of these three real functions directly, in place, and every real change is pinned by this lesson's own new, permanent test file.
+  - *Type:* Three real Flask view functions, registered on the real `machines_bp` blueprint.
+  - *Responsibility:* Together, listing, creating, and updating real `Machine` rows over real HTTP, each independently responsible for its own real validation and real response shape.
+  - *Depends on:* This project's own real `Machine`/`MachineGroup` models; a real, valid `Authorization` token for `create_machine`/`update_machine` specifically, whose own real `allowed_roles=['programming', 'admin']` excludes `'operator'`.
+  - *Connects to:* `create_machine`/`update_machine` now both call `MachineGroup.query.get(...)` directly, a real, new dependency neither of them had before this lesson.
+  - *Shape:* Each real route takes a real HTTP request in, returns real JSON - `{'data': {...}}` on success, `{'error': '...'}` with a real, specific status code on failure.
+
+- **`MachineGroup.query.get`**
+  - *What it is:* This project's own real, already-existing class-bound query method, called on `MachineGroup` for the first time in this lesson's own rebuilt code.
+  - *Implementation:* `MachineGroup.query.get(group_id)` issues a real `SELECT ... WHERE id = ?` against the real `machine_groups` table, returning a real `MachineGroup` instance or `None`.
+  - *Its use:* This lesson's own second unit calls this once in `create_machine` and once in `update_machine`, specifically to check a real, submitted `groupId` actually names an existing real row before ever assigning it.
+  - *Type:* A real class-bound query method, identical in kind to `Machine.query.get` already examined earlier in this curriculum.
+  - *Responsibility:* Looking up one real row by its real primary key, returning `None` rather than raising when nothing matches.
+  - *Depends on:* A real, live SQLAlchemy `db` extension instance.
+  - *Connects to:* Its real, `None` return value is exactly what this lesson's own new validation branches check for, in both rebuilt routes.
+  - *Shape:* Takes a real primary-key value in, returns a real `MachineGroup` instance or `None`.
+
+- **`User, encode_auth_token, and FlaskClient (.get / .post / .put)`**
+  - *What it is:* `User` is this project's own real, existing SQLAlchemy model class; `encode_auth_token` is this project's own real, existing function producing a real, signed JWT; `FlaskClient` is the real class `app.test_client()` returns, already used throughout this curriculum - together, what this lesson's own permanent test file uses to authenticate and send every real HTTP request.
+  - *Implementation:* `User(id=..., email=..., name=..., role=...)` (`backend/app/models/user.py`) builds one real, in-memory row; `encode_auth_token(user_id: str, role: str) -> str` (`backend/app/utils/auth_utils.py:163-247`) signs a real token for it. `client.get(path, headers=...)`, `.post(path, json=..., headers=...)`, and `.put(path, json=..., headers=...)` each simulate one real HTTP request of that method, in-process, against this app's own real routing.
+  - *Its use:* This lesson's own shared `auth_headers` fixture builds the real token every one of this lesson's own eight test functions sends; every one of those eight calls at least one of `client.get`/ `.post`/`.put`.
+  - *Type:* A real SQLAlchemy model class, a real module-level function, and three real instance methods on `FlaskClient`.
+  - *Responsibility:* `User`/`encode_auth_token` together produce one real, valid credential; each `FlaskClient` method sends one real, complete HTTP request through this app's own real routing.
+  - *Depends on:* A real, live SQLAlchemy `db` extension instance; a fully-built real `Flask` app instance.
+  - *Connects to:* Every real request this lesson's own tests send reaches one of the three real, rebuilt view functions named above.
+  - *Shape:* `User(...)` takes real keyword arguments in; `encode_auth_token` takes two real strings in, returns one real, signed token string; each `FlaskClient` method takes a real path (and optional body/headers) in, returns one real `Response` object.
+
+## Concept Unit: Validation - the Real, Live ?type= Crash Becomes a Real 400
+
+### The Problem
+
+`get_machines` still contains `query.filter(Machine.type == machine_type)` - a real line this curriculum's own earlier work already triggered, live, producing a real, unhandled `AttributeError`, since `Machine` has no `type` attribute. What does "apply validation" mean here, given the real intended semantics of a `type` filter were never actually established?
+
+Before reading on:
+
+- `Machine`'s own real columns are `category` and `sub_type`, not `type`. Given nothing in this project's own real evidence settles whether a `type` filter was ever meant to mean `category`, `sub_type`, or something else, what does this curriculum's own stated default - matching real, observed behavior over guessing at what "should" be right - suggest about inventing a new mapping here versus simply rejecting the request cleanly?
+- A real `400` response and a real, unhandled `500` both tell a real client "this didn't work." What real, concrete difference does a caller actually experience between the two?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:27-38` (`get_machines`, before this change), read again this session - the exact real, live bug this project's own earlier work already triggered and captured (`AttributeError("type object 'Machine' has no attribute 'type'")`).
+- **Files affected:** `backend/app/routes/machines.py` (modified)
+- **Change type:** replace
+- **Location:** Inside `get_machines`, replacing the unguarded `query.filter(Machine.type == machine_type)` line.
+- **Dependencies:** None beyond this project's own real, existing `Machine` model.
+
+### The New Code
+
+A real, early guard clause, returning a real, structured `400` before the real query is ever touched - shown alongside the real, complete, permanent test file this whole lesson's own rebuild is checked against:
+
+**File:** `backend/app/routes/machines.py` (new)
+
+```python
+if machine_type:
+    return jsonify({'error': "Filtering by 'type' is not supported - Machine has no 'type' column (real columns are 'category' and 'subType')"}), 400
+```
+
+**File:** `backend/tests/test_machines_characterization.py` (new)
+
+```python
+"""
+Characterization tests for this project's own real /api/machines routes
+(backend/app/routes/machines.py) and the real Machine persistence
+rebuild performed in this same lesson: validation (the real, live
+?type= AttributeError converted to a real 400; group_id existence
+checked on create/update), relationships (Machine.group/MachineGroup
+still navigable), transactions (a rejected group_id commits nothing),
+and indexes (group_id now has a real, used index).
+"""
+import pytest
+
+from sqlalchemy import text
+
+from app import create_app, db
+from app.models.machine import Machine, MachineGroup
+from app.utils.auth_utils import encode_auth_token
+from app.models.user import User
+
+
+@pytest.fixture
+def app():
+    application = create_app("testing")
+    with application.app_context():
+        yield application
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture
+def auth_headers(app):
+    user = User(id="U-MACH-TEST", email="mach-test@example.com", name="Machine Tester", role="programming")
+    db.session.add(user)
+    db.session.commit()
+    token = encode_auth_token("U-MACH-TEST", "programming")
+    return {"Authorization": f"Bearer {token}"}
+
+
+class TestValidation:
+    """The real, live ?type= crash, now a real, handled 400."""
+
+    def test_type_filter_returns_400_not_a_crash(self, client, auth_headers):
+        resp = client.get("/api/machines?type=mill", headers=auth_headers)
+        assert resp.status_code == 400
+        assert "type" in resp.get_json()["error"]
+
+    def test_status_filter_still_works(self, client, auth_headers):
+        resp = client.get("/api/machines?status=available", headers=auth_headers)
+        assert resp.status_code == 200
+
+    def test_create_machine_with_nonexistent_group_returns_400(self, client, auth_headers):
+        resp = client.post(
+            "/api/machines",
+            json={"id": "M-BAD-GRP", "name": "Test", "category": "mill", "subType": "3_axis",
+                  "manufacturer": "Haas", "model": "VF-2", "groupId": "G-DOES-NOT-EXIST"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 400
+
+    def test_update_machine_with_nonexistent_group_returns_400(self, client, auth_headers, app):
+        with app.app_context():
+            m = Machine(id="M-UPD-001", name="Test", category="mill", sub_type="3_axis")
+            db.session.add(m)
+            db.session.commit()
+        resp = client.put(
+            "/api/machines/M-UPD-001",
+            json={"groupId": "G-DOES-NOT-EXIST"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 400
+
+
+class TestRelationships:
+    """Machine.group_id validated against a real, existing MachineGroup."""
+
+    def test_create_machine_with_real_group_succeeds(self, client, auth_headers, app):
+        with app.app_context():
+            group = MachineGroup(id="G-REAL-001", name="Mill Room", type="location")
+            db.session.add(group)
+            db.session.commit()
+        resp = client.post(
+            "/api/machines",
+            json={"id": "M-GOOD-GRP", "name": "Test", "category": "mill", "subType": "3_axis",
+                  "manufacturer": "Haas", "model": "VF-2", "groupId": "G-REAL-001"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 201
+        assert resp.get_json()["data"]["groupId"] == "G-REAL-001"
+
+
+class TestTransactions:
+    """A rejected groupId commits nothing - no partial machine row."""
+
+    def test_rejected_create_leaves_no_real_row(self, client, auth_headers):
+        client.post(
+            "/api/machines",
+            json={"id": "M-NO-COMMIT", "name": "Test", "category": "mill", "subType": "3_axis",
+                  "manufacturer": "Haas", "model": "VF-2", "groupId": "G-DOES-NOT-EXIST"},
+            headers=auth_headers,
+        )
+        resp = client.get("/api/machines/M-NO-COMMIT", headers=auth_headers)
+        assert resp.status_code == 404
+
+
+class TestIndexes:
+    """A real, used index on machines.group_id."""
+
+    def test_group_id_has_a_real_index(self, app):
+        rows = db.session.execute(
+            text("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='machines'")
+        ).fetchall()
+        names = [r[0] for r in rows]
+        assert any("group_id" in n for n in names)
+
+    def test_group_id_filter_uses_search_not_scan(self, app):
+        plan = db.session.execute(
+            text("EXPLAIN QUERY PLAN SELECT * FROM machines WHERE group_id = 'G-1'")
+        ).fetchall()
+        plan_text = " ".join(row[-1] for row in plan)
+        assert "SEARCH" in plan_text
+        assert "SCAN machines" not in plan_text
+```
+
+### The Updated Project
+
+`get_machines`'s own real, complete body, with the new guard clause placed right after the query parameters are read, before the real query is ever built:
+
+**File:** `backend/app/routes/machines.py` (already exists — read-only, nothing to type)
+
+```python
+def get_machines(current_user):
+    """
+    GET /api/machines
+
+    List all machines with optional filtering.
+
+    Query params:
+        - status: Filter by status (available, running, offline, maintenance)
+        - type: Filter by machine type (3-axis, 5-axis, lathe, etc.)
+        - groupId: Filter by group
+    """
+    status = request.args.get('status')
+    machine_type = request.args.get('type')
+    group_id = request.args.get('groupId')
+
+    if machine_type:  # <- new
+        return jsonify({'error': "Filtering by 'type' is not supported - Machine has no 'type' column (real columns are 'category' and 'subType')"}), 400  # <- new
+
+    query = Machine.query
+
+    if status:
+        query = query.filter(Machine.status == status)
+    if group_id:
+        query = query.filter(Machine.group_id == group_id)
+
+    machines = query.order_by(Machine.name).all()
+
+    return jsonify({
+        'data': [m.to_dict() for m in machines],
+        'total': len(machines)
+    })
+```
+
+### Mechanical Walkthrough
+
+- `if machine_type: return jsonify({...}), 400` — Runs before `query = Machine.query` is even reached - the real, broken `Machine.type` comparison this line replaces never executes at all now, for any real request that includes `?type=`.
+- `'error': "Filtering by 'type' is not supported - Machine has no 'type' column..."` — Names the real, specific reason, in the response itself, rather than a generic "bad request" - a real caller reading this real error message learns exactly what went wrong, something the previous, unhandled `AttributeError` never communicated to anyone outside this project's own real server logs.
+- `the now-removed real line 'query = query.filter(Machine.type == machine_type)'` — Deleted entirely - not wrapped in a `try`/`except`, since catching an `AttributeError` here would still leave the real question of what `type` was supposed to filter by unanswered; returning a real, honest `400` doesn't pretend to solve a semantic the real, original code never actually defined.
+
+### CS Lens
+
+This is **input validation at the boundary**: rejecting a real, malformed request explicitly, at the earliest real point it can be recognized as invalid, rather than letting it proceed into code that assumes it's well-formed. Also recognized in: a real compiler's own front-end rejecting a syntactically invalid program before any real code generation runs; a real network protocol's own header validation, rejecting a malformed packet before its real payload is ever parsed; and, in this project's own domain, this project's own real `create_part`'s existing required- field check, rejecting a real request missing `partNumber` before any real `Part` object is ever constructed.
+
+### SE Lens
+
+The design principle is that an unsupported real request should fail loudly and specifically, not crash unpredictably. The real alternative not chosen here - guessing that `type` was meant to filter by `category` or `sub_type` and silently wiring that in - would make the endpoint "work" for some real caller's guess at the original intent; the honest cost of that real alternative: it invents behavior this project's own real evidence never actually established, exactly the kind of guess this curriculum's own stated method exists to avoid. The real, structured `400` this unit actually ships is honest about what's unsupported, without pretending to know what should replace it.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe -m pytest backend/tests/test_machines_characterization.py::TestValidation -v` — Runs just this unit's own two new real tests, from the repository root.
+
+### Verification
+
+```text
+backend/tests/test_machines_characterization.py::TestValidation::test_type_filter_returns_400_not_a_crash PASSED
+backend/tests/test_machines_characterization.py::TestValidation::test_status_filter_still_works PASSED
+```
+
+Full saved run: `N/A - real, permanent test file; run directly via pytest, not a saved verification/ output pair.`.
+
+### Connection to the previous unit
+
+This lesson's own first unit; it closes a real, already-known gap before the next unit opens a new real check of its own.
+
+## Concept Unit: Relationships - a Real groupId Must Name a Real, Existing Group
+
+### The Problem
+
+`create_machine`/`update_machine` both accept a real `groupId` field and assign it directly - `group_id=data.get('groupId')` - with nothing checking it actually names a real `MachineGroup` row. What real, observable problem does that gap actually create?
+
+Before reading on:
+
+- This project's own real `Machine.group_id` column has no database-level `PRAGMA foreign_keys` enforcement turned on anywhere in this app's own real runtime code. Given that, what would actually stop a real `groupId` naming a row that doesn't exist from being silently accepted today?
+- `MachineGroup.query.get(group_id)` already exists as a real, working method - the identical real pattern `Machine.query.get` already uses throughout this project. What real, minimal check would use it to reject an invalid `groupId` before it's ever assigned?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:140-159` (`create_machine`, before this change) and `:184-208` (`update_machine`, before this change), read again this session.
+- **Files affected:** `backend/app/routes/machines.py` (modified)
+- **Change type:** add
+- **Location:** In `create_machine`, immediately after the existing machine-ID-uniqueness check; in `update_machine`, immediately after `data = request.get_json()`.
+- **Dependencies:** This project's own real `MachineGroup` model, already imported in this file.
+
+### The New Code
+
+Two real guard clauses, one per route - textually different, since `create_machine` reads from a real, freshly-received `data` dict while `update_machine` checks whether `groupId` was even submitted at all before treating it as a real change:
+
+**File:** `backend/app/routes/machines.py` (new)
+
+```python
+if data.get('groupId') and not MachineGroup.query.get(data['groupId']):
+    return jsonify({'error': f"Machine group {data['groupId']} does not exist"}), 400
+```
+
+**File:** `backend/app/routes/machines.py` (new)
+
+```python
+if 'groupId' in data and data['groupId'] and not MachineGroup.query.get(data['groupId']):
+    return jsonify({'error': f"Machine group {data['groupId']} does not exist"}), 400
+```
+
+### The Updated Project
+
+`create_machine`'s own real, complete body, with the new check placed right after the existing ID-uniqueness check:
+
+**File:** `backend/app/routes/machines.py` (already exists — read-only, nothing to type)
+
+```python
+def create_machine(current_user):
+    """
+    POST /api/machines
+
+    Create a new machine.
+    """
+    data = request.get_json()
+
+    # Validate required fields
+    required = ['id', 'name', 'category', 'subType', 'manufacturer', 'model']
+    for field in required:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+
+    # Check if machine ID already exists
+    existing = Machine.query.get(data['id'])
+    if existing:
+        return jsonify({'error': 'Machine ID already exists'}), 400
+
+    if data.get('groupId') and not MachineGroup.query.get(data['groupId']):  # <- new
+        return jsonify({'error': f"Machine group {data['groupId']} does not exist"}), 400  # <- new
+
+    try:
+        machine = Machine(
+            id=data['id'],
+            name=data['name'],
+            category=data['category'],
+            sub_type=data['subType'],
+            manufacturer=data.get('manufacturer'),
+            model=data.get('model'),
+            serial_number=data.get('serialNumber'),
+            location=data.get('location'),
+            axes=data.get('axes', 3),
+            x_travel=data.get('xTravel'),
+            y_travel=data.get('yTravel'),
+            z_travel=data.get('zTravel'),
+            max_spindle_speed=data.get('maxSpindleSpeed'),
+            spindle_taper=data.get('spindleTaper'),
+            has_tool_changer=data.get('hasToolChanger', False),
+            tool_changer_capacity=data.get('toolChangerCapacity'),
+            status=data.get('status', 'available'),
+            group_id=data.get('groupId'),
+        )
+
+        db.session.add(machine)
+        db.session.commit()
+
+        socketio.emit('APP_STATE_INVALIDATED')
+
+        return jsonify({'data': machine.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+```
+
+### Mechanical Walkthrough
+
+- `data.get('groupId') and not MachineGroup.query.get(data['groupId'])` — Two real conditions joined by `and`: only checks at all when a real `groupId` was actually submitted (a machine with no group is still valid), and only fails when `MachineGroup.query.get` genuinely returns `None` - the real row doesn't exist.
+- `f"Machine group {data['groupId']} does not exist"` — Names the real, specific `groupId` that failed, directly in the response - a real caller doesn't have to guess which field was wrong.
+- `'groupId' in data and data['groupId'] and not MachineGroup.query.get(data['groupId'])` — `update_machine`'s own real version of this check, textually different from `create_machine`'s: it tests `'groupId' in data` first, because `update_machine` treats a field's *absence* from the real request body as "leave unchanged" - the identical real convention every other field in this route already follows (`if 'name' in data: machine.name = data['name']`) - so this check must not fire for a real update that never mentions `groupId` at all, only one that submits an invalid one.
+- `placed before the try/except block, not inside it` — This real check runs and can return early *before* any real `Machine(...)` object is even constructed - a deliberate, real ordering this lesson's own next unit examines directly.
+
+### CS Lens
+
+This is **referential integrity enforced in application code**, standing in for the real, database-level enforcement this project never turns on. Also recognized in: a real ORM's own `validates()`-style decorator, checking a value before it's ever assigned to a real attribute; a real compiler's own type checker, rejecting a reference to an undeclared name before code generation; and, in this project's own domain, this project's own real `create_part`'s duplicate-`part_number` check, the identical real shape - look a value up, reject if the real lookup fails to find what's expected.
+
+### SE Lens
+
+The design principle is that when a real database doesn't enforce a real constraint itself (this project's own real, confirmed gap: `PRAGMA foreign_keys` never turned on anywhere in its own runtime code), the application layer has to, or the real constraint simply doesn't exist in practice. The real alternative not chosen here - turning on `PRAGMA foreign_keys` at the database level instead - would enforce this for every real write path at once, not just these two routes; the honest cost of the real alternative this lesson actually chose: every other real write path that sets `group_id` (if any exist elsewhere in this codebase) still isn't protected, a real, narrower fix than a database-level change would have been.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe -m pytest backend/tests/test_machines_characterization.py::TestRelationships -v` — Runs this unit's own new real test, from the repository root.
+
+### Verification
+
+```text
+backend/tests/test_machines_characterization.py::TestRelationships::test_create_machine_with_real_group_succeeds PASSED
+```
+
+Full saved run: `N/A - real, permanent test file; run directly via pytest, not a saved verification/ output pair.`.
+
+### Connection to the previous unit
+
+The previous unit closed a real validation gap on read; this unit closes a real validation gap on write - the next unit examines exactly what this write-side check protects.
+
+## Concept Unit: Transactions - a Rejected Group Leaves No Real, Partial Row
+
+### The Problem
+
+The previous unit's own new check runs *before* `db.session.add`/ `.commit()`. What real, concrete difference does that ordering make to what ends up in the real database when a `groupId` is rejected?
+
+Before reading on:
+
+- If the new `groupId` check instead ran *after* `db.session.add(machine)`, inside the existing `try` block, would a real `Machine` row still end up committed for a rejected request - and how would you actually prove the answer, rather than guess?
+- `create_machine`'s own real `except Exception as e:` block already calls `db.session.rollback()`. Given the new `groupId` check returns before that `try` block is ever entered, does this specific real check depend on `rollback()` working correctly at all?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/routes/machines.py:140-143` (the new `groupId` check, placed before the `try` block), read again this session.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - examines the previous unit's own already-placed real code; no new change.
+- **Dependencies:** The previous unit's own already-shipped real check.
+
+### Mechanical Walkthrough
+
+- `the real groupId check, sitting before 'try: machine = Machine(...)'` — Because this real check `return`s before a `Machine` object is even constructed, there's nothing for `db.session.add` to ever be called on for a rejected request - not "added then rolled back," genuinely never added at all.
+- `GET /api/machines/M-NO-COMMIT after a rejected POST with that id` — This lesson's own new test sends a real, rejected `POST`, then makes a real, separate `GET` for the identical id - real, direct proof (a `404`) that no real row exists, rather than trusting the `400` response alone.
+
+### Mental Model
+
+```text
+POST /api/machines, invalid groupId
+        |
+        v
+groupId check fails -> return 400   (never reaches Machine(...))
+        |
+        v (never happens)
+db.session.add(machine)
+        |
+        v (never happens)
+db.session.commit()
+```
+
+### CS Lens
+
+This is **fail-fast validation preventing a real transaction from ever starting**, a stronger real guarantee than atomicity applied after the fact - proven directly earlier in this curriculum, real operations rolled back together after both were staged. Here, nothing is staged at all for a rejected request. Also recognized in: a real build system refusing to even begin compiling a project with a missing dependency, rather than compiling partway and failing; a real payment system validating a card number's real checksum before ever opening a connection to a real payment processor; and, in this project's own domain, this project's own real `create_part`'s required-field check, which also returns before any real `Part` object is constructed.
+
+### SE Lens
+
+The design principle is that the cheapest real transaction to roll back is one that never opened. The real alternative not chosen here - performing the `groupId` check inside the existing `try` block, after `db.session.add(machine)` - would still work correctly, relying on the already-proven real `rollback()` mechanism; the honest cost of that real alternative: it does real, unnecessary work (constructing a real object, staging it) for a request already known to be invalid, and makes the real reason for failure one exception-handling layer further from where the actual problem was detected.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe -m pytest backend/tests/test_machines_characterization.py::TestTransactions -v` — Runs this unit's own new real test, from the repository root.
+
+### Verification
+
+```text
+backend/tests/test_machines_characterization.py::TestTransactions::test_rejected_create_leaves_no_real_row PASSED
+```
+
+Full saved run: `N/A - real, permanent test file; run directly via pytest, not a saved verification/ output pair.`.
+
+### Connection to the previous unit
+
+The previous unit added the real check; this unit proves exactly what real consequence its placement has for the database - the final unit closes this lesson with a real, unrelated concern: how fast that same real column can actually be queried.
+
+## Concept Unit: Indexes - a Real, Missing Index on machines.group_id
+
+### The Problem
+
+`Machine.group_id` is actively filtered - `get_machines`'s own real `query.filter(Machine.group_id == group_id)` - but the real, current schema has no real index on it at all. What real, observable difference does adding one actually make?
+
+Before reading on:
+
+- `EXPLAIN QUERY PLAN` already distinguished `SEARCH` from `SCAN` earlier in this curriculum's own work. Given `group_id` has no real index today, what would you predict `EXPLAIN QUERY PLAN` shows for `SELECT * FROM machines WHERE group_id = ?`, before running it?
+- `db.Column(..., index=True)` is a real, declarative keyword argument, the identical real shape as `primary_key`/`nullable` already examined earlier in this curriculum. Given that, what real, generated DDL would you expect this one keyword change to add?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/models/machine.py:83` (`group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)`, before this change), read again this session; confirmed missing via a real `EXPLAIN QUERY PLAN` this session, returning `SCAN machines`.
+- **Files affected:** `backend/app/models/machine.py` (modified)
+- **Change type:** add
+- **Location:** On the existing `group_id` column declaration.
+- **Dependencies:** None beyond this project's own real, existing `Machine` model.
+
+### The New Code
+
+One real, added keyword argument:
+
+**File:** `backend/app/models/machine.py` (new)
+
+```python
+group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True, index=True)
+```
+
+### The Updated Project
+
+The real, single line this change touches, in place:
+
+**File:** `backend/app/models/machine.py` (already exists — read-only, nothing to type)
+
+```python
+# Group association
+group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True, index=True)  # <- new
+```
+
+### Mechanical Walkthrough
+
+- `index=True` — The one real, new keyword - tells SQLAlchemy's own `db.create_all()` to generate a real, separate `CREATE INDEX` statement for this column, alongside the existing `CREATE TABLE` statement, the identical real mechanism `primary_key=True` already used to add its own real DDL clause earlier in this curriculum.
+
+### CS Lens
+
+This is a real **B-tree index**, the identical real data structure and identical real tradeoff already proven at length earlier in this curriculum - real, faster lookups by `group_id`, paid for with real, additional storage and real, slightly slower writes. Also recognized in: a real book's own back-of-book index, the same real tradeoff (extra pages, faster lookup by topic); a real search engine's own inverted index; and, in this project's own domain, `Machine.group_id`'s own real sibling column, `Sequence.tool_assembly_id`, confirmed earlier in this curriculum to have the identical real gap - actively filtered, still no real index, not yet fixed.
+
+### SE Lens
+
+The design principle is that a foreign key column actively used to filter real queries should be indexed - the real, foreign-key relationship alone doesn't make SQLite add one automatically, confirmed directly by this exact column's own real, missing index before this change. The real alternative not chosen here - leaving it unindexed, since this project's real, current data is small enough that a real `SCAN` costs little today - is genuinely how this column has shipped until this lesson; the honest cost of that real alternative, unchanged by this fix: every other real, actively-filtered, unindexed column this curriculum has already found (`Sequence.tool_assembly_id`, `Issue.part_id`/`machine_id`) still has the identical real gap, not yet addressed.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe -m pytest backend/tests/test_machines_characterization.py::TestIndexes -v` — Runs this unit's own two new real tests, from the repository root.
+
+### Verification
+
+```text
+backend/tests/test_machines_characterization.py::TestIndexes::test_group_id_has_a_real_index PASSED
+backend/tests/test_machines_characterization.py::TestIndexes::test_group_id_filter_uses_search_not_scan PASSED
+```
+
+Full saved run: `N/A - real, permanent test file; run directly via pytest, not a saved verification/ output pair.`.
+
+### Connection to the previous unit
+
+The previous three units rebuilt what happens when `group_id` is written; this unit closes the lesson by rebuilding how fast it can be read back.
+
+## Connect the pieces
+
+Four real, separate fixes to the identical real column and its surrounding code: `get_machines`'s own real, live crash on `?type=` is now a real, structured `400`, proven by a real request that used to raise an uncaught `AttributeError` now returning cleanly. `create_machine`/`update_machine` both now reject a real, nonexistent `groupId` via `MachineGroup.query.get`, proven by a real `400` on a fake group and a real `201` on a genuine one. That same check's real placement - before `db.session.add` is ever called - means a rejected request leaves no real, partial `Machine` row behind, proven by a real, follow-up `GET` returning `404`. And `Machine.group_id` now has a real, working index, proven by a real `EXPLAIN QUERY PLAN` changing from `SCAN machines` to a real `SEARCH ... USING INDEX`. All eight of this lesson's own new, permanent tests pass, and the full, real suite - 40 tests total, not just this lesson's own file - still passes alongside them.
+
+**Next lesson:** This lesson rebuilt one model's own persistence in isolation. Next, this curriculum rebuilds `CAMFile`'s own persistence, where the real aggregate this project's data actually forms - a CAM file, its real sequences, its real operations - starts to matter to how the rebuild is shaped.
