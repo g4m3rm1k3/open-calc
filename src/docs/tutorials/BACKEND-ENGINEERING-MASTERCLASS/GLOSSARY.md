@@ -52,6 +52,9 @@ re-run the script after any lesson changes instead.
 ## .json())
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - `requests.get` is the real top-level function from the third-party `requests` library, sending a real HTTP `GET` request over an actual TCP connection; the object it returns is a real `Response`.
 
+## .nc_files (relationships)
+- **Object/method** in `LESSON-8.4-REBUILD-CAM-FILE-PERSISTENCE` - Two real, existing `db.relationship` declarations on this project's own real `CAMFile` model (`backend/app/models/cam_file.py:72-73`).
+
 ## .order_by
 - **Object/method** in `LESSON-7.4-QUERYING` - `Machine.query` is the real, class-bound query interface Flask- SQLAlchemy attaches to every real model, already used by this project's own real `get_machines` route; `.filter`, `.order_by`, `.count`, and `.all` are four of its real, chainable methods.
 
@@ -294,6 +297,9 @@ re-run the script after any lesson changes instead.
 
 ## CAMFile.query.get
 - **Object/method** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real ORM query reading one row from the database by its primary key.
+
+## CAMFile.sequences
+- **Object/method** in `LESSON-8.4-REBUILD-CAM-FILE-PERSISTENCE` - Two real, existing `db.relationship` declarations on this project's own real `CAMFile` model (`backend/app/models/cam_file.py:72-73`).
 
 ## canonical endpoint (decision)
 - **Term** in `LESSON-5.2-DESIGNING-THE-HEALTH-CONTRACT` - The real, deliberate decision about which real URL(s) a resource lives at, and what real relationship multiple URLs answering the identical real question should have to each other - in this lesson's own case, keeping both real, existing URLs alive but making them share one real, unified implementation. It exists because "which URL is correct" and "should this URL even keep existing" are two genuinely different real questions, and conflating them risks breaking a real, legitimate caller for no real reason.
@@ -1591,6 +1597,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.delete)` / `delete_notification` - shares: delete
 - `.delete)` / `soft delete` - shares: delete
 - `.flush` / `flush` - shares: flush
+- `.nc_files (relationships)` / `download_nc_file` - shares: nc
+- `.nc_files (relationships)` / `generate_nc_file` - shares: nc
+- `.nc_files (relationships)` / `get_nc_file` - shares: nc
 - `.order_by` / `GROUP BY` - shares: by
 - `.order_by` / `ORDER BY` - shares: by, order
 - `.patch` / `PATCH` - shares: patch
