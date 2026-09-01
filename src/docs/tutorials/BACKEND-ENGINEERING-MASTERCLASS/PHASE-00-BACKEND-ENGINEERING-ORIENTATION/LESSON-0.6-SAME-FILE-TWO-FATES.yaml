@@ -1,0 +1,249 @@
+number: "0.6"
+title: "Same File, Two Fates: Live Code vs. Dead Code"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  A real, small tool that answers "who actually imports this module" by
+  searching every real `.py` file in this application for a real module
+  name, mechanically - then uses it to settle, with real evidence, which
+  of two same-purpose Mastercam XML parser modules this application
+  actually runs. The transferable problem: a file's name, its position
+  in the directory, or the quality of its code tells you nothing about
+  whether it's live - only tracing real callers does.
+
+what_you_need_to_know_first: >
+  Proving a claim about a codebase by checking it two independent ways,
+  rather than trusting the first plausible answer; reading a real,
+  existing file as evidence.
+
+terms:
+  - name: "Static analysis"
+    definition: >
+      Examining what source code says, structurally, without executing
+      it. It exists as a distinct approach from watching a program
+      actually run - static analysis can answer real, mechanical
+      questions like "does this file's text contain this module's real
+      name" for every file in a whole codebase, without running a single
+      one of them, and without missing a rarely-executed code path the
+      way only-ever-running-and-observing would.
+
+objects_and_methods:
+  - name: "Path"
+    what_it_is: "The standard-library class representing a real filesystem path, from Python's `pathlib` module."
+    implementation: "`pathlib.Path(path_string)`"
+    its_use: "This lesson's lab constructs one pointing at `backend`, the real directory holding this entire application's source, to search every file inside it."
+    type: "A class, in Python's standard library `pathlib` module."
+    responsibility: "Represent a filesystem location and provide real methods for inspecting or navigating it, without itself reading any file's content."
+    depends_on: "A string naming the path - real or not; `Path` itself doesn't check existence until a method that touches the filesystem is called."
+    connects_to: "Its `rglob` method, below, is called directly on the constructed instance."
+    shape: "Takes one string; returns one `Path` object representing that location, ready for further real filesystem operations."
+  - name: "Path.rglob"
+    what_it_is: "A method listing every real file matching a pattern, searching a directory and every real subdirectory beneath it."
+    implementation: "`Path.rglob(pattern: str) -> Iterator[Path]`"
+    its_use: >
+      This lesson's lab calls it with `\"*.py\"` on the real `backend`
+      directory, so every real `.py` file anywhere under it is checked -
+      not just files directly inside `backend` itself, since the real
+      module being searched for could be imported from any real
+      subdirectory (`app/services/`, `app/routes/`, or the backend root).
+    type: "An instance method on `Path`."
+    responsibility: >
+      Recursively scan the real directory this `Path` represents,
+      including every real subdirectory, and yield one `Path` object for
+      every real file whose name matches the given pattern - the
+      recursive counterpart to `Path.glob`, which only looks one level
+      deep.
+    depends_on: "The `Path` it's called on actually existing as a real directory."
+    connects_to: "Each yielded `Path` is read directly by `Path.read_text`, below."
+    shape: "Takes one pattern string; returns a generator yielding one `Path` per real matching file, anywhere in the real directory tree beneath the starting path."
+  - name: "Path.read_text"
+    what_it_is: "A method reading a real file's entire content as one plain string."
+    implementation: "`Path.read_text(encoding: str = None, errors: str = None) -> str`"
+    its_use: >
+      This lesson's lab calls it on each real `.py` file `rglob` found,
+      to search that file's actual source text for a real module name -
+      with `encoding=\"utf-8\"` and `errors=\"ignore\"` so a file
+      containing any unexpected byte doesn't crash the whole search.
+    type: "An instance method on `Path`."
+    responsibility: >
+      Open the real file this `Path` points at, read its entire real
+      content, and return it as one plain Python string - the whole
+      file, not a line at a time.
+    depends_on: "The `Path` it's called on being a real, readable file."
+    connects_to: "Its return value is checked with Python's own `in` operator against the module name being searched for."
+    shape: >
+      Takes no required argument for this lab's use (encoding/errors are
+      both given here); returns one plain string holding the file's
+      entire real text content.
+
+concept_units:
+  - title: "Two Files, Same Job, One Real Caller"
+    problem: >
+      `backend/app/services/final_parser.py` and
+      `backend/app/services/mastercam_xml_parser.py` both exist, in the
+      same real directory, both built to parse the same real Mastercam
+      XML format this application imports. Reading either file's own
+      source proves nothing about which one this application actually
+      runs when a real XML file gets uploaded - a well-written file and
+      a dead one can look equally convincing from the inside. The real
+      question - "which one actually runs" - is a question about real
+      callers elsewhere in this codebase, not about either file itself.
+    socratic_prompt:
+      - "If two files both plausibly do the same real job, what would
+        reading either file's own source code, by itself, actually
+        prove about which one this application runs?"
+      - "What real, mechanical fact - not file naming, not code quality,
+        not a comment - would actually settle which one is live?"
+    project_change:
+      reference_source: >
+        `backend/app/services/cam_import_service.py:30`, read this
+        session: `from app.services.final_parser import parse_final as
+        parse_mastercam_xml` - and line 62, `parsed_data =
+        parse_mastercam_xml(xml_content)`. `backend/test_xml_parser.py:13`
+        and `backend/test_schema.py:12`, both read this session, each
+        read `from app.services.mastercam_xml_parser import
+        parse_mastercam_xml`.
+      explanation: >
+        `cam_import_service.py` imports `final_parser.py`'s real
+        `parse_final` function, but aliases it, at import time, to the
+        local name `parse_mastercam_xml` - the exact real function name
+        `mastercam_xml_parser.py` itself exports. Read in isolation,
+        either file's own code could plausibly be "the" real parser;
+        this unit's real tool searches every actual file in the
+        application for real references to each module's name, instead
+        of trusting either file's contents or its name.
+      files_affected:
+        - path: "verification/phase-00/lab_find_real_importers.py"
+          status: new
+      change_type: add
+      location: "New file, no existing project to place it within."
+      dependencies: "Python's standard library `pathlib` module only."
+    new_code:
+      applicable: true
+      intro: >
+        New code, typed into a new throwaway file - the whole file at
+        once, since there's no existing structure to return to for
+        something this small:
+      file: "verification/phase-00/lab_find_real_importers.py"
+      status: new
+      code: |
+        from pathlib import Path
+
+        def real_importers(module_name):
+            hits = []
+            for path in Path("backend").rglob("*.py"):
+                if path.stem == module_name:
+                    continue
+                if module_name in path.read_text(encoding="utf-8", errors="ignore"):
+                    hits.append(str(path))
+            return sorted(hits)
+
+        for module in ("final_parser", "mastercam_xml_parser"):
+            print(module)
+            for hit in real_importers(module):
+                print(" ", hit)
+            print()
+    updated_project:
+      applicable: false
+      note: >
+        Not applicable - the code shown above is already the whole new
+        structure, with nothing existing to return to (per this
+        schema's own skip condition for a brand-new file).
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "for path in Path(\"backend\").rglob(\"*.py\"):"
+          explanation: >
+            `Path` builds a real handle on the whole `backend` directory;
+            `Path.rglob(\"*.py\")` recursively yields every real `.py`
+            file anywhere beneath it - not just one directory level, so
+            a real import from any subdirectory is found.
+        - element: "if path.stem == module_name: continue"
+          explanation: >
+            `.stem` (a plain string attribute, the filename without its
+            `.py` extension - already read in passing in the previous
+            lesson) is compared against the module name itself, so the
+            module's own defining file isn't counted as its own real
+            importer - `basic Python` `continue` skips straight to the
+            next file.
+        - element: "if module_name in path.read_text(encoding=\"utf-8\", errors=\"ignore\"):"
+          explanation: >
+            `Path.read_text` reads the real file's entire text; Python's
+            own `in` operator (basic Python) checks whether the module
+            name appears anywhere in it at all - a real, blunt but
+            mechanical substring check, not a guess.
+        - element: "hits.append(str(path))"
+          explanation: >
+            `str(path)` (basic Python) converts the real `Path` object
+            to a plain string for display; `hits.append` (basic Python
+            list method) records it.
+        - element: "return sorted(hits)"
+          explanation: >
+            `sorted()` (basic Python) gives every run a stable, readable
+            order rather than whatever order the real filesystem happens
+            to yield files in.
+    cs_lens: >
+      This is static analysis again, applied to a different real
+      question: not "what routes does one file define" (the previous
+      lesson's tool), but "which real files, anywhere in this whole
+      codebase, reference this specific name at all." The same idea
+      recurs as an IDE's real "find all references" feature, a linter
+      flagging an import that's never actually used, and a build system
+      determining which real source files need recompiling because they
+      reference a changed one - all of them answer "who depends on this"
+      by searching real source text or structure, never by running the
+      program and hoping the right path gets exercised.
+    se_lens: >
+      The real alternative not chosen: trusting the two files' own names
+      and positions in the directory - both sit in `app/services/`,
+      both are named plausibly, and nothing about that placement
+      distinguishes a live module from an abandoned one. The real,
+      honest cost of the blunt substring search actually used here: it
+      would also match a module name appearing only in a comment or a
+      string literal, not a real `import` statement - a false positive
+      this exact script can't tell apart from a genuine import. For
+      these two real files, checked directly, that risk didn't cost
+      anything - every real hit found is a genuine import - but a larger,
+      noisier codebase could produce a false lead this same script
+      wouldn't catch.
+    commands:
+      - command: "python verification/phase-00/lab_find_real_importers.py"
+        explanation: >
+          Run from the manufacturing-platform repository root, so the
+          relative path to the real `backend` directory resolves
+          correctly.
+    verification:
+      applicable: true
+      real_output: |
+        final_parser
+          backend\app\services\cam_import_service.py
+
+        mastercam_xml_parser
+          backend\test_schema.py
+          backend\test_xml_parser.py
+      output_file: "verification/phase-00/lab_find_real_importers_output.txt"
+    connection_to_previous: >
+      There is no previous unit - this is the first and only unit in
+      this lesson.
+
+closing:
+  connect_the_pieces: >
+    One real question - "which parser does this application actually
+    run" - answered mechanically instead of by reading either
+    candidate's own code: `final_parser.py`'s real `parse_final` function
+    is imported, under the alias `parse_mastercam_xml`, by exactly one
+    real file, `cam_import_service.py`, which is itself called by a real,
+    live route (`POST /cam-files/<id>/import-xml`). `mastercam_xml_parser.py`'s
+    own `parse_mastercam_xml` function is referenced only by two
+    standalone scripts at the backend's root, outside the real
+    application's own routes and services entirely. Same directory, same
+    real job, same exported function name once aliased - and only
+    tracing real callers, not reading either file's own source, settled
+    which one is live.
+  next_lesson_pointer: >
+    Turning this same habit - read the real control flow, not the name -
+    on a piece of middleware that already comes with its own, plausible-
+    sounding explanation for what it does.
