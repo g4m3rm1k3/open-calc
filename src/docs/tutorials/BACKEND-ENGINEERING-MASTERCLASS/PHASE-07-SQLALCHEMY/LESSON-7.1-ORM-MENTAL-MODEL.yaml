@@ -14,8 +14,9 @@ what_you_will_build: >
   real `INSERT`; the second showing what `Machine.query.get()` - this
   project's own real, already-shipped call - actually returns when a real
   row comes back. The transferable problem: every `db.session`/`.query`
-  call this curriculum's own database work has already made has been
-  doing exactly this same real translation, in one direction or the
+  call this project's own real routes already make (e.g.
+  `Machine.query.get(machine_id)` in `backend/app/routes/machines.py:56`)
+  is doing exactly this same real translation, in one direction or the
   other, unexamined until now.
 
 what_you_need_to_know_first: >
@@ -34,13 +35,10 @@ terms:
       statements a relational database actually understands. It exists
       so application code manipulates real objects and real attributes
       directly, instead of composing SQL strings by hand for every read
-      and write - exactly what every earlier concept unit's own
-      `db.session` and `Machine.query` calls (used throughout this
-      curriculum's own database work, including
-      `Machine.query.get(machine_id)` in this project's own real
-      `backend/app/routes/machines.py:56`) have already been doing since
-      this curriculum first started building and querying real rows,
-      examined directly, by name, for the first time in this lesson.
+      and write - examined directly, by name, for the first time in this
+      lesson, even though this project's own real routes already call it
+      constantly (e.g. `Machine.query.get(machine_id)` in
+      `backend/app/routes/machines.py:56`).
   - name: Session
     definition: >
       The real, stateful object - this project's own `db.session` - that
@@ -203,22 +201,19 @@ objects_and_methods:
 concept_units:
   - title: "Python Object to SQL - What add(), flush(), and commit() Actually Do"
     problem: >
-      Every earlier concept unit's own database work already called
-      `db.session.add(...)` and `.commit()` and got a real row in the
-      real database - without ever
-      asking what happens between those two calls, or which one actually
-      sends the real SQL. Is a real `INSERT` statement sent the moment
-      `add()` runs, or only later - and if later, exactly which real call
-      is the one that does it?
+      This project's own real routes already call `db.session.add(...)`
+      and `.commit()` and get a real row in the real database - without
+      anything in this codebase ever printing what happens between those
+      two calls, or which one actually sends the real SQL. Is a real
+      `INSERT` statement sent the moment `add()` runs, or only later -
+      and if later, exactly which real call is the one that does it?
     socratic_prompt:
       - >
-        This curriculum's own earlier, direct SQL work already ran a real
-        `INSERT INTO machines (...) VALUES (...)` statement directly,
-        with real column names and real bound values. Given `Machine`'s
-        own real columns
-        (`backend/app/models/machine.py:41-86`), what would you expect an
-        ORM-generated `INSERT` for a new `Machine` object to actually
-        look like, before seeing it?
+        Given `Machine`'s own real columns
+        (`backend/app/models/machine.py:41-86`) and an ordinary SQL
+        `INSERT`'s own shape (column names, bound placeholder values),
+        what would you expect an ORM-generated `INSERT` for a new
+        `Machine` object to actually look like, before seeing it?
       - >
         `db.session.add(machine)` and `db.session.commit()` are two
         separate real calls. If you had to prove - not guess - which one
@@ -226,11 +221,10 @@ concept_units:
         settle it, given nothing in this project prints the SQL SQLAlchemy
         generates anywhere?
       - >
-        This curriculum's own earlier transaction work already proved a
-        real transaction can hold more than one pending change before
-        either committing or rolling all of them back together. If
-        `add()` doesn't send SQL immediately, what does it do instead, in
-        the meantime?
+        A database transaction can hold more than one pending change
+        before either committing or rolling all of them back together.
+        If `add()` doesn't send SQL immediately, what does it do instead,
+        in the meantime?
     project_change:
       reference_source: >
         Real specimen: `backend/app/models/machine.py:41-86` (`Machine`),
@@ -396,9 +390,8 @@ concept_units:
       repository until a later, separate `git commit`; a spreadsheet
       holding every changed cell before a recalculation pass actually
       runs; a text editor holding real edits in an in-memory buffer,
-      never touching the real file on disk until an explicit save; and,
-      already proven at the SQL level itself, in this project's own real,
-      earlier transaction work - one or more pending statements, held
+      never touching the real file on disk until an explicit save; and a
+      database transaction itself - one or more pending statements, held
       open, before either a real `commit` or `rollback` decides their
       fate together.
     se_lens: >
@@ -406,10 +399,10 @@ concept_units:
       pending change and sends them as one real, coordinated operation,
       rather than writing each one to the database the instant it's
       described. The real alternative not chosen here - executing and
-      committing each real change immediately, the way this curriculum's
-      own earlier, direct raw `sqlite3` work did, one statement at a
-      time - is simpler to
-      reason about moment-to-moment, since nothing is ever "pending"; the
+      committing each real change immediately, the way a plain DB-API
+      script (raw `sqlite3`, no ORM at all) would, one statement at a
+      time - is simpler to reason about moment-to-moment, since nothing
+      is ever "pending"; the
       honest cost of the `Session`'s deferred approach, proven directly by
       this unit's own real trace: a reader (or a maintainer of this exact
       project) cannot tell, from `add()` alone, whether a change has
@@ -436,11 +429,10 @@ concept_units:
       output_file: verification/phase-07/lab_orm_object_to_sql_output.txt
     connection_to_previous: >
       This lesson's own first unit; it establishes, with real, captured
-      proof, the exact real boundary this curriculum's own earlier
-      database work already pointed toward without naming - that every
-      ORM call this curriculum has made since its own database work began
-      is running real SQL underneath, at one specific real moment, not
-      continuously.
+      proof, exactly which real call in a `db.session` sequence actually
+      sends SQL - the boundary every other real route in this app's own
+      codebase relies on, unexamined, every time it calls
+      `db.session.add`/`.commit`.
 
   - title: "SQL to Python Object - What a Real Query Actually Returns"
     problem: >
@@ -453,11 +445,12 @@ concept_units:
       attributes?
     socratic_prompt:
       - >
-        This curriculum's own earlier, direct SQL work already proved a
-        real SQLite row comes back as a plain tuple of raw values, in
-        column order, with no names attached. Given
-        that, what would have to happen for `result.manufacturer` to work
-        as real Python attribute access afterward?
+        A raw DB-API cursor - Python's own standard-library `sqlite3`
+        module, with no ORM or SQLAlchemy involved at all - hands back
+        each row as a plain, unnamed tuple: position only, no attribute
+        access. Given that, what would have to happen for
+        `result.manufacturer` to work as real Python attribute access
+        afterward?
       - >
         Given the previous unit's own real `INSERT` named every one of
         `Machine`'s 23 real columns explicitly, what would you expect the
@@ -565,10 +558,9 @@ concept_units:
         - element: 'print("result.id:", repr(result.id)) / print("result.manufacturer:", repr(result.manufacturer))'
           explanation: >
             Reads real, named Python attributes directly off `result` -
-            the real row's raw, flat, unnamed tuple values (already
-            proven directly, earlier in this curriculum's own SQL work)
-            have already become real, named attributes on a real object
-            by this point.
+            unlike a raw DB-API cursor row (a plain, unnamed tuple,
+            position only), this is a real, named attribute on a genuine
+            `Machine` instance.
         - element: 'isinstance(result, Machine)'
           explanation: >
             Confirms `result` is a genuine instance of this project's own
@@ -590,9 +582,8 @@ concept_units:
       applicable: false
     cs_lens: >
       This is **marshalling**: translating a real, flat, positional data
-      shape (a database row - a plain tuple of raw values, no names, as
-      this curriculum's own earlier SQL work already proved directly)
-      into a real, structured representation
+      shape (a raw DB-API cursor row - a plain tuple of values, no
+      names, no attribute access) into a real, structured representation
       a program can address by name (`result.manufacturer`, not "the
       fifth value"). Also recognized in: this project's own real JSON
       responses, where a Python `dict` becomes a real, named-field JSON
@@ -606,15 +597,13 @@ concept_units:
       boundary - code on either side of `Machine.query.get` only ever
       deals with real Python objects, never raw rows. The real
       alternative not chosen anywhere in this project - hand-writing raw
-      SQL and manually mapping each real tuple back to named values, the
-      way this curriculum's own earlier, direct SQL labs did - gives
-      full, explicit control over exactly what SQL runs; the honest cost
-      of the convenience this project's real code chose instead is
-      exactly what this curriculum's own real, counted N+1 finding and
-      its own real missing-index finding already proved, both against
-      this same real schema: the ORM decides what SQL to generate, and
-      that real, generated SQL is not always the real SQL a hand-written
-      query would have chosen.
+      SQL and manually mapping each real tuple back to named values by
+      position - gives full, explicit control over exactly what SQL
+      runs; the honest cost of the convenience this project's real code
+      chose instead: the ORM decides what SQL to generate on the
+      caller's behalf, and a decision made for convenience is not
+      guaranteed to be the same real SQL a hand-written query would have
+      chosen.
     commands:
       - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_orm_sql_to_object.py
         explanation: >
@@ -658,9 +647,9 @@ closing:
     machines.id = ?` statement, captured the same way, and comes back as
     a genuine `Machine` instance whose `.manufacturer` is real Python
     attribute access, not a raw tuple position. Every `db.session`/
-    `.query` call this curriculum's own database work has ever made has
-    been running exactly this same real translation, in one direction or
-    the other - only now made visible.
+    `.query` call this project's own real routes already make has been
+    running exactly this same real translation, in one direction or the
+    other - only now made visible.
   next_lesson_pointer: >
     This lesson treated `Machine` as already fully built. Next, this
     curriculum looks at exactly how a class like `Machine` gets mapped to

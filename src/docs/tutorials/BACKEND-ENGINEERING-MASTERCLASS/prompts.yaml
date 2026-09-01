@@ -493,6 +493,19 @@ closing:
 project_overrides:
   # This project's own decisions, layered on top of the generic rules
   # above - kept here, in one place, rather than re-litigated per lesson.
+  - "The standard for how a lesson is built is this file and
+    LESSON SCHEMA.md / LESSON AUTHORING CONTRACT.md - never another
+    lesson's own finished file. An existing lesson may be read for
+    real-world context (what real code it cites, what it already
+    covers) but never copied as a structural, phrasing, or citation
+    precedent, and never trusted as a source of fact about what an
+    earlier lesson 'proved' without independently re-verifying that
+    fact against real source this session. This failed once already: a
+    new lesson copied an existing lesson's cross-referencing phrasing
+    and asserted specific facts about an earlier phase's real evidence
+    that turned out to be wrong on inspection - caught only because the
+    user asked where this reference habit came from, and the honest
+    answer was nowhere in this file or LESSON SCHEMA.md."
   - "What you need to know first" states concepts only, never a lesson
     number/pointer - a lesson is never itself the dependency, only its
     content is, and content gets fully re-taught inline regardless per
