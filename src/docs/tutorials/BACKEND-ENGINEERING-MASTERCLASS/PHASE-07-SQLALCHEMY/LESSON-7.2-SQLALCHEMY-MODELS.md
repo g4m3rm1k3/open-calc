@@ -1,0 +1,271 @@
+# Lesson 7.2: SQLAlchemy Models
+
+*File paths under backend/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** One real lab that reads the literal, real DDL SQLite itself stored for this project's own `machines` and `machine_groups` tables - straight from `sqlite_master`, not a guess about what a model "should" produce - and traces every real line of it back to the exact `db.Column`, type, `primary_key`, and `db.ForeignKey` declaration in `backend/app/models/machine.py` that caused it. The transferable problem: a SQLAlchemy model class is not a description of a table - it is the real, executable source that generates one.
+
+**What you need to know first:** What a Python class attribute is; what a real SQL `CREATE TABLE` statement's shape looks like - a table name, a list of columns each with a real type keyword, constraints; that a relational table has exactly one real column (or set of columns) uniquely identifying each row; that one table's column can hold a value referring to another table's row.
+
+## Terms used in this lesson
+
+- **DDL** — Data Definition Language - the category of real SQL statements (`CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`) that define or change a database's real structure, as opposed to DML (`INSERT`, `SELECT`, `UPDATE`, `DELETE`), which manipulates the data living inside that already-defined structure. It exists as a real, named distinction because the two kinds of statements answer completely different questions - "what shape does this table have" versus "what rows does it hold" - and this lesson's own lab reads real DDL text directly, not real row data.
+- **column type** — The real, Python-facing object (`db.String(50)`, `db.Integer`, `db.Boolean`, ...) a `db.Column` declaration names as its second concern, after the column's name - it exists so a column's real SQL data type is written once, in Python, and SQLAlchemy's own dialect layer translates it into the real, target database's own actual type keyword (`VARCHAR(50)`, `INTEGER`, `BOOLEAN`) when it generates real DDL - the same real translation this lesson's own lab reads back directly from SQLite itself.
+- **primary key** — The real column (or set of columns) a relational table declares as uniquely identifying every one of its own real rows - no two real rows may ever share the same real primary-key value, and a table has exactly one. It exists so every other real table that needs to refer to a specific row of this one has one real, guaranteed-unique value to refer to it by, instead of guessing at some other column that merely happens, today, to hold different values per row.
+- **foreign key** — A real column in one table holding a value that must match a real primary-key value in another table (or be `NULL`, if the column allows it) - the mechanism a relational database uses to record that one real row genuinely refers to another, specific real row, rather than merely resembling it by coincidence. It exists so that relationship is stated once, in the schema itself, instead of trusted to application code to maintain correctly every time.
+
+## Objects and methods used
+
+- **`db.Column`**
+  - *What it is:* The real, declarative construct Flask-SQLAlchemy's `db` extension exposes, used as a class attribute on a `db.Model` subclass to declare one real database column.
+  - *Implementation:* `db.Column(<type>, primary_key=False, nullable=True, unique=False, default=None, ...)` (Flask-SQLAlchemy's own real, exposed re-export of SQLAlchemy's `Column` class) - the positional argument is the column's real `column type` (see Terms, above); the keyword arguments state real constraints and defaults. Real, concrete examples from this project's own `Machine` model (`backend/app/models/machine.py:49-83`): `id = db.Column(db.String(50), primary_key=True)`, `name = db.Column(db.String(100), nullable=False)`, `axes = db.Column(db.Integer, default=3)`, `has_tool_changer = db.Column(db.Boolean, default=False)`.
+  - *Its use:* This lesson's own lab reads the real, generated `CREATE TABLE` DDL SQLite stored for `machines`/`machine_groups`, and every real column named in that DDL - `id VARCHAR(50) NOT NULL`, `axes INTEGER`, `has_tool_changer BOOLEAN`, and every other - traces directly back to one real `db.Column(...)` declaration in this project's own real model file.
+  - *Type:* A real class (accessed via Flask-SQLAlchemy's `db.Column`), instantiated once per real column.
+  - *Responsibility:* Declaring, in one real Python statement, everything a real database column needs to exist: its name (the attribute name itself), its real type, and its real constraints - so that a single real class body is both the Python-facing model and the complete source `db.create_all()` (already used throughout this curriculum's own real database work) compiles into real DDL.
+  - *Depends on:* A real `column type` object (`db.String`, `db.Integer`, ...); being assigned as a class attribute on a real `db.Model` subclass, so SQLAlchemy's own mapper can discover it.
+  - *Connects to:* Every real column in this project's own real schema is declared this way; `db.create_all()` reads every real `db.Column` on every registered model and compiles it into the real DDL this lesson's own lab reads back from `sqlite_master`.
+  - *Shape:* Takes a real `column type` and real keyword constraints in; produces one real, mapped column, attached to whichever real class attribute name it was assigned to.
+
+- **`db.ForeignKey`**
+  - *What it is:* The real, declarative construct passed as an extra positional argument to `db.Column`, naming another real table's real column this one must reference.
+  - *Implementation:* `db.ForeignKey('<table_name>.<column_name>')` - a real string, not a Python reference to the other model class itself. Real, concrete example from this project's own `Machine` model: `group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)` (`backend/app/models/machine.py:83`).
+  - *Its use:* This lesson's own lab reads the real, generated DDL line `FOREIGN KEY(group_id) REFERENCES machine_groups (id)` - the direct real compilation of this exact `db.ForeignKey('machine_groups.id')` declaration.
+  - *Type:* A real class (accessed via Flask-SQLAlchemy's `db.ForeignKey`), instantiated once per real foreign-key column.
+  - *Responsibility:* Recording, as part of one real column's own declaration, exactly which other real table and column that column's real values must correspond to - the one real piece of information `db.create_all()` needs to generate a real `FOREIGN KEY ... REFERENCES ...` clause.
+  - *Depends on:* A real, existing table-and-column name string, naming a real table this model's own table will reference.
+  - *Connects to:* Attached to `Machine.group_id`'s own `db.Column(...)` call; compiled by `db.create_all()` into the real `FOREIGN KEY` clause this lesson's own lab reads directly from `sqlite_master`.
+  - *Shape:* Takes one real `"table.column"` string in; produces one real constraint object, attached to whichever `db.Column` it's passed into.
+
+- **`Machine (db.Model)`**
+  - *What it is:* A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
+  - *Implementation:* `class Machine(db.Model): __tablename__ = 'machines'` (`backend/app/models/machine.py:41-86`) - declares 23 real columns via real `db.Column(...)` calls, including a real primary key (`id`) and one real foreign key (`group_id`, referencing `machine_groups.id`).
+  - *Its use:* This lesson's own lab reads the real, complete DDL SQLite generated from every one of this class's real column declarations - the direct, compiled proof of what this class actually declares.
+  - *Type:* A real class, declared as a subclass of Flask-SQLAlchemy's own `db.Model`.
+  - *Responsibility:* Declaring, once, the real mapping between a Python class's real attributes and a real database table's real columns, types, and constraints, so `db.create_all()` can compile that declaration into a real, running table.
+  - *Depends on:* A real, live SQLAlchemy `db` extension instance; every real `db.Column`/`db.ForeignKey` declared on it.
+  - *Connects to:* References `MachineGroup` via its own real `group_id` foreign key; every real machine route in `backend/app/routes/machines.py` builds, queries, or updates real instances of this exact class.
+  - *Shape:* A real class; `db.create_all()` reads it once and produces one real `CREATE TABLE machines (...)` statement, verified directly in this lesson's own lab.
+
+- **`MachineGroup (db.Model)`**
+  - *What it is:* A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machine_groups` database table to a real Python class - the real table `Machine.group_id`'s own foreign key references.
+  - *Implementation:* `class MachineGroup(db.Model): __tablename__ = 'machine_groups'` (`backend/app/models/machine.py:11-38`) - declares 7 real columns, including `id = db.Column(db.String(50), primary_key=True)`, the real primary key `Machine.group_id` actually points at.
+  - *Its use:* This lesson's own lab reads its real, generated DDL alongside `Machine`'s own, specifically to show the real primary key (`PRIMARY KEY (id)`) that `Machine`'s own real `FOREIGN KEY` clause references by real table and column name.
+  - *Type:* A real class, declared as a subclass of Flask-SQLAlchemy's own `db.Model`.
+  - *Responsibility:* Declaring the real mapping for organizational groups of machines, and, specifically for this lesson, providing the real primary key `Machine`'s own foreign key must be able to reference.
+  - *Depends on:* A real, live SQLAlchemy `db` extension instance; every real `db.Column` declared on it.
+  - *Connects to:* Referenced by `Machine.group_id`'s own real `db.ForeignKey`; `db.create_all()` must create this real table before `machines`, since `machines`'s own real `FOREIGN KEY` clause names it.
+  - *Shape:* A real class; `db.create_all()` reads it and produces one real `CREATE TABLE machine_groups (...)` statement, verified directly in this lesson's own lab.
+
+## Concept Unit: Columns and Types - What db.Column Actually Declares
+
+### The Problem
+
+This project's own real `Machine` class declares columns as plain Python class attributes - `axes = db.Column(db.Integer, default=3)`. Nothing about that line looks like SQL. What real SQL does it actually become, and is there a way to know for certain, rather than trusting that it "probably" works the way it reads?
+
+Before reading on:
+
+- `db.Column(db.Integer, default=3)` names a real Python type object, `db.Integer`, not a bare Python `int`. Given SQLite itself is a different, real program with its own real type system, what would have to happen to `db.Integer` before SQLite could understand it at all?
+- If you had to prove - not guess - exactly what real SQL statement `db.create_all()` produces for the real `Machine` class, what real, running tool would you reach for, given nothing in this project ever prints that statement anywhere?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/models/machine.py:41-86` (`Machine`) and `:11-38` (`MachineGroup`), read again this session. A real, root-level script, `backend/check_schema.py:8`, already queries `sqlite_master` for real table names (`SELECT name FROM sqlite_master WHERE type='table'`) - but not the `sql` column this lab reads, so the real, complete DDL text itself is not printed anywhere in this project's own existing code; this lab is the first place that specific text is made visible.
+- **Files affected:** `verification/phase-07/lab_model_to_ddl.py` (new)
+- **Change type:** add
+- **Location:** N/A - a new, standalone script; no existing project structure to place it within.
+- **Dependencies:** This project's own real `Machine`/`MachineGroup` models; the real, in-memory SQLite database this app's own `TestingConfig` already configures; SQLite's own real `sqlite_master` table, where SQLite itself stores every real table's own literal, creating DDL text.
+
+### The New Code
+
+A real query against SQLite's own `sqlite_master` table, reading back the literal, real DDL text SQLite itself stored for two of this project's own real tables:
+
+**File:** `verification/phase-07/lab_model_to_ddl.py` (new)
+
+```python
+import sys
+sys.path.insert(0, "backend")
+
+from sqlalchemy import text
+
+from app import create_app, db
+
+app = create_app("testing")
+
+with app.app_context():
+    rows = db.session.execute(
+        text("SELECT name, sql FROM sqlite_master WHERE type='table' AND name IN ('machines', 'machine_groups')")
+    ).fetchall()
+
+    for name, sql in sorted(rows, key=lambda r: r[0]):
+        print(f"=== real DDL SQLite stored for table {name!r} ===")
+        print(sql)
+        print()
+```
+
+### Mechanical Walkthrough
+
+- `app = create_app("testing")` — Builds this app's own real `Flask` instance under its real `\"testing\"` config - the same real call that already runs `db.create_all()` internally, which is the real, actual moment every model's own `db.Column` declarations get compiled into real DDL and executed against a real, in-memory SQLite database.
+- `db.session.execute(text("SELECT name, sql FROM sqlite_master WHERE type='table' AND name IN (...)"))` — Runs a real `SELECT` against `sqlite_master` - SQLite's own real, built-in table recording every other real table's name and the literal, real `CREATE TABLE` text SQLite itself used to build it. This is not SQLAlchemy's own internal representation being inspected; it's the real, final DDL SQLite itself actually stored and would use again to recreate the table.
+- `.fetchall()` — Pulls every real matching row back at once as a real, in-memory list - appropriate here since exactly two real rows are expected, not an unbounded result set.
+- `for name, sql in sorted(rows, key=lambda r: r[0]): print(...)` — Prints each real table's real name and its real, complete DDL text, sorted by name so the real output is deterministic across runs - `sqlite_master` itself makes no promise about row order.
+
+### CS Lens
+
+This is **compilation**: `db.Column(db.Integer, ...)`, a real Python object, is translated by SQLAlchemy's own dialect layer into `INTEGER`, a real token in SQLite's own DDL language - the identical relationship between a real high-level construct and the real lower-level output it's translated into. Also recognized in: a C compiler translating a real `int` declaration into a real machine-specific instruction; a CSS preprocessor's own variable translated into a plain real CSS custom property; and, in this project's own domain, a G-code post-processor translating a real CAM toolpath into a real, specific machine control's own G-code dialect.
+
+### SE Lens
+
+The design principle is a single real source of truth: the column's name, type, and constraints are declared exactly once, in Python, and every real consumer - the real running database, any real tooling that reads the model class itself - derives from that one real declaration instead of a separately maintained SQL script. The real alternative not chosen here - hand-writing `CREATE TABLE` statements directly and keeping them separately in sync with the model - keeps the SQL fully explicit and inspectable at all times; the honest cost of hand-maintaining DDL separately is already real and visible in this exact project: `backend/app/models/part.py`'s own docstring (lines 17-22) already shows a hand-written, illustrative `CREATE TABLE parts (...)` example with only three columns, while the real, live table this lesson's own method would read back for `parts` has far more - a real, already-existing case of hand-written DDL drifting out of sync with what the model actually declares.
+
+### Commands needed
+
+- `backend/.venv/Scripts/python.exe verification/phase-07/lab_model_to_ddl.py` — Runs this as a plain script, from the repository root; uses this app's own real `"testing"` config (`sqlite:///:memory:`), so it leaves no real file behind.
+
+### Verification
+
+```text
+Seeding default users...
+=== real DDL SQLite stored for table 'machine_groups' ===
+CREATE TABLE machine_groups (
+	id VARCHAR(50) NOT NULL,
+	name VARCHAR(100) NOT NULL,
+	type VARCHAR(50) NOT NULL,
+	description VARCHAR(500),
+	color VARCHAR(20),
+	created_at DATETIME,
+	created_by VARCHAR(100),
+	PRIMARY KEY (id)
+)
+
+=== real DDL SQLite stored for table 'machines' ===
+CREATE TABLE machines (
+	id VARCHAR(50) NOT NULL,
+	name VARCHAR(100) NOT NULL,
+	category VARCHAR(50) NOT NULL,
+	sub_type VARCHAR(50) NOT NULL,
+	manufacturer VARCHAR(100),
+	model VARCHAR(100),
+	serial_number VARCHAR(100),
+	location VARCHAR(200),
+	axes INTEGER,
+	x_travel FLOAT,
+	y_travel FLOAT,
+	z_travel FLOAT,
+	max_spindle_speed INTEGER,
+	spindle_taper VARCHAR(50),
+	has_tool_changer BOOLEAN,
+	tool_changer_capacity INTEGER,
+	status VARCHAR(20),
+	current_part_id VARCHAR(50),
+	current_operator_client_id VARCHAR(100),
+	operator_last_heartbeat_at DATETIME,
+	group_id VARCHAR(50),
+	created_at DATETIME,
+	updated_at DATETIME,
+	PRIMARY KEY (id),
+	FOREIGN KEY(group_id) REFERENCES machine_groups (id)
+)
+```
+
+Full saved run: `verification/phase-07/lab_model_to_ddl_output.txt`.
+
+### Connection to the previous unit
+
+This lesson's own first unit; it produces the single real piece of evidence - the real, generated DDL - every later unit in this lesson reads a different specific part of.
+
+## Concept Unit: Primary Keys - What primary_key=True Actually Produces
+
+### The Problem
+
+`Machine.id` is declared `db.Column(db.String(50), primary_key=True)` - one keyword argument, sitting among several. What does that one keyword argument actually cause, concretely, in the real database this project runs against?
+
+Before reading on:
+
+- The previous unit's own real DDL output includes the line `PRIMARY KEY (id)`, sitting after every real column definition, not attached to the `id` column's own line. Given `id = db.Column(db.String(50), primary_key=True)` is the only real place `primary_key` appears in `Machine`'s own source, what does that separation suggest about how SQLAlchemy actually assembles a `CREATE TABLE` statement from several independent `db.Column` declarations?
+- `MachineGroup.id` is declared the identical way. Given a real table can only have rows uniquely identified one way, what would you expect to go wrong, concretely, if `Machine` declared `primary_key=True` on two different real columns at once?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/models/machine.py:49` (`id = db.Column(db.String(50), primary_key=True)`), read again this session - the exact real declaration this unit traces through to the previous unit's own already-captured real DDL.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - reuses the previous unit's own already-run lab and already-captured real output; no new file.
+- **Dependencies:** The previous unit's own real, already-verified DDL output.
+
+### Mechanical Walkthrough
+
+- `id = db.Column(db.String(50), primary_key=True)` — The real, only place `primary_key` is declared for `Machine` - a single keyword argument on a single column's own `db.Column` call, with no separate statement or section anywhere else in the class body.
+- `PRIMARY KEY (id)  # from the previous unit's real DDL` — SQLAlchemy compiles that one keyword argument into a real, separate DDL clause, listed after every column definition in the real `CREATE TABLE` statement - proof that `primary_key=True` doesn't change how `id`'s own column definition looks (still just `id VARCHAR(50) NOT NULL`); it adds an entirely separate, real constraint clause naming that column.
+
+### CS Lens
+
+This is a **uniqueness constraint enforced by the storage engine itself**, not by application code choosing to check it. Also recognized in: a hash set's own real guarantee that no two equal elements can coexist, enforced by the set's own implementation, never by code remembering to check first; a filesystem refusing to create two real files with the identical name in the same real directory; and, in this project's own domain, this project's own real `part_number` `UniqueConstraint` on `Part` - a different real column, the identical real kind of guarantee, enforced the identical way.
+
+### SE Lens
+
+The design principle is that identity is guaranteed by the real database itself, not by every piece of application code that creates a `Machine` remembering to check for a duplicate `id` first. The real alternative not chosen anywhere in this project - trusting every real insert path to check uniqueness in Python before writing - would fail the moment two real requests raced each other, since a check-then-insert has a real gap between the check and the write; the honest cost of the database-enforced approach this project's models actually use: a real insert that violates it doesn't fail with a friendly, predictable Python exception naming the problem in advance - it fails only when the real write is attempted, as a real database error the calling code still has to catch.
+
+### Verification
+
+This unit's own real DDL evidence is the identical real output already run and shown in the previous unit's own Verification block - re-running the identical script would produce the identical real output, adding no new evidence, only a duplicated block; the real, already-shown `PRIMARY KEY (id)` line is the actual behavioral evidence for this unit's own claim, already established.
+
+### Connection to the previous unit
+
+The previous unit produced the real, complete DDL; this unit reads one specific real clause inside it - `PRIMARY KEY (id)` - and traces it back to the one real keyword argument that caused it.
+
+## Concept Unit: Foreign Keys - What db.ForeignKey Actually Produces
+
+### The Problem
+
+`Machine.group_id` is declared with a second positional argument, `db.ForeignKey('machine_groups.id')`, that `Machine.id` never gets. What does that one real argument actually cause in the real database, and how does it actually connect two entirely separate `CREATE TABLE` statements to each other?
+
+Before reading on:
+
+- `db.ForeignKey('machine_groups.id')` is a real Python string, not a real Python reference to the `MachineGroup` class itself. Given the first unit's own real DDL for `machines` shows `FOREIGN KEY(group_id) REFERENCES machine_groups (id)`, what real, exact information did SQLAlchemy have to pull out of that one string to produce it?
+- `MachineGroup`'s own real table must actually exist, with its own real `id` primary key already defined, before `machines`'s own real `FOREIGN KEY` clause could reference it meaningfully. Given `db.create_all()` creates every registered model's table in one real call, what real problem would arise if it happened to create `machines` before `machine_groups`?
+
+### Project Change
+
+- **Reference Source:** Real specimen: `backend/app/models/machine.py:83` (`group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)`), read again this session - the exact real declaration this unit traces through to the first unit's own already-captured real DDL.
+- **Files affected:** None
+- **Change type:** none
+- **Location:** N/A - reuses the first unit's own already-run lab and already-captured real output; no new file.
+- **Dependencies:** The first unit's own real, already-verified DDL output for both `machines` and `machine_groups`.
+
+### Mechanical Walkthrough
+
+- `group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)` — The real, only place this specific foreign key is declared - `'machine_groups.id'` names the real target table (`machine_groups`) and the real target column (`id`) as one real string, parsed by SQLAlchemy at real `db.create_all()` time.
+- `FOREIGN KEY(group_id) REFERENCES machine_groups (id)  # from the first unit's real DDL` — The real, compiled clause naming this table's own real `group_id` column and the exact real table/column (`machine_groups (id)`) it must correspond to - the direct, literal translation of the one real string `'machine_groups.id'` into real DDL syntax.
+- `PRIMARY KEY (id)  # from the first unit's real machine_groups DDL` — The real primary key `machines`'s own foreign key actually references - without this real constraint already existing on `machine_groups`, the `REFERENCES machine_groups (id)` clause above would name a column with no real guarantee of uniqueness to refer to at all.
+
+### Mental Model
+
+```text
+machine_groups                    machines
++----+------+                     +----+----------+
+| id | name |  <-- referenced --  | id | group_id |
++----+------+     by name/col     +----+----------+
+PRIMARY KEY (id)                  FOREIGN KEY(group_id)
+                                   REFERENCES machine_groups (id)
+```
+
+### CS Lens
+
+This is a **referential integrity constraint**: a real, named link between two separate structures, enforced by the storage layer itself rather than assumed by whatever code happens to read or write it. Also recognized in: a real pointer in a language like C, which can (unlike this constraint) point at freed or invalid memory with nothing stopping it - the exact real absence of referential integrity a foreign key exists to prevent at the database level; a symbolic link on a real filesystem, which can likewise point at a path that no longer exists; and, in this project's own domain, an `Operation`'s own real `sequence_id`, the identical real kind of link, one level further down this same project's own real schema.
+
+### SE Lens
+
+The design principle is that a relationship between two real tables is declared once, in the schema, and enforced by the real database on every real write - not left to application code to remember to check. The real alternative not chosen here - storing `group_id` as a plain column with no `db.ForeignKey` at all, the way this project's own real `Machine.current_part_id` column already does (a real, plain `db.String`, no `db.ForeignKey`, despite conceptually pointing at `parts.id`) - is simpler to declare and never blocks an insert that happens to reference something that doesn't exist yet; the honest cost of that real, already-shipped alternative: nothing in the real database stops `current_part_id` from silently holding a value that names no real `Part` row at all, a gap `group_id`'s own real `db.ForeignKey` here does not have.
+
+### Verification
+
+This unit's own real DDL evidence is the identical real output already run and shown in the first unit's own Verification block - the real `FOREIGN KEY(group_id) REFERENCES machine_groups (id)` line, already captured there, is the actual behavioral evidence for this unit's own claim.
+
+### Connection to the previous unit
+
+The previous unit traced `PRIMARY KEY (id)` back to one keyword argument; this unit traces the real `FOREIGN KEY` clause back to the second real argument on a different column - completing the real, three-part translation this lesson's title names: columns and types, primary keys, foreign keys, all compiled from the identical class body into the identical real DDL.
+
+## Connect the pieces
+
+One real class body, `Machine`, traced all the way to one real, running database structure: `id = db.Column(db.String(50), primary_key=True)` becomes both a real `id VARCHAR(50) NOT NULL` column definition and a separate real `PRIMARY KEY (id)` clause; `axes = db.Column(db.Integer, default=3)` becomes a real `axes INTEGER` column, `db.Integer` translated into SQLite's own real type keyword; `group_id = db.Column(db.String(50), db.ForeignKey('machine_groups.id'), nullable=True)` becomes both a real `group_id VARCHAR(50)` column and a real `FOREIGN KEY(group_id) REFERENCES machine_groups (id)` clause, naming `MachineGroup`'s own real primary key by table and column. None of this real DDL is guessed - every line of it was read directly from `sqlite_master`, the same real place SQLite itself keeps it.
+
+**Next lesson:** This lesson traced a single model's own columns into a single real table. Next, this curriculum looks at how two real, separately mapped classes - like `Machine` and `MachineGroup` - become navigable from Python on both sides, not just linked at the DDL level.

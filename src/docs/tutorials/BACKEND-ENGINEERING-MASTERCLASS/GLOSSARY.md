@@ -285,6 +285,9 @@ re-run the script after any lesson changes instead.
 ## column
 - **Term** in `LESSON-6.2-RELATIONAL-MODEL` - The everyday, practical word for exactly what the relational model formally calls an attribute: one named, single-valued property every row shares. It exists for the identical reason "row" does - it is the word real SQL, and this project's own real code (its `db.Column` declarations), actually uses, even though "attribute" is the formally precise term for the same idea.
 
+## column type
+- **Term** in `LESSON-7.2-SQLALCHEMY-MODELS` - The real, Python-facing object (`db.String(50)`, `db.Integer`, `db.Boolean`, ...) a `db.Column` declaration names as its second concern, after the column's name - it exists so a column's real SQL data type is written once, in Python, and SQLAlchemy's own dialect layer translates it into the real, target database's own actual type keyword (`VARCHAR(50)`, `INTEGER`, `BOOLEAN`) when it generates real DDL - the same real translation this lesson's own lab reads back directly from SQLite itself.
+
 ## commit
 - **Term** in `LESSON-6.11-TRANSACTIONS` - The real, explicit action that makes every operation in the current transaction permanent, all at once - `db.session.commit()` in this project's own real code. It exists as a distinct, separate step from staging changes (`db.session.add(...)`) specifically so several real operations can be staged first and only actually take effect together, at one single, deliberate point, rather than one at a time as each is staged.
 
@@ -376,8 +379,12 @@ re-run the script after any lesson changes instead.
 ## db (module-level SQLAlchemy instance)
 - **Object/method** in `LESSON-4.2-APPLICATION-FACTORY` - This project's own real, single `SQLAlchemy` instance, created at module level in `backend/app/__init__.py`, before `create_app` is ever called.
 
+## db.Column
+- **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - The real, declarative construct Flask-SQLAlchemy's `db` extension exposes, used as a class attribute on a `db.Model` subclass to declare one real database column.
+
 ## db.ForeignKey
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct, passed as an argument to `db.Column`, declaring that a column's own values are meant to reference another table's primary key.
+- **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - The real, declarative construct passed as an extra positional argument to `db.Column`, naming another real table's real column this one must reference.
 
 ## db.relationship
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy construct that adds a Python-level, virtual attribute connecting two real models, without itself adding a column to the database.
@@ -400,6 +407,9 @@ re-run the script after any lesson changes instead.
 
 ## db.Table
 - **Object/method** in `LESSON-6.6-MANY-TO-MANY-RELATIONSHIPS` - A real SQLAlchemy construct for declaring a table directly, by its real columns, without wrapping it in a full model class - used specifically for a table, like `part_tags`, that has no real data of its own beyond the two real foreign keys connecting it.
+
+## DDL
+- **Term** in `LESSON-7.2-SQLALCHEMY-MODELS` - Data Definition Language - the category of real SQL statements (`CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`) that define or change a database's real structure, as opposed to DML (`INSERT`, `SELECT`, `UPDATE`, `DELETE`), which manipulates the data living inside that already-defined structure. It exists as a real, named distinction because the two kinds of statements answer completely different questions - "what shape does this table have" versus "what rows does it hold" - and this lesson's own lab reads real DDL text directly, not real row data.
 
 ## Decorator
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - Python syntax (`@something`) that wraps a function in another piece of behavior without changing the function's own body. It exists so "register this function as a route handler" can be stated once, directly above the function it applies to, instead of a separate registration call elsewhere in the file.
@@ -537,6 +547,7 @@ re-run the script after any lesson changes instead.
 
 ## foreign key
 - **Term** in `LESSON-6.4-FOREIGN-KEYS` - A column in one relation whose declared job is to hold a real value from ANOTHER relation's own primary key - not a copy of that row, only a pointer to it. It exists so one relation can refer to a specific row of a different relation without duplicating that row's own data everywhere it needs to be referenced.
+- **Term** in `LESSON-7.2-SQLALCHEMY-MODELS` - A real column in one table holding a value that must match a real primary-key value in another table (or be `NULL`, if the column allows it) - the mechanism a relational database uses to record that one real row genuinely refers to another, specific real row, rather than merely resembling it by coincidence. It exists so that relationship is stated once, in the schema itself, instead of trusted to application code to maintain correctly every time.
 
 ## foreign key (as a constraint)
 - **Term** in `LESSON-6.9-CONSTRAINTS` - Fully treated in this curriculum's own Foreign Keys lesson - a column declared to reference another relation's own primary key. Named again here specifically as one member of the same real family as `NOT NULL`, `UNIQUE`, and `CHECK`: a rule the database itself can be made to enforce on a column's own real value, though this curriculum's own Foreign Keys lesson already proved this particular one is not actually turned on anywhere in this project's own real configuration.
@@ -759,12 +770,16 @@ re-run the script after any lesson changes instead.
 
 ## Machine (db.Model)
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
+- **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
 
 ## Machine.to_dict
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing instance method on this project's own `Machine` model, converting a real database row into a real, JSON-safe dict.
 
 ## MachineCAMPairing.query.get
 - **Object/method** in `LESSON-0.3-BACKEND-BOUNDARIES` - A real ORM query reading one row from the database by its primary key.
+
+## MachineGroup (db.Model)
+- **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machine_groups` database table to a real Python class - the real table `Machine.group_id`'s own foreign key references.
 
 ## machines_bp (as a real, standalone Blueprint)
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - This project's own real `Blueprint` instance for every machine-related route, already studied extensively in this curriculum, examined here specifically as a self-contained real object, independent of any app.
@@ -885,6 +900,9 @@ re-run the script after any lesson changes instead.
 
 ## POST
 - **Term** in `LESSON-3.2-HTTP-METHODS` - The real HTTP method naming a request as "create something new, at a real identity the server itself decides" - this lesson's own second unit calls it against this project's own real `/api/machines/groups`. It exists for exactly the case a client doesn't yet know, and can't supply, the real identity of the thing it's asking to create.
+
+## primary key
+- **Term** in `LESSON-7.2-SQLALCHEMY-MODELS` - The real column (or set of columns) a relational table declares as uniquely identifying every one of its own real rows - no two real rows may ever share the same real primary-key value, and a table has exactly one. It exists so every other real table that needs to refer to a specific row of this one has one real, guaranteed-unique value to refer to it by, instead of guessing at some other column that merely happens, today, to hold different values per row.
 
 ## Process
 - **Term** in `LESSON-0.1-WHAT-BACKEND-ENGINEERING-ACTUALLY-IS` - one running instance of a program, with its own
@@ -1413,6 +1431,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.commit) and Machine.query.get` / `update_machine_status` - shares: machine
 - `.commit) and Machine.query.get` / `update_machine_status (PUT)` - shares: machine
 - `.content_type` / `204 (No Content)` - shares: content
+- `.content_type` / `column type` - shares: type
 - `.content_type` / `Content-Type` - shares: content, type
 - `.content_type` / `tuple (Python builtin type)` - shares: type
 - `.content_type` / `type affinity` - shares: type
@@ -1664,6 +1683,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `client` / `Flask.test_client` - shares: client
 - `collaborator (test scope)` / `fixture scope` - shares: scope
 - `collaborator (test scope)` / `pytest.fixture(scope=...)` - shares: scope
+- `column` / `column type` - shares: column
+- `column` / `db.Column` - shares: column
+- `column type` / `Content-Type` - shares: type
+- `column type` / `db.Column` - shares: column
+- `column type` / `tuple (Python builtin type)` - shares: type
+- `column type` / `type affinity` - shares: type
+- `column type` / `Type annotation` - shares: type
 - `commit` / `db.session.commit` - shares: commit
 - `commit` / `db.session.commit()` - shares: commit
 - `composite index` / `composite uniqueness` - shares: composite
@@ -1766,7 +1792,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `database-side vs application-side processing` / `side effect` - shares: side
 - `db` / `db (module-level SQLAlchemy instance)` - shares: db
 - `db` / `Machine (db.Model)` - shares: db
+- `db` / `MachineGroup (db.Model)` - shares: db
 - `db` / `Session (db.session)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `db.Column` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.ForeignKey` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.relationship` - shares: db
 - `db (module-level SQLAlchemy instance)` / `db.relationship (secondary=)` - shares: db
@@ -1777,6 +1805,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `db.Table` - shares: db
 - `db (module-level SQLAlchemy instance)` / `Flask (the class, and this project's own app instance)` - shares: instance
 - `db (module-level SQLAlchemy instance)` / `Machine (db.Model)` - shares: db
+- `db (module-level SQLAlchemy instance)` / `MachineGroup (db.Model)` - shares: db
 - `db (module-level SQLAlchemy instance)` / `proof at every real level` - shares: level
 - `db (module-level SQLAlchemy instance)` / `Public/private module interface` - shares: module
 - `db (module-level SQLAlchemy instance)` / `Session (db.session)` - shares: db
@@ -1784,42 +1813,53 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.event.listens_for` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text` - shares: sqlalchemy
 - `db (module-level SQLAlchemy instance)` / `sqlalchemy.text (for a real SQL statement)` - shares: sqlalchemy
+- `db.Column` / `Machine (db.Model)` - shares: db
+- `db.Column` / `MachineGroup (db.Model)` - shares: db
+- `db.Column` / `Session (db.session)` - shares: db
 - `db.ForeignKey` / `Machine (db.Model)` - shares: db
+- `db.ForeignKey` / `MachineGroup (db.Model)` - shares: db
 - `db.ForeignKey` / `Session (db.session)` - shares: db
 - `db.relationship` / `Machine (db.Model)` - shares: db
+- `db.relationship` / `MachineGroup (db.Model)` - shares: db
 - `db.relationship` / `many-to-many relationship` - shares: relationship
 - `db.relationship` / `one-to-many relationship` - shares: relationship
 - `db.relationship` / `parent/child relationship` - shares: relationship
 - `db.relationship` / `relationship modeling` - shares: relationship
 - `db.relationship` / `Session (db.session)` - shares: db
 - `db.relationship (secondary=)` / `Machine (db.Model)` - shares: db
+- `db.relationship (secondary=)` / `MachineGroup (db.Model)` - shares: db
 - `db.relationship (secondary=)` / `many-to-many relationship` - shares: relationship
 - `db.relationship (secondary=)` / `one-to-many relationship` - shares: relationship
 - `db.relationship (secondary=)` / `parent/child relationship` - shares: relationship
 - `db.relationship (secondary=)` / `relationship modeling` - shares: relationship
 - `db.relationship (secondary=)` / `Session (db.session)` - shares: db
 - `db.session.add` / `Machine (db.Model)` - shares: db
+- `db.session.add` / `MachineGroup (db.Model)` - shares: db
 - `db.session.add` / `Session` - shares: session
 - `db.session.add` / `Session (.add` - shares: add, session
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Machine (db.Model)` - shares: db
+- `db.session.commit` / `MachineGroup (db.Model)` - shares: db
 - `db.session.commit` / `Session` - shares: session
 - `db.session.commit` / `Session (.add` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
 - `db.session.commit()` / `Machine (db.Model)` - shares: db
+- `db.session.commit()` / `MachineGroup (db.Model)` - shares: db
 - `db.session.commit()` / `Session` - shares: session
 - `db.session.commit()` / `Session (.add` - shares: session
 - `db.session.commit()` / `Session (db.session)` - shares: db, session
 - `db.session.commit()` / `test session` - shares: session
 - `db.session.rollback()` / `Machine (db.Model)` - shares: db
+- `db.session.rollback()` / `MachineGroup (db.Model)` - shares: db
 - `db.session.rollback()` / `rollback` - shares: rollback
 - `db.session.rollback()` / `Session` - shares: session
 - `db.session.rollback()` / `Session (.add` - shares: session
 - `db.session.rollback()` / `Session (db.session)` - shares: db, session
 - `db.session.rollback()` / `test session` - shares: session
 - `db.Table` / `Machine (db.Model)` - shares: db
+- `db.Table` / `MachineGroup (db.Model)` - shares: db
 - `db.Table` / `Session (db.session)` - shares: db
 - `Decorator` / `get_machine (revisited for its real decorator stack)` - shares: decorator
 - `DELETE` / `delete_machine` - shares: delete
@@ -1850,6 +1890,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `dictionary key access` / `foreign key (as a constraint)` - shares: key
 - `dictionary key access` / `Key function` - shares: key
 - `dictionary key access` / `natural key` - shares: key
+- `dictionary key access` / `primary key` - shares: key
 - `dictionary key access` / `surrogate key` - shares: key
 - `Domain exception` / `Domain logic` - shares: domain
 - `Domain exception` / `Domain object` - shares: domain
@@ -1910,11 +1951,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `foreign key` / `foreign key (as a constraint)` - shares: foreign, key
 - `foreign key` / `Key function` - shares: key
 - `foreign key` / `natural key` - shares: key
+- `foreign key` / `primary key` - shares: key
 - `foreign key` / `surrogate key` - shares: key
 - `foreign key (as a constraint)` / `Key function` - shares: key
 - `foreign key (as a constraint)` / `machines_bp (as a real, standalone Blueprint)` - shares: a, as
 - `foreign key (as a constraint)` / `mark_as_read` - shares: as
 - `foreign key (as a constraint)` / `natural key` - shares: key
+- `foreign key (as a constraint)` / `primary key` - shares: key
 - `foreign key (as a constraint)` / `rebuild (as this curriculum's own real term)` - shares: as
 - `foreign key (as a constraint)` / `sqlalchemy.text (for a real SQL statement)` - shares: a
 - `foreign key (as a constraint)` / `SQLite (as a specific engine)` - shares: a, as
@@ -2099,6 +2142,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `JSON response body` / `request body` - shares: body
 - `JSON response body` / `response body` - shares: body
 - `Key function` / `natural key` - shares: key
+- `Key function` / `primary key` - shares: key
 - `Key function` / `Pure function` - shares: function
 - `Key function` / `surrogate key` - shares: key
 - `Key function` / `test function` - shares: function
@@ -2113,6 +2157,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
 - `Machine (db.Model)` / `Machine.to_dict` - shares: machine
+- `Machine (db.Model)` / `MachineGroup (db.Model)` - shares: db, model
 - `Machine (db.Model)` / `Query (Machine.query` - shares: machine
 - `Machine (db.Model)` / `Query.filter (Machine.query.filter)` - shares: machine
 - `Machine (db.Model)` / `Session (db.session)` - shares: db
@@ -2135,6 +2180,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `MachineCAMPairing.query.get` / `query pattern` - shares: query
 - `MachineCAMPairing.query.get` / `query plan (recap)` - shares: query
 - `MachineCAMPairing.query.get` / `Query.filter (Machine.query.filter)` - shares: query
+- `MachineGroup (db.Model)` / `Session (db.session)` - shares: db
 - `machines_bp (as a real, standalone Blueprint)` / `mark_as_read` - shares: as
 - `machines_bp (as a real, standalone Blueprint)` / `proof at every real level` - shares: real
 - `machines_bp (as a real, standalone Blueprint)` / `real_health_status (proposed prototype)` - shares: real
@@ -2152,6 +2198,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `mark_as_read` / `pytest.mark.parametrize` - shares: mark
 - `mark_as_read` / `rebuild (as this curriculum's own real term)` - shares: as
 - `mark_as_read` / `SQLite (as a specific engine)` - shares: as
+- `natural key` / `primary key` - shares: key
 - `natural key` / `surrogate key` - shares: key
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
@@ -2173,6 +2220,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `PATCH` / `update_machine (PATCH)` - shares: patch
 - `PDMService.download_file` / `send_file` - shares: file
 - `Persistence` / `persistence` - shares: persistence
+- `primary key` / `surrogate key` - shares: key
 - `proof at every real level` / `real_health_status (proposed prototype)` - shares: real
 - `proof at every real level` / `rebuild (as this curriculum's own real term)` - shares: real
 - `proof at every real level` / `request (the real context-local proxy)` - shares: real
