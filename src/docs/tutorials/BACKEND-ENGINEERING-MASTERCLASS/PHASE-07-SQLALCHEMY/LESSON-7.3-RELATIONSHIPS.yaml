@@ -1,0 +1,744 @@
+number: "7.3"
+title: "Relationships"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Two real, run labs against this project's own real `Machine` and
+  `MachineGroup` models and their own real, existing
+  `db.relationship('Machine', backref='group', lazy='dynamic')`
+  declaration - the first proving one declaration creates real
+  navigation in both directions and that `lazy='dynamic'` hands back a
+  real, further-filterable query object, not a plain list; the second
+  proving what actually happens to a real `Machine` row when its real
+  `MachineGroup` gets deleted, with no `cascade=` set at all. The
+  transferable problem: a foreign-key column makes two rows relationally
+  connected in the database; `relationship` is the separate, real
+  mechanism that makes that same connection walkable as plain Python
+  attribute access, in both directions.
+
+what_you_need_to_know_first: >
+  What a foreign-key column is and what real `REFERENCES` clause it
+  compiles into; what a one-to-many relationship means, conceptually,
+  between two real tables; what a Python class attribute is; what
+  deleting a database row actually removes.
+
+terms:
+  - name: backref
+    definition: >
+      A real, optional keyword argument to `db.relationship`, naming a
+      second, real attribute SQLAlchemy automatically adds to the
+      *other* real model in the relationship - so a real, working
+      attribute exists on both sides of a relationship from writing
+      only one `db.relationship(...)` call, not two. It exists so the
+      two directions of one real relationship (parent-to-children,
+      child-to-parent) don't have to be declared, and kept in sync,
+      twice.
+  - name: lazy loading
+    definition: >
+      A general strategy where a relationship's real, related rows are
+      not actually queried from the database until the real attribute
+      holding them is actually accessed - as opposed to eagerly loading
+      them the moment the parent object itself is loaded, whether or
+      not anything ever reads them. `lazy='dynamic'` (this lesson's own
+      real, exact strategy) is a specific, stronger form of this: the
+      real attribute doesn't even hand back a real, already-fetched
+      list when accessed - it hands back a real, still-unexecuted query
+      object, queried only once something asks it to actually run.
+  - name: cascade
+    definition: >
+      A real, optional keyword argument to `db.relationship`, stating
+      what should happen to a parent object's real, related child
+      objects when an ORM-level operation - deleting the parent,
+      adding it to a session - happens to it. It exists because a
+      parent-child relationship declared in Python doesn't by itself
+      say what "delete the parent" should mean for the children still
+      pointing at it; without stating one, SQLAlchemy falls back to a
+      real, specific default behavior, not silence or an error.
+
+objects_and_methods:
+  - name: db.relationship
+    what_it_is: >
+      The real, top-level function Flask-SQLAlchemy's `db` extension
+      exposes (a re-export of SQLAlchemy's own `relationship`), used as
+      a class attribute on a `db.Model` subclass to declare a real,
+      Python-navigable link to another real model.
+    implementation: >
+      `db.relationship('<ModelName>', backref='<name>',
+      lazy='<strategy>', cascade='<rules>')` - the first, positional
+      argument names the real, related model by string; the keyword
+      arguments configure the real backref, loading strategy, and
+      cascade behavior. Real, concrete example from this project's own
+      `MachineGroup` model: `machines = db.relationship('Machine',
+      backref='group', lazy='dynamic')`
+      (`backend/app/models/machine.py:27`) - no `cascade=` is set here
+      at all, which this lesson's own second unit shows the real,
+      default consequence of.
+    its_use: >
+      Both of this lesson's own labs exercise this identical, real,
+      already-existing declaration - the first to prove what it
+      actually creates on both `MachineGroup` and `Machine`; the second
+      to prove what its real, default (unset) `cascade` behavior
+      actually does.
+    type: A real function (accessed as `db.relationship`), called once per real relationship declaration.
+    responsibility: >
+      Declaring, in one real Python statement, a real, navigable
+      Python-level link between two already-mapped model classes - what
+      real attribute name to add to each side, what real kind of object
+      accessing it hands back, and what happens to the real, related
+      side when the parent is deleted.
+    depends_on: >
+      A real, already-mapped target model (named by string, resolved by
+      SQLAlchemy's own mapper once both classes are registered); a real
+      foreign key already connecting the two real tables at the DDL
+      level (`Machine.group_id`'s own `db.ForeignKey`, this project's
+      own real, already-declared column).
+    connects_to: >
+      Adds a real `machines` attribute to `MachineGroup` and, via its
+      own `backref`, a real `group` attribute to `Machine` - both
+      exercised directly in this lesson's own first lab.
+    shape: >
+      Takes a real target-model name string and real keyword
+      configuration in; produces one real, working attribute on the
+      declaring class, and, when `backref` is given, a second real
+      attribute on the target class.
+
+  - name: AppenderQuery (type(group.machines))
+    what_it_is: >
+      The real, specific class SQLAlchemy's own `lazy='dynamic'`
+      strategy hands back when a `lazy='dynamic'` relationship
+      attribute is accessed on a real, already-persisted parent object -
+      confirmed directly this session by printing its real type.
+    implementation: >
+      `group.machines` (where `group` is a real, persisted
+      `MachineGroup` instance) returns a real
+      `sqlalchemy.orm.dynamic.AppenderQuery` instance - a real subclass
+      of SQLAlchemy's own `Query`, carrying every real method a
+      standalone query object has (`.filter(...)`, `.all()`, `.count()`,
+      ...), pre-scoped to only this specific real parent's own related
+      rows.
+    its_use: >
+      This lesson's own first lab calls `.all()` on it directly to get
+      every real, related `Machine` row, and `.filter(Machine.sub_type
+      == '5_axis')` on the identical object to prove it's a real,
+      further-narrowable query, not a plain Python list that happens to
+      support neither.
+    type: A real class, an instance of which is returned by accessing a `lazy='dynamic'` relationship attribute.
+    responsibility: >
+      Representing "every real row related to this one specific real
+      parent" as a real, still-unexecuted query - deferring the actual
+      real `SELECT` until something (`.all()`, iteration, another
+      filter) actually asks it to run.
+    depends_on: >
+      A real, already-persisted parent object (accessing this on a
+      transient, uncommitted object has nothing real to scope the query
+      to).
+    connects_to: >
+      Created by accessing `group.machines`; every real method called
+      on it in this lesson's own lab (`.all()`, `.filter(...)`) narrows
+      or executes the identical, real, parent-scoped query.
+    shape: >
+      Behaves like SQLAlchemy's own real `Query` object - real filter
+      methods return a new, real, still-unexecuted query; `.all()`
+      returns a real, executed list of real model instances.
+
+  - name: Session (.add / .add_all / .commit / .delete)
+    what_it_is: >
+      The real, live session object this project's own `db` extension
+      exposes as `db.session` - a real instance of SQLAlchemy's own
+      `Session` class - and four of its real methods this lesson's own
+      labs call directly.
+    implementation: >
+      `db.session.add(instance)` registers one real, new object as
+      pending; `db.session.add_all([a, b, ...])` does the identical real
+      thing for every real object in the given list, one at a time;
+      `db.session.commit()` flushes every real pending change into real
+      SQL and finalizes the real transaction; `db.session.delete(
+      instance)` registers a real, already-persisted object as pending
+      deletion - like `.add()`, sending no real SQL by itself until the
+      next real flush.
+    its_use: >
+      This lesson's own first unit uses `.add`/`.add_all`/`.commit` to
+      build the real rows its own relationship connects; its third unit
+      calls `.delete` once, on a real, persisted `MachineGroup`
+      instance, specifically to observe what real, default consequence
+      deleting it has for the real `Machine` row still pointing at it.
+    type: A real instance of SQLAlchemy's `Session` class (`db.session`).
+    responsibility: >
+      Tracking every real pending object change - additions and
+      deletions alike - and deciding, on `commit`, when that state
+      actually becomes real SQL; for a real deletion specifically, also
+      deciding, per any relationship configured to care, what happens to
+      its real, related objects at the same time.
+    depends_on: >
+      A real, open connection from this app's own real `Engine`; for
+      `.delete`, a real, already-persisted instance already known to
+      the session.
+    connects_to: >
+      `MachineGroup.machines`'s own configured (or, here, default/unset)
+      `cascade` behavior decides what happens to every real `Machine`
+      a real `.delete()` call's target group was related to.
+    shape: >
+      `.add`/`.add_all`/`.delete` take a real object (or list of them)
+      in, return nothing; `.commit` takes no arguments; all four have
+      real, observable side effects (sending SQL, finalizing a
+      transaction) rather than a real return value.
+
+  - name: Machine (db.Model)
+    what_it_is: >
+      A real, existing SQLAlchemy model class in this project's own
+      backend, mapping the real `machines` database table to a real
+      Python class.
+    implementation: >
+      `class Machine(db.Model): __tablename__ = 'machines'`
+      (`backend/app/models/machine.py:41-86`) - `group_id = db.Column(
+      db.String(50), db.ForeignKey('machine_groups.id'),
+      nullable=True)` is the real column this lesson's own relationship
+      is built on top of.
+    its_use: >
+      Both of this lesson's own labs create real `Machine` instances,
+      each associated with a real `MachineGroup` via `group_id`, then
+      navigate or delete through the real relationship connecting them.
+    type: A real class, declared as a subclass of Flask-SQLAlchemy's own `db.Model`.
+    responsibility: >
+      Declaring the real mapping between a Python class's real
+      attributes and the real `machines` table's real columns,
+      including the real foreign key this lesson's own relationship
+      navigates.
+    depends_on: >
+      A real, live SQLAlchemy `db` extension instance; `MachineGroup`
+      already being registered, since `group_id`'s own real
+      `db.ForeignKey` names it by table name.
+    connects_to: >
+      `MachineGroup.machines`'s own real `backref='group'` adds a real
+      `.group` attribute directly onto this class, exercised in this
+      lesson's own first lab.
+    shape: >
+      A real class; `m.group` (via the real backref) returns a real
+      `MachineGroup` instance or `None`.
+
+  - name: MachineGroup (db.Model)
+    what_it_is: >
+      A real, existing SQLAlchemy model class in this project's own
+      backend, mapping the real `machine_groups` database table to a
+      real Python class - the real parent side of this lesson's own
+      relationship.
+    implementation: >
+      `class MachineGroup(db.Model): __tablename__ = 'machine_groups'`
+      (`backend/app/models/machine.py:11-38`) -
+      `machines = db.relationship('Machine', backref='group',
+      lazy='dynamic')` (`:27`) is this lesson's own entire real subject.
+    its_use: >
+      Both of this lesson's own labs create a real `MachineGroup`
+      instance and either navigate to its real, related `Machine` rows
+      or delete it to observe the real, default cascade consequence.
+    type: A real class, declared as a subclass of Flask-SQLAlchemy's own `db.Model`.
+    responsibility: >
+      Declaring the real mapping for `machine_groups`, and, specifically
+      for this lesson, declaring the real relationship every other unit
+      here examines.
+    depends_on: >
+      A real, live SQLAlchemy `db` extension instance.
+    connects_to: >
+      Its own real `machines` relationship is what every unit in this
+      lesson exercises, in one direction or the other.
+    shape: >
+      A real class; `group.machines` (via the real relationship) returns
+      a real `AppenderQuery`, never a plain list.
+
+concept_units:
+  - title: "relationship and backref - One Declaration, Two Real Directions"
+    problem: >
+      `Machine.group_id`, a real foreign-key column, already connects a
+      real `Machine` row to a real `MachineGroup` row at the database
+      level. But `machine.group_id` is just a real string - `'G-MILLS'`
+      - not a real `MachineGroup` object. What has to exist for
+      `machine.group` to actually return the real, related object
+      itself, in Python?
+    socratic_prompt:
+      - >
+        `MachineGroup.machines = db.relationship('Machine',
+        backref='group', lazy='dynamic')` is written once, only on
+        `MachineGroup`. Given `backref='group'` is part of that single
+        real call, what would you expect to happen if you tried to
+        access `some_machine.group` before ever reading this
+        declaration - does `Machine`'s own real class body have to
+        declare anything itself for that to work?
+      - >
+        Given `Machine.group_id` already exists as a real, plain foreign-
+        key column, what real, additional information does
+        `db.relationship('Machine', ...)` need, that a bare foreign
+        key column doesn't already provide, to know which real
+        `Machine` rows belong to which real `MachineGroup`?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:27`
+        (`machines = db.relationship('Machine', backref='group',
+        lazy='dynamic')`) and `:83` (`Machine.group_id`'s own real
+        `db.ForeignKey`), both read again this session.
+      files_affected:
+        - path: verification/phase-07/lab_relationship_backref_lazy.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine`/`MachineGroup` models, and
+        the real, already-declared relationship connecting them.
+    new_code:
+      applicable: true
+      intro: >
+        A real `MachineGroup` and two real `Machine` rows, connected
+        only by `group_id`, navigated in both real directions through
+        the identical, already-existing relationship:
+      file: verification/phase-07/lab_relationship_backref_lazy.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine, MachineGroup
+
+        app = create_app("testing")
+
+        with app.app_context():
+            group = MachineGroup(id="G-MILLS", name="Mill Room", type="location")
+            db.session.add(group)
+            db.session.commit()
+
+            m1 = Machine(id="M-REL-001", name="Haas VF-2", category="mill", sub_type="3_axis", group_id="G-MILLS")
+            m2 = Machine(id="M-REL-002", name="Haas UMC-750", category="mill", sub_type="5_axis", group_id="G-MILLS")
+            db.session.add_all([m1, m2])
+            db.session.commit()
+
+            print("group.machines.all():")
+            for m in group.machines.all():
+                print(" ", m.id, m.name)
+
+            print()
+            print("m1.group (the real backref, navigating the opposite direction):")
+            print(" ", m1.group.id, m1.group.name)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'group = MachineGroup(id="G-MILLS", ...); db.session.add(group); db.session.commit()'
+          explanation: >
+            Creates and commits a real, persisted `MachineGroup` row -
+            required first, since the two `Machine` rows below reference
+            it by real `group_id` string, and that real foreign key has
+            to name a row that actually exists.
+        - element: 'm1 = Machine(..., group_id="G-MILLS"); m2 = Machine(..., group_id="G-MILLS")'
+          explanation: >
+            Two real `Machine` rows, each with the real, plain string
+            `"G-MILLS"` in their own `group_id` column - nothing here
+            uses the relationship yet; this is plain, ordinary
+            foreign-key assignment, exactly the same real mechanics as
+            setting any other real column.
+        - element: 'group.machines.all()'
+          explanation: >
+            The real, forward direction: accessing `.machines` on a
+            real, persisted `MachineGroup` instance runs a real query
+            (scoped to this specific group's own `id`) and returns
+            every real, related `Machine` row - proof the relationship,
+            not just the raw `group_id` column, is what makes this
+            navigation possible in Python at all.
+        - element: 'm1.group'
+          explanation: >
+            The real, opposite direction: accessing `.group` directly on
+            a `Machine` instance - an attribute `Machine`'s own class
+            body never declares itself - returns the real, related
+            `MachineGroup` instance. This attribute exists purely
+            because `MachineGroup.machines`'s own `backref='group'`
+            added it automatically; nothing in `machine.py`'s own
+            `Machine` class definition creates it.
+    mental_model:
+      applicable: true
+      diagram: |
+        MachineGroup.machines = db.relationship('Machine', backref='group', ...)
+                |                                              |
+                | creates                                      | also creates
+                v                                              v
+        group.machines  ---- forward direction ---->    (real Machine rows)
+        (real Machine rows) <---- backref direction ----  machine.group
+      execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **bidirectional association**: one real declaration
+      produces two real, independently walkable directions between two
+      structures, rather than one structure holding a reference and the
+      other knowing nothing back. Also recognized in: a doubly linked
+      list, where each real node holds both a `next` and a `prev`
+      pointer, built together rather than one direction bolted on
+      later; a real HTML DOM node's own `parentNode` alongside its
+      `childNodes`; and, in this project's own domain, this project's
+      own real `CAMFile.part_id` foreign key paired with `Part`'s own
+      real `cam_files = db.relationship('CAMFile', backref='part',
+      lazy='dynamic')` (`backend/app/models/part.py:346`) - the
+      identical real pattern, one level up this same schema.
+    se_lens: >
+      The design principle is that `backref` keeps both directions of
+      one real relationship defined in exactly one place, so they can
+      never independently drift out of sync with each other. The real
+      alternative not chosen here - declaring a second, separate
+      `db.relationship('MachineGroup', ...)` directly on `Machine`
+      itself, instead of relying on `backref` - states both directions
+      explicitly, which some real codebases prefer because it's
+      visible directly on both class bodies without knowing to check the
+      other side; the honest cost of the `backref` approach this
+      project's own model actually uses: reading `Machine`'s own class
+      body alone (`machine.py:41-86`) never reveals that `.group` exists
+      on it at all - that fact lives entirely in `MachineGroup`'s own,
+      separate file.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_relationship_backref_lazy.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        group.machines.all():
+          M-REL-001 Haas VF-2
+          M-REL-002 Haas UMC-750
+
+        m1.group (the real backref, navigating the opposite direction):
+          G-MILLS Mill Room
+      output_file: verification/phase-07/lab_relationship_backref_lazy_output.txt
+    connection_to_previous: >
+      This lesson's own first unit; it establishes the real, bidirectional
+      navigation `db.relationship`/`backref` produce, on top of Lesson
+      7.2's own real foreign-key column - the next unit examines exactly
+      what kind of real object `group.machines` actually is.
+
+  - title: "lazy='dynamic' - What group.machines Actually Returns"
+    problem: >
+      The previous unit called `.all()` on `group.machines` without
+      asking what `group.machines` itself actually is, on its own,
+      before that call. Is it a real, already-fetched Python list, or
+      something else - and does the difference actually matter?
+    socratic_prompt:
+      - >
+        If `group.machines` were a plain Python list, what real,
+        list-shaped operation would fail on it that a real database
+        query wouldn't - and, conversely, what could you do to a real,
+        unexecuted query that you could never do to an already-fetched
+        list?
+      - >
+        `MachineGroup.machines` is declared with `lazy='dynamic'`
+        specifically. Given the previous unit's own real output already
+        shows `.all()` working, what real, additional capability would
+        `lazy='dynamic'` have to provide beyond that, for the keyword
+        argument to be worth its own name?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:27`, the identical
+        `lazy='dynamic'` argument already read in this lesson's own
+        first unit.
+      files_affected: []
+      change_type: none
+      location: N/A - extends the previous unit's own already-run lab in place; no new file.
+      dependencies: >
+        The previous unit's own real, already-created `group`/`m1`/`m2`
+        rows.
+    new_code:
+      applicable: true
+      intro: >
+        Two more real lines, appended to the identical script, proving
+        `group.machines` is a real, further-filterable query object, not
+        a plain list:
+      file: verification/phase-07/lab_relationship_backref_lazy.py
+      status: existing
+      language: python
+      code: |
+        print("type(group.machines):", type(group.machines))
+
+        print()
+        print("group.machines.filter(Machine.sub_type == '5_axis').all():")
+        for m in group.machines.filter(Machine.sub_type == "5_axis").all():
+            print(" ", m.id, m.name)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'type(group.machines)'
+          explanation: >
+            Prints the real, exact class `group.machines` actually is -
+            not `list`, and not a bare `Query` either, but SQLAlchemy's
+            own real `sqlalchemy.orm.dynamic.AppenderQuery` - direct,
+            inspectable proof of what `lazy='dynamic'` actually produces,
+            rather than trusting the keyword's own name to mean what it
+            sounds like it means.
+        - element: "group.machines.filter(Machine.sub_type == '5_axis').all()"
+          explanation: >
+            Calls a real, further filter directly on the same object the
+            previous unit already called `.all()` on - a real, working
+            operation with no real equivalent on a plain Python list,
+            proof `group.machines` really is a live, still-narrowable
+            query and not a fixed collection that merely happened to
+            support `.all()`.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **lazy evaluation**, specifically applied to a real
+      collection: the real work (querying the database) is deferred
+      until something actually demands a real result, and the
+      intermediate object (`group.machines` itself, before `.all()` or
+      `.filter()` runs) represents a real, not-yet-executed computation,
+      not the computation's own result. Also recognized in: a Python
+      generator expression, which produces no real values at all until
+      iterated; a spreadsheet formula cell, which holds a real,
+      unevaluated computation until something reads its value; and, in
+      this project's own domain, this project's own real `Sequence`
+      objects, whose `to_dict()` only queries related `OperationImage`
+      rows at the moment of serialization, not when the `Sequence`
+      itself is loaded.
+    se_lens: >
+      The design principle is that a relationship scoped to potentially
+      many real rows shouldn't force a full, real query the instant the
+      parent object is touched, especially when the caller might only
+      want a filtered subset or a count. The real alternative not
+      chosen here - the plain, non-`dynamic` default `lazy` behavior -
+      is real and already in use elsewhere in this same project:
+      `CAMDocument.pairing = db.relationship('MachineCAMPairing',
+      backref='documents')` (`backend/app/models/machine_pairing.py:137`)
+      sets no `lazy=` at all, and checked directly this session, a real
+      `pairing.documents` access on it returns a real
+      `sqlalchemy.orm.collections.InstrumentedList` - an already-fetched,
+      real Python list-like object, not a query; the honest cost of
+      `lazy='dynamic'` specifically: that real, already-fetched list
+      supports slicing, `len()`, and repeated iteration with no further
+      real queries, while a real `AppenderQuery` re-runs a real query
+      practically every time it's used unless the caller explicitly
+      calls `.all()` once and holds onto the real result.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_relationship_backref_lazy.py
+        explanation: >
+          Identical real command as the previous unit - both units'
+          real code lives in the same script, run once.
+    verification:
+      applicable: true
+      real_output: |
+        type(group.machines): <class 'sqlalchemy.orm.dynamic.AppenderQuery'>
+
+        group.machines.filter(Machine.sub_type == '5_axis').all():
+          M-REL-002 Haas UMC-750
+      output_file: verification/phase-07/lab_relationship_backref_lazy_output.txt
+    connection_to_previous: >
+      The previous unit proved `group.machines` works like a real
+      collection; this unit proves, directly, exactly what real class it
+      is and why that specific class supports more than a plain list
+      ever could.
+
+  - title: "cascade - What Happens to Machine Rows When Their Group Is Deleted"
+    problem: >
+      `MachineGroup.machines = db.relationship('Machine',
+      backref='group', lazy='dynamic')` sets no `cascade=` at all. If a
+      real `MachineGroup` row is deleted while a real `Machine` row
+      still has that group's `id` in its own `group_id` column, what
+      actually happens to that `Machine` row - deleted along with its
+      group, left with a real, now-dangling `group_id`, or something
+      else entirely?
+    socratic_prompt:
+      - >
+        This project's own real, running app never turns on SQLite's
+        foreign-key enforcement anywhere in its own request-serving
+        code (`PRAGMA foreign_keys` appears only once in this entire
+        codebase - confirmed by a real, repo-wide search this session -
+        turned on, then immediately back off, inside a one-off,
+        standalone `backend/migrate_machines.py` script, only while it
+        drops and recreates a table). Given that, would the real,
+        running database itself stop this delete, or allow it
+        regardless of what it leaves behind?
+      - >
+        `db.relationship`'s own real `cascade` keyword controls what the
+        *ORM* does to related objects it already knows about - not what
+        the raw database does. Given no `cascade=` is set here at all,
+        what would you guess SQLAlchemy's own real default behavior is,
+        before seeing it run?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/models/machine.py:27`
+        (`MachineGroup.machines`, no `cascade=` set), read again this
+        session, contrasted with this project's own real
+        `CAMFile.nc_files`/`CAMFile.sequences`
+        (`backend/app/models/cam_file.py:72-73`), both declared with
+        `cascade='all, delete-orphan'` - a real, already-existing
+        counterexample in this same codebase.
+      files_affected:
+        - path: verification/phase-07/lab_relationship_cascade.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine`/`MachineGroup` models and
+        their real, already-declared, cascade-unset relationship.
+    new_code:
+      applicable: true
+      intro: >
+        A real `MachineGroup` with one real `Machine` still pointing at
+        it, deleted with no `cascade=` configured, to observe the real,
+        default consequence directly:
+      file: verification/phase-07/lab_relationship_cascade.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app, db
+        from app.models.machine import Machine, MachineGroup
+
+        app = create_app("testing")
+
+        with app.app_context():
+            group = MachineGroup(id="G-LATHES", name="Lathe Room", type="location")
+            db.session.add(group)
+            db.session.commit()
+
+            machine = Machine(id="M-CASC-001", name="Okuma Genos", category="lathe", sub_type="single_turret", group_id="G-LATHES")
+            db.session.add(machine)
+            db.session.commit()
+
+            print("before delete:")
+            print("  machine.group_id:", repr(machine.group_id))
+
+            db.session.delete(group)
+            db.session.commit()
+
+            db.session.expire_all()
+            reloaded = Machine.query.get("M-CASC-001")
+            print()
+            print("after deleting the group, with no cascade= set on the relationship:")
+            print("  machine still exists:", reloaded is not None)
+            print("  reloaded.group_id:", repr(reloaded.group_id))
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'group = MachineGroup(...); machine = Machine(..., group_id="G-LATHES")'
+          explanation: >
+            Creates one real, persisted `MachineGroup` and one real
+            `Machine` whose own `group_id` names it - the identical real
+            setup as this lesson's first unit, reduced to one machine
+            for a clean before/after comparison.
+        - element: 'db.session.delete(group)'
+          explanation: >
+            Marks the real, persisted `group` instance for deletion -
+            registers the pending delete; sends no real SQL by itself,
+            the same real staging behavior `db.session.add` already
+            showed for inserts.
+        - element: 'db.session.commit()'
+          explanation: >
+            Flushes and finalizes the real transaction - this is the
+            real moment SQLAlchemy decides, using `MachineGroup.machines`'s
+            own (unset) `cascade` configuration, what to actually do
+            with the real `Machine` row still referencing the group
+            being deleted.
+        - element: 'db.session.expire_all(); reloaded = Machine.query.get("M-CASC-001")'
+          explanation: >
+            Forces a real, fresh read from the database rather than
+            trusting any value Python might still be holding in memory
+            from before the delete - `reloaded.group_id`'s own real
+            value below is read from the actual, current database row,
+            not a stale Python object.
+        - element: 'print("  machine still exists:", reloaded is not None)'
+          explanation: >
+            Confirms the real `Machine` row itself was not deleted along
+            with its group - the real, direct answer to this unit's own
+            problem statement.
+        - element: 'print("  reloaded.group_id:", repr(reloaded.group_id))'
+          explanation: >
+            Prints the real, current value of the surviving row's own
+            `group_id` column - proving what SQLAlchemy's own default,
+            unset `cascade` behavior actually did to it, rather than
+            asserting a guess about ORM internals.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **referential cleanup on deletion** - deciding what a
+      dependent reference should become once the thing it referred to
+      is gone. Also recognized in: a raw pointer in a language like C
+      left dangling after the memory it pointed at is freed, with
+      nothing automatically clearing it (the real absence of this
+      behavior, useful as a contrast - SQLAlchemy's own real default
+      here is the opposite: it actively nulls the reference rather than
+      leaving it dangling); a filesystem symbolic link left pointing at
+      a path after the real file it named is deleted; and, in this
+      project's own domain, this project's own real
+      `CAMDocument.pairing = db.relationship('MachineCAMPairing',
+      backref='documents')` (`backend/app/models/machine_pairing.py:137`),
+      which - like `MachineGroup.machines` - also sets no `cascade=` at
+      all.
+    se_lens: >
+      The design principle at play is SQLAlchemy's own real default:
+      with no `cascade=` set, deleting a parent nulls the foreign key on
+      any real, already-loaded related row rather than deleting it or
+      leaving it dangling - proven directly by this unit's own real
+      output. The real alternative, already chosen elsewhere in this
+      exact project - `CAMFile.nc_files`/`CAMFile.sequences`
+      (`backend/app/models/cam_file.py:72-73`), both real
+      `cascade='all, delete-orphan'` - deletes the real children along
+      with their parent instead; the honest cost of the default this
+      project's own `Machine`/`MachineGroup` relationship actually
+      relies on: a `Machine` row can end up with a real, `NULL`
+      `group_id` silently, with nothing forcing a caller to notice or
+      handle a machine that used to belong to a group and now belongs to
+      none.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_relationship_cascade.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        before delete:
+          machine.group_id: 'G-LATHES'
+
+        after deleting the group, with no cascade= set on the relationship:
+          machine still exists: True
+          reloaded.group_id: None
+      output_file: verification/phase-07/lab_relationship_cascade_output.txt
+    connection_to_previous: >
+      The previous two units proved what `relationship`/`backref`/
+      `lazy='dynamic'` make possible while everything still exists; this
+      unit proves what the identical relationship actually does at the
+      one moment those earlier units never tested - when part of it is
+      deleted.
+
+closing:
+  connect_the_pieces: >
+    One real relationship, `MachineGroup.machines = db.relationship(
+    'Machine', backref='group', lazy='dynamic')`, traced through every
+    real thing it actually does: it adds a real `.machines` attribute to
+    `MachineGroup` and, via `backref='group'`, a real `.group` attribute
+    directly onto `Machine`, with nothing in `Machine`'s own class body
+    declaring it. Accessing `group.machines` doesn't return a plain
+    list - `type()` shows it's a real `AppenderQuery`, which is exactly
+    why calling `.filter(Machine.sub_type == '5_axis')` directly on it,
+    after already calling `.all()` on the same object, works at all.
+    And with no `cascade=` set anywhere on this real declaration,
+    deleting the real `MachineGroup` row leaves the real `Machine` row
+    fully intact - `machine still exists: True` - with its own real
+    `group_id` set to `None`, not deleted alongside it and not left
+    dangling either.
+  next_lesson_pointer: >
+    This lesson examined a relationship already fully declared. Next,
+    this curriculum looks at how to actually query through the ORM
+    directly, comparing what it produces against the real, raw SQL
+    doing the identical job.
