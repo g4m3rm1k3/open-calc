@@ -6,17 +6,26 @@ re-run the script after any lesson changes instead.
 ## .add_all
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
 
+## .all)
+- **Object/method** in `LESSON-7.4-QUERYING` - `Machine.query` is the real, class-bound query interface Flask- SQLAlchemy attaches to every real model, already used by this project's own real `get_machines` route; `.filter`, `.order_by`, `.count`, and `.all` are four of its real, chainable methods.
+
 ## .close)
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - The real, raw networking class from Python's own standard library `socket` module - the actual mechanism both `requests` and Flask's own real server are themselves built on top of, used directly in this lesson with no HTTP-specific library at all.
 
 ## .commit
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
 
+## .commit)
+- **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
+
 ## .commit) and Machine.query.get
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
 
 ## .content_type
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
+
+## .count
+- **Object/method** in `LESSON-7.4-QUERYING` - `Machine.query` is the real, class-bound query interface Flask- SQLAlchemy attaches to every real model, already used by this project's own real `get_machines` route; `.filter`, `.order_by`, `.count`, and `.all` are four of its real, chainable methods.
 
 ## .count())
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - SQLAlchemy's real query interface, reached through a model class's own `.query` attribute.
@@ -34,6 +43,9 @@ re-run the script after any lesson changes instead.
 
 ## .json())
 - **Object/method** in `LESSON-3.1-HTTP-MENTAL-MODEL` - `requests.get` is the real top-level function from the third-party `requests` library, sending a real HTTP `GET` request over an actual TCP connection; the object it returns is a real `Response`.
+
+## .order_by
+- **Object/method** in `LESSON-7.4-QUERYING` - `Machine.query` is the real, class-bound query interface Flask- SQLAlchemy attaches to every real model, already used by this project's own real `get_machines` route; `.filter`, `.order_by`, `.count`, and `.all` are four of its real, chainable methods.
 
 ## .patch
 - **Object/method** in `LESSON-3.2-HTTP-METHODS` - The real test client this project's own `app.test_client()` returns - the same real class this curriculum has already used, here calling all five real HTTP methods this lesson studies.
@@ -60,6 +72,9 @@ re-run the script after any lesson changes instead.
 
 ## .status
 - **Object/method** in `LESSON-2.6-TESTING-HTTP-APIS` - The real response object Flask's test client returns from a simulated request.
+
+## .status_code)
+- **Object/method** in `LESSON-7.4-QUERYING` - `app.test_client()` is a real method on this project's own real `Flask` app instance, returning a real `FlaskClient` - the same real class already used to test HTTP routes throughout this curriculum; `.get` is a real method on it, and `.status_code` a real attribute on the `Response` object it returns.
 
 ## 1NF (First Normal Form)
 - **Term** in `LESSON-6.7-NORMALIZATION` - The rule that every attribute in a relation holds exactly one atomic value per row, and that no group of attributes repeats within a single row to hold what is really a variable-length list of the same kind of thing. It exists as the foundational normalization rule because both failures - a single cell packing in several real values, and several real, same-shaped columns standing in for a list - break the same basic promise a relation makes: one row, one fact per attribute, checkable by name, not by parsing a value or by hand-enumerating a fixed set of columns.
@@ -123,6 +138,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-3.4-HEADERS` - Two real, existing Flask view functions listing and creating a real user's favorited machine/CAM pairings.
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing Flask view function creating a favorite record.
 
+## aggregate
+- **Term** in `LESSON-7.4-QUERYING` - A real SQL function (`COUNT`, `SUM`, `AVG`, `MAX`, `MIN`) that computes one real value across many real rows, inside the database itself, rather than handing every real row back to the caller to compute the same value in application code. It exists so a question like "how many" can be answered by the database doing the real counting internally, without every matching row's own full, real data ever needing to leave the database at all.
+
 ## aggregate function
 - **Term** in `LESSON-6.12-SQL` - A real SQL function - `COUNT`, `SUM`, `AVG`, among others - that computes a single, real summary value from many rows at once, rather than returning one value per row. It exists so a real question like "how many" or "what is the total" can be answered by the database itself, computed directly over however many real rows actually match, instead of the calling application fetching every real row and computing the summary itself.
 
@@ -137,6 +155,9 @@ re-run the script after any lesson changes instead.
 
 ## app.register_blueprint
 - **Object/method** in `LESSON-4.5-BLUEPRINTS` - The real, existing `Flask` method every one of this project's own 18 blueprints is attached through.
+
+## app.test_client (.get
+- **Object/method** in `LESSON-7.4-QUERYING` - `app.test_client()` is a real method on this project's own real `Flask` app instance, returning a real `FlaskClient` - the same real class already used to test HTTP routes throughout this curriculum; `.get` is a real method on it, and `.status_code` a real attribute on the `Response` object it returns.
 
 ## app.url_map
 - **Object/method** in `LESSON-4.1-WHAT-FLASK-PROVIDES` - The real, central routing table Flask (through Werkzeug) builds from every real `@app.route`/`@blueprint.route` call made during `create_app`'s own real setup.
@@ -793,6 +814,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.2-SQLALCHEMY-MODELS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - A real, existing SQLAlchemy model class in this project's own backend, mapping the real `machines` database table to a real Python class.
 
+## Machine.query (.filter
+- **Object/method** in `LESSON-7.4-QUERYING` - `Machine.query` is the real, class-bound query interface Flask- SQLAlchemy attaches to every real model, already used by this project's own real `get_machines` route; `.filter`, `.order_by`, `.count`, and `.all` are four of its real, chainable methods.
+
 ## Machine.to_dict
 - **Object/method** in `LESSON-3.5-JSON-APIS` - A real, existing instance method on this project's own `Machine` model, converting a real database row into a real, JSON-safe dict.
 
@@ -955,6 +979,9 @@ re-run the script after any lesson changes instead.
 
 ## Query (Machine.query
 - **Object/method** in `LESSON-2.4-TEST-ISOLATION` - SQLAlchemy's real query interface, reached through a model class's own `.query` attribute.
+
+## query object
+- **Term** in `LESSON-7.4-QUERYING` - A real, structured Python object (SQLAlchemy's own `Query` class, or a further-narrowed version of one) representing a real, not-yet-executed database read - built up by chaining real methods (`.filter(...)`, `.order_by(...)`) that each return a new, real query object, rather than executing anything immediately. It exists so a query can be assembled conditionally, piece by piece (exactly the way this project's own real `get_machines` route already does, adding a real `.filter(...)` only when a given query parameter is actually present), with the real SQL compiled only once, at the end, from whatever pieces actually got added.
 
 ## Query parameter
 - **Term** in `LESSON-0.4-READING-AN-EXISTING-BACKEND` - A real piece of data attached to a URL after a `?`, as `name=value` pairs - not part of the path itself. It exists so a request can carry optional, named extra information (which commit to fetch, which page to show) without that information changing which route handles the request at all.
@@ -1144,6 +1171,9 @@ re-run the script after any lesson changes instead.
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - together with `Machine.query.get`, the real, class-bound query interface Flask-SQLAlchemy attaches to every real model.
 - **Object/method** in `LESSON-7.3-RELATIONSHIPS` - The real, live session object this project's own `db` extension exposes as `db.session` - a real instance of SQLAlchemy's own `Session` class - and four of its real methods this lesson's own labs call directly.
 
+## Session (.add_all
+- **Object/method** in `LESSON-7.4-QUERYING` - The real, live session object this project's own `db` extension exposes as `db.session`, and two of its real methods this lesson's own labs use to set up real rows before querying them.
+
 ## Session (db.session)
 - **Object/method** in `LESSON-2.2-UNIT-VS-INTEGRATION-VS-SYSTEM-TESTS` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
 - **Object/method** in `LESSON-2.3-PYTEST` - SQLAlchemy's real database session object, `db.session`, already wired up by this app's own `create_app`.
@@ -1210,6 +1240,7 @@ re-run the script after any lesson changes instead.
 
 ## sqlalchemy.event.listens_for
 - **Object/method** in `LESSON-7.1-ORM-MENTAL-MODEL` - A real, top-level function from SQLAlchemy's own `sqlalchemy.event` module, used here as a decorator, registering a real callback against one specific real event a given real object (here, an `Engine`) can fire.
+- **Object/method** in `LESSON-7.4-QUERYING` - A real, top-level function from SQLAlchemy's own `sqlalchemy.event` module, used here as a decorator, registering a real callback against one specific real event a given real object (here, an `Engine`) can fire.
 
 ## sqlalchemy.text
 - **Object/method** in `LESSON-6.4-FOREIGN-KEYS` - A real SQLAlchemy function that wraps a plain string as an executable statement, for the rare case a raw statement - not expressed through the ORM's own Python API - needs to run directly.
@@ -1428,9 +1459,14 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.add_all` / `add_favorite` - shares: add
 - `.add_all` / `db.session.add` - shares: add
 - `.add_all` / `Session (.add` - shares: add
+- `.add_all` / `Session (.add_all` - shares: add, all
+- `.all)` / `Session (.add_all` - shares: all
 - `.commit` / `commit` - shares: commit
 - `.commit` / `db.session.commit` - shares: commit
 - `.commit` / `db.session.commit()` - shares: commit
+- `.commit)` / `commit` - shares: commit
+- `.commit)` / `db.session.commit` - shares: commit
+- `.commit)` / `db.session.commit()` - shares: commit
 - `.commit) and Machine.query.get` / `CAMFile.query.get` - shares: query
 - `.commit) and Machine.query.get` / `commit` - shares: commit
 - `.commit) and Machine.query.get` / `Config (and its real subclasses)` - shares: and
@@ -1446,10 +1482,12 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.commit) and Machine.query.get` / `is_valid_machine_status` - shares: machine
 - `.commit) and Machine.query.get` / `Machine` - shares: machine
 - `.commit) and Machine.query.get` / `Machine (db.Model)` - shares: machine
+- `.commit) and Machine.query.get` / `Machine.query (.filter` - shares: machine, query
 - `.commit) and Machine.query.get` / `Machine.to_dict` - shares: machine
 - `.commit) and Machine.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `.commit) and Machine.query.get` / `NCTemplate.query.get` - shares: query
 - `.commit) and Machine.query.get` / `Query (Machine.query` - shares: machine, query
+- `.commit) and Machine.query.get` / `query object` - shares: query
 - `.commit) and Machine.query.get` / `Query parameter` - shares: query
 - `.commit) and Machine.query.get` / `query parameter` - shares: query
 - `.commit) and Machine.query.get` / `query pattern` - shares: query
@@ -1470,6 +1508,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `.delete)` / `delete_machine` - shares: delete
 - `.delete)` / `delete_notification` - shares: delete
 - `.flush` / `flush` - shares: flush
+- `.order_by` / `GROUP BY` - shares: by
+- `.order_by` / `ORDER BY` - shares: by, order
 - `.patch` / `PATCH` - shares: patch
 - `.patch` / `unittest.mock.patch` - shares: patch
 - `.patch` / `update_machine (PATCH)` - shares: patch
@@ -1493,6 +1533,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `404 (Not Found)` / `NOT NULL` - shares: not
 - `4xx (client error)` / `500 (Internal Server Error)` - shares: error
 - `4xx (client error)` / `5xx (server error)` - shares: error, xx
+- `4xx (client error)` / `app.test_client (.get` - shares: client
 - `4xx (client error)` / `build_error_response` - shares: error
 - `4xx (client error)` / `centralized error mapping` - shares: error
 - `4xx (client error)` / `Client` - shares: client
@@ -1532,6 +1573,8 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Accept` / `socket.accept` - shares: accept
 - `add_favorite` / `db.session.add` - shares: add
 - `add_favorite` / `Session (.add` - shares: add
+- `add_favorite` / `Session (.add_all` - shares: add
+- `aggregate` / `aggregate function` - shares: aggregate
 - `aggregate function` / `Dependency (of a function)` - shares: function
 - `aggregate function` / `Key function` - shares: function
 - `aggregate function` / `Pure function` - shares: function
@@ -1546,6 +1589,9 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `app.register_blueprint` / `health_check (blueprint route)` - shares: blueprint
 - `app.register_blueprint` / `machines_bp (as a real, standalone Blueprint)` - shares: blueprint
 - `app.register_blueprint` / `register_routes` - shares: register
+- `app.test_client (.get` / `Client` - shares: client
+- `app.test_client (.get` / `client` - shares: client
+- `app.test_client (.get` / `Flask.test_client` - shares: client
 - `app.url_map` / `map` - shares: map
 - `AppenderQuery (type(group.machines))` / `column type` - shares: type
 - `AppenderQuery (type(group.machines))` / `Content-Type` - shares: type
@@ -1676,9 +1722,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `caching header` / `Header` - shares: header
 - `caching header` / `header` - shares: header
 - `caching header` / `request header` - shares: header
+- `CAMFile.query.get` / `Machine.query (.filter` - shares: query
 - `CAMFile.query.get` / `MachineCAMPairing.query.get` - shares: query
 - `CAMFile.query.get` / `NCTemplate.query.get` - shares: query
 - `CAMFile.query.get` / `Query (Machine.query` - shares: query
+- `CAMFile.query.get` / `query object` - shares: query
 - `CAMFile.query.get` / `Query parameter` - shares: query
 - `CAMFile.query.get` / `query parameter` - shares: query
 - `CAMFile.query.get` / `query pattern` - shares: query
@@ -1781,6 +1829,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine` / `is_valid_machine_status` - shares: machine
 - `create_machine` / `Machine` - shares: machine
 - `create_machine` / `Machine (db.Model)` - shares: machine
+- `create_machine` / `Machine.query (.filter` - shares: machine
 - `create_machine` / `Machine.to_dict` - shares: machine
 - `create_machine` / `Query (Machine.query` - shares: machine
 - `create_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1796,6 +1845,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group` / `is_valid_machine_status` - shares: machine
 - `create_machine_group` / `Machine` - shares: machine
 - `create_machine_group` / `Machine (db.Model)` - shares: machine
+- `create_machine_group` / `Machine.query (.filter` - shares: machine
 - `create_machine_group` / `Machine.to_dict` - shares: machine
 - `create_machine_group` / `Query (Machine.query` - shares: machine
 - `create_machine_group` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -1812,6 +1862,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `create_machine_group (POST)` / `is_valid_machine_status` - shares: machine
 - `create_machine_group (POST)` / `Machine` - shares: machine
 - `create_machine_group (POST)` / `Machine (db.Model)` - shares: machine
+- `create_machine_group (POST)` / `Machine.query (.filter` - shares: machine
 - `create_machine_group (POST)` / `Machine.to_dict` - shares: machine
 - `create_machine_group (POST)` / `POST` - shares: post
 - `create_machine_group (POST)` / `Query (Machine.query` - shares: machine
@@ -1879,18 +1930,21 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.add` / `MachineGroup (db.Model)` - shares: db
 - `db.session.add` / `Session` - shares: session
 - `db.session.add` / `Session (.add` - shares: add, session
+- `db.session.add` / `Session (.add_all` - shares: add, session
 - `db.session.add` / `Session (db.session)` - shares: db, session
 - `db.session.add` / `test session` - shares: session
 - `db.session.commit` / `Machine (db.Model)` - shares: db
 - `db.session.commit` / `MachineGroup (db.Model)` - shares: db
 - `db.session.commit` / `Session` - shares: session
 - `db.session.commit` / `Session (.add` - shares: session
+- `db.session.commit` / `Session (.add_all` - shares: session
 - `db.session.commit` / `Session (db.session)` - shares: db, session
 - `db.session.commit` / `test session` - shares: session
 - `db.session.commit()` / `Machine (db.Model)` - shares: db
 - `db.session.commit()` / `MachineGroup (db.Model)` - shares: db
 - `db.session.commit()` / `Session` - shares: session
 - `db.session.commit()` / `Session (.add` - shares: session
+- `db.session.commit()` / `Session (.add_all` - shares: session
 - `db.session.commit()` / `Session (db.session)` - shares: db, session
 - `db.session.commit()` / `test session` - shares: session
 - `db.session.rollback()` / `Machine (db.Model)` - shares: db
@@ -1898,6 +1952,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `db.session.rollback()` / `rollback` - shares: rollback
 - `db.session.rollback()` / `Session` - shares: session
 - `db.session.rollback()` / `Session (.add` - shares: session
+- `db.session.rollback()` / `Session (.add_all` - shares: session
 - `db.session.rollback()` / `Session (db.session)` - shares: db, session
 - `db.session.rollback()` / `test session` - shares: session
 - `db.Table` / `Machine (db.Model)` - shares: db
@@ -1912,6 +1967,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `delete_machine` / `is_valid_machine_status` - shares: machine
 - `delete_machine` / `Machine` - shares: machine
 - `delete_machine` / `Machine (db.Model)` - shares: machine
+- `delete_machine` / `Machine.query (.filter` - shares: machine
 - `delete_machine` / `Machine.to_dict` - shares: machine
 - `delete_machine` / `Query (Machine.query` - shares: machine
 - `delete_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -2048,6 +2104,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine` / `is_valid_machine_status` - shares: machine
 - `get_machine` / `Machine` - shares: machine
 - `get_machine` / `Machine (db.Model)` - shares: machine
+- `get_machine` / `Machine.query (.filter` - shares: machine
 - `get_machine` / `Machine.to_dict` - shares: machine
 - `get_machine` / `Query (Machine.query` - shares: machine
 - `get_machine` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -2061,6 +2118,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `get_machine (revisited for its real decorator stack)` / `is_valid_machine_status` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine (db.Model)` - shares: machine
+- `get_machine (revisited for its real decorator stack)` / `Machine.query (.filter` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `Machine.to_dict` - shares: machine
 - `get_machine (revisited for its real decorator stack)` / `machines_bp (as a real, standalone Blueprint)` - shares: real
 - `get_machine (revisited for its real decorator stack)` / `proof at every real level` - shares: real
@@ -2173,6 +2231,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `integrity` / `referential integrity` - shares: integrity
 - `is_valid_machine_status` / `Machine` - shares: machine
 - `is_valid_machine_status` / `Machine (db.Model)` - shares: machine
+- `is_valid_machine_status` / `Machine.query (.filter` - shares: machine
 - `is_valid_machine_status` / `Machine.to_dict` - shares: machine
 - `is_valid_machine_status` / `Query (Machine.query` - shares: machine
 - `is_valid_machine_status` / `Query.filter (Machine.query.filter)` - shares: machine
@@ -2198,6 +2257,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine` / `update_machine (PATCH)` - shares: machine
 - `Machine` / `update_machine_status` - shares: machine
 - `Machine` / `update_machine_status (PUT)` - shares: machine
+- `Machine (db.Model)` / `Machine.query (.filter` - shares: machine
 - `Machine (db.Model)` / `Machine.to_dict` - shares: machine
 - `Machine (db.Model)` / `MachineGroup (db.Model)` - shares: db, model
 - `Machine (db.Model)` / `Query (Machine.query` - shares: machine
@@ -2207,6 +2267,19 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine (db.Model)` / `update_machine (PATCH)` - shares: machine
 - `Machine (db.Model)` / `update_machine_status` - shares: machine
 - `Machine (db.Model)` / `update_machine_status (PUT)` - shares: machine
+- `Machine.query (.filter` / `MachineCAMPairing.query.get` - shares: query
+- `Machine.query (.filter` / `NCTemplate.query.get` - shares: query
+- `Machine.query (.filter` / `Query (Machine.query` - shares: machine, query
+- `Machine.query (.filter` / `query object` - shares: query
+- `Machine.query (.filter` / `Query parameter` - shares: query
+- `Machine.query (.filter` / `query parameter` - shares: query
+- `Machine.query (.filter` / `query pattern` - shares: query
+- `Machine.query (.filter` / `query plan (recap)` - shares: query
+- `Machine.query (.filter` / `Query.filter (Machine.query.filter)` - shares: filter, machine, query
+- `Machine.query (.filter` / `update_machine` - shares: machine
+- `Machine.query (.filter` / `update_machine (PATCH)` - shares: machine
+- `Machine.query (.filter` / `update_machine_status` - shares: machine
+- `Machine.query (.filter` / `update_machine_status (PUT)` - shares: machine
 - `Machine.to_dict` / `many-to-many relationship` - shares: to
 - `Machine.to_dict` / `one-to-many relationship` - shares: to
 - `Machine.to_dict` / `Query (Machine.query` - shares: machine
@@ -2217,6 +2290,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Machine.to_dict` / `update_machine_status (PUT)` - shares: machine
 - `MachineCAMPairing.query.get` / `NCTemplate.query.get` - shares: query
 - `MachineCAMPairing.query.get` / `Query (Machine.query` - shares: query
+- `MachineCAMPairing.query.get` / `query object` - shares: query
 - `MachineCAMPairing.query.get` / `Query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query parameter` - shares: query
 - `MachineCAMPairing.query.get` / `query pattern` - shares: query
@@ -2243,6 +2317,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `natural key` / `primary key` - shares: key
 - `natural key` / `surrogate key` - shares: key
 - `NCTemplate.query.get` / `Query (Machine.query` - shares: query
+- `NCTemplate.query.get` / `query object` - shares: query
 - `NCTemplate.query.get` / `Query parameter` - shares: query
 - `NCTemplate.query.get` / `query parameter` - shares: query
 - `NCTemplate.query.get` / `query pattern` - shares: query
@@ -2272,6 +2347,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `PUT` / `update_machine_status (PUT)` - shares: put
 - `pytest.fixture` / `yield fixture` - shares: fixture
 - `pytest.fixture(scope=...)` / `yield fixture` - shares: fixture
+- `Query (Machine.query` / `query object` - shares: query
 - `Query (Machine.query` / `Query parameter` - shares: query
 - `Query (Machine.query` / `query parameter` - shares: query
 - `Query (Machine.query` / `query pattern` - shares: query
@@ -2281,6 +2357,11 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Query (Machine.query` / `update_machine (PATCH)` - shares: machine
 - `Query (Machine.query` / `update_machine_status` - shares: machine
 - `Query (Machine.query` / `update_machine_status (PUT)` - shares: machine
+- `query object` / `Query parameter` - shares: query
+- `query object` / `query parameter` - shares: query
+- `query object` / `query pattern` - shares: query
+- `query object` / `query plan (recap)` - shares: query
+- `query object` / `Query.filter (Machine.query.filter)` - shares: query
 - `Query parameter` / `query parameter` - shares: parameter, query
 - `Query parameter` / `query pattern` - shares: query
 - `Query parameter` / `query plan (recap)` - shares: query
@@ -2329,10 +2410,13 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `server` / `WSGI (Web Server Gateway Interface)` - shares: server
 - `Session` / `Session (.add` - shares: session
+- `Session` / `Session (.add_all` - shares: session
 - `Session` / `Session (db.session)` - shares: session
 - `Session` / `test session` - shares: session
 - `Session (.add` / `Session (db.session)` - shares: session
 - `Session (.add` / `test session` - shares: session
+- `Session (.add_all` / `Session (db.session)` - shares: session
+- `Session (.add_all` / `test session` - shares: session
 - `Session (db.session)` / `test session` - shares: session
 - `set` / `set (builtin)` - shares: set
 - `set (builtin)` / `tuple (Python builtin type)` - shares: builtin

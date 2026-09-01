@@ -1,0 +1,698 @@
+number: "7.4"
+title: "Querying"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  Three real, run labs comparing SQLAlchemy's own real query methods
+  against the real SQL they actually compile into, using this project's
+  own real, already-shipped `GET /api/machines` route
+  (`backend/app/routes/machines.py:14-45`) as the evidence: its real,
+  working `.filter(Machine.status == status)` call; its real,
+  already-shipped, genuinely broken `.filter(Machine.type ==
+  machine_type)` call, triggered for real against this project's own
+  real, running app; and the real difference between `.count()` and
+  `len(query.all())` - the exact real choice this route's own code
+  already made. The transferable problem: an ORM query can fail at
+  three different, real points - building the Python query object,
+  compiling it to SQL, or running that SQL against the database - and
+  which point a given failure happens at changes what kind of error you
+  actually get.
+
+what_you_need_to_know_first: >
+  What a SQL `WHERE` clause does; what a real Python `AttributeError`
+  is and when it's raised; what a real SQL aggregate function (like
+  `COUNT`) computes, and where; what a class attribute is versus an
+  instance attribute.
+
+terms:
+  - name: query object
+    definition: >
+      A real, structured Python object (SQLAlchemy's own `Query` class,
+      or a further-narrowed version of one) representing a real,
+      not-yet-executed database read - built up by chaining real
+      methods (`.filter(...)`, `.order_by(...)`) that each return a new,
+      real query object, rather than executing anything immediately. It
+      exists so a query can be assembled conditionally, piece by piece
+      (exactly the way this project's own real `get_machines` route
+      already does, adding a real `.filter(...)` only when a given query
+      parameter is actually present), with the real SQL compiled only
+      once, at the end, from whatever pieces actually got added.
+  - name: aggregate
+    definition: >
+      A real SQL function (`COUNT`, `SUM`, `AVG`, `MAX`, `MIN`) that
+      computes one real value across many real rows, inside the
+      database itself, rather than handing every real row back to the
+      caller to compute the same value in application code. It exists
+      so a question like "how many" can be answered by the database
+      doing the real counting internally, without every matching row's
+      own full, real data ever needing to leave the database at all.
+
+objects_and_methods:
+  - name: Machine.query (.filter / .order_by / .count / .all)
+    what_it_is: >
+      `Machine.query` is the real, class-bound query interface Flask-
+      SQLAlchemy attaches to every real model, already used by this
+      project's own real `get_machines` route; `.filter`, `.order_by`,
+      `.count`, and `.all` are four of its real, chainable methods.
+    implementation: >
+      `Machine.query` starts a real, unfiltered query object.
+      `.filter(Machine.status == status)` returns a new real query
+      object with a real `WHERE` condition added - this project's own
+      real code (`backend/app/routes/machines.py:31-38`) chains up to
+      three of these conditionally, one per real query parameter
+      actually present. `.order_by(Machine.name)` returns a new real
+      query object with a real `ORDER BY` added. `.count()` compiles
+      and runs a real `SELECT count(*)` immediately, returning a real
+      `int`. `.all()` compiles and runs the real, full `SELECT`
+      immediately, returning a real, already-fetched list of `Machine`
+      instances.
+    its_use: >
+      This lesson's own three labs each exercise a different real
+      combination of these methods, directly reusing the exact real
+      filter/order pattern this project's own `get_machines` route
+      already runs in production.
+    type: A real class-bound query attribute (`Machine.query`), and four real chainable/terminal methods on the query object it returns.
+    responsibility: >
+      Assembling a real, structured description of what rows to select
+      and how to order them, deferring the real SQL compilation and
+      execution until a real terminal method (`.all()`, `.count()`,
+      `.first()`, ...) is actually called.
+    depends_on: >
+      A real, live SQLAlchemy `db` extension instance already bound to
+      this app's own configured database; real, valid column
+      expressions (`Machine.status`, not an attribute `Machine` doesn't
+      actually have).
+    connects_to: >
+      This project's own real `get_machines` route
+      (`backend/app/routes/machines.py:14-45`) builds a real query this
+      exact way, conditionally, from real, incoming query-string
+      parameters.
+    shape: >
+      `.filter`/`.order_by` take a real column expression in, return a
+      new real query object out; `.count` takes nothing, returns a real
+      `int`; `.all` takes nothing, returns a real, already-fetched list
+      of real model instances.
+
+  - name: Session (.add_all / .commit)
+    what_it_is: >
+      The real, live session object this project's own `db` extension
+      exposes as `db.session`, and two of its real methods this
+      lesson's own labs use to set up real rows before querying them.
+    implementation: >
+      `db.session.add_all([a, b, ...])` registers every real object in
+      the given list as pending, one at a time; `db.session.commit()`
+      flushes every real pending change into real SQL and finalizes the
+      real transaction.
+    its_use: >
+      Every one of this lesson's own three labs uses this identical
+      real pair to build the real `Machine` rows each lab then queries.
+    type: A real instance of SQLAlchemy's `Session` class (`db.session`).
+    responsibility: >
+      Staging every real, new object as pending, then, on `commit`,
+      compiling and sending the real SQL that actually persists them.
+    depends_on: >
+      A real, open connection from this app's own real `Engine`.
+    connects_to: >
+      Every real query this lesson's own labs then run reads back
+      exactly the rows these two calls just committed.
+    shape: >
+      `.add_all` takes a real list of objects in, returns nothing;
+      `.commit` takes nothing, returns nothing, but has the real,
+      observable side effect of persisting every pending change.
+
+  - name: sqlalchemy.event.listens_for
+    what_it_is: >
+      A real, top-level function from SQLAlchemy's own `sqlalchemy.event`
+      module, used here as a decorator, registering a real callback
+      against one specific real event a given real object (here, an
+      `Engine`) can fire.
+    implementation: >
+      `@event.listens_for(engine, "before_cursor_execute") def
+      capture_sql(conn, cursor, statement, parameters, context,
+      executemany): captured.append((statement, parameters))` -
+      registers `capture_sql` to run immediately before the real
+      `Engine`'s underlying DBAPI cursor actually executes any real SQL,
+      receiving the real, exact statement text and real bound
+      parameters as arguments.
+    its_use: >
+      Two of this lesson's own three labs use this identical, real
+      mechanism as the one direct way to observe the literal real SQL
+      each query method actually compiles into.
+    type: A real function from SQLAlchemy's own `sqlalchemy.event` module, used as a decorator.
+    responsibility: >
+      Firing a real, user-supplied callback at one specific real, named
+      moment in the real `Engine`'s own execution - the instant before
+      real SQL is sent, not before or after.
+    depends_on: >
+      A real `Engine` instance (`db.engine`) and a real, named, valid
+      event string (`"before_cursor_execute"`).
+    connects_to: >
+      The real, module-level `captured` list each lab defines - every
+      real statement/parameters pair this callback observes gets
+      appended there.
+    shape: >
+      Takes a real target object and a real event name string in (plus
+      the function it decorates); the decorated callback itself takes
+      six real, fixed positional arguments SQLAlchemy always supplies
+      for this specific event.
+
+  - name: app.test_client (.get / .status_code)
+    what_it_is: >
+      `app.test_client()` is a real method on this project's own real
+      `Flask` app instance, returning a real `FlaskClient` - the same
+      real class already used to test HTTP routes throughout this
+      curriculum; `.get` is a real method on it, and `.status_code` a
+      real attribute on the `Response` object it returns.
+    implementation: >
+      `client = app.test_client()` builds one real, reusable client,
+      in-process, with no real network socket involved.
+      `client.get(path)` simulates a real HTTP `GET` request against
+      the given real path, running this app's own real routing and view
+      function exactly as a real deployed request would, and returns a
+      real `Response` object whose `.status_code` is a real `int`.
+    its_use: >
+      This lesson's own second unit calls this twice, on the identical
+      real client, against the identical real route
+      (`GET /api/machines`) - once with a real, working query
+      parameter, once with the real, broken one.
+    type: A real method (`app.test_client`) returning a real `FlaskClient` instance; `.get` a real instance method on it.
+    responsibility: >
+      Running a real HTTP request through this app's own real routing
+      and view-function code, in-process, without a real, separate
+      server process or socket.
+    depends_on: >
+      A fully-built, real `Flask` app instance (`create_app("testing")`).
+    connects_to: >
+      Each real `client.get(...)` call reaches this project's own real
+      `get_machines` view function directly, running its real,
+      unmodified code.
+    shape: >
+      `app.test_client()` takes nothing in, returns one real
+      `FlaskClient`; `.get(path)` takes a real path string in, returns
+      one real `Response` object whose `.status_code` is a real `int`.
+
+concept_units:
+  - title: "Filtering - .filter() and What Real SQL It Actually Compiles Into"
+    problem: >
+      This project's own real `get_machines` route builds a query
+      conditionally: `query = query.filter(Machine.status == status)`,
+      only when a real `status` query parameter is present. What real
+      SQL does that one real line actually produce, and does it match
+      what a hand-written `WHERE` clause for the identical filter would
+      look like?
+    socratic_prompt:
+      - >
+        `Machine.status == status` looks like an ordinary Python
+        equality check, evaluating to `True` or `False`. Given that
+        `.filter(...)` clearly doesn't receive a bare `True`/`False` at
+        all - it receives something it can compile into real SQL later -
+        what would `Machine.status == status` actually have to return
+        instead, for that to be possible?
+      - >
+        This project's own real `get_machines` route chains up to three
+        real `.filter(...)` calls, one per parameter, only when each is
+        present. If two real filters both apply, what real SQL keyword
+        would you expect to join their two real conditions together?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:27-40`
+        (`get_machines`), read again this session - the exact real
+        route this lesson's own lab mirrors.
+      files_affected:
+        - path: verification/phase-07/lab_query_filter_vs_sql.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine` model; the real
+        `sqlalchemy.event.listens_for` SQL-capture mechanism.
+    new_code:
+      applicable: true
+      intro: >
+        The identical real filter-then-order pattern this project's own
+        `get_machines` route already runs, with the real, generated SQL
+        captured the instant it's sent:
+      file: verification/phase-07/lab_query_filter_vs_sql.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from sqlalchemy import event
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        captured = []
+
+        with app.app_context():
+            engine = db.engine
+
+            db.session.add_all([
+                Machine(id="M-Q-001", name="Haas VF-2", category="mill", sub_type="3_axis", status="available"),
+                Machine(id="M-Q-002", name="Haas UMC-750", category="mill", sub_type="5_axis", status="running"),
+            ])
+            db.session.commit()
+
+            @event.listens_for(engine, "before_cursor_execute")
+            def capture_sql(conn, cursor, statement, parameters, context, executemany):
+                captured.append((statement, parameters))
+
+            status = "available"
+            query = Machine.query
+            query = query.filter(Machine.status == status)
+            results = query.order_by(Machine.name).all()
+
+            for statement, parameters in captured:
+                print("statement:", " ".join(statement.split()))
+                print("parameters:", parameters)
+
+            print()
+            print("results:")
+            for m in results:
+                print(" ", m.id, m.name, m.status)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'query = Machine.query'
+          explanation: >
+            Starts a real, unfiltered query object - no real SQL has
+            run yet; this line alone touches no database connection at
+            all, the same real deferred-execution behavior a
+            `db.relationship`'s own dynamic query object already has.
+        - element: 'query = query.filter(Machine.status == status)'
+          explanation: >
+            `Machine.status` is a real SQLAlchemy `InstrumentedAttribute`,
+            not a plain Python string - `== status` doesn't evaluate to
+            a real `bool` here; it produces a real, compilable SQL
+            expression object `.filter` can actually use, exactly the
+            real mechanism this project's own `get_machines` route
+            already relies on.
+        - element: 'results = query.order_by(Machine.name).all()'
+          explanation: >
+            Adds a real `ORDER BY`, then `.all()` is the real, terminal
+            call that finally compiles and runs the real, complete SQL -
+            everything built up across the two lines above happens in
+            one real round trip here, not one per `.filter`/`.order_by`
+            call.
+        - element: 'for statement, parameters in captured: print(...)'
+          explanation: >
+            Prints the real, literal SQL text and real bound parameter
+            this call actually sent - direct proof of what the real
+            `.filter(Machine.status == status)` call compiled into,
+            rather than an assumption about what it "probably" produces.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the **builder pattern**: each real method call
+      (`.filter`, `.order_by`) returns a new, real, still-incomplete
+      object representing the request so far, rather than mutating
+      something in place or executing immediately - the same real
+      pattern letting `Machine.query`, `.filter(...)`, and
+      `.order_by(...)` be chained in any real combination the caller
+      actually needs. Also recognized in: a real HTTP client library's
+      own request builder, chaining `.header(...).body(...).send()`; a
+      real GUI layout builder, chaining `.add(...).align(...)`; and, in
+      this project's own domain, this project's own real
+      `get_machines` route conditionally chaining up to three real
+      `.filter(...)` calls, one per query parameter actually present.
+    se_lens: >
+      The design principle is that assembling a real query and running
+      it are two separate, real steps - a real query object can be
+      built up conditionally, across several real lines, or even
+      several real function calls, before anything is actually sent.
+      The real alternative not chosen here - building a raw SQL string
+      by hand, concatenating a real `WHERE` clause onto it only when
+      each real filter applies - is exactly as flexible, but the honest
+      cost of that real alternative is real, direct exposure to SQL
+      injection if any piece of that string ever includes unescaped
+      user input, a risk the query-object approach this project's real
+      route actually uses avoids entirely by never building SQL text by
+      hand at all.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_query_filter_vs_sql.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        statement: SELECT machines.id AS machines_id, machines.name AS machines_name, machines.category AS machines_category, machines.sub_type AS machines_sub_type, machines.manufacturer AS machines_manufacturer, machines.model AS machines_model, machines.serial_number AS machines_serial_number, machines.location AS machines_location, machines.axes AS machines_axes, machines.x_travel AS machines_x_travel, machines.y_travel AS machines_y_travel, machines.z_travel AS machines_z_travel, machines.max_spindle_speed AS machines_max_spindle_speed, machines.spindle_taper AS machines_spindle_taper, machines.has_tool_changer AS machines_has_tool_changer, machines.tool_changer_capacity AS machines_tool_changer_capacity, machines.status AS machines_status, machines.current_part_id AS machines_current_part_id, machines.current_operator_client_id AS machines_current_operator_client_id, machines.operator_last_heartbeat_at AS machines_operator_last_heartbeat_at, machines.group_id AS machines_group_id, machines.created_at AS machines_created_at, machines.updated_at AS machines_updated_at FROM machines WHERE machines.status = ? ORDER BY machines.name
+        parameters: ('available',)
+
+        results:
+          M-Q-001 Haas VF-2 available
+      output_file: verification/phase-07/lab_query_filter_vs_sql_output.txt
+    connection_to_previous: >
+      This lesson's own first unit; it establishes the real, working
+      half of this project's own `get_machines` route - the next unit
+      examines the identical route's other real filter, which does not
+      work at all.
+
+  - title: "Where a Query Can Actually Fail - the Real, Live ?type= Crash"
+    problem: >
+      This project's own real `get_machines` route also has
+      `query = query.filter(Machine.type == machine_type)`, guarded the
+      identical real way as the working `status` filter the previous
+      unit just proved works. Given `Machine`'s own real columns are
+      `id`, `name`, `category`, `sub_type`, and 19 others - never
+      `type` - what actually happens when a real request supplies
+      `?type=mill`?
+    socratic_prompt:
+      - >
+        A SQL `WHERE` clause naming a column that doesn't exist in a
+        real table fails at the real database, as a real SQL error,
+        once that SQL is actually sent. Given `Machine.type` is
+        evaluated in Python, one real line before any SQL gets built at
+        all, would you expect this specific bug to fail the identical
+        way, or somewhere earlier?
+      - >
+        This project's own real `get_machines` route never wraps this
+        line in a real `try`/`except`. Before running it, what real,
+        concrete error would you predict - both its real Python
+        exception type and what real message it names?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:14-45`
+        (`get_machines`), specifically line 36
+        (`query = query.filter(Machine.type == machine_type)`), read
+        again this session - this project's own real, already-shipped,
+        unguarded code, not a constructed example.
+      files_affected:
+        - path: verification/phase-07/lab_query_attribute_error.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real, running Flask app (`create_app`,
+        `app.test_client()`) - this unit calls the real route directly,
+        not a standalone query built by hand.
+    new_code:
+      applicable: true
+      intro: >
+        The real, live route, called twice - once with the real,
+        working `status` filter, once with the real, broken `type`
+        filter:
+      file: verification/phase-07/lab_query_attribute_error.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from app import create_app
+
+        app = create_app("testing")
+        client = app.test_client()
+
+        r1 = client.get("/api/machines?status=available")
+        print("real GET /api/machines?status=available ->", r1.status_code)
+
+        try:
+            client.get("/api/machines?type=mill")
+        except AttributeError as e:
+            print("real GET /api/machines?type=mill -> AttributeError raised before any HTTP response:")
+            print(" ", repr(e))
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'r1 = client.get("/api/machines?status=available")'
+          explanation: >
+            Confirms the real, working path still succeeds - the
+            identical real route, the identical real filtering
+            mechanism the previous unit already proved compiles to real
+            SQL correctly.
+        - element: 'client.get("/api/machines?type=mill")'
+          explanation: >
+            Calls the identical real route with the real query
+            parameter its own code path never actually protects -
+            `machine_type = request.args.get('type')` reads the real
+            string `"mill"`, then `Machine.type` is evaluated as a real
+            Python attribute access on the `Machine` class itself,
+            before any SQL is built at all.
+        - element: 'except AttributeError as e: print(repr(e))'
+          explanation: >
+            Catches and prints the real, exact exception this project's
+            own real code actually raises - proof this fails as a
+            genuine Python `AttributeError`, at class-attribute-lookup
+            time, not as a SQL error the database itself would raise
+            much later in the same real pipeline.
+    mental_model:
+      applicable: true
+      diagram: |
+        Machine.type == machine_type
+                |
+                v
+        Python attribute lookup on the Machine class itself   <- fails HERE
+                |
+                v  (never reached)
+        .filter(...) compiles a real SQL expression
+                |
+                v  (never reached)
+        real SQL sent to the real database
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a **failure at the wrong layer of abstraction**: a bug
+      that looks, from the route's own code, like it should be a
+      data-filtering problem (a machine type that doesn't match
+      anything) is actually a real, static naming error, caught the
+      moment Python tries to resolve `Machine.type` at all - one layer
+      below where SQL, or the database, ever gets involved. Also
+      recognized in: a typo'd dictionary key raising `KeyError` before
+      any real business logic runs; a JavaScript `undefined.property`
+      access failing before a real network request is ever sent; and,
+      in this project's own domain, a G-code program referencing a tool
+      number never actually loaded in the machine's own turret -
+      failing at the control's own lookup step, before a single real
+      axis ever moves.
+    se_lens: >
+      The design principle this bug violates is that a query parameter
+      name (`type`, chosen by whoever wrote the route or its docstring)
+      should be validated against the real, actual model it's meant to
+      filter, not assumed to match a real column by name alone. The
+      real alternative not chosen here - `Machine.__table__.columns` or
+      a small, explicit allow-list of real, valid filter names, checked
+      before ever reaching `Machine.type` - would turn this into a
+      real, handled `400` instead of an unhandled crash; the honest
+      cost already paid by this project's own real, shipped code: every
+      real client that has ever sent `?type=...` to this exact route
+      has received a real, unhandled `500`-shaped failure instead of a
+      real answer.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_query_attribute_error.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        real GET /api/machines?status=available -> 200
+        real GET /api/machines?type=mill -> AttributeError raised before any HTTP response:
+          AttributeError("type object 'Machine' has no attribute 'type'")
+      output_file: verification/phase-07/lab_query_attribute_error_output.txt
+    connection_to_previous: >
+      The previous unit proved `.filter(Machine.status == status)`
+      compiles correctly; this unit proves the identical, real route's
+      other filter never reaches SQL at all - a different real class of
+      failure entirely.
+
+  - title: "Aggregates - .count() vs len(), and What This Route Already Chose"
+    problem: >
+      This project's own real `get_machines` route computes
+      `'total': len(machines)` - counting a real, already-fetched
+      Python list, after every real column of every matching row has
+      already been transferred out of the database. Does SQL itself
+      offer a way to answer "how many," without fetching the rows at
+      all - and, if so, why didn't this route use it?
+    socratic_prompt:
+      - >
+        `len(machines)` can only run after `machines = query.all()` has
+        already completed. Given `.all()` fetches every real column of
+        every real matching row, what real, wasted work happens here if
+        a caller only ever wanted the real count, never the actual rows?
+      - >
+        SQL has a real, built-in `COUNT(*)` function, computed entirely
+        inside the database. Given SQLAlchemy already compiles
+        `.filter(...)` into a real `WHERE` clause, what would you expect
+        a hypothetical `.count()` method to do with that same, real
+        `WHERE` clause?
+    project_change:
+      reference_source: >
+        Real specimen: `backend/app/routes/machines.py:40-45`
+        (`machines = query.order_by(Machine.name).all()` ... `'total':
+        len(machines)`), read again this session - this project's own
+        real, already-shipped choice, not a hypothetical.
+      files_affected:
+        - path: verification/phase-07/lab_query_aggregate_vs_sql.py
+          status: new
+      change_type: add
+      location: N/A - a new, standalone script; no existing project structure to place it within.
+      dependencies: >
+        This project's own real `Machine` model; the real, already-used
+        `event.listens_for` SQL-capture mechanism.
+    new_code:
+      applicable: true
+      intro: >
+        The real, generated SQL for both real approaches, run back to
+        back against the identical real filter:
+      file: verification/phase-07/lab_query_aggregate_vs_sql.py
+      status: new
+      language: python
+      code: |
+        import sys
+        sys.path.insert(0, "backend")
+
+        from sqlalchemy import event
+
+        from app import create_app, db
+        from app.models.machine import Machine
+
+        app = create_app("testing")
+
+        captured = []
+
+        with app.app_context():
+            engine = db.engine
+
+            db.session.add_all([
+                Machine(id="M-AGG-001", name="Haas VF-2", category="mill", sub_type="3_axis"),
+                Machine(id="M-AGG-002", name="Haas UMC-750", category="mill", sub_type="5_axis"),
+                Machine(id="M-AGG-003", name="Okuma Genos", category="lathe", sub_type="single_turret"),
+            ])
+            db.session.commit()
+
+            @event.listens_for(engine, "before_cursor_execute")
+            def capture_sql(conn, cursor, statement, parameters, context, executemany):
+                captured.append((statement, parameters))
+
+            real_count = Machine.query.filter(Machine.category == "mill").count()
+
+            captured_count_sql = list(captured)
+            captured.clear()
+
+            fetched = Machine.query.filter(Machine.category == "mill").all()
+            python_len = len(fetched)
+
+            print("Machine.query.filter(...).count() real SQL:")
+            for statement, parameters in captured_count_sql:
+                print("  statement:", " ".join(statement.split()))
+            print("  real_count:", real_count)
+
+            print()
+            print("len(query.filter(...).all()) real SQL - what this project's own real get_machines route actually does:")
+            for statement, parameters in captured:
+                print("  statement:", " ".join(statement.split()))
+            print("  python_len:", python_len)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: 'real_count = Machine.query.filter(Machine.category == "mill").count()'
+          explanation: >
+            Calls the real, terminal `.count()` method directly on the
+            filtered query - compiles and runs one real, distinct SQL
+            statement of its own, immediately, rather than reusing
+            anything from a separately-run `.all()`.
+        - element: 'fetched = Machine.query.filter(Machine.category == "mill").all(); python_len = len(fetched)'
+          explanation: >
+            The identical real filter, but calling `.all()` instead -
+            this compiles and runs a completely different real SQL
+            statement, one that selects every real column of every
+            matching row; `len(fetched)` then counts them in real
+            Python, after the real transfer has already happened -
+            exactly what this project's own real `get_machines` route
+            does today.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **pushing computation to where the data already lives**:
+      `COUNT(*)` runs inside the real database process, against real
+      rows that never have to cross into the application's own memory
+      at all, instead of transferring every real row out first and
+      counting them in a separate, real process. Also recognized in: a
+      real search engine returning a real total-hit count without
+      transferring every matching document; a real `wc -l` counting
+      lines inside the filesystem's own I/O layer rather than a
+      separate program reading the whole file first; and, in this
+      project's own domain, this project's own real
+      `Notification.query.filter_by(user_id=user_id,
+      is_read=False).count()`
+      (`backend/app/routes/notifications.py:29`) - the identical real
+      `.filter_by(...).count()` shape, already used elsewhere in this
+      codebase for exactly this reason.
+    se_lens: >
+      The design principle is that the cheapest real place to answer
+      "how many" is wherever the real data already sits - inside the
+      database - not after paying to move every real row somewhere
+      else first. The real alternative this project's own
+      `get_machines` route actually chose - `len(machines)`, after a
+      real `.all()` - is simpler when the real rows were going to be
+      fetched and returned to the caller anyway (which `get_machines`
+      genuinely does, in its own `'data'` field, so no real row-transfer
+      cost is wasted here); the honest cost of reaching for `len()` as a
+      default habit instead of `.count()`: it stops being free the
+      moment a caller wants only a real count and not the real rows
+      themselves - real work this exact pattern would then be doing for
+      no reason.
+    commands:
+      - command: backend/.venv/Scripts/python.exe verification/phase-07/lab_query_aggregate_vs_sql.py
+        explanation: >
+          Runs this as a plain script, from the repository root; uses
+          this app's own real `"testing"` config, so it leaves no real
+          file behind.
+    verification:
+      applicable: true
+      real_output: |
+        Seeding default users...
+        Machine.query.filter(...).count() real SQL:
+          statement: SELECT count(*) AS count_1 FROM (SELECT machines.id AS machines_id, machines.name AS machines_name, machines.category AS machines_category, machines.sub_type AS machines_sub_type, machines.manufacturer AS machines_manufacturer, machines.model AS machines_model, machines.serial_number AS machines_serial_number, machines.location AS machines_location, machines.axes AS machines_axes, machines.x_travel AS machines_x_travel, machines.y_travel AS machines_y_travel, machines.z_travel AS machines_z_travel, machines.max_spindle_speed AS machines_max_spindle_speed, machines.spindle_taper AS machines_spindle_taper, machines.has_tool_changer AS machines_has_tool_changer, machines.tool_changer_capacity AS machines_tool_changer_capacity, machines.status AS machines_status, machines.current_part_id AS machines_current_part_id, machines.current_operator_client_id AS machines_current_operator_client_id, machines.operator_last_heartbeat_at AS machines_operator_last_heartbeat_at, machines.group_id AS machines_group_id, machines.created_at AS machines_created_at, machines.updated_at AS machines_updated_at FROM machines WHERE machines.category = ?) AS anon_1
+          real_count: 2
+
+        len(query.filter(...).all()) real SQL - what this project's own real get_machines route actually does:
+          statement: SELECT machines.id AS machines_id, machines.name AS machines_name, machines.category AS machines_category, machines.sub_type AS machines_sub_type, machines.manufacturer AS machines_manufacturer, machines.model AS machines_model, machines.serial_number AS machines_serial_number, machines.location AS machines_location, machines.axes AS machines_axes, machines.x_travel AS machines_x_travel, machines.y_travel AS machines_y_travel, machines.z_travel AS machines_z_travel, machines.max_spindle_speed AS machines_max_spindle_speed, machines.spindle_taper AS machines_spindle_taper, machines.has_tool_changer AS machines_has_tool_changer, machines.tool_changer_capacity AS machines_tool_changer_capacity, machines.status AS machines_status, machines.current_part_id AS machines_current_part_id, machines.current_operator_client_id AS machines_current_operator_client_id, machines.operator_last_heartbeat_at AS machines_operator_last_heartbeat_at, machines.group_id AS machines_group_id, machines.created_at AS machines_created_at, machines.updated_at AS machines_updated_at FROM machines WHERE machines.category = ?
+          python_len: 2
+      output_file: verification/phase-07/lab_query_aggregate_vs_sql_output.txt
+    connection_to_previous: >
+      The previous unit proved where a query can fail before ever
+      reaching SQL; this unit closes the lesson by proving what two
+      genuinely different, both fully-working real SQL statements this
+      identical filter can produce, depending only on which real,
+      terminal method is called.
+
+closing:
+  connect_the_pieces: >
+    One real route, `get_machines`, traced through every real way its
+    own query construction actually behaves: `.filter(Machine.status ==
+    status)` compiles into a real `WHERE machines.status = ?`, proven by
+    capturing the exact real SQL sent; the identical real pattern with
+    `Machine.type` instead never reaches SQL at all, failing as a real
+    Python `AttributeError` the instant the class attribute is looked
+    up - a genuinely different real failure, one layer earlier in the
+    same real pipeline; and the route's own real choice, `len(machines)`
+    after a real `.all()`, is shown against the real alternative,
+    `.count()`, which compiles into an entirely different, real
+    `SELECT count(*)` statement that never transfers a single full row.
+  next_lesson_pointer: >
+    Every real query this lesson built returned real ORM objects
+    directly. Next, this curriculum looks at why those real objects
+    still aren't what actually gets sent back to a real API caller.
