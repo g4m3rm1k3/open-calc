@@ -36,6 +36,9 @@ re-run the script after any lesson changes instead.
 ## Runtime dependency
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - A package whose real code actually executes as part of the shipped application - in the browser, or in Electron's renderer process - provable only by finding a real import of it somewhere in application source. Its presence in a manifest file like package.json is a claim that it's used, never proof by itself.
 
+## Scope
+- **Term** in `LESSON-F0.4-WHAT-THIS-FRONTEND-IS-STILL-HIDING` - A deliberate boundary on what one piece of work will and won't attempt to settle. It exists because naming a real problem precisely and explaining or fixing it are genuinely different amounts of work - a habit-building phase can locate four real, serious things without owing a full treatment of any of them yet, as long as that boundary is stated honestly rather than implied away.
+
 ## StrictMode
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - React's development-only wrapper component that intentionally runs certain code twice, to surface real side-effect bugs (code that isn't safe to run more than once) early rather than let them hide until production. It exists purely as a development-time check and has zero effect on a real production build.
 
