@@ -9,11 +9,20 @@ re-run the script after any lesson changes instead.
 ## Client-side routing
 - **Term** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - Mapping a URL to a component entirely inside the browser, without a new request to a server for each navigation - a router library watches the current URL and renders whichever component is registered for it. It exists so navigating between views feels instant and preserves in-memory state, at the cost of the server never seeing which "page" a visitor is actually on.
 
+## ColumnDef
+- **Object/method** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - A real TypeScript interface, declared only inside the dead file, describing one table column's complete shape as data instead of as hand-written JSX.
+
 ## Concurrent rendering
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - React's ability to prepare more than one version of the UI at once and interrupt in-progress work that's no longer needed, instead of finishing every render synchronously once started. It exists so a large update doesn't block the browser from responding to more urgent work (like a keystroke) while it's still being computed - and is only reachable through the root API createRoot creates, never through the legacy ReactDOM.render.
 
 ## createRoot
 - **Object/method** in `LESSON-F0.2-THE-REAL-STACK` - The real React 18 function that creates a root attached to one real DOM node, replacing the legacy ReactDOM.render as this app's own actual entry point.
+
+## Dead code
+- **Term** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - Code that still exists in the real source tree but has no real import or call reaching it from any live entry point - provable only by a real, mechanical search confirming zero such callers exist anywhere, never assumed from a file's name, location, or how complete it looks.
+
+## Live code
+- **Term** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - Code reachable from a real, running entry point through an actual chain of real imports and calls - the only kind of code a real user's session can ever actually execute. Its presence in a source tree says nothing on its own; reachability is what makes it live.
 
 ## ProtectedRoute
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - This project's own real guard component, wrapping a page element and deciding whether it's actually allowed to render.
@@ -30,6 +39,12 @@ re-run the script after any lesson changes instead.
 ## StrictMode
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - React's development-only wrapper component that intentionally runs certain code twice, to surface real side-effect bugs (code that isn't safe to run more than once) early rather than let them hide until production. It exists purely as a development-time check and has zero effect on a real production build.
 
+## ToolingPage
+- **Object/method** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - This app's real, live tool-inventory page component - the one this app's router actually renders when a user visits /tooling.
+
+## ToolingPage_backup
+- **Object/method** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - A second, real, complete ToolingPage-shaped component sitting in this app's own source tree, never rendered by anything - the actual subject of this lesson.
+
 ## useAuth
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - This project's own real custom hook exposing the current authentication state to any component that calls it.
 
@@ -38,3 +53,4 @@ re-run the script after any lesson changes instead.
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
 - `Build-time dependency` / `Runtime dependency` - shares: dependency
+- `ToolingPage` / `ToolingPage_backup` - shares: toolingpage
