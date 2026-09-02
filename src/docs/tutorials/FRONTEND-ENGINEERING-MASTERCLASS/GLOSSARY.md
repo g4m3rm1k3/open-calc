@@ -21,11 +21,26 @@ re-run the script after any lesson changes instead.
 ## Dead code
 - **Term** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - Code that still exists in the real source tree but has no real import or call reaching it from any live entry point - provable only by a real, mechanical search confirming zero such callers exist anywhere, never assumed from a file's name, location, or how complete it looks.
 
+## Interface
+- **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - TypeScript's way of naming a real object's shape - which fields exist and what type each one is - checked entirely before the code runs, with zero real representation left in the compiled JavaScript. It exists so a function or component can state, in one place, exactly what shape of value it requires, instead of that requirement living only in a reader's head or a comment.
+
 ## Live code
 - **Term** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - Code reachable from a real, running entry point through an actual chain of real imports and calls - the only kind of code a real user's session can ever actually execute. Its presence in a source tree says nothing on its own; reachability is what makes it live.
 
+## MasterObject
+- **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for the full, serialized UI state it saves to the database - the deepest-nested real shape in this file.
+
+## Pairing
+- **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for one CAM-file/machine pairing - the real, selectable item the Operations Manager works with.
+
+## PartStatus
+- **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real type alias for a part's lifecycle state - the direct contrast to the three interfaces above, since it names a union of string literals, not an object shape.
+
 ## ProtectedRoute
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - This project's own real guard component, wrapping a page element and deciding whether it's actually allowed to render.
+
+## Record<K, V>
+- **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - A built-in TypeScript utility type describing a real object whose every key is of type `K` and whose every value is of type `V`. It exists so an object used as a lookup table gets its own real, checked shape instead of the looser `{ [key: string]: V }` index signature, which cannot guarantee every real key of `K` actually has an entry.
 
 ## Route
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - A React Router component declaring one real mapping from a URL path to the element that should render for it.
@@ -35,6 +50,9 @@ re-run the script after any lesson changes instead.
 
 ## Runtime dependency
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - A package whose real code actually executes as part of the shipped application - in the browser, or in Electron's renderer process - provable only by finding a real import of it somewhere in application source. Its presence in a manifest file like package.json is a claim that it's used, never proof by itself.
+
+## SavedOrderResponse
+- **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for what GET /api/operation-orders/{id} actually returns - a genuinely nested shape, one level deeper than Pairing.
 
 ## Scope
 - **Term** in `LESSON-F0.4-WHAT-THIS-FRONTEND-IS-STILL-HIDING` - A deliberate boundary on what one piece of work will and won't attempt to settle. It exists because naming a real problem precisely and explaining or fixing it are genuinely different amounts of work - a habit-building phase can locate four real, serious things without owing a full treatment of any of them yet, as long as that boundary is stated honestly rather than implied away.
@@ -48,6 +66,15 @@ re-run the script after any lesson changes instead.
 ## ToolingPage_backup
 - **Object/method** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - A second, real, complete ToolingPage-shaped component sitting in this app's own source tree, never rendered by anything - the actual subject of this lesson.
 
+## Type alias
+- **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - A real, reusable name for any type expression - an object shape, a union of literal values, a primitive, a tuple - not only an object shape the way an interface is limited to. It exists so a type expression that would otherwise be repeated, or that isn't an object shape at all, gets one real name instead of being written out in full everywhere it's needed.
+
+## Type-only import
+- **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - An `import type { ... }` statement, importing only a name's real type information, never a real runtime value. It exists so a build tool can safely erase the whole import at compile time, confirming, by construction, that nothing imported this way is ever actually used as a real value at runtime.
+
+## Union type
+- **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - A type built from two or more real types joined by `|`, meaning "a value that is genuinely one of these, never more than one at once." It exists so a field or parameter can be restricted to a real, closed set of possibilities instead of left as broad as `string` when only a handful of exact values are ever actually valid.
+
 ## useAuth
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - This project's own real custom hook exposing the current authentication state to any component that calls it.
 
@@ -57,3 +84,6 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 
 - `Build-time dependency` / `Runtime dependency` - shares: dependency
 - `ToolingPage` / `ToolingPage_backup` - shares: toolingpage
+- `Type alias` / `Type-only import` - shares: type
+- `Type alias` / `Union type` - shares: type
+- `Type-only import` / `Union type` - shares: type
