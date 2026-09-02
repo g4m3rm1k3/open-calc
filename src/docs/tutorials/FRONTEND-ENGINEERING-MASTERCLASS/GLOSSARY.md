@@ -6,6 +6,9 @@ re-run the script after any lesson changes instead.
 ## apiRequest<T = any>
 - **Object/method** in `LESSON-F1.2-GENERICS` - This app's own real, central function for every JSON API call it makes - and this app's own first real generic function.
 
+## Automatic JSX runtime
+- **Term** in `LESSON-F2.1-JSX-AND-WHAT-IT-ACTUALLY-COMPILES-TO` - The specific real JSX-to-JavaScript transform this project is configured to use (`"jsx": "react-jsx"` in tsconfig.json, confirmed this session), compiling each JSX element into a real call to `jsx` or `jsxs`, imported automatically from `react/jsx-runtime`. It exists as the real, modern replacement for the older "classic" transform, which compiled every element to `React.createElement` instead and required `React` itself to be imported into every real file that used any JSX at all.
+
 ## Build-time dependency
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - A package whose real job is transforming or serving the project's own source before or while it runs - a bundler, a CSS toolchain - real and necessary, but never appearing as an application-code import statement. It exists so build/tooling concerns stay separate from what a browser actually downloads and executes; verified by its own config file and build script actually existing and being invoked, not by an import search.
 
@@ -38,6 +41,15 @@ re-run the script after any lesson changes instead.
 
 ## Interface
 - **Term** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - TypeScript's way of naming a real object's shape - which fields exist and what type each one is - checked entirely before the code runs, with zero real representation left in the compiled JavaScript. It exists so a function or component can state, in one place, exactly what shape of value it requires, instead of that requirement living only in a reader's head or a comment.
+
+## JSX
+- **Term** in `LESSON-F2.1-JSX-AND-WHAT-IT-ACTUALLY-COMPILES-TO` - A real, non-standard syntax extension to JavaScript, letting HTML-like markup appear directly inside real code - `<div className="x">...</div>`, written where an ordinary expression would go. It exists so a component's real UI structure can be written close to how it visually nests, and is compiled away entirely into ordinary function calls before any real browser ever sees it - no browser executes JSX itself, ever.
+
+## jsx
+- **Object/method** in `LESSON-F2.1-JSX-AND-WHAT-IT-ACTUALLY-COMPILES-TO` - The real function this project's own configured JSX transform compiles a single-child JSX element down to.
+
+## jsxs
+- **Object/method** in `LESSON-F2.1-JSX-AND-WHAT-IT-ACTUALLY-COMPILES-TO` - The real function this project's own configured JSX transform compiles a JSX element down to instead, specifically when that element has more than one real child.
 
 ## Live code
 - **Term** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - Code reachable from a real, running entry point through an actual chain of real imports and calls - the only kind of code a real user's session can ever actually execute. Its presence in a source tree says nothing on its own; reachability is what makes it live.
@@ -109,6 +121,9 @@ re-run the script after any lesson changes instead.
 
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
+- `Automatic JSX runtime` / `JSX` - shares: jsx
+- `Automatic JSX runtime` / `jsx` - shares: jsx
+- `Automatic JSX runtime` / `Runtime dependency` - shares: runtime
 - `Build-time dependency` / `Runtime dependency` - shares: dependency
 - `Component props interface` / `Interface` - shares: interface
 - `Default type parameter` / `Generic type parameter` - shares: parameter, type
@@ -118,6 +133,7 @@ Not necessarily a problem - review each one. A real violation looks like two dif
 - `Generic type parameter` / `Type alias` - shares: type
 - `Generic type parameter` / `Type-only import` - shares: type
 - `Generic type parameter` / `Union type` - shares: type
+- `JSX` / `jsx` - shares: jsx
 - `ToolingPage` / `ToolingPage_backup` - shares: toolingpage
 - `Type alias` / `Type-only import` - shares: type
 - `Type alias` / `Union type` - shares: type
