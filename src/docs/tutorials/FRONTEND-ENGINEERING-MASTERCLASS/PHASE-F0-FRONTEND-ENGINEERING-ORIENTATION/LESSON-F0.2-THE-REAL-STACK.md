@@ -2,7 +2,7 @@
 
 *File paths under src/... refer to the real manufacturing-platform repository's frontend. Paths under verification/... refer to that same repository's verification folder.*
 
-**What you will build:** A real, mechanical tool proving which of this app's own real, listed dependencies actually get imported anywhere in src/ - extending Lesson F0.1's exact route-finding method from searching one file to searching an entire real dependency list - then a direct trace of one of those real dependencies, react, all the way to the one real line where this app's actual entry point calls React 18's createRoot instead of the legacy ReactDOM.render. The transferable problem: a name in a manifest file (package.json, requirements.txt, any dependency list) is a claim, not a proof - the same verification habit already proven on a Python backend, and on this frontend's own routes in Lesson F0.1, now settles what a codebase's real, stated stack actually is.
+**What you will build:** A real, mechanical tool proving which of this app's own real, listed dependencies actually get imported anywhere in src/ - extending this phase's own earlier real route-finding method from searching one file to searching an entire real dependency list - then a direct trace of one of those real dependencies, react, all the way to the one real line where this app's actual entry point calls React 18's createRoot instead of the legacy ReactDOM.render. The transferable problem: a name in a manifest file (package.json, requirements.txt, any dependency list) is a claim, not a proof - the same verification habit already proven on a Python backend, and on this frontend's own routes earlier this phase, now settles what a codebase's real, stated stack actually is.
 
 **What you need to know first:** Verifying a claim about a codebase by mechanically searching its real source instead of trusting a manifest file or a construct's name; reading a function's real declared shape from its actual installed package rather than assuming it from documentation alone.
 
@@ -29,7 +29,7 @@
 
 ### The Problem
 
-This curriculum's own phase description claims this frontend is really built on React, Zustand, React Router, Three.js/R3F, Socket.IO, and diff. package.json lists all of them as real, declared dependencies - but a name in that file is a claim, not proof: this exact project already has one confirmed real counter-example, recharts, a real, listed dependency with zero real imports anywhere in src/ (found in an earlier investigation pass, not yet mechanically reproduced in this curriculum). Before trusting the stack claim above, it needs the same real, mechanical verification Lesson F0.1 already proved on 13 guarded routes.
+This curriculum's own phase description claims this frontend is really built on React, Zustand, React Router, Three.js/R3F, Socket.IO, and diff. package.json lists all of them as real, declared dependencies - but a name in that file is a claim, not proof: this exact project already has one confirmed real counter-example, recharts, a real, listed dependency with zero real imports anywhere in src/ (found in an earlier investigation pass, not yet mechanically reproduced in this curriculum). Before trusting the stack claim above, it needs the same real, mechanical verification already proved earlier this phase on 13 guarded routes.
 
 Before reading on:
 
@@ -41,12 +41,12 @@ Before reading on:
 - **Reference Source:** `package.json`'s real `dependencies` block, read this session, cross-checked against real import lines already found this session for `react` (`App.tsx:181`), `zustand` (`components/shared/ModelViewerModal.tsx:16`), `react-router-dom` (`App.tsx:102`), `@react-three/fiber` (`components/operator/OBJViewer.tsx:16`), `socket.io-client` (`hooks/useWebSockets.ts:17`), and `diff` (`components/parts/nc-files/NCFileDiffModal.tsx:4`).
 - **Files affected:** `verification/frontend-phase-00/lab_verify_real_stack.py` (new)
 - **Change type:** add
-- **Location:** New file, alongside Lesson F0.1's own real route-finding tool, in the same verification/frontend-phase-00/ folder.
+- **Location:** New file, alongside this phase's own earlier real route-finding tool, in the same verification/frontend-phase-00/ folder.
 - **Dependencies:** Python's standard library json, re, and pathlib modules only.
 
 ### The New Code
 
-New code, typed into a new throwaway file - the same real pattern Lesson F0.1 used, now searching an entire real directory tree for a real import shape instead of one file for a real JSX shape:
+New code, typed into a new throwaway file - the same real pattern already used earlier this phase, now searching an entire real directory tree for a real import shape instead of one file for a real JSX shape:
 
 **File:** `verification/frontend-phase-00/lab_verify_real_stack.py` (new)
 
@@ -88,7 +88,7 @@ for name in real_stack:
 
 ### Mechanical Walkthrough
 
-- `package_json = json.loads(Path("package.json").read_text(encoding="utf-8"))` — Reads the real, current text of this project's own package.json and parses it into a real Python dict - the same real `Path`/`read_text` habit Lesson F0.1 already proved, now pointed at a JSON manifest instead of a `.tsx` source file; `json.loads` turns the real JSON text into a real, indexable Python value (basic Python/stdlib).
+- `package_json = json.loads(Path("package.json").read_text(encoding="utf-8"))` — Reads the real, current text of this project's own package.json and parses it into a real Python dict - the same real `Path`/`read_text` habit already proved earlier this phase, now pointed at a JSON manifest instead of a `.tsx` source file; `json.loads` turns the real JSON text into a real, indexable Python value (basic Python/stdlib).
 - `dependencies = package_json["dependencies"]` — Real dict-key access into the real, current `dependencies` block this project's own manifest actually declares (basic Python) - deliberately not `devDependencies`, since every one of this unit's seven real target names is a real runtime dependency, not a build-time one (see this unit's SE Lens for the two names, Vite and Tailwind, that this exact distinction excludes on purpose).
 - `real_stack = ["react", "zustand", "react-router-dom", "@react-three/fiber", "socket.io-client", "diff", "recharts"]` — The seven real names this unit verifies: the six libraries this curriculum's own F0.2 phase description names, plus `recharts` as an honest contrast case - already known, from an earlier investigation pass, to be a real, listed dependency with zero real usage, now checked by this exact mechanical tool instead of taken on citation alone.
 - `for name in real_stack: version = dependencies.get(name, "NOT IN package.json")` — Walks the seven real names one at a time; `dict.get`'s second argument is a real fallback value returned only if the real key is missing, instead of raising a real `KeyError` the way `dependencies[name]` would - deliberately forgiving here, since a name genuinely absent from `dependencies` (this never actually happens for these seven, all seven are real, listed entries) should still print a real, readable line instead of crashing the whole tool (basic Python `dict` method).
@@ -100,7 +100,7 @@ for name in real_stack:
 
 ### CS Lens
 
-This is the identical class of static analysis Lesson F0.1 already proved - mechanically scanning real source text for a repeated real shape instead of trusting a name - applied one level up: from searching a single file for a real JSX shape, to searching an entire real directory tree for a real import shape, across every name a manifest file claims the project depends on. The same general idea recurs constantly outside this curriculum: license compliance tooling flagging a third-party package that's declared but never actually imported before a release; a linter's own unused-import rule doing the identical check at single-file scope; a bundler's dead-code-elimination step pruning anything never actually reached by a real import chain.
+This is the identical class of static analysis already proved earlier this phase - mechanically scanning real source text for a repeated real shape instead of trusting a name - applied one level up: from searching a single file for a real JSX shape, to searching an entire real directory tree for a real import shape, across every name a manifest file claims the project depends on. The same general idea recurs constantly outside this curriculum: license compliance tooling flagging a third-party package that's declared but never actually imported before a release; a linter's own unused-import rule doing the identical check at single-file scope; a bundler's dead-code-elimination step pruning anything never actually reached by a real import chain.
 
 ### SE Lens
 
@@ -108,7 +108,7 @@ The real alternative not chosen: trusting package.json as documentation of what 
 
 ### Commands needed
 
-- `python verification/frontend-phase-00/lab_verify_real_stack.py` — Run from the manufacturing-platform repository root, same as Lesson F0.1's own tool, so the relative paths to package.json and src/ resolve correctly.
+- `python verification/frontend-phase-00/lab_verify_real_stack.py` — Run from the manufacturing-platform repository root, same as this phase's earlier tool, so the relative paths to package.json and src/ resolve correctly.
 
 ### Verification
 
