@@ -1,0 +1,442 @@
+number: "F0.2"
+title: "The Real Stack"
+path_note: >
+  File paths under src/... refer to the real manufacturing-platform
+  repository's frontend. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  A real, mechanical tool proving which of this app's own real, listed
+  dependencies actually get imported anywhere in src/ - extending Lesson
+  F0.1's exact route-finding method from searching one file to searching
+  an entire real dependency list - then a direct trace of one of those
+  real dependencies, react, all the way to the one real line where this
+  app's actual entry point calls React 18's createRoot instead of the
+  legacy ReactDOM.render. The transferable problem: a name in a manifest
+  file (package.json, requirements.txt, any dependency list) is a claim,
+  not a proof - the same verification habit already proven on a Python
+  backend, and on this frontend's own routes in Lesson F0.1, now settles
+  what a codebase's real, stated stack actually is.
+
+what_you_need_to_know_first: >
+  Verifying a claim about a codebase by mechanically searching its real
+  source instead of trusting a manifest file or a construct's name;
+  reading a function's real declared shape from its actual installed
+  package rather than assuming it from documentation alone.
+
+terms:
+  - name: "Runtime dependency"
+    definition: >
+      A package whose real code actually executes as part of the shipped
+      application - in the browser, or in Electron's renderer process -
+      provable only by finding a real import of it somewhere in
+      application source. Its presence in a manifest file like
+      package.json is a claim that it's used, never proof by itself.
+  - name: "Build-time dependency"
+    definition: >
+      A package whose real job is transforming or serving the project's
+      own source before or while it runs - a bundler, a CSS toolchain -
+      real and necessary, but never appearing as an application-code
+      import statement. It exists so build/tooling concerns stay
+      separate from what a browser actually downloads and executes;
+      verified by its own config file and build script actually existing
+      and being invoked, not by an import search.
+  - name: "StrictMode"
+    definition: >
+      React's development-only wrapper component that intentionally runs
+      certain code twice, to surface real side-effect bugs (code that
+      isn't safe to run more than once) early rather than let them hide
+      until production. It exists purely as a development-time check and
+      has zero effect on a real production build.
+  - name: "Concurrent rendering"
+    definition: >
+      React's ability to prepare more than one version of the UI at
+      once and interrupt in-progress work that's no longer needed,
+      instead of finishing every render synchronously once started. It
+      exists so a large update doesn't block the browser from responding
+      to more urgent work (like a keystroke) while it's still being
+      computed - and is only reachable through the root API createRoot
+      creates, never through the legacy ReactDOM.render.
+
+objects_and_methods:
+  - name: "createRoot"
+    what_it_is: "The real React 18 function that creates a root attached to one real DOM node, replacing the legacy ReactDOM.render as this app's own actual entry point."
+    implementation: "`function createRoot(container: Element | DocumentFragment): Root`, exported from the `react-dom/client` module - confirmed, this session, a real function export in this project's actually-installed `react-dom@18.3.1` package."
+    its_use: "Called exactly once, at `src/main.tsx:61`, on the real `<div id=\"root\">` DOM node, to create the one real root this whole app renders into."
+    type: "A function, exported by the `react-dom/client` module."
+    responsibility: "Attach a real React component tree to one real DOM node and return a real `Root` object whose own `.render()` method is the only way this app actually paints anything to the screen."
+    depends_on: "A real DOM node already existing in `index.html` before this runs, found via `document.getElementById('root')`."
+    connects_to: "The `Root` object it returns is called once more, immediately, via `.render()`, with `<App />` wrapped in `<StrictMode>`."
+    shape: "Takes one real DOM element; returns a real `Root` object with exactly one method this app calls, `.render(reactNode)` - it never returns the rendered UI itself, only the handle used to render it."
+
+concept_units:
+  - title: "Verifying the Real Stack Mechanically, Not From package.json Alone"
+    problem: >
+      This curriculum's own phase description claims this frontend is
+      really built on React, Zustand, React Router, Three.js/R3F,
+      Socket.IO, and diff. package.json lists all of them as real,
+      declared dependencies - but a name in that file is a claim, not
+      proof: this exact project already has one confirmed real
+      counter-example, recharts, a real, listed dependency with zero
+      real imports anywhere in src/ (found in an earlier investigation
+      pass, not yet mechanically reproduced in this curriculum). Before
+      trusting the stack claim above, it needs the same real, mechanical
+      verification Lesson F0.1 already proved on 13 guarded routes.
+    socratic_prompt:
+      - "Given the exact real method that found 13 guarded routes last
+        lesson - searching real file text for a real, repeated shape -
+        what would the equivalent search look like for 'is this exact
+        package actually imported anywhere in src/'?"
+      - "package.json already tells you recharts is a real, listed
+        dependency. What would you need to check, mechanically, before
+        trusting that it's actually used anywhere in this app?"
+    project_change:
+      reference_source: >
+        `package.json`'s real `dependencies` block, read this session,
+        cross-checked against real import lines already found this
+        session for `react` (`App.tsx:181`), `zustand`
+        (`components/shared/ModelViewerModal.tsx:16`),
+        `react-router-dom` (`App.tsx:102`), `@react-three/fiber`
+        (`components/operator/OBJViewer.tsx:16`), `socket.io-client`
+        (`hooks/useWebSockets.ts:17`), and `diff`
+        (`components/parts/nc-files/NCFileDiffModal.tsx:4`).
+      files_affected:
+        - path: "verification/frontend-phase-00/lab_verify_real_stack.py"
+          status: new
+      change_type: add
+      location: "New file, alongside Lesson F0.1's own real route-finding tool, in the same verification/frontend-phase-00/ folder."
+      dependencies: "Python's standard library json, re, and pathlib modules only."
+    new_code:
+      applicable: true
+      intro: >
+        New code, typed into a new throwaway file - the same real
+        pattern Lesson F0.1 used, now searching an entire real directory
+        tree for a real import shape instead of one file for a real JSX
+        shape:
+      file: "verification/frontend-phase-00/lab_verify_real_stack.py"
+      status: new
+      language: python
+      code: |
+        import json
+        import re
+        from pathlib import Path
+
+        package_json = json.loads(Path("package.json").read_text(encoding="utf-8"))
+        dependencies = package_json["dependencies"]
+
+        real_stack = [
+            "react",
+            "zustand",
+            "react-router-dom",
+            "@react-three/fiber",
+            "socket.io-client",
+            "diff",
+            "recharts",
+        ]
+
+        for name in real_stack:
+            version = dependencies.get(name, "NOT IN package.json")
+            pattern = re.compile(r"from ['\"]" + re.escape(name) + r"['\"]")
+            match = None
+            for path in sorted(Path("src").rglob("*.ts*")):
+                text = path.read_text(encoding="utf-8")
+                for line_number, line in enumerate(text.splitlines(), start=1):
+                    if pattern.search(line):
+                        match = (path, line_number)
+                        break
+                if match:
+                    break
+            if match:
+                print(f"{name} ({version}): real import at {match[0].as_posix()}:{match[1]}")
+            else:
+                print(f"{name} ({version}): zero real imports found in src/")
+    updated_project:
+      applicable: false
+      note: >
+        Not applicable - the code shown above (New Code) is already the
+        whole new structure, with nothing existing to return to (per
+        this schema's own skip condition for a brand-new file).
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "package_json = json.loads(Path(\"package.json\").read_text(encoding=\"utf-8\"))"
+          explanation: >
+            Reads the real, current text of this project's own
+            package.json and parses it into a real Python dict - the
+            same real `Path`/`read_text` habit Lesson F0.1 already
+            proved, now pointed at a JSON manifest instead of a `.tsx`
+            source file; `json.loads` turns the real JSON text into a
+            real, indexable Python value (basic Python/stdlib).
+        - element: "dependencies = package_json[\"dependencies\"]"
+          explanation: >
+            Real dict-key access into the real, current `dependencies`
+            block this project's own manifest actually declares (basic
+            Python) - deliberately not `devDependencies`, since every
+            one of this unit's seven real target names is a real runtime
+            dependency, not a build-time one (see this unit's SE Lens
+            for the two names, Vite and Tailwind, that this exact
+            distinction excludes on purpose).
+        - element: "real_stack = [\"react\", \"zustand\", \"react-router-dom\", \"@react-three/fiber\", \"socket.io-client\", \"diff\", \"recharts\"]"
+          explanation: >
+            The seven real names this unit verifies: the six libraries
+            this curriculum's own F0.2 phase description names, plus
+            `recharts` as an honest contrast case - already known, from
+            an earlier investigation pass, to be a real, listed
+            dependency with zero real usage, now checked by this exact
+            mechanical tool instead of taken on citation alone.
+        - element: "for name in real_stack: version = dependencies.get(name, \"NOT IN package.json\")"
+          explanation: >
+            Walks the seven real names one at a time; `dict.get`'s
+            second argument is a real fallback value returned only if
+            the real key is missing, instead of raising a real
+            `KeyError` the way `dependencies[name]` would - deliberately
+            forgiving here, since a name genuinely absent from
+            `dependencies` (this never actually happens for these seven,
+            all seven are real, listed entries) should still print a
+            real, readable line instead of crashing the whole tool
+            (basic Python `dict` method).
+        - element: "pattern = re.compile(r\"from ['\\\"]\" + re.escape(name) + r\"['\\\"]\")"
+          explanation: >
+            Builds a real regex requiring the exact real name to sit
+            alone between quotes immediately after `from` - an exact
+            quote-boundary match, not a bare substring search, so
+            `react` can never falsely match inside `react-dom` or
+            `react-router-dom`. `re.escape` treats the name's own
+            regex-meaningful characters - the `/` and `@` in
+            `@react-three/fiber` - as literal text to search for, not
+            regex syntax to interpret.
+        - element: "for path in sorted(Path(\"src\").rglob(\"*.ts*\")):"
+          explanation: >
+            A real, recursive glob over every real `.ts`/`.tsx` file
+            inside `src/`, sorted so the search order - and therefore
+            which real file gets reported first when more than one real
+            match exists - stays the same every real run (basic
+            `pathlib`).
+        - element: "text = path.read_text(encoding=\"utf-8\"); for line_number, line in enumerate(text.splitlines(), start=1):"
+          explanation: >
+            Reads each real file's full text, then walks it line by
+            line, tracking the real 1-based line number a match happens
+            to appear on - `enumerate`'s `start=1` matches how a real
+            editor or `git blame` numbers lines, not Python's own
+            default zero-based count (basic Python).
+        - element: "if pattern.search(line): match = (path, line_number); break"
+          explanation: >
+            Stops at the first real match found in the current file,
+            then the outer loop's own `if match: break` (below) stops
+            the whole search entirely - this unit's real question is
+            only "does at least one real import exist," not "how many,"
+            so nothing is gained by continuing to search once one is
+            found.
+        - element: "if match: print(f\"{name} ({version}): real import at {match[0].as_posix()}:{match[1]}\") else: print(f\"{name} ({version}): zero real imports found in src/\")"
+          explanation: >
+            Reports either the real file and line where the import
+            actually lives, or an honest "zero real imports found" - the
+            exact real outcome this unit already expects for `recharts`,
+            now produced by a real, reusable tool instead of relied on
+            from an earlier investigation's own citation.
+    cs_lens: >
+      This is the identical class of static analysis Lesson F0.1 already
+      proved - mechanically scanning real source text for a repeated
+      real shape instead of trusting a name - applied one level up: from
+      searching a single file for a real JSX shape, to searching an
+      entire real directory tree for a real import shape, across every
+      name a manifest file claims the project depends on. The same
+      general idea recurs constantly outside this curriculum: license
+      compliance tooling flagging a third-party package that's declared
+      but never actually imported before a release; a linter's own
+      unused-import rule doing the identical check at single-file scope;
+      a bundler's dead-code-elimination step pruning anything never
+      actually reached by a real import chain.
+    se_lens: >
+      The real alternative not chosen: trusting package.json as
+      documentation of what this app "really" uses - already proven
+      wrong once, for `recharts`, by an earlier investigation pass this
+      project already ran, now mechanically reproduced instead of taken
+      on citation. The real, honest limitation of this exact tool: it
+      only proves import-level usage of a package pulled in through a
+      real JS/TS `import` statement - it says nothing about two other
+      real, listed dependencies this same app genuinely depends on,
+      `vite` and `tailwindcss`, which never appear as an application-code
+      import at all. Run against either of those two names, this exact
+      script would print "zero real imports found" too - a real false
+      negative for a genuinely real, in-use dependency. Vite is verified
+      instead by its own real `vite.config.ts` existing and
+      package.json's own real `"dev": "vite"` script actually invoking
+      it; Tailwind is verified by `tailwind.config.js` existing and the
+      three real `@tailwind` directives at `src/index.css:1-3`. Import
+      grepping and build-tool-config-checking are two different real
+      verification methods, not one universal one - a tool built for one
+      real question silently produces a wrong answer to the other.
+    commands:
+      - command: "python verification/frontend-phase-00/lab_verify_real_stack.py"
+        explanation: "Run from the manufacturing-platform repository root, same as Lesson F0.1's own tool, so the relative paths to package.json and src/ resolve correctly."
+    verification:
+      applicable: true
+      real_output: |
+        react (^18.3.1): real import at src/App.tsx:181
+        zustand (^5.0.0): real import at src/components/shared/ModelViewerModal.tsx:16
+        react-router-dom (^6.28.0): real import at src/App.tsx:102
+        @react-three/fiber (^8.17.0): real import at src/components/operator/OBJViewer.tsx:16
+        socket.io-client (^4.7.2): real import at src/hooks/useWebSockets.ts:17
+        diff (^8.0.3): real import at src/components/parts/nc-files/NCFileDiffModal.tsx:4
+        recharts (^2.13.0): zero real imports found in src/
+      output_file: "verification/frontend-phase-00/lab_verify_real_stack_output.txt"
+    connection_to_previous: >
+      There is no previous unit - this is the first one in this lesson.
+
+  - title: "React 18's Root API - A Real, Versioned Behavior Change"
+    problem: >
+      The unit above found a real react import at App.tsx:181 - but that
+      only proves react is imported somewhere, not which real react API
+      this app's own entry point actually calls, or why its version
+      matters. This app's own package.json pins react and react-dom to
+      ^18.3.1, a specific real major version. This unit traces the one
+      real, concrete difference that specific version number makes.
+    socratic_prompt:
+      - "React's own real, versioned history associates React 18
+        specifically with a new way of creating a root. Before reading
+        main.tsx: what would you expect a function literally named
+        createRoot to take as input, and to hand back?"
+      - "This app's installed react-dom@18.3.1 still exports both
+        createRoot and the older render function (confirmed a moment
+        ago by actually calling `typeof` on both, this session). Given
+        both real exports still exist, what would you check to know for
+        sure which one this app's own entry point actually calls?"
+    project_change:
+      reference_source: >
+        `src/main.tsx:31-68`, read verbatim this session. The quoted
+        excerpt below omits the file's own explanatory prose comments,
+        keeping only the real functional lines, for brevity.
+      files_affected: []
+      change_type: none
+      location: "N/A - existing file, nothing added or changed."
+      dependencies: "None beyond the real repository already checked out on disk."
+      explanation: >
+        `main.tsx` is this app's real entry point - the first file that
+        runs when the app loads, responsible for finding the real DOM
+        node the whole app attaches to and rendering the real component
+        tree into it exactly once.
+    new_code:
+      applicable: false
+      note: >
+        No new code - this unit cites the real, already-existing entry
+        point directly; see Updated Project below.
+    updated_project:
+      applicable: true
+      language: typescript
+      file: "src/main.tsx"
+      status: existing
+      code: |
+        import { StrictMode } from 'react';
+        import { createRoot } from 'react-dom/client';
+
+        import './index.css';
+
+        import App from './App';
+
+        const rootElement = document.getElementById('root')!;
+
+        const root = createRoot(rootElement);
+
+        root.render(
+            <StrictMode>
+                <App />
+            </StrictMode>
+        );
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "import { createRoot } from 'react-dom/client';"
+          explanation: >
+            Imports the real React 18 function this app's entry point
+            actually calls, from the real `react-dom/client` module -
+            confirmed, this session, to actually export a real function
+            named `createRoot` in this project's installed
+            `react-dom@18.3.1` package, not just assumed from the import
+            statement's own name.
+        - element: "const rootElement = document.getElementById('root')!;"
+          explanation: >
+            Reads the real, single DOM node `index.html` declares as
+            `<div id="root">`. The trailing `!` is TypeScript's
+            non-null assertion operator - it tells the type checker to
+            trust that this real element exists, rather than narrowing
+            its type to possibly `null` and forcing an explicit check
+            (basic TypeScript).
+        - element: "const root = createRoot(rootElement);"
+          explanation: >
+            Calls the real function this unit is tracing, handing it the
+            one real DOM node found above, and getting back a real
+            `Root` object - nothing is rendered yet, only the handle
+            this app will use to render.
+        - element: "root.render(<StrictMode><App /></StrictMode>);"
+          explanation: >
+            Calls the real `Root` object's own `.render()` method
+            exactly once - the actual real moment this app's whole
+            component tree first attaches to the real DOM.
+            `StrictMode` wraps it: a development-only real component
+            that intentionally runs certain code twice to surface real
+            side-effect bugs early, with zero effect on a real
+            production build.
+    cs_lens: >
+      A real instance of a versioned API surface deliberately keeping two
+      coexisting entry points during a transition, rather than replacing
+      one outright - the same shape recurs constantly outside React:
+      Node's own callback-style `fs` functions still exported alongside
+      the newer `fs/promises`; database client libraries keeping a
+      synchronous connection method alongside a newer pooled/async one;
+      Python's own `imp` module continuing to work for years alongside
+      `importlib` before finally being removed. In every case, the real
+      technical reason is the same - forcing an immediate migration
+      breaks every existing consumer at once, so both real paths stay
+      callable until consumers move at their own pace.
+    se_lens: >
+      The real alternative not chosen: React 18 could have replaced
+      `ReactDOM.render` outright, forcing every consuming project to
+      migrate immediately. Instead both real exports coexist in the one
+      real installed package this session confirmed by directly calling
+      `typeof` on each - so an app adopts the new root API at its own
+      pace, and this app's own source confirms zero real remaining calls
+      to the legacy `render` anywhere in src/ (its only other real
+      react-dom import, in components/ui/Modal.tsx, is the unrelated
+      `createPortal`). Real, honest nuance worth naming: this app does
+      have one real, concrete concurrent-rendering-dependent opt-in -
+      HashRouter's own `future={{ v7_startTransition: true }}` flag at
+      App.tsx:543, which makes React Router internally wrap its route
+      transitions in React 18's startTransition - but that's reached
+      through a router library flag, never called directly by this
+      app's own component code. The version bump to createRoot is real
+      and complete; concurrent rendering's actual benefit here is real
+      but indirect, borrowed from a dependency's own opt-in rather than
+      deliberately written into this app's own components.
+    commands:
+      - command: "node -e \"const m = require('react-dom/client'); console.log('createRoot:', typeof m.createRoot); console.log('render (legacy):', typeof require('react-dom').render);\""
+        explanation: "Run from the manufacturing-platform repository root, so Node resolves react-dom/client and react-dom from the real, already-installed node_modules; confirms both real functions actually exist in this project's installed react-dom@18.3.1 package."
+    verification:
+      applicable: true
+      real_output: |
+        createRoot: function
+        render (legacy): function
+    connection_to_previous: >
+      The unit above's own tool found react's real import at
+      App.tsx:181, proving only that react is used somewhere; this unit
+      traced the real, specific reason its pinned version matters -
+      main.tsx:61's real call to createRoot instead of the legacy API
+      both real exports still make available.
+
+closing:
+  connect_the_pieces: >
+    One real dependency list, package.json, produced two completely
+    different real, honest answers from the identical general method -
+    search real source for a real, repeated shape. `recharts`: a real,
+    listed dependency, zero real imports anywhere in src/, confirmed
+    directly by this lesson's own tool rather than taken on citation.
+    `react`: a real import found at App.tsx:181, then traced one level
+    deeper - main.tsx:61's real, single call to createRoot, the React 18
+    entry point this app's own pinned `^18.3.1` version actually makes
+    available, confirmed by directly querying the real installed
+    package rather than assumed from a version number alone.
+  next_lesson_pointer: >
+    Applying this same "don't trust a name, verify the real structure"
+    habit to a currently dead file - a component confirmed unreachable
+    by the same real-caller-search method already proven twice this
+    phase, now in TypeScript instead of Python.
