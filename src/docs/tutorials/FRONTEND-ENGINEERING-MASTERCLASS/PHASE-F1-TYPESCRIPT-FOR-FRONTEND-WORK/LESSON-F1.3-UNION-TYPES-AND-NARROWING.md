@@ -1,0 +1,239 @@
+# Lesson F1.3: Union Types and Narrowing
+
+*File paths under src/... refer to the real manufacturing-platform repository's frontend. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** A throwaway function proving, with two real, contrasting compiler outputs, that TypeScript genuinely shrinks a union type down inside one real branch and forgets that narrowing the moment the branch ends - then two more throwaway functions, one handling every real member of a union and one missing a member on purpose, proving a real compiler error can catch a forgotten case instead of leaving it to be found at runtime. Then a direct read of this app's own real `'linear' | 'subprogram' | null` view-mode union - real, recurring seven separate times across this app, and never once actually narrowed exhaustively the way this lesson's own throwaway labs are. The transferable problem: narrowing is a real, provable compiler mechanism, and exhaustiveness is a real, separate, optional guarantee on top of it - a codebase can use the first constantly while never reaching for the second.
+
+**What you need to know first:** What a union type is, and that TypeScript checks it entirely before code runs, with nothing left in the compiled JavaScript.
+
+## Terms used in this lesson
+
+- **Narrowing** — TypeScript's real process of shrinking a union type down to a smaller, more specific type inside one branch of real code, based on a real, recognized check - an `===` comparison, a `typeof` check, and others - then forgetting that narrower type again the moment the branch ends. It exists so code that has already ruled out some real members of a union, by checking, doesn't have to keep treating a value as broadly as its original declared type.
+- **Exhaustiveness check** — A real, deliberate pattern - typically a function whose one real parameter is typed `never` - placed at the end of a chain of narrowing branches, so the compiler itself raises a real error if a real union ever gains a new member with no branch handling it. It exists so a union growing a new real case is caught at compile time, at the exact place every other case is already handled, instead of surfacing later as a real, silent gap in behavior.
+
+## Objects and methods used
+
+- **`viewMode`**
+  - *What it is:* This app's own real piece of state tracking which of two real display modes the Operations Manager is currently in - one real, concrete instance of a union type that recurs, unnamed, across seven separate real files.
+  - *Implementation:* `const [viewMode, setViewMode] = useState<'linear' | 'subprogram' | null>(null);`, declared at src/hooks/useProgrammerOperations.ts:106.
+  - *Its use:* Read directly, via real `=== ` comparisons, in six other real files - src/components/programmer-operations/MultiplierPanel.tsx, OperationList.tsx, SortableSequenceItem.tsx, SortableSubprogramItem.tsx, and src/hooks/operations/useOperationsState.ts - each independently retyping the identical real union rather than importing one shared name.
+  - *Type:* React state, typed as a real union of two string literals plus `null` - not an object shape, so this app's own type alias lesson's `interface` could never declare it directly.
+  - *Responsibility:* Track which of this app's own two real sequence-display modes is active, or `null` before either is chosen, so every real component reading it can decide what to render without maintaining its own separate copy of that decision.
+  - *Depends on:* React's own `useState`, called with no other real dependency.
+  - *Connects to:* Read by `displayedSequences` (useProgrammerOperations.ts:136-141) to pick a real transformation function; read again by OperationList.tsx's own real JSX to decide what to render and which toggle button appears active.
+  - *Shape:* One real value at a time: the exact string `'linear'`, the exact string `'subprogram'`, or `null` - never more than one of the three, never anything else.
+
+## Concept Unit: Narrowing - A Union Type Shrunk Down Inside One Real Branch
+
+### The Problem
+
+A value typed as a real union - like this app's own three-state view mode - could genuinely be any one of its real members at any given point. Once a real `===` check has ruled some of them out, does TypeScript keep treating the value as broadly as before, or does it actually track, branch by branch, which real members are still possible?
+
+Before reading on:
+
+- Inside a real `if (mode === 'linear')` block, would you expect TypeScript to still consider `mode` capable of being `'subprogram'` or `null`, or to have ruled those out for the rest of that one real branch?
+- Once that same `if` block ends, would you expect TypeScript to remember what it ruled out, or to go back to treating the value as the full original union again?
+
+### Project Change
+
+- **Reference Source:** src/hooks/useProgrammerOperations.ts:106,136-141, read verbatim this session.
+- **Files affected:** `verification/frontend-phase-01/lab_narrowing_basic.ts` (new)
+- **Change type:** add
+- **Location:** New file, alongside this phase's own earlier real labs, in the same verification/frontend-phase-01/ folder.
+- **Dependencies:** TypeScript's own compiler, already installed in this project.
+
+A small, throwaway TypeScript file, isolating what narrowing actually does, and how long it lasts, before reading this app's own real view-mode union below - discarded once understood.
+
+### The New Code
+
+New code, typed into a new throwaway file - one real function expecting only the narrowest possible literal, called once inside a narrowing branch and once outside it:
+
+**File:** `verification/frontend-phase-01/lab_narrowing_basic.ts` (new)
+
+```typescript
+type ViewMode = 'linear' | 'subprogram' | null;
+
+function acceptLinear(mode: 'linear'): void {
+    console.log('confirmed linear:', mode);
+}
+
+function handle(mode: ViewMode) {
+    if (mode === 'linear') {
+        acceptLinear(mode);
+    }
+    acceptLinear(mode);
+}
+```
+
+### The Updated Project
+
+**File:** `src/hooks/useProgrammerOperations.ts` (already exists — read-only, nothing to type)
+
+```typescript
+const [viewMode, setViewMode] = useState<'linear' | 'subprogram' | null>(null);
+
+const displayedSequences = useMemo(() => {
+    if (viewMode === 'subprogram') {
+        return groupSequencesBySubprogram(sequences);
+    }
+    return sequences;
+}, [sequences, viewMode]);
+```
+
+### Mechanical Walkthrough
+
+- `type ViewMode = 'linear' | 'subprogram' | null;` — Names, as a real throwaway alias, the identical three-member union this app's own real `viewMode` uses inline - kept named here only for this lab's own readability, not because the real app does the same, which this unit's own SE Lens, below, returns to.
+- `function acceptLinear(mode: 'linear'): void { ... }` — A real function whose one real parameter accepts nothing but the exact literal `'linear'` - deliberately narrower than the full union, so calling it is a real, direct test of whether a given value has actually been narrowed that far.
+- `if (mode === 'linear') { acceptLinear(mode); }` — Inside this real branch, TypeScript has already ruled out `'subprogram'` and `null` - the real, narrowed type of `mode` here is exactly `'linear'`, confirmed by this unit's own real compiler run producing no error on this exact call.
+- `acceptLinear(mode);` — This second, real call sits outside the `if` block - the narrowing above doesn't survive past it, so `mode` is back to its full real declared type, `ViewMode`, and this exact line is what this unit's own real compiler run, below, catches.
+- `const [viewMode, setViewMode] = useState<'linear' | 'subprogram' | null>(null);` — This app's own real, live version of the identical pattern - the same three-member union, typed inline rather than through the throwaway `ViewMode` alias above.
+- `const displayedSequences = useMemo(() => { if (viewMode === 'subprogram') { return groupSequencesBySubprogram(sequences); } return sequences; }, [sequences, viewMode]);` — A real, live narrowing branch with a real behavioral payoff - inside the `if`, `viewMode` is narrowed to exactly `'subprogram'`, and a different real function is called; outside it, the plain `sequences` value is returned instead, collapsing `'linear'` and `null` into one shared real outcome.
+
+### CS Lens
+
+A real instance of flow-sensitive typing - a value's real, tracked type depends on which real branch of code it's currently inside, not just on how it was originally declared. The same general idea recurs constantly outside TypeScript: a null-safety checker in Kotlin or Swift narrowing an optional value to non-optional inside a real `if x != null` check; a pattern match in Rust binding a narrower, real variant-specific type inside each real match arm; a database query planner narrowing which real index it can use once a `WHERE` clause has already ruled out a range of real values.
+
+### SE Lens
+
+The real alternative not chosen: this app never actually reaches for `acceptLinear`-style, narrowly-typed helper functions - every real branch this session found instead reads `viewMode` directly and either returns a different real value or renders different real JSX, without ever passing the narrowed value into something that would fail to compile if the narrowing were wrong. Real, honest cost: this app's own real safety here rests entirely on TypeScript tracking the narrowing correctly at each real `===` check, not on any real downstream function additionally requiring it - a real, structural difference between narrowing existing and narrowing actually being *relied on* by something typed narrowly.
+
+### Commands needed
+
+- `npx tsc --noEmit --strict --skipLibCheck verification/frontend-phase-01/lab_narrowing_basic.ts` — Run from the manufacturing-platform repository root; confirms no real error on the in-branch call, and a real TS2345 error on the same call made outside the branch.
+
+### Verification
+
+```text
+verification/frontend-phase-01/lab_narrowing_basic.ts(11,18): error TS2345: Argument of type 'ViewMode' is not assignable to parameter of type '"linear"'.
+  Type 'null' is not assignable to type '"linear"'.
+```
+
+Full saved run: `verification/frontend-phase-01/lab_narrowing_basic_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first one in this lesson.
+
+## Concept Unit: Exhaustiveness - Proving Every Real Case Is Handled, Not Assuming It
+
+### The Problem
+
+The unit above narrowed a union one real branch at a time, but never checked whether every real member had a branch at all - a real, silent gap (a forgotten case) would compile cleanly with plain `if`/`else` alone. This app's own real view-mode handling never checks for that gap either - this unit builds the one real TypeScript pattern that would.
+
+Before reading on:
+
+- If a real chain of `if`/`else if` branches handles two of a real union's three members, and the final `else` is trusted to cover 'whatever's left,' what real, silent mistake becomes possible the moment that union gains a fourth real member later?
+- A function typed to accept only `never` - a type with no real possible values - would reject every real argument except one it can never actually receive if every prior branch already narrowed correctly. What would you expect to happen if one real branch were missing, and that function were still called at the end?
+
+### Project Change
+
+- **Reference Source:** src/components/programmer-operations/OperationList.tsx:217-219, read verbatim this session.
+- **Files affected:** `verification/frontend-phase-01/lab_narrowing_exhaustive.ts` (new), `verification/frontend-phase-01/lab_narrowing_incomplete.ts` (new)
+- **Change type:** add
+- **Location:** New files, alongside this unit's own earlier real lab, in the same verification/frontend-phase-01/ folder.
+- **Dependencies:** TypeScript's own compiler, already installed in this project.
+
+Two small, throwaway TypeScript files - one real function handling all three real union members, one missing one on purpose - both discarded once understood.
+
+### The New Code
+
+Two new throwaway files, sharing the identical real structure except for one missing branch. First, every real case handled:
+
+**File:** `verification/frontend-phase-01/lab_narrowing_exhaustive.ts` (new)
+
+```typescript
+type ViewMode = 'linear' | 'subprogram' | null;
+
+function assertNever(x: never): never {
+    throw new Error('Unhandled case: ' + x);
+}
+
+function describe(mode: ViewMode): string {
+    if (mode === 'linear') {
+        return 'Linear program';
+    } else if (mode === 'subprogram') {
+        return 'Subprogram-grouped';
+    } else if (mode === null) {
+        return 'No mode selected';
+    } else {
+        return assertNever(mode);
+    }
+}
+
+console.log(describe('linear'));
+```
+
+**File:** `verification/frontend-phase-01/lab_narrowing_incomplete.ts` (new)
+
+```typescript
+type ViewMode = 'linear' | 'subprogram' | null;
+
+function assertNever(x: never): never {
+    throw new Error('Unhandled case: ' + x);
+}
+
+function describe(mode: ViewMode): string {
+    if (mode === 'linear') {
+        return 'Linear program';
+    } else if (mode === 'subprogram') {
+        return 'Subprogram-grouped';
+    } else {
+        return assertNever(mode);
+    }
+}
+
+console.log(describe('linear'));
+```
+
+### The Updated Project
+
+**File:** `src/components/programmer-operations/OperationList.tsx` (already exists — read-only, nothing to type)
+
+```typescript
+{viewMode === 'subprogram' ? (
+    sequences.map((group: any) => (
+        <div key={group.id} />
+    ))
+) : (
+    <div />
+)}
+```
+
+### Mechanical Walkthrough
+
+- `function assertNever(x: never): never { throw new Error('Unhandled case: ' + x); }` — A real function whose one real parameter is typed `never` - a type with no real possible values at all - so any real attempt to call it with a value TypeScript hasn't already narrowed down to nothing is itself a real type error; its own real return type, also `never`, states plainly that it never actually returns normally.
+- `if (mode === 'linear') { ... } else if (mode === 'subprogram') { ... } else if (mode === null) { ... } else { return assertNever(mode); }` — In the exhaustive lab, every real member of `ViewMode` has its own real branch, so by the final real `else`, TypeScript has narrowed `mode` down to nothing - real `never` - and the real call to `assertNever` compiles cleanly, confirmed by this unit's own first real compiler run producing no error.
+- `if (mode === 'linear') { ... } else if (mode === 'subprogram') { ... } else { return assertNever(mode); }` — The incomplete lab drops the real `mode === null` branch - by the final `else`, TypeScript has only ruled out two of three real members, so `mode` there is still real `null`, not `never`, and the identical `assertNever` call is now a real type error, confirmed by this unit's own second real compiler run, below.
+- `{viewMode === 'subprogram' ? ( sequences.map(...) ) : ( <div /> )}` — This app's own real, live rendering branch - a real ternary, not a real exhaustive chain; its own `: (...)` side is reached by both `'linear'` and `null` alike, with nothing in this real code, or anywhere else this session searched, checking that every real member was actually accounted for.
+
+### CS Lens
+
+Names exhaustiveness checking, a real, specific application of the `never` type as "the type with no values" - the same general idea recurs constantly outside TypeScript: Rust and Haskell's own compilers refusing to build a real program whose `match`/`case` expression doesn't cover every real variant of a type; a real linter's own "no-fallthrough" rule for a `switch` statement, catching a structurally similar real gap one level less strictly; a database `CHECK` constraint again, the same real completeness guarantee already met on a different real side of this exact application.
+
+### SE Lens
+
+The real alternative not chosen: this app never once reaches for an exhaustiveness check anywhere - confirmed this session, a real search for `assertNever` or a real `: never` parameter anywhere in `src/` found zero matches. Real, honest cost: this app's own real view-mode union recurs, retyped inline, in seven separate real files (confirmed this session by an exact count of the literal string `'linear' | 'subprogram' | null`), and not one of them would fail to compile if a real fourth mode were added and one of those seven real files simply forgot to handle it - the real completeness this unit's own throwaway labs prove is possible here is a real capability this app has never once used, the identical real shape as this phase's earlier finding about `apiRequest<T>`'s own unused generic parameter.
+
+### Commands needed
+
+- `npx tsc --noEmit --strict --skipLibCheck verification/frontend-phase-01/lab_narrowing_exhaustive.ts` — Run first, from the manufacturing-platform repository root; confirms the exhaustive version compiles with no real error.
+- `npx tsc --noEmit --strict --skipLibCheck verification/frontend-phase-01/lab_narrowing_incomplete.ts` — Run second, independently; confirms the incomplete version's missing branch is a real, caught compile error.
+
+### Verification
+
+```text
+verification/frontend-phase-01/lab_narrowing_exhaustive.ts: (no output - compiled clean, exit code 0)
+verification/frontend-phase-01/lab_narrowing_incomplete.ts(13,28): error TS2345: Argument of type 'null' is not assignable to parameter of type 'never'.
+```
+
+Full saved run: `verification/frontend-phase-01/lab_narrowing_exhaustive_output.txt and verification/frontend-phase-01/lab_narrowing_incomplete_output.txt`.
+
+### Connection to the previous unit
+
+The unit above proved narrowing itself is real; this unit proved a real gap in narrowing's own coverage can be caught by the compiler too, then found this app's own real view-mode handling never actually reaches for that guarantee, anywhere.
+
+## Connect the pieces
+
+One real throwaway `mode`, narrowed to exactly `'linear'` inside one real branch and back to the full union the moment that branch ended - the identical real mechanism this app's own `displayedSequences` leans on to pick between two real functions. One real throwaway `describe`, proven exhaustive by a real, clean compile, then proven incomplete by removing one real branch and watching the identical real `assertNever` call fail - a real guarantee this app's own seven separate, un-aliased copies of the identical union, and its own real, informal ternary in `OperationList.tsx`, never once reach for.
+
+**Next lesson:** This app's own real component prop types - a real interface declaring exactly what a component requires from whatever renders it, and what happens, concretely, when a real caller gets it wrong.

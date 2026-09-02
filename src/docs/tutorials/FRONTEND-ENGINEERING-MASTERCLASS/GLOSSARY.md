@@ -27,6 +27,9 @@ re-run the script after any lesson changes instead.
 ## Default type parameter
 - **Term** in `LESSON-F1.2-GENERICS` - The `= X` part of `<T = X>`, giving a generic type parameter a real fallback type used whenever a caller doesn't supply one explicitly. It exists so a generic function stays callable without a type argument at all, at the real cost that every such call gets the real default type instead of one tailored to what that call actually returns.
 
+## Exhaustiveness check
+- **Term** in `LESSON-F1.3-UNION-TYPES-AND-NARROWING` - A real, deliberate pattern - typically a function whose one real parameter is typed `never` - placed at the end of a chain of narrowing branches, so the compiler itself raises a real error if a real union ever gains a new member with no branch handling it. It exists so a union growing a new real case is caught at compile time, at the exact place every other case is already handled, instead of surfacing later as a real, silent gap in behavior.
+
 ## Generic type parameter
 - **Term** in `LESSON-F1.2-GENERICS` - A placeholder type name - conventionally `T` - a function, interface, or type declares in angle brackets, filled in with a real, specific type at each real call site. It exists so one real function's signature can stay accurate for many different real shapes of data, instead of either losing all real type information (returning `any`) or needing a separate, hand-written copy of the same function per shape.
 
@@ -38,6 +41,9 @@ re-run the script after any lesson changes instead.
 
 ## MasterObject
 - **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for the full, serialized UI state it saves to the database - the deepest-nested real shape in this file.
+
+## Narrowing
+- **Term** in `LESSON-F1.3-UNION-TYPES-AND-NARROWING` - TypeScript's real process of shrinking a union type down to a smaller, more specific type inside one branch of real code, based on a real, recognized check - an `===` comparison, a `typeof` check, and others - then forgetting that narrower type again the moment the branch ends. It exists so code that has already ruled out some real members of a union, by checking, doesn't have to keep treating a value as broadly as its original declared type.
 
 ## Pairing
 - **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for one CAM-file/machine pairing - the real, selectable item the Operations Manager works with.
@@ -86,6 +92,9 @@ re-run the script after any lesson changes instead.
 
 ## useAuth
 - **Object/method** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - This project's own real custom hook exposing the current authentication state to any component that calls it.
+
+## viewMode
+- **Object/method** in `LESSON-F1.3-UNION-TYPES-AND-NARROWING` - This app's own real piece of state tracking which of two real display modes the Operations Manager is currently in - one real, concrete instance of a union type that recurs, unnamed, across seven separate real files.
 
 ## Possible collisions (shared words, different names)
 
