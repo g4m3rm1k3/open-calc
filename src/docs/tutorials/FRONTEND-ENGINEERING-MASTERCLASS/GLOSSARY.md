@@ -12,6 +12,9 @@ re-run the script after any lesson changes instead.
 ## Build-time dependency
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - A package whose real job is transforming or serving the project's own source before or while it runs - a bundler, a CSS toolchain - real and necessary, but never appearing as an application-code import statement. It exists so build/tooling concerns stay separate from what a browser actually downloads and executes; verified by its own config file and build script actually existing and being invoked, not by an import search.
 
+## buildUrl
+- **Object/method** in `LESSON-F2.2-PROPS-AND-COMPOSITION` - This app's own real, small function bridging Model3DViewerProps' single array field and OBJViewerProps' five separate string fields - the actual, concrete mechanism this lesson's own transformation claim rests on.
+
 ## Client-side routing
 - **Term** in `LESSON-F0.1-MAPPING-THIS-FRONTEND` - Mapping a URL to a component entirely inside the browser, without a new request to a server for each navigation - a router library watches the current URL and renders whichever component is registered for it. It exists so navigating between views feels instant and preserves in-memory state, at the cost of the server never seeing which "page" a visitor is actually on.
 
@@ -20,6 +23,9 @@ re-run the script after any lesson changes instead.
 
 ## Component props interface
 - **Term** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - A real, named interface declaring the exact real shape of data a component requires from whatever renders it, matched against a real, destructured function parameter. It exists so a component's own real requirements are checked at every real call site, the same way any other interface is checked, rather than discovered only once the component runs and reads a value that was never actually passed.
+
+## Composition
+- **Term** in `LESSON-F2.2-PROPS-AND-COMPOSITION` - React's real, primary way of building a larger UI out of smaller ones - one component rendering another inside its own JSX, passing it real, specific props - rather than a class extending another class the way object-oriented inheritance would. It exists because a UI's real, natural structure is already a tree of nested pieces, and composing components mirrors that structure directly instead of building a rigid, single-parent inheritance chain that has to be decided in advance.
 
 ## Concurrent rendering
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - React's ability to prepare more than one version of the UI at once and interrupt in-progress work that's no longer needed, instead of finishing every render synchronously once started. It exists so a large update doesn't block the browser from responding to more urgent work (like a keystroke) while it's still being computed - and is only reachable through the root API createRoot creates, never through the legacy ReactDOM.render.
@@ -59,12 +65,16 @@ re-run the script after any lesson changes instead.
 
 ## Model3DViewerProps
 - **Object/method** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - This app's own real, partially-consumed props interface for its 3D model viewer wrapper - a real, direct contrast to NCFileDiffModalProps, above.
+- **Object/method** in `LESSON-F2.2-PROPS-AND-COMPOSITION` - This app's own real props interface for the outer, composing half of this lesson's real example - already characterized earlier this curriculum, given full treatment again here per this schema's own repetition rule.
 
 ## Narrowing
 - **Term** in `LESSON-F1.3-UNION-TYPES-AND-NARROWING` - TypeScript's real process of shrinking a union type down to a smaller, more specific type inside one branch of real code, based on a real, recognized check - an `===` comparison, a `typeof` check, and others - then forgetting that narrower type again the moment the branch ends. It exists so code that has already ruled out some real members of a union, by checking, doesn't have to keep treating a value as broadly as its original declared type.
 
 ## NCFileDiffModalProps
 - **Object/method** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - This app's own real, fully-consumed props interface for its file-diff modal - every one of its seven real declared fields is genuinely read inside the component.
+
+## OBJViewerProps
+- **Object/method** in `LESSON-F2.2-PROPS-AND-COMPOSITION` - OBJViewer's own real props interface - the receiving half of this lesson's real composition example, genuinely different in shape from Model3DViewerProps, above.
 
 ## Pairing
 - **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for one CAM-file/machine pairing - the real, selectable item the Operations Manager works with.
