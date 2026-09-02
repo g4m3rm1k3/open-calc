@@ -15,6 +15,9 @@ re-run the script after any lesson changes instead.
 ## ColumnDef
 - **Object/method** in `LESSON-F0.3-LIVE-VS-DEAD-CODE-APPLIED-FRESH` - A real TypeScript interface, declared only inside the dead file, describing one table column's complete shape as data instead of as hand-written JSX.
 
+## Component props interface
+- **Term** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - A real, named interface declaring the exact real shape of data a component requires from whatever renders it, matched against a real, destructured function parameter. It exists so a component's own real requirements are checked at every real call site, the same way any other interface is checked, rather than discovered only once the component runs and reads a value that was never actually passed.
+
 ## Concurrent rendering
 - **Term** in `LESSON-F0.2-THE-REAL-STACK` - React's ability to prepare more than one version of the UI at once and interrupt in-progress work that's no longer needed, instead of finishing every render synchronously once started. It exists so a large update doesn't block the browser from responding to more urgent work (like a keystroke) while it's still being computed - and is only reachable through the root API createRoot creates, never through the legacy ReactDOM.render.
 
@@ -42,8 +45,14 @@ re-run the script after any lesson changes instead.
 ## MasterObject
 - **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for the full, serialized UI state it saves to the database - the deepest-nested real shape in this file.
 
+## Model3DViewerProps
+- **Object/method** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - This app's own real, partially-consumed props interface for its 3D model viewer wrapper - a real, direct contrast to NCFileDiffModalProps, above.
+
 ## Narrowing
 - **Term** in `LESSON-F1.3-UNION-TYPES-AND-NARROWING` - TypeScript's real process of shrinking a union type down to a smaller, more specific type inside one branch of real code, based on a real, recognized check - an `===` comparison, a `typeof` check, and others - then forgetting that narrower type again the moment the branch ends. It exists so code that has already ruled out some real members of a union, by checking, doesn't have to keep treating a value as broadly as its original declared type.
+
+## NCFileDiffModalProps
+- **Object/method** in `LESSON-F1.4-TYPING-PROPS-AND-COMPONENT-BOUNDARIES` - This app's own real, fully-consumed props interface for its file-diff modal - every one of its seven real declared fields is genuinely read inside the component.
 
 ## Pairing
 - **Object/method** in `LESSON-F1.1-INTERFACES-AND-TYPE-ALIASES` - This app's own real interface for one CAM-file/machine pairing - the real, selectable item the Operations Manager works with.
@@ -101,6 +110,7 @@ re-run the script after any lesson changes instead.
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
 - `Build-time dependency` / `Runtime dependency` - shares: dependency
+- `Component props interface` / `Interface` - shares: interface
 - `Default type parameter` / `Generic type parameter` - shares: parameter, type
 - `Default type parameter` / `Type alias` - shares: type
 - `Default type parameter` / `Type-only import` - shares: type
