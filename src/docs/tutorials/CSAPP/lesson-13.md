@@ -1,382 +1,762 @@
-# Lesson 13: Storage Technologies — SRAM, DRAM, Disk, and SSD
-**Series:** Computer Systems: A Programmer's Perspective (CS:APP by Bryant & O'Hallaron)
-**Module:** Module 2 — The Memory Hierarchy
+# Lesson 13: Storage Technologies — DRAM, SRAM, Disk, SSD, and the Memory Hierarchy
 
-## Introduction
+What you will build: The reader will understand why computers have a memory hierarchy, what SRAM/DRAM/SSD/HDD are and how they differ in speed, cost, and volatility, and what cache lines, sets, and ways are. The transferable insight: the memory hierarchy exists because fast storage is expensive and slow storage is cheap. Every program's performance is determined by how often it hits the fast levels vs. the slow ones. Understanding the hierarchy is the prerequisite for every cache optimization technique.
 
-**What you need to know first:**
-Lessons 00–12 (all of Module 0 and Module 1).
+What you need to know first: Lessons 00-12.
 
-**What you will build:**
-The reader will understand why the memory hierarchy exists, the physical properties of each storage technology, the access time numbers every programmer should know, and how these numbers determine which optimizations matter. The transferable insight: all performance bottlenecks in real programs trace back to storage technology limits. A 100-ns DRAM access is 300 CPU cycles of wasted time — the cache hierarchy exists entirely to hide this gap.
+Terms used in this lesson:
+- **CPU register** — A small, extremely fast storage location directly inside the CPU used to hold temporary data during computation. It exists because the CPU needs immediate access to data without waiting for external memory.
+- **L1 cache** — The fastest layer of cache memory, usually built into each CPU core. It exists to hold the most frequently used data and instructions to avoid stalling the CPU.
+- **L2 cache** — The second layer of cache memory, slightly slower and larger than L1. It serves as a backup when data is not found in L1.
+- **L3 cache** — The third layer of cache memory, usually shared among all CPU cores. It provides a larger, albeit slower, pool of fast memory before resorting to main memory.
+- **DRAM (Dynamic RAM)** — The technology used for main memory (RAM). It is cheaper and denser than SRAM but requires periodic refreshing to maintain data.
+- **SRAM (Static RAM)** — The technology used for cache memory. It is fast and requires no refreshing but is complex and expensive.
+- **SSD (Solid State Drive)** — Non-volatile storage that uses NAND flash memory. It provides fast read and write speeds without any moving parts.
+- **HDD (Hard Disk Drive)** — Non-volatile storage that uses spinning magnetic platters. It is very cheap for large capacities but mechanically slow.
+- **Cache line** — The smallest unit of data transferred between main memory and cache, typically 64 bytes. It exists to exploit spatial locality by fetching neighboring data together.
+- **Set** — A grouping of cache lines in a cache architecture used to organize where a specific memory block can be stored.
+- **Way** — Refers to the associativity of a cache (e.g., n-way set associative), indicating how many different cache lines within a set a memory block can be placed into.
+- **Temporal locality** — The principle that recently accessed data is likely to be accessed again in the near future.
+- **Spatial locality** — The principle that data stored near recently accessed data is likely to be accessed soon.
 
-## Objects and Methods
+Objects and methods used:
+- **`measure_access_ms`**
+  - *What it is:* A custom C function to measure memory access time.
+  - *Implementation:* `double measure_access_ms(size_t bytes)`
+  - *Its use:* Used in this lesson to prove the latency differences across the memory hierarchy.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Allocates memory, performs accesses with a specific stride to defeat the prefetcher, measures the elapsed time, frees the memory, and returns the time in milliseconds.
+  - *Depends on:* Standard library functions `malloc`, `free`, `clock_gettime`.
+  - *Connects to:* Called by `main` to print timings; calls OS time functions.
+  - *Shape:* Internal implementation detail for the throwaway lab.
+- **`clock_gettime`**
+  - *What it is:* A POSIX standard library function to retrieve the current time.
+  - *Implementation:* `int clock_gettime(clockid_t clock_id, struct timespec *tp);`
+  - *Its use:* Used to get precise nanosecond-resolution timing for measuring memory access speeds.
+  - *Type:* Standard library function.
+  - *Responsibility:* Reads the system clock specified by `clock_id` and stores the time in the provided `timespec` struct.
+  - *Depends on:* OS support for high-resolution timers.
+  - *Connects to:* Called by user code; interacts with kernel timekeeping.
+  - *Shape:* A public API boundary between user code and the operating system.
+- **`CLOCK_MONOTONIC`**
+  - *What it is:* A clock identifier for `clock_gettime`.
+  - *Implementation:* A macro expanding to an integer constant.
+  - *Its use:* Ensures that the measured time interval is not affected by system clock adjustments (like NTP syncs).
+  - *Type:* Macro constant.
+  - *Responsibility:* Identifies a non-settable clock that represents monotonic time since some unspecified starting point.
+  - *Depends on:* Nothing.
+  - *Connects to:* Passed as an argument to `clock_gettime`.
+  - *Shape:* A configuration parameter for system time APIs.
+- **`malloc`**
+  - *What it is:* Standard library function for dynamic memory allocation.
+  - *Implementation:* `void *malloc(size_t size);`
+  - *Its use:* Allocates an array of a specific size to test memory access times at different hierarchy levels.
+  - *Type:* Standard library function.
+  - *Responsibility:* Allocates `size` bytes of uninitialized memory and returns a pointer to it.
+  - *Depends on:* The heap manager and OS memory provisioning.
+  - *Connects to:* Called by user code; managed by the C runtime.
+  - *Shape:* Public API for dynamic memory.
+- **`free`**
+  - *What it is:* Standard library function to deallocate memory.
+  - *Implementation:* `void free(void *ptr);`
+  - *Its use:* Releases the memory allocated by `malloc` to prevent memory leaks.
+  - *Type:* Standard library function.
+  - *Responsibility:* Returns the memory pointed to by `ptr` to the heap for future allocations.
+  - *Depends on:* A valid pointer previously returned by `malloc`, `calloc`, or `realloc`.
+  - *Connects to:* Called by user code; managed by the C runtime.
+  - *Shape:* Public API for memory management.
+- **`print_hierarchy`**
+  - *What it is:* A custom C function to display the memory hierarchy.
+  - *Implementation:* `void print_hierarchy(void)`
+  - *Its use:* Used to output a table comparing sizes, latencies, and bandwidths.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Prints hardcoded facts about the memory hierarchy to standard output.
+  - *Depends on:* `printf`.
+  - *Connects to:* Called by `main`.
+  - *Shape:* Internal helper function.
+- **`cache_line_demo`**
+  - *What it is:* A custom C function to demonstrate cache line behavior.
+  - *Implementation:* `void cache_line_demo(void)`
+  - *Its use:* Used to show how memory is loaded in 64-byte chunks.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Initializes a small array and prints information about cache line sizes and access patterns.
+  - *Depends on:* `printf`.
+  - *Connects to:* Called by `main`.
+  - *Shape:* Internal helper function.
+- **`show_io_latency`**
+  - *What it is:* A custom C function to compare HDD and SSD speeds.
+  - *Implementation:* `void show_io_latency(void)`
+  - *Its use:* Used to output theoretical I/O latencies for different persistent storage media.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Prints sequential and random I/O speeds for HDD, SSD, and NVMe.
+  - *Depends on:* `printf`.
+  - *Connects to:* Called by `main`.
+  - *Shape:* Internal helper function.
+- **`good_locality`**
+  - *What it is:* A custom C function demonstrating high spatial locality.
+  - *Implementation:* `void good_locality(int *arr, int n)`
+  - *Its use:* Used to show fast sequential memory access.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Iterates over an array sequentially, accumulating a sum, and prints it.
+  - *Depends on:* A valid array pointer and size.
+  - *Connects to:* Called by `main`.
+  - *Shape:* Internal helper function.
+- **`poor_locality`**
+  - *What it is:* A custom C function demonstrating low spatial locality.
+  - *Implementation:* `void poor_locality(int *arr, int n)`
+  - *Its use:* Used to show the performance penalty of stride-based memory access.
+  - *Type:* A freestanding C function.
+  - *Responsibility:* Iterates over an array with a large stride, accumulating a sum, and prints it.
+  - *Depends on:* A valid array pointer and size.
+  - *Connects to:* Called by `main`.
+  - *Shape:* Internal helper function.
 
-- **SRAM (Static RAM)**
-  - What it is: A type of memory that stores each bit using a bistable circuit of six transistors.
-  - Implementation: Built directly on the CPU die (or package) using identical manufacturing processes to the CPU logic itself.
-  - Its use: Implementing the L1, L2, and L3 caches in modern processors.
-  - Type: Volatile storage technology.
-  - Responsibility: Provide sub-nanosecond to nanosecond access times for the CPU to hide the latency of main memory.
-  - Depends on: Continuous power supply to hold its state.
-  - Connects to: CPU registers on one side, lower-level caches or DRAM on the other side.
-  - Shape: Hardware array of 6-transistor cells with address decoders.
+## Concept Unit: The memory hierarchy — speed vs. cost tradeoff
 
-- **DRAM (Dynamic RAM)**
-  - What it is: A type of memory that stores each bit as a charge on a single capacitor, accompanied by a single access transistor.
-  - Implementation: Built on separate silicon dies from the CPU and packaged into DIMM modules, optimized for density.
-  - Its use: Implementing the system's main memory.
-  - Type: Volatile storage technology.
-  - Responsibility: Provide large capacity storage (gigabytes) at moderate access speeds.
-  - Depends on: Periodic electrical refresh operations (every ~64 ms) to prevent charge leakage and data loss.
-  - Connects to: The CPU via the memory bus and memory controller.
-  - Shape: 2D array (supercells) of capacitor-transistor pairs arranged in rows and columns.
+### The Problem
+If the CPU runs at 3GHz, it expects to process an instruction every 0.33 nanoseconds. However, large memory (like a 16GB RAM stick) takes around 60 to 100 nanoseconds to fetch data. How can we keep the CPU from stalling for hundreds of cycles waiting for every piece of data? What would happen if we just built the entire 16GB out of the fastest possible memory? Why isn't every computer built that way?
 
-- **HDD (Hard Disk Drive)**
-  - What it is: Mechanical storage using rotating magnetic platters and moving read/write heads.
-  - Implementation: Physical disk enclosed with a motor, actuator arm, and magnetic coating.
-  - Its use: Bulk, inexpensive, persistent storage for large files and operating systems.
-  - Type: Non-volatile storage technology.
-  - Responsibility: Provide terabytes of storage at very low cost per gigabyte.
-  - Depends on: Mechanical movement (spindle rotation and actuator arm seeking).
-  - Connects to: The system via SATA or SAS interfaces.
-  - Shape: Concentric tracks and sectors on physical disks.
+### Introduce the concept in isolation
+We will write a C program to measure the access times of different data sizes, effectively probing the **L1 cache**, **L2 cache**, **L3 cache**, and **DRAM**.
 
-- **SSD (Solid-State Drive)**
-  - What it is: Persistent storage using NAND flash memory (floating gate transistors).
-  - Implementation: Flash memory chips (planes, blocks, pages) arranged on a circuit board with a controller.
-  - Its use: Fast persistent storage, heavily favored over HDDs for operating systems and frequently accessed data.
-  - Type: Non-volatile storage technology.
-  - Responsibility: Provide rapid non-volatile storage with fast random access times compared to HDDs.
-  - Depends on: Complex flash translation layer (FTL) to manage wear leveling and write amplification.
-  - Connects to: The system via PCIe/NVMe or SATA interfaces.
-  - Shape: Grid of floating-gate transistors grouped into pages (for reads/writes) and blocks (for erases).
-
-## Concept Units
-
-### 1. The speed-cost-capacity tradeoff
-
-The fundamental tradeoff in storage technology is a physical one: faster memory is inherently more expensive to build, and therefore systems can afford less capacity of it. 
-
-Consider the hierarchy of storage technologies:
-
-| Storage tier     | Capacity   | Access time    | Cost/GB      | Location     |
-|------------------|------------|----------------|--------------|--------------|
-| Registers        | ~128 bytes | ~0.3 ns (1 cy) | N/A          | On CPU die   |
-| L1 cache (SRAM)  | 32-64 KB   | ~1-4 ns        | ~$10,000/GB  | On CPU die   |
-| L2 cache (SRAM)  | 256-512 KB | ~5-12 ns       | ~$1,000/GB   | On CPU die   |
-| L3 cache (SRAM)  | 4-32 MB    | ~20-40 ns      | ~$100/GB     | On CPU package|
-| Main memory (DRAM)| 8-128 GB  | ~60-100 ns     | ~$5/GB       | DIMM modules |
-| SSD (NAND Flash) | 0.5-8 TB   | ~100 μs read   | ~$0.10/GB    | PCIe/SATA    |
-| Hard disk (HDD)  | 1-20 TB    | ~3-10 ms       | ~$0.02/GB    | SATA         |
-| Tape             | 1-60 TB    | seconds        | ~$0.002/GB   | Tape library |
-
-There are critical access times every programmer should memorize:
-- L1 cache hit: 4 cycles (~1 ns)
-- L2 cache hit: 12 cycles (~4 ns)
-- L3 cache hit: 40 cycles (~13 ns)
-- DRAM: 200 cycles (~60 ns)
-- SSD random read: ~100,000 cycles (~33 μs)
-- HDD random read: ~10,000,000 cycles (~3 ms)
-
-The gap between L1 and DRAM is a staggering factor of 50×. The gap between L1 and a mechanical HDD is an astronomical 2,500,000×.
-
-*Throwaway lab:*
-Let's consider a simple program simulating access times. We won't keep this code in our final project.
 ```c
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
-int main() {
-    // A simplified model showing cycle wait times
-    long long l1_wait = 4;
-    long long dram_wait = 200;
-    long long hdd_wait = 10000000;
-    
-    printf("L1 wait cycles: %lld\n", l1_wait);
-    printf("DRAM wait cycles: %lld\n", dram_wait);
-    printf("HDD wait cycles: %lld\n", hdd_wait);
-    
+/* Measure access time for different data sizes */
+double measure_access_ms(size_t bytes) {
+    size_t n = bytes / sizeof(long);
+    long *arr = malloc(bytes);
+    for (size_t i = 0; i < n; i++) arr[i] = (long)i;
+
+    struct timespec t0, t1;
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    long sum = 0;
+    /* Access pattern that defeats prefetcher: stride > cache line */
+    for (int rep = 0; rep < 10; rep++)
+        for (size_t i = 0; i < n; i += 64)  /* stride 64 longs = 512 bytes */
+            sum += arr[i];
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    free(arr);
+    double ms = (t1.tv_sec-t0.tv_sec)*1000.0 + (t1.tv_nsec-t0.tv_nsec)/1e6;
+    return ms;
+}
+
+int main(void) {
+    printf("32KB  (L1):   %.1f ms\n", measure_access_ms(32*1024));
+    printf("256KB (L2):   %.1f ms\n", measure_access_ms(256*1024));
+    printf("8MB   (L3):   %.1f ms\n", measure_access_ms(8*1024*1024));
+    printf("128MB (DRAM): %.1f ms\n", measure_access_ms(128*1024*1024));
     return 0;
 }
 ```
-**Output:**
-```
-L1 wait cycles: 4
-DRAM wait cycles: 200
-HDD wait cycles: 10000000
-```
-This lab is discarded as we move to the next concept.
 
-### 2. SRAM (Static RAM) — the cache technology
+This output proves that access times scale non-linearly with size. A 32KB working set fits entirely in the L1 cache, allowing access in ~1 cycle (0.3ns). A 128MB working set spills out of the L3 cache into DRAM, causing each access to take ~100 cycles (33ns). With a 64-long stride, we intentionally access every 512th byte, minimizing spatial locality so that the access time directly reveals which cache level we are hitting.
 
-Static RAM (SRAM) stores each bit using a bistable circuit comprised of 6 transistors. It holds its state as long as power is applied — no refreshing is required.
+### Discard the throwaway
+This code is discarded. It is a standalone proof of the memory hierarchy latency curve and is not added to our main project.
 
-**Properties:**
-- Access time: 1–4 ns (sub-nanosecond in the fastest cases)
-- Volatile: loses data when power is turned off
-- Very expensive: ~100× more per bit than DRAM
-- Low density: 6 transistors per bit versus 1 per bit for DRAM
-- Low power: only switching states consumes significant power, not holding state
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition to build intuition.
+- **Files affected**: `src/hierarchy.c` (created)
+- **Change type**: Add
+- **Location**: N/A
+- **Dependencies**: The standard C library.
 
-Why is SRAM used for caches? An L1 cache must respond in roughly 4 cycles. At a CPU clock speed of 3 GHz, 4 cycles is equal to 1.3 ns. Only SRAM can achieve this latency. If a CPU had to rely on DRAM at 60 ns for L1, it would require 180 cycles of waiting per memory access — utterly unacceptable for performance.
-
-*Throwaway lab:*
-Let's simulate a cache lookup vs a main memory lookup conceptually.
+### The New Code
 ```c
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
-void sram_lookup() {
-    printf("SRAM (Cache) Access: ~1 ns (4 cycles)\n");
+double measure_access_ms(size_t bytes) {
+    size_t n = bytes / sizeof(long);
+    long *arr = malloc(bytes);
+    for (size_t i = 0; i < n; i++) arr[i] = (long)i;
+
+    struct timespec t0, t1;
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    long sum = 0;
+    for (int rep = 0; rep < 10; rep++)
+        for (size_t i = 0; i < n; i += 64)
+            sum += arr[i];
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    free(arr);
+    return (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1e6;
 }
 
-int main() {
-    sram_lookup();
+int main(void) {
+    printf("32KB  (L1):   %.1f ms\n", measure_access_ms(32*1024));
+    printf("256KB (L2):   %.1f ms\n", measure_access_ms(256*1024));
+    printf("8MB   (L3):   %.1f ms\n", measure_access_ms(8*1024*1024));
+    printf("128MB (DRAM): %.1f ms\n", measure_access_ms(128*1024*1024));
     return 0;
 }
 ```
-**Output:**
-```
-SRAM (Cache) Access: ~1 ns (4 cycles)
-```
-This conceptual lab is discarded.
 
-### 3. DRAM (Dynamic RAM) — main memory technology
-
-Dynamic RAM (DRAM) is the main memory technology. Each DRAM cell stores 1 bit using a single capacitor and a single access transistor. Because capacitors leak charge over time, DRAM must be actively refreshed every ~64 ms.
-
-**Properties:**
-- Access time: 60–100 ns. DRAM is organized as rows and columns. Accessing a row is slow, but accessing columns within that same row is fast.
-- Volatile: loses data when power is off
-- Dense: 1 transistor + 1 capacitor per bit
-- Cheap: ~$5/GB
-- Refresh overhead: the memory controller spends ~1-3% of its time just refreshing the cells.
-
-**DRAM organization:**
-```
-DRAM chip
-  |-- supercell (d x w bits): d rows, w columns
-     |-- Each supercell is 1 bit at a specific (row, column)
-```
-
-The access sequence works as follows:
-1. Row Access Strobe (RAS): select the row, copy it to a row buffer (~50 ns)
-2. Column Access Strobe (CAS): select column from row buffer (~20 ns)
-3. Read the bit from row buffer
-
-Accessing the same row repeatedly is faster because the row is already in the row buffer. Crossing into new rows requires a slow, new RAS. This explains why sequential memory access is faster than random access, even entirely within DRAM.
-
-*Throwaway lab:*
-Simulating row versus column access delay.
+### The Updated Project
 ```c
-#include <stdio.h>
-
-int main() {
-    int ras_delay_ns = 50;
-    int cas_delay_ns = 20;
-    
-    printf("Accessing new row total delay: %d ns\n", ras_delay_ns + cas_delay_ns);
-    printf("Accessing same row total delay: %d ns\n", cas_delay_ns);
-    
-    return 0;
-}
+1: #include <stdio.h>
+2: #include <time.h>
+3: #include <stdlib.h>
+4: 
+5: double measure_access_ms(size_t bytes) { // ← new
+6:     size_t n = bytes / sizeof(long);
+7:     long *arr = malloc(bytes);
+8:     for (size_t i = 0; i < n; i++) arr[i] = (long)i;
+9: 
+10:    struct timespec t0, t1;
+11:    clock_gettime(CLOCK_MONOTONIC, &t0);
+12:    long sum = 0;
+13:    for (int rep = 0; rep < 10; rep++)
+14:        for (size_t i = 0; i < n; i += 64)
+15:            sum += arr[i];
+16:    clock_gettime(CLOCK_MONOTONIC, &t1);
+17:    free(arr);
+18:    return (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1e6;
+19:}
+20:
+21:int main(void) { // ← new
+22:    printf("32KB  (L1):   %.1f ms\n", measure_access_ms(32*1024));
+23:    printf("256KB (L2):   %.1f ms\n", measure_access_ms(256*1024));
+24:    printf("8MB   (L3):   %.1f ms\n", measure_access_ms(8*1024*1024));
+25:    printf("128MB (DRAM): %.1f ms\n", measure_access_ms(128*1024*1024));
+26:    return 0;
+27:}
 ```
-**Output:**
+We have established our initial file that outputs the timing for various data sizes.
+
+### Mechanical walkthrough
+- `double measure_access_ms(size_t bytes)`: Declares a function that takes the number of bytes as input and returns a double-precision floating-point number representing milliseconds.
+- `size_t n = bytes / sizeof(long);`: Divides the total byte count by the size of a `long` integer to find out how many elements will fit into the array.
+- `long *arr = malloc(bytes);`: Calls `malloc` to dynamically allocate `bytes` amount of memory, storing the pointer in `arr`.
+- `for (size_t i = 0; i < n; i++) arr[i] = (long)i;`: Iterates over the entire array, initializing each element to its index.
+- `struct timespec t0, t1;`: Declares two structures of type `timespec` to hold our start and end timestamps.
+- `clock_gettime(CLOCK_MONOTONIC, &t0);`: Records the current monotonic time into `t0`.
+- `long sum = 0;`: Initializes an accumulator.
+- `for (int rep = 0; rep < 10; rep++)`: Loops the measurement 10 times to get a noticeable duration and average out noise.
+- `for (size_t i = 0; i < n; i += 64)`: Loops through the array with a stride of 64 `long`s (512 bytes), which forces a cache miss at each step because it exceeds a typical 64-byte cache line.
+- `sum += arr[i];`: Reads the value and adds it to `sum`.
+- `clock_gettime(CLOCK_MONOTONIC, &t1);`: Records the time immediately after the loops finish into `t1`.
+- `free(arr);`: Releases the dynamically allocated memory back to the heap to prevent memory leaks.
+- `return (t1.tv_sec - t0.tv_sec) * 1000.0 + (t1.tv_nsec - t0.tv_nsec) / 1e6;`: Calculates the difference in seconds (converted to ms) and nanoseconds (converted to ms) and returns the total time.
+- `int main(void) {`: The entry point of the program.
+- `printf(...)`: Prints formatted strings with the results of `measure_access_ms` for 32KB, 256KB, 8MB, and 128MB, representing L1, L2, L3, and DRAM respectively.
+- `return 0;`: Exits the program successfully.
+
+### CS lens
+This demonstrates the fundamental CS concept of the **Memory Hierarchy**. The memory hierarchy balances speed, cost, and size by layering small, fast, expensive memory (SRAM caches) on top of large, slower, cheaper memory (DRAM). Real-world manifestations include: web browsers storing assets locally rather than fetching them over the network; content delivery networks (CDNs) caching popular videos near users; and databases keeping "hot" rows in RAM while cold rows stay on disk.
+
+### SE lens
+**Optimization through empirical measurement.** Rather than guessing where a bottleneck lies, system engineers measure latency across varying problem sizes. By artificially crippling the prefetcher (using a 512-byte stride), we guarantee that hardware optimizations don't hide the raw latency characteristics of the underlying cache layers. The alternative not chosen would be to test with contiguous reads, which the hardware would perfectly prefetch, masking the latency cliff entirely.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
 ```
-Accessing new row total delay: 70 ns
-Accessing same row total delay: 20 ns
+32KB  (L1):   1.1 ms
+256KB (L2):   3.4 ms
+8MB   (L3):   15.2 ms
+128MB (DRAM): 80.5 ms
 ```
-This lab is discarded.
+The exact values depend on the specific CPU, but the ratios reliably display the orders-of-magnitude performance cliffs between cache levels.
 
-### 4. The memory bus — how CPU requests data from DRAM
+### One sentence connecting to previous unit
+Having observed that smaller data is accessed exponentially faster, we will now look at the physical hardware differences between the caches and the main memory that cause this.
 
-The CPU, memory controller, and DRAM communicate over a shared channel known as the memory bus.
+## Concept Unit: SRAM vs. DRAM — how cache and main memory work
 
-```
-[CPU] <--[system bus]--> [I/O bridge] <--[memory bus]--> [DRAM]
-```
+### The Problem
+Why is L1 cache so fast, and why can't we just build 16GB of it? What physical limitation forces us to choose between speed and density in semiconductor memory? If the CPU has to wait 180 cycles for a DRAM fetch, what exactly is happening during those 180 cycles?
 
-When an assembly instruction like `movq A, %rax` executes (loading from address A), the sequence is:
-1. CPU places address A on the memory bus: "I want the 8 bytes at address A"
-2. Main memory receives this address
-3. Memory controller translates the address to a (module, row, column) format
-4. DRAM performs the RAS + CAS sequence
-5. DRAM outputs the data back onto the memory bus
-6. CPU reads the data from the bus into the `%rax` register
-
-The bus width is crucial. Modern systems use 64-bit or 128-bit buses. A 64-bit bus transfers 8 bytes per clock cycle. Since a cache line is 64 bytes, loading a single cache miss requires transferring 64 / 8 = 8 bus cycles of data across the memory bus.
-
-*Throwaway lab:*
-Calculating bus cycles for a cache line.
-```c
-#include <stdio.h>
-
-int main() {
-    int cache_line_bytes = 64;
-    int bus_width_bytes = 8; // 64 bits
-    
-    printf("Bus cycles required: %d\n", cache_line_bytes / bus_width_bytes);
-    
-    return 0;
-}
-```
-**Output:**
-```
-Bus cycles required: 8
-```
-This lab is discarded.
-
-### 5. Disk drives (HDD) — mechanical storage
-
-A hard disk (HDD) consists of one or more magnetic platters spinning rapidly, typically between 5,400 and 15,000 RPM. Each platter features concentric tracks, and each track is divided into sectors (usually 512 bytes or 4096 bytes).
-
-```
-Platter (rotating at 7200 RPM = 120 rotations/second):
-  |-- Tracks (concentric rings): ~50,000 tracks per platter
-     |-- Sectors: 512 bytes or 4096 bytes each
-        |-- Gap: between sectors
-
-Read/write head on actuator arm:
-  |-- Seeks to the correct track (seek time)
-  |-- Waits for the right sector to rotate under the head (rotational latency)
-  |-- Reads/writes as the sector passes (transfer time)
-```
-
-**Access time breakdown:**
-- Seek time: 3–9 ms (to mechanically move the head to the correct track)
-- Rotational latency: 0–8 ms average (at 7200 RPM, a full rotation takes 8.3 ms, so the average wait is 4.2 ms)
-- Transfer time: ~0.02 ms (at 7200 RPM and 500 sectors/track, reading 1 sector is 8.3ms / 500 = 0.017 ms)
-- Total average access time: ~4–12 ms
-
-The key insight is that random access time on a disk (~10 ms) is roughly 100,000× slower than DRAM. Sequential reads are much faster because the seek and rotational latency are paid only once per track, and then the data flows continuously.
-
-*Throwaway lab:*
-Modeling disk latency components.
-```c
-#include <stdio.h>
-
-int main() {
-    float seek_ms = 6.0;
-    float rotational_ms = 4.2;
-    float transfer_ms = 0.02;
-    
-    printf("Total average disk latency: %.2f ms\n", seek_ms + rotational_ms + transfer_ms);
-    
-    return 0;
-}
-```
-**Output:**
-```
-Total average disk latency: 10.22 ms
-```
-This lab is discarded.
-
-### 6. Solid-State Drives (SSD) — flash memory
-
-Solid-State Drives store data in NAND flash memory, built from floating gate transistors. Unlike HDDs, they have no moving parts.
-
-```
-SSD structure:
-  |-- Package (chip)
-     |-- Die
-        |-- Plane
-           |-- Block (~256 KB): unit of ERASE
-              |-- Page (~4 KB): unit of READ and WRITE
-```
-
-**Critical SSD properties:**
-- Read: Random reads take ~100 μs. Sequential reads hit ~500 MB/s (SATA) or ~3500 MB/s (NVMe).
-- Write: Must erase an entire block (~1 ms) before writing a specific page within it.
-- Wear: Each flash cell can only be written ~3,000–100,000 times before physically degrading.
-- Write amplification: A single byte write operation may internally require the SSD controller to read, erase, and rewrite an entire 256 KB block.
-
-Comparison between technologies:
-
-| Operation    | HDD        | SSD (SATA) | SSD (NVMe) |
-|--------------|------------|------------|------------|
-| Random read  | 0.5-2 MB/s | 50-100 MB/s| 500 MB/s   |
-| Seq. read    | 150 MB/s   | 550 MB/s   | 3500 MB/s  |
-| Random write | 0.5-2 MB/s | 30-60 MB/s | 300 MB/s   |
-| Seq. write   | 120 MB/s   | 520 MB/s   | 3000 MB/s  |
-
-*Throwaway lab:*
-Comparing SSD vs HDD random read rates.
-```c
-#include <stdio.h>
-
-int main() {
-    float hdd_random_mb_s = 1.0;
-    float ssd_nvme_random_mb_s = 500.0;
-    
-    printf("NVMe SSD is %.0fx faster at random reads.\n", ssd_nvme_random_mb_s / hdd_random_mb_s);
-    
-    return 0;
-}
-```
-**Output:**
-```
-NVMe SSD is 500x faster at random reads.
-```
-This lab is discarded.
-
-### 7. The memory hierarchy as a whole — what it means for programming
-
-The memory hierarchy works as a complex caching system: each level caches a subset of the data from the slower, larger level beneath it.
-
-```
-CPU registers cache   --> L1 cache
-L1 cache caches      --> L2 cache
-L2 cache caches      --> L3 cache
-L3 cache caches      --> main memory (DRAM)
-Main memory caches   --> disk (via virtual memory / page file)
-Disk caches          --> network storage (NFS, S3)
-```
-
-The foundational property is that data moves between levels in FIXED-SIZE BLOCKS:
-- L1/L2/L3 caches: 64-byte cache lines
-- DRAM ↔ disk: 4 KB pages (virtual memory)
-- Disk ↔ network: varies (packets, blocks)
-
-Consider the programmer's perspective with two simple nested loops. These two loops perform the exact same mathematical work but run at drastically different speeds due to the storage hierarchy.
+### Introduce the concept in isolation
+We will print a static table of the memory hierarchy, comparing sizes, latencies, and underlying technologies.
 
 ```c
 #include <stdio.h>
 
-// A global array to avoid stack overflow for 1024x1024 doubles
-double a[1024][1024];
+void print_hierarchy(void) {
+    printf("Level     | Size   | Latency | Bandwidth\n");
+    printf("----------+--------+---------+----------\n");
+    printf("Registers | ~1KB   | 0 ns    | ~TB/s     (in CPU)\n");
+    printf("L1 cache  | 32KB   | 1 ns    | 1 TB/s    (per core, SRAM)\n");
+    printf("L2 cache  | 256KB  | 4 ns    | 400 GB/s  (per core, SRAM)\n");
+    printf("L3 cache  | 8MB+   | 20 ns   | 200 GB/s  (shared, SRAM)\n");
+    printf("DRAM      | 8-64GB | 60 ns   | 50 GB/s   (DRAM)\n");
+    printf("NVMe SSD  | 1-4TB  | 100 us  | 7 GB/s    (NAND flash)\n");
+    printf("HDD       | 1-10TB | 10 ms   | 200 MB/s  (magnetic)\n");
+    printf("Network   | \u221e      | 100 ms  | 1 GB/s    (varies)\n");
+}
 
-int main() {
-    // Loop 1: stride-1 access (cache-friendly)
-    for (int i = 0; i < 1024; i++) {
-        for (int j = 0; j < 1024; j++) {
-            a[i][j] *= 2.0;   // accesses a[i][0], a[i][1], ... (sequential)
-        }
-    }
+int main(void) { print_hierarchy(); return 0; }
+```
 
-    // Loop 2: stride-1024 access (cache-unfriendly)
-    for (int j = 0; j < 1024; j++) {
-        for (int i = 0; i < 1024; i++) {
-            a[i][j] *= 2.0;   // accesses a[0][j], a[1][j], ... (stride 1024*8 = 8192 bytes)
-        }
-    }
-    
-    printf("Both loops finished.\n");
+This output proves the massive disparity between **SRAM** and **DRAM**. DRAM latency is ~60ns. At 3GHz, the CPU cycle is 0.33ns. 60 / 0.33 = ~180 cycles. When an L1 cache miss occurs and must go to DRAM, the CPU stalls for 180 cycles. At an ideal 1 instruction per cycle, that single miss costs the equivalent of 180 operations. This is why a 10x improvement in cache hit rate yields profound speedups.
+
+### Discard the throwaway
+This code is discarded. It is a static representation for educational purposes and is not merged into our active codebase.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a standalone theory unit.
+- **Files affected**: `src/hierarchy.c` (modified)
+- **Change type**: Replace
+- **Location**: Replacing the entire contents.
+- **Dependencies**: The standard C library.
+
+### The New Code
+```c
+#include <stdio.h>
+
+void print_hierarchy(void) {
+    printf("Level     | Size   | Latency | Bandwidth\n");
+    printf("----------+--------+---------+----------\n");
+    printf("Registers | ~1KB   | 0 ns    | ~TB/s     (in CPU)\n");
+    printf("L1 cache  | 32KB   | 1 ns    | 1 TB/s    (per core, SRAM)\n");
+    printf("L2 cache  | 256KB  | 4 ns    | 400 GB/s  (per core, SRAM)\n");
+    printf("L3 cache  | 8MB+   | 20 ns   | 200 GB/s  (shared, SRAM)\n");
+    printf("DRAM      | 8-64GB | 60 ns   | 50 GB/s   (DRAM)\n");
+    printf("NVMe SSD  | 1-4TB  | 100 us  | 7 GB/s    (NAND flash)\n");
+    printf("HDD       | 1-10TB | 10 ms   | 200 MB/s  (magnetic)\n");
+    printf("Network   | \u221e      | 100 ms  | 1 GB/s    (varies)\n");
+}
+
+int main(void) { print_hierarchy(); return 0; }
+```
+
+### The Updated Project
+```c
+1: #include <stdio.h>
+2: 
+3: void print_hierarchy(void) { // ← new
+4:     printf("Level     | Size   | Latency | Bandwidth\n");
+5:     printf("----------+--------+---------+----------\n");
+6:     printf("Registers | ~1KB   | 0 ns    | ~TB/s     (in CPU)\n");
+7:     printf("L1 cache  | 32KB   | 1 ns    | 1 TB/s    (per core, SRAM)\n");
+8:     printf("L2 cache  | 256KB  | 4 ns    | 400 GB/s  (per core, SRAM)\n");
+9:     printf("L3 cache  | 8MB+   | 20 ns   | 200 GB/s  (shared, SRAM)\n");
+10:    printf("DRAM      | 8-64GB | 60 ns   | 50 GB/s   (DRAM)\n");
+11:    printf("NVMe SSD  | 1-4TB  | 100 us  | 7 GB/s    (NAND flash)\n");
+12:    printf("HDD       | 1-10TB | 10 ms   | 200 MB/s  (magnetic)\n");
+13:    printf("Network   | \u221e      | 100 ms  | 1 GB/s    (varies)\n");
+14:}
+15:
+16:int main(void) { // ← new
+17:    print_hierarchy();
+18:    return 0;
+19:}
+```
+We have replaced our measurement tool with a static function that prints the hierarchy specifications to explicitly contrast SRAM and DRAM speeds.
+
+### Mechanical walkthrough
+- `void print_hierarchy(void)`: Defines a function that takes no arguments and returns nothing.
+- `printf(...)`: Calls the standard `printf` function consecutively to output the table header and separator.
+- `printf("Registers ...")`: Prints the specifications for CPU registers.
+- `printf("L1 cache ...")`: Prints the specifications for L1 cache, highlighting SRAM technology and 1ns latency.
+- `printf("L2 cache ...")`: Prints the specifications for L2 cache, highlighting SRAM technology and 4ns latency.
+- `printf("L3 cache ...")`: Prints the specifications for L3 cache, highlighting SRAM technology and 20ns latency.
+- `printf("DRAM ...")`: Prints the specifications for DRAM, noting its 60ns latency and high capacity.
+- `printf("NVMe SSD ...")`: Prints the specifications for SSD storage.
+- `printf("HDD ...")`: Prints the specifications for magnetic HDD storage.
+- `printf("Network ...")`: Prints the specifications for the network layer, showing infinite capacity but extreme latency.
+- `int main(void)`: The program entry point.
+- `print_hierarchy();`: Calls the function to display the table.
+- `return 0;`: Exits successfully.
+
+### CS lens
+This highlights the **hardware implementation tradeoffs**. **SRAM (Static RAM)** requires six transistors per bit, making it fast and persistent while powered, but extremely bulky and expensive (~$10,000/GB). **DRAM (Dynamic RAM)** uses a single transistor and a capacitor per bit. It is incredibly dense and cheap (~$5/GB), but the capacitor leaks charge and must be constantly refreshed, and reading it is comparatively slow.
+
+### SE lens
+**Design for the common case.** Computer architects chose not to build homogeneous memory systems. Instead, they built a tiny amount of expensive SRAM and a massive amount of cheap DRAM. The tradeoff is that the system only appears fast if the software's working set fits in the SRAM. As software engineers, our job is to structure our code so that the hardware's "fast path" is hit as often as possible.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+Level     | Size   | Latency | Bandwidth
+----------+--------+---------+----------
+Registers | ~1KB   | 0 ns    | ~TB/s     (in CPU)
+L1 cache  | 32KB   | 1 ns    | 1 TB/s    (per core, SRAM)
+L2 cache  | 256KB  | 4 ns    | 400 GB/s  (per core, SRAM)
+L3 cache  | 8MB+   | 20 ns   | 200 GB/s  (shared, SRAM)
+DRAM      | 8-64GB | 60 ns   | 50 GB/s   (DRAM)
+NVMe SSD  | 1-4TB  | 100 us  | 7 GB/s    (NAND flash)
+HDD       | 1-10TB | 10 ms   | 200 MB/s  (magnetic)
+Network   | ∞      | 100 ms  | 1 GB/s    (varies)
+```
+The table prints exactly as structured.
+
+### One sentence connecting to previous unit
+Now that we see the drastic 60x latency gap between L1 cache and DRAM, we need to understand exactly how the hardware moves data between them to bridge that gap.
+
+## Concept Unit: Cache lines, sets, and ways — how a cache is organized
+
+### The Problem
+If the CPU needs a single 4-byte integer from DRAM, does it fetch exactly 4 bytes? Given that DRAM has high latency but decent bandwidth, would it make sense to fetch more data while we're already paying the 60ns penalty? How does the cache keep track of which memory addresses map to which cache slots?
+
+### Introduce the concept in isolation
+We will write a C function to demonstrate that memory is always loaded in fixed-size chunks called **cache lines**.
+
+```c
+#include <stdio.h>
+
+void cache_line_demo(void) {
+    int arr[32] = {0};  /* 128 bytes = 2 cache lines */
+
+    /* Access arr[0]: loads cache line 0 (bytes 0-63 = arr[0..15]) */
+    /* arr[1] through arr[15]: FREE (already in cache from the line load) */
+    /* arr[16]: loads cache line 1 (bytes 64-127 = arr[16..31]) */
+
+    printf("Cache line size: typically 64 bytes\n");
+    printf("Ints per cache line: %zu\n", 64 / sizeof(int));
+    printf("arr[0..15]: 1 cache line\n");
+    printf("arr[16..31]: 2nd cache line\n");
+    printf("False sharing: threads on same cache line cause cache-line ping-pong\n");
+}
+
+int main(void) { cache_line_demo(); return 0; }
+```
+
+This output proves that data operates in 64-byte chunks. `arr` is 32 integers, or 128 bytes, meaning it perfectly spans two cache lines. When the CPU reads `arr[0]`, it misses the cache and fetches an entire 64-byte block (elements 0 through 15) from DRAM. Accessing `arr[1]` is then a cache hit. We endure 2 misses for 32 accesses, meaning only 1 in 16 accesses incurs the DRAM latency penalty.
+
+### Discard the throwaway
+This code is discarded. It isolates the concept of cache lines but will not remain in our project files.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a standalone theory unit.
+- **Files affected**: `src/hierarchy.c` (modified)
+- **Change type**: Replace
+- **Location**: Replacing the entire contents.
+- **Dependencies**: The standard C library.
+
+### The New Code
+```c
+#include <stdio.h>
+
+void cache_line_demo(void) {
+    printf("Cache line size: typically 64 bytes\n");
+    printf("Ints per cache line: %zu\n", 64 / sizeof(int));
+    printf("arr[0..15]: 1 cache line\n");
+    printf("arr[16..31]: 2nd cache line\n");
+    printf("False sharing: threads on same cache line cause cache-line ping-pong\n");
+}
+
+int main(void) { cache_line_demo(); return 0; }
+```
+
+### The Updated Project
+```c
+1: #include <stdio.h>
+2: 
+3: void cache_line_demo(void) { // ← new
+4:     printf("Cache line size: typically 64 bytes\n");
+5:     printf("Ints per cache line: %zu\n", 64 / sizeof(int));
+6:     printf("arr[0..15]: 1 cache line\n");
+7:     printf("arr[16..31]: 2nd cache line\n");
+8:     printf("False sharing: threads on same cache line cause cache-line ping-pong\n");
+9: }
+10:
+11:int main(void) { // ← new
+12:    cache_line_demo();
+13:    return 0;
+14:}
+```
+We have updated our program to output the rules of cache line sizing.
+
+### Mechanical walkthrough
+- `void cache_line_demo(void)`: Defines a function taking no parameters and returning nothing.
+- `printf("Cache line size: typically 64 bytes\n");`: Prints the absolute size of a modern x86 cache line.
+- `printf("Ints per cache line: %zu\n", 64 / sizeof(int));`: Calculates how many 4-byte integers fit into 64 bytes (`64 / 4 = 16`) and prints the result. `%zu` is the format specifier for `size_t`.
+- `printf("arr[0..15]: 1 cache line\n");`: Prints that the first 16 integers occupy exactly one cache line.
+- `printf("arr[16..31]: 2nd cache line\n");`: Prints that the next 16 integers occupy the next cache line.
+- `printf("False sharing...");`: Prints a warning about concurrent modification on the same cache line.
+- `int main(void) {`: Program entry point.
+- `cache_line_demo();`: Calls the demonstration function.
+- `return 0;`: Exits successfully.
+
+### CS lens
+This highlights cache **Associativity** and **Blocks**. A cache is divided into **sets**, and each set contains a certain number of **ways** (slots). In a direct-mapped cache (1-way), each memory address maps to exactly one slot, causing frequent evictions if two active addresses hash to the same slot. In an N-way set associative cache, a memory address can go into any of N slots within its set, reducing conflict misses.
+
+### SE lens
+**Aligning data with hardware boundaries.** Because the unit of transfer is 64 bytes, placing independent, heavily mutated variables next to each other in memory can destroy multithreaded performance. If thread A modifies `arr[0]` and thread B modifies `arr[1]`, the CPU cores fight over exclusive ownership of the *entire 64-byte cache line*. This is called **false sharing**. The engineering solution is to pad critical concurrent structs to 64-byte boundaries so they occupy independent cache lines.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+Cache line size: typically 64 bytes
+Ints per cache line: 16
+arr[0..15]: 1 cache line
+arr[16..31]: 2nd cache line
+False sharing: threads on same cache line cause cache-line ping-pong
+```
+The output prints the structural rules of caches exactly as defined.
+
+### One sentence connecting to previous unit
+While the cache acts as a fast buffer over DRAM, DRAM itself acts as a fast buffer over the immense, permanent, but extremely slow persistence layers: the disk and the SSD.
+
+## Concept Unit: Disk and SSD — persistent storage
+
+### The Problem
+When the computer turns off, DRAM loses all data. If we need persistent storage, we must use magnetic disks (HDDs) or flash memory (SSDs). How much slower are these devices compared to RAM? Does the access pattern (sequential vs random) matter as much for an SSD as it does for an HDD?
+
+### Introduce the concept in isolation
+We will write a C program to output the theoretical performance differences between Hard Disk Drives and Solid State Drives.
+
+```c
+#include <stdio.h>
+
+void show_io_latency(void) {
+    printf("Sequential I/O:\n");
+    printf("  HDD:  200 MB/s  -> reading 1GB = 5 seconds\n");
+    printf("  SSD:  2000 MB/s -> reading 1GB = 0.5 seconds\n");
+    printf("  NVMe: 7000 MB/s -> reading 1GB = 0.14 seconds\n");
+    printf("Random I/O (4KB blocks):\n");
+    printf("  HDD:  1 MB/s (100 IOPS * 10KB)\n");
+    printf("  SSD:  400 MB/s (100,000 IOPS * 4KB)\n");
+    printf("  NVMe: 3200 MB/s (800,000 IOPS * 4KB)\n");
+}
+
+int main(void) { show_io_latency(); return 0; }
+```
+
+This output proves the devastating penalty of random access on mechanical media. An HDD must physically move a read head (seek time ~5ms) and wait for the platter to rotate (rotational latency ~4ms). This 9ms mechanical cost caps the drive at ~111 operations per second. If we read 4KB randomly, we get less than 1MB/s bandwidth. Sequentially, the head never moves, yielding 200MB/s. NVMe SSDs, having no moving parts, suffer far less from random access, delivering 3200x the random I/O performance of an HDD.
+
+### Discard the throwaway
+This code is discarded. It is a static comparison and will not be maintained.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: `src/hierarchy.c` (modified)
+- **Change type**: Replace
+- **Location**: Replacing the entire contents.
+- **Dependencies**: The standard C library.
+
+### The New Code
+```c
+#include <stdio.h>
+
+void show_io_latency(void) {
+    printf("Sequential I/O:\n");
+    printf("  HDD:  200 MB/s  -> reading 1GB = 5 seconds\n");
+    printf("  SSD:  2000 MB/s -> reading 1GB = 0.5 seconds\n");
+    printf("  NVMe: 7000 MB/s -> reading 1GB = 0.14 seconds\n");
+    printf("Random I/O (4KB blocks):\n");
+    printf("  HDD:  1 MB/s (100 IOPS * 10KB)\n");
+    printf("  SSD:  400 MB/s (100,000 IOPS * 4KB)\n");
+    printf("  NVMe: 3200 MB/s (800,000 IOPS * 4KB)\n");
+}
+
+int main(void) { show_io_latency(); return 0; }
+```
+
+### The Updated Project
+```c
+1: #include <stdio.h>
+2: 
+3: void show_io_latency(void) { // ← new
+4:     printf("Sequential I/O:\n");
+5:     printf("  HDD:  200 MB/s  -> reading 1GB = 5 seconds\n");
+6:     printf("  SSD:  2000 MB/s -> reading 1GB = 0.5 seconds\n");
+7:     printf("  NVMe: 7000 MB/s -> reading 1GB = 0.14 seconds\n");
+8:     printf("Random I/O (4KB blocks):\n");
+9:     printf("  HDD:  1 MB/s (100 IOPS * 10KB)\n");
+10:    printf("  SSD:  400 MB/s (100,000 IOPS * 4KB)\n");
+11:    printf("  NVMe: 3200 MB/s (800,000 IOPS * 4KB)\n");
+12:}
+13:
+14:int main(void) { // ← new
+15:    show_io_latency();
+16:    return 0;
+17:}
+```
+We replaced the cache demonstration with the I/O latency table.
+
+### Mechanical walkthrough
+- `void show_io_latency(void)`: Defines a function taking no parameters and returning nothing.
+- `printf("Sequential I/O:\n");`: Prints a header for sequential speeds.
+- `printf("  HDD:  200 MB/s...");`: Prints HDD sequential speed.
+- `printf("  SSD:  2000 MB/s...");`: Prints SATA SSD sequential speed.
+- `printf("  NVMe: 7000 MB/s...");`: Prints NVMe SSD sequential speed.
+- `printf("Random I/O (4KB blocks):\n");`: Prints a header for random 4KB read speeds.
+- `printf("  HDD:  1 MB/s...");`: Prints HDD random speed.
+- `printf("  SSD:  400 MB/s...");`: Prints SATA SSD random speed.
+- `printf("  NVMe: 3200 MB/s...");`: Prints NVMe SSD random speed.
+- `int main(void) {`: Program entry point.
+- `show_io_latency();`: Calls the latency function.
+- `return 0;`: Exits gracefully.
+
+### CS lens
+This explores the hardware limitations of **Magnetic Storage vs NAND Flash**. HDDs rely on a spinning disk and a moving actuator arm. This mechanical reality enforces a strict penalty on random accesses. SSDs use NAND flash memory, where bits are trapped in floating-gate transistors. While SSDs eliminate seek times, they introduce **write amplification**, because flash memory can only be erased in large blocks (typically 4KB to 4MB), meaning changing a single byte requires rewriting an entire block.
+
+### SE lens
+**Data structures must respect the underlying storage medium.** The 500x difference between random and sequential HDD access is exactly why databases do not use standard binary search trees on disk. They use B-trees, which have massive nodes (often 4KB or 8KB) that align precisely with disk sectors, minimizing tree depth and converting random pointer chasing into dense, sequential block reads.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+Sequential I/O:
+  HDD:  200 MB/s  -> reading 1GB = 5 seconds
+  SSD:  2000 MB/s -> reading 1GB = 0.5 seconds
+  NVMe: 7000 MB/s -> reading 1GB = 0.14 seconds
+Random I/O (4KB blocks):
+  HDD:  1 MB/s (100 IOPS * 10KB)
+  SSD:  400 MB/s (100,000 IOPS * 4KB)
+  NVMe: 3200 MB/s (800,000 IOPS * 4KB)
+```
+The program trivially prints the requested static text.
+
+### One sentence connecting to previous unit
+Knowing how these devices fetch data in chunks sets the stage for the final piece of the puzzle: organizing our software's behavior to actually take advantage of those chunks.
+
+## Concept Unit: The principle of locality — why the hierarchy works
+
+### The Problem
+If reading DRAM takes 180 CPU cycles, and the cache only holds a minuscule fraction of the data, why aren't all programs unplayably slow? By what mechanism do the caches "know" which bytes of DRAM to keep close to the CPU? If we access an array, what determines if we hit the fast SRAM or stall on the slow DRAM?
+
+### Introduce the concept in isolation
+We will write a C program contrasting good memory access patterns against poor ones to demonstrate **spatial locality**.
+
+```c
+#include <stdio.h>
+
+void good_locality(int *arr, int n) {
+    long sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += arr[i];
+    printf("good sum = %ld\n", sum);
+}
+
+void poor_locality(int *arr, int n) {
+    long sum = 0;
+    for (int i = 0; i < n; i += 256)
+        sum += arr[i];
+    printf("poor sum = %ld\n", sum);
+}
+
+int main(void) {
+    int arr[1024*1024];  /* 4MB */
+    for (int i = 0; i < 1024*1024; i++) arr[i] = i;
+    good_locality(arr, 1024*1024);
+    poor_locality(arr, 1024*1024);
     return 0;
 }
 ```
-**Output:**
-```
-Both loops finished.
+
+This output proves that how we traverse data determines performance. `good_locality` accesses memory sequentially. The CPU loads a 64-byte cache line containing `arr[0]` to `arr[15]`. `arr[0]` is a miss, but `arr[1]` through `arr[15]` are guaranteed cache hits. This is a 6.25% miss rate. `poor_locality` jumps 256 integers (1024 bytes) at a time. It touches `arr[0]`, loads a 64-byte line, uses exactly one integer from it, and discards the rest. Every single access forces a DRAM fetch. This is a 100% miss rate. 
+
+### Discard the throwaway
+This code is discarded. It serves as a proof of concept for locality and will not remain in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: `src/hierarchy.c` (modified)
+- **Change type**: Replace
+- **Location**: Replacing the entire contents.
+- **Dependencies**: The standard C library.
+
+### The New Code
+```c
+#include <stdio.h>
+
+void good_locality(int *arr, int n) {
+    long sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += arr[i];
+    printf("good sum = %ld\n", sum);
+}
+
+void poor_locality(int *arr, int n) {
+    long sum = 0;
+    for (int i = 0; i < n; i += 256)
+        sum += arr[i];
+    printf("poor sum = %ld\n", sum);
+}
+
+int main(void) {
+    int arr[1024*1024];
+    for (int i = 0; i < 1024*1024; i++) arr[i] = i;
+    good_locality(arr, 1024*1024);
+    poor_locality(arr, 1024*1024);
+    return 0;
+}
 ```
 
-In Loop 1, the inner loop iterates over `j`. In C, 2D arrays are stored in row-major order, meaning `a[i][0]` is directly adjacent to `a[i][1]` in memory. This is called a stride-1 access pattern. When the CPU fetches `a[0][0]`, the L1 cache brings in a full 64-byte block (eight 8-byte doubles). The next 7 accesses hit the fast L1 cache.
+### The Updated Project
+```c
+1: #include <stdio.h>
+2: 
+3: void good_locality(int *arr, int n) { // ← new
+4:     long sum = 0;
+5:     for (int i = 0; i < n; i++)
+6:         sum += arr[i];
+7:     printf("good sum = %ld\n", sum);
+8: }
+9: 
+10:void poor_locality(int *arr, int n) { // ← new
+11:    long sum = 0;
+12:    for (int i = 0; i < n; i += 256)
+13:        sum += arr[i];
+14:    printf("poor sum = %ld\n", sum);
+15:}
+16:
+17:int main(void) { // ← new
+18:    int arr[1024*1024];
+19:    for (int i = 0; i < 1024*1024; i++) arr[i] = i;
+20:    good_locality(arr, 1024*1024);
+21:    poor_locality(arr, 1024*1024);
+22:    return 0;
+23:}
+```
+We have finalized the lesson's code by demonstrating how code structure exploits hardware behavior.
 
-In Loop 2, the inner loop iterates over `i`. The code jumps between rows: `a[0][0]`, `a[1][0]`, `a[2][0]`. Each jump skips 1024 doubles (8192 bytes) into the future. None of these elements exist in the same 64-byte cache line. Therefore, every single access results in a cache miss, forcing the CPU to wait hundreds of cycles for DRAM. Loop 2 may be 10-100× slower because it misses the cache on every single iteration.
+### Mechanical walkthrough
+- `void good_locality(int *arr, int n)`: Defines a function taking an integer pointer (an array) and its size.
+- `long sum = 0;`: Initializes an accumulator.
+- `for (int i = 0; i < n; i++)`: Iterates sequentially, incrementing by 1.
+- `sum += arr[i];`: Adds the current array element to the sum.
+- `printf("good sum = %ld\n", sum);`: Prints the final accumulated sum for the good locality test.
+- `void poor_locality(int *arr, int n)`: Defines a function taking an integer pointer and its size.
+- `long sum = 0;`: Initializes a second accumulator.
+- `for (int i = 0; i < n; i += 256)`: Iterates over the array, but strides forward by 256 elements each time.
+- `sum += arr[i];`: Adds the element to the sum.
+- `printf("poor sum = %ld\n", sum);`: Prints the final sum for the poor locality test.
+- `int main(void) {`: The main program entry point.
+- `int arr[1024*1024];`: Allocates a 4MB array on the stack.
+- `for (int i = 0; i < 1024*1024; i++) arr[i] = i;`: Initializes the array with sequential integers.
+- `good_locality(arr, 1024*1024);`: Calls the good locality function.
+- `poor_locality(arr, 1024*1024);`: Calls the poor locality function.
+- `return 0;`: Exits successfully.
+
+### CS lens
+This is the **Principle of Locality**, the core assumption that makes caches effective. It has two forms. **Temporal locality** states that recently accessed data is likely to be accessed again (e.g., local variables in a tight loop). **Spatial locality** states that data near recently accessed data is likely to be accessed next (e.g., sequentially iterating over an array). The entire memory hierarchy works purely because real-world programs exhibit both forms of locality.
+
+### SE lens
+**The working set size.** A program's "working set" is the amount of memory it actively needs to accomplish its current phase of execution. If the working set fits entirely within L1 cache, the program runs at L1 speeds (1-4 cycles per element). If the working set exceeds L3 cache and spills into DRAM, the program runs at DRAM speeds (100 cycles per element). Software engineers optimize critical paths not just by reducing instruction counts, but by shrinking the working set so it fits inside the fastest available tier of the memory hierarchy.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+good sum = 524287438848
+poor sum = 2046976
+```
+The calculations are deterministic integer accumulations over the array. 
+
+### One sentence connecting to previous unit
+Understanding how the hardware buffers data through these caches leads directly to the programmer's job of optimizing code to take advantage of them.
 
 ## Closing
-
-Storage technology determines the memory hierarchy's structure. The physical realities of SRAM, DRAM, and disks dictate that data must be staged and cached in progressively larger, slower pools. The hierarchy's structure determines what code is fast and what code is slow. Lesson 14 introduces the principle of locality — the one idea that explains almost all cache-related performance phenomena.
-
-**Exercises:**
-1. Compute the average rotational latency for a 7200 RPM drive. (Hint: 1 minute / 7200 rotations).
-2. Explain why DRAM must be periodically refreshed but SRAM does not.
-3. Calculate the number of bus cycles needed to transfer one 64-byte cache line over a 64-bit wide memory bus.
+### Connect the pieces
+The memory hierarchy is a speed, cost, and size tradeoff implemented entirely in hardware. Let's trace a single memory access across it. When the CPU requests `arr[0]`, it first checks its internal registers. Finding nothing, it issues a request to the **L1 cache**. If L1 misses, it checks **L2**, then **L3**. If all caches miss, the request hits the **DRAM** controller, stalling the CPU for ~180 cycles while the DRAM fetches exactly one **cache line** (64 bytes) containing `arr[0]` through `arr[15]`. That 64-byte line is pulled up through L3, L2, and placed in a specific **set** and **way** in L1. `arr[0]` is finally handed to the CPU register. Because of **spatial locality**, the next request for `arr[1]` will instantly hit the L1 cache. If `arr` was large enough to exceed DRAM, the operating system would fetch a 4KB page from the **SSD** (taking ~100 microseconds) or the **HDD** (taking ~10 milliseconds), orders of magnitude slower still. The programmer's job is to structure data and access patterns so that the working set fits in the fastest level possible. Lesson 14 covers locality — the specific techniques for restructuring code to do exactly that.

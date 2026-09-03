@@ -1,777 +1,669 @@
-# Lesson 19: What the Operating System Does — Abstraction, Isolation, Multiplexing
+# Lesson 19: What the OS Does — Processes, Kernel Mode, System Calls, and Exceptions
 
-The reader will understand the three fundamental roles the OS plays (virtualization, concurrency, persistence), the key abstractions it provides (process, virtual memory, file), and the mechanism by which user programs request OS services (system calls via traps). The transferable insight: the OS is not magic -- it is a C program that runs in a privileged hardware mode and provides illusions to user programs. Understanding what the OS does makes every system call, every signal, and every segfault comprehensible.
+**What you will build**
+The reader will understand what the OS kernel does and HOW it does it: user vs. kernel mode, the exception/interrupt mechanism, system calls as controlled mode transitions, and the process abstraction. The transferable insight is that the OS is not magic. It is software that runs in a privileged mode and gains control via hardware exceptions. Every interaction between your program and the system (file I/O, network, memory allocation, process creation) is fundamentally a system call.
 
-**What you need to know first:**
-- Lesson 18
+**What you need to know first**
+Lessons 00-18. 
 
-**Terms used in this lesson:**
-- **Virtualization** — the OS makes shared hardware appear private and infinite to each process.
-- **Concurrency** — the OS manages multiple tasks running simultaneously, ensuring fair time-sharing and safe synchronization.
-- **Persistence** — the OS ensures data survives power cycles by organizing it on durable storage.
-- **Process** — an instance of a running program with its own address space, CPU context, and open files.
-- **Virtual Memory** — an abstraction that makes each process think it owns the entire address space.
-- **File** — a sequence of bytes used to abstract disks, devices, pipes, and sockets.
-- **Kernel mode** — the hardware privilege level with full access to all CPU instructions and memory.
-- **User mode** — the restricted hardware privilege level where ordinary programs run.
-- **System call** — a controlled entry into the kernel for a user program to request a privileged service.
-- **Exception** — an abrupt change in the control flow in response to a change in processor state (interrupt, trap, fault, abort).
-- **Context switch** — the OS mechanism for multiplexing the CPU by saving one process's state and loading another's.
-- **`#include`** — a C preprocessor directive used to include the contents of a standard header file into the current file.
-- **`int`** — a primitive C data type representing a standard integer.
-- **`void`** — a C keyword indicating the absence of a value or parameters.
-- **`return`** — a C keyword used to exit a function and optionally pass a value back to the caller.
-- **Pointer (`*`)** — a C variable that stores the memory address of another value.
-- **Address-of (`&`)** — a C operator that returns the memory address of its operand.
-- **`if` / `else`** — C control flow constructs used for conditional execution.
-- **`struct`** — a C keyword used to define a composite data type that groups variables of different types.
-- **`long`** — a primitive C data type representing an integer larger than a standard `int`.
-- **`pid_t`** — a POSIX data type representing a process identifier.
-- **`ssize_t`** — a POSIX data type used for a byte count or error indication.
+**Terms used in this lesson**
+- **Ring 0 / Kernel Mode** — The hardware-enforced CPU privilege level where the operating system kernel runs. Code here can execute any instruction, access any memory address, and interact directly with hardware peripherals. It exists to protect the system from malicious or buggy user programs.
+- **Ring 3 / User Mode** — The restricted CPU privilege level where normal applications run. Code here cannot directly access hardware or kernel memory, and must ask the kernel for help via system calls. It exists to isolate applications from each other and from the OS itself.
+- **System Call (syscall)** — A controlled mechanism that intentionally triggers an exception to switch the CPU from Ring 3 to Ring 0, jumping to a pre-registered OS handler. It exists because user-mode code cannot perform privileged operations directly.
+- **Exception** — A hardware event that abruptly changes the CPU's control flow, switching execution to the kernel. It exists to handle asynchronous events (interrupts), intentional requests (traps/syscalls), and errors (faults and aborts).
+- **Process** — The kernel's abstraction of a running program. It exists to give each program the illusion that it has exclusive use of the CPU and its own private, contiguous memory space, simplifying application development.
+- **Context Switch** — The mechanism by which the OS saves the CPU registers and memory state of a running process and restores the state of a different process. It exists to multiplex a single CPU across many concurrent processes.
+- **Virtual File System (/proc)** — An interface provided by the kernel that looks like normal files and directories but actually queries kernel data structures in real-time. It exists to allow user-space tools to inspect OS state using standard file I/O operations.
 
-**Objects and methods used:**
-- **`printf`**
-  - *What it is:* A formatted output function from the C standard library.
-  - *Implementation:* `int printf(const char *format, ...);`
-  - *Its use:* Used to demonstrate user-level printing that eventually requires a system call.
-  - *Type:* A variadic library function.
-  - *Responsibility:* Formats data into a character string and writes it to standard output.
-  - *Depends on:* The string format and any variables matching the format specifiers.
-  - *Connects to:* Calls `write()` internally to pass the formatted string to the OS.
-  - *Shape:* A standard library API available to all C programs.
+**Objects and methods used**
 
-- **`getpid`**
-  - *What it is:* A system call wrapper that retrieves the process ID of the calling process.
+- **getpid**
+  - *What it is:* A POSIX standard library function that returns the Process ID of the calling process.
   - *Implementation:* `pid_t getpid(void);`
-  - *Its use:* Used to demonstrate the process abstraction.
-  - *Type:* A library function wrapping a system call.
-  - *Responsibility:* Returns the unique integer identifier assigned to the current process by the OS.
-  - *Depends on:* Nothing (takes `void`).
-  - *Connects to:* Executes a trap instruction to ask the OS kernel for the PID.
-  - *Shape:* A POSIX standard system call interface.
+  - *Its use:* Used in this lesson to demonstrate a basic, simple system call that queries the kernel for information.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Queries the OS kernel for the unique integer identifying the current running process.
+  - *Depends on:* The underlying OS kernel providing a system call to retrieve process metadata.
+  - *Connects to:* Called by user code; calls into the kernel's process management subsystem.
+  - *Shape:* A public API in `<unistd.h>` serving as a thin wrapper around a system call.
 
-- **`getppid`**
-  - *What it is:* A system call wrapper that retrieves the process ID of the parent process.
+- **getppid**
+  - *What it is:* A POSIX standard library function returning the Parent Process ID.
   - *Implementation:* `pid_t getppid(void);`
-  - *Its use:* Used to demonstrate the parent-child relationship of the process abstraction.
-  - *Type:* A library function wrapping a system call.
-  - *Responsibility:* Returns the PID of the process that created the current process.
-  - *Depends on:* Nothing (takes `void`).
-  - *Connects to:* Executes a trap instruction to ask the OS kernel for the parent's PID.
-  - *Shape:* A POSIX standard system call interface.
+  - *Its use:* Used to demonstrate retrieving relational metadata about processes.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Identifies the process that spawned the current process.
+  - *Depends on:* Kernel process tracking data structures.
+  - *Connects to:* Called by user code; queries kernel state.
+  - *Shape:* A public API in `<unistd.h>`.
 
-- **`malloc`**
-  - *What it is:* A memory allocation function from the C standard library.
-  - *Implementation:* `void *malloc(size_t size);`
-  - *Its use:* Used to demonstrate virtual memory allocation on the heap.
-  - *Type:* A library function.
-  - *Responsibility:* Allocates a block of uninitialized virtual memory of the specified size and returns a pointer to it.
-  - *Depends on:* The size in bytes to allocate.
-  - *Connects to:* May call `brk` or `mmap` system calls to request more memory from the OS if the heap is exhausted.
-  - *Shape:* A standard library API.
+- **getuid**
+  - *What it is:* A POSIX standard library function returning the Real User ID.
+  - *Implementation:* `uid_t getuid(void);`
+  - *Its use:* Used to show how the kernel tracks privileges and identity.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Retrieves the numeric ID of the user who launched the process.
+  - *Depends on:* Kernel security/credential data structures.
+  - *Connects to:* Called by user code; queries kernel state.
+  - *Shape:* A public API in `<sys/types.h>` and `<unistd.h>`.
 
-- **`free`**
-  - *What it is:* A memory deallocation function from the C standard library.
-  - *Implementation:* `void free(void *ptr);`
-  - *Its use:* Used to return dynamically allocated virtual memory to the heap.
-  - *Type:* A library function.
-  - *Responsibility:* Frees the memory space pointed to by `ptr`, making it available for further allocations.
-  - *Depends on:* A pointer previously returned by `malloc`, `calloc`, or `realloc`.
-  - *Connects to:* Updates the heap allocator's internal data structures.
-  - *Shape:* A standard library API.
-
-- **`write`**
-  - *What it is:* A system call wrapper for writing data to a file descriptor.
+- **write**
+  - *What it is:* A low-level POSIX system call wrapper for writing bytes to a file descriptor.
   - *Implementation:* `ssize_t write(int fd, const void *buf, size_t count);`
-  - *Its use:* Used to demonstrate the file abstraction and how user programs directly interact with the OS.
-  - *Type:* A library function wrapping a system call.
-  - *Responsibility:* Writes up to `count` bytes from the buffer `buf` to the open file descriptor `fd`.
-  - *Depends on:* An open file descriptor, a memory buffer containing data, and the number of bytes to write.
-  - *Connects to:* Executes a trap instruction to transfer control to the OS kernel to perform the actual write.
-  - *Shape:* A POSIX standard system call interface.
+  - *Its use:* Used to demonstrate a system call that moves data from user space to a kernel-managed device or file.
+  - *Type:* Standard C library function (syscall wrapper).
+  - *Responsibility:* Requests the kernel to transfer `count` bytes from the user buffer `buf` to the resource identified by `fd`.
+  - *Depends on:* An open, valid file descriptor and a valid memory buffer.
+  - *Connects to:* Called by user code; interacts with the kernel VFS (Virtual File System) layer and device drivers.
+  - *Shape:* The fundamental output primitive in POSIX systems, residing in `<unistd.h>`.
 
-- **`fork`**
-  - *What it is:* A system call wrapper used to create a new process.
-  - *Implementation:* `pid_t fork(void);`
-  - *Its use:* Used to demonstrate the process lifecycle and how the OS creates process instances.
-  - *Type:* A library function wrapping a system call.
-  - *Responsibility:* Creates a new child process by duplicating the calling parent process.
-  - *Depends on:* Nothing (takes `void`).
-  - *Connects to:* Executes a trap instruction; the kernel duplicates the process's memory space and context.
-  - *Shape:* A fundamental POSIX process creation API.
+- **signal**
+  - *What it is:* A standard C library function to set a signal handler.
+  - *Implementation:* `void (*signal(int signum, void (*handler)(int)))(int);`
+  - *Its use:* Used to catch a hardware fault (SIGSEGV) that the kernel translates into a user-space signal.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Registers a user-space function to be executed asynchronously when the kernel delivers a specific signal.
+  - *Depends on:* The kernel's signal delivery mechanism.
+  - *Connects to:* Called by user code; modifies process state in the kernel.
+  - *Shape:* A public API in `<signal.h>`.
 
-- **`waitpid`**
-  - *What it is:* A system call wrapper used to wait for state changes in a child process.
-  - *Implementation:* `pid_t waitpid(pid_t pid, int *wstatus, int options);`
-  - *Its use:* Used to demonstrate parent-child synchronization in the process lifecycle.
-  - *Type:* A library function wrapping a system call.
-  - *Responsibility:* Suspends execution of the calling process until a child specified by `pid` changes state.
-  - *Depends on:* The PID of the child to wait for, a pointer to store status information, and options flags.
-  - *Connects to:* Traps into the OS, which blocks the parent process until the child exits or changes state.
-  - *Shape:* A POSIX standard system call interface.
+- **setjmp**
+  - *What it is:* A standard C library macro/function that saves the current execution context.
+  - *Implementation:* `int setjmp(jmp_buf env);`
+  - *Its use:* Used to demonstrate recovering control flow after a severe fault, saving state before doing something dangerous.
+  - *Type:* Standard C library macro/function.
+  - *Responsibility:* Snapshots the CPU registers (like stack pointer and instruction pointer) into a buffer for later restoration.
+  - *Depends on:* A user-provided `jmp_buf` structure.
+  - *Connects to:* Called by user code; sets a jump target for `longjmp`.
+  - *Shape:* A non-local goto mechanism in `<setjmp.h>`.
 
-- **`WEXITSTATUS`**
-  - *What it is:* A macro used to extract the exit status of a child process.
-  - *Implementation:* `#define WEXITSTATUS(status) (((status) & 0xff00) >> 8)`
-  - *Its use:* Used to inspect the return value of a child process after `waitpid`.
-  - *Type:* A C preprocessor macro.
-  - *Responsibility:* Evaluates to the least significant 8 bits of the return code of the child process.
-  - *Depends on:* The integer status value populated by `waitpid`.
-  - *Connects to:* Operates directly on the integer status locally.
-  - *Shape:* A POSIX standard macro defined in `<sys/wait.h>`.
+- **longjmp**
+  - *What it is:* A standard C library function that restores an execution context.
+  - *Implementation:* `void longjmp(jmp_buf env, int val);`
+  - *Its use:* Used inside a signal handler to escape the faulting context and return to the safe state saved by `setjmp`.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Replaces the current CPU registers with those saved in `env`, causing execution to resume as if `setjmp` had just returned `val`.
+  - *Depends on:* A valid `jmp_buf` previously initialized by `setjmp`.
+  - *Connects to:* Called from within a signal handler; jumps back to the `setjmp` call site.
+  - *Shape:* A non-local goto mechanism in `<setjmp.h>`.
 
-- **`perror`**
-  - *What it is:* A library function that prints a system error message.
-  - *Implementation:* `void perror(const char *s);`
-  - *Its use:* Used to print the human-readable string corresponding to the current value of `errno`.
-  - *Type:* A standard library function.
-  - *Responsibility:* Translates an error code into a descriptive message and writes it to standard error.
-  - *Depends on:* An optional prefix string `s`, and the global `errno` variable set by the last failed system call.
-  - *Connects to:* Calls `write` on file descriptor 2 (stderr).
-  - *Shape:* A standard C library error handling function.
+- **syscall**
+  - *What it is:* A GNU C Library function that invokes a raw system call by number.
+  - *Implementation:* `long syscall(long number, ...);`
+  - *Its use:* Used to show exactly how user mode transitions to kernel mode by manually passing the syscall number and arguments.
+  - *Type:* Standard C library function (architecture specific).
+  - *Responsibility:* Executes the architecture-specific trap instruction (e.g., `syscall` on x86-64) with the provided arguments in the correct registers.
+  - *Depends on:* Architecture-specific calling conventions and valid syscall numbers.
+  - *Connects to:* Called by user code; triggers a trap to the kernel's syscall entry point.
+  - *Shape:* A low-level escape hatch in `<unistd.h>` and `<sys/syscall.h>`.
 
-## Concept Unit: The three roles of the OS
+- **fopen**
+  - *What it is:* A standard C library function for opening a file stream.
+  - *Implementation:* `FILE *fopen(const char *pathname, const char *mode);`
+  - *Its use:* Used to read from the `/proc` virtual filesystem.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Allocates a `FILE` structure, buffers, and calls the `open` system call.
+  - *Depends on:* A valid file path and the OS kernel's VFS layer.
+  - *Connects to:* Called by user code; calls the `open` syscall.
+  - *Shape:* The standard buffered I/O initialization in `<stdio.h>`.
 
-### The Problem
-Hardware is complex, messy, and finite. A computer has one CPU, a finite amount of RAM, and specific disk drives. If every user program had to write directly to the disk controller hardware to save a file, or if every program had to manually coordinate with other programs to share the CPU, writing software would be impossible. We need a layer between the hardware and the applications to manage these resources. What should that layer actually do?
+- **fgets**
+  - *What it is:* A standard C library function for reading a line from a stream.
+  - *Implementation:* `char *fgets(char *s, int size, FILE *stream);`
+  - *Its use:* Used to read text lines generated dynamically by the kernel from `/proc`.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Reads characters from a stream into a buffer until a newline or EOF is reached.
+  - *Depends on:* A valid, open `FILE` stream.
+  - *Connects to:* Called by user code; calls the `read` syscall under the hood.
+  - *Shape:* Buffered input primitive in `<stdio.h>`.
 
-### Introduce the concept in isolation
-Here is a conceptual view of how a user program interacts with the hardware, mediated by the Operating System (OS). We will write a tiny throwaway C program that simply prints "hello", but we will trace its execution conceptually.
+- **fclose**
+  - *What it is:* A standard C library function to close a file stream.
+  - *Implementation:* `int fclose(FILE *stream);`
+  - *Its use:* Used to cleanly release the file descriptor opened for `/proc`.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Flushes any pending output and closes the underlying file descriptor via the `close` syscall.
+  - *Depends on:* A valid, open `FILE` stream.
+  - *Connects to:* Called by user code; calls `close` in the kernel.
+  - *Shape:* Resource cleanup function in `<stdio.h>`.
 
-```c
-#include <stdio.h>
+- **snprintf**
+  - *What it is:* A standard C library function for safe string formatting.
+  - *Implementation:* `int snprintf(char *str, size_t size, const char *format, ...);`
+  - *Its use:* Used to dynamically build the `/proc/[pid]/status` file path string.
+  - *Type:* Standard C library function.
+  - *Responsibility:* Writes a formatted string into a buffer, ensuring it does not write more than `size` bytes.
+  - *Depends on:* A valid output buffer and a format string.
+  - *Connects to:* Called by user code.
+  - *Shape:* Safe string manipulation API in `<stdio.h>`.
 
-int main(void)
-{
-    printf("hello\n"); 
-    return 0;
-}
-```
-*Output (predicted):*
-```
-hello
-```
-This output proves that the string was sent to the terminal. But this is called **abstraction and virtualization**. The `printf` function does not push pixels to the screen. It calls the `write()` system call. `write()` is a trap instruction that switches the CPU from user mode to kernel mode. The OS kernel takes over, copies the bytes to a terminal device driver. The driver knows the specific hardware details and tells the graphics hardware to display the characters. 
+- **clock_gettime**
+  - *What it is:* A POSIX standard library function for high-resolution timing.
+  - *Implementation:* `int clock_gettime(clockid_t clk_id, struct timespec *tp);`
+  - *Its use:* Used to measure the actual elapsed time of a sleep, revealing the overhead of context switching.
+  - *Type:* POSIX standard library function.
+  - *Responsibility:* Queries a specific system clock to get the current time down to nanosecond precision.
+  - *Depends on:* Kernel timing subsystems and vDSO (virtual dynamic shared object) for fast retrieval.
+  - *Connects to:* Called by user code; often fulfilled without a full syscall via vDSO.
+  - *Shape:* Timing API in `<time.h>`.
 
-The OS plays three roles:
-1. **Virtualization**: The OS makes shared hardware appear private and infinite. The CPU virtualization gives each process the illusion it owns the entire CPU. Memory virtualization gives each process the illusion it has a massive, private address space. Storage virtualization makes the disk appear as a hierarchical file system, hiding the physical sectors.
-2. **Concurrency**: The OS manages multiple tasks running simultaneously. It uses time-sharing to rapidly switch the CPU between processes, and synchronization to ensure concurrent access to shared resources is safe.
-3. **Persistence**: The OS ensures data survives power cycles. It implements file systems to organize data on disk and uses journaling to recover from crashes without data corruption.
+- **nanosleep**
+  - *What it is:* A POSIX standard library function to suspend execution for a high-resolution time interval.
+  - *Implementation:* `int nanosleep(const struct timespec *req, struct timespec *rem);`
+  - *Its use:* Used to intentionally trigger a voluntary context switch by blocking the current process.
+  - *Type:* POSIX standard library function.
+  - *Responsibility:* Tells the kernel scheduler to put the process to sleep and not schedule it again until the requested time has elapsed.
+  - *Depends on:* The kernel's timer and scheduler mechanisms.
+  - *Connects to:* Called by user code; invokes a blocking syscall in the kernel.
+  - *Shape:* Process control API in `<time.h>`.
 
-### Discard the throwaway example
-The simple `printf` conceptual trace is discarded. It will not appear in the project again.
 
-### Project Change
-No reference counterpart — this is a from-scratch addition because we are exploring conceptual foundations of the OS.
-- **Files affected**: `os_roles.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: standard C library
-
-### The New Code
-```c
-/* The OS kernel is written in C (and some assembly). It runs first. */
-/* When your C program runs: */
-#include <stdio.h>
-
-int main(void)
-{
-    printf("hello\n");  /* this is NOT just printing to a screen */
-    /* printf() calls write() system call */
-    /* write() is a trap instruction that switches to kernel mode */
-    /* The kernel copies bytes to the terminal device driver */
-    /* The driver tells the hardware to display the characters */
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: /* The OS kernel is written in C (and some assembly). It runs first. */
-// 2: /* When your C program runs: */
-// 3: #include <stdio.h>
-// 4: 
-// 5: int main(void)
-// 6: {
-// 7:     printf("hello\n");  /* this is NOT just printing to a screen */
-// 8:     /* printf() calls write() system call */
-// 9:     /* write() is a trap instruction that switches to kernel mode */
-// 10:    /* The kernel copies bytes to the terminal device driver */
-// 11:    /* The driver tells the hardware to display the characters */
-// 12:    return 0;
-// 13: }
-```
-This file demonstrates the illusion of simplicity. The `main` function simply asks to print "hello".
-
-### Mechanical walkthrough
-- `#include <stdio.h>`: The preprocessor directive that includes the standard input/output library declarations, making `printf` available.
-- `int main(void)`: The entry point of the C program, where `int` specifies the integer return type and `void` indicates no arguments.
-- `{`: Opens the function body.
-- `printf("hello\n");`: A call to `printf`, passing the string literal `"hello\n"`. `printf` formats the string and eventually invokes the OS to do the actual I/O.
-- `return 0;`: The `return` statement exits the function, returning the integer 0 to the OS to indicate successful execution.
-- `}`: Closes the function body.
-
-The actual magic happens under the hood: the OS virtualization abstracts away the complexity of electrons and pixels into a simple function call.
-
-## Concept Unit: The three key OS abstractions
+## Concept Unit: Kernel mode vs. user mode — privilege levels
 
 ### The Problem
-If the OS virtualizes hardware, what specific shapes do these illusions take? How does a C program "see" the CPU, the memory, and the disk?
+How can an operating system protect itself and other programs from a buggy or malicious application? If any program could execute any instruction, it could wipe the hard drive or halt the CPU. How does the hardware physically restrict what normal programs can do?
 
 ### Introduce the concept in isolation
-We will look at the three abstractions: Process, Virtual Memory, and File.
-
-**Abstraction 1: Process**
 ```c
+/* User mode: your program runs here */
+/* - Cannot execute privileged instructions (hlt, cli, sti, in, out) */
+/* - Cannot access kernel memory (page table marks it non-accessible) */
+/* - Cannot directly access hardware (disk, NIC, GPU registers) */
+/* - Cannot modify page tables */
+
+/* Kernel mode: OS kernel runs here */
+/* - Can execute ALL instructions */
+/* - Can access ALL memory */
+/* - Can access hardware registers directly */
+/* - Controls which processes run (scheduler) */
+
+/* The CPU has a privilege level bit (Ring 0 = kernel, Ring 3 = user on x86) */
+/* User code: Ring 3. Kernel code: Ring 0. */
+/* Attempting a privileged op in Ring 3 -> General Protection Fault (exception) */
+
 #include <stdio.h>
 #include <unistd.h>
-
-int main(void) {
-    pid_t my_pid = getpid();
-    printf("My PID: %d\n", my_pid);
-    return 0;
-}
-```
-*Predicted output:*
-```
-My PID: 12345
-```
-This is called the **process abstraction**. The process is an instance of a running program. It has its own PID, CPU context, and address space.
-
-**Abstraction 2: Virtual Memory**
-```c
-#include <stdio.h>
-
-int global_var = 10;
-int main(void) {
-    printf("Global address: %p\n", (void*)&global_var);
-    return 0;
-}
-```
-*Predicted output:*
-```
-Global address: 0x601044
-```
-This is called **virtual memory**. The pointer address is a virtual address, not a physical hardware address in RAM. The OS maps it to physical memory transparently.
-
-**Abstraction 3: File**
-```c
-#include <unistd.h>
-int main(void) {
-    write(1, "test\n", 5);
-    return 0;
-}
-```
-*Predicted output:*
-```
-test
-```
-This is the **file abstraction**. Everything is a file. The `write` function takes a file descriptor (`1` for standard output) and writes bytes to it, treating the terminal exactly like a disk file.
-
-### Discard the throwaway example
-The three throwaway snippets are discarded. They will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition because we are demonstrating OS abstractions.
-- **Files affected**: `abstractions.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: POSIX libraries (`unistd.h`, `fcntl.h`)
-
-### The New Code
-```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-int global = 42;  /* lives in .data segment */
-
-int main(void)
-{
-    /* Abstraction 1: Process */
-    pid_t my_pid = getpid();   /* returns this process's ID */
-    pid_t parent  = getppid(); /* returns parent's PID */
-    printf("PID: %d, Parent PID: %d\n", my_pid, parent);
-
-    /* Abstraction 2: Virtual Memory */
-    int local = 100;  /* lives on the stack */
-    int *heap = malloc(sizeof(int));  /* lives on the heap */
-    *heap = 200;
-
-    printf("global: %p\n", (void*)&global); /* e.g. 0x601234 */
-    printf("local:  %p\n", (void*)&local);  /* e.g. 0x7fff1234 */
-    printf("heap:   %p\n", (void*)heap);    /* e.g. 0x1234560 */
-    free(heap);
-
-    /* Abstraction 3: File */
-    write(1, "hello\n", 6);  /* fd 1 = stdout = the terminal */
-    write(2, "error\n", 6);  /* fd 2 = stderr = also the terminal */
-    
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: #include <stdio.h>
-// 2: #include <stdlib.h>
-// 3: #include <unistd.h>
-// 4: #include <fcntl.h>
-// 5: 
-// 6: int global = 42;  /* lives in .data segment */
-// 7: 
-// 8: int main(void)
-// 9: {
-// 10:    /* Abstraction 1: Process */
-// 11:    pid_t my_pid = getpid();   /* returns this process's ID */
-// 12:    pid_t parent  = getppid(); /* returns parent's PID */
-// 13:    printf("PID: %d, Parent PID: %d\n", my_pid, parent);
-// 14: 
-// 15:    /* Abstraction 2: Virtual Memory */
-// 16:    int local = 100;  /* lives on the stack */
-// 17:    int *heap = malloc(sizeof(int));  /* lives on the heap */
-// 18:    *heap = 200;
-// 19: 
-// 20:    printf("global: %p\n", (void*)&global); /* e.g. 0x601234 */
-// 21:    printf("local:  %p\n", (void*)&local);  /* e.g. 0x7fff1234 */
-// 22:    printf("heap:   %p\n", (void*)heap);    /* e.g. 0x1234560 */
-// 23:    free(heap);
-// 24: 
-// 25:    /* Abstraction 3: File */
-// 26:    write(1, "hello\n", 6);  /* fd 1 = stdout = the terminal */
-// 27:    write(2, "error\n", 6);  /* fd 2 = stderr = also the terminal */
-// 28:    
-// 29:    return 0;
-// 30: }
-```
-This single program exercises all three core OS abstractions.
-
-### Mechanical walkthrough
-- `int global = 42;`: Declares a global integer variable. In the virtual memory abstraction, this is placed in the data segment.
-- `pid_t my_pid = getpid();`: Calls the `getpid()` function to get the current process ID, storing it in the `pid_t` variable `my_pid`. This relies on the process abstraction.
-- `pid_t parent  = getppid();`: Calls `getppid()` to get the parent process ID, storing it in `parent`.
-- `printf("PID: %d, Parent PID: %d\n", my_pid, parent);`: Prints the PIDs.
-- `int local = 100;`: Declares a local integer variable, which is placed on the process's stack in virtual memory.
-- `int *heap = malloc(sizeof(int));`: Calls `malloc()` to allocate memory on the heap. The return value is assigned to `heap`, a pointer to an integer (`int *`).
-- `*heap = 200;`: Dereferences the pointer to store the value 200 in the allocated heap memory.
-- `printf("global: %p\n", (void*)&global);`: Uses the address-of operator `&` to get the address of `global`, casts it to a void pointer, and prints it as a virtual memory address.
-- `printf("local:  %p\n", (void*)&local);`: Prints the virtual memory address of the local variable.
-- `printf("heap:   %p\n", (void*)heap);`: Prints the virtual memory address of the heap allocation.
-- `free(heap);`: Returns the dynamically allocated memory to the virtual memory manager.
-- `write(1, "hello\n", 6);`: Calls `write()` on file descriptor `1` (stdout). The OS treats the terminal as a file abstraction.
-- `write(2, "error\n", 6);`: Calls `write()` on file descriptor `2` (stderr).
-
-## Concept Unit: Kernel mode vs user mode
-
-### The Problem
-If the OS provides abstractions, what stops a user program from bypassing the OS and writing directly to the disk, or modifying another program's virtual memory? How is isolation enforced?
-
-### Introduce the concept in isolation
-We will write a C program that attempts to execute a privileged instruction that only the OS should be allowed to run.
-
-```c
-int main(void) {
-    /* Attempt to disable hardware interrupts */
-    __asm__ volatile ("cli");
-    return 0;
-}
-```
-*Predicted output:*
-```
-Segmentation fault (core dumped)
-```
-This is called **kernel mode vs user mode isolation**. The CPU has hardware privilege levels. On x86-64, Ring 0 is Kernel mode (full access), and Ring 3 is User mode (restricted access). The `cli` instruction disables hardware interrupts, which is a Ring 0 instruction. Because our C program runs in Ring 3, the CPU hardware itself blocks the instruction, raises a General Protection Fault, and the OS terminates our program with a Segmentation fault (SIGSEGV).
-
-### Discard the throwaway example
-The illegal instruction example is discarded. It will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `privilege.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: none
-
-### The New Code
-```c
-int main(void)
-{
-    /* This would be a privileged instruction -- illegal in user mode */
-    /* asm volatile ("cli"); */  /* disable interrupts -- only kernel can do this */
-    /* The CPU raises a General Protection Fault -> SIGSEGV or program termination */
-
-    /* Correct way: ask the OS via a system call */
-    /* write(1, "hello", 5); -> trap instruction -> kernel handles it */
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: int main(void)
-// 2: {
-// 3:     /* This would be a privileged instruction -- illegal in user mode */
-// 4:     /* asm volatile ("cli"); */  /* disable interrupts -- only kernel can do this */
-// 5:     /* The CPU raises a General Protection Fault -> SIGSEGV or program termination */
-// 6: 
-// 7:     /* Correct way: ask the OS via a system call */
-// 8:     /* write(1, "hello", 5); -> trap instruction -> kernel handles it */
-// 9:     return 0;
-// 10: }
-```
-This conceptual code illustrates that to interact with hardware safely, you cannot bypass the OS; you must ask the OS to do it on your behalf.
-
-### Mechanical walkthrough
-- `/* asm volatile ("cli"); */`: A commented-out inline assembly instruction that would attempt to clear the interrupt flag. If executed in user mode, it causes a hardware fault.
-- `/* write(1, "hello", 5); */`: A commented-out system call wrapper. Instead of doing the hardware work ourselves, we trap into the OS, which validates the request and performs it safely in kernel mode.
-
-## Concept Unit: System calls
-
-### The Problem
-If a user program is trapped in Ring 3 and cannot access hardware directly, how does it ever read a file or print to the screen? How do we securely transition from user mode to kernel mode?
-
-### Introduce the concept in isolation
-We will make a raw system call in assembly to demonstrate how the transition happens on x86-64.
-
-```c
-#include <unistd.h>
-
-int main(void) {
-    /* Raw system call to write(1, "hello", 5) */
-    __asm__ volatile (
-        "movq $1, %%rax\n"
-        "movq $1, %%rdi\n"
-        "leaq %0, %%rsi\n"
-        "movq $5, %%rdx\n"
-        "syscall\n"
-        : 
-        : "m" ("hello")
-        : "%rax", "%rdi", "%rsi", "%rdx"
-    );
-    return 0;
-}
-```
-*Predicted output:*
-```
-hello
-```
-This is called a **system call via a trap**. To ask the OS to do something, we load the system call number (1 for `sys_write`) into the `%rax` register, the arguments into `%rdi`, `%rsi`, and `%rdx`, and then execute the special `syscall` instruction. The `syscall` instruction is a hardware trap: it intentionally changes the CPU privilege level to Ring 0 and jumps to a predefined address in the OS kernel. The kernel handles the request, and then executes a return-from-trap instruction to resume the user program in Ring 3.
-
-### Discard the throwaway example
-The raw inline assembly system call is discarded. C libraries provide convenient wrappers. It will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `syscall_wrapper.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: POSIX standard library (`unistd.h`, `stdio.h`)
-
-### The New Code
-```c
-#include <unistd.h>
-#include <stdio.h>
-
-int main(void)
-{
-    /* write() in libc wraps the syscall instruction: */
-    ssize_t n = write(1, "hello", 5);  /* returns 5 on success */
-    if (n < 0) {
-        /* errno is set by the C library from the kernel error code */
-        perror("write");  /* prints: write: <error description> */
-        return 1;
-    }
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: #include <unistd.h>
-// 2: #include <stdio.h>
-// 3: 
-// 4: int main(void)
-// 5: {
-// 6:     /* write() in libc wraps the syscall instruction: */
-// 7:     ssize_t n = write(1, "hello", 5);  /* returns 5 on success */
-// 8:     if (n < 0) {
-// 9:         /* errno is set by the C library from the kernel error code */
-// 10:        perror("write");  /* prints: write: <error description> */
-// 11:        return 1;
-// 12:    }
-// 13:    return 0;
-// 14: }
-```
-This program uses the C library wrapper `write()` to safely execute a system call.
-
-### Mechanical walkthrough
-- `ssize_t n = write(1, "hello", 5);`: The `write` function is called and returns an `ssize_t` stored in `n`. Internally, it loads the registers and issues the `syscall` instruction. The OS executes the I/O and returns the number of bytes written.
-- `if (n < 0)`: Checks if the system call failed (e.g., bad file descriptor) using an `if` statement. The OS actually returns a negative error code (like `-EBADF`), but the C library wrapper detects the negative value, sets the global `errno` variable to the positive error code, and returns `-1` to the caller.
-- `perror("write");`: The `perror` function reads the global `errno` variable and prints the corresponding human-readable error message.
-- `return 1;`: Exits the program with a failure status.
-
-## Concept Unit: Exceptions
-
-### The Problem
-A system call is an intentional transition into the kernel, initiated by the program. But how does the OS regain control if the program is stuck in an infinite loop? Or how does it handle hardware events like a key press or a bad memory access?
-
-### Introduce the concept in isolation
-We will write a C program that triggers a division by zero.
-
-```c
-int main(void) {
-    int x = 1;
-    int y = 0;
-    int z = x / y;
-    return z;
-}
-```
-*Predicted output:*
-```
-Floating point exception (core dumped)
-```
-This is called an **exception**. An exception is a sudden change in control flow in response to a state change. There are four classes:
-1. **Interrupt**: Asynchronous (caused by hardware like a timer). Returns to the next instruction.
-2. **Trap**: Synchronous and intentional (like a system call). Returns to the next instruction.
-3. **Fault**: Synchronous and potentially recoverable (like a page fault or divide by zero). Returns to the current instruction to retry, or aborts if unrecoverable.
-4. **Abort**: Unrecoverable hardware error (like machine check). Never returns.
-
-The division by zero caused the CPU hardware to raise a fault. The CPU switched to kernel mode and jumped to the OS's exception handler. The OS determined the fault was a divide-by-zero, and since the program cannot recover, the OS sent a signal to terminate the program.
-
-### Discard the throwaway example
-The divide-by-zero example is discarded. It will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `exceptions.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: `stdlib.h`
-
-### The New Code
-```c
-#include <stdlib.h>
-
-int main(void)
-{
-    /* Trap: intentional, synchronous -- system calls use traps */
-    /* write(1, "hi", 2); */  /* syscall instruction: trap to kernel, return after */
-
-    /* Fault: recoverable error -- the OS may fix it and retry */
-    /* Page fault example: */
-    int *p = malloc(4096 * 1000);  /* allocate virtual memory (no physical pages yet) */
-    *p = 42;  /* first access: page fault! OS allocates a physical page, retries instruction */
-    /* transparent to the program -- appears to work normally */
-
-    /* Abort: unrecoverable */
-    /* Machine check: hardware detected uncorrectable memory error -> kernel aborts */
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: #include <stdlib.h>
-// 2: 
-// 3: int main(void)
-// 4: {
-// 5:     /* Trap: intentional, synchronous -- system calls use traps */
-// 6:     /* write(1, "hi", 2); */  /* syscall instruction: trap to kernel, return after */
-// 7: 
-// 8:     /* Fault: recoverable error -- the OS may fix it and retry */
-// 9:     /* Page fault example: */
-// 10:    int *p = malloc(4096 * 1000);  /* allocate virtual memory (no physical pages yet) */
-// 11:    *p = 42;  /* first access: page fault! OS allocates a physical page, retries instruction */
-// 12:    /* transparent to the program -- appears to work normally */
-// 13: 
-// 14:    /* Abort: unrecoverable */
-// 15:    /* Machine check: hardware detected uncorrectable memory error -> kernel aborts */
-// 16:    return 0;
-// 17: }
-```
-This conceptual program illustrates the different types of exceptions and how faults can be silently recovered by the OS.
-
-### Mechanical walkthrough
-- `int *p = malloc(4096 * 1000);`: The `malloc` function requests a large chunk of virtual memory, assigning the result to the pointer `p`. The OS grants the virtual address range but does not actually allocate physical RAM pages for it yet (lazy allocation).
-- `*p = 42;`: The program attempts to write to the memory by dereferencing the pointer `p`. The CPU checks the page table, finds no valid physical mapping, and raises a **page fault** exception. The CPU traps to the OS. The OS allocates a real physical page, updates the page table, and returns control to the *same instruction* `*p = 42;`. The instruction runs again, succeeds, and the user program never knew it was paused.
-
-## Concept Unit: Process lifecycle
-
-### The Problem
-If a process is an abstraction, how does a new one come into existence? How do programs like a shell start other programs?
-
-### Introduce the concept in isolation
-We will write a C program that creates a new process.
-
-```c
-#include <unistd.h>
-#include <stdio.h>
-
-int main(void) {
-    pid_t pid = fork();
-    if (pid == 0) {
-        printf("I am the child\n");
-    } else {
-        printf("I am the parent\n");
-    }
-    return 0;
-}
-```
-*Predicted output (order may vary):*
-```
-I am the parent
-I am the child
-```
-This is the **process lifecycle via fork**. The `fork()` system call creates a near-identical clone of the calling process. Both processes resume execution at the instruction immediately following `fork()`. They have separate memory spaces. They are distinguished only by the return value of `fork()`: it returns `0` to the new child process, and the child's PID to the parent.
-
-### Discard the throwaway example
-The simple fork example is discarded. It will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `process_lifecycle.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: POSIX standard library (`unistd.h`, `sys/wait.h`, `stdio.h`)
-
-### The New Code
-```c
-#include <unistd.h>
-#include <sys/wait.h>
-#include <stdio.h>
-
-int main(void)
-{
-    pid_t pid = fork();  /* create a copy of this process */
-
-    if (pid == 0) {
-        /* CHILD process: fork() returned 0 */
-        printf("Child: PID=%d\n", getpid());
-        /* child does work here */
-        return 0;  /* child exits */
-    } else {
-        /* PARENT process: fork() returned child's PID */
-        printf("Parent: child PID=%d\n", pid);
-        int status;
-        waitpid(pid, &status, 0);  /* wait for child to finish */
-        printf("Child exited with status %d\n", WEXITSTATUS(status));
-    }
-    return 0;
-}
-```
-
-### The Updated Project
-```c
-// 1: #include <unistd.h>
-// 2: #include <sys/wait.h>
-// 3: #include <stdio.h>
-// 4: 
-// 5: int main(void)
-// 6: {
-// 7:     pid_t pid = fork();  /* create a copy of this process */
-// 8: 
-// 9:     if (pid == 0) {
-// 10:        /* CHILD process: fork() returned 0 */
-// 11:        printf("Child: PID=%d\n", getpid());
-// 12:        /* child does work here */
-// 13:        return 0;  /* child exits */
-// 14:    } else {
-// 15:        /* PARENT process: fork() returned child's PID */
-// 16:        printf("Parent: child PID=%d\n", pid);
-// 17:        int status;
-// 18:        waitpid(pid, &status, 0);  /* wait for child to finish */
-// 19:        printf("Child exited with status %d\n", WEXITSTATUS(status));
-// 20:    }
-// 21:    return 0;
-// 22: }
-```
-This program creates a process, does different things in the parent and child, and synchronizes their execution.
-
-### Mechanical walkthrough
-- `pid_t pid = fork();`: Calls the `fork` system call to duplicate the process.
-- `if (pid == 0)`: Evaluates whether the current process is the child using the `if` construct. `fork` returns 0 in the child.
-- `printf("Child: PID=%d\n", getpid());`: In the child, calls `getpid()` to print its own PID.
-- `return 0;`: The child process exits successfully. When a process terminates, the OS reclaims its memory and CPU slices.
-- `else {`: Executed by the parent process using the `else` construct, where `pid` holds the positive integer PID of the newly created child.
-- `printf("Parent: child PID=%d\n", pid);`: The parent prints the child's PID.
-- `int status;`: Declares an integer to hold the child's exit status.
-- `waitpid(pid, &status, 0);`: The parent calls `waitpid`, which issues a system call. The OS puts the parent to sleep (blocks it) until the child process terminates. The child's exit status is written into the memory location pointed to by `&status`.
-- `printf("Child exited with status %d\n", WEXITSTATUS(status));`: The `WEXITSTATUS` macro extracts the 8-bit exit code (0 in this case) from the raw integer status, and prints it.
-
-## Concept Unit: Context switching
-
-### The Problem
-If we create multiple processes using `fork()`, and there is only one CPU core, how do they appear to run simultaneously? How does the OS multiplex the CPU among them without the programs constantly cooperating?
-
-### Introduce the concept in isolation
-No C program can truly show this in user space, because it happens invisibly underneath the program. We will conceptually trace what happens during a **context switch**. 
-
-The hardware includes a timer chip that interrupts the CPU every few milliseconds. This asynchronous timer interrupt forces the CPU to jump to the OS kernel. 
-The OS maintains a Process Control Block (PCB) for every process. When the timer fires while Process A is running, the OS saves Process A's state into A's PCB, picks Process B from the ready queue, loads B's state from B's PCB, and jumps to B's code.
-
-### Discard the throwaway example
-The conceptual trace stands on its own. It will not appear in the project again.
-
-### Project Change
-No reference counterpart.
-- **Files affected**: `pcb_structure.c` (created)
-- **Change type**: add
-- **Location**: brand new file
-- **Dependencies**: none
-
-### The New Code
-```c
-/* Conceptual structure (simplified from the Linux task_struct): */
 #include <sys/types.h>
 
-struct PCB {
-    pid_t    pid;           /* process ID */
-    long     regs[16];      /* saved general-purpose registers */
-    long     rip;           /* saved program counter */
-    long     rsp;           /* saved stack pointer */
-    long     cr3;           /* saved page table base address */
-    int      state;         /* RUNNING, READY, BLOCKED */
-    int      exit_status;
-    /* ... file descriptor table, signal masks, etc. */
-};
+int main(void) {
+    /* Everything we do goes through the kernel: */
+    pid_t pid = getpid();     /* syscall: kernel returns our PID */
+    pid_t ppid = getppid();   /* syscall: kernel returns parent PID */
+    uid_t uid  = getuid();    /* syscall: kernel returns user ID */
+
+    printf("PID=%d PPID=%d UID=%d\n", pid, ppid, uid);
+
+    /* printf itself uses write() syscall to write to fd 1 (stdout) */
+    /* write() is a syscall: CPU switches to kernel mode */
+    /* Kernel: validates the fd, copies bytes to the output buffer */
+    /* Kernel: returns number of bytes written */
+    /* CPU: switches back to user mode */
+    write(1, "direct write syscall\n", 21);
+    return 0;
+}
+/* Output (PIDs vary):
+   PID=12345 PPID=12300 UID=1000
+   direct write syscall */
+```
+This output proves that our application successfully communicated with the kernel to request information (PIDs, UIDs) and to perform a restricted operation (writing to a device). We did not interact with the screen directly; we asked the kernel to do it for us. This boundary is **Kernel Mode vs. User Mode**.
+
+### Discard the throwaway
+This code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a from-scratch addition because this lesson focuses on system fundamentals.
+- **Files affected:** None.
+- **Change type:** None.
+- **Location:** None.
+- **Dependencies:** None.
+
+### The New Code
+```c
+write(1, "direct write syscall\n", 21);
 ```
 
 ### The Updated Project
 ```c
-// 1: /* Conceptual structure (simplified from the Linux task_struct): */
-// 2: #include <sys/types.h>
-// 3: 
-// 4: struct PCB {
-// 5:     pid_t    pid;           /* process ID */
-// 6:     long     regs[16];      /* saved general-purpose registers */
-// 7:     long     rip;           /* saved program counter */
-// 8:     long     rsp;           /* saved stack pointer */
-// 9:     long     cr3;           /* saved page table base address */
-// 10:    int      state;         /* RUNNING, READY, BLOCKED */
-// 11:    int      exit_status;
-// 12:    /* ... file descriptor table, signal masks, etc. */
-// 13: };
+1: int main(void) {
+2:     // ... initialization code
+3:     write(1, "direct write syscall\n", 21); // <- new
+4:     return 0;
+5: }
 ```
-This is what the OS keeps track of in kernel memory for every process you run.
+We place a direct system call wrapper into our `main` entry point. This structure acts as a simple test bed to observe interactions with the operating system kernel.
 
 ### Mechanical walkthrough
-- `struct PCB {`: Defines the conceptual Process Control Block using the `struct` keyword to group data.
-- `pid_t pid;`: Stores the unique integer identifier for the process.
-- `long regs[16];`: An array of type `long` to store the state of the CPU's general-purpose registers (like `%rax`, `%rbx`) when the process is preempted.
-- `long rip;`: Stores the Instruction Pointer (program counter) indicating the exact memory address of the next instruction the process was about to execute before being paused.
-- `long rsp;`: Stores the Stack Pointer, keeping track of the process's call stack.
-- `long cr3;`: Stores the memory address of the process's page table. This is how the OS switches the virtual memory context. By loading a new value into the hardware `cr3` register, the whole virtual memory map instantly switches to the new process's map.
-- `int state;`: Tracks whether the process is currently running on the CPU, ready to run, or blocked (e.g., waiting for `waitpid` or disk I/O).
-- `int exit_status;`: Stores the value the process passed to `exit()` or returned from `main()`, to be later read by the parent's `waitpid()`.
-- `};`: Closes the struct definition.
+- **`write`**: A function call to a POSIX library wrapper.
+- **`(`**: Opens the argument list.
+- **`1`**: The first argument, an integer literal representing the file descriptor for standard output (stdout).
+- **`,`**: Separates arguments.
+- **`"direct write syscall\n"`**: A string literal providing the data buffer to write. The `\n` is the newline character.
+- **`,`**: Separates arguments.
+- **`21`**: An integer literal specifying the exact number of bytes to transfer.
+- **`)`**: Closes the argument list.
+- **`;`**: Terminates the statement.
 
-A context switch from A to B works precisely by saving all current CPU registers into A's PCB, then copying all registers from B's PCB into the physical CPU registers, and finally setting the CPU's instruction pointer to B's saved `rip`. This restores B exactly as it was when it was paused.
+### CS lens
+The fundamental CS concept is Privilege Separation. By creating hardware-enforced boundaries (Rings), systems can isolate critical components from untrusted or error-prone code. This appears in hypervisors managing VMs, web browsers isolating JavaScript tabs in sandboxes, and cloud architectures separating tenant network traffic.
 
----
-You now know what the OS is and what it does. The next six lessons peel back each OS service layer by layer. Lesson 20 covers processes in depth: `fork()`, `exec()`, `wait()`, and how the shell is just C code. 
+### SE lens
+A design principle here is the Facade or Gateway pattern at the OS level. Instead of exposing complex disk scheduling and hardware interrupts to applications, the kernel exposes a stable, abstract API (system calls). The tradeoff is performance overhead: transitioning across the user/kernel boundary costs CPU cycles.
 
-**Exercises:**
-1. List all three OS abstractions and their hardware counterparts.
-2. Trace what happens at the hardware level when you call `write(1, "hi", 2)`.
-3. Explain why a segfault (SIGSEGV) is delivered by the OS rather than directly by the CPU.
+### Commands needed
+`strace ./prog` (to trace the system calls made by a program).
+
+### Run it
+Trace `write(1, "direct write syscall\n", 21)`: user code executes `syscall` instruction (x86-64). CPU: saves user-mode registers (`rip`, `rsp`, `rflags`) to kernel stack. Switches to Ring 0. Jumps to kernel's syscall handler (address in `MSR_LSTAR` register). Kernel validates fd=1 (stdout), copies 21 bytes to kernel buffer, flushes to terminal device. Returns 21 in `rax`. CPU restores user-mode registers, switches to Ring 3. Execution resumes after syscall.
+
+### One sentence connecting to previous unit
+If user-mode applications cannot directly access the hardware or kernel memory, we must understand the exact mechanism by which the CPU transfers control to the kernel.
+
+## Concept Unit: Exceptions and interrupts — how the kernel gains control
+
+### The Problem
+How does the CPU actually transfer execution to the kernel? If your user-mode program is in an infinite loop, how does the OS ever get the CPU back to stop it?
+
+### Introduce the concept in isolation
+```c
+/* Four types of exceptions (CS:APP taxonomy): */
+/* 1. Interrupts: asynchronous, from HARDWARE (timer, disk, NIC) */
+/*    Timer interrupt fires ~1000x/sec -> kernel preempts running process */
+/*    Disk interrupt: disk has data ready -> kernel wakes waiting process */
+
+/* 2. Traps: intentional, synchronous (system calls) */
+/*    'syscall' instruction -> trap to kernel -> handle syscall -> return */
+
+/* 3. Faults: unintentional, potentially recoverable */
+/*    Page fault: access unmapped page -> kernel maps page -> re-execute */
+/*    Divide by zero: usually kills process (SIGFPE) */
+/*    Protection fault: access kernel memory from user mode -> SIGSEGV */
+
+/* 4. Aborts: unrecoverable hardware errors */
+/*    Machine check: uncorrectable RAM error -> kernel panic */
+
+#include <stdio.h>
+#include <signal.h>
+#include <setjmp.h>
+
+static jmp_buf jump_buf;
+
+void segv_handler(int sig) {
+    printf("Caught SIGSEGV (signal %d): page fault that couldn't be fixed\n", sig);
+    longjmp(jump_buf, 1);
+}
+
+int main(void) {
+    signal(SIGSEGV, segv_handler);
+    if (setjmp(jump_buf) == 0) {
+        int *bad_ptr = (int*)0xDEADBEEF;  /* invalid address */
+        printf("Accessing bad ptr...\n");
+        *bad_ptr = 42;  /* page fault -> SIGSEGV -> handler */
+    } else {
+        printf("Recovered from fault\n");
+    }
+    return 0;
+}
+/* Output:
+   Accessing bad ptr...
+   Caught SIGSEGV (signal 11): page fault that couldn't be fixed
+   Recovered from fault */
+```
+This output proves that when a program performs an illegal operation (writing to unmapped memory), the CPU hardware generates a **Fault (Exception)** that immediately pauses user execution, switches to kernel mode, and forces the kernel to handle the error—which then translates into a signal sent back to the user process. 
+
+### Discard the throwaway
+This code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a from-scratch addition.
+- **Files affected:** None.
+- **Change type:** None.
+- **Location:** None.
+- **Dependencies:** None.
+
+### The New Code
+```c
+*bad_ptr = 42;
+```
+
+### The Updated Project
+```c
+1:     if (setjmp(jump_buf) == 0) {
+2:         int *bad_ptr = (int*)0xDEADBEEF;
+3:         printf("Accessing bad ptr...\n");
+4:         *bad_ptr = 42;  // <- new
+5:     }
+```
+We inject an intentional invalid memory write into our program to force the hardware to generate an exception.
+
+### Mechanical walkthrough
+- **`*`**: The dereference operator. It instructs the CPU to interpret the following variable as a memory address and access the value at that location.
+- **`bad_ptr`**: A variable of type pointer-to-integer, containing an invalid address.
+- **`=`**: The assignment operator.
+- **`42`**: An integer literal.
+- **`;`**: Terminates the statement.
+
+### CS lens
+The fundamental CS concept is Asynchronous Control Flow. Hardware exceptions override the normal sequential execution of instructions. This is essential for preemptive multitasking, hardware event handling (like keyboard presses), and system stability (preventing one bad program from freezing the machine).
+
+### SE lens
+A design principle here is Inversion of Control. Instead of the application polling for errors or hardware events, the hardware forcefully notifies the system. The alternative—having user programs voluntarily yield control or check for interrupts—leads to uncooperative multitasking, where one frozen program locks the entire computer (as in early versions of Windows and Mac OS).
+
+### Commands needed
+None for this unit.
+
+### Run it
+Trace `*bad_ptr = 42`: CPU fetches `0xDEADBEEF` -> MMU checks page table -> no valid PTE (not mapped). MMU raises page fault exception (exception number 14). CPU: saves `rip` (address of faulting instruction), switches to kernel mode, calls kernel's page fault handler. Kernel: checks if `0xDEADBEEF` is a valid virtual address for this process. It's not (not in any VMA). Kernel sends SIGSEGV to process. Process signal handler runs. `longjmp` recovers.
+
+### One sentence connecting to previous unit
+While faults and interrupts are unplanned exceptions, programs intentionally trigger exceptions to request OS services.
+
+## Concept Unit: System calls — the controlled kernel entry point
+
+### The Problem
+If user mode cannot directly access the disk or network, but needs to read files and send packets, how exactly does it ask the kernel to perform these tasks on its behalf? 
+
+### Introduce the concept in isolation
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/syscall.h>
+
+int main(void) {
+    /* Every library function that talks to hardware uses syscalls: */
+    /* fopen() -> open() syscall (SYS_open = 2) */
+    /* fread() -> read() syscall (SYS_read = 0) */
+    /* malloc() -> mmap() or brk() syscall */
+    /* printf() -> write() syscall (SYS_write = 1) */
+    /* exit() -> exit_group() syscall (SYS_exit_group = 231) */
+
+    /* Making a syscall directly (Linux x86-64): */
+    /* rax = syscall number */
+    /* rdi,rsi,rdx,r10,r8,r9 = arguments */
+    /* syscall instruction -> kernel */
+    /* return value in rax */
+
+    /* Equivalent to write(1, "hello\n", 6): */
+    long ret = syscall(SYS_write, 1, "hello via syscall()\n", 20);
+    printf("write returned: %ld\n", ret);  /* 20 */
+
+    /* strace shows all syscalls a program makes: */
+    /* strace ./prog 2>&1 | head -20 */
+    /* Output shows: execve, brk, mmap, open, read, write, exit */
+    /* A 'hello world' program makes ~100 syscalls before main() */
+
+    return 0;
+}
+/* Output:
+   hello via syscall()
+   write returned: 20 */
+```
+This output proves that we can explicitly invoke an OS routine by supplying its unique identifying number (`SYS_write`) and arguments to the **System Call** interface, bypassing the standard library wrapper entirely. 
+
+### Discard the throwaway
+This code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a from-scratch addition.
+- **Files affected:** None.
+- **Change type:** None.
+- **Location:** None.
+- **Dependencies:** None.
+
+### The New Code
+```c
+long ret = syscall(SYS_write, 1, "hello via syscall()\n", 20);
+```
+
+### The Updated Project
+```c
+1: int main(void) {
+2:     long ret = syscall(SYS_write, 1, "hello via syscall()\n", 20); // <- new
+3:     printf("write returned: %ld\n", ret); 
+4:     return 0;
+5: }
+```
+We replace the standard `write` function call with a direct invocation of the raw system call mechanism to reveal the underlying machinery.
+
+### Mechanical walkthrough
+- **`long`**: The type declaration for the return value, capable of holding register-sized responses.
+- **`ret`**: The name of the variable storing the result.
+- **`=`**: The assignment operator.
+- **`syscall`**: A variadic library function that formats arguments into CPU registers and executes the trap instruction.
+- **`(`**: Opens the argument list.
+- **`SYS_write`**: A macro defined in `<sys/syscall.h>` representing the integer ID of the write system call (1 on x86-64).
+- **`,`**: Separates arguments.
+- **`1`**: The file descriptor argument.
+- **`,`**: Separates arguments.
+- **`"hello via syscall()\n"`**: The buffer argument.
+- **`,`**: Separates arguments.
+- **`20`**: The length argument.
+- **`)`**: Closes the argument list.
+- **`;`**: Terminates the statement.
+
+### CS lens
+The fundamental CS concept is an API boundary via Trap. Instead of a function call that jumps to a memory address, a system call triggers a hardware trap, which safely transitions the processor state. You see similar boundary transitions in RPC (Remote Procedure Calls) crossing a network, or FFI (Foreign Function Interfaces) crossing languages.
+
+### SE lens
+A design principle here is Architecture Isolation. By providing a fixed, numbered system call interface, the OS kernel can change its internal memory layout, structures, and algorithms freely without breaking user-space applications, as long as the syscall ABI (Application Binary Interface) remains stable.
+
+### Commands needed
+`strace` 
+
+### Run it
+Trace `syscall(SYS_write, 1, "hello...", 20)`: `syscall()` wrapper puts `SYS_write=1` in `rax`, `1` in `rdi` (fd), buffer address in `rsi`, `20` in `rdx`. Executes `syscall` instruction. CPU: saves state, switches to Ring 0, jumps to syscall dispatch table. Kernel: looks up handler for syscall 1 (`sys_write`). `sys_write`: validates fd 1 (stdout), copies 20 bytes from user space to kernel output buffer, flushes to terminal. Returns 20. CPU: restores user state, Ring 3. `rax=20`.
+
+### One sentence connecting to previous unit
+Because every program must use system calls for anything meaningful, the kernel becomes the ultimate mediator, tracking all these isolated running programs as separate processes.
+
+## Concept Unit: The process abstraction — what the kernel provides
+
+### The Problem
+If fifty different programs are running at once, how do they not corrupt each other's memory, and how do they all think they own the CPU? 
+
+### Introduce the concept in isolation
+```c
+/* A process is the OS's abstraction of a running program. */
+/* The kernel gives each process the ILLUSION of: */
+/* - Its own CPU (time-sliced by the scheduler) */
+/* - Its own private memory (virtual address space) */
+/* - Its own file descriptors (isolated from other processes) */
+
+/* Process state (from the kernel's perspective): */
+/* - Running: currently executing on a CPU */
+/* - Ready: could run, waiting for CPU */
+/* - Blocked (sleeping): waiting for I/O, timer, or signal */
+/* - Zombie: exited, parent hasn't called wait() yet */
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(void) {
+    /* Show process info from /proc: */
+    pid_t pid = getpid();
+    char path[64];
+
+    /* /proc/PID/status: process state, memory, etc. */
+    snprintf(path, sizeof(path), "/proc/%d/status", pid);
+    FILE *f = fopen(path, "r");
+    if (f) {
+        char line[128];
+        int lines = 0;
+        while (fgets(line, sizeof(line), f) && lines < 8) {
+            printf("%s", line);
+            lines++;
+        }
+        fclose(f);
+    }
+    /* Output (first 8 lines of /proc/PID/status): */
+    /* Name: prog */
+    /* Umask: 0022 */
+    /* State: R (running) */
+    /* Tgid: 12345 */
+    /* Ngid: 0 */
+    /* Pid: 12345 */
+    /* PPid: 12300 */
+    /* TracerPid: 0 */
+    return 0;
+}
+```
+This output proves that the kernel actively maintains detailed internal metadata about every running **Process**, tracking its state, identifiers, and resource usage, which it exposes through the virtual `/proc` filesystem.
+
+### Discard the throwaway
+This code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a from-scratch addition.
+- **Files affected:** None.
+- **Change type:** None.
+- **Location:** None.
+- **Dependencies:** None.
+
+### The New Code
+```c
+snprintf(path, sizeof(path), "/proc/%d/status", pid);
+```
+
+### The Updated Project
+```c
+1:     pid_t pid = getpid();
+2:     char path[64];
+3:     snprintf(path, sizeof(path), "/proc/%d/status", pid); // <- new
+4:     FILE *f = fopen(path, "r");
+```
+We construct a string path pointing into the Linux `/proc` filesystem to interrogate the kernel about our own process's status.
+
+### Mechanical walkthrough
+- **`snprintf`**: A standard library function call to format a string safely.
+- **`(`**: Opens the argument list.
+- **`path`**: The destination character array.
+- **`,`**: Separates arguments.
+- **`sizeof(path)`**: An operator evaluating to the total size in bytes of the `path` array, ensuring we don't write past its bounds.
+- **`,`**: Separates arguments.
+- **`"/proc/%d/status"`**: The format string literal. `%d` is a placeholder for a decimal integer.
+- **`,`**: Separates arguments.
+- **`pid`**: The integer variable holding our Process ID, which will replace the `%d` placeholder.
+- **`)`**: Closes the argument list.
+- **`;`**: Terminates the statement.
+
+### CS lens
+The fundamental CS concept is Virtualization/Abstraction. The OS provides each process with a "virtual machine" consisting of virtual memory and a virtual CPU. This pattern appears in containerization (Docker), virtual memory pagers, and hardware virtualization (Hyper-V).
+
+### SE lens
+A design principle here is Everything is a File. Unix-like systems expose kernel state (like process metadata in `/proc`) using the exact same filesystem APIs (`open`, `read`) used for reading text documents. The alternative would be creating hundreds of bespoke system calls for every tiny piece of OS information, which would bloat the kernel ABI.
+
+### Commands needed
+`/proc` (browsing the procfs via cat or shell).
+
+### Run it
+Trace: `fopen("/proc/12345/status",...)`: the `/proc` filesystem is a VIRTUAL filesystem -- there are no actual files on disk. The kernel generates the text content dynamically on demand when you read it. `fgets` reads kernel-generated text describing the process state. State: R (running) means this process is currently executing. State: S (sleeping) would mean blocked on a syscall.
+
+### One sentence connecting to previous unit
+To maintain the illusion that dozens of processes are running simultaneously, the kernel must constantly pause one process and switch to another.
+
+## Concept Unit: Context switching — how the kernel multiplexes the CPU
+
+### The Problem
+If a process is running on the CPU, and its time slice expires, how exactly does the OS take the CPU away and give it to someone else without losing the first program's progress?
+
+### Introduce the concept in isolation
+```c
+/* Context switch: saving one process's state, restoring another's */
+/* Trigger: timer interrupt (preemptive) or blocking syscall (voluntary) */
+
+/* What the kernel saves/restores: */
+/* - All 16 general-purpose registers (rax, rbx, ..., r15) */
+/* - %rip (instruction pointer: where to resume) */
+/* - %rsp (stack pointer: which stack to use) */
+/* - %rflags (condition codes) */
+/* - FPU/SSE/AVX state (optional: lazy save) */
+/* - cr3 (page table base: switches virtual address space) */
+
+/* Context switch cost: ~1-10 microseconds */
+/* Breakdown: */
+/* - Save/restore registers: ~100 ns */
+/* - Switch page tables (cr3 write): ~100 ns + TLB flush */
+/* - Cache warming (new process data not in cache): 1-5 us */
+
+#include <stdio.h>
+#include <unistd.h>
+#include <time.h>
+
+int main(void) {
+    /* Voluntary context switch: blocking syscall */
+    struct timespec req = {0, 1};  /* sleep 1 nanosecond */
+    struct timespec t0, t1;
+
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    nanosleep(&req, NULL);  /* blocks: kernel switches to another process */
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+
+    long actual_ns = (t1.tv_sec-t0.tv_sec)*1000000000L
+                   + (t1.tv_nsec-t0.tv_nsec);
+    printf("Requested 1ns sleep, actual: %ld ns\n", actual_ns);
+    /* Typically 50,000-100,000 ns (50-100 us): */
+    /* Overhead = scheduler latency + context switch cost */
+    return 0;
+}
+/* Output:
+   Requested 1ns sleep, actual: 54231 ns */
+/* The 54us overhead is the cost of two context switches */
+/* (this process -> idle/other -> this process) */
+```
+This output proves that a **Context Switch** is not instantaneous. By requesting an impossible 1-nanosecond sleep, we force the kernel to take the CPU away from our process and then give it back, allowing us to measure the actual time it takes to swap process states.
+
+### Discard the throwaway
+This code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a from-scratch addition.
+- **Files affected:** None.
+- **Change type:** None.
+- **Location:** None.
+- **Dependencies:** None.
+
+### The New Code
+```c
+nanosleep(&req, NULL);
+```
+
+### The Updated Project
+```c
+1:     struct timespec req = {0, 1}; 
+2:     struct timespec t0, t1;
+3:     clock_gettime(CLOCK_MONOTONIC, &t0);
+4:     nanosleep(&req, NULL);  // <- new
+5:     clock_gettime(CLOCK_MONOTONIC, &t1);
+```
+We intentionally block our own process by making a system call that sleeps, ensuring the kernel scheduler gets invoked to perform a context switch.
+
+### Mechanical walkthrough
+- **`nanosleep`**: A standard library function call that suspends execution.
+- **`(`**: Opens the argument list.
+- **`&`**: The address-of operator. It takes the memory address of the following variable.
+- **`req`**: The `timespec` struct containing the requested sleep duration.
+- **`,`**: Separates arguments.
+- **`NULL`**: A macro representing a null pointer, indicating we do not need the remaining un-slept time if interrupted.
+- **`)`**: Closes the argument list.
+- **`;`**: Terminates the statement.
+
+### CS lens
+The fundamental CS concept is State Multiplexing. A context switch pauses a state machine (the CPU executing a program), stores its exact state into memory, and loads a different state. This allows a limited resource (one CPU core) to be shared across many consumers.
+
+### SE lens
+A design principle here is Overhead vs. Responsiveness. The scheduler could let programs run for 1 whole second before switching, reducing context switch overhead. But the system would feel laggy. By switching every few milliseconds, the OS sacrifices raw throughput (wasting time swapping registers and flushing caches) to buy low latency (responsiveness). 
+
+### Commands needed
+None for this unit.
+
+### Run it
+Trace `nanosleep(&req, NULL)`: `write(CLOCK_NANOSLEEP, ...)` syscall. Kernel: marks process as SLEEPING. Removes from run queue. Scheduler picks another process to run. Timer interrupt fires: scheduler checks sleeping processes. After ~1ms (default timer resolution), our process is eligible. Scheduler places it on run queue. CPU executes our process: restores registers, resumes after syscall. Elapsed: 54us >> 1ns.
+
+### One sentence connecting to previous unit
+The kernel handles exceptions, fields system calls, and swaps out processes thousands of times a second to keep the system alive.
+
+## Closing
+
+### Connect the pieces
+Trace a `printf("hello")` call through ALL concept units from user space to kernel and back:
+When your **process** (Unit 4) in **Ring 3 / User Mode** (Unit 1) executes `printf`, the C library formats the string and eventually calls the `write` wrapper. The wrapper places the syscall number and arguments into registers and executes a hardware trap instruction, triggering an intentional **Exception** (Unit 2). The CPU immediately transitions to **Ring 0 / Kernel Mode** (Unit 1), saving your user state and jumping to the kernel's **System Call** handler (Unit 3). The kernel validates the file descriptor and writes "hello" to the terminal buffer. If writing to a disk instead of a terminal took a long time, the kernel might put your process to sleep and execute a **Context Switch** (Unit 5) to run another program while waiting. Once the write finishes, the CPU restores your registers and drops back down to Ring 3, resuming execution exactly where it left off, as if nothing happened. The OS is software running in Ring 0 that gains control via hardware exceptions. Lesson 20 covers processes — fork, exec, and wait. One sentence: every privilege boundary crossing — file I/O, network, memory allocation, process creation — is a hardware trap from Ring 3 to Ring 0, and the OS kernel is the only code that runs in Ring 0.

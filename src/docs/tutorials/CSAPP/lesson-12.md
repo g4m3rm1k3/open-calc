@@ -1,361 +1,465 @@
-# Lesson 12: Reading Compiler Output — gcc -O2 and What It Does
+# Lesson 12: Reading Compiler Output — What gcc -O2 Does to Your Code
 
-**Series:** Computer Systems: A Programmer's Perspective (CS:APP by Bryant & O'Hallaron)
-**Module:** Module 1 — From C to Machine (Final Lesson)
-**Language:** C and x86-64 assembly (AT&T syntax)
+The reader will be able to take any C function, compile it at -O0 and -O2, and understand what transformations the compiler applied and why. The transferable insight: the -O2 compiler is not magic; it applies a fixed set of well-understood transformations: inlining, constant folding, dead code elimination, strength reduction, and register allocation. Knowing what it can and cannot do tells you when to help it and when to get out of its way.
 
-## What You Need to Know First
-Lessons 00–11 (entire Module 0 and Lessons 05–11 of Module 1).
+What you need to know first: Lessons 00-11.
 
-## What You Will Build
-The reader will be able to read real compiler-optimized assembly, understand the major optimizations GCC applies at -O2, and know when undefined behavior enables transformations that break intuitions. The transferable insight: the compiler is smarter than you at code generation — but it only knows what the C standard guarantees. Undefined behavior gives it permission to do things that seem wrong to you but are correct per the standard. Reading assembly reveals both the compiler's power and its contract.
+**Terms used in this lesson:**
+- **Optimization level (-O0 / -O2)** — Compiler flags that dictate how much effort the compiler spends improving the generated code's performance and size. -O0 (the default) does almost no optimization, mapping C statements directly to assembly for easier debugging. -O2 turns on a broad set of safe optimizations that significantly improve performance.
+- **Register allocation** — The process by which the compiler decides which local variables and temporary values should be kept in fast CPU registers rather than slower memory (the stack).
+- **Constant folding** — An optimization where the compiler evaluates constant expressions (like `10 + 20`) at compile time rather than emitting instructions to compute them at runtime.
+- **Dead code elimination** — An optimization where the compiler removes code that it can prove will never be executed (like branches of an `if` statement whose condition is always false) or whose results are never used.
+- **Inlining** — An optimization where the compiler replaces a function call with the actual body of the called function, eliminating the overhead of the `call` and `ret` instructions and setting up a stack frame.
+- **Strength reduction** — An optimization where the compiler replaces a computationally expensive operation (like multiplication) with a cheaper but equivalent operation (like addition or bit shifting).
+- **Aliasing** — A situation where two different pointers refer to the same memory location. This limits the compiler's ability to optimize memory accesses, as writing to one pointer might unexpectedly change the value read from the other.
 
-## Objects and Methods
+**Objects and methods used:**
 
-### GCC Optimization Levels
-* **What it is**: Command-line flags (like `-O0`, `-O1`, `-O2`, `-O3`, `-Os`, `-Og`) that instruct the GCC compiler on how aggressively to transform the C source code into machine code to improve performance or reduce size.
-* **Implementation**: Implemented as optimization passes within the compiler backend, analyzing and rewriting intermediate representation (IR) code.
-* **Its use**: Used by programmers during the build process to balance compilation time, debuggability, binary size, and execution speed.
-* **Type**: Build configuration parameter.
-* **Responsibility**: To determine the set of algorithms the compiler applies to optimize the program.
-* **Depends on**: The C compiler (GCC or Clang) and the source code provided.
-* **Connects to**: The generated x86-64 assembly instructions.
-* **Shape**: A discrete scale of increasing transformational complexity (0 through 3).
+**`gcc`**
+- *What it is:* The GNU Compiler Collection's C compiler driver.
+- *Implementation:* An executable command-line tool (`gcc`).
+- *Its use:* We use it to compile C source code into assembly language or executable binaries, specifically testing its `-O0` and `-O2` flags to observe their effects.
+- *Type:* Command-line executable.
+- *Responsibility:* Orchestrates the preprocessing, compilation, assembly, and linking of C programs.
+- *Depends on:* Source files, command-line flags (like `-O2`, `-S`).
+- *Connects to:* Reads `.c` files, writes `.s` (assembly), `.o` (object), or executable files.
+- *Shape:* A build-time tool that sits between the source code and the final executable artifact.
 
-### Dead Code Elimination
-* **What it is**: An optimization where the compiler removes code that does not affect the program's observable behavior.
-* **Implementation**: The compiler builds a control flow graph and data dependency graph, identifying variables or branches whose results are never used or reached, and strips them from the output.
-* **Its use**: Used automatically by the compiler at `-O1` and higher to clean up redundant computations, often left over from macro expansions or unused variables.
-* **Type**: Compiler optimization pass.
-* **Responsibility**: To ensure the final binary does not contain instructions that perform useless work.
-* **Depends on**: Thorough static analysis of variable usage and branch conditions.
-* **Connects to**: The execution time and binary size (reducing both).
-* **Shape**: A subtraction operation on the instruction stream.
-
-### Common Subexpression Elimination (CSE)
-* **What it is**: An optimization that replaces identical expressions evaluated multiple times with a single evaluation.
-* **Implementation**: The compiler detects that the same calculation (e.g., `a + b`) occurs more than once without its operands changing in between, stores the result in a register, and reuses the register.
-* **Its use**: Automatically applied to avoid redundant CPU cycles computing the same arithmetic or memory address.
-* **Type**: Compiler optimization pass.
-* **Responsibility**: To minimize redundant arithmetic operations.
-* **Depends on**: Data flow analysis to prove operands have not been modified between uses.
-* **Connects to**: Register allocation (needs a place to store the common result).
-* **Shape**: A substitution mapping from multiple expressions to a single computed value.
-
-### Function Inlining
-* **What it is**: Replacing a function call with the actual body of the called function.
-* **Implementation**: The compiler copies the IR of the target function directly into the caller's IR, substituting parameters with the arguments provided.
-* **Its use**: Used to eliminate function call overhead (stack frame setup, branching) and to expose further optimization opportunities within the caller's context.
-* **Type**: Interprocedural compiler optimization.
-* **Responsibility**: To flatten the call graph where profitable for performance.
-* **Depends on**: The size of the called function and optimization heuristics.
-* **Connects to**: Code size (often increases it) and execution speed (often increases it).
-* **Shape**: An expansion of code at the call site.
-
-### Strength Reduction
-* **What it is**: Replacing an expensive operation (like multiplication or division) with an equivalent but cheaper sequence of operations (like bit shifts and additions).
-* **Implementation**: The compiler's instruction selection phase matches arithmetic patterns against hardware capabilities, e.g., using `leaq` for `x * 9`.
-* **Its use**: Applied automatically to decrease the latency of mathematical calculations on modern CPUs.
-* **Type**: Peephole and algebraic compiler optimization.
-* **Responsibility**: To lower the CPU cycle cost of arithmetic.
-* **Depends on**: The specific latencies of x86-64 instructions.
-* **Connects to**: Arithmetic operations like `*`, `/`, and `%`.
-* **Shape**: A structural transformation from one complex operator to multiple simple operators.
-
-### Undefined Behavior (UB)
-* **What it is**: Code constructs for which the C standard imposes no requirements on the compiler's behavior (e.g., dereferencing a null pointer, signed integer overflow).
-* **Implementation**: Compilers assume UB never happens. They use this assumption as an absolute axiom during static analysis to aggressively eliminate checks or optimize loops.
-* **Its use**: Used (often inadvertently by the programmer) to write code, which the compiler then exploits to heavily optimize based on the assumption that the UB state is unreachable.
-* **Type**: Language specification concept.
-* **Responsibility**: To provide a boundary for what the compiler must guarantee versus what it can freely optimize.
-* **Depends on**: The C Standard specification (ISO/IEC 9899).
-* **Connects to**: Security vulnerabilities and surprising runtime behaviors when assumptions are violated.
-* **Shape**: An unbounded set of possible runtime behaviors arising from invalid assumptions.
+**`restrict`**
+- *What it is:* A type qualifier in C (introduced in C99) for pointers.
+- *Implementation:* A keyword applied to a pointer declaration (e.g., `int * restrict p`).
+- *Its use:* We use it to promise the compiler that the memory accessed through this pointer is not accessed by any other pointer in the same scope, allowing the compiler to perform optimizations (like eliminating redundant memory loads/stores) it otherwise couldn't due to potential aliasing.
+- *Type:* C language keyword / type qualifier.
+- *Responsibility:* Asserts an absence of aliasing for a specific pointer.
+- *Depends on:* Must be applied to a pointer type.
+- *Connects to:* Affects the optimizer's assumptions during code generation.
+- *Shape:* An internal implementation detail and API contract modifier.
 
 ---
 
-## Concept Units
+## Concept Unit: -O0 vs -O2 — what optimization actually changes
 
-### Optimization Levels — What Each -O Flag Enables
-Optimization levels dictate how hard the compiler works to improve your code. Let's start with a throwaway lab to see this in practice before applying it to project code.
+### The Problem
+When you write C code, variables exist conceptually. But CPUs don't have C variables; they have a small set of fast registers and a large, slow memory (RAM). How does the compiler decide where to put your variables? If you compile without optimizations, what is the default behavior? Why might this default be terrible for performance?
+
+### Introduce the concept in isolation
 
 ```c
-/* Throwaway Lab: Constant Folding */
+/* compile_test.c */
+long square(long x) { return x * x; }
+```
+
+```asm
+# gcc -O0 square:
+square:
+    pushq  %rbp
+    movq   %rsp, %rbp
+    movq   %rdi, -8(%rbp)      # spill x to stack
+    movq   -8(%rbp), %rax      # reload x from stack
+    imulq  -8(%rbp), %rax      # x * x (reads from stack twice!)
+    popq   %rbp
+    ret
+# 7 instructions, accesses memory 3 extra times
+
+# gcc -O2 square:
+square:
+    movq   %rdi, %rax          # rax = x
+    imulq  %rdi, %rax          # rax = x * x
+    ret
+# 3 instructions, no memory access
+```
+
+Trace `-O0`: `x` arrives in the `%rdi` register (standard calling convention). The compiler stores it to the stack memory (`-8(%rbp)`), then immediately reloads it to the `%rax` register. This is needless: `-O0` compiles each statement in isolation with no optimization. At `-O2`: the register allocator keeps `x` in `%rdi` and multiplies `%rdi * %rdi` directly into `%rax`. No stack traffic is generated. This proves that `-O0` heavily relies on memory for safety and debugging, while `-O2` leverages registers for speed.
+
+### Discard the throwaway
+The `compile_test.c` file and its functions are discarded and will not be used in the main project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating compiler behavior on basic mathematical functions.
+- **Files affected**: Create `math_ops.c`.
+- **Change type**: Add.
+- **Location**: Entire file.
+- **Dependencies**: None.
+
+### The New Code
+
+```c
+long sum(long *arr, int n) {
+    long s = 0;
+    for (int i = 0; i < n; i++)
+        s += arr[i];
+    return s;
+}
+```
+
+### The Updated Project
+
+```c
+// ← new
+1: long sum(long *arr, int n) {
+2:     long s = 0;
+3:     for (int i = 0; i < n; i++)
+4:         s += arr[i];
+5:     return s;
+6: }
+```
+We have created a function `sum` that iterates over an array and accumulates its values.
+
+### Mechanical walkthrough
+- `long sum(long *arr, int n) {` declares a function returning a `long` integer, taking a pointer to `long` (`arr`) and an integer `n`.
+- `long s = 0;` declares a local accumulator variable `s` initialized to `0`.
+- `for (int i = 0; i < n; i++)` initiates a loop with an index `i` from `0` up to `n - 1`.
+- `s += arr[i];` adds the value at the `i`-th position of the array `arr` to the accumulator `s`.
+- `return s;` returns the accumulated sum.
+
+### CS lens
+**Register Allocation:** This is a fundamental problem in compiler design—mapping a potentially infinite number of program variables to a finite, small set of CPU registers. It appears in JIT compilers (like V8 for JavaScript), ahead-of-time compilers (like GCC or LLVM), and even in the microcode of modern processors that perform register renaming.
+
+### SE lens
+**Debuggability vs. Performance:** The `-O0` flag optimizes for the developer's experience (predictable line-by-line execution, variables always live in memory for a debugger to inspect). The `-O2` flag optimizes for the user's experience (maximum execution speed). You don't ship `-O0` code, but you often debug with it.
+
+### Commands needed
+`gcc -O0 -S math_ops.c` and `gcc -O2 -S math_ops.c` to generate the assembly output for comparison.
+
+### Run it
+Predicted confidently: `-O0` will generate a loop that constantly loads and stores `i` and `s` to the stack on every iteration. `-O2` will keep `s`, `i`, and the `arr` pointer in registers, avoiding memory access entirely except for reading the array elements.
+
+### One sentence connecting to previous unit
+Understanding how variables map to registers is the first step; next we will see how the compiler handles computations that don't need to happen at runtime at all.
+
+---
+
+## Concept Unit: Constant folding and dead code elimination
+
+### The Problem
+If you write `int x = 60 * 60 * 24;` to represent the number of seconds in a day, does the CPU actually perform two multiplications every time that line of code runs? What if you have debugging code wrapped in an `if (false)` block—does the CPU still have to evaluate the branch?
+
+### Introduce the concept in isolation
+
+```c
+int compute(void) {
+    int a = 10;
+    int b = 20;
+    int c = a + b;     /* 30: computed at compile time */
+    int d = c * 2;     /* 60: computed at compile time */
+    if (d > 100)       /* false: dead branch */
+        return -1;     /* dead code: never emitted */
+    return d;          /* always returns 60 */
+}
+```
+
+```asm
+# gcc -O2 compute:
+       movl   $60, %eax   # one instruction!
+       ret                # constant folded + dead code removed
+```
+
+Trace: The compiler evaluates `a + b = 30` and `c * 2 = 60` at COMPILE time (constant folding). It checks `d > 100`: `60 > 100` is false. The dead branch is eliminated. The remaining code is `return 60;`. It generates `movl $60, %eax; ret`. The entire sequence of variables and conditionals disappears. This proves that the compiler actively simplifies expressions and removes unreachable paths before generating assembly.
+
+### Discard the throwaway
+The `compute` function is discarded and will not be kept.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Modify `math_ops.c`.
+- **Change type**: Add.
+- **Location**: Below the `sum` function.
+- **Dependencies**: None.
+
+### The New Code
+
+```c
 #include <stdio.h>
-int f(void) { 
-    return 2 * 3 + 4; 
-}
-int main() {
-    printf("%d\n", f());
-    return 0;
+
+void unused_function(void) {
+    printf("I am never called\n");
 }
 ```
 
-This throwaway lab simply calculates a constant. Let's explicitly discard the main function and look at how the compiler translates `f()` at different optimization levels.
+### The Updated Project
+
+```c
+  long sum(long *arr, int n) {
+      // ... (body of sum)
+  }
+
+// ← new
+8: #include <stdio.h>
+9: 
+10: void unused_function(void) {
+11:     printf("I am never called\n");
+12: }
+```
+We added a function that is never called by any other function in our file.
+
+### Mechanical walkthrough
+- `#include <stdio.h>` includes the standard I/O library header to declare `printf`.
+- `void unused_function(void) {` declares a function taking no arguments and returning nothing.
+- `printf("I am never called\n");` calls the standard print function with a string literal.
+- `}` closes the function body.
+
+### CS lens
+**Static Analysis and Reachability:** Constant folding and dead code elimination are forms of static analysis. The compiler builds a control flow graph and proves that certain nodes (blocks of code) can never be reached from the entry point. This is the same principle used by garbage collectors (to find unreachable objects) and security auditing tools (to find unreachable code paths).
+
+### SE lens
+**Write for Humans:** Because the compiler folds constants automatically, you should write `60 * 60 * 24` instead of `86400`. The performance is identical, but the intent is vastly clearer. Do not pre-calculate constants manually if it obscures meaning.
+
+### Commands needed
+`gcc -O2 -S math_ops.c` to see if `unused_function` is emitted, and `gcc -O2 -flto -c math_ops.c` to see Link-Time Optimization behavior.
+
+### Run it
+Predicted confidently: Without LTO, `unused_function` will still appear in the `.s` file because the compiler doesn't know if another C file might call it. With Link-Time Optimization (`-flto`), the linker will see it's never called globally and completely remove it from the final binary.
+
+### One sentence connecting to previous unit
+While dead code is removed entirely, what happens to code that *is* called, but the act of calling it is too slow?
+
+---
+
+## Concept Unit: Inlining — eliminating function call overhead
+
+### The Problem
+Calling a function in C has a cost: the CPU must push the return address to the stack, jump to the function, set up a new stack frame, do the work, tear down the frame, and jump back. If a function is extremely small—like `return x * 3;`—the overhead of calling it might take longer than the multiplication itself. How can we abstract code into small functions without paying this penalty?
+
+### Introduce the concept in isolation
+
+```c
+static inline long triple(long x) { return x * 3; }
+
+long use_triple(long a, long b) {
+    return triple(a) + triple(b);
+}
+```
 
 ```asm
-# At -O0:
-f:
-    movl  $6, %eax    # 2*3 = 6
-    addl  $4, %eax    # 6 + 4 = 10
+# gcc -O2 use_triple:
+use_triple:
+    leaq   (%rdi,%rdi,2), %rax   # rax = a + 2*a = 3a (inlined triple(a))
+    leaq   (%rsi,%rsi,2), %rdx   # rdx = b + 2*b = 3b (inlined triple(b))
+    addq   %rdx, %rax            # rax = 3a + 3b
+    ret
+# No call instruction! triple's body substituted directly
+```
+
+Trace `use_triple(4, 5)`: Without inlining, we would have a `call` to `triple(4)` (pushing stack, multiplying, returning), then a `call` to `triple(5)`. With inlining, the compiler substitutes the body of `triple` directly into `use_triple`. The instruction `leaq (%rdi,%rdi,2), %rax` computes `4 + (4*2) = 12`. The next `leaq` computes `5 + (5*2) = 15`. The `addq` adds them to `27`. There are zero `call` instructions. This proves the compiler can flatten the call graph for efficiency.
+
+### Discard the throwaway
+The `triple` and `use_triple` functions are discarded.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Modify `math_ops.c`.
+- **Change type**: Add.
+- **Location**: Below `unused_function`.
+- **Dependencies**: None.
+
+### The New Code
+
+```c
+long add_one(long x) { return x + 1; }
+```
+
+### The Updated Project
+
+```c
+  void unused_function(void) {
+      printf("I am never called\n");
+  }
+
+// ← new
+14: long add_one(long x) { return x + 1; }
+```
+We added a small helper function `add_one` that doesn't even use the `inline` keyword.
+
+### Mechanical walkthrough
+- `long add_one(long x) {` declares a function taking a `long` and returning a `long`.
+- `return x + 1;` computes the value plus one and returns it.
+- `}` closes the function.
+
+### CS lens
+**Time/Space Tradeoff:** Inlining trades space for time. By copying the function body to every call site, the binary size increases, but the execution speed increases by avoiding call overhead. Too much inlining causes code bloat and can hurt instruction cache performance.
+
+### SE lens
+**The `inline` Keyword is a Hint:** In modern C, the `inline` keyword is merely a suggestion. At `-O2`, the compiler will aggressively inline small functions like `add_one` even without the keyword, and it may refuse to inline massive functions even if you request it. Trust the compiler's heuristics over manual hinting.
+
+### Commands needed
+`gcc -O2 -S math_ops.c`
+
+### Run it
+Predicted confidently: If we write a function `test()` that calls `add_one(5)`, the generated assembly for `test()` will simply contain an instruction to put `6` into `%rax`, completely bypassing a `call add_one` instruction, because GCC at `-O2` inlines small functions automatically.
+
+### One sentence connecting to previous unit
+Inlining removes the boundaries between functions, allowing the compiler to see more of the computation at once; this wider view enables optimizations that transform the operations themselves, like strength reduction.
+
+---
+
+## Concept Unit: Strength reduction and register allocation
+
+### The Problem
+If you have a loop `for (int i = 0; i < n; i++)` and inside it you access `arr[i]`, the CPU conceptually has to calculate the memory address on every iteration: `base_address + (i * size_of_element)`. Multiplication is slower than addition. Can the compiler find a faster way to step through memory?
+
+### Introduce the concept in isolation
+
+```c
+long sum_array(long *arr, int n) {
+    long s = 0;
+    for (int i = 0; i < n; i++)
+        s += arr[i];
+    return s;
+}
+```
+
+```asm
+# gcc -O2 sum_array:
+sum_array:
+    testl  %esi, %esi
+    jle    .return_zero      # if n <= 0: return 0
+    movl   %esi, %esi        # zero-extend n to 64-bit
+    leaq   (%rdi,%rsi,8), %rdx  # rdx = arr + n*8  (one past end)
+    xorl   %eax, %eax        # s = 0
+.loop:
+    addq   (%rdi), %rax      # s += *arr (direct memory add)
+    addq   $8, %rdi          # arr++ (pointer increment: +8 bytes)
+    cmpq   %rdx, %rdi        # arr == end?
+    jne    .loop             # no: continue
+    ret                      # return s in rax
+.return_zero:
+    xorl   %eax, %eax
     ret
 ```
 
-At `-O0`, the compiler performs no optimization. Each C statement maps to obvious assembly. The purpose is debugging: variables and steps stay exactly as written.
+Trace `sum_array([10,20,30], 3)`: `%rdx` holds the end address (`arr+24`). `%rax` is initialized to `0`. Iteration 1: `addq (%rdi), %rax` adds `10`. `%rdi` is incremented by 8 (bytes) to point to the next element. `cmpq` checks if we reached `%rdx`. Not equal. Iteration 2: Adds `30`. `%rdi` increments by 8. Iteration 3: Adds `60`. `%rdi` increments by 8, now equaling `%rdx`. The `jne` branch is not taken, and it returns `60`. This proves the compiler replaced `i * 8` with a simple `addq $8, %rdi` on each iteration—this is strength reduction.
 
-```asm
-# At -O2:
-f:
-    movl  $10, %eax   # compiler computed 2*3+4=10 at compile time!
-    ret
+### Discard the throwaway
+The `sum_array` function is already functionally similar to our `sum` function, but we discard this specific isolated code block.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: No files changed. We are analyzing the existing `sum` function from earlier.
+- **Change type**: None.
+- **Location**: N/A.
+- **Dependencies**: None.
+
+### The New Code
+(No new code to type; we are analyzing the `-O2` behavior of the `sum` function we wrote earlier.)
+
+### The Updated Project
+```c
+1: long sum(long *arr, int n) {
+2:     long s = 0;
+3:     for (int i = 0; i < n; i++)
+4:         s += arr[i];
+5:     return s;
+6: }
 ```
+We analyze this exact structure.
 
-At `-O2`, we see constant folding. The compiler evaluates constant expressions at compile time. The function body becomes a single instruction! Here is what each level generally does:
-- `-O0`: No optimization. Debugging focus.
-- `-O1`: Basic optimizations: constant folding, dead code elimination, register allocation.
-- `-O2`: Full optimization without size tradeoffs: loop optimizations, inlining, common subexpression elimination, strength reduction. DEFAULT for production builds.
-- `-O3`: Aggressive: vectorization, loop unrolling.
-- `-Os`: Optimize for size.
-- `-Og`: Optimize for debugging.
+### Mechanical walkthrough
+- We analyze the loop structure: `for (int i = 0; i < n; i++)` implies an index `i`.
+- The access `arr[i]` conceptually means `*(arr + i)`.
+- The `-O2` compiler transforms this into pointer arithmetic internally, maintaining a pointer that advances by `sizeof(long)` (8 bytes) on each iteration.
+- The `i` variable is often entirely optimized away; the compiler just compares the advancing pointer to the calculated end address of the array.
 
-### Dead Code Elimination
-Dead code elimination removes code that has no effect. Time for a throwaway lab.
+### CS lens
+**Algorithm Refinement:** Strength reduction is the compiler doing algorithmic optimization for you at a micro level. Replacing multiplication with addition in a loop is a classic technique that dates back to the earliest compilers (like FORTRAN). It shows up in graphics programming (Bresenham's line algorithm avoids floating-point math) and cryptography.
+
+### SE lens
+**Write Clear Code, Not "Fast" Code:** Developers sometimes write convoluted pointer arithmetic like `long *ptr = arr; while(ptr < end) { sum += *ptr++; }` thinking it's faster. As shown, the `-O2` compiler takes the readable `arr[i]` code and turns it into exact same pointer arithmetic assembly. Write the readable version.
+
+### Commands needed
+`gcc -O2 -S math_ops.c` and observe the output for `sum`.
+
+### Run it
+Predicted confidently: The assembly for our `sum` function will look exactly like the `sum_array` trace above. It will use `addq $8, %rdi` instead of multiplying an index by 8.
+
+### One sentence connecting to previous unit
+The compiler is incredibly smart about transforming loops and math, but there is one major blind spot that forces it to be conservative: pointers.
+
+---
+
+## Concept Unit: What the compiler CANNOT do — aliasing and side effects
+
+### The Problem
+If you write to the same memory location twice, can the compiler just skip the first write? `*p = 1; *p = 2;` can safely become just `*p = 2;`. But what if you write to two *different* pointers, `*p = 1; *q = 2; *p = 3;`? Can the compiler skip `*p = 1`? What if `p` and `q` point to the exact same memory address?
+
+### Introduce the concept in isolation
 
 ```c
-/* Throwaway Lab: Dead Code */
-int dead_code(int x)
-{
-    int y = x * 2;     /* computed but never used */
-    if (0) {           /* always false */
-        return -1;
-    }
-    return x + 1;
+void write_twice(int *p, int *q) {
+    *p = 1;
+    *q = 2;
+    *p = 3;
+}
+
+void write_twice_r(int * restrict p, int * restrict q) {
+    *p = 1;
+    *q = 2;
+    *p = 3;
 }
 ```
 
-We discard the lab context and analyze the raw assembly output at `-O2`:
+Trace `write_twice`: If `p == q`, the sequence must be: write 1 to `p`, write 2 to `q` (which overwrites `p` since they alias), write 3 to `p` (overwrites again). Final state: `*p == 3`, `*q == 3`. If the compiler aggressively removed `*p = 1` and just did `*q = 2; *p = 3;`, the final state is still `3`. BUT, what if another thread or hardware device reads `*q` *between* the writes? The compiler is forced to emit all three memory writes just in case. 
+Trace `write_twice_r`: By using the `restrict` keyword, we promise the compiler that `p` and `q` NEVER point to the same memory. Because it knows `*q = 2` cannot possibly overwrite the memory at `p`, it knows `*p = 1` is completely useless because `*p = 3` happens immediately after. It eliminates the first store entirely.
 
-```asm
-# At -O2:
-dead_code:
-    leal  1(%rdi), %eax    # eax = x + 1 (y and the if branch are gone!)
-    ret
-```
+### Discard the throwaway
+The `write_twice` functions are discarded.
 
-**Mechanical Trace:**
-1. The function takes `x` in register `%rdi`.
-2. The instruction `leal 1(%rdi), %eax` computes `x + 1` and stores it in `%eax` (the return register).
-3. `ret` returns control to the caller.
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Modify `math_ops.c`.
+- **Change type**: Add.
+- **Location**: Bottom of the file.
+- **Dependencies**: None.
 
-Notice what is missing. The compiler proves `y` is never read (a dead store) and the `if(0)` branch is mathematically unreachable (dead code). It eliminates both entirely. Profiling tools might show "0% time" for code you think runs because the compiler removed it.
-
-### Common Subexpression Elimination (CSE)
-When you write the same calculation multiple times, the compiler can reuse the result. Let's write a throwaway lab to demonstrate CSE.
+### The New Code
 
 ```c
-/* Throwaway Lab: Redundant Math */
-long cse(long a, long b, long c)
-{
-    return (a + b) * (a + b) + c;
+void update_counters(long * restrict a, long * restrict b) {
+    *a += 10;
+    *b += 20;
+    *a += 30;
 }
 ```
 
-Let's discard the lab and examine the `-O2` assembly:
-
-```asm
-# At -O2:
-cse:
-    leaq  (%rdi,%rsi), %rax   # rax = a + b
-    imulq %rax, %rax          # rax = (a+b)^2  -- computed ONCE
-    addq  %rdx, %rax          # rax += c
-    ret
-```
-
-**Mechanical Trace:**
-1. Arguments are passed in `%rdi` (a), `%rsi` (b), and `%rdx` (c).
-2. `leaq (%rdi,%rsi), %rax` computes `a + b` and stores the result in `%rax`.
-3. `imulq %rax, %rax` multiplies `%rax` by itself. The expression `(a + b)` is only computed ONCE. This is Common Subexpression Elimination.
-4. `addq %rdx, %rax` adds `c` to the accumulated result.
-5. `ret` returns the value in `%rax`.
-
-### Function Inlining
-Calling a function has overhead. Inlining removes it. Here is our throwaway lab for inlining:
+### The Updated Project
 
 ```c
-/* Throwaway Lab: Small Functions */
-static inline long square(long x) { return x * x; }
-
-long sum_of_squares(long a, long b)
-{
-    return square(a) + square(b);
-}
+14: long add_one(long x) { return x + 1; }
+15: 
+// ← new
+16: void update_counters(long * restrict a, long * restrict b) {
+17:     *a += 10;
+18:     *b += 20;
+19:     *a += 30;
+20: }
 ```
+We added a function demonstrating the `restrict` keyword.
 
-Discarding the lab constraints, we look at the generated assembly for `sum_of_squares` at `-O2`.
+### Mechanical walkthrough
+- `void update_counters(` starts a function that returns nothing.
+- `long * restrict a` declares a pointer `a` to a `long`, with the `restrict` keyword promising it does not alias other pointers in this scope.
+- `, long * restrict b)` declares a second restricted pointer `b`.
+- `*a += 10;` reads the value at `a`, adds 10, and writes it back.
+- `*b += 20;` reads the value at `b`, adds 20, and writes it back.
+- `*a += 30;` reads `a`, adds 30, and writes it back.
 
-```asm
-# At -O2 (square() is inlined -- no call instruction):
-sum_of_squares:
-    imulq %rdi, %rdi    # rdi = a * a
-    imulq %rsi, %rsi    # rsi = b * b
-    leaq  (%rdi,%rsi), %rax  # rax = a^2 + b^2
-    ret
-```
+### CS lens
+**Pointer Aliasing:** Aliasing is a massive barrier to optimization in C and C++. It's the reason Fortran historically beat C in numerical computing (Fortran didn't have pointers that could arbitrarily alias). Modern languages like Rust solve this at the language level by enforcing strict borrowing rules, making aliasing impossible by default and giving the compiler free reign to optimize.
 
-**Mechanical Trace:**
-1. `%rdi` (a) and `%rsi` (b) are our inputs.
-2. `imulq %rdi, %rdi` computes `a * a` and overwrites `%rdi`.
-3. `imulq %rsi, %rsi` computes `b * b` and overwrites `%rsi`.
-4. `leaq (%rdi,%rsi), %rax` adds the two squared values together into `%rax`.
-5. `ret` returns.
+### SE lens
+**The Contract of `restrict`:** Using `restrict` is an unsafe promise to the compiler. If you lie and pass `update_counters(&x, &x)`, the compiler will generate code that produces incorrect results because it optimized away operations assuming they didn't overlap. Use it only in low-level hot paths where you strictly control the inputs.
 
-The compiler completely replaced the call to `square` with its body, eliminating the call overhead (push/pop, branch, frame setup). Even without the `static inline` keyword, the compiler often inlines small functions at `-O2`.
+### Commands needed
+`gcc -O2 -S math_ops.c`
 
-### Strength Reduction
-Multiplication is slow; addition and shifting are fast. Strength reduction swaps them. Throwaway lab time:
+### Run it
+Predicted confidently: With the `restrict` keyword, the `-O2` compiler will combine the two additions to `*a`. It will emit code equivalent to `*a += 40; *b += 20;`, cutting the memory reads/writes to `a` in half. Without `restrict`, it would be forced to do `*a += 10`, then `*b += 20`, then `*a += 30` in exactly that order.
 
-```c
-/* Throwaway Lab: Multiply by 9 */
-long multiply_by_9(long x) { 
-    return x * 9; 
-}
-```
+### One sentence connecting to previous unit
+We've seen how the compiler manipulates variables and memory, but where does that memory actually live?
 
-We discard the lab and review the assembly output.
+---
 
-```asm
-# At -O2 (no imul instruction needed!):
-multiply_by_9:
-    leaq  (%rdi,%rdi,8), %rax   # rax = rdi + rdi*8 = 9*rdi
-    ret
-```
+## Closing
 
-**Mechanical Trace:**
-1. `%rdi` holds `x`.
-2. `leaq (%rdi,%rdi,8), %rax` uses the Load Effective Address instruction to compute `%rdi + (%rdi * 8)`. This equals `9 * %rdi`.
-3. The result is placed in `%rax`, and `ret` returns it.
-
-Strength reduction replaces multiplication by a constant with shifts and adds. For example: `x * 2` becomes `addq %rdi, %rdi`, and `x * 10` becomes `leaq (%rdi,%rdi,4), %rax; addq %rax, %rax`.
-
-### How UB Enables Aggressive Optimization
-The C standard guarantees that certain constructs (like signed integer overflow or null pointer dereference) are Undefined Behavior (UB). Compilers assume UB *never happens*. Throwaway lab to explore this:
-
-```c
-/* Throwaway Lab: Signed Overflow */
-int signed_loop(int n)
-{
-    int sum = 0;
-    for (int i = 0; i < n + 1; i++) {  /* SIGNED overflow if n = INT_MAX */
-        sum += i;
-    }
-    return sum;
-}
-```
-
-Discarding the lab, we realize the compiler assumes `n + 1` does NOT overflow. If it did, it would be UB.
-
-```asm
-# Compiler treats n+1 as always > n mathematically.
-# This allows it to unroll or vectorize the loop aggressively,
-# which would produce incorrect results if n actually was INT_MAX.
-```
-
-Another profound example of UB-based optimization:
-
-```c
-int *p = get_ptr();
-if (p != NULL) {
-    *p = 42;     
-}
-```
-
-Wait, if we wrote it differently...
-
-```c
-int *p = get_ptr();
-*p = 42;         /* Dereference happens FIRST */
-if (p != NULL) { /* NULL check happens SECOND */
-    return 1;
-}
-```
-
-At `-O2`, the compiler *removes* the NULL check. If `p` was NULL, dereferencing it earlier was UB. Since the compiler assumes UB never happens, it concludes `p` cannot possibly be NULL by the time it hits the `if`. Therefore, `p != NULL` is always true, and the check is redundant! This is how UB-based optimization can sometimes introduce security vulnerabilities by deleting safety checks.
-
-### Reading a Complete Optimized Function
-Let's put it all together. Here is our final throwaway lab, computing exponents.
-
-```c
-/* Throwaway Lab: Exponentiation */
-long power(long base, unsigned long exp)
-{
-    long result = 1;
-    while (exp > 0) {
-        if (exp & 1)
-            result *= base;
-        base *= base;
-        exp >>= 1;
-    }
-    return result;
-}
-```
-
-Discarding the lab wrapper, let's look at the raw `-O2` assembly.
-
-```asm
-power:
-    movl  $1, %eax           # result = 1
-    testq %rsi, %rsi         # test exp
-    je    .L_done            # if exp == 0, return 1
-.L_loop:
-    testb $1, %sil           # test lowest bit of exp
-    je    .L_no_mul          # if not set, skip multiply
-    imulq %rdi, %rax         # result *= base
-.L_no_mul:
-    imulq %rdi, %rdi         # base *= base
-    shrq  $1, %rsi           # exp >>= 1
-    testq %rsi, %rsi         # test exp again
-    jne   .L_loop            # if exp != 0, loop
-.L_done:
-    ret
-```
-
-**Mechanical Trace (for base=2, exp=5):**
-1. `movl $1, %eax`: `result` (`%rax`) is initialized to 1.
-2. `testq %rsi, %rsi`: checks if `exp` (5, which is binary `101`) is 0.
-3. `je .L_done`: jump not taken.
-4. **Iter 1:**
-   - `testb $1, %sil`: checks lowest bit of `exp` (5 & 1 = 1).
-   - `je .L_no_mul`: jump not taken.
-   - `imulq %rdi, %rax`: `result` (1) *= `base` (2). `result` = 2.
-   - `imulq %rdi, %rdi`: `base` (2) *= `base` (2). `base` = 4.
-   - `shrq $1, %rsi`: `exp` (5) >>= 1. `exp` = 2.
-   - `testq %rsi, %rsi`: check if `exp` is 0.
-   - `jne .L_loop`: jump taken to `.L_loop`.
-5. **Iter 2:**
-   - `testb $1, %sil`: check lowest bit of `exp` (2 & 1 = 0).
-   - `je .L_no_mul`: jump **taken** (skip multiply).
-   - `imulq %rdi, %rdi`: `base` (4) *= `base` (4). `base` = 16.
-   - `shrq $1, %rsi`: `exp` (2) >>= 1. `exp` = 1.
-   - `testq %rsi, %rsi`: check if `exp` is 0.
-   - `jne .L_loop`: jump taken to `.L_loop`.
-6. **Iter 3:**
-   - `testb $1, %sil`: check lowest bit of `exp` (1 & 1 = 1).
-   - `je .L_no_mul`: jump not taken.
-   - `imulq %rdi, %rax`: `result` (2) *= `base` (16). `result` = 32.
-   - `imulq %rdi, %rdi`: `base` (16) *= `base` (16). `base` = 256.
-   - `shrq $1, %rsi`: `exp` (1) >>= 1. `exp` = 0.
-   - `testq %rsi, %rsi`: check if `exp` is 0 (ZF=1).
-   - `jne .L_loop`: jump **not** taken.
-7. `ret`: Returns `result` = 32.
-
-Verify: 2^5 = 32. Correct. This is the fast exponentiation algorithm (square-and-multiply), operating in O(log exp) time. The assembly closely mirrors the C source at `-O2` because the function is already well-optimized natively.
-
-## Conclusion and Self-Check
-Module 1 is complete. You can now read, trace, and reason about real x86-64 assembly produced by the compiler. Module 2 begins with Lesson 13 — the memory hierarchy. Why does the same algorithm run 100× faster on one dataset than another? Cache is the answer.
-
-**Self-Check Exercises:**
-1. Predict the `-O2` assembly for `long f(long x) { return x*7; }` using `leaq` (no `imul`).
-2. Explain why the compiler cannot eliminate `volatile int counter; counter++;` even at `-O3`.
-3. Identify all the specific optimizations applied to the `power()` assembly trace above.
-
-*All required concepts handled. Objects and methods fully defined. Mechanical traces provided for assembly code blocks.*
+### Connect the pieces
+When you take a C function and run it through `gcc -O2`, a massive pipeline of transformations occurs. The compiler parses the code, evaluates constants immediately (constant folding), removes paths that can't be reached (dead code elimination), replaces function calls with their actual bodies (inlining), swaps slow math like `i * 8` for fast pointer increments (strength reduction), and finally maps your variables to fast CPU registers rather than stack memory (register allocation). The only thing that consistently stops this juggernaut of optimization is pointer aliasing, which you can bypass with `restrict`. The `-O2` compiler applies a fixed set of transformations — constant folding, inlining, strength reduction, dead code elimination, and register allocation — and understanding each one tells you when to write code that helps it and when it's already handling things optimally. Module 2 begins with Lesson 13: storage technologies.
