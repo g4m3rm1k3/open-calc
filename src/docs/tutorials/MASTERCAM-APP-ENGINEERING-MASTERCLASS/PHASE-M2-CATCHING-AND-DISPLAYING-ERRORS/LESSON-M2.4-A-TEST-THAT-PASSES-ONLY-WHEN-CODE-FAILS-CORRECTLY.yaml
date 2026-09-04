@@ -258,74 +258,117 @@ concept_units:
     connection_to_previous: >
       There is no previous unit - this is the first one in this lesson.
 
-  - title: "Wiring the Whole Mechanism Together, and Testing That It Actually Runs"
+  - title: "Wiring the Whole Mechanism Together Reveals a Real Gap the Isolated Pieces Didn't Have"
     problem: >
       Lessons M2.1-M2.3 each proved one real, separate piece in
       isolation: `sys.excepthook` catches uncaught slot exceptions;
       redirecting `sys.stdout` catches ordinary `print()` output;
-      `ErrorTerminalDialog` safely displays real text from any real
-      thread. None of those three real pieces do anything for this
-      app's own real, current problem until they're actually connected
-      to each other. Given everything proven so far: what real, minimal
-      set of connections - which real function becomes
-      `sys.excepthook`, what does the custom `sys.stdout` object's own
-      real `.write()` actually do, and who constructs the real
-      `ErrorTerminalDialog` in the first place - would wire all three
-      into one, real, working whole?
+      `ErrorTerminalDialog.emit_from_any_thread` safely displays real
+      text from any real thread. Wiring all three together means both
+      `sys.excepthook` *and* the redirected `sys.stdout` end up calling
+      the identical real entry point - but this app's own real
+      `LiveColorServer` (Lessons M0.1, M2.2) prints real, routine
+      progress lines constantly, on its own real background thread,
+      while it's running. Given that: if every real call to that one
+      entry point also raised and focused the real terminal window
+      (a real, natural thing to want for an actual error) - what real,
+      concrete, undesirable thing would happen during perfectly normal,
+      successful use of this app?
     socratic_prompt:
-      - "Lesson M2.1's own custom sys.excepthook and Lesson M2.2's own custom sys.stdout object both need to get text to the identical real place - what real object would both of them need a reference to, to make that possible?"
-      - "Given Lesson M2.3's own real ErrorTerminalDialog.emit_from_any_thread method, what would a custom sys.excepthook function's own real body need to do with the real (exc_type, exc_value, exc_tb) it receives, to actually use it?"
-      - "A real test proving this whole mechanism works can't just check a return value the way Lesson M1's own tests did - what real, observable side effect would a real test need to check instead?"
+      - "If ErrorTerminalDialog.emit_from_any_thread also raised and focused the window every single time it was called, and LiveColorServer calls it once per routine print(), what would using this app actually feel like?"
+      - "Given that a real exception (Lesson M2.1) and a real, routine print() (Lesson M2.2) are genuinely different real events - one is a problem, one is normal - what real, minimal change would let this app tell them apart at the one real point they both currently converge?"
+      - "A real test proving this whole mechanism works can't just check a return value the way Lesson M1's own tests did - what real, observable side effects would a real test need to check instead, now that there are two real, different ones to tell apart?"
     project_change:
       reference_source: >
         No reference counterpart - a real, concrete proposal connecting
         three already-proposed pieces (Lessons M2.1-M2.3), none of which
         exist in the real app yet - add all of this yourself, once you
-        understand it.
+        understand it. This unit's own real proposal is stronger than
+        this lesson's first draft: verified this session against a real,
+        full, disposable copy of the entire real app (constructed via a
+        real DataViewer, not a simplified stand-in), specifically because
+        composing three pieces that each worked correctly in isolation
+        surfaced a real design gap none of the three isolated proofs
+        (Lessons M2.1-M2.3) could have shown on their own.
       files_affected:
         - path: mastercam-app/mastercam_app/error_terminal.py
           status: modified
+        - path: mastercam-app/mastercam_app/app.py
+          status: modified
         - path: mastercam-app/tests/test_error_terminal.py
-          status: new
-        - path: verification/mastercam-phase-02/lab_full_composition.py
           status: new
       change_type: add
       location: >
         mastercam-app/mastercam_app/error_terminal.py already has
         `ErrorTerminalDialog`/`ErrorLogBridge` proposed in Lesson M2.3 -
-        this unit proposes two real, small additions to that same file:
-        a custom `sys.stdout`-shaped class, and a real `install()`
-        function tying everything together.
-        mastercam-app/tests/test_error_terminal.py is a genuinely new,
-        proposed test file.
-        verification/mastercam-phase-02/lab_full_composition.py is a
-        real, throwaway harness - the identical proposed classes,
-        assembled into one file and actually run this session (real Qt
-        slot exception, real background-thread print(), both landing in
-        a real dialog) - proving the composition genuinely works before
-        asking you to add it to the real app.
+        this unit proposes real, replacing changes to that same file
+        (Lesson M2.3's own single `text_ready` signal and
+        `emit_from_any_thread` method split into two real, separate
+        real paths), plus the real `_DialogWriter`/`install()` additions.
+        mastercam-app/mastercam_app/app.py's own real `main()` (Lesson
+        M0.1) gets three real, new lines, right after `QApplication` is
+        constructed. mastercam-app/tests/test_error_terminal.py is a
+        genuinely new, proposed test file.
       dependencies: >
         Lessons M2.1 (sys.excepthook), M2.2 (sys.stdout redirect), and
         M2.3 (ErrorTerminalDialog) - this unit is where all three
-        actually meet.
+        actually meet, and where their combination was actually tested,
+        together, this session.
     new_code:
       applicable: true
       intro: >
-        Two real, small additions to `error_terminal.py` (Lesson M2.3),
-        plus one real, proposed test file - none of this applied to the
-        real app by this lesson. The `error_terminal.py` addition itself
-        is verified for real, below, assembled into a real, throwaway
-        harness and actually run this session; the `pytest-qt`-based
-        test file is a real, correct proposal, not yet run, since
-        `pytest-qt` isn't installed in this environment and
-        `error_terminal.py` doesn't exist in the real app yet - both
-        real, honest facts, not glossed over:
+        The full, real, corrected `error_terminal.py` - Lesson M2.3's
+        own `ErrorLogBridge`/`ErrorTerminalDialog`, now with two real,
+        separate signals instead of one, plus the real `_DialogWriter`
+        and `install()` additions - followed by the real, proposed test
+        file. Verified this session by actually constructing this app's
+        own real `DataViewer` with this exact code installed first (real
+        output below); the `pytest-qt`-based test itself is a correct,
+        real proposal, not yet run, since `pytest-qt` isn't installed in
+        this environment:
       files:
         - file: mastercam-app/mastercam_app/error_terminal.py
           status: modified
           code: |
             import sys
             import traceback
+
+            from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit
+            from PySide6.QtCore import QObject, Signal
+
+
+            class ErrorLogBridge(QObject):
+                text_ready = Signal(str)
+                error_ready = Signal(str)
+
+
+            class ErrorTerminalDialog(QDialog):
+                def __init__(self, parent=None):
+                    super().__init__(parent)
+                    self.setWindowTitle("Error Terminal")
+                    self.resize(700, 400)
+                    self.text_edit = QTextEdit(readOnly=True)
+                    layout = QVBoxLayout(self)
+                    layout.addWidget(self.text_edit)
+
+                    self.bridge = ErrorLogBridge()
+                    self.bridge.text_ready.connect(self._append_text)
+                    self.bridge.error_ready.connect(self._append_error)
+
+                def _append_text(self, text):
+                    self.text_edit.append(text.rstrip("\n"))
+
+                def _append_error(self, text):
+                    self.text_edit.append(text.rstrip("\n"))
+                    if not self.isVisible():
+                        self.show()
+                    self.raise_()
+
+                def log_from_any_thread(self, text):
+                    self.bridge.text_ready.emit(text)
+
+                def report_error_from_any_thread(self, text):
+                    self.bridge.error_ready.emit(text)
 
 
             class _DialogWriter:
@@ -334,7 +377,7 @@ concept_units:
 
                 def write(self, text):
                     if text.strip():
-                        self.dialog.emit_from_any_thread(text)
+                        self.dialog.log_from_any_thread(text)
 
                 def flush(self):
                     pass
@@ -343,7 +386,7 @@ concept_units:
             def install(dialog):
                 def _excepthook(exc_type, exc_value, exc_tb):
                     formatted = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
-                    dialog.emit_from_any_thread(formatted)
+                    dialog.report_error_from_any_thread(formatted)
 
                 sys.excepthook = _excepthook
                 sys.stdout = _DialogWriter(dialog)
@@ -353,110 +396,157 @@ concept_units:
             from mastercam_app.error_terminal import ErrorTerminalDialog
 
 
-            def test_emit_from_any_thread_appends_text_to_the_widget(qtbot):
+            def test_log_from_any_thread_appends_text_without_showing_the_window(qtbot):
                 dialog = ErrorTerminalDialog()
                 qtbot.addWidget(dialog)
 
-                dialog.emit_from_any_thread("a real, test error message")
+                dialog.log_from_any_thread("a real, routine log line")
+
+                assert "a real, routine log line" in dialog.text_edit.toPlainText()
+                assert dialog.isVisible() is False
+
+
+            def test_report_error_from_any_thread_appends_text_and_shows_the_window(qtbot):
+                dialog = ErrorTerminalDialog()
+                qtbot.addWidget(dialog)
+
+                dialog.report_error_from_any_thread("a real, test error message")
 
                 assert "a real, test error message" in dialog.text_edit.toPlainText()
+                assert dialog.isVisible() is True
       language: python
     updated_project:
-      applicable: false
+      applicable: true
+      intro: >
+        `main()` (Lesson M0.1), already existing, with the three real,
+        new lines this unit proposes marked:
+      files:
+        - file: mastercam-app/mastercam_app/app.py
+          status: modified
+          code: |
+            def main():
+                app = QApplication(sys.argv)
+                app.setStyle("Fusion")
+
+                from mastercam_app.error_terminal import ErrorTerminalDialog, install  # <- new
+                error_terminal = ErrorTerminalDialog()                                  # <- new
+                install(error_terminal)                                                 # <- new
+
+                window = DataViewer()
+                window.show()
+                sys.exit(app.exec())
+      language: python
     mechanical_walkthrough:
       applicable: true
       items:
-        - element: "class _DialogWriter: def __init__(self, dialog): self.dialog = dialog"
+        - element: "error_ready = Signal(str)"
           explanation: >
-            Full treatment already established (Lesson M2.2, file-like
-            object) - a real, ordinary class, holding a real reference
-            to the `ErrorTerminalDialog` it should forward text to.
-        - element: "def write(self, text): if text.strip(): self.dialog.emit_from_any_thread(text)"
+            A real, second signal, alongside Lesson M2.3's own
+            `text_ready` - full treatment already established
+            (`QObject.Signal`) for the mechanism itself; this is a real,
+            new *use* of it, one real signal per real category of event
+            (routine, versus an actual error) rather than one signal
+            carrying both.
+        - element: "def _append_error(self, text): ... if not self.isVisible(): self.show(); self.raise_()"
           explanation: >
-            The identical real `.write()` shape Lesson M2.2's own
-            throwaway `CapturingStream` used - but instead of appending
-            to a plain list, it calls `emit_from_any_thread` (Lesson
-            M2.3, full treatment already established), the one real,
-            safe entry point into the dialog. The real `if text.strip():`
-            guard skips `print()`'s own real, separate newline-only
-            `.write()` calls (Lesson M2.2's own real, observed
-            two-calls-per-print behavior), so an empty real line never
-            triggers a real signal emission on its own.
-        - element: "def install(dialog): def _excepthook(exc_type, exc_value, exc_tb): ..."
+            The real, new behavior this unit's own Socratic prompt led
+            to - appends the real text (identically to `_append_text`),
+            then, only here, checks `self.isVisible()` (a real, ordinary
+            `QDialog` method) and calls `self.show()` if it's currently
+            hidden, then `self.raise_()` (brings the real window to the
+            front, even if it was already visible but behind another
+            real window). `_append_text` (Lesson M2.3's routine path)
+            never does either.
+        - element: "log_from_any_thread / report_error_from_any_thread"
           explanation: >
-            A real function, taking the real `ErrorTerminalDialog`
-            instance itself as its own argument - defines a real, nested
-            `_excepthook` closure (the identical real pattern Lesson
-            M1.1 established for `Holder.from_xml`'s own `sg`), matching
-            `sys.excepthook`'s own real, fixed three-parameter shape
-            (Lesson M2.1, full treatment already established).
-        - element: "traceback.format_exception(exc_type, exc_value, exc_tb)"
+            Two real, separate, named entry points, replacing Lesson
+            M2.3's own single `emit_from_any_thread` - each real
+            method's own name states plainly which real signal it
+            emits, so a real caller (like this unit's own proposed
+            `install()`, below) never has to guess which real behavior
+            it's triggering.
+        - element: "dialog.log_from_any_thread(text) (inside _DialogWriter.write)"
           explanation: >
-            A real, standard-library function - builds the identical
-            real, human-readable traceback text Python's own default
-            `sys.excepthook` would have printed to `stderr` (Lesson
-            M2.1), as a real, plain string instead, ready to hand to the
-            dialog.
-        - element: "sys.excepthook = _excepthook / sys.stdout = _DialogWriter(dialog)"
+            Routine `print()` output (Lesson M2.2) now calls the real,
+            non-showing path - confirmed directly in Verification,
+            below, that a real `print()` genuinely does not raise the
+            real window.
+        - element: "dialog.report_error_from_any_thread(formatted) (inside _excepthook)"
           explanation: >
-            The two real assignments from Lessons M2.1 and M2.2,
-            performed together, both pointed at the identical real
-            `dialog` - this is the one real, concrete moment all three
-            lessons' own separate mechanisms become one, real, working
-            whole.
-        - element: "def test_emit_from_any_thread_appends_text_to_the_widget(qtbot): ..."
+            A real, uncaught exception (Lesson M2.1) now calls the real,
+            showing path instead - confirmed directly in Verification,
+            below, that a real, deliberate exception genuinely does
+            raise and focus the real window.
+        - element: "from mastercam_app.error_terminal import ErrorTerminalDialog, install (inside main())"
           explanation: >
-            A real, proposed pytest test - `qtbot` is a real, standard
-            fixture from the `pytest-qt` package (a real, separate
-            dependency this app would need added, not yet installed),
-            letting a real test safely construct and interact with real
-            Qt widgets without actually showing a window on screen.
-        - element: "dialog.emit_from_any_thread(\"a real, test error message\")"
+            A real, ordinary import, placed *inside* `main()` itself
+            rather than at the real module's own top level - deliberate,
+            so `error_terminal.py` only ever gets imported at the one
+            real moment it's actually needed, keeping this app's own
+            real, existing top-level imports (Lesson M0.1) unchanged.
+        - element: "error_terminal = ErrorTerminalDialog() (inside main())"
           explanation: >
-            Full treatment already established (Lesson M2.3) - called
-            directly here, on the real main thread (a real test doesn't
-            need a genuinely separate thread to prove the *connection*
-            works, only Lesson M2.3's own throwaway lab needed a real,
-            separate thread to prove real cross-thread safety
-            specifically).
-        - element: "assert \"a real, test error message\" in dialog.text_edit.toPlainText()"
+            Constructed *after* `QApplication` (a real, hard requirement
+            - no real `QWidget`, including a `QDialog`, can be
+            constructed before it) and *before* `DataViewer` - so
+            `install()`, next, is already active by the time
+            `DataViewer`'s own real construction runs, catching anything
+            it might print or raise too.
+        - element: "install(error_terminal) (inside main())"
           explanation: >
-            Full treatment already established (Lesson M0.2, `assert`) -
-            reads the real widget's own real, current text directly,
-            proving the real signal, the real slot, and the real
-            widget update all actually happened, not just that no real
-            exception occurred along the way.
+            Full treatment already established (Objects and methods,
+            this unit's own real function) - the one real, concrete
+            moment every lesson in this whole phase becomes one, real,
+            working whole, wired into this app's own real, existing
+            entry point.
     mental_model:
       applicable: false
     execution_trace:
       applicable: false
     cs_lens: >
-      This is real **composition of independently-proven pieces** - none
-      of `_DialogWriter`, `_excepthook`, or `ErrorTerminalDialog` needed
-      to change at all to be combined; `install()` only ever calls real,
-      already-existing, already-proven real methods on each.
+      This is real **composition surfacing an emergent requirement** -
+      none of `sys.excepthook`, `sys.stdout` redirection, or
+      `ErrorTerminalDialog` were *wrong* in isolation (Lessons
+      M2.1-M2.3's own real verification already proved each one
+      correct) - the real gap (routine output shouldn't behave like an
+      error) only exists, and only matters, once they're actually
+      combined and run together against this app's own real,
+      continuous background logging. Also recognized in: two real,
+      individually-tested software modules that only reveal a real
+      timing conflict once integrated together, two real, individually
+      safe medications that only interact once taken together, and a
+      real orchestra's two soloists, each flawless alone, only revealing
+      a real tempo mismatch once they actually play the same real piece
+      together.
     se_lens: >
-      The real design principle: **testing an observable side effect
-      instead of a return value, when a return value genuinely isn't
-      what the real code under test produces**. `emit_from_any_thread`
-      returns nothing (Lesson M2.3) - the real, honest thing worth
-      proving is that the real widget's own real state actually changed,
-      which is exactly what this proposed test checks directly, rather
-      than trusting that "no exception was raised" is the same claim as
-      "it worked." The real, honest cost of this whole design, worth
-      naming plainly: `sys.stdout`/`sys.excepthook` are real,
+      The real design principle this unit's own real correction
+      demonstrates directly: **verify the composed whole, not just each
+      isolated piece** - Lessons M2.1, M2.2, and M2.3 each had real,
+      passing verification, and the *composition* still had a real,
+      undiscovered problem until it was actually run together against
+      this app's own real `DataViewer`, not a simplified stand-in. The
+      real alternative not chosen: shipping the single-signal version
+      (this lesson's own first draft) and discovering the intrusive
+      pop-up behavior only after real, live use on a real shop floor -
+      the real, honest reason this correction happened *before* being
+      handed to you to type in, not after. The real, remaining cost,
+      worth naming plainly: `sys.stdout`/`sys.excepthook` are still real,
       process-wide, global state (Lessons M2.1-M2.2's own se_lens
       already named this once each) - `install()` should genuinely only
-      ever be called once, near this app's own real `main()` (Lesson
-      M0.1), since calling it twice would silently discard whichever
+      ever be called once, exactly where this unit proposes it, since
+      calling it twice would silently discard whichever
       `ErrorTerminalDialog` was installed first.
     commands:
-      - command: "python verification/mastercam-phase-02/lab_full_composition.py"
+      - command: "python integration_check.py"
         explanation: >
-          Runs the real, throwaway composition harness directly with the
-          real Python interpreter, from inside manufacturing-platform's
-          own repo root - this is what produced Verification's own real
-          output, below.
+          Run from inside a real, disposable copy of the entire
+          mastercam-app/ folder (never the real, live app), with this
+          exact proposal already applied - constructs a real
+          `QApplication`, a real `ErrorTerminalDialog`, calls `install()`,
+          then constructs this app's own real `DataViewer` before
+          checking a real, deliberate print() and a real, deliberate
+          exception in turn. This is what produced Verification's own
+          real output, below.
       - command: "pip install pytest-qt"
         explanation: >
           A real, additional, currently-not-installed dependency this
@@ -467,21 +557,25 @@ concept_units:
     verification:
       applicable: true
       real_output: |
-        final dialog text:
-        Traceback (most recent call last):
-          File "C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-02\lab_full_composition.py", line 59, in on_click
-            raise ValueError("real composed error, from a real Qt slot")
-        ValueError: real composed error, from a real Qt slot
-        real print() from a real background thread
+        visible_after_construction: False
+        captured_startup_text_len: 0
+        visible_after_print: False
+        visible_after_error: True
+        final_text: <372 chars> ... last 300 chars:
+        ...integration_check.py", line 32, in boom
+            raise RuntimeError("a real, deliberate test exception")
+        RuntimeError: a real, deliberate test exception
         exit code: 0
-      output_file: verification/mastercam-phase-02/lab_full_composition_output.txt
+      output_file: verification/mastercam-phase-02/lab_integration_check_output.txt
     connection_to_previous: >
       The unit above proved `pytest.raises` distinguishes a correctly
       expected failure from a wrong one or from no failure at all; this
       unit connected every real mechanism this whole phase built -
       Lessons M2.1, M2.2, and M2.3 - into one real, concrete proposal,
-      and a real, proposed test checking the one thing that actually
-      matters: did the real widget's own text genuinely change.
+      caught a real gap only visible once they were actually composed,
+      fixed it, and verified the fix against this app's own real,
+      complete `DataViewer` - not a simplified stand-in - before handing
+      any of it to you.
 
 closing:
   connect_the_pieces: >
@@ -494,11 +588,17 @@ closing:
     started on, and shaped that proof into `ErrorTerminalDialog`. This
     lesson's own second unit connected all three - a real
     `sys.excepthook` and a real `sys.stdout` replacement, both handing
-    real text to the identical real dialog through its one, real, safe
-    `emit_from_any_thread` entry point - and this lesson's own first
-    unit proved `pytest.raises` is the real, correct way to test any of
-    it that's *supposed* to fail on purpose, the same real technique
-    already sitting, unexplained until now, in
+    real text to the identical real dialog - and, composing them
+    together against this app's own real `DataViewer`, found and fixed a
+    real gap none of the three isolated pieces had on their own: routine
+    `print()` output now calls a real, quiet `log_from_any_thread`
+    entry point, while an actual, uncaught exception calls a real,
+    separate `report_error_from_any_thread` entry point that raises and
+    focuses the window - confirmed by actually constructing this app's
+    own real main window with both paths exercised. This lesson's own
+    first unit proved `pytest.raises` is the real, correct way to test
+    any of it that's *supposed* to fail on purpose, the same real
+    technique already sitting, unexplained until now, in
     mastercam-app/tests/test_sequence.py since Lesson M1.4. None of this
     phase's own real code exists in the app yet - every real file shown
     across all four lessons is real, verified guidance for you to add
