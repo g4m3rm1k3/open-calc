@@ -1,0 +1,354 @@
+# Lesson M1.1: A Dataclass Built From XML Instead of By Hand
+
+*File paths under mastercam-app/... refer to the real manufacturing-platform repository's mastercam-app folder. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** A throwaway dataclass proving Python's own `@dataclass` decorator writes a real `__init__` for you from field defaults alone, then this app's own real, smallest two dataclasses - `Holder` and `Assembly` - traced through their own real `from_xml` classmethods and `to_dict` methods, backed by 7 real, already-passing tests (mastercam-app/tests/test_holder_assembly.py). The transferable problem: this app's real parser turns raw XML into real Python objects by the same two-method pattern, repeated at every level from a single tool holder up to the whole part - understanding it once, here, on the two smallest real classes, is what makes every larger class in this phase's later lessons readable instead of overwhelming.
+
+**What you need to know first:** Lesson M0.2 - specifically real `assert`/`pytest` tests and the characterization-test idea; nothing about this app's own dataclasses is assumed yet.
+
+## Terms used in this lesson
+
+- **dataclass** — A real, ordinary Python class, decorated with `@dataclass` (Objects and methods, below), that gets a real `__init__` written for it automatically from its own field declarations - no hand-written constructor needed. It exists so a plain data container class doesn't need the same repetitive `self.x = x` boilerplate, line by line, for every field.
+- **default value** — A real value a field falls back to when nothing is passed for it at construction - written directly after the field's own type, e.g. `catalog: str = ""`. It exists so a real object can be built with only the fields that are actually known at that moment, leaving the rest at a real, sensible, already-decided value instead of forcing every single field to be supplied every time.
+- **classmethod** — A real, ordinary method, marked with the real `@classmethod` decorator, that receives the real class itself (conventionally named `cls`) as its first argument instead of a real instance (`self`). It exists so a class can offer more than one real way to build an instance - `Holder(...)`, the plain, ordinary constructor, versus `Holder.from_xml(...)`, below, a second, real, alternate way to build the identical kind of object from a genuinely different kind of input.
+
+## Objects and methods used
+
+- **`Holder`**
+  - *What it is:* A real, small dataclass representing one tool holder's own real, static catalog data - not the tool itself, the physical holder it sits in.
+  - *Implementation:* `@dataclass class Holder:` at mastercam-app/mastercam_app/parsing/parser.py:24-48 - six real fields, every one a plain `str = ""`: `catalog`, `length`, `manufacturer`, `name`, `description`, `library`. A real `from_xml(cls, xml)` classmethod, and a real `to_dict(self)` method.
+  - *Its use:* The first real, smallest building block this whole parser builds on top of - every other real dataclass in this phase's later lessons is a larger structure built partly out of a `Holder`, directly or indirectly.
+  - *Type:* A real, module-level dataclass.
+  - *Responsibility:* Hold six real, plain string facts about one tool holder, and know how to build itself from a real XML element, and how to hand itself back as a real, plain dict.
+  - *Depends on:* Its own `from_xml`, below, depends on a real `xml.etree.ElementTree.Element` (or `None`) - nothing else.
+  - *Connects to:* Built by `Assembly.from_xml` (below) as part of building a real `Assembly`; `Tool.from_xml`, in the next lesson, builds an `Assembly` that in turn builds one of these.
+  - *Shape:* Six real, plain string fields, always present, always strings (never `None`, never a number) - confirmed directly by mastercam-app/tests/test_holder_assembly.py's own real, passing tests.
+
+- **`Holder.from_xml`**
+  - *What it is:* A real, alternate constructor (classmethod, Terms above) building a real `Holder` from a real, already-parsed XML element instead of from six hand-typed string arguments.
+  - *Implementation:* `@classmethod def from_xml(cls, xml):` - if `xml` is `None`, returns `cls()` (every field at its own real default). Otherwise, a small, real, nested closure `sg(tag)` (not a separate top-level function - defined fresh, inside `from_xml`, every time it runs) reads one real child element's own text, defaulting to `""` when that child is missing or empty; called six times, once per real field.
+  - *Its use:* Called by `Assembly.from_xml`, below, every real time an assembly element in the source XML has its own real, nested holder element.
+  - *Type:* A real classmethod.
+  - *Responsibility:* Given one real, possibly-`None` XML element, produce exactly one real `Holder`, never raising, never leaving a field unset - a missing real child element becomes a real empty string, not a real crash.
+  - *Depends on:* One real argument, `xml` - either a real `xml.etree.ElementTree.Element`, or `None`.
+  - *Connects to:* Calls `xml.find(tag)` (a real, standard-library method) six times, through its own local `sg` closure - nothing else.
+  - *Shape:* Always returns one real, fully-populated `Holder` - never `None`, even when its own `xml` argument is `None`, confirmed directly by mastercam-app/tests/test_holder_assembly.py's own `test_holder_from_xml_none_returns_default_holder`.
+
+- **`Assembly`**
+  - *What it is:* A real, small dataclass representing one real tool assembly - a real TA number and stick-out length, plus the one real `Holder` that assembly is built on.
+  - *Implementation:* `@dataclass class Assembly:` at mastercam-app/mastercam_app/parsing/parser.py:51-72 - `holder: Holder` (a real, required field, no default - every real `Assembly` must be given one), `ta_number: str` (also required), `stick_out: str = ""` (defaulted). A real `from_xml(cls, sp_assembly_xml, sp_holder_xml)` classmethod - two real XML arguments, not one, since the source XML keeps assembly data and holder data as two real, separate sibling elements. A real `to_dict(self)` method.
+  - *Its use:* The next lesson's own real `Tool` builds one of these for every real tool this app parses - this lesson stops at `Assembly` itself, one level before `Tool`.
+  - *Type:* A real, module-level dataclass, composed of a nested `Holder`.
+  - *Responsibility:* Hold one real tool assembly's own real TA number and stick-out length, together with the one real `Holder` it's built on, and know how to build itself from two real, separate XML elements, and how to hand itself back as one real, nested dict.
+  - *Depends on:* Its own `from_xml` depends on two real, separate XML elements - one for the assembly's own fields, one for the nested holder - either of which can be `None`.
+  - *Connects to:* Its own `from_xml` calls `Holder.from_xml` (above) directly, passing the second of its own two real arguments straight through; its own `to_dict` calls `self.holder.to_dict()` directly.
+  - *Shape:* A real, nested dict, one level deep - `ta_number` and `stick_out` as plain strings, plus a real `holder` key whose own value is `Holder`'s own real `to_dict()` output, not a flat structure.
+
+## Concept Unit: @dataclass Writes a Real __init__ From Field Declarations Alone
+
+### The Problem
+
+This app's own real `Holder` class (Objects and methods, above) has six real fields and no hand-written `__init__` anywhere in its own real source. Before any real tool is shown: what would a hand-written `__init__` for a class with six real string fields, all defaulting to `""`, actually have to contain, line by line?
+
+Before reading on:
+
+- If you wrote `__init__(self, a='', b=''):` by hand for a two-field class, what real line would you need inside it for each field, to actually store what was passed in?
+- Now imagine that same class had six fields instead of two - how much of that `__init__` body would just be six near-identical `self.x = x` lines in a row?
+- What would you expect a real, built-in Python decorator to do for a class shaped exactly like that, if its whole point was removing exactly that repetition?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - a from-scratch, throwaway example proving the one real mechanism `Holder` itself (the unit right after this one) depends on.
+- **Files affected:** `verification/mastercam-phase-01/lab_dataclass_basics.py` (new)
+- **Change type:** add
+- **Location:** New file, no existing project to place it within.
+- **Dependencies:** Nothing beyond Python's own standard library.
+
+### The New Code
+
+One small, real, throwaway dataclass, typed fresh, with two defaulted string fields - deliberately the same real shape as `Holder`'s own six, just fewer of them:
+
+**File:** `verification/mastercam-phase-01/lab_dataclass_basics.py` (new)
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class ThrowawayPoint:
+    x: str = ""
+    y: str = ""
+
+
+p1 = ThrowawayPoint()
+p2 = ThrowawayPoint(x="1", y="2")
+print(p1)
+print(p2)
+print(p2.x, p2.y)
+```
+
+### Mechanical Walkthrough
+
+- `from dataclasses import dataclass` — A real, ordinary import from Python's own standard library - brings in the real `@dataclass` decorator (Objects and methods' own category applies to decorators too, but this one is genuinely a Term-level language feature, not a class or function this code calls directly - it's applied to a class definition, not called on an object).
+- `@dataclass` — Full treatment above (Terms) - applied directly above the real class definition below it, this is what actually generates a real `__init__` from the two real field declarations that follow, with no hand-written constructor anywhere in this file.
+- `x: str = "" / y: str = ""` — Full treatment above (Terms, default value) - two real field declarations, each with a real type annotation (`str`) and a real default (`\"\"`). `@dataclass` reads these two lines directly to build its own real, generated `__init__`.
+- `ThrowawayPoint()` — Calls the real, generated `__init__` with no arguments at all - both real fields fall back to their own real defaults, confirmed directly in Verification, below.
+- `ThrowawayPoint(x="1", y="2")` — Calls the identical real, generated `__init__`, this time supplying both real fields explicitly by name - proving the same generated constructor accepts real, explicit values in place of its own defaults.
+- `print(p1) / print(p2)` — `@dataclass` also generates a real, readable `__repr__` for free - printing a real dataclass instance shows its own real class name and every real field's own current value, not a bare, unhelpful memory address the way an ordinary hand-written class would print by default.
+
+### CS Lens
+
+This is **code generation from declarative structure** - the real shape of the data (two fields, two defaults) is stated once, and a real constructor gets derived from that statement mechanically, rather than written out by hand to match it. Also recognized in: a database's own real `CREATE TABLE` statement (column names and types declared once; the database itself derives the real row-insertion machinery from that declaration), a form-builder library reading a real schema to generate real input fields, and a compiler's own real struct/record definition generating its real memory layout from the field list alone.
+
+### SE Lens
+
+The real alternative not chosen anywhere in this app's own real `Holder`, `Assembly`, or any of the dataclasses this phase covers: a hand-written `__init__` doing `self.catalog = catalog`, `self.length = length`, and so on, six real times, by hand, for `Holder` alone. That alternative genuinely works, and Python supported it for decades before `@dataclass` existed - the real, honest cost it carries that `@dataclass` removes: every one of those six real lines is a real place a typo (`self.catalog = lenght`) could silently assign the wrong real field, caught by nothing until it caused a real, confusing bug somewhere else entirely.
+
+### Commands needed
+
+- `python verification/mastercam-phase-01/lab_dataclass_basics.py` — Runs the real, throwaway file directly with the real Python interpreter, from inside manufacturing-platform's own repo root.
+
+### Verification
+
+```text
+ThrowawayPoint(x='', y='')
+ThrowawayPoint(x='1', y='2')
+1 2
+```
+
+Full saved run: `verification/mastercam-phase-01/lab_dataclass_basics_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first one in this lesson.
+
+## Concept Unit: Holder.from_xml Is a Second, Real Way to Build the Same Class
+
+### The Problem
+
+`ThrowawayPoint(x=\"1\", y=\"2\")`, above, builds an instance from values already sitting in Python variables. This app's own real `Holder` needs to be built from real XML instead - a real `xml.etree.ElementTree.Element`, not six ready-made strings. Given `@dataclass` already generates `Holder`'s own real `__init__(self, catalog='', length='', ...)`: could that same generated `__init__` accept a real XML element directly as one of its arguments, or does something else have to happen first?
+
+Before reading on:
+
+- Holder's own generated __init__ expects six real strings, one per field. Could you pass one real XML element as the `catalog` argument and have it work correctly?
+- Given that, what real, separate step would have to happen between "here is a real XML element" and "here is a real Holder" - reading six real child elements' own text out of it first, or something else?
+- Where would you put real code that does that reading - inside `__init__` itself, or somewhere else on the class?
+
+### Project Change
+
+- **Reference Source:** mastercam-app/mastercam_app/parsing/parser.py:24-48 (quoted in
+full, the real, whole class):
+@dataclass
+class Holder:
+    catalog: str = ""
+    length: str = ""
+    manufacturer: str = ""
+    name: str = ""
+    description: str = ""
+    library: str = ""
+
+    @classmethod
+    def from_xml(cls, xml):
+        if xml is None:
+            return cls()
+        def sg(tag):
+            e = xml.find(tag)
+            return e.text.strip() if e is not None and e.text else ""
+        return cls(
+            catalog=sg("Catalog"), length=sg("Length"),
+            manufacturer=sg("ManufacturerName"), name=sg("Name"),
+            description=sg("Description"), library=sg("LibraryName")
+        )
+
+    def to_dict(self):
+        return {k: getattr(self, k) for k in
+                ("catalog","length","manufacturer","name","description","library")}
+- **Files affected:** `mastercam-app/mastercam_app/parsing/parser.py` (existing), `mastercam-app/tests/test_holder_assembly.py` (new)
+- **Change type:** none
+- **Location:** mastercam-app/mastercam_app/parsing/parser.py already exists, already in exactly this shape - read, not typed, in this unit. mastercam-app/tests/test_holder_assembly.py is a new, real, permanent test file, already written and passing this session.
+- **Dependencies:** The unit above's own real proof that `@dataclass` generates a real `__init__` from field declarations - this unit reads what `Holder` builds *on top of* that generated constructor, not instead of it.
+
+### The Updated Project
+
+mastercam-app/mastercam_app/parsing/parser.py's real, whole `Holder` class, already existing, nothing typed here - read top to bottom:
+
+**File:** `mastercam-app/mastercam_app/parsing/parser.py` (already exists — read-only, nothing to type)
+
+```python
+@dataclass
+class Holder:
+    catalog: str = ""
+    length: str = ""
+    manufacturer: str = ""
+    name: str = ""
+    description: str = ""
+    library: str = ""
+
+    @classmethod
+    def from_xml(cls, xml):
+        if xml is None:
+            return cls()
+        def sg(tag):
+            e = xml.find(tag)
+            return e.text.strip() if e is not None and e.text else ""
+        return cls(
+            catalog=sg("Catalog"), length=sg("Length"),
+            manufacturer=sg("ManufacturerName"), name=sg("Name"),
+            description=sg("Description"), library=sg("LibraryName")
+        )
+
+    def to_dict(self):
+        return {k: getattr(self, k) for k in
+                ("catalog","length","manufacturer","name","description","library")}
+```
+
+### Mechanical Walkthrough
+
+- `@classmethod` — Full treatment above (Terms) - this is what makes `from_xml`'s own first real parameter the class itself (`cls`), rather than a real, already-existing instance (`self`), since building a brand-new `Holder` is exactly this method's own real job - there's no instance yet to be `self`.
+- `if xml is None: return cls()` — A real, ordinary `if` guard - when there's genuinely no real XML to read from, `cls()` calls `Holder`'s own real, generated `__init__` with zero arguments, giving every field its own real default (Terms, above) rather than raising or returning `None` itself.
+- `def sg(tag): ...` — A real, ordinary function, defined *inside* `from_xml` itself - a real nested closure, not a separate top-level function - meaning it only exists, fresh, for the duration of one real `from_xml` call, and can see `xml` (the enclosing function's own real argument) directly, without `xml` being passed to it explicitly.
+- `xml.find(tag)` — A real, standard-library method on `xml.etree.ElementTree.Element` - searches this real element's own direct children for one whose real tag name matches `tag`, returning the first real match, or `None` if there isn't one.
+- `e.text.strip() if e is not None and e.text else ""` — A real, ordinary conditional expression - not `if`/`else` as separate statements, one real expression that evaluates to either side depending on its own real condition. Reads as: if a real matching element was found, *and* it has real, non-empty text, strip and use that text; otherwise, fall back to a real, empty string - the same real missing-or-empty-defaults-to-empty-string behavior confirmed directly by `test_holder_from_xml_missing_child_elements_default_to_empty_string`.
+- `return cls(catalog=sg("Catalog"), ...)` — Calls `sg` six real times, once per real field, then calls the real, generated `__init__` (the unit above) with all six real results at once - this is the real moment a real XML element genuinely becomes a real `Holder`.
+- `{k: getattr(self, k) for k in (...)}` — A real dict comprehension - for each of the six real field names in the real tuple, `getattr(self, k)` reads that real field's own current value off `self` by name, building one real, flat dict with all six. Not shown by name in prose before now, `getattr` is a real, built-in function reading an attribute by its own real, string name, rather than by a real, hard-coded `self.catalog` reference - the same real effect as writing all six fields out by hand, done once, generically, over the real tuple of field names instead.
+
+### CS Lens
+
+This is the **factory method** pattern - a real, named, alternate way to construct an object, living on the class itself, standing in for a constructor that can only ever take the object's own final field values directly. Also recognized in: a document editor's own real "New From Template" versus a real blank "New Document" (both real, valid ways to reach the identical kind of real document, starting from genuinely different real inputs), a real image library offering `Image.open(path)` alongside `Image.new(mode, size)`, and a real ORM's own `Model.from_row(db_row)` sitting next to its ordinary `Model(**kwargs)` constructor.
+
+### SE Lens
+
+The real design principle: **keeping "how do I parse XML" and "what does a Holder actually contain" as two, separate, real concerns** - `__init__` itself (the generated constructor from the unit above) knows nothing about XML at all; only `from_xml` does. The real alternative not chosen: teaching `__init__` itself to accept a raw XML element directly, parsing it inline - that alternative would make `Holder(catalog="C", length="L", ...)`, the plain, ordinary way every other real test in mastercam-app/tests/test_holder_assembly.py already constructs one directly, either impossible or awkward, since `__init__` would now have to guess whether it was handed six real strings or one real XML element. The real, honest cost of keeping them separate, already visible in this exact class: two real ways to build the identical kind of object means two real places a future change to `Holder`'s own fields has to be kept in sync - add a seventh real field, and both the field declaration *and* `from_xml`'s own six (now seven) `sg(...)` calls need updating together.
+
+### Verification
+
+```text
+collected 7 items
+
+tests/test_holder_assembly.py::test_holder_from_xml_reads_all_six_fields PASSED [ 14%]
+tests/test_holder_assembly.py::test_holder_from_xml_none_returns_default_holder PASSED [ 28%]
+tests/test_holder_assembly.py::test_holder_from_xml_missing_child_elements_default_to_empty_string PASSED [ 42%]
+tests/test_holder_assembly.py::test_holder_to_dict_round_trips_all_six_fields PASSED [ 57%]
+tests/test_holder_assembly.py::test_assembly_from_xml_builds_nested_holder PASSED [ 71%]
+tests/test_holder_assembly.py::test_assembly_from_xml_none_returns_ta_number_zero_and_default_holder PASSED [ 85%]
+tests/test_holder_assembly.py::test_assembly_to_dict_nests_holder_to_dict PASSED [100%]
+
+7 passed in 0.09s
+```
+
+Full saved run: `mastercam-app/tests/test_holder_assembly.py`.
+
+### Connection to the previous unit
+
+The unit above proved `@dataclass` generates a real `__init__` from field declarations alone; this unit read `Holder.from_xml` as a real, second, deliberate way to reach that same generated constructor - built from a real XML element instead of six ready-made strings.
+
+## Concept Unit: Assembly Composes a Holder Instead of Duplicating Its Fields
+
+### The Problem
+
+A real tool assembly needs its own real TA number and stick-out length, *and* the one real holder it's built on - `Holder`'s own six real fields, above. Given `Holder` already exists as its own real, complete class: would it be better for `Assembly` to declare six more real fields of its own, copying `Holder`'s own shape, or to hold one real `Holder` directly as a single field?
+
+Before reading on:
+
+- If Assembly copied Holder's own six fields directly onto itself instead of holding a real Holder, what would have to happen, by hand, every time Holder itself gained a new real field?
+- Assembly's own real to_dict (Objects and methods, above) needs to include the holder's own data somewhere in its output. If Assembly holds a real Holder directly, what real method does it already have available to get that data, rather than reading Holder's own fields one by one?
+- The real source XML keeps assembly data (TA number, stick-out) and holder data as two separate sibling elements, not one combined element. What would Assembly.from_xml's own real parameter list need to reflect that?
+
+### Project Change
+
+- **Reference Source:** mastercam-app/mastercam_app/parsing/parser.py:51-72 (quoted in
+full, the real, whole class):
+@dataclass
+class Assembly:
+    holder: Holder
+    ta_number: str
+    stick_out: str = ""
+
+    @classmethod
+    def from_xml(cls, sp_assembly_xml, sp_holder_xml):
+        if sp_assembly_xml is None:
+            return cls(holder=Holder(), ta_number="0")
+        def sg(elem, tag):
+            n = elem.find(tag) if elem is not None else None
+            return n.text.strip() if n is not None and n.text else ""
+        return cls(
+            holder=Holder.from_xml(sp_holder_xml),
+            ta_number=sg(sp_assembly_xml, "Name"),
+            stick_out=sg(sp_assembly_xml, "StickOut"),
+        )
+
+    def to_dict(self):
+        return {"ta_number": self.ta_number, "stick_out": self.stick_out,
+                "holder": self.holder.to_dict()}
+- **Files affected:** `mastercam-app/mastercam_app/parsing/parser.py` (existing)
+- **Change type:** none
+- **Location:** Already exists, already in exactly this shape - read, not typed, in this unit.
+- **Dependencies:** `Holder` and `Holder.from_xml` (the unit above) - `Assembly` genuinely cannot be explained without them already understood.
+
+### The Updated Project
+
+mastercam-app/mastercam_app/parsing/parser.py's real, whole `Assembly` class, already existing:
+
+**File:** `mastercam-app/mastercam_app/parsing/parser.py` (already exists — read-only, nothing to type)
+
+```python
+@dataclass
+class Assembly:
+    holder: Holder
+    ta_number: str
+    stick_out: str = ""
+
+    @classmethod
+    def from_xml(cls, sp_assembly_xml, sp_holder_xml):
+        if sp_assembly_xml is None:
+            return cls(holder=Holder(), ta_number="0")
+        def sg(elem, tag):
+            n = elem.find(tag) if elem is not None else None
+            return n.text.strip() if n is not None and n.text else ""
+        return cls(
+            holder=Holder.from_xml(sp_holder_xml),
+            ta_number=sg(sp_assembly_xml, "Name"),
+            stick_out=sg(sp_assembly_xml, "StickOut"),
+        )
+
+    def to_dict(self):
+        return {"ta_number": self.ta_number, "stick_out": self.stick_out,
+                "holder": self.holder.to_dict()}
+```
+
+### Mechanical Walkthrough
+
+- `holder: Holder` — A real field declaration with no default (Terms, above, contrasts this with `Holder`'s own all-defaulted fields) - its real type is `Holder` itself, not `str`. This one line is **composition**: `Assembly` doesn't repeat `Holder`'s own six fields; it holds one real `Holder` instance directly.
+- `ta_number: str (no default)` — Also required, no default - `@dataclass` requires every field with no default to come before any field that has one in the real declaration order, which is exactly why `stick_out`, the one real defaulted field, is declared last.
+- `if sp_assembly_xml is None: return cls(holder=Holder(), ta_number="0")` — The same real missing-input guard shape as `Holder.from_xml` (the unit above), adapted: since `ta_number` has no real default of its own, this real fallback path supplies `\"0\"` for it explicitly, and builds a real, empty `Holder()` directly (the first unit's own generated constructor) for the nested field.
+- `def sg(elem, tag): ...` — A real, second nested closure, similar in shape to `Holder.from_xml`'s own `sg` but genuinely different: this one takes `elem` as a real, explicit parameter instead of reading a single, fixed `xml` from its own enclosing scope, since `Assembly.from_xml` has two real XML elements to read from, not one.
+- `holder=Holder.from_xml(sp_holder_xml)` — Full treatment above (Objects and methods, `Holder.from_xml`) - called here directly, passing `Assembly.from_xml`'s own second real argument straight through. This is the real, concrete moment composition (Terms, above, implicit in `holder: Holder`) actually happens: one real class's own `from_xml` calling a different real class's `from_xml` directly, rather than re-deriving `Holder`'s own real parsing logic here a second time.
+- `"holder": self.holder.to_dict()` — The real, matching payoff on the output side: `to_dict` doesn't read `self.holder`'s own six fields one by one either - it calls `self.holder.to_dict()` (`Holder`'s own real method, above) directly, and nests the real result under one `\"holder\"` key.
+
+### CS Lens
+
+This is **composition over duplication** - `Assembly` is built *out of* a real `Holder`, not built to merely *resemble* one with its own copied fields. Also recognized in: a car's own real engine assembly (built *from* a real, separate cylinder-head component, not a re-manufactured copy of one), a company's own real org chart (a department *contains* real employee records; it doesn't duplicate each employee's own personnel file inline), and a real software UI's own panel widget holding a real, separate button widget rather than redrawing a button's own pixels by hand.
+
+### SE Lens
+
+The real alternative already ruled out by this exact class's own real shape: if `Assembly` copied `Holder`'s six fields onto itself instead of holding one, a real future change to `Holder` (a seventh field) would need a matching, separate, real change to `Assembly` too, by hand, or the two would silently drift apart. Composition avoids that specific real cost entirely - `Assembly` automatically has whatever `Holder` has, since it holds a real `Holder`, not a copy. The real, honest cost this design does carry: reading one real assembly's own holder name now takes `assembly.holder.name`, one real attribute access deeper than a flat `assembly.holder_name` would have been - a small, real, ongoing readability cost traded for never needing to keep two real field lists in sync by hand.
+
+### Verification
+
+```text
+tests/test_holder_assembly.py::test_assembly_from_xml_builds_nested_holder PASSED
+tests/test_holder_assembly.py::test_assembly_from_xml_none_returns_ta_number_zero_and_default_holder PASSED
+tests/test_holder_assembly.py::test_assembly_to_dict_nests_holder_to_dict PASSED
+```
+
+Full saved run: `mastercam-app/tests/test_holder_assembly.py`.
+
+### Connection to the previous unit
+
+The unit above showed `Holder.from_xml` building the real, smallest object in this whole parser; this unit showed `Assembly` built directly on top of it - by holding a real `Holder`, not copying it - the same real composition pattern this phase's later lessons will show repeating at every larger level, up through `Tool` holding an `Assembly`, and `Sequence` holding a `Tool`.
+
+## Connect the pieces
+
+One real, small piece of XML, followed all the way through: a real `<spHolder>` element becomes a real `Holder`, via `Holder.from_xml` reading its own six real child elements through its own nested `sg` closure. A real, sibling `<spAssembly>` element, plus that same real holder element, become one real `Assembly`, via `Assembly.from_xml` calling `Holder.from_xml` directly rather than re-deriving its logic. Both real classes hand themselves back out the same real way, `to_dict()`, with `Assembly`'s own version nesting `Holder`'s output one level deep - and all of this is now backed by 7 real, already-passing tests in mastercam-app/tests/test_holder_assembly.py, not just this lesson's own read-through.
+
+**Next lesson:** Tool - the real dataclass built on top of Assembly, with real validation logic appended after construction, not just plain parsing - the next genuinely new pattern in this app's own real parser.

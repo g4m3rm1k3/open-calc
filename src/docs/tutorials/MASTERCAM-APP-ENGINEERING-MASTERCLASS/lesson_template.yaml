@@ -1,0 +1,113 @@
+# Base template - copy this file per lesson and fill in the pieces.
+# Run: python lesson_compiler.py <this-file>.yaml
+# It validates structure first and refuses to compile if anything
+# required is missing - see lesson_compiler.py's validate() for exactly
+# what gets checked mechanically.
+
+number: "0.0"              # e.g. "0.3"
+title: ""                  # concept-first, e.g. "Backend Boundaries"
+path_note: >
+  File paths under backend/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same
+  repository's verification folder.
+
+what_you_will_build: >
+  One paragraph: the working feature, then the transferable problem.
+
+what_you_need_to_know_first: >
+  Concepts only - never a lesson number/pointer.
+
+terms:
+  - name: ""
+    definition: >
+      What it is, and why it exists / what problem it solves.
+
+objects_and_methods:
+  - name: ""
+    what_it_is: ""
+    implementation: ""
+    its_use: ""
+    type: ""
+    responsibility: ""
+    depends_on: ""
+    connects_to: ""
+    shape: ""
+
+concept_units:
+  - title: ""
+    problem: >
+      What are we trying to solve, right now, specifically?
+    socratic_prompt:
+      - ""
+    project_change:
+      reference_source: >
+        Real file + line range, quoted verbatim - or an explicit
+        "No reference counterpart - because ___."
+      files_affected:
+        - path: ""
+          status: new          # new | existing | modified | none
+      change_type: add         # add | replace | remove | refactor | configure | none
+      location: ""
+      dependencies: ""
+    new_code:
+      applicable: true
+      intro: ""
+      file: ""
+      status: new              # new | existing
+      language: python
+      code: |
+        # smallest typeable fragment
+    updated_project:
+      applicable: true
+      intro: ""
+      file: ""
+      language: python
+      code: |
+        # smallest real enclosing structure, new_code's lines included
+        # verbatim; anything here NOT already in new_code.code must end
+        # its line with "  # <- new" or it fails validation.
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: ""
+          explanation: >
+            Explain, don't describe - why it's shaped this way, not
+            just what it does.
+    mental_model:
+      applicable: false        # true only when the unit has a shape a
+                                # reader can't easily hold in prose alone -
+                                # more than one path/boundary/branch, or a
+                                # multi-stage relationship between them.
+      diagram: |
+        plain-text diagram (arrows/boxes), showing structure or
+        relationships - not real per-step values (that's
+        execution_trace's job) and not decorative (only when the real
+        shape genuinely needs a picture to stay straight)
+    execution_trace:
+      applicable: false        # true only if there's a loop/recursion/state, or real timing to trace
+      shape: values            # values | timing
+      lines:
+        - ""
+    cs_lens: >
+      Name the computational concept. For a hard concept, name several
+      unrelated real-world recurrences, not one.
+    se_lens: >
+      Name the design principle, the real alternative not chosen, and
+      the honest cost.
+    commands:
+      - command: ""             # the REAL, concrete command - never <path>
+        explanation: ""
+    verification:
+      applicable: true
+      real_output: |
+        paste the real, actually-run output here
+      output_file: ""
+      exemption_reason: ""      # only used when applicable: false
+    connection_to_previous: >
+      One sentence.
+
+closing:
+  connect_the_pieces: >
+    One concrete value/action traced through every unit, start to finish.
+  next_lesson_pointer: >
+    What comes next - no lesson number.

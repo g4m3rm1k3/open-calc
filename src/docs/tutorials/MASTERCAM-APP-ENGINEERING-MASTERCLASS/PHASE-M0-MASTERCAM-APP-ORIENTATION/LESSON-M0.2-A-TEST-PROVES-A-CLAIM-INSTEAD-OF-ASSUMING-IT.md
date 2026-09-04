@@ -1,0 +1,324 @@
+# Lesson M0.2: A Test Proves a Claim Instead of Assuming It
+
+*File paths under mastercam-app/... refer to the real manufacturing-platform repository's mastercam-app folder. Paths under verification/... refer to that same repository's verification folder.*
+
+**What you will build:** Three small, real, actually-run proofs: first, that Python's own `assert` statement either does nothing at all or stops the program outright - there is no in-between; second, that `pytest` finds and runs real test functions by name alone, and explains a real failure far more precisely than a bare `assert` does; third, one real, small, already-existing piece of this app's own real parser (`extract_subprogram_number`), pinned down with a real test proving exactly what it already, actually does today. The transferable problem: a claim about what code does is either backed by something that was actually run and checked, or it is only ever a guess wearing the clothing of a fact - this lesson is the foundation the next one (building real tests for this app's own real parser) stands on.
+
+**What you need to know first:** Lesson M0.1 - specifically its own real discipline of running code and showing real, actual output rather than describing behavior from memory or assumption; nothing about this app's own parser itself is assumed yet.
+
+## Terms used in this lesson
+
+- **test / test function** — A real, ordinary function whose only real job is to make one specific claim about what some other, real code does, and let the program itself check that claim by actually running it - not a human reading the code and deciding, by feel, whether it looks right. It exists because "I read it and it looks correct" and "I ran it and confirmed it" are different claims, and only the second one is real evidence.
+- **assert statement** — A real, ordinary Python statement - not a function call, a real keyword-based statement in the language itself - that evaluates a real expression immediately: if that expression is truthy, nothing happens at all, execution just continues to the next line; if it's falsy, the statement immediately raises a real `AssertionError` (Objects and methods, below) and the program stops right there, unless something catches it. It exists as the single most basic real building block every other testing tool in this lesson - including `pytest` itself - is actually built on top of underneath.
+- **test discovery** — `pytest`'s own real, automatic behavior of finding every real function matching one fixed naming convention - a file starting with `test_`, containing a function also starting with `test_` - and running each one as its own separate, real test, without a human having to list them by hand anywhere. It exists so adding a new real test is as simple as writing one more real function with the right name - nothing has to be registered, imported into a master list, or manually wired in for `pytest` to find and run it.
+- **characterization test** — A real test written to record and pin down what a real, existing piece of code already, actually does today - verified by really running it - as opposed to a test written before the code it checks even exists, predicting what that not-yet-written code should do (a real, different, and genuinely valid practice called test-driven development, not the one this lesson or the next one uses). It exists specifically for exactly this app's own real situation: `mastercam-app`'s own real parser already exists, already runs, and has already been checked against real XML this session - a characterization test's whole job is making that already-true fact checkable by a program from now on, not designing new behavior that doesn't exist yet.
+
+## Objects and methods used
+
+- **`AssertionError`**
+  - *What it is:* The real, standard-library built-in exception class Python raises, automatically, the moment an `assert` statement's own expression (Terms, above) turns out to be falsy.
+  - *Implementation:* A real, ordinary exception class, inheriting from Python's own built-in `Exception` - raised with no import needed, since it's one of Python's own always-available built-in names, the same as `ValueError` or `TypeError`.
+  - *Its use:* The first unit, below, deliberately triggers one for real, on purpose, specifically to show what a real, un-caught test failure actually looks like before the unit right after it, about pytest, explains the same real kind of failure far more precisely.
+  - *Type:* A real, built-in exception class.
+  - *Responsibility:* Signal, by being raised, that a real `assert` statement's own expression was falsy - and, since Python exceptions unwind the real call stack until something catches them, stop whatever real code was running at the exact real line the failed `assert` sat on, unless a real `try`/`except` block is deliberately placed around it (none is, anywhere in this lesson).
+  - *Depends on:* A real, falsy `assert` expression to trigger it - nothing else raises it under ordinary use.
+  - *Connects to:* Raised directly by Python's own real `assert` statement (Terms, above); `pytest` (the unit below about pytest itself) catches this exact real exception internally for every test function it runs, which is how it can print a real, detailed failure report instead of just letting the whole test run crash the instant one test fails.
+  - *Shape:* Carries no real, structured data of its own here - this lesson's own bare `assert add(2, 3) == 6` (the first unit, below) raises one with an empty real message; pytest (the unit right after it) is what adds the real, readable detail (the actual values on both sides of the failed comparison) on top of this otherwise plain, undecorated exception.
+
+- **`mastercam_app.parsing.parser.extract_subprogram_number`**
+  - *What it is:* A real, small, already-existing, pure function in this app's own real parser - given a real operation comment string, it looks for a real subprogram number written inside it, using a fixed real order of patterns, and hands back whatever it finds as a real string.
+  - *Implementation:* `def extract_subprogram_number(comment: str) -> str:`, defined at mastercam-app/mastercam_app/parsing/parser.py:421-450ish. Not shown here in full - the third unit, below, tests its real, observed behavior directly rather than walking through its own internal regex patterns, which this track's own next planned lesson (the real parser and its dataclasses, in full) is where that full internal treatment belongs instead.
+  - *Its use:* The third unit, below, writes this lesson's one real characterization test (Terms, above) against it - a real, small, already-existing, already-pure piece of this app's own real parser, chosen specifically because it's small and self-contained enough to pin down completely in one lesson, without yet needing the full parser walkthrough a later lesson is planned to cover.
+  - *Type:* A real, module-level, pure function - no class, no state, defined once in mastercam_app/parsing/parser.py.
+  - *Responsibility:* Given one real operation comment string, decide whether it contains a real, extractable subprogram number, using a fixed real priority order among a few different real ways that number might be written, and hand back either that real number as a string, or a real empty string when none of those patterns match at all.
+  - *Depends on:* One real argument, `comment` - a string, or `None`, both of which the third unit's own real test confirms it handles without raising anything.
+  - *Connects to:* Called from this app's own real `Sequence.regroup_operations_by_subprogram` method elsewhere in mastercam_app/parsing/parser.py - not shown or tested in this lesson, deferred to the later, full-parser lesson, since testing that caller correctly would require this app's own real `Operation`/`Sequence` dataclasses, not yet covered here.
+  - *Shape:* Always returns a real, plain string - either the real digits it found, as text (never converted to a real integer), or a real empty string `""` when nothing matched; it never returns `None`, even when given `None` itself as input, confirmed directly by the third unit's own real, executed test.
+
+## Concept Unit: A Raw `assert` Either Does Nothing, or Stops the Program - No In Between
+
+### The Problem
+
+A claim like "this function returns 5 when given these two numbers" needs some real way to actually be checked by a program, not just stated in a comment or a commit message. Before any real tool is shown: given nothing but an ordinary `if` statement already familiar from any Python code, what's the smallest real thing you could write that would let a program stop itself the moment a claim like that turned out to be false?
+
+Before reading on:
+
+- If a real claim about code turns out to be true, what, if anything, should actually happen when a program checks it - anything visible at all, or nothing?
+- If that same real claim turns out to be false instead, what real, concrete consequence would make that failure impossible to quietly miss - not print a warning nobody reads, but something that can't be ignored?
+- Python already has a real way to stop a program immediately when something is wrong - what do you already know that does that?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - this is a from-scratch, throwaway teaching example, built to prove the one real mechanism every other tool in this lesson sits on top of.
+- **Files affected:** `verification/mastercam-phase-00/lab_add.py` (new), `verification/mastercam-phase-00/lab_assert_pass.py` (new), `verification/mastercam-phase-00/lab_assert_fail.py` (new)
+- **Change type:** add
+- **Location:** New files, no existing project to place them within.
+- **Dependencies:** Nothing beyond Python's own standard library.
+
+### The New Code
+
+Three small files, typed fresh. First, a tiny real function to make claims about; second and third, two files that each make one real claim about it - one true, one deliberately false:
+
+**File:** `verification/mastercam-phase-00/lab_add.py` (new)
+
+```python
+def add(a, b):
+    return a + b
+```
+
+**File:** `verification/mastercam-phase-00/lab_assert_pass.py` (new)
+
+```python
+from lab_add import add
+
+assert add(2, 3) == 5
+print("assert did not raise - the program kept running past it")
+```
+
+**File:** `verification/mastercam-phase-00/lab_assert_fail.py` (new)
+
+```python
+from lab_add import add
+
+assert add(2, 3) == 6
+print("this line never runs")
+```
+
+### Mechanical Walkthrough
+
+- `def add(a, b): return a + b` — An already-familiar, ordinary real function - nothing new here syntactically. It exists purely to have one small, real piece of behavior worth making a claim about at all; the claim itself lives in the two files below, not here.
+- `assert add(2, 3) == 5` — Full treatment above (Terms, for the `assert` statement itself). This specific real expression, `add(2, 3) == 5`, is genuinely true - `add(2, 3)` really evaluates to `5` first, then `5 == 5` is compared - so this exact `assert` does nothing observable at all, confirmed directly in Verification, below.
+- `print(...)` — An already-familiar real call - included specifically so Verification, below, has something visible to confirm the program actually kept running past the `assert` above, rather than the reader having to infer "nothing happened" as a real fact from nothing printing at all.
+- `assert add(2, 3) == 6` — The identical real statement shape as the file above, with one real value changed - `add(2, 3)` still evaluates to `5`, but `5 == 6` is false, so this specific real `assert` raises a real `AssertionError` (Objects and methods, above) immediately, right at this exact line.
+- `print("this line never runs")` — Never actually reached - proven directly in Verification, below, by its own real absence from the output. This is the real, concrete meaning of "the program stops right there": not a warning printed and continuing, an actual halt, with everything written after the failed `assert` in this same file never running at all.
+
+### CS Lens
+
+This is a **boolean precondition check** - one specific real expression's truth value deciding, completely, whether execution continues at all. Also recognized in: a machine's own real interlock (a CNC mill's own door switch stopping the spindle outright the instant it reads false, no partial or "mostly safe" state in between), a database transaction's own real commit check (either every real condition holds and the transaction commits, or it doesn't and nothing partial is saved), and a building's own real fire door (either fully latched, a true condition the alarm system checks, or it isn't, with no real in-between state the system treats as acceptable).
+
+### SE Lens
+
+The real alternative this lesson's own next unit moves away from: writing every real check as a bare `assert`, scattered across plain `.py` files, the way this exact unit just did. That alternative genuinely works - Verification, below, proves it - but it has a real, honest cost visible already, even in this small an example: nothing here found and ran these tests automatically, nothing collected their results into one real report, and the moment `lab_assert_fail.py`'s own `assert` failed, its own process stopped completely - a second, unrelated real claim written further down that same file would never even get checked at all, once one earlier `assert` in it had already failed. pytest, taught in the unit right after this one, exists specifically to remove that real cost without removing `assert` itself - `pytest` still uses real `assert` statements underneath, just run and reported differently.
+
+### Commands needed
+
+- `python verification/mastercam-phase-00/lab_assert_pass.py` — Runs the real, passing file directly with the real Python interpreter, from inside manufacturing-platform's own repo root.
+- `python verification/mastercam-phase-00/lab_assert_fail.py` — Runs the real, deliberately-failing file the same way, run second so both real outputs sit together in Verification, below.
+
+### Verification
+
+```text
+=== python lab_assert_pass.py ===
+assert did not raise - the program kept running past it
+
+=== python lab_assert_fail.py ===
+Traceback (most recent call last):
+  File "C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-00\lab_assert_fail.py", line 3, in <module>
+    assert add(2, 3) == 6
+           ^^^^^^^^^^^^^^
+AssertionError
+exit code: 1
+```
+
+Full saved run: `verification/mastercam-phase-00/lab_assert_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first one in this lesson.
+
+## Concept Unit: pytest Finds Tests by Name, Then Explains a Real Failure in Detail
+
+### The Problem
+
+The unit above proved a bare `assert` stops a whole file cold the instant one fails - `lab_assert_fail.py`'s own second line never ran. A real app needs to check many real claims and still find out about every failing one, not just the first, and needs a real way to run every real test function without a human hand-typing `python lab_X.py` once per file. Given the unit above already proved `assert` raises a real, catchable exception: what would a tool need to actually do, mechanically, to run many real test functions, keep going after one fails, and still report every real failure it found?
+
+Before reading on:
+
+- If a real tool wanted to run every test function in a file without a human listing them by name, what would it need to look for in that file to find them automatically?
+- The unit above showed one failed `assert` stops a whole file. What would a real test tool need to do internally - given `AssertionError` is just a real, catchable exception - to keep going and check the next real test after one fails, instead of stopping entirely?
+- `assert 5 == 6` only ever raises a bare `AssertionError` with no real message. What real information would actually help someone fix a failing test that a bare `AssertionError` alone doesn't give them?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - `pytest` itself is a real, external, already-installed tool (confirmed this session: `pytest 7.4.3`), not project code; this unit's own new files are throwaway teaching examples using it for the first time.
+- **Files affected:** `verification/mastercam-phase-00/test_lab_add.py` (new)
+- **Change type:** add
+- **Location:** A new file, reusing lab_add.py from the unit above - no existing project structure to place it within.
+- **Dependencies:** `pytest`, already installed in this environment (confirmed this session via `pytest --version`); no new installation needed.
+
+### The New Code
+
+One new file, typed fresh, reusing lab_add.py's own real `add` function from the unit above - two real test functions, one making a true claim, one deliberately false, matching the unit above's own two separate files, now both collected here as real, separate test functions in one file instead:
+
+**File:** `verification/mastercam-phase-00/test_lab_add.py` (new)
+
+```python
+from lab_add import add
+
+
+def test_add_two_positive_numbers():
+    assert add(2, 3) == 5
+
+
+def test_add_produces_wrong_result_on_purpose():
+    assert add(2, 3) == 6
+```
+
+### Mechanical Walkthrough
+
+- `test_lab_add.py (the filename itself)` — Full treatment above (Terms, test discovery) - this specific real filename starting with `test_` is not a stylistic choice; it's the exact real pattern `pytest`'s own test discovery looks for. A file named `lab_add_checks.py`, containing the identical real functions below, would be silently skipped entirely by `pytest`'s own default discovery - confirmed by this being the real, documented convention `pytest` itself relies on, not an assumption.
+- `def test_add_two_positive_numbers():` — Full treatment above (Terms, test discovery) for the real `test_` naming convention this function name follows - otherwise an already-familiar function definition, taking no real arguments, matching the plain shape `pytest` expects a real test function to have.
+- `assert add(2, 3) == 5` — The identical real statement, and the identical real true claim, from `lab_assert_pass.py` in the unit above - now living inside a real, named test function `pytest` can find and run automatically, instead of being the only real statement in its own standalone file.
+- `def test_add_produces_wrong_result_on_purpose():` — A second, separate real test function, also matching the real `test_` naming convention - genuinely independent of the first one; `pytest` runs each real test function it discovers as its own separate real unit, confirmed directly in Verification, below, by both running and being reported on individually.
+- `assert add(2, 3) == 6` — The identical real false claim from `lab_assert_fail.py` in the unit above - but this time, because it lives inside its own real, separate test function rather than being the only statement in its own file, its real failure doesn't prevent the first real test function, above it, from having already run and passed.
+
+### CS Lens
+
+This is **automated test discovery and isolation** - finding real, independent units of checkable behavior by a fixed real naming convention, then running each one in a way that one real failure can't silently hide or prevent another. Also recognized in: a factory's own real quality-control line (each real unit gets its own real pass/fail check; one defective unit doesn't stop the line from checking the next one), a spell-checker's own real pass over a document (every real word gets its own real check; one misspelled word doesn't stop the rest of the document from being checked too), and a real medical panel of blood tests run from one real sample (each real value - cholesterol, glucose, iron - gets its own real pass/fail range, reported together, with one abnormal result never hiding whether the others were normal).
+
+### SE Lens
+
+The real design principle: **fail-safe isolation between independent checks** - one real test's own failure should never be allowed to prevent a different, unrelated real test from running and being reported on. The real alternative already shown not to have this property is the unit above's own bare `assert` files - each real file is its own all-or-nothing unit; put ten real claims in one file, and the first false one hides whether the other nine were ever true. The real, honest cost `pytest` adds on top of bare `assert` to get this property: an external, real, already-installed dependency this project now needs available to run its own tests at all - `pytest` is not part of Python's own standard library, and confirming it's actually installed (Commands, below) is a real step bare `assert` alone never required.
+
+### Commands needed
+
+- `python -m pytest test_lab_add.py -v` — Runs `pytest` (already confirmed installed this session) as a real module via Python's own `-m` flag, against this one real file, from inside verification/mastercam-phase-00/. The real `-v` flag (verbose) makes `pytest` print each real test function's own name and real pass/fail result individually, rather than only a final real summary count.
+
+### Verification
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-7.4.3, pluggy-1.6.0 -- ...python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-00
+plugins: anyio-3.7.1, Faker-20.0.0, asyncio-0.21.1, cov-4.1.0, mock-3.12.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 2 items
+
+test_lab_add.py::test_add_two_positive_numbers PASSED                    [ 50%]
+test_lab_add.py::test_add_produces_wrong_result_on_purpose FAILED        [100%]
+
+================================== FAILURES ===================================
+__________________ test_add_produces_wrong_result_on_purpose __________________
+
+    def test_add_produces_wrong_result_on_purpose():
+>       assert add(2, 3) == 6
+E       assert 5 == 6
+E        +  where 5 = add(2, 3)
+
+test_lab_add.py:9: AssertionError
+=========================== short test summary info ===========================
+FAILED test_lab_add.py::test_add_produces_wrong_result_on_purpose - assert 5 ...
+========================= 1 failed, 1 passed in 0.30s ==========================
+```
+
+Full saved run: `verification/mastercam-phase-00/lab_pytest_output.txt`.
+
+### Connection to the previous unit
+
+The unit above proved `assert` as a raw mechanism, one real claim per file, first failure stopping everything after it; this unit showed `pytest` running the identical two real claims as two real, independent test functions in one file - both running to completion regardless of the other's result, and the real failure explained with the actual values involved (`assert 5 == 6`, `where 5 = add(2, 3)`) instead of a bare, contextless `AssertionError`.
+
+## Concept Unit: A Characterization Test Pins Down What This App's Own Real Parser Already Does
+
+### The Problem
+
+Every test so far checked a small, throwaway function invented just for this lesson. This app's own real parser (mastercam_app/parsing/parser.py) already exists, already runs, and was already confirmed against real XML earlier this session - but none of that is checkable by a program right now; it only exists as something that was true once, during a real but unrepeatable session. Given `extract_subprogram_number` (Objects and methods, above) already, actually works today: what's the real difference between writing a test that predicts what a not-yet-written function *should* do, versus writing one that records what an already-working real function *already* does?
+
+Before reading on:
+
+- extract_subprogram_number("O1103 FINISH") already, really returns "1103" today, confirmed this session. Does a real test proving that fact teach the function anything new, or does it only ever record a fact that was already true?
+- Given the real function's own docstring mentions three different real patterns it looks for ('O123', 'SUB 123', 'just a number at the start') - how many separate real test functions would it take to check all three separately, rather than cramming every real case into one?
+- What real, concrete value would a test like this actually provide, later, if someone changed this exact function's own real code for an unrelated reason?
+
+### Project Change
+
+- **Reference Source:** mastercam-app/mastercam_app/parsing/parser.py:421-450ish (cited,
+not shown in full - Objects and methods, above, states why: this
+lesson tests the function's real, observed behavior, not its
+internal regex patterns, which a later, dedicated lesson on this
+app's own full parser is where that internal treatment belongs).
+- **Files affected:** `verification/mastercam-phase-00/lab_parser_characterization/test_extract_subprogram_number.py` (new)
+- **Change type:** add
+- **Location:** A new file, in a new folder, no existing project structure to place it within - this app's own real parser.py itself is not modified at all in this unit.
+- **Dependencies:** This app's own real, already-existing mastercam_app package (confirmed importable this session via `PYTHONPATH`, Commands below) and `pytest`, already confirmed installed in the unit above.
+
+### The New Code
+
+One new file, typed fresh, five real test functions - each one checking one real, separate, already-true fact about this app's own real `extract_subprogram_number`, confirmed by running each one this session before it was written here:
+
+**File:** `verification/mastercam-phase-00/lab_parser_characterization/test_extract_subprogram_number.py` (new)
+
+```python
+from mastercam_app.parsing.parser import extract_subprogram_number
+
+
+def test_leading_number_with_no_O_prefix():
+    assert extract_subprogram_number("1101 ROUGH POCKET") == "1101"
+
+
+def test_O_prefixed_number_takes_priority():
+    assert extract_subprogram_number("O1103 FINISH") == "1103"
+
+
+def test_SUB_prefixed_number():
+    assert extract_subprogram_number("SUB 12") == "12"
+
+
+def test_empty_string_returns_empty_string():
+    assert extract_subprogram_number("") == ""
+
+
+def test_none_returns_empty_string():
+    assert extract_subprogram_number(None) == ""
+```
+
+### Mechanical Walkthrough
+
+- `from mastercam_app.parsing.parser import extract_subprogram_number` — A real, ordinary import, identical in kind to every real import already covered in Lesson M0.1 - reaching directly into this app's own real, already-existing package to import one real, already-working function, rather than redefining or copying it into this throwaway test file.
+- `test_leading_number_with_no_O_prefix / test_O_prefixed_number_takes_priority / test_SUB_prefixed_number` — Three separate real test functions (test discovery, Terms above), each checking one separate real pattern this app's own real function already, actually handles - kept as three real, separate functions rather than one, so a future real failure in only one of these three real patterns is reported as exactly that one, by its own real, descriptive name, never bundled with the other two.
+- `test_empty_string_returns_empty_string / test_none_returns_empty_string` — Two more separate real test functions, checking this app's own real function against its own real edge cases - an empty string, and `None` itself - both already, actually handled by the real `if not comment: return \"\"` line at this function's own real start, confirmed directly in Verification, below, by both passing.
+
+### CS Lens
+
+This is the same real **test isolation** concept from the unit above, now applied to real, existing project code instead of a throwaway example - five separate real facts about one real function, each checkable, reportable, and fixable independently of the other four.
+
+### SE Lens
+
+The real design principle named in Terms, above: **characterizing existing behavior instead of designing new behavior**. The real alternative not chosen here: rewriting or "improving" `extract_subprogram_number` first, then writing tests for the new version - that alternative is exactly backwards for this app's own real, current situation, where the explicit, real user instruction governing this whole track right now is understanding this exact function, and everything around it, before changing anything. The honest, real cost characterization tests carry that this lesson doesn't hide: a characterization test proves this function's own current, real behavior is genuinely captured and checkable - it does not, by itself, prove that behavior is correct, desirable, or free of the exact kind of real bug this session already found and fixed once elsewhere in this same app (Lesson M0.1's own `get_base_path()` unit) - only that whatever it does today keeps doing exactly that, checkably, going forward, until someone deliberately decides otherwise.
+
+### Commands needed
+
+- `python -m pytest --version` — Confirms `pytest` is actually installed and importable in this real environment before relying on it - real, printed output this session: `pytest 7.4.3`.
+- `PYTHONPATH="/c/Users/g4m3r/Documents/manufacturing-platform/mastercam-app" python -m pytest lab_parser_characterization/test_extract_subprogram_number.py -v` — Runs this unit's own real test file with `pytest`, from inside verification/mastercam-phase-00/, with the real `PYTHONPATH` environment variable set to this app's own real mastercam-app/ folder so the real `from mastercam_app.parsing.parser import ...` line above can actually find and import this app's own real package - the same real, standard way to make an already-existing project's own code importable from a test file living outside that project's own folder, without permanently modifying anything inside the real project itself.
+
+### Verification
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-7.4.3, pluggy-1.6.0 -- ...python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-00
+plugins: anyio-3.7.1, Faker-20.0.0, asyncio-0.21.1, cov-4.1.0, mock-3.12.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 5 items
+
+lab_parser_characterization/test_extract_subprogram_number.py::test_leading_number_with_no_O_prefix PASSED [ 20%]
+lab_parser_characterization/test_extract_subprogram_number.py::test_O_prefixed_number_takes_priority PASSED [ 40%]
+lab_parser_characterization/test_extract_subprogram_number.py::test_SUB_prefixed_number PASSED [ 60%]
+lab_parser_characterization/test_extract_subprogram_number.py::test_empty_string_returns_empty_string PASSED [ 80%]
+lab_parser_characterization/test_extract_subprogram_number.py::test_none_returns_empty_string PASSED [100%]
+
+============================== 5 passed in 0.08s ==============================
+```
+
+Full saved run: `verification/mastercam-phase-00/lab_parser_characterization_output.txt`.
+
+### Connection to the previous unit
+
+The unit above proved `pytest` running many independent real claims about a throwaway function; this unit ran the identical real technique against one small, real, already-existing piece of this app's own actual parser - proving it's not just a lesson technique, but something that already, genuinely works against the real code this whole track exists to teach.
+
+## Connect the pieces
+
+One real claim, followed through every real tool in this lesson: "extract_subprogram_number returns \"1103\" for the comment \"O1103 FINISH\"" starts as a real fact this session already observed once, informally, while investigating this app's own parser earlier. The first unit proved a bare `assert` can check a claim like that for real, immediately, at the real cost of stopping everything else the instant it's wrong. The second unit proved `pytest` checks many such real claims independently, reporting every real failure with the real values involved, not just a bare exception. The third unit aimed that exact same real machinery at this app's own real code, turning one, real, previously-informal observation into a real, permanent, five-part characterization test that now genuinely proves, on demand, exactly what this one small piece of this app's own real parser does today.
+
+**Next lesson:** Building a real, complete test suite for this app's own real parser as a whole - starting from `parse_mastercam_xml` itself and the real dataclasses (Holder, Assembly, Tool, Operation, Sequence, Part) it builds, run against this app's own real sample XML files, following the exact same characterization-test approach this lesson's own third unit just proved works.
