@@ -1,0 +1,285 @@
+# Lesson M2.1: The One Real Function Python Calls Before Giving Up
+
+*File paths under mastercam-app/... refer to the real manufacturing-platform repository's mastercam-app folder. Paths under verification/... refer to that same repository's verification folder. Unlike Phase M1, nothing under mastercam-app/ is applied to the real app by this lesson - every real, concrete addition shown here is something you type into the real app yourself, once you understand it.*
+
+**What you will build:** A throwaway proof of `sys.excepthook` - the one real, global function Python calls for any exception that reaches the very top of a running program uncaught, before deciding what to do about it - first showing Python's own real default behavior, then a real, custom replacement. Then a second, real, separate throwaway proof, specific to this app's own real framework: that PySide6 already routes an exception raised inside a real button-click handler through that exact same real `sys.excepthook`, and, unlike a plain script, the real app keeps running afterward instead of exiting. The transferable problem: this app's own real, current gap - "when there are code errors there is no terminal" - isn't that errors go uncaught; it's that they're already being caught and printed to a real place (`stderr`) nobody using a packaged, windowed app can ever see.
+
+**What you need to know first:** Nothing about exception handling specifically - Lesson M1.2's own real `try`/`except` usage inside `Tool.from_xml` is the closest prior exposure, and this lesson explains `sys.excepthook` fully regardless.
+
+## Terms used in this lesson
+
+- **uncaught exception** — A real exception that was `raise`d somewhere, and never matched by any real, enclosing `try`/`except` block anywhere between where it was raised and the very top of the program. It exists as a real, distinct category from a *caught* exception (Lesson M1.2's own real `except ValueError:` blocks inside `Tool.from_xml`) - a caught exception is handled and the program continues normally; an uncaught one keeps unwinding, real function call by real function call, until nothing is left to catch it.
+- **stderr** — A real, second output stream every running program has, separate from `stdout` (what `print()` writes to by default) - conventionally where error messages and tracebacks go, so a real, automated tool reading a program's normal output can tell the two apart. It exists here specifically because a real, packaged, windowed application (this app, once built with PyInstaller) has no real, visible console at all - anything written to `stderr` reaches nowhere a real user can see, even though the real message was genuinely produced.
+
+## Objects and methods used
+
+- **`sys.excepthook`**
+  - *What it is:* A real, ordinary, real, module-level attribute on Python's own `sys` module - not a decorator, not a context manager, a plain variable that happens to hold a real, callable function. Python's own real interpreter calls whatever function this real variable currently points to, automatically, the moment an exception reaches the top of the program still uncaught.
+  - *Implementation:* A real function assigned to `sys.excepthook`, with exactly three real parameters: `sys.excepthook(exc_type, exc_value, exc_tb)` - the real exception's own class, the real exception instance itself, and a real traceback object describing where it happened. Python's own real, default value for this is a real function that formats and prints all three to `stderr` (Terms, above) - exactly what the first unit's own first throwaway lab shows happening automatically, with nothing installed at all.
+  - *Its use:* The first unit, below, replaces this real, default function with a throwaway one; the second unit proves PySide6 itself already calls whatever real function this variable points to, for exceptions raised inside a real Qt slot specifically.
+  - *Type:* A real, plain, reassignable module-level variable holding a callable.
+  - *Responsibility:* Decide what happens to any real exception that made it all the way to the top of the program without being caught by anything - formatting it, logging it, displaying it, or anything else a real, custom function assigned here chooses to do.
+  - *Depends on:* Nothing to install it - reassigning `sys.excepthook = my_function` is itself the entire real mechanism; no registration call, no decorator.
+  - *Connects to:* Called automatically by Python's own real interpreter (for a plain, uncaught exception) and, confirmed directly by Concept Unit 2's own real, executed proof, by PySide6's own real Qt event loop too, whenever a real slot raises something nothing inside it catches.
+  - *Shape:* Always called with exactly the same real three arguments, regardless of what actually went wrong - a real, fixed, three-item shape a custom real function can always rely on.
+
+## Concept Unit: sys.excepthook Is a Real, Reassignable Variable, Not a Fixed Rule
+
+### The Problem
+
+This app's own real, current behavior - a real exception somewhere produces no visible feedback at all, once packaged - has to be a real, changeable *default*, not a fixed, unchangeable rule, or nothing this lesson teaches could ever fix it. Before any real tool is shown: is what happens to an uncaught real exception (printing a real traceback, exiting) baked into Python itself with no way to change it, or is it something a real program can override?
+
+Before reading on:
+
+- sys.excepthook is a real, ordinary Python variable, the same kind of thing as any other name you could assign to. What would you expect to happen if you assigned a different real function to it, before an exception ever occurs?
+- Given that, would replacing sys.excepthook change what happens the moment an exception is raised, or only after it's already gone completely uncaught, all the way to the top?
+- What real, concrete information would a replacement function need, at minimum, to be able to report a real error usefully?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - a from-scratch, throwaway example proving Python's own real default `sys.excepthook` behavior, and a real replacement, before either is proposed for the real app in the unit right after this one.
+- **Files affected:** `verification/mastercam-phase-02/lab_excepthook_default.py` (new), `verification/mastercam-phase-02/lab_excepthook_custom.py` (new)
+- **Change type:** add
+- **Location:** New files, no existing project to place them within.
+- **Dependencies:** Nothing beyond Python's own standard library.
+
+### The New Code
+
+Two small, real, throwaway scripts, typed fresh - the first with no real `sys.excepthook` installed at all, the second replacing it with a real, custom function first:
+
+**File:** `verification/mastercam-phase-02/lab_excepthook_default.py` (new)
+
+```python
+def boom():
+    raise ValueError("something real went wrong")
+
+print("before boom")
+boom()
+print("this line never runs")
+```
+
+**File:** `verification/mastercam-phase-02/lab_excepthook_custom.py` (new)
+
+```python
+import sys
+
+captured = []
+
+
+def my_excepthook(exc_type, exc_value, exc_tb):
+    captured.append(f"CAUGHT: {exc_type.__name__}: {exc_value}")
+    print("my_excepthook ran instead of the default one")
+
+
+sys.excepthook = my_excepthook
+
+
+def boom():
+    raise ValueError("something real went wrong")
+
+
+print("before boom")
+boom()
+print("this line still never runs")
+print("captured list after the crash:", captured)
+```
+
+### Mechanical Walkthrough
+
+- `boom() (first file)` — An already-familiar real function call - `boom` itself raises, and nothing anywhere in this file catches it, so it becomes a real, genuinely uncaught exception (Terms, above), confirmed in Verification, below, to print a real traceback and exit with a real, non-zero status.
+- `def my_excepthook(exc_type, exc_value, exc_tb): ...` — Full treatment above (Objects and methods) - a real, ordinary function definition, matching `sys.excepthook`'s own real, fixed three-parameter shape exactly.
+- `sys.excepthook = my_excepthook` — The entire real mechanism - a plain, real assignment, reassigning a real, existing variable Python's own interpreter already checks. No decorator, no registration call, nothing more than this one real line.
+- `boom() (second file)` — Raises identically to the first file - but this time, confirmed directly in Verification below, `my_excepthook` runs instead of Python's own real, default printer.
+- `print("this line still never runs") / print("captured list after the crash:", captured)` — Neither of these two real lines ever executes, confirmed by their own real absence from Verification's output - a real, important, non-obvious fact: `sys.excepthook` fires only after the entire real call stack has already unwound, right before the interpreter gives up and exits. It is not a `try`/`except` that lets the *same* function keep running past the real line that failed.
+
+### CS Lens
+
+This is a real **hook** - one, fixed, real extension point a system deliberately exposes, letting outside code change *what happens* at one specific real moment, without needing to change the system's own real, internal logic that leads up to it. Also recognized in: a real doorbell's own chime being swappable (the real mechanism that detects a press is unchanged; only what happens *after* is customized), a database's own real "on commit" trigger, and a real web framework's own error-page handler, replacing a real, generic "500 Internal Server Error" with something project-specific.
+
+### SE Lens
+
+The real design principle: **Python exposes the one, real, final moment before giving up as a genuine extension point, instead of hard-coding "always print to stderr and exit."** The real alternative not chosen anywhere in this lesson's own real proof: wrapping the *entire* real program in one giant `try`/`except` block instead. That alternative genuinely can't work the same way here - the unit right after this one needs this real mechanism to work for exceptions raised inside a real Qt *slot*, called by Qt's own C++ event loop, somewhere a single, real, top-level Python `try`/`except` around `app.exec()` would never actually reach. The real, honest cost: `sys.excepthook` is real, global, process-wide state - only one real function can be installed at a time; a second, real library also replacing it later would silently discard whatever this app's own real replacement was doing, with no warning at all.
+
+### Commands needed
+
+- `python verification/mastercam-phase-02/lab_excepthook_default.py` — Runs the real, throwaway file with no custom hook installed, from inside manufacturing-platform's own repo root.
+- `python verification/mastercam-phase-02/lab_excepthook_custom.py` — Runs the second real, throwaway file, with the real, custom hook installed first.
+
+### Verification
+
+```text
+=== lab_excepthook_default.py ===
+before boom
+Traceback (most recent call last):
+  File "C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-02\lab_excepthook_default.py", line 5, in <module>
+    boom()
+    ~~~~^^
+  File "C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-02\lab_excepthook_default.py", line 2, in boom
+    raise ValueError("something real went wrong")
+ValueError: something real went wrong
+exit code: 1
+
+=== lab_excepthook_custom.py ===
+before boom
+my_excepthook ran instead of the default one
+exit code: 1
+```
+
+Full saved run: `verification/mastercam-phase-02/lab_excepthook_default_output.txt and verification/mastercam-phase-02/lab_excepthook_custom_output.txt`.
+
+### Connection to the previous unit
+
+There is no previous unit - this is the first one in this lesson.
+
+## Concept Unit: PySide6 Already Routes a Slot's Uncaught Exception Through sys.excepthook
+
+### The Problem
+
+The unit above proved `sys.excepthook` fires for a plain script, then the program exits. This app's own real code runs almost entirely inside real Qt slots - button-click handlers, dialog callbacks - driven by Qt's own C++ event loop, not by ordinary, linear `__main__` code the way the unit above's throwaway scripts were. Given that: would a real exception raised inside a real Qt slot even reach `sys.excepthook` at all, the same way a plain script's uncaught exception does - or does PySide6 handle that real case completely differently?
+
+Before reading on:
+
+- The unit above's own real proof only tested a plain, linear script - no GUI, no event loop. Do you already know whether that same real mechanism extends into a genuinely different execution model, or is this an open, real question this lesson still needs to answer?
+- If a real Qt slot raises an exception and PySide6 does route it through sys.excepthook, would you expect the whole real app to exit afterward, the same way the unit above's plain script did - or might a GUI event loop behave differently once one event's own handling goes wrong?
+- Given this app's own real, current symptom (no visible errors, app doesn't necessarily crash), which of those two real possibilities does that already hint at?
+
+### Project Change
+
+- **Reference Source:** No reference counterpart - a from-scratch, throwaway example, using real PySide6 widgets, proving real, current PySide6 behavior this session, before anything is proposed for the real app.
+- **Files affected:** `verification/mastercam-phase-02/lab_qt_slot_exception.py` (new), `verification/mastercam-phase-02/lab_qt_slot_exception_with_hook.py` (new)
+- **Change type:** add
+- **Location:** New files, no existing project to place them within.
+- **Dependencies:** PySide6, already installed and used throughout mastercam-app/.
+
+### The New Code
+
+Two small, real, throwaway PySide6 scripts, typed fresh - a real button whose real click handler raises, first with no `sys.excepthook` installed, then with the identical real hook pattern from the unit above:
+
+**File:** `verification/mastercam-phase-02/lab_qt_slot_exception.py` (new)
+
+```python
+import sys
+from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtCore import QTimer
+
+app = QApplication(sys.argv)
+btn = QPushButton("test")
+
+
+def on_click():
+    print("on_click: about to raise")
+    raise ValueError("exception raised inside a real Qt slot")
+
+
+btn.clicked.connect(on_click)
+
+def fire_and_check():
+    print("before btn.click()")
+    btn.click()
+    print("after btn.click() - did we get here?")
+    app.quit()
+
+QTimer.singleShot(0, fire_and_check)
+app.exec()
+print("after app.exec() returned")
+```
+
+**File:** `verification/mastercam-phase-02/lab_qt_slot_exception_with_hook.py` (new)
+
+```python
+import sys
+from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtCore import QTimer
+
+captured = []
+
+
+def my_excepthook(exc_type, exc_value, exc_tb):
+    captured.append(f"HOOK CAUGHT: {exc_type.__name__}: {exc_value}")
+
+
+sys.excepthook = my_excepthook
+
+app = QApplication(sys.argv)
+btn = QPushButton("test")
+
+
+def on_click():
+    raise ValueError("exception raised inside a real Qt slot")
+
+
+btn.clicked.connect(on_click)
+
+
+def fire_and_check():
+    btn.click()
+    print("after btn.click(), captured =", captured)
+    app.quit()
+
+
+QTimer.singleShot(0, fire_and_check)
+app.exec()
+print("app.exec() returned normally, exit will be 0")
+```
+
+### Mechanical Walkthrough
+
+- `btn.clicked.connect(on_click)` — Connects a real Qt signal (`clicked`, built into `QPushButton`) to a real, ordinary Python function - not this lesson's own new concept, included only so `btn.click()` below has a real function to actually invoke.
+- `QTimer.singleShot(0, fire_and_check)` — Schedules `fire_and_check` to run once the real Qt event loop (`app.exec()`, below) actually starts - a real, standard way to run real, one-off setup code after a Qt app is genuinely up and running, rather than before.
+- `btn.click() (first file)` — Programmatically triggers the identical real signal a real mouse click would - runs `on_click` for real, through Qt's own real, internal signal-dispatch mechanism, not by calling `on_click()` directly as an ordinary function call.
+- `print("after btn.click() - did we get here?") / print("after app.exec() returned") (first file)` — Both of these real lines *do* run, confirmed in Verification below - answering the unit's own Socratic question directly: a real Qt slot's uncaught exception does not stop the rest of this script, unlike the unit above's own plain-script proof. Qt's own event loop catches it internally and keeps going.
+- `sys.excepthook = my_excepthook (second file)` — The identical real mechanism from the unit above - installed here *before* `QApplication` is even constructed, so it's already in place the first time any real slot might raise.
+- `print("after btn.click(), captured =", captured) (second file)` — Confirmed in Verification, below, to actually print a real, non-empty `captured` list - proving PySide6's own internal exception handling for a real slot genuinely calls whatever real function `sys.excepthook` currently points to, the identical real mechanism as a plain, uncaught script exception, just triggered from inside Qt's own C++ event loop instead of Python's own top-level interpreter.
+
+### Execution Trace
+
+1. `app.exec()` starts Qt's own real event loop; `fire_and_check` runs (scheduled by `QTimer.singleShot(0, ...)`).
+2. `btn.click()` synchronously dispatches the real `clicked` signal, which calls `on_click()` - this is still inside Qt's own real signal-dispatch machinery, not ordinary Python call stack unwinding.
+3. `on_click()` raises `ValueError` - Qt's own internal handling catches it right here, at the boundary of its own signal dispatch, and calls whatever function `sys.excepthook` currently is - the default printer in the first file, `my_excepthook` in the second.
+4. Control returns to `fire_and_check`, right after the `btn.click()` line, as if the call had simply returned - the exception does not propagate any further up through `fire_and_check` itself.
+5. `fire_and_check` finishes normally, calling `app.quit()`; `app.exec()` returns normally afterward, in both files.
+
+### CS Lens
+
+This is a real **event-loop exception boundary** - Qt's own, separate, real dispatch mechanism (not ordinary Python call-stack unwinding) contains a real exception at the edge of whichever signal handler raised it, then reports it (via `sys.excepthook`) and moves on to the *next* real event, rather than letting one broken handler crash the whole real loop. Also recognized in: a real web server handling one broken request without taking down every other real, concurrent connection, a real operating system isolating one crashed process without rebooting the whole real machine, and a real assembly line stopping only the one real station with a jam, not the entire real line.
+
+### SE Lens
+
+The real design principle this app's own current gap is actually about: **PySide6 already does the fail-soft thing correctly** - the real app doesn't crash on a real, uncaught slot exception; it keeps running. The real, honest, remaining problem is purely one of *visibility* - the real default `sys.excepthook` still just prints to `stderr` (Terms, Lesson M2.1's own opening unit), which a packaged, windowed real app has nowhere visible to show. The real alternative this app does *not* need: wrapping every single real slot in this app's own codebase in its own `try`/`except`, by hand, one at a time - `sys.excepthook`, installed once, already catches every one of them, the identical real way it caught this lesson's own throwaway `on_click`.
+
+### Commands needed
+
+- `python verification/mastercam-phase-02/lab_qt_slot_exception.py` — Runs the first real, throwaway PySide6 script directly with the real Python interpreter.
+- `python verification/mastercam-phase-02/lab_qt_slot_exception_with_hook.py` — Runs the second, identically, with the real, custom hook installed first.
+
+### Verification
+
+```text
+=== lab_qt_slot_exception.py ===
+Traceback (most recent call last):
+  File "C:\Users\g4m3r\Documents\manufacturing-platform\verification\mastercam-phase-02\lab_qt_slot_exception.py", line 11, in on_click
+    raise ValueError("exception raised inside a real Qt slot")
+ValueError: exception raised inside a real Qt slot
+before btn.click()
+on_click: about to raise
+after btn.click() - did we get here?
+after app.exec() returned
+exit code: 0
+
+=== lab_qt_slot_exception_with_hook.py ===
+after btn.click(), captured = ['HOOK CAUGHT: ValueError: exception raised inside a real Qt slot']
+app.exec() returned normally, exit will be 0
+exit code: 0
+```
+
+Full saved run: `verification/mastercam-phase-02/lab_qt_slot_exception_output.txt and verification/mastercam-phase-02/lab_qt_slot_exception_with_hook_output.txt`.
+
+### Connection to the previous unit
+
+The unit above proved `sys.excepthook` as a raw mechanism, for a plain script that exits right after; this unit proved PySide6 itself already routes a real slot's uncaught exception through the identical real mechanism - and, unlike the plain-script case, this app keeps running afterward, confirming installing a real, custom `sys.excepthook` is a genuine, minimal, correct real fix for this app's own real "no visible errors" gap.
+
+## Connect the pieces
+
+One real exception, raised inside a real Qt button handler, followed through both units: the first proved `sys.excepthook` is a real, reassignable variable, and that Python's own real default just prints to `stderr` and exits - for a plain script. The second proved this app's own real framework, PySide6, already routes a real slot's uncaught exception through that identical real variable - and, critically, the real app keeps running afterward, exactly matching this app's own real, current behavior (no crash, no visible feedback). This is the real, concrete, evidence-backed reason a custom `sys.excepthook`, installed once in this app's own real `main.py` or `mastercam_app/app.py`, would genuinely fix the real problem - not a guess, a fact this lesson's own two real, executed labs just proved about this exact PySide6 version.
+
+**Next lesson:** Making print() output visible too - a real, second gap this app's own current setup has, since `LiveColorServer`'s own real debug logging (mastercam-app/mastercam_app/cbook/stl_processor.py) uses plain `print()` calls, which `sys.excepthook` alone does nothing for.

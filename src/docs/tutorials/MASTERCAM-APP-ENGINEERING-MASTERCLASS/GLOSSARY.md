@@ -27,6 +27,12 @@ re-run the script after any lesson changes instead.
 ## composition root
 - **Term** in `LESSON-M0.1-THE-ENTRY-POINT-IS-NOT-THE-PROGRAM` - The one deliberate place in a real program where the pieces that do the actual work get built and wired together - here, where a real window gets constructed and shown - kept separate from the code that defines what those pieces are and how they behave. It exists so the wiring (what gets built, in what order) can change without touching the logic being wired, and so the logic itself can be imported - by a test, by another tool - without that import alone triggering the wiring and putting a real window on screen.
 
+## context manager
+- **Term** in `LESSON-M2.4-A-TEST-THAT-PASSES-ONLY-WHEN-CODE-FAILS-CORRECTLY` - A real object usable directly after Python's own real `with` keyword, defining what real setup happens the moment the `with` block begins, and what real teardown or checking happens the moment it ends - regardless of whether the code inside the block finished normally or raised. `pytest.raises(SomeError)` (Objects and methods, below) is a real, concrete example: its own real teardown is what actually decides whether the test passes.
+
+## cross-thread communication
+- **Term** in `LESSON-M2.3-CROSSING-THE-THREAD-BOUNDARY-SAFELY` - Real data or a real notification passed safely from one real, running thread to another, without either one directly touching an object the other real thread owns. It exists because two real threads running at once (this app's own real main thread, and `LiveColorServer`'s own two real background threads) can each be part-way through their own real work at any given real moment - a real widget being read by one thread while a different real thread is mid-way through changing it is exactly the real, undefined territory Qt's own thread-affinity rule exists to prevent.
+
 ## dataclass
 - **Term** in `LESSON-M1.1-A-DATACLASS-BUILT-FROM-XML-INSTEAD-OF-BY-HAND` - A real, ordinary Python class, decorated with `@dataclass` (Objects and methods, below), that gets a real `__init__` written for it automatically from its own field declarations - no hand-written constructor needed. It exists so a plain data container class doesn't need the same repetitive `self.x = x` boilerplate, line by line, for every field.
 
@@ -35,6 +41,9 @@ re-run the script after any lesson changes instead.
 
 ## entry point
 - **Term** in `LESSON-M0.1-THE-ENTRY-POINT-IS-NOT-THE-PROGRAM` - The one real file a running program was actually launched FROM - the file named on the real command line (`python main.py`) - as opposed to any other file that only ever gets reached by being imported. It exists as a named concept because a real program can have many files but only ever has one real starting point per run, and that starting point is not automatically the same as "the file with the most important code in it."
+
+## file-like object
+- **Term** in `LESSON-M2.2-STDOUT-IS-JUST-AN-OBJECT-WITH-A-WRITE-METHOD` - Any real object with the right real methods (`.write()`, and sometimes `.flush()`/`.read()`) - not necessarily backed by an actual, real file on disk at all. It exists as a real, deliberate convention throughout Python's own standard library and beyond: a real function expecting "something to write text to" (`print()` included) checks for the right real *methods*, not for a real, literal `open()`-produced file object specifically - any object shaped the right way works identically.
 
 ## frozen-build detection
 - **Term** in `LESSON-M0.1-THE-ENTRY-POINT-IS-NOT-THE-PROGRAM` - A real, deliberate check for whether the currently-running program is an ordinary Python script or a packaged, standalone `.exe` built by PyInstaller - checked here via `getattr(sys, 'frozen', False)` (a real, three-argument builtin call: look up the real attribute named `'frozen'` on the real `sys` module, and hand back the plain value `False` instead of raising an error if `sys` has no such attribute at all) together with `sys._MEIPASS` (a real attribute PyInstaller itself adds to `sys` only inside a frozen build, naming the real temporary folder its bundled data files were extracted into). It exists because a frozen `.exe`'s real bundled files live somewhere Windows itself chose at that run's own extraction time, never at any fixed path relative to this module's own real `__file__` the way they do in ordinary development.
@@ -53,6 +62,9 @@ re-run the script after any lesson changes instead.
 
 ## in-place mutation across objects
 - **Term** in `LESSON-M1.4-ONE-OBJECTS-METHOD-CHANGING-A-DIFFERENT-OBJECT` - A real method, called on one object, directly changing a field on a real, different, separate object it has a reference to - not just changing `self`, the object the method itself was actually called on. It exists as a real, named idea specifically because it's easy to assume a method's own effects stay confined to `self` alone; `Sequence.add_operation`, below, is real, concrete proof that isn't a real guarantee at all.
+
+## main thread
+- **Term** in `LESSON-M2.3-CROSSING-THE-THREAD-BOUNDARY-SAFELY` - The one, real, original thread a program starts running on - for a real PySide6 app, the one, real, specific thread that must own every real widget and must be the one running `app.exec()` (Lesson M0.1). It exists as a named, real concept because Qt itself enforces, internally, that real widget operations only happen on this one real thread - not as a suggestion, as a real, hard requirement this lesson's own first unit proves the cost of ignoring.
 
 ## mastercam_app.app.main
 - **Object/method** in `LESSON-M0.1-THE-ENTRY-POINT-IS-NOT-THE-PROGRAM` - A real, ordinary, zero-argument function - the one place in this entire app that actually builds and shows the real main window.
@@ -87,6 +99,12 @@ re-run the script after any lesson changes instead.
 ## pathlib.Path
 - **Object/method** in `LESSON-M0.1-THE-ENTRY-POINT-IS-NOT-THE-PROGRAM` - The real, standard-library class representing one filesystem path - not the file's actual bytes, just the real, structured path to it.
 
+## pytest.raises
+- **Object/method** in `LESSON-M2.4-A-TEST-THAT-PASSES-ONLY-WHEN-CODE-FAILS-CORRECTLY` - A real, callable function from the real `pytest` package, used directly after `with` - not to catch and discard a real exception, but to make "a specific real exception happens here" the actual, real thing being tested.
+
+## QObject.Signal
+- **Object/method** in `LESSON-M2.3-CROSSING-THE-THREAD-BOUNDARY-SAFELY` - A real, declared attribute on a real `QObject` subclass - `Signal(str)` here - not a plain Python attribute; a real, Qt-aware mechanism for one part of a program to announce "this real thing happened" without knowing, or caring, who (if anyone) is listening.
+
 ## re.search
 - **Object/method** in `LESSON-M1.3-PULLING-STRUCTURED-VALUES-OUT-OF-ONE-COMBINED-STRING` - A real, standard-library function - not a method on the string being searched; the string is its own second real argument.
 
@@ -95,6 +113,15 @@ re-run the script after any lesson changes instead.
 
 ## Sequence.add_operation
 - **Object/method** in `LESSON-M1.4-ONE-OBJECTS-METHOD-CHANGING-A-DIFFERENT-OBJECT` - A real, ordinary instance method that adds one real `Operation` into a real `Sequence`'s own operations, and, along the way, links it to whichever real operation was added immediately before it under the same real program key.
+
+## stderr
+- **Term** in `LESSON-M2.1-THE-ONE-REAL-FUNCTION-PYTHON-CALLS-BEFORE-GIVING-UP` - A real, second output stream every running program has, separate from `stdout` (what `print()` writes to by default) - conventionally where error messages and tracebacks go, so a real, automated tool reading a program's normal output can tell the two apart. It exists here specifically because a real, packaged, windowed application (this app, once built with PyInstaller) has no real, visible console at all - anything written to `stderr` reaches nowhere a real user can see, even though the real message was genuinely produced.
+
+## sys.excepthook
+- **Object/method** in `LESSON-M2.1-THE-ONE-REAL-FUNCTION-PYTHON-CALLS-BEFORE-GIVING-UP` - A real, ordinary, real, module-level attribute on Python's own `sys` module - not a decorator, not a context manager, a plain variable that happens to hold a real, callable function. Python's own real interpreter calls whatever function this real variable currently points to, automatically, the moment an exception reaches the top of the program still uncaught.
+
+## sys.stdout
+- **Object/method** in `LESSON-M2.2-STDOUT-IS-JUST-AN-OBJECT-WITH-A-WRITE-METHOD` - A real, ordinary, reassignable module-level variable on `sys` - the identical real kind of thing as `sys.excepthook` (Lesson M2.1), just holding a real, writable object instead of a real, callable function.
 
 ## test / test function
 - **Term** in `LESSON-M0.2-A-TEST-PROVES-A-CLAIM-INSTEAD-OF-ASSUMING-IT` - A real, ordinary function whose only real job is to make one specific claim about what some other, real code does, and let the program itself check that claim by actually running it - not a human reading the code and deciding, by feel, whether it looks right. It exists because "I read it and it looks correct" and "I ran it and confirmed it" are different claims, and only the second one is real evidence.
@@ -105,13 +132,20 @@ re-run the script after any lesson changes instead.
 ## Tool
 - **Object/method** in `LESSON-M1.2-PARSE-THEN-VALIDATE-INTO-A-SHARED-ERROR-LIST` - A real, larger dataclass than `Holder`/`Assembly` - sixteen real fields describing one real cutting tool, plus the real `Assembly` it's mounted in.
 
+## uncaught exception
+- **Term** in `LESSON-M2.1-THE-ONE-REAL-FUNCTION-PYTHON-CALLS-BEFORE-GIVING-UP` - A real exception that was `raise`d somewhere, and never matched by any real, enclosing `try`/`except` block anywhere between where it was raised and the very top of the program. It exists as a real, distinct category from a *caught* exception (Lesson M1.2's own real `except ValueError:` blocks inside `Tool.from_xml`) - a caught exception is handled and the program continues normally; an uncaught one keeps unwinding, real function call by real function call, until nothing is left to catch it.
+
 ## Possible collisions (shared words, different names)
 
 Not necessarily a problem - review each one. A real violation looks like two different names that could be confused with each other (e.g. "freestanding" vs "free function").
 
+- `__file__` / `file-like object` - shares: file
 - `__name__` / `if __name__ == "__main__":` - shares: name
+- `cross-thread communication` / `main thread` - shares: thread
 - `Holder.from_xml` / `parse_mastercam_xml` - shares: xml
+- `if __name__ == "__main__":` / `main thread` - shares: main
 - `if __name__ == "__main__":` / `mastercam_app.app.main` - shares: main
+- `main thread` / `mastercam_app.app.main` - shares: main
 - `mastercam_app.app.main` / `parse_mastercam_xml` - shares: mastercam
 - `mastercam_app.parsing.parser.extract_subprogram_number` / `parse_mastercam_xml` - shares: mastercam
 - `match object` / `Match.group` - shares: match

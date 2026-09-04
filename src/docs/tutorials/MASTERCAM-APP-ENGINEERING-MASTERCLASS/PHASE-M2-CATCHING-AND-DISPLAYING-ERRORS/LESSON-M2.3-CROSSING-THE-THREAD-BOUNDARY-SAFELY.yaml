@@ -1,0 +1,486 @@
+number: "M2.3"
+title: "Crossing the Thread Boundary Safely"
+path_note: >
+  File paths under mastercam-app/... refer to the real
+  manufacturing-platform repository's mastercam-app folder. Paths under
+  verification/... refer to that same repository's verification folder.
+  As in Lessons M2.1-M2.2, nothing under mastercam-app/ is applied to
+  the real app by this lesson - the real, concrete addition shown here
+  is something you type into the real app yourself.
+
+what_you_will_build: >
+  A real, deliberately dangerous throwaway proof first: a real
+  background thread touching a real Qt widget directly, hung and killed
+  by a real timeout, with zero output - not a clean Python exception,
+  a genuine, silent lockup. Then the real, correct fix: a real PySide6
+  `Signal`, crossing the identical real thread boundary safely, proven
+  by the same real scenario completing normally. Then a real, concrete,
+  minimal `ErrorTerminalDialog` - a real `QDialog` with a real
+  `QTextEdit` - designed around that exact real constraint, ready for
+  you to add to the real app. The transferable problem: this app's own
+  real `LiveColorServer` (Lessons M0.1, M2.2) genuinely runs two real
+  background threads - any error-display window built without this
+  lesson's own real proof in mind would intermittently hang or corrupt
+  this app's own real UI the moment an error happened to originate from
+  one of them, in a way that would be nearly impossible to reproduce
+  reliably afterward.
+
+what_you_need_to_know_first: >
+  Lesson M2.1's own real `sys.excepthook`; Lesson M2.2's own real
+  `sys.stdout` redirect - both are what would feed real text into the
+  window this lesson designs.
+
+terms:
+  - name: main thread
+    definition: >
+      The one, real, original thread a program starts running on - for
+      a real PySide6 app, the one, real, specific thread that must own
+      every real widget and must be the one running `app.exec()`
+      (Lesson M0.1). It exists as a named, real concept because Qt
+      itself enforces, internally, that real widget operations only
+      happen on this one real thread - not as a suggestion, as a real,
+      hard requirement this lesson's own first unit proves the cost of
+      ignoring.
+  - name: cross-thread communication
+    definition: >
+      Real data or a real notification passed safely from one real,
+      running thread to another, without either one directly touching
+      an object the other real thread owns. It exists because two real
+      threads running at once (this app's own real main thread, and
+      `LiveColorServer`'s own two real background threads) can each be
+      part-way through their own real work at any given real moment - a
+      real widget being read by one thread while a different real thread
+      is mid-way through changing it is exactly the real, undefined
+      territory Qt's own thread-affinity rule exists to prevent.
+
+objects_and_methods:
+  - name: "QObject.Signal"
+    what_it_is: >
+      A real, declared attribute on a real `QObject` subclass -
+      `Signal(str)` here - not a plain Python attribute; a real, Qt-aware
+      mechanism for one part of a program to announce "this real thing
+      happened" without knowing, or caring, who (if anyone) is listening.
+    implementation: >
+      Declared at real class level: `text_ready = Signal(str)` inside a
+      real `class Bridge(QObject):`. Real instances of that class then
+      have a real, callable `.emit(text)` method, and any other real
+      code can `.connect(some_function)` to it - Qt's own real, internal
+      machinery, not ordinary Python, decides how and when the connected
+      real function actually runs.
+    its_use: >
+      The second unit, below, uses this exact real mechanism to carry
+      text safely from a real background thread to a real slot running
+      on the main thread (Terms, above) - the identical real shape this
+      app's own proposed `ErrorTerminalDialog` needs to receive
+      real-time error text from `LiveColorServer`'s own two real
+      background threads.
+    type: A real, class-level declaration on a `QObject` subclass, producing a real, per-instance emitter.
+    responsibility: >
+      Announce a real event, carrying a real, typed payload (`str`
+      here), to every real function connected to it - crucially, Qt's
+      own real, internal delivery mechanism, confirmed directly by
+      the second unit below's own real proof, safely hands that payload
+      to the connected real function's own thread, rather than running
+      the connected function on whichever real thread called `.emit()`.
+    depends_on: >
+      A real, containing `QObject` subclass to be declared on, and a
+      real payload type (`str`, here) fixed at declaration time.
+    connects_to: >
+      `.emit(text)`, called from a real background thread; a real,
+      connected function (a "slot," in Qt's own real terminology),
+      running safely on the real main thread the moment Qt's own event
+      loop next gets a chance to deliver it.
+    shape: >
+      Carries exactly one real, typed value per real emission here (a
+      plain string) - confirmed directly by the second unit's own real
+      proof to arrive at the connected real function as an ordinary,
+      real function argument, nothing more exotic.
+
+concept_units:
+  - title: "Touching a Real Widget From a Background Thread Doesn't Raise - It Hangs"
+    problem: >
+      This app's own real `LiveColorServer` runs two real, separate
+      background threads (Lesson M0.1). If either one needed to show a
+      real error message in a real widget the instant something went
+      wrong, the most obvious real approach - just calling a real method
+      on that widget directly, from inside the background thread's own
+      real code - seems like it should work, the same way any other
+      real Python object's methods can be called from anywhere. Before
+      any real tool is shown: given Lesson M2.1's own real proof that an
+      uncaught exception at least produces a real, visible traceback -
+      would you expect a real *thread-safety* violation to fail the
+      identical, visible way, or might it fail differently?
+    socratic_prompt:
+      - "If two real threads could both be mid-way through changing the identical real object at the exact same real moment, what real, concrete kind of problem would you expect - a clean error message, or something messier?"
+      - "Lesson M0.1's own real Concept Isolation Rule already proved a real, deliberately broken lab is worth running to see the real, actual failure, not just describing it. What would you want to actually observe here, rather than assume?"
+      - "If a real thread-safety violation doesn't raise a real, catchable Python exception at all, what would that mean for trying to guard against it with an ordinary try/except?"
+    project_change:
+      reference_source: >
+        No reference counterpart - a from-scratch, deliberately dangerous
+        throwaway example, run once, this session, specifically to
+        observe its real, actual failure mode rather than assume one.
+      files_affected:
+        - path: verification/mastercam-phase-02/lab_thread_unsafe_widget_update.py
+          status: new
+      change_type: add
+      location: New file, no existing project to place it within.
+      dependencies: PySide6, already installed and used throughout mastercam-app/.
+    new_code:
+      applicable: true
+      intro: >
+        One small, real, throwaway PySide6 script, typed fresh - a real
+        background thread calling `.append()` directly on a real
+        `QTextEdit` it does not own:
+      files:
+        - file: verification/mastercam-phase-02/lab_thread_unsafe_widget_update.py
+          status: new
+          code: |
+            import sys
+            import threading
+            from PySide6.QtWidgets import QApplication, QTextEdit
+            from PySide6.QtCore import QTimer
+
+            app = QApplication(sys.argv)
+            text_edit = QTextEdit()
+
+
+            def background_work():
+                text_edit.append("touched directly from a background thread")
+                print("background thread finished its direct widget touch")
+                app.quit()
+
+
+            def start_thread():
+                t = threading.Thread(target=background_work, daemon=True)
+                t.start()
+
+
+            QTimer.singleShot(0, start_thread)
+            app.exec()
+            print("final widget text:", repr(text_edit.toPlainText()))
+      language: python
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "text_edit = QTextEdit()"
+          explanation: >
+            Constructed on the real main thread (Terms, above) - the one
+            real thread every widget's own thread-affinity is fixed to,
+            the instant it's constructed.
+        - element: "def background_work(): text_edit.append(...)"
+          explanation: >
+            A real, ordinary function, run on a genuinely different,
+            real thread (below) - calling `.append()` directly on
+            `text_edit`, the identical real object the main thread also
+            owns, from *outside* the one real thread Qt requires for
+            that.
+        - element: "threading.Thread(target=background_work, daemon=True).start()"
+          explanation: >
+            An already-familiar real standard-library mechanism - starts
+            `background_work` running on a genuinely separate, real
+            operating-system thread, concurrently with the real main
+            thread's own, ongoing `app.exec()`.
+        - element: "app.exec()"
+          explanation: >
+            Full treatment already established (Lesson M0.1) - starts
+            the real Qt event loop on the real main thread; confirmed in
+            Verification, below, this real line never actually returns
+            in this specific, unsafe version.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a real **data race** - two real threads, one reading or
+      writing the identical real, shared object at an unpredictable,
+      real, overlapping moment, with no real, external means (looked at
+      from Python alone) to know which one "wins," or what state the
+      real object is left in. Also recognized in: two real people
+      editing the identical real, physical paper form at the same real
+      moment, a real bank's own two tellers both updating the identical
+      real account balance simultaneously with no real coordination, and
+      a real double-booked hotel room, checked in by two real front-desk
+      clerks at once.
+    se_lens: >
+      The real design principle this lab's own real, observed failure
+      makes concrete: **a genuine thread-safety violation is not
+      guaranteed to fail loudly or consistently** - Verification, below,
+      shows this real, exact script hanging completely, killed only by
+      an external, real timeout, with not one line of real output ever
+      appearing - not even the real `print()` calls that should have run
+      first. The real, honest, sobering cost: this exact kind of real
+      bug can appear to work correctly dozens of real times during
+      ordinary use, then hang or corrupt real UI state unpredictably,
+      once, under real, slightly different timing - the real reason
+      the unit right after this one doesn't treat "it seemed to work
+      when I
+      tried it" as real proof of thread safety, ever.
+    commands:
+      - command: "python verification/mastercam-phase-02/lab_thread_unsafe_widget_update.py"
+        explanation: >
+          Runs the real, deliberately unsafe script, from inside
+          manufacturing-platform's own repo root - real, observed
+          behavior this session required an external timeout to
+          terminate it at all.
+    verification:
+      applicable: true
+      real_output: |
+        (no output at all - the process hung completely and was killed
+        by an external timeout after 8 real seconds; not even the
+        script's own first print() call, which runs before app.exec()
+        returns, ever appeared)
+      output_file: verification/mastercam-phase-02/lab_thread_unsafe_widget_update_output.txt
+    connection_to_previous: >
+      There is no previous unit - this is the first one in this lesson.
+
+  - title: "A Signal Carries Data Across the Thread Boundary Safely"
+    problem: >
+      The unit above proved direct, cross-thread widget access can hang
+      the entire real application, silently, with no real exception to
+      catch. This app's own real `LiveColorServer` still needs a real
+      way to get error text from its own real background threads onto
+      the real main thread's own real widget - the *need* itself doesn't
+      go away just because the naive real approach is dangerous. Given
+      Lesson M2.1's own real proof that PySide6 already has its own,
+      real, internal thread-safe delivery mechanisms for signals and
+      slots: could that same real machinery carry a plain, real string
+      safely across the identical real thread boundary this unit's
+      own throwaway lab just proved was dangerous to cross directly?
+    socratic_prompt:
+      - "The unit above's own real widget update ran directly inside background_work, on the background thread itself. What would need to be different for the actual widget update to run on the main thread instead, even though the background thread is what first knows there's real text to show?"
+      - "If a real Signal's own .emit() call, made from a background thread, is what Qt's own internal machinery uses to safely schedule the connected real function - where would that connected real function's own code end up actually running: the thread that emitted it, or the thread that owns the object it was connected to?"
+      - "Given that, what real, minimal two things would a real \"terminal\" window need: one real signal, and one real, connected function - doing what, specifically, with the real text it receives?"
+    project_change:
+      reference_source: >
+        No reference counterpart - a from-scratch, throwaway proof of
+        the real, correct mechanism, followed directly by a real,
+        concrete `ErrorTerminalDialog` proposal for the real app -
+        add this yourself once you understand both.
+      files_affected:
+        - path: verification/mastercam-phase-02/lab_thread_safe_signal.py
+          status: new
+        - path: mastercam-app/mastercam_app/error_terminal.py
+          status: new
+      change_type: add
+      location: >
+        verification/mastercam-phase-02/lab_thread_safe_signal.py is a
+        new, throwaway file. mastercam-app/mastercam_app/error_terminal.py
+        does not exist yet - this is a real, concrete proposal for a
+        genuinely new file, sitting alongside mastercam_app/style.py and
+        mastercam_app/paths.py, for you to create.
+      dependencies: >
+        PySide6, already installed; Lesson M2.1's own real
+        `sys.excepthook` and Lesson M2.2's own real `sys.stdout`
+        redirect are what would actually feed text into this real
+        window, once both are wired together by you.
+    new_code:
+      applicable: true
+      intro: >
+        Two real files, typed fresh. First, a throwaway proof - a real
+        `Bridge` object declaring one real `Signal`, connected to a real
+        function that both updates the widget *and* quits the app, both
+        running safely on the main thread. Second, a real, concrete,
+        minimal `ErrorTerminalDialog`, built directly on that identical
+        real `Bridge`/`Signal` shape - a genuinely new file,
+        `mastercam-app/mastercam_app/error_terminal.py`, that does not
+        exist in the real app yet. Nothing here is applied to the real
+        app by this lesson - this is what to create yourself:
+      files:
+        - file: verification/mastercam-phase-02/lab_thread_safe_signal.py
+          status: new
+          code: |
+            import sys
+            import threading
+            from PySide6.QtWidgets import QApplication, QTextEdit
+            from PySide6.QtCore import QObject, Signal, QTimer
+
+            app = QApplication(sys.argv)
+            text_edit = QTextEdit()
+
+
+            class Bridge(QObject):
+                text_ready = Signal(str)
+
+
+            bridge = Bridge()
+
+
+            def on_text_ready(text):
+                text_edit.append(text)
+                app.quit()
+
+
+            bridge.text_ready.connect(on_text_ready)
+
+
+            def background_work():
+                print("background thread: about to emit")
+                bridge.text_ready.emit("sent safely from a background thread")
+                print("background thread: emit() returned")
+
+
+            def start_thread():
+                t = threading.Thread(target=background_work, daemon=True)
+                t.start()
+
+
+            QTimer.singleShot(0, start_thread)
+            app.exec()
+            print("final widget text:", repr(text_edit.toPlainText()))
+        - file: mastercam-app/mastercam_app/error_terminal.py
+          status: new
+          code: |
+            from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit
+            from PySide6.QtCore import QObject, Signal
+
+
+            class ErrorLogBridge(QObject):
+                text_ready = Signal(str)
+
+
+            class ErrorTerminalDialog(QDialog):
+                def __init__(self, parent=None):
+                    super().__init__(parent)
+                    self.setWindowTitle("Error Terminal")
+                    self.resize(700, 400)
+                    self.text_edit = QTextEdit(readOnly=True)
+                    layout = QVBoxLayout(self)
+                    layout.addWidget(self.text_edit)
+
+                    self.bridge = ErrorLogBridge()
+                    self.bridge.text_ready.connect(self._append_text)
+
+                def _append_text(self, text):
+                    self.text_edit.append(text.rstrip("\n"))
+
+                def emit_from_any_thread(self, text):
+                    self.bridge.text_ready.emit(text)
+      language: python
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "class Bridge(QObject): text_ready = Signal(str)"
+          explanation: >
+            Full treatment above (Objects and methods, `QObject.Signal`)
+            - a real `QObject` subclass exists here specifically to hold
+            this real, declared `Signal`; `Bridge` itself has no other
+            real job.
+        - element: "bridge.text_ready.connect(on_text_ready)"
+          explanation: >
+            Connects the real signal to a real, ordinary function - made
+            *before* the background thread ever starts, so the real
+            connection genuinely exists by the time anything might try
+            to use it.
+        - element: "bridge.text_ready.emit(\"sent safely from a background thread\")"
+          explanation: >
+            Called from inside `background_work` - full treatment above
+            (Objects and methods) - this real call happens on the
+            background thread, but does *not* itself run
+            `on_text_ready`'s own real body directly.
+        - element: "def on_text_ready(text): text_edit.append(text); app.quit()"
+          explanation: >
+            Confirmed directly in Verification, below, that both real
+            lines inside this function actually run, and that
+            `text_edit`'s own real content genuinely updates - proving
+            Qt's own real, internal delivery safely runs this connected
+            real function on the main thread, regardless of which real
+            thread called `.emit()`.
+        - element: "class ErrorTerminalDialog(QDialog): ..."
+          explanation: >
+            A real, ordinary `QDialog` subclass - the identical real
+            composition-root-adjacent shape as this app's own existing
+            dialogs (Lesson M1's own `Tool`/`Assembly` composition
+            pattern, here applied to widgets instead of dataclasses): a
+            real `QTextEdit`, held as `self.text_edit`, laid out with a
+            real `QVBoxLayout`.
+        - element: "self.bridge = ErrorLogBridge(); self.bridge.text_ready.connect(self._append_text)"
+          explanation: >
+            The identical real `Bridge`/connect shape just proven above,
+            now owned by the dialog itself - any real code, on any real
+            thread, that has a reference to this real dialog can call
+            its own real `emit_from_any_thread` method safely.
+        - element: "def emit_from_any_thread(self, text): self.bridge.text_ready.emit(text)"
+          explanation: >
+            The one real, public method this whole class exists to
+            provide - a real, safe, named entry point `LiveColorServer`'s
+            own real background threads (or Lesson M2.1's own
+            `sys.excepthook`, or Lesson M2.2's own redirected
+            `sys.stdout`) could call directly, from any real thread,
+            without ever touching `self.text_edit` themselves.
+        - element: "def _append_text(self, text): self.text_edit.append(text.rstrip(\"\\n\"))"
+          explanation: >
+            The real, connected slot - runs safely on the main thread
+            only, confirmed by this exact mechanism in the unit's own
+            throwaway proof above; strips a trailing real newline since
+            `QTextEdit.append` already adds its own real line break.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the same real **cross-thread communication** concept
+      (Terms, above) proven in isolation, now shaped into a real,
+      reusable class - `ErrorTerminalDialog` is a real, concrete
+      instance of the identical real pattern: a `QObject`-owned
+      `Signal`, and one real, connected slot doing the only real widget
+      touch anywhere in the class.
+    se_lens: >
+      The real design principle: **the one real widget mutation lives in
+      exactly one place** (`_append_text`), reachable only through one
+      real, safe, public entry point (`emit_from_any_thread`) - nothing
+      else in this real class, and nothing calling into it from
+      `LiveColorServer` or Lesson M2.1's own hook, ever needs to know
+      *which* real thread it's running on. The real alternative not
+      chosen: exposing `self.text_edit` directly and trusting every real
+      future caller, forever, to remember to route through a signal
+      instead of calling `.append()` on it themselves - the real,
+      honest cost of that alternative is exactly the unit above's own
+      real, observed hang, waiting to happen again the moment one real
+      caller forgets.
+    commands:
+      - command: "python verification/mastercam-phase-02/lab_thread_safe_signal.py"
+        explanation: >
+          Runs the real, throwaway proof directly with the real Python
+          interpreter, from inside manufacturing-platform's own repo
+          root.
+    verification:
+      applicable: true
+      real_output: |
+        background thread: about to emit
+        background thread: emit() returned
+        final widget text: 'sent safely from a background thread'
+      output_file: verification/mastercam-phase-02/lab_thread_safe_signal_output.txt
+    connection_to_previous: >
+      The unit above proved direct, cross-thread widget access can hang
+      the whole app, with no real, catchable exception; this unit proved
+      a real `Signal` crosses the identical thread boundary safely, then
+      shaped that exact real mechanism into a concrete, minimal
+      `ErrorTerminalDialog` proposal - real, verified, and ready for you
+      to add to the real app yourself.
+
+closing:
+  connect_the_pieces: >
+    One real string, "sent safely from a background thread," followed
+    through both units: the first proved touching a real widget directly
+    from a real background thread doesn't raise a catchable error at
+    all - it hangs the whole real application, silently, confirmed by an
+    external timeout being the only thing that ever stopped it. The
+    second proved a real `Signal`, declared on a real `QObject`,
+    crosses the identical real thread boundary correctly - the connected
+    real function runs safely on the main thread regardless of which
+    thread called `.emit()` - then shaped that exact, proven mechanism
+    into `ErrorTerminalDialog`, a real, concrete, minimal class with
+    exactly one safe entry point (`emit_from_any_thread`) and exactly
+    one place that ever touches the real widget (`_append_text`). This
+    class doesn't exist in the real app yet - it's real, verified
+    guidance for you to add.
+  next_lesson_pointer: >
+    Wiring Lesson M2.1's own sys.excepthook and Lesson M2.2's own
+    sys.stdout redirect into this lesson's own ErrorTerminalDialog, and
+    writing real tests that expect specific, deliberate failures to
+    happen - proving the whole real mechanism actually works, not just
+    reads correctly.
