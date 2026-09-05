@@ -1,654 +1,661 @@
 # Lesson 32: Divide and Conquer
 
-The reader will understand divide and conquer as a general algorithm design paradigm: divide the problem into subproblems, solve each subproblem recursively, combine the solutions. They will apply it to merge sort (reviewed), binary search (reviewed), and two new problems: finding the maximum subarray sum (Kadane's algorithm as contrast) and fast exponentiation (binary exponentiation). The transferable problems: (1) D&C is a TEMPLATE, not a specific algorithm — once you recognize the pattern, you can derive algorithms you haven't seen before; (2) D&C leads to O(log n) or O(n log n) complexity for problems that would otherwise be O(n²) or O(2^n); (3) the recurrence relation T(n) = 2T(n/2) + O(n) gives O(n log n), T(n) = T(n/2) + O(1) gives O(log n).
+The reader understands the divide-and-conquer paradigm: split the problem in half, solve each half recursively, combine the results. They implement merge sort (O(n log n)) and see it applied to fast exponentiation (O(log n)). The transferable insight: divide and conquer achieves O(n log n) or O(log n) by splitting problems in half. Any algorithm that can split its input and recombine the results in linear time gets O(n log n) total. This is why binary search, merge sort, FFT, and many others are so fast.
 
-**What you need to know first**
-- Lesson 31
+What you need to know first: Lessons 00-31.
 
-**Terms used in this lesson**
-- **Divide and Conquer** — A recursive algorithm design paradigm where a problem is split into independent subproblems of the same type, solved recursively, and merged to form a complete solution. This breaks complex problems into manageable ones.
-- **Base Case** — The condition under which a recursive function returns a direct value rather than making another recursive call, preventing infinite loops.
-- **Recursion** — A programming technique where a function calls itself to solve a smaller instance of the same problem.
-- **Recurrence Relation** — An equation that recursively defines a sequence or multidimensional array of values, used to mathematically express the time complexity of divide and conquer algorithms.
-- **Master Theorem** — A mathematical tool that provides a direct method for solving recurrence relations of the form T(n) = aT(n/b) + f(n), giving the time complexity.
-- **Dynamic Programming** — An algorithmic technique that solves complex problems by breaking them down into overlapping subproblems, saving the results to avoid redundant work. Mentioned to contrast with D&C.
-- **Parallelization** — The act of designing an algorithm so that multiple operations can be executed simultaneously on different processors, easily achieved with independent D&C subproblems.
+Terms used in this lesson:
+- **Divide and Conquer** — A design paradigm that solves a problem by recursively breaking it down into two or more sub-problems of the same type until they become simple enough to be solved directly.
+- **Base case** — The condition in a recursive function that stops the recursion, preventing an infinite loop.
+- **O(n log n)** — The time complexity typically seen when a dataset of size n is repeatedly halved (log n steps) and recombined with linear (n) work at each step.
+- **O(log n)** — The time complexity when a problem space is halved at each step without linear recombination work.
+- **Pivot** — The element chosen in quicksort to partition the array.
+- **Partition** — The step in quicksort that reorganizes the array around a pivot element.
+- **def** — Keyword used to define a new function.
+- **if** / **else** — Conditional keywords used to branch logic.
+- **return** — Keyword used to exit a function and pass a value back to the caller.
+- **while** / **for** / **in** — Looping keywords to iterate over sequences or run while a condition holds.
+- **global** — Keyword used to declare that a variable inside a function refers to the module-level variable of the same name.
+- **import** — Keyword used to bring external modules into the current namespace.
+- **is** / **None** — `is` checks for object identity. `None` is the singleton object representing the absence of a value.
+- **List slicing `[:]`** — Syntax to create a new list containing a subset of elements from an existing list.
+- **List creation `[]`** — Syntax to define a new empty or populated list.
+- **f-string** — Syntax `f'...'` for formatting strings with embedded Python expressions.
+- **Operators (`//`, `%`, `<=`, `<`, `==`, `+=`, `=`, `+`, `-`, `*`)** — Standard arithmetic, comparison, and assignment operators in Python.
 
-**Objects and methods used**
+Objects and methods used:
 
-- `print`
-  - *What it is:* A built-in function to output text.
-  - *Implementation:* `print(*objects, sep=' ', end='\n', file=None, flush=False)`
-  - *Its use:* To display the results of our functions to the user.
-  - *Type:* Built-in function.
-  - *Responsibility:* Converts given objects to strings and writes them to standard output.
-  - *Depends on:* Standard output stream.
-  - *Connects to:* Calls `__str__` or `__repr__` on the passed objects, writes to `sys.stdout`.
-  - *Shape:* A global built-in utility.
+**`len`**
+- *What it is:* A built-in function to count items.
+- *Implementation:* `def len(obj: Sized) -> int`
+- *Its use:* Used to check if a list has reached the base case (size 1 or 0) or to find the midpoint.
+- *Type:* Built-in function.
+- *Responsibility:* Returns the number of items in a container.
+- *Depends on:* A single argument that implements the sized protocol (like a list).
+- *Connects to:* Called by our sorting/math algorithms; returns an integer.
+- *Shape:* Core standard library.
 
-- `len`
-  - *What it is:* A built-in function that returns the number of items in an object.
-  - *Implementation:* `len(s)`
-  - *Its use:* Used to determine the size of lists to find base cases and midpoints.
-  - *Type:* Built-in function.
-  - *Responsibility:* Returns the length of a collection.
-  - *Depends on:* The object passed must support the `__len__` protocol.
-  - *Connects to:* Calls `s.__len__()`.
-  - *Shape:* A global built-in utility.
+**`max`**
+- *What it is:* A built-in function to find the largest item.
+- *Implementation:* `def max(arg1, arg2, *args)`
+- *Its use:* Used to combine the results of two recursive calls by returning the larger of the two.
+- *Type:* Built-in function.
+- *Responsibility:* Identifies and returns the maximum value among its arguments.
+- *Depends on:* Two or more comparable arguments.
+- *Connects to:* Called by `max_dc`; returns a single value.
+- *Shape:* Core standard library.
 
-- `max`
-  - *What it is:* A built-in function that returns the largest item in an iterable or the largest of two or more arguments.
-  - *Implementation:* `max(arg1, arg2, *args, [key])`
-  - *Its use:* Used to compare sums in the maximum subarray problem.
-  - *Type:* Built-in function.
-  - *Responsibility:* Returns the maximum value based on the default sorting order or a custom key.
-  - *Depends on:* Comparable items.
-  - *Connects to:* Computes the maximum by iterating and comparing.
-  - *Shape:* A global built-in utility.
+**`list.append`**
+- *What it is:* A list method to add one item.
+- *Implementation:* `def append(self, object: _T) -> None`
+- *Its use:* Used to add the next smallest item to the merged result list.
+- *Type:* Instance method of `list`.
+- *Responsibility:* Mutates the list by adding the given object to the end.
+- *Depends on:* An existing list instance and one item to add.
+- *Connects to:* Called during the merge step; returns None.
+- *Shape:* Standard list API.
 
-- `float`
-  - *What it is:* A built-in class representing floating point numbers.
-  - *Implementation:* `float(x)`
-  - *Its use:* Used as `float('-inf')` to initialize maximum sums to negative infinity.
-  - *Type:* Built-in class/type.
-  - *Responsibility:* Constructs a float object from a number or string.
-  - *Depends on:* A valid number or string representation of a number.
-  - *Connects to:* C-level float parsing.
-  - *Shape:* Core data type.
+**`list.extend`**
+- *What it is:* A list method to add multiple items.
+- *Implementation:* `def extend(self, iterable: Iterable[_T]) -> None`
+- *Its use:* Used to append all remaining elements from a list when the other list is exhausted.
+- *Type:* Instance method of `list`.
+- *Responsibility:* Mutates the list by appending all items from the provided iterable.
+- *Depends on:* An existing list instance and an iterable of items.
+- *Connects to:* Called at the end of the merge step; returns None.
+- *Shape:* Standard list API.
 
-- `range`
-  - *What it is:* A built-in immutable sequence type, often used for looping.
-  - *Implementation:* `range(start, stop[, step])`
-  - *Its use:* To iterate backwards and forwards from the midpoint in the crossover sum function.
-  - *Type:* Built-in class/sequence.
-  - *Responsibility:* Generates a sequence of numbers lazily.
-  - *Depends on:* Integer arguments.
-  - *Connects to:* Python's iteration protocol (`__iter__`).
-  - *Shape:* A fundamental generator-like sequence.
+**`math.log2`**
+- *What it is:* A mathematical function to compute base-2 logarithm.
+- *Implementation:* `def log2(x: float) -> float`
+- *Its use:* Used to verify that the empirical total work matches the O(n log n) theoretical bound.
+- *Type:* Module-level function in `math`.
+- *Responsibility:* Calculates the base-2 logarithm of a number.
+- *Depends on:* A positive numeric argument.
+- *Connects to:* Called in our profiling script; returns a float.
+- *Shape:* Standard library `math` module.
 
----
+**`print`**
+- *What it is:* A built-in function to output text.
+- *Implementation:* `def print(*values, sep=' ', end='\n', file=sys.stdout, flush=False)`
+- *Its use:* Used to display the results of our algorithms.
+- *Type:* Built-in function.
+- *Responsibility:* Writes string representations of objects to a stream.
+- *Depends on:* Objects to print.
+- *Connects to:* Writes to standard output.
+- *Shape:* Core standard library.
 
-## Concept Unit: The divide and conquer template
+**`list`**
+- *What it is:* A built-in type for mutable sequences.
+- *Implementation:* `class list(Iterable[_T])`
+- *Its use:* Used to construct a list from a `range` object for sorting.
+- *Type:* Built-in class.
+- *Responsibility:* Maintains an ordered, mutable sequence of items.
+- *Depends on:* An optional iterable to initialize from.
+- *Connects to:* Instantiated to hold our test data.
+- *Shape:* Core standard library.
 
+**`range`**
+- *What it is:* A built-in type generating a sequence of numbers.
+- *Implementation:* `class range(start, stop[, step])`
+- *Its use:* Used to generate a sequence of numbers for loops or to populate a list.
+- *Type:* Built-in class.
+- *Responsibility:* Generates arithmetic progressions lazily.
+- *Depends on:* Integer bounds.
+- *Connects to:* Consumed by `for` loops or `list()`.
+- *Shape:* Core standard library.
+
+## Concept Unit: The divide-and-conquer pattern
 ### The Problem
-How can we recognize the underlying structure of algorithms like merge sort and binary search so we can apply the same strategy to new problems? If you were to describe how merge sort works abstractly, what steps would you list?
+How can we find the maximum value in a list more efficiently, or at least differently, than simply looking at every element one by one in a loop? If we split the list in half, and knew the maximum of the left half and the maximum of the right half, could we find the overall maximum without looking at all elements again? What if we kept splitting until the halves were trivially small?
+
+### Introduce the concept in isolation
+```python
+# Throwaway demonstration of simple division
+data = [3, 1, 4, 1]
+mid = len(data) // 2
+left, right = data[:mid], data[mid:]
+print(left, right)
+```
+Output confidently predicted: `[3, 1] [4, 1]`
+This proves that we can slice a list into two distinct halves. This is the foundation of **divide and conquer**.
+
+### Discard the throwaway
+This snippet is deleted and will not appear in the project again.
 
 ### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring algorithm templates.
-- **Files affected:** `dc_template.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
+- Reference Source: No reference counterpart — this is a standalone theory lesson because it introduces algorithmic fundamentals.
+- Files affected: `lesson32.py` (created)
+- Change type: add
+- Location: Brand new file.
+- Dependencies: None.
 
 ### The New Code
 ```python
-def divide_and_conquer(problem):
-    # This is a conceptual template, not runnable code
-    if is_base_case(problem):
-        return solve_base_case(problem)
-    
-    subproblems = divide(problem)
-    solutions = [divide_and_conquer(sub) for sub in subproblems]
-    return combine(solutions)
+def max_linear(lst):
+    m = lst[0]
+    for x in lst[1:]:
+        if x > m: m = x
+    return m
+
+def max_dc(lst):
+    if len(lst) == 1:
+        return lst[0]
+    mid = len(lst) // 2
+    left_max  = max_dc(lst[:mid])
+    right_max = max_dc(lst[mid:])
+    return max(left_max, right_max)
+
+data = [3, 1, 4, 1, 5, 9, 2, 6]
 ```
 
 ### The Updated Project
 ```python
-# 1: def divide_and_conquer(problem):
-# 2:     if is_base_case(problem):
-# 3:         return solve_base_case(problem)
-# 4:     
-# 5:     subproblems = divide(problem)
-# 6:     solutions = [divide_and_conquer(sub) for sub in subproblems]
-# 7:     return combine(solutions)
+# 1: def max_linear(lst):             # <- new
+# 2:     m = lst[0]                   # <- new
+# 3:     for x in lst[1:]:            # <- new
+# 4:         if x > m: m = x          # <- new
+# 5:     return m                     # <- new
+# 6: 
+# 7: def max_dc(lst):                 # <- new
+# 8:     if len(lst) == 1:            # <- new
+# 9:         return lst[0]            # <- new
+# 10:    mid = len(lst) // 2          # <- new
+# 11:    left_max  = max_dc(lst[:mid]) # <- new
+# 12:    right_max = max_dc(lst[mid:]) # <- new
+# 13:    return max(left_max, right_max) # <- new
+# 14: 
+# 15: data = [3, 1, 4, 1, 5, 9, 2, 6] # <- new
 ```
-This is a conceptual outline of the template. It first checks for a base case, divides the problem into subproblems, solves them recursively, and combines the results.
+This adds the `max_dc` function which applies the divide-and-conquer pattern to find the maximum element.
 
-### Isolate the Concept
-Because this is a conceptual template, we will map it to known algorithms instead of running it directly as a throwaway block. 
-Output predicted: N/A, conceptual only.
-Map to merge sort:
-- Divide: split the list in half
-- Conquer: recursively sort each half
-- Combine: merge the two sorted halves
+### Mechanical walkthrough
+- `def max_linear(lst):`: Defines a linear approach taking one list argument.
+- `m = lst[0]`: Initializes maximum to the first element.
+- `for x in lst[1:]:`: Iterates through the rest of the list.
+- `if x > m: m = x`: Updates maximum if a larger value is found.
+- `return m`: Returns the found maximum.
+- `def max_dc(lst):`: Defines the divide-and-conquer function.
+- `if len(lst) == 1:`: Checks if the list has only one element (base case).
+- `return lst[0]`: Returns the only element.
+- `mid = len(lst) // 2`: Calculates the midpoint integer index using floor division.
+- `left_max = max_dc(lst[:mid])`: Recursively calls `max_dc` on the left half.
+- `right_max = max_dc(lst[mid:])`: Recursively calls `max_dc` on the right half.
+- `return max(left_max, right_max)`: Uses the built-in `max` function to return the larger of the two maxes.
+- `data = [...]`: Creates a test list.
 
-Map to binary search:
-- Divide: find the middle element
-- Conquer: recursively search the relevant half
-- Combine: nothing to combine (the result is already found)
+### CS lens
+Divide and Conquer is a fundamental algorithmic paradigm. It appears in:
+1. Merge Sort and Quick Sort for efficient sorting.
+2. Binary Search for O(log n) lookups in sorted data.
+3. The Fast Fourier Transform (FFT) for signal processing.
+4. Strassen's matrix multiplication algorithm.
 
-### Discard the Concept
-The pseudocode template is discarded and will not appear in the project.
+### SE lens
+Design principle: Recursive decomposition. The alternative not chosen is iterative processing with manual stacks. The real tradeoff is call stack depth (which costs memory and risks stack overflow in Python) versus the clean, expressive simplicity of recursive logic.
 
-### Mechanical Walkthrough
-- `def divide_and_conquer(problem):` defines the function.
-- `if is_base_case(problem):` checks if the recursion should terminate.
-- `return solve_base_case(problem)` returns the direct answer for the simplest case.
-- `subproblems = divide(problem)` splits the input.
-- `solutions = [divide_and_conquer(sub) for sub in subproblems]` is a list comprehension recursively solving each part.
-- `return combine(solutions)` merges the partial answers.
+### Commands needed
+`python3 lesson32.py`
 
-### CS Lens
-The Divide and Conquer paradigm is a fundamental algorithm design strategy. Also recognized in: MapReduce data processing, parallel processing tasks, database query optimization.
+### Run it
+Predicted confidently: Nothing will print yet since we only defined the variables and functions.
 
-### SE Lens
-Why use this template? It modularizes the problem logic. The alternative is writing complex, monolithic iterative loops that are hard to parallelize and debug. The cost is the overhead of recursive function calls.
+### One sentence connecting to previous unit
+Now that we have seen how dividing a list allows us to find a maximum, we can apply this same splitting technique to sorting.
 
-### Execution and Verification
-No execution needed for a conceptual template. Confidently predictable that it represents an abstract pattern.
-
-### Connection to Next
-Now we will apply this template to an actual problem: fast exponentiation.
-
----
-
-## Concept Unit: Fast exponentiation — O(log n)
-
+## Concept Unit: Merge sort
 ### The Problem
-How do you calculate 2^10 efficiently without multiplying 2 by itself 10 times? What would you try if you could divide the exponent?
+If we split an unsorted list into halves down to single elements, those single elements are technically "sorted" lists of length 1. How can we take two sorted lists and combine them into a single sorted list efficiently without re-sorting from scratch? What is the logic for interleaving them?
+
+### Introduce the concept in isolation
+```python
+# Throwaway demonstration of merging two sorted lists
+left = [3, 5]
+right = [1, 4]
+res = []
+i = 0; j = 0
+while i < len(left) and j < len(right):
+    if left[i] < right[j]:
+        res.append(left[i])
+        i += 1
+    else:
+        res.append(right[j])
+        j += 1
+res.extend(left[i:])
+res.extend(right[j:])
+print(res)
+```
+Output confidently predicted: `[1, 3, 4, 5]`
+This proves we can combine two sorted arrays in linear time by walking pointers. This is the **merge** operation.
+
+### Discard the throwaway
+This snippet is deleted and will not appear in the project again.
 
 ### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are demonstrating fast exponentiation.
-- **Files affected:** `fast_power.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
+- Reference Source: No reference counterpart.
+- Files affected: `lesson32.py` (modified)
+- Change type: add
+- Location: Appended to the file.
+- Dependencies: Previous unit's basic understanding.
 
 ### The New Code
 ```python
-def fast_power(base, exp):
+def merge_sort(lst):
+    if len(lst) <= 1:
+        return lst
+    mid = len(lst) // 2
+    left  = merge_sort(lst[:mid])
+    right = merge_sort(lst[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+print(merge_sort([5, 3, 8, 1, 4]))
+```
+
+### The Updated Project
+```python
+# 16: def merge_sort(lst):                     # <- new
+# 17:     if len(lst) <= 1:                    # <- new
+# 18:         return lst                       # <- new
+# 19:     mid = len(lst) // 2                  # <- new
+# 20:     left  = merge_sort(lst[:mid])        # <- new
+# 21:     right = merge_sort(lst[mid:])        # <- new
+# 22:     return merge(left, right)            # <- new
+# 23: 
+# 24: def merge(left, right):                  # <- new
+# 25:     result = []                          # <- new
+# 26:     i = j = 0                            # <- new
+# 27:     while i < len(left) and j < len(right): # <- new
+# 28:         if left[i] <= right[j]:          # <- new
+# 29:             result.append(left[i])       # <- new
+# 30:             i += 1                       # <- new
+# 31:         else:                            # <- new
+# 32:             result.append(right[j])      # <- new
+# 33:             j += 1                       # <- new
+# 34:     result.extend(left[i:])              # <- new
+# 35:     result.extend(right[j:])             # <- new
+# 36:     return result                        # <- new
+# 37: 
+# 38: print(merge_sort([5, 3, 8, 1, 4]))       # <- new
+```
+This adds the `merge_sort` function which breaks the list down, and `merge` which stitches it back together in sorted order.
+
+### Mechanical walkthrough
+- `def merge_sort(lst):`: Defines the main sorting function.
+- `if len(lst) <= 1:`: Base case; lists of 0 or 1 element are already sorted.
+- `return lst`: Returns the sorted list.
+- `mid = len(lst) // 2`: Finds the middle index.
+- `left = merge_sort(lst[:mid])`: Sorts the left half recursively.
+- `right = merge_sort(lst[mid:])`: Sorts the right half recursively.
+- `return merge(left, right)`: Combines the two sorted halves.
+- `def merge(left, right):`: Defines the helper merging function.
+- `result = []`: Initializes an empty list to hold the merged elements.
+- `i = j = 0`: Initializes two pointer indices to 0.
+- `while i < len(left) and j < len(right):`: Loops as long as neither list is exhausted.
+- `if left[i] <= right[j]:`: Compares the current elements of both lists.
+- `result.append(left[i])`: Adds the smaller element to the result.
+- `i += 1`: Advances the left pointer.
+- `else:`: Handles the case where the right element is smaller.
+- `result.append(right[j])`: Adds the right element.
+- `j += 1`: Advances the right pointer.
+- `result.extend(left[i:])`: Appends any remaining elements from the left list.
+- `result.extend(right[j:])`: Appends any remaining elements from the right list.
+- `return result`: Returns the fully merged and sorted list.
+- `print(...)`: Prints the result of the function call.
+
+### CS lens
+Merge Sort is a classic Divide and Conquer algorithm. It appears in:
+1. Python's Timsort (which is derived from merge sort and insertion sort).
+2. External sorting algorithms where data is too large to fit in RAM.
+3. Linked list sorting (where it can be implemented with O(1) space).
+
+### SE lens
+Design principle: Delegation. The alternative not chosen is an in-place sort like Bubble Sort. The real tradeoff is that Merge Sort is stable and guarantees O(n log n) time, but typically requires O(n) auxiliary space to hold the newly merged arrays, unlike in-place algorithms.
+
+### Commands needed
+`python3 lesson32.py`
+
+### Run it
+Predicted confidently: `[1, 3, 4, 5, 8]`
+
+### One sentence connecting to previous unit
+Having built merge sort, we must now formally verify its efficiency by tracking exactly how much work it performs across all recursive layers.
+
+## Concept Unit: Merge sort complexity analysis
+### The Problem
+How do we actually prove that merge sort runs in O(n log n) time instead of O(n^2)? If we count every time a recursive function is called and measure how many elements are merged at each step, will the total work mirror the theoretical mathematical curve `n * log2(n)`?
+
+### Introduce the concept in isolation
+```python
+# Throwaway demonstration of global counters
+count = 0
+def increment():
+    global count
+    count += 1
+increment()
+print(count)
+```
+Output confidently predicted: `1`
+This proves we can track a running tally across multiple function calls using the **global** keyword.
+
+### Discard the throwaway
+This snippet is deleted and will not appear in the project again.
+
+### Project Change
+- Reference Source: No reference counterpart.
+- Files affected: `lesson32.py` (modified)
+- Change type: add
+- Location: Appended to the file.
+- Dependencies: None.
+
+### The New Code
+```python
+def merge_sort_counted(lst, depth=0):
+    global call_count, total_work
+    call_count += 1
+    if len(lst) <= 1:
+        return lst
+    mid = len(lst) // 2
+    left  = merge_sort_counted(lst[:mid], depth+1)
+    right = merge_sort_counted(lst[mid:], depth+1)
+    merged = merge(left, right)
+    total_work += len(lst)
+    return merged
+
+for n in [8, 16, 32, 64]:
+    call_count = 0
+    total_work = 0
+    merge_sort_counted(list(range(n, 0, -1)))
+    import math
+    print(f'n={n:3d}: calls={call_count}, work={total_work}, n*log2(n)={n*math.log2(n):.0f}')
+```
+
+### The Updated Project
+```python
+# 40: def merge_sort_counted(lst, depth=0):             # <- new
+# 41:     global call_count, total_work                 # <- new
+# 42:     call_count += 1                               # <- new
+# 43:     if len(lst) <= 1:                             # <- new
+# 44:         return lst                                # <- new
+# 45:     mid = len(lst) // 2                           # <- new
+# 46:     left  = merge_sort_counted(lst[:mid], depth+1) # <- new
+# 47:     right = merge_sort_counted(lst[mid:], depth+1) # <- new
+# 48:     merged = merge(left, right)                   # <- new
+# 49:     total_work += len(lst)                        # <- new
+# 50:     return merged                                 # <- new
+# 51: 
+# 52: for n in [8, 16, 32, 64]:                         # <- new
+# 53:     call_count = 0                                # <- new
+# 54:     total_work = 0                                # <- new
+# 55:     merge_sort_counted(list(range(n, 0, -1)))     # <- new
+# 56:     import math                                   # <- new
+# 57:     print(f'n={n:3d}: calls={call_count}, work={total_work}, n*log2(n)={n*math.log2(n):.0f}') # <- new
+```
+This adds an instrumented version of merge sort to empirically measure its time complexity.
+
+### Mechanical walkthrough
+- `def merge_sort_counted(lst, depth=0):`: Defines the tracked sort function with a default depth argument.
+- `global call_count, total_work`: Declares intent to modify module-level counter variables.
+- `call_count += 1`: Increments the recursive call counter.
+- `if len(lst) <= 1: return lst`: Standard base case.
+- `mid = len(lst) // 2`: Midpoint calculation.
+- `left = merge_sort_counted(lst[:mid], depth+1)`: Sorts left half, incrementing depth.
+- `right = merge_sort_counted(lst[mid:], depth+1)`: Sorts right half, incrementing depth.
+- `merged = merge(left, right)`: Uses the original merge function.
+- `total_work += len(lst)`: Adds the size of the current list to the total work (since merging takes O(n) time).
+- `return merged`: Returns the sorted list.
+- `for n in [8, 16, 32, 64]:`: Loops through various input sizes.
+- `call_count = 0; total_work = 0`: Resets global counters for each run.
+- `merge_sort_counted(list(range(n, 0, -1)))`: Calls the function with a worst-case reversed list.
+- `import math`: Imports the standard math library.
+- `print(...)`: Uses an f-string to print formatted metrics, comparing empirical work against mathematical expectation.
+
+### CS lens
+Algorithmic Complexity is a fundamental CS concept. It appears in:
+1. Benchmarking database queries.
+2. Predicting load limits for web servers.
+3. Choosing appropriate data structures (e.g. hash maps vs trees).
+
+### SE lens
+Design principle: Profiling and Instrumentation. The alternative not chosen is relying solely on mathematical proofs. The real tradeoff is that modifying code to inject counters (`global` state) makes it messy and thread-unsafe, but provides undeniable runtime validation of theoretical complexity.
+
+### Commands needed
+`python3 lesson32.py`
+
+### Run it
+Predicted confidently:
+```
+n=  8: calls=15, work=24, n*log2(n)=24
+n= 16: calls=31, work=64, n*log2(n)=64
+n= 32: calls=63, work=160, n*log2(n)=160
+n= 64: calls=127, work=384, n*log2(n)=384
+```
+
+### One sentence connecting to previous unit
+If cutting a problem in half and processing the halves gives us O(n log n), what happens if we cut it in half and only process *one* of the halves?
+
+## Concept Unit: Fast exponentiation
+### The Problem
+If we want to compute 2^1000000, multiplying 2 by itself a million times is very slow (O(n)). Since `2^10 = (2^5) * (2^5)`, we can compute `2^5` just once, and square it. Can we write a recursive function that repeatedly halves the exponent to compute massive powers in mere fractions of a second?
+
+### Introduce the concept in isolation
+```python
+# Throwaway demonstration of halving an exponent
+exp = 10
+print(exp // 2, exp % 2 == 0)
+exp = 5
+print(exp // 2, exp % 2 == 0)
+```
+Output confidently predicted: `5 True`, `2 False`
+This proves we can repeatedly halve integers and check if they are even. This is the **halving step**.
+
+### Discard the throwaway
+This snippet is deleted and will not appear in the project again.
+
+### Project Change
+- Reference Source: No reference counterpart.
+- Files affected: `lesson32.py` (modified)
+- Change type: add
+- Location: Appended to the file.
+- Dependencies: None.
+
+### The New Code
+```python
+def power(base, exp):
     if exp == 0:
         return 1
     if exp % 2 == 0:
-        half = fast_power(base, exp // 2)
+        half = power(base, exp // 2)
         return half * half
     else:
-        return base * fast_power(base, exp - 1)
+        return base * power(base, exp - 1)
+
+print(power(2, 10))
+print(power(3, 5))
 ```
 
 ### The Updated Project
 ```python
-# 1: def fast_power(base, exp):
-# 2:     if exp == 0:
-# 3:         return 1
-# 4:     if exp % 2 == 0:
-# 5:         half = fast_power(base, exp // 2)
-# 6:         return half * half
-# 7:     else:
-# 8:         return base * fast_power(base, exp - 1)
+# 59: def power(base, exp):                       # <- new
+# 60:     if exp == 0:                            # <- new
+# 61:         return 1                            # <- new
+# 62:     if exp % 2 == 0:                        # <- new
+# 63:         half = power(base, exp // 2)        # <- new
+# 64:         return half * half                  # <- new
+# 65:     else:                                   # <- new
+# 66:         return base * power(base, exp - 1)  # <- new
+# 67: 
+# 68: print(power(2, 10))                         # <- new
+# 69: print(power(3, 5))                          # <- new
 ```
-This function computes the power of a base to an exponent using divide and conquer, achieving O(log n) time complexity.
+This adds the O(log n) exponentiation function.
 
-### Isolate the Concept
-Let's see this in action with a test run.
-```python
-def fast_power(base, exp):
-    if exp == 0: return 1
-    if exp % 2 == 0:
-        half = fast_power(base, exp // 2)
-        return half * half
-    else:
-        return base * fast_power(base, exp - 1)
+### Mechanical walkthrough
+- `def power(base, exp):`: Defines the exponentiation function.
+- `if exp == 0:`: Base case; anything to the power of 0 is 1.
+- `return 1`: Returns the base case result.
+- `if exp % 2 == 0:`: Checks if the exponent is an even number.
+- `half = power(base, exp // 2)`: Recursively computes the power of half the exponent.
+- `return half * half`: Combines by squaring the result of the half, cutting work in half.
+- `else:`: If the exponent is odd.
+- `return base * power(base, exp - 1)`: Reduces the exponent by 1 to make it even for the next call.
+- `print(...)`: Prints the results.
 
-print(fast_power(2, 10))
-print(fast_power(3, 5))
-print(fast_power(2, 0))
-```
-Output:
+### CS lens
+O(log n) efficiency is a CS holy grail. It appears in:
+1. Cryptography (RSA relies heavily on fast modular exponentiation).
+2. Binary search trees finding an element.
+3. Blockchain state verification (Merkle proofs).
+
+### SE lens
+Design principle: Algorithmic optimization over hardware scaling. The alternative not chosen is waiting for a million iterations in a `for` loop. The real tradeoff is complexity; a `for` loop is universally understood, whereas recursive halving requires deeper conceptual tracing, but it changes an intractable problem into an instantaneous one.
+
+### Commands needed
+`python3 lesson32.py`
+
+### Run it
+Predicted confidently:
 ```
 1024
 243
-1
 ```
-This proves that the fast exponentiation works correctly by recursively halving the exponent.
 
-### Discard the Concept
-The isolated throwaway lab is discarded.
+### One sentence connecting to previous unit
+While halving the workload makes math incredibly fast, we can also apply divide-and-conquer to array sorting in a way that doesn't use extra memory, unlike merge sort.
 
-### Mechanical Walkthrough
-- `def fast_power(base, exp):` defines the exponentiation function.
-- `if exp == 0:` is the base case check.
-- `return 1` returns the result for the 0th power.
-- `if exp % 2 == 0:` checks if the exponent is even.
-- `half = fast_power(base, exp // 2)` recursively calculates the power for half the exponent.
-- `return half * half` combines the result by squaring the half-power.
-- `else:` handles odd exponents.
-- `return base * fast_power(base, exp - 1)` reduces the odd exponent by one and multiplies by the base once.
-
-### Execution Trace
-1. `fast_power(2,8)` — even exponent, calculates `half = fast_power(2,4)`
-2. `fast_power(2,4)` — even exponent, calculates `half = fast_power(2,2)`
-3. `fast_power(2,2)` — even exponent, calculates `half = fast_power(2,1)`
-4. `fast_power(2,1)` — odd exponent, returns `2 * fast_power(2,0)`
-5. `fast_power(2,0)` — base case, returns `1`
-6. `fast_power(2,1)` — returns `2 * 1 = 2`
-7. `fast_power(2,2)` — returns `2 * 2 = 4`
-8. `fast_power(2,4)` — returns `4 * 4 = 16`
-9. `fast_power(2,8)` — returns `16 * 16 = 256`
-
-### CS Lens
-Binary exponentiation (fast power) is a classic O(log n) algorithm. Also recognized in: modular exponentiation in RSA cryptography, matrix exponentiation for Fibonacci numbers.
-
-### SE Lens
-Why use fast power instead of a loop? A naive loop runs in O(n) time, doing n multiplications. Fast power runs in O(log n) time, drastically reducing the operations for large exponents. The tradeoff is recursion depth for massive exponents, though Python's built-in `**` is implemented in C using a similar approach.
-
-### Execution and Verification
-Execution output has been predicted confidently based on Python's math capabilities.
-
-### Connection to Next
-Now we will apply D&C to a more complex search space: finding the maximum subarray sum.
-
----
-
-## Concept Unit: Finding the maximum subarray sum — D&C approach
-
+## Concept Unit: Quicksort
 ### The Problem
-Given an array of integers, how do you find the contiguous subarray with the largest sum? What if you split the array in half?
+Merge sort guarantees fast sorting, but creating a new `result = []` list every time uses O(n) extra memory. Can we divide an array in half and sort it *in place*, by just swapping elements around a chosen "pivot" value? 
+
+### Introduce the concept in isolation
+```python
+# Throwaway demonstration of in-place swapping
+arr = [10, 20]
+arr[0], arr[1] = arr[1], arr[0]
+print(arr)
+```
+Output confidently predicted: `[20, 10]`
+This proves that Python allows simultaneous variable assignment to swap values without a temporary variable. This is **in-place swapping**.
+
+### Discard the throwaway
+This snippet is deleted and will not appear in the project again.
 
 ### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `max_subarray.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
+- Reference Source: No reference counterpart.
+- Files affected: `lesson32.py` (modified)
+- Change type: add
+- Location: Appended to the file.
+- Dependencies: None.
 
 ### The New Code
 ```python
-def max_subarray_dc(lst, low=None, high=None):
-    if low is None:
-        low, high = 0, len(lst) - 1
-    if low == high:
-        return lst[low]
-    mid = (low + high) // 2
-    left_max  = max_subarray_dc(lst, low, mid)
-    right_max = max_subarray_dc(lst, mid+1, high)
-    cross_max = max_crossing(lst, low, mid, high)
-    return max(left_max, right_max, cross_max)
+def quicksort(lst, lo=0, hi=None):
+    if hi is None:
+        hi = len(lst) - 1
+    if lo < hi:
+        p = partition(lst, lo, hi)
+        quicksort(lst, lo, p - 1)
+        quicksort(lst, p + 1, hi)
 
-def max_crossing(lst, low, mid, high):
-    left_sum = float('-inf')
-    total = 0
-    for i in range(mid, low-1, -1):
-        total += lst[i]
-        left_sum = max(left_sum, total)
-    right_sum = float('-inf')
-    total = 0
-    for i in range(mid+1, high+1):
-        total += lst[i]
-        right_sum = max(right_sum, total)
-    return left_sum + right_sum
+def partition(lst, lo, hi):
+    pivot = lst[hi]
+    i = lo - 1
+    for j in range(lo, hi):
+        if lst[j] <= pivot:
+            i += 1
+            lst[i], lst[j] = lst[j], lst[i]
+    lst[i+1], lst[hi] = lst[hi], lst[i+1]
+    return i + 1
+
+data = [3, 6, 8, 10, 1, 2, 1]
+quicksort(data)
+print(data)
 ```
 
 ### The Updated Project
 ```python
-# 1: def max_subarray_dc(lst, low=None, high=None):
-# 2:     if low is None:
-# 3:         low, high = 0, len(lst) - 1
-# 4:     if low == high:
-# 5:         return lst[low]
-# 6:     mid = (low + high) // 2
-# 7:     left_max  = max_subarray_dc(lst, low, mid)
-# 8:     right_max = max_subarray_dc(lst, mid+1, high)
-# 9:     cross_max = max_crossing(lst, low, mid, high)
-# 10:    return max(left_max, right_max, cross_max)
-# 11:
-# 12: def max_crossing(lst, low, mid, high):
-# 13:    left_sum = float('-inf')
-# 14:    total = 0
-# 15:    for i in range(mid, low-1, -1):
-# 16:        total += lst[i]
-# 17:        left_sum = max(left_sum, total)
-# 18:    right_sum = float('-inf')
-# 19:    total = 0
-# 20:    for i in range(mid+1, high+1):
-# 21:        total += lst[i]
-# 22:        right_sum = max(right_sum, total)
-# 23:    return left_sum + right_sum
+# 71: def quicksort(lst, lo=0, hi=None):          # <- new
+# 72:     if hi is None:                          # <- new
+# 73:         hi = len(lst) - 1                   # <- new
+# 74:     if lo < hi:                             # <- new
+# 75:         p = partition(lst, lo, hi)          # <- new
+# 76:         quicksort(lst, lo, p - 1)           # <- new
+# 77:         quicksort(lst, p + 1, hi)           # <- new
+# 78: 
+# 79: def partition(lst, lo, hi):                 # <- new
+# 80:     pivot = lst[hi]                         # <- new
+# 81:     i = lo - 1                              # <- new
+# 82:     for j in range(lo, hi):                 # <- new
+# 83:         if lst[j] <= pivot:                 # <- new
+# 84:             i += 1                          # <- new
+# 85:             lst[i], lst[j] = lst[j], lst[i] # <- new
+# 86:     lst[i+1], lst[hi] = lst[hi], lst[i+1]   # <- new
+# 87:     return i + 1                            # <- new
+# 88: 
+# 89: data = [3, 6, 8, 10, 1, 2, 1]               # <- new
+# 90: quicksort(data)                             # <- new
+# 91: print(data)                                 # <- new
 ```
-This algorithm divides the array, finding the maximum subarray in the left half, the right half, and the segment crossing the middle, taking the maximum of the three.
+This introduces the quicksort algorithm which uses in-place array partitioning.
 
-### Isolate the Concept
-Let's see the algorithm process a test array.
-```python
-data = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
-print(max_subarray_dc(data))
-```
-Output:
-```
-6
-```
-This proves the algorithm successfully finds the maximum subarray sum of 6 (which corresponds to `[4, -1, 2, 1]`).
+### Mechanical walkthrough
+- `def quicksort(lst, lo=0, hi=None):`: Defines quicksort with optional low and high index bounds.
+- `if hi is None: hi = len(lst) - 1`: Initializes the high bound to the last index on the first call.
+- `if lo < hi:`: Ensures the bounds define a valid sub-array to sort.
+- `p = partition(lst, lo, hi)`: Calls partition to organize the array around a pivot and returns the pivot's final index.
+- `quicksort(lst, lo, p - 1)`: Recursively sorts the elements before the pivot.
+- `quicksort(lst, p + 1, hi)`: Recursively sorts the elements after the pivot.
+- `def partition(lst, lo, hi):`: Defines the partition helper function.
+- `pivot = lst[hi]`: Chooses the last element in the given range as the comparison pivot.
+- `i = lo - 1`: Initializes the pointer for the boundary of smaller elements.
+- `for j in range(lo, hi):`: Iterates through the given range up to the pivot.
+- `if lst[j] <= pivot:`: Checks if the current element is smaller than or equal to the pivot.
+- `i += 1`: Moves the smaller-element boundary forward.
+- `lst[i], lst[j] = lst[j], lst[i]`: Swaps the current element into the smaller-element zone.
+- `lst[i+1], lst[hi] = lst[hi], lst[i+1]`: Swaps the pivot itself into its final correct position right after the smaller elements.
+- `return i + 1`: Returns the final index of the pivot.
+- `data = [...]`: Creates test data.
+- `quicksort(data)`: Mutates the list in place.
+- `print(data)`: Prints the now-sorted list.
 
-### Discard the Concept
-The isolated run is discarded.
+### CS lens
+In-place memory management is vital. It appears in:
+1. Embedded systems with strict RAM constraints.
+2. V8 JavaScript engine array sorting.
+3. Linux kernel memory allocators.
 
-### Mechanical Walkthrough
-- `def max_subarray_dc(lst, low=None, high=None):` defines the main function.
-- `if low is None:` sets default boundaries for the first call.
-- `low, high = 0, len(lst) - 1` calculates the first and last indices.
-- `if low == high:` checks the base case (1 element).
-- `return lst[low]` returns the single element.
-- `mid = (low + high) // 2` finds the middle index.
-- `left_max = max_subarray_dc(lst, low, mid)` recursively finds the left maximum.
-- `right_max = max_subarray_dc(lst, mid+1, high)` recursively finds the right maximum.
-- `cross_max = max_crossing(lst, low, mid, high)` calculates the maximum sum crossing the midpoint.
-- `return max(left_max, right_max, cross_max)` returns the largest of the three.
-- `def max_crossing(lst, low, mid, high):` defines the crossing helper.
-- `left_sum = float('-inf')` initializes the left maximum sum.
-- `total = 0` initializes the running total.
-- `for i in range(mid, low-1, -1):` iterates backwards from the middle.
-- `total += lst[i]` adds to the running total.
-- `left_sum = max(left_sum, total)` updates the left maximum if the total is larger.
-- The right side does the same iterating forwards.
-- `return left_sum + right_sum` combines both halves of the crossing sum.
+### SE lens
+Design principle: Mutability vs Immutability. The alternative not chosen is Merge Sort returning a brand new list. The real tradeoff is that mutating data in place (Quicksort) saves memory and garbage collection overhead, but makes functions impure and introduces side-effects, making concurrent access dangerous.
 
-### Execution Trace
-For `[-2, 1, -3, 4]`:
-1. `max_subarray_dc([-2, 1, -3, 4], 0, 3)` calls `mid=1`. Left half `[0,1]`, Right half `[2,3]`.
-2. Left recursion: `max_subarray_dc(..., 0, 1)`. `mid=0`. Left `[-2]`, Right `[1]`.
-3. Left base case: returns `-2`. Right base case: returns `1`.
-4. Cross: max from `mid=0` left is `-2`, max from `mid+1=1` right is `1`. Cross sum = `-1`.
-5. Max for `[0,1]` is `max(-2, 1, -1) = 1`.
-6. Right recursion: `max_subarray_dc(..., 2, 3)`. `mid=2`. Left base case `[-3]`, Right base case `[4]`. Cross = `1`.
-7. Max for `[2,3]` is `max(-3, 4, 1) = 4`.
-8. Top-level cross: `mid=1`. Left max starting from 1 back to 0 is `1` (from `1`), right max starting from 2 to 3 is `4` (from `4`). Cross sum = `1 + 4 = 5` (wait, from index 1 back, it's 1; index 2 forward is `4 + (-3) = 1`, actually `cross_max` will compute left max from index 1 `[1, -2]` which is `1`, right max from index 2 `[-3, 4]` which is `1`. Total cross = `2`.).
-9. Top-level return: `max(1, 4, 2) = 4`.
+### Commands needed
+`python3 lesson32.py`
 
-### CS Lens
-The algorithm is O(n log n). This is a classic example of using D&C to handle edge cases that straddle dividing lines. Also recognized in: closest pair of points algorithm, Strassen's matrix multiplication.
+### Run it
+Predicted confidently: `[1, 1, 2, 3, 6, 8, 10]`
 
-### SE Lens
-Why show this D&C approach? Because it's a general technique that works on many problems and parallelizes effortlessly. The alternative is Kadane's algorithm (below), which is O(n) but relies on a specific insight rather than a universal pattern.
-
-### Execution and Verification
-Execution conceptually verified. Output is standard for Kadane/D&C max subarray problems.
-
-### Connection to Next
-Now we contrast this O(n log n) general pattern with a brilliant, problem-specific O(n) algorithm.
-
----
-
-## Concept Unit: Kadane's algorithm — O(n) for the same problem
-
-### The Problem
-Can we do better than O(n log n) by recognizing when a running sum becomes completely useless?
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `kadane.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
-
-### The New Code
-```python
-def max_subarray_kadane(lst):
-    max_sum = lst[0]
-    current_sum = lst[0]
-    for x in lst[1:]:
-        current_sum = max(x, current_sum + x)
-        max_sum = max(max_sum, current_sum)
-    return max_sum
-```
-
-### The Updated Project
-```python
-# 1: def max_subarray_kadane(lst):
-# 2:     max_sum = lst[0]
-# 3:     current_sum = lst[0]
-# 4:     for x in lst[1:]:
-# 5:         current_sum = max(x, current_sum + x)
-# 6:         max_sum = max(max_sum, current_sum)
-# 7:     return max_sum
-```
-This iteratively builds the maximum subarray sum in O(n) time by abandoning negative prefixes.
-
-### Isolate the Concept
-Testing Kadane's algorithm.
-```python
-data = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
-print(max_subarray_kadane(data))
-```
-Output:
-```
-6
-```
-This confirms Kadane's provides the identical result but through a linear scan.
-
-### Discard the Concept
-The test execution is discarded.
-
-### Mechanical Walkthrough
-- `def max_subarray_kadane(lst):` defines the function.
-- `max_sum = lst[0]` initializes the global maximum to the first element.
-- `current_sum = lst[0]` initializes the running local maximum.
-- `for x in lst[1:]:` loops through the rest of the list.
-- `current_sum = max(x, current_sum + x)` decides whether to extend the current subarray or start a new one at `x`.
-- `max_sum = max(max_sum, current_sum)` updates the overall maximum if the current run is better.
-- `return max_sum` yields the final answer.
-
-### Execution Trace
-For `[-2, 1, -3, 4]`:
-1. Init: `max= -2`, `current = -2`.
-2. Iter 1: `x=1`. `current = max(1, -2+1) = 1`. `max = max(-2, 1) = 1`.
-3. Iter 2: `x=-3`. `current = max(-3, 1-3) = -2`. `max = max(1, -2) = 1`.
-4. Iter 3: `x=4`. `current = max(4, -2+4) = 4`. `max = max(1, 4) = 4`.
-
-### CS Lens
-Kadane's algorithm is a simplified form of Dynamic Programming running in O(n) time.
-
-### SE Lens
-Why learn both? Kadane's is a brilliant special insight specific to this problem. D&C is a GENERAL technique. D&C is a stepping stone to the Master Theorem and O(n log n) algorithms, and parallelizes perfectly. Kadane's is strictly sequential.
-
-### Execution and Verification
-Execution output predicted with absolute certainty based on classical algorithm behavior.
-
-### Connection to Next
-Now we examine Quicksort, another D&C algorithm that relies on the element values to determine the divide step.
-
----
-
-## Concept Unit: Quicksort — D&C with O(n log n) expected
-
-### The Problem
-Merge sort does all its work in the combine step. What if we do all the work in the divide step, sorting elements as we partition them, making the combine step trivial?
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `quicksort.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
-
-### The New Code
-```python
-def quicksort(lst):
-    if len(lst) <= 1:
-        return lst
-    pivot = lst[len(lst) // 2]
-    left  = [x for x in lst if x < pivot]
-    mid   = [x for x in lst if x == pivot]
-    right = [x for x in lst if x > pivot]
-    return quicksort(left) + mid + quicksort(right)
-```
-
-### The Updated Project
-```python
-# 1: def quicksort(lst):
-# 2:     if len(lst) <= 1:
-# 3:         return lst
-# 4:     pivot = lst[len(lst) // 2]
-# 5:     left  = [x for x in lst if x < pivot]
-# 6:     mid   = [x for x in lst if x == pivot]
-# 7:     right = [x for x in lst if x > pivot]
-# 8:     return quicksort(left) + mid + quicksort(right)
-```
-This recursively partitions the list around a pivot element.
-
-### Isolate the Concept
-Testing Quicksort.
-```python
-print(quicksort([3, 6, 8, 10, 1, 2, 1]))
-```
-Output:
-```
-[1, 1, 2, 3, 6, 8, 10]
-```
-This proves that Quicksort successfully orders the list by grouping smaller, equal, and larger elements recursively.
-
-### Discard the Concept
-The isolated run is discarded.
-
-### Mechanical Walkthrough
-- `def quicksort(lst):` defines the sorting function.
-- `if len(lst) <= 1:` checks for the base case (an empty or single-element list is already sorted).
-- `return lst` yields the base case result.
-- `pivot = lst[len(lst) // 2]` selects the middle element to partition around.
-- `left = [x for x in lst if x < pivot]` extracts all elements smaller than the pivot.
-- `mid = [x for x in lst if x == pivot]` extracts all elements equal to the pivot.
-- `right = [x for x in lst if x > pivot]` extracts all elements larger than the pivot.
-- `return quicksort(left) + mid + quicksort(right)` recursively sorts the left and right groups, and concatenates the lists in order.
-
-### Execution Trace
-For `[3, 1, 2]`:
-1. `quicksort([3, 1, 2])`: `pivot=1`. `left=[]`, `mid=[1]`, `right=[3,2]`.
-2. Recursion `left`: `quicksort([])` returns `[]`.
-3. Recursion `right`: `quicksort([3, 2])`. `pivot=2`. `left=[]`, `mid=[2]`, `right=[3]`. Returns `[] + [2] + [3] = [2, 3]`.
-4. Final return: `[] + [1] + [2, 3] = [1, 2, 3]`.
-
-### CS Lens
-Quicksort has an average-case time complexity of O(n log n), but a worst-case of O(n²) if the pivot choice consistently results in extreme splits (e.g., already sorted data with the wrong pivot strategy).
-
-### SE Lens
-Why use quicksort? In practice, an in-place quicksort is often faster than merge sort because it avoids allocating new lists and has excellent memory cache locality. The functional version shown here uses extra memory for clarity, but production versions are implemented in-place.
-
-### Execution and Verification
-Code behaves deterministically per standard python list mechanics and recursion. Output correctly predicted.
-
-### Connection to Next
-With several D&C algorithms implemented, how do we formally analyze their speed?
-
----
-
-## Concept Unit: Recurrence relations and the Master Theorem
-
-### The Problem
-How can we mathematically prove that `max_subarray_dc` is O(n log n) and `fast_power` is O(log n)? What if we could model the time taken as a recursive equation?
-
-### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition (conceptual).
-- **Files affected:** `master_theorem.txt` (created)
-- **Change type:** add
-- **Location:** At the top of the file
-- **Dependencies:** None
-
-### The New Code
-```text
-merge sort: T(n) = 2T(n/2) + O(n)
-binary search: T(n) = T(n/2) + O(1)
-fast_power: T(n) = T(n/2) + O(1)
-naive recursion: T(n) = 2T(n-1) + O(1)
-```
-
-### The Updated Project
-```text
-# 1: merge sort: T(n) = 2T(n/2) + O(n)
-# 2: binary search: T(n) = T(n/2) + O(1)
-# 3: fast_power: T(n) = T(n/2) + O(1)
-# 4: naive recursion: T(n) = 2T(n-1) + O(1)
-```
-These equations represent the time complexity: the number of recursive calls, the size of each call, and the work done at each step.
-
-### Isolate the Concept
-No executable code here; this is a mathematical theorem.
-For merge sort: we make `2` recursive calls, each on half the data `T(n/2)`, and it takes `O(n)` to combine them.
-
-### Discard the Concept
-The theoretical outline remains a concept.
-
-### Mechanical Walkthrough
-- `merge sort: T(n) = 2T(n/2) + O(n)` represents dividing into 2 subproblems of half size, with linear combine time, resolving to `O(n log n)`.
-- `binary search: T(n) = T(n/2) + O(1)` represents 1 subproblem of half size, with constant division/combine time, resolving to `O(log n)`.
-- `fast_power: T(n) = T(n/2) + O(1)` behaves exactly like binary search.
-- `naive recursion: T(n) = 2T(n-1) + O(1)` represents 2 subproblems of size `n-1` (like naive Fibonacci), which resolves to exponential `O(2^n)`.
-- The Master Theorem formalizes this: if `T(n) = aT(n/b) + O(n^d)`:
-  - If `a < b^d`: `O(n^d)`
-  - If `a = b^d`: `O(n^d log n)`
-  - If `a > b^d`: `O(n^(log_b a))`
-- For merge sort: `a=2, b=2, d=1`. `2 = 2^1`. This is the second case, giving `O(n log n)`.
-
-### CS Lens
-The Master Theorem is a cornerstone of algorithm analysis, turning complex recursive time tracing into simple algebra.
-
-### SE Lens
-Why care? Knowing the Master Theorem allows a developer to instantly assess whether a recursive design will perform well at scale. A poor divide step can inadvertently create an O(n²) or worse bottleneck.
-
-### Execution and Verification
-Mathematical rules; no execution needed.
-
-### Connection to Next
-Finally, we summarize the rules for when to apply this powerful technique.
-
----
-
-## Concept Unit: When to use D&C
-
-### The Problem
-When should you reach for the Divide and Conquer template versus another technique?
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None, purely conceptual synthesis.
-- **Change type:** add
-- **Location:** N/A
-- **Dependencies:** None
-
-### The New Code
-```text
-Rule of thumb: use D&C when:
-- The problem can be split into independent subproblems of the same type.
-- The combine step is efficient (O(n) or less).
-```
-
-### The Updated Project
-```text
-# 1: Rule of thumb: use D&C when:
-# 2: - The problem can be split into independent subproblems of the same type.
-# 3: - The combine step is efficient (O(n) or less).
-```
-This final checklist helps decide if D&C is applicable.
-
-### Isolate the Concept
-If subproblems overlap heavily (like computing Fibonacci iteratively where `fib(3)` is needed by `fib(4)` and `fib(5)`), D&C will repeat work, leading to exponential time. In that case, use Dynamic Programming instead (covered in Lesson 34).
-
-### Discard the Concept
-N/A
-
-### Mechanical Walkthrough
-- `Independent subproblems:` The work done in one half does not affect or duplicate the work in the other half.
-- `Efficient combine:` The actual merging of results must be fast. If merging takes `O(n^2)`, the whole algorithm slows down significantly.
-
-### CS Lens
-D&C patterns to recognize in the wild:
-- Sorting (Merge/Quick)
-- Searching (Binary)
-- Tree traversals
-- Geometric algorithms (Closest pair of points)
-- Mathematical (Strassen matrix multiplication, Fast Fourier Transform).
-
-### SE Lens
-Identifying the paradigm allows engineers to communicate complex implementations concisely. Saying "It's a D&C approach" instantly communicates the structure and likely complexity profile of the solution.
-
-### Execution and Verification
-Conceptual checklist.
-
-### Connection to Next
-This concludes our exploration of the D&C algorithm design paradigm.
-
----
+### One sentence connecting to previous unit
+We now have two powerful sorting algorithms and a mathematical technique, all sharing the same divide-and-conquer philosophy.
 
 ## Closing
-
-Divide and conquer is one of the three fundamental algorithm design paradigms (with greedy algorithms and dynamic programming). By understanding how to split a problem, solve its components independently, and stitch them back together efficiently, you unlock O(n log n) and O(log n) speeds. 
-
-Lesson 33 covers loop invariants and proving algorithms correct.
+### Connect the pieces
+Trace `merge_sort([5, 3, 8, 1, 4])` through all concept units:
+- We start with the full problem `[5, 3, 8, 1, 4]`.
+- The divide step splits it into `[5, 3]` and `[8, 1, 4]`.
+- We recurse: `[5, 3]` splits into `[5]` and `[3]`.
+- The base case hits, and the merge step combines them into `[3, 5]`.
+- Meanwhile, the right half recurses, splits, and merges into `[1, 4, 8]`.
+- Finally, the top-level merge step interleaves `[3, 5]` and `[1, 4, 8]` into `[1, 3, 4, 5, 8]`.
+- As proved by our complexity counter, this recursive halving and linear combination took just `n log2(n)` work rather than `n^2`.

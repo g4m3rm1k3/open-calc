@@ -1,543 +1,489 @@
-# Lesson 18: Files — Reading, Writing, and `with`
+# Lesson 18: Files — Reading, Writing, and with
 
-This is Lesson 18 of the Introduction to Computation and Programming Using Python series, part of Module 2 — Writing Good Programs.
+What you will build
+The reader understands file I/O in Python: opening files with `open()`, the `with` statement for guaranteed cleanup, reading (read, readline, readlines, iteration), writing, and working with text vs. binary modes. The transferable insight: a file object is an iterator. You can iterate it line by line with `for line in f`, which is memory-efficient even for huge files. Always use `with` to ensure the file is closed even if an exception occurs.
 
-What you will build:
-The reader will read and write text files using `open()`, use the `with` statement as a context manager, work with CSV files using the `csv` module, and understand file modes and encoding. The transferable problems this lesson is actually about are: (1) the `with` statement guarantees the file is closed even if an exception occurs — always use `with open(...)` rather than manual `f.close()`; (2) files are sequences of bytes on disk; Python reads them as text (strings) or binary (bytes) depending on the mode; (3) the `csv` module handles the quoting and delimiter rules so you don't have to split on commas manually.
+What you need to know first
+Lessons 00-17
 
-What you need to know first:
-- Lesson 0–17 (all prior Python through exceptions, testing, debugging)
+Terms used in this lesson
+- **file object** — A Python object that provides methods to read from and write to a file on disk. It is an iterator over the lines of the file.
+- **context manager** — An object that implements `__enter__` and `__exit__`, ensuring that resources are properly acquired and released, typically used with the `with` statement.
+- **file mode** — A string indicating how a file is opened, such as 'r' for reading, 'w' for writing, 'a' for appending.
 
-Terms used in this lesson:
-- **file object** — an interface to a file on the computer's storage, allowing Python to read from or write to it. It manages the connection between your program and the operating system's file system.
-- **context manager** — an object that sets up a context for a block of code and automatically cleans it up when the block exits. It exists to guarantee resources (like file handles) are released even if errors occur.
-- **absolute path** — a file path that provides the complete route from the root of the file system to the file. It exists to point to exactly one file regardless of the program's current working directory.
-- **relative path** — a file path resolved relative to the current working directory. It exists to let programs find local files without knowing the exact location on every machine.
-- **encoding** — a specific set of rules for converting characters into bytes (and vice versa). It exists because disks only store bytes, while programs need text, and there needs to be an agreed-upon mapping (like UTF-8).
-- **mode** — a string passed to `open()` that tells Python what you intend to do with the file (e.g., read, write, append). It exists to control permissions and prevent accidental modification of data.
-- **newline** — a special character (e.g., `\n`) that marks the end of a line of text. It exists to divide a single long string of characters into separate physical lines.
+Objects and methods used
+- **`open()`**
+  - What it is: The built-in function to open a file.
+  - Implementation: `open(file, mode='r', encoding=None)`
+  - Its use: Returns a file object used for I/O operations.
+  - Type: Built-in function.
+  - Responsibility: Opens a file and returns a corresponding file object, or raises an OSError upon failure.
+  - Depends on: A valid file path and mode.
+  - Connects to: The OS file system.
+  - Shape: System boundary.
 
-Objects and methods used:
+- **`file.read()`**
+  - What it is: Method to read the entire contents of a file.
+  - Implementation: `read(size=-1)`
+  - Its use: Reads all characters into a single string.
+  - Type: Instance method on file object.
+  - Responsibility: Reads and returns the file's contents.
+  - Depends on: File opened in read mode.
+  - Connects to: The file object.
+  - Shape: I/O method.
 
-**`open`**
-- *What it is:* A built-in Python function that opens a file and returns a file object.
-- *Implementation:* `open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`
-- *Its use:* We use it to get access to the contents of a file on the disk or to create a new file to write to.
-- *Type:* Built-in function.
-- *Responsibility:* Interacts with the operating system to open a file and returns a file object that Python can use to interact with the file.
-- *Depends on:* A string representing the file path, and optionally a mode string and encoding string.
-- *Connects to:* Called by our code, returns a file object.
-- *Shape:* A fundamental Python built-in function, serving as the boundary between our program and the file system.
+- **`file.write()`**
+  - What it is: Method to write a string to a file.
+  - Implementation: `write(text)`
+  - Its use: Writes the given text to the file.
+  - Type: Instance method on file object.
+  - Responsibility: Writes data to the stream.
+  - Depends on: File opened in write or append mode.
+  - Connects to: The file object.
+  - Shape: I/O method.
 
-**`file.read`**
-- *What it is:* A method on a file object that reads the contents of the file.
-- *Implementation:* `file.read(size=-1)` returns a string (in text mode) or bytes (in binary mode).
-- *Its use:* We use it to read the entire file into a single string.
-- *Type:* Instance method on a file object.
-- *Responsibility:* Reads a specified number of characters/bytes from the file, or the entire file if no size is given.
-- *Depends on:* The file object being open in a mode that allows reading.
-- *Connects to:* Called on the file object, returns a string.
-- *Shape:* An instance method of the file object interface.
+- **`csv.reader`**
+  - What it is: Function that returns a reader object.
+  - Implementation: `csv.reader(csvfile)`
+  - Its use: Parses a file object containing CSV data into lists of strings.
+  - Type: Module function.
+  - Responsibility: Iterates over lines in the given csvfile.
+  - Depends on: An open file object.
+  - Connects to: The file object and csv module.
+  - Shape: Data parser.
 
-**`file.close`**
-- *What it is:* A method on a file object that closes the file and releases its resources.
-- *Implementation:* `file.close()`
-- *Its use:* We use it to tell the OS that we are done with the file, ensuring data is written and locks are released.
-- *Type:* Instance method on a file object.
-- *Responsibility:* Flushes any unwritten information and closes the file object, after which no more reading or writing can be done.
-- *Depends on:* The file object itself.
-- *Connects to:* Called on the file object.
-- *Shape:* An instance method of the file object interface.
+- **`csv.writer`**
+  - What it is: Function that returns a writer object.
+  - Implementation: `csv.writer(csvfile)`
+  - Its use: Writes lists of strings as comma-separated rows.
+  - Type: Module function.
+  - Responsibility: Formats data as CSV and writes to the given csvfile.
+  - Depends on: An open file object in write mode.
+  - Connects to: The file object and csv module.
+  - Shape: Data serializer.
 
-**`file.readlines`**
-- *What it is:* A method that reads all lines from the file and returns them as a list of strings.
-- *Implementation:* `file.readlines(hint=-1)` returns a list of strings.
-- *Its use:* We use it to get every line of the file into memory at once as a distinct item in a list.
-- *Type:* Instance method on a file object.
-- *Responsibility:* Reads until EOF and returns a list of lines.
-- *Depends on:* The file object being open for reading.
-- *Connects to:* Called on the file object, returns a list.
-- *Shape:* An instance method of the file object interface.
+- **`Path`**
+  - What it is: Class representing a filesystem path.
+  - Implementation: `class pathlib.Path(*pathsegments)`
+  - Its use: OS-independent path construction and manipulation.
+  - Type: Class in `pathlib`.
+  - Responsibility: Provides object-oriented filesystem paths.
+  - Depends on: Path string segments.
+  - Connects to: The filesystem.
+  - Shape: System abstraction.
 
-**`file.readline`**
-- *What it is:* A method that reads a single line from the file.
-- *Implementation:* `file.readline(size=-1)` returns a string.
-- *Its use:* We use it to manually pull one line at a time from the file.
-- *Type:* Instance method on a file object.
-- *Responsibility:* Reads characters until a newline or EOF is reached, returning the line as a string.
-- *Depends on:* The file object being open for reading.
-- *Connects to:* Called on the file object, returns a string.
-- *Shape:* An instance method of the file object interface.
-
-**`file.write`**
-- *What it is:* A method that writes a string to the file.
-- *Implementation:* `file.write(s)` returns the number of characters written.
-- *Its use:* We use it to put text into a file.
-- *Type:* Instance method on a file object.
-- *Responsibility:* Writes the string `s` to the stream and returns the number of characters written.
-- *Depends on:* The file object being open in a mode that allows writing (e.g., `'w'`, `'a'`).
-- *Connects to:* Called on the file object, takes a string.
-- *Shape:* An instance method of the file object interface.
-
-**`print`**
-- *What it is:* A built-in function that prints objects to a text stream.
-- *Implementation:* `print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)`
-- *Its use:* We use it with the `file=` argument to redirect output to a file instead of the screen.
-- *Type:* Built-in function.
-- *Responsibility:* Converts objects to strings, joins them with `sep`, and writes them to the specified `file` stream, followed by `end`.
-- *Depends on:* The objects to print, and the destination stream.
-- *Connects to:* Called by our code, outputs to the specified stream.
-- *Shape:* A fundamental Python built-in for output.
-
-**`os.path.join`**
-- *What it is:* A function in the `os.path` module that intelligently joins one or more path components.
-- *Implementation:* `os.path.join(path, *paths)` returns a string.
-- *Its use:* We use it to build file paths correctly for the current operating system (e.g., using `\` on Windows and `/` on Mac/Linux).
-- *Type:* Function in the `os.path` module.
-- *Responsibility:* Joins paths using the correct OS-specific separator.
-- *Depends on:* Path components provided as strings.
-- *Connects to:* Called by our code, returns a formatted path string.
-- *Shape:* A standard library utility function.
-
-**`os.path.exists`**
-- *What it is:* A function that checks if a file or directory exists.
-- *Implementation:* `os.path.exists(path)` returns a boolean.
-- *Its use:* We use it to verify a file is present before attempting to open it, avoiding a `FileNotFoundError`.
-- *Type:* Function in the `os.path` module.
-- *Responsibility:* Returns `True` if path refers to an existing path or an open file descriptor.
-- *Depends on:* A string path.
-- *Connects to:* Called by our code, returns a boolean.
-- *Shape:* A standard library utility function.
-
-**`os.path.getsize`**
-- *What it is:* A function that returns the size of a file in bytes.
-- *Implementation:* `os.path.getsize(path)` returns an integer.
-- *Its use:* We use it to find out how large a file is before reading it.
-- *Type:* Function in the `os.path` module.
-- *Responsibility:* Returns the size, in bytes, of path.
-- *Depends on:* A string path.
-- *Connects to:* Called by our code, returns an integer.
-- *Shape:* A standard library utility function.
-
-**`sys.getdefaultencoding`**
-- *What it is:* A function that returns the name of the current default string encoding.
-- *Implementation:* `sys.getdefaultencoding()` returns a string.
-- *Its use:* We use it to illustrate that the default encoding is platform-dependent.
-- *Type:* Function in the `sys` module.
-- *Responsibility:* Returns the encoding used by the Python runtime for string operations when none is specified.
-- *Depends on:* Nothing.
-- *Connects to:* Called by our code, returns a string.
-- *Shape:* A standard library utility function.
-
-**`sys.stdout.encoding`**
-- *What it is:* An attribute that holds the encoding of standard output.
-- *Implementation:* A string attribute on the `sys.stdout` file object.
-- *Its use:* We use it to show that terminal encoding may differ from the system default.
-- *Type:* String attribute.
-- *Responsibility:* Stores the encoding used to print to the console.
-- *Depends on:* The `sys.stdout` object.
-- *Connects to:* Accessed by our code.
-- *Shape:* A property of the standard output stream.
-
-**`csv.writer`**
-- *What it is:* A function in the `csv` module that creates an object capable of writing CSV data.
-- *Implementation:* `csv.writer(csvfile, dialect='excel', **fmtparams)` returns a writer object.
-- *Its use:* We use it to write rows of data correctly formatted with commas and quotes.
-- *Type:* Function returning a writer object.
-- *Responsibility:* Converts user data into delimited strings and writes them to the given file-like object.
-- *Depends on:* An open file object.
-- *Connects to:* Called with a file object, returns a writer object.
-- *Shape:* A factory function in the `csv` standard library.
-
-**`csv.reader`**
-- *What it is:* A function that creates an object capable of iterating over lines in a CSV file.
-- *Implementation:* `csv.reader(csvfile, dialect='excel', **fmtparams)` returns a reader object.
-- *Its use:* We use it to parse lines of text into lists of strings based on comma delimiters.
-- *Type:* Function returning an iterator object.
-- *Responsibility:* Parses CSV-formatted data from the given file-like object.
-- *Depends on:* An open file object.
-- *Connects to:* Called with a file object, returns an iterator.
-- *Shape:* A factory function in the `csv` standard library.
-
-**`csv.DictReader`**
-- *What it is:* A class that operates like a regular reader but maps the information in each row to a dictionary.
-- *Implementation:* `csv.DictReader(f, fieldnames=None, restkey=None, restval=None, dialect='excel', *args, **kwds)`
-- *Its use:* We use it to read CSV rows as dictionaries, where the keys are the column headers.
-- *Type:* Class in the `csv` module.
-- *Responsibility:* Reads a CSV file and constructs a dictionary for each row using the header row as keys.
-- *Depends on:* An open file object.
-- *Connects to:* Instantiated with a file object, yields dictionaries on iteration.
-- *Shape:* A class in the `csv` standard library.
-
-**`next`**
-- *What it is:* A built-in function that retrieves the next item from an iterator.
-- *Implementation:* `next(iterator, default)`
-- *Its use:* We use it to manually extract the first row (the header) from a `csv.reader` before looping through the rest.
-- *Type:* Built-in function.
-- *Responsibility:* Calls the `__next__()` method on the iterator to return the next item.
-- *Depends on:* An iterator object.
-- *Connects to:* Called with an iterator, returns an element.
-- *Shape:* A fundamental Python built-in function.
-
-## Concept Unit: Opening and Reading a File
+## Concept Unit: open() and file modes
 
 ### The Problem
-We need our programs to be able to read data that was saved on the computer's hard drive, rather than typing all data directly into the source code. How do we access a file on disk?
+How do we save data to a file on our hard drive, and how do we retrieve it later? If we just keep data in memory, it is lost when the program terminates. What would you try first to write to a file in Python? How would you retrieve it?
 
-### The Code in Isolation
+### Introduce the concept in isolation
 ```python
-# Assume a file 'hello.txt' is created beforehand containing:
-# Hello, World!
-# This is line two.
-# Third line.
+# open(path, mode, encoding)
+# Modes: 'r' read (default), 'w' write (creates/truncates),
+#        'a' append, 'x' exclusive create, 'b' binary, '+' update
 
-f = open('hello.txt', 'r')  # 'r' = read mode
-content = f.read()           # reads the whole file as a string
-f.close()                    # MUST close!
-print(content)
-# Output proves we successfully read from disk:
-# Hello, World!
-# This is line two.
-# Third line.
+# Write a file:
+with open('data.txt', 'w', encoding='utf-8') as f:
+    f.write('Hello, World!\n')
+    f.write('Line two\n')
+
+# Read it back:
+with open('data.txt', 'r', encoding='utf-8') as f:
+    content = f.read()   # reads entire file as one string
+    print(repr(content)) # 'Hello, World!\nLine two\n'
 ```
-This proves that `open()` connects us to the file and `read()` pulls its contents into a standard Python string. 
+This demonstrates **file I/O**. Trace: `open('data.txt', 'w')`: creates/truncates `data.txt`, returns file object `f`. `f.write('Hello, World!\n')`: writes 14 bytes. `with` block ends: `__exit__` calls `f.close()`. Second `with`: open for reading. `f.read()`: reads all bytes as str. `repr()` shows `\n` escapes. This proves we can persist data.
 
-### Discard the Example
-The example above is throwaway code. We will discard it and not use it in our final project structure, because we will learn a safer way to manage the file object in the next unit.
+### Discard the throwaway
+This code is discarded and will not be kept in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `file_reading.py` (created).
-- **Change type:** add.
-- **Location:** at the top of the file.
-- **Dependencies:** None.
+- **Reference Source**: None — this is a from-scratch addition to introduce saving data.
+- **Files affected**: `save_data.py` (created)
+- **Change type**: add
+- **Location**: N/A
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-f = open('hello.txt', 'r')
-content = f.read()
-f.close()
+def save_greeting(filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write('Welcome to the project!\n')
 ```
 
 ### The Updated Project
 ```python
-1: f = open('hello.txt', 'r')  # ← new
-2: content = f.read()          # ← new
-3: f.close()                   # ← new
+1: def save_greeting(filename):
+2:     with open(filename, 'w', encoding='utf-8') as f: # ← new
+3:         f.write('Welcome to the project!\n')         # ← new
 ```
-This script now opens the file, reads it, and closes the handle.
+This is a brand new file `save_greeting.py` that writes a greeting.
 
-### Mechanical Walkthrough
-- `open('hello.txt', 'r')`: The built-in `open` function is called with the string `'hello.txt'` specifying the path, and `'r'` specifying read **mode**. It interacts with the operating system and returns a **file object**, assigned to `f`.
-- `f.read()`: The `read` method is called on the file object `f`. It reads the entire file into memory and returns it as one large string, including **newlines**, which is assigned to `content`.
-- `f.close()`: The `close` method is called on the file object. This tells the operating system we are done, releasing the file lock and freeing memory. Forgetting to close can cause data loss on write and resource leaks on read.
+### Mechanical walkthrough
+- `def save_greeting(filename):` defines a function.
+- `with open(...) as f:` opens the file for writing and assigns the file object to `f`.
+- `f.write(...)` writes the string to the file on disk.
 
+### CS lens
+File system interaction. 3-5 unrelated real-world places it appears: Log files on web servers, saving a game state on a console, configuration files in /etc on Linux, caching HTTP responses to disk.
 
-## Concept Unit: The `with` Statement
+### SE lens
+Persisting state. The alternative NOT chosen: keeping everything in memory. Real tradeoff: disk is significantly slower than RAM, but it outlives the process.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: A file named whatever `filename` evaluates to is created with the string content.
+
+### One sentence connecting to previous unit
+Now that we can open files, we need to understand how the cleanup happens.
+
+## Concept Unit: The with statement — guaranteed cleanup
 
 ### The Problem
-If an exception occurs between opening a file and closing it, the `f.close()` line might never execute, leaving the file handle open indefinitely and leaking resources. How can we ensure a file is always closed?
+What happens if our code crashes while writing to a file? Will the file stay locked or corrupted? How do we ensure cleanup always happens?
 
-### The Code in Isolation
+### Introduce the concept in isolation
 ```python
-with open('hello.txt', 'r') as f:
+# WITHOUT with: risky (file stays open on exception)
+f = open('data.txt', 'r')
+try:
     content = f.read()
-# f is automatically closed here, even if an exception occurs
-print(content)
-# Output proves we can read the file identically:
-# Hello, World!
-# This is line two.
-# Third line.
-```
-This proves that the **context manager** pattern allows us to read the file, and as soon as the indented block finishes, the file is safely closed for us.
+finally:
+    f.close()   # must remember this
 
-### Discard the Example
-The throwaway example above is discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `file_reading.py` (modified).
-- **Change type:** replace.
-- **Location:** replacing the previous manual `open`/`close` logic.
-- **Dependencies:** None.
-
-### The New Code
-```python
-with open('hello.txt', 'r') as f:
+# WITH with: automatic cleanup
+with open('data.txt', 'r', encoding='utf-8') as f:
     content = f.read()
+# f is automatically closed here, even if read() raises
+
+# with works on anything implementing __enter__ / __exit__
+# File objects implement the context manager protocol
+print(f.closed)  # True (after with block)
 ```
+This demonstrates the **context manager**. Trace: `with open(...) as f`: calls `f.__enter__()` which returns `f`. Block executes. Normal exit or exception: Python calls `f.__exit__()`. `__exit__` calls `f.close()`. `f.closed` becomes `True`.
 
-### The Updated Project
-```python
-1: with open('hello.txt', 'r') as f:  # ← new (replaces previous open)
-2:     content = f.read()             # ← new (replaces previous read/close)
-```
-The file reading logic is now wrapped safely in a context manager.
-
-### Mechanical Walkthrough
-- `with`: The `with` keyword starts a context block. It evaluates the expression that follows, expecting a **context manager** object.
-- `open('hello.txt', 'r')`: The `open` function returns our **file object**, which acts as a context manager.
-- `as f`: The returned file object is bound to the variable `f` for use within the block.
-- `content = f.read()`: We read the entire file string into `content`. When the block ends, Python guarantees `f.close()` is called automatically, regardless of success or exceptions.
-
-
-## Concept Unit: Reading Line by Line
-
-### The Problem
-If a file is extremely large (e.g., gigabytes of logs), reading the entire thing into a single string using `.read()` will crash the program by running out of memory. How can we process files efficiently?
-
-### The Code in Isolation
-```python
-# Method 2: iterate over the file object (memory-efficient)
-with open('hello.txt', 'r') as f:
-    for line in f:
-        print(line.strip())  # .strip() removes the trailing \n
-
-# Output proves we read each line separately:
-# Hello, World!
-# This is line two.
-# Third line.
-```
-This proves that iterating over `f` yields one line at a time, consuming very little memory.
-
-### Discard the Example
-This iteration example is discarded from our working project.
+### Discard the throwaway
+This code is discarded and will not be kept in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `line_reader.py` (created).
-- **Change type:** add.
-- **Location:** top of file.
-- **Dependencies:** None.
+- **Reference Source**: None.
+- **Files affected**: `save_data.py`
+- **Change type**: configure
+- **Location**: inside `save_greeting`
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-with open('hello.txt', 'r') as f:
-    for line in f:
-        print(line.strip())
+        print(f"File {filename} is automatically closed: {f.closed}")
 ```
 
 ### The Updated Project
 ```python
-1: with open('hello.txt', 'r') as f:  # ← new
-2:     for line in f:                 # ← new
-3:         print(line.strip())        # ← new
+1: def save_greeting(filename):
+2:     with open(filename, 'w', encoding='utf-8') as f:
+3:         f.write('Welcome to the project!\n')
+4:     print(f"File {filename} is automatically closed: {f.closed}") # ← new
 ```
-This project now processes files in a memory-efficient loop.
+We verify that our context manager is cleaning up.
 
-### Mechanical Walkthrough
-- `with open('hello.txt', 'r') as f:`: We safely open the file using a **context manager**.
-- `for line in f:`: A `for` loop iterates directly over the **file object**. The file object acts as an iterator, yielding one line of text at a time.
-- `line.strip()`: We call `.strip()` on the string to remove the trailing **newline** character that is included in each line read from the file.
-- `print(...)`: The `print` function outputs the cleaned line.
+### Mechanical walkthrough
+- `print(...)` outputs to stdout.
+- `f.closed` accesses the boolean attribute of the file object indicating closure.
 
-## Concept Unit: Writing to a File
+### CS lens
+Resource management. 3-5 unrelated real-world places it appears: Database connections, network sockets, thread locks, hardware device handles.
+
+### SE lens
+RAII (Resource Acquisition Is Initialization). The alternative NOT chosen: manual `close()` calls everywhere. Real tradeoff: manual calls are prone to programmer error if exceptions skip the cleanup code.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: Prints "File filename is automatically closed: True".
+
+### One sentence connecting to previous unit
+Knowing the file is safely closed, let's explore reading massive files.
+
+## Concept Unit: Reading line by line — memory-efficient iteration
 
 ### The Problem
-We can read data, but how do we save computed results back out to a file on the disk?
+If a log file is 10 GB and our server only has 2 GB of RAM, how can we process it? What happens if we try to read it all at once?
 
-### The Code in Isolation
+### Introduce the concept in isolation
 ```python
-# 'w' mode: create or OVERWRITE
-with open('output.txt', 'w') as f:
-    f.write('Line 1\n')
-    f.write('Line 2\n')
+# Write multi-line file:
+with open('names.txt', 'w') as f:
+    for name in ['Alice', 'Bob', 'Charlie', 'Diana']:
+        f.write(name + '\n')
 
-# Verify:
-with open('output.txt', 'r') as f:
-    print(f.read())
-# Output proves the file was created and written to:
-# Line 1
-# Line 2
+# Method 1: readlines() — loads all into memory as list
+with open('names.txt') as f:
+    lines = f.readlines()   # ['Alice\n', 'Bob\n', ...]
+    names = [l.strip() for l in lines]
+print(names)  # ['Alice', 'Bob', 'Charlie', 'Diana']
+
+# Method 2: iterate directly — one line at a time (best for large files)
+with open('names.txt') as f:
+    for line in f:           # file object IS an iterator
+        print(line.strip())  # Alice, Bob, Charlie, Diana
+
+# Method 3: readline() — one line per call
+with open('names.txt') as f:
+    first = f.readline()    # 'Alice\n'
+    second = f.readline()   # 'Bob\n'
 ```
-This proves that using the `'w'` mode and `.write()` modifies the disk.
+This demonstrates **file iteration**. Trace: `for line in f`: Python calls `next(f)` repeatedly. Each call reads one line from disk. When EOF: raises `StopIteration`. Loop ends. Only one line in memory at a time.
 
-### Discard the Example
-This write-test example is discarded.
+### Discard the throwaway
+This code is discarded and will not be kept in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `file_writer.py` (created).
-- **Change type:** add.
-- **Location:** top of file.
-- **Dependencies:** None.
+- **Reference Source**: None.
+- **Files affected**: `save_data.py`
+- **Change type**: add
+- **Location**: End of file.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-with open('output2.txt', 'w') as f:
-    print('Hello from print', file=f)
+def read_greeting(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        for line in f:
+            print("Found line:", line.strip())
 ```
 
 ### The Updated Project
 ```python
-1: with open('output2.txt', 'w') as f:       # ← new
-2:     print('Hello from print', file=f)     # ← new
+1: def save_greeting(filename):
+2:     with open(filename, 'w', encoding='utf-8') as f:
+3:         f.write('Welcome to the project!\n')
+4:     print(f"File {filename} is automatically closed: {f.closed}")
+5: 
+6: def read_greeting(filename):                                       # ← new
+7:     with open(filename, 'r', encoding='utf-8') as f:             # ← new
+8:         for line in f:                                           # ← new
+9:             print("Found line:", line.strip())                   # ← new
 ```
-This script creates a new file and writes a string directly to it.
+We added a function to read lines efficiently.
 
-### Mechanical Walkthrough
-- `open('output2.txt', 'w')`: We open a file in write **mode** (`'w'`). This will create a new file or completely overwrite an existing one.
-- `as f`: Bound to variable `f` via the **context manager**.
-- `print('Hello from print', file=f)`: We use the built-in `print` function, but supply the `file=f` keyword argument. Instead of printing to the screen, `print` writes the formatted string, complete with an automatic **newline**, into the file object.
+### Mechanical walkthrough
+- `def read_greeting(filename):` starts new function.
+- `with open(...)` opens file in read mode.
+- `for line in f:` iterates the file object.
+- `print(...)` outputs the stripped line.
+- `line.strip()` removes trailing whitespace like `\n`.
 
+### CS lens
+Iterators. 3-5 unrelated real-world places it appears: Database cursors, stream processing like Kafka, pagination in REST APIs, generator functions yielding sequences.
 
-## Concept Unit: File Paths and `os.path`
+### SE lens
+Lazy evaluation and streaming. The alternative NOT chosen: loading the entire file into a list with `readlines()`. Real tradeoff: streaming saves memory but you cannot random-access index the data easily.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: Will print "Found line: Welcome to the project!".
+
+### One sentence connecting to previous unit
+Lines of text are great, but structured data requires formats like CSV.
+
+## Concept Unit: Writing, appending, and CSV
 
 ### The Problem
-So far we've just passed filenames like `'hello.txt'`, which looks in the folder the script runs from. What if the file is in a different directory, or we need to run on a different operating system?
+If we have a dictionary or list of fields, how do we write it such that another program (like Excel) can reliably read it? What happens if data contains commas itself?
 
-### The Code in Isolation
-```python
-import os
-
-data_dir = 'data'
-filename = 'sales.csv'
-path = os.path.join(data_dir, filename)
-
-if os.path.exists(path):
-    print("Found it!")
-else:
-    print(f'File not found: {path}')
-
-# Output proves we can construct paths and check existence:
-# File not found: data\sales.csv
-```
-This proves `os.path.join` creates the correct path format safely.
-
-### Discard the Example
-The path construction example is discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `path_example.py` (created).
-- **Change type:** add.
-- **Location:** top of file.
-- **Dependencies:** None.
-
-### The New Code
-```python
-import os
-path = os.path.join('data', 'sales.csv')
-print(os.path.exists(path))
-```
-
-### The Updated Project
-```python
-1: import os                                   # ← new
-2: path = os.path.join('data', 'sales.csv')    # ← new
-3: print(os.path.exists(path))                 # ← new
-```
-This script safely builds a relative path and checks if it exists.
-
-### Mechanical Walkthrough
-- `import os`: Imports the built-in operating system module.
-- `os.path.join('data', 'sales.csv')`: Calls the `join` method. It combines directory names and filenames using the correct separator (e.g., `\` on Windows) and returns a **relative path**.
-- `os.path.exists(path)`: Calls the `exists` function, returning a boolean indicating if the path points to a real file, preventing errors when opening missing files.
-
-
-## Concept Unit: Encoding
-
-### The Problem
-Files on disk are just 1s and 0s (bytes). How does Python know which bytes correspond to "A" versus "Café"?
-
-### The Code in Isolation
-```python
-# Writing with explicit encoding:
-with open('unicode.txt', 'w', encoding='utf-8') as f:
-    f.write('Caf\u00e9\n')  # Café
-    f.write('\u4e2d\u6587\n')  # Chinese characters
-
-with open('unicode.txt', 'r', encoding='utf-8') as f:
-    print(f.read())
-# Output proves characters are saved and read accurately:
-# Café
-# 中文
-```
-This proves explicitly setting `encoding='utf-8'` handles special characters perfectly.
-
-### Discard the Example
-This encoding demonstration is discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `encoding_test.py` (created).
-- **Change type:** add.
-- **Location:** top of file.
-- **Dependencies:** None.
-
-### The New Code
-```python
-with open('unicode.txt', 'w', encoding='utf-8') as f:
-    f.write('Caf\u00e9\n')
-```
-
-### The Updated Project
-```python
-1: with open('unicode.txt', 'w', encoding='utf-8') as f:  # ← new
-2:     f.write('Caf\u00e9\n')                             # ← new
-```
-The file is now written using an explicit UTF-8 encoding.
-
-### Mechanical Walkthrough
-- `open('unicode.txt', 'w', encoding='utf-8')`: We pass the `encoding='utf-8'` keyword argument. This **encoding** guarantees Python maps our characters into bytes using the universal UTF-8 standard, avoiding platform-dependent crashes when writing text outside the basic alphabet.
-- `f.write('Caf\u00e9\n')`: Writes the unicode string to the file, converted to bytes using the specified encoding.
-
-
-## Concept Unit: CSV Files with the `csv` Module
-
-### The Problem
-Data is often saved in Comma Separated Value (CSV) format. Using `.split(',')` manually breaks if a data field itself contains a comma (e.g., `"Smith, John"`). How do we read it correctly?
-
-### The Code in Isolation
+### Introduce the concept in isolation
 ```python
 import csv
 
-# Assume students.csv exists with headers and data
-with open('students.csv', 'r', newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        print(f"{row['name']}: {row['score']}")
-# Output proves DictReader parses rows into dictionaries safely:
-# Alice: 95
-# Bob: 82
-# Carol: 91
-```
-This proves that the `csv` module correctly parses each row into a dictionary.
+# Write CSV:
+with open('scores.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Name', 'Score'])   # header
+    writer.writerow(['Alice', 95])
+    writer.writerow(['Bob', 87])
+    writer.writerow(['Charlie', 92])
 
-### Discard the Example
-The CSV reader example is discarded.
+# Read CSV:
+with open('scores.csv', 'r', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    header = next(reader)           # ['Name', 'Score']
+    for row in reader:
+        print(f'{row[0]}: {row[1]}') # Alice: 95, etc.
+
+# Append to existing file:
+with open('scores.csv', 'a', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Diana', 99])  # adds at end
+```
+This demonstrates the **CSV module**. Trace: `csv.writer` wraps the file object. `writerow(['Alice', 95])`: converts to `'Alice,95\n'`, writes to file. `csv.reader`: on each iteration, reads one line, splits on comma, returns list of strings.
+
+### Discard the throwaway
+This code is discarded and will not be kept in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `csv_reader.py` (created).
-- **Change type:** add.
-- **Location:** top of file.
-- **Dependencies:** `students.csv` file.
+- **Reference Source**: None.
+- **Files affected**: `save_data.py`
+- **Change type**: add
+- **Location**: Top of file and end of file.
+- **Dependencies**: `csv` module.
 
 ### The New Code
 ```python
 import csv
-with open('students.csv', 'r', newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        print(row['name'])
+
+def write_score(filename, name, score):
+    with open(filename, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([name, score])
 ```
 
 ### The Updated Project
 ```python
-1: import csv                                                        # ← new
-2: with open('students.csv', 'r', newline='', encoding='utf-8') as f: # ← new
-3:     reader = csv.DictReader(f)                                    # ← new
-4:     for row in reader:                                            # ← new
-5:         print(row['name'])                                        # ← new
+1: import csv                                                       # ← new
+2: 
+3: def save_greeting(filename):
+4:     with open(filename, 'w', encoding='utf-8') as f:
+5:         f.write('Welcome to the project!\n')
+6:     print(f"File {filename} is automatically closed: {f.closed}")
+7: 
+8: def read_greeting(filename):
+9:     with open(filename, 'r', encoding='utf-8') as f:
+10:        for line in f:
+11:            print("Found line:", line.strip())
+12:
+13: def write_score(filename, name, score):                          # ← new
+14:     with open(filename, 'a', newline='', encoding='utf-8') as f: # ← new
+15:         writer = csv.writer(f)                                   # ← new
+16:         writer.writerow([name, score])                           # ← new
 ```
-This script reliably reads complex data grids.
+We added CSV appending support.
 
-### Mechanical Walkthrough
-- `import csv`: Imports the standard library CSV module.
-- `newline=''`: Passed to `open()`, this prevents Python's default **newline** translation, handing control of row boundaries directly to the CSV module (preventing empty lines on Windows).
-- `csv.DictReader(f)`: The `DictReader` class wraps our **file object** `f`. It reads the first row to determine column names.
-- `for row in reader:`: We iterate over the `DictReader`.
-- `row['name']`: Each `row` yielded is a Python dictionary, mapping the header string `'name'` to the actual string value in that column for this row.
+### Mechanical walkthrough
+- `import csv` imports the standard library module.
+- `with open(...)` opens file in append mode (`'a'`).
+- `csv.writer(f)` creates the writer wrapping the file.
+- `writer.writerow([...])` writes a list as a CSV line.
 
-Closing: file I/O is the bridge between your program and the outside world. Lesson 19 covers closures and decorators — advanced function patterns. Exercises: write a function `count_lines(path)` that returns the number of non-empty lines in a file; write a CSV-to-dict converter that reads a CSV and returns a list of dicts; write a word frequency counter that reads a text file and writes the results to a new file sorted by frequency.
+### CS lens
+Serialization. 3-5 unrelated real-world places it appears: JSON endpoints in REST, Protocol Buffers in gRPC, saving game configs in INI, object pickling.
+
+### SE lens
+Standard formats. The alternative NOT chosen: writing a custom format with string splits. Real tradeoff: using the `csv` module handles edge cases (like escaping commas in the data) that a naive split wouldn't catch.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: Appends formatted CSV text to the file.
+
+### One sentence connecting to previous unit
+Handling files gets trickier when we need cross-platform path resolution.
+
+## Concept Unit: Paths with pathlib and os.path
+
+### The Problem
+Windows uses backslashes `\` for paths. Linux uses forward slashes `/`. How do we write code that works on both without breaking?
+
+### Introduce the concept in isolation
+```python
+from pathlib import Path
+import os
+
+# pathlib (modern Python):
+p = Path('data') / 'scores.csv'    # OS-independent path joining
+print(p)              # data/scores.csv (or data\scores.csv on Windows)
+print(p.exists())     # True/False
+print(p.suffix)       # '.csv'
+print(p.stem)         # 'scores'
+print(p.parent)       # Path('data')
+
+# Read with pathlib:
+if p.exists():
+    content = p.read_text(encoding='utf-8')  # one-liner read
+    p.write_text('new content', encoding='utf-8')  # one-liner write
+
+# List directory:
+for f in Path('.').iterdir():
+    if f.suffix == '.csv':
+        print(f.name)
+```
+This demonstrates **pathlib**. Trace: `Path('data') / 'scores.csv'`: `__truediv__` joins paths with OS separator. `p.exists()`: calls `os.path.exists` internally. `p.read_text()`: opens, reads all, closes. Returns str.
+
+### Discard the throwaway
+This code is discarded and will not be kept in the project.
+
+### Project Change
+- **Reference Source**: None.
+- **Files affected**: `save_data.py`
+- **Change type**: add
+- **Location**: Top of file and end of file.
+- **Dependencies**: `pathlib` module.
+
+### The New Code
+```python
+from pathlib import Path
+
+def list_csvs(directory):
+    for f in Path(directory).iterdir():
+        if f.suffix == '.csv':
+            print(f.name)
+```
+
+### The Updated Project
+```python
+1: import csv
+2: from pathlib import Path                                         # ← new
+3: 
+4: def save_greeting(filename):
+5:     with open(filename, 'w', encoding='utf-8') as f:
+6:         f.write('Welcome to the project!\n')
+7:     print(f"File {filename} is automatically closed: {f.closed}")
+8: 
+9: def read_greeting(filename):
+10:    with open(filename, 'r', encoding='utf-8') as f:
+11:        for line in f:
+12:            print("Found line:", line.strip())
+13:
+14: def write_score(filename, name, score):
+15:     with open(filename, 'a', newline='', encoding='utf-8') as f:
+16:         writer = csv.writer(f)
+17:         writer.writerow([name, score])
+18:
+19: def list_csvs(directory):                                       # ← new
+20:     for f in Path(directory).iterdir():                         # ← new
+21:         if f.suffix == '.csv':                                  # ← new
+22:             print(f.name)                                       # ← new
+```
+We added a method to reliably iterate and list CSV files in a directory.
+
+### Mechanical walkthrough
+- `from pathlib import Path` imports the Path object.
+- `Path(directory).iterdir()` creates a path object and yields children.
+- `f.suffix` gives the file extension.
+- `print(f.name)` outputs the base name of the file.
+
+### CS lens
+Cross-platform abstractions. 3-5 unrelated real-world places it appears: JVM virtual machines abstracting hardware, Docker abstracting host OS, web browsers abstracting graphics APIs, ORMs abstracting SQL dialects.
+
+### SE lens
+Object-oriented standard libraries. The alternative NOT chosen: manipulating strings with `os.path.join()`. Real tradeoff: Path objects carry their methods with them, avoiding functional clutter, but you occasionally must cast them back to strings for older APIs.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: Prints the names of all `.csv` files in the specified directory.
+
+### One sentence connecting to previous unit
+Let's trace everything we built from end to end.
+
+## Closing
+
+### Connect the pieces
+We learned to open files in write mode and safely manage them using `with` and the context manager. When writing CSV data using `csv.writer`, the file handles formatting seamlessly, and we can append rows dynamically. We then learned how memory-efficient reading works: by iterating `for row in reader`, we read and parse one row at a time. If we run a trace writing `scores.csv`, reading it back, and filtering rows where the score > 90, we create the file context, wrap it in a writer, and save to disk; then we re-open it, iterate via `csv.reader`, check the row's second element, and print matches — all without ever loading the entire dataset into memory at once. Finally, `pathlib` ensures this pipeline operates safely across different operating systems.

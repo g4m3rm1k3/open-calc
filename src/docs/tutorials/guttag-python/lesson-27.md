@@ -1,187 +1,428 @@
 # Lesson 27: Dataclasses and Named Tuples — Lightweight Records
 
-**What you will build**
-The reader will use `collections.namedtuple`, `typing.NamedTuple`, and `@dataclass` to create lightweight record types with minimal boilerplate. The transferable problems: (1) `@dataclass` auto-generates `__init__`, `__repr__`, `__eq__`, and optionally `__hash__` and `__lt__` — write the fields, not the plumbing; (2) `frozen=True` makes the dataclass immutable and hashable; (3) knowing when to use a namedtuple (pure data, no methods, immutable) vs a dataclass (richer behavior, optional mutability) vs a full class (complex invariants, private state).
+What you will build: The reader understands @dataclass (auto-generates `__init__`, `__repr__`, `__eq__`, with optional ordering and freezing) and collections.namedtuple / typing.NamedTuple (immutable, tuple-compatible records with named fields). The transferable insight: most custom classes that just hold data should be dataclasses. Writing `__init__`, `__repr__`, and `__eq__` by hand is repetitive boilerplate. @dataclass generates them for you from field annotations.
 
-**What you need to know first**
-Lessons 0–26.
+What you need to know first: Lessons 00-26.
 
-**Terms used in this lesson**
-- **Record** — a data structure that groups related fields together. It exists to bundle data logically without necessarily requiring full object-oriented behavior.
-- **Immutable** — state that cannot be modified after creation. It exists to guarantee data integrity and enable safe use as dictionary keys or in sets.
-- **Hashable** — an object that has a hash value that never changes during its lifetime, allowing it to be looked up efficiently in a hash table. It exists to support sets and dictionary keys.
-- **Boilerplate** — repetitive code needed in many places with little to no alteration. It exists as a necessary evil in language design but is often targeted for elimination.
-- **Type hint** — a formal indication of the type of a value. It exists to aid static analysis, IDE autocompletion, and self-documenting code.
-- **Decorator** — a function that modifies the behavior of another function or class. It exists to cleanly separate cross-cutting concerns from core logic.
-- **Default factory** — a function used to generate default values for a field dynamically. It exists to prevent the shared-mutable-default trap in class definitions.
+## Terms used in this lesson
+- **@dataclass** — A decorator that automatically generates boilerplate methods for data-holding classes, eliminating the need to write repetitive `__init__`, `__repr__`, and `__eq__` implementations.
+- **Boilerplate** — Repetitive code that must be written in many places with little to no variation, which distracts from the core logic.
+- **Decorator** — A special syntax starting with `@` that modifies or wraps a class or function to change its behavior dynamically.
+- **Frozen** — A state where an object cannot be modified after it is created; making it immutable.
+- **Immutable** — An object whose state cannot be changed after creation, making it safe to share across code or use as a dictionary key.
+- **Tuple compatibility** — The ability for an object to behave like a standard Python tuple, such as allowing index access (`p[0]`) and unpacking (`x, y = p`).
 
-**Objects and methods used**
+## Objects and methods used
+- **`dataclass`**
+  - *What it is*: A class decorator.
+  - *Implementation*: `@dataclass(init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False)`
+  - *Its use*: We use it to turn a plain class into a lightweight record without writing standard initialization methods.
+  - *Type*: Decorator function.
+  - *Responsibility*: Generates dunder methods (`__init__`, `__repr__`, `__eq__`, etc.) dynamically based on the class's type hints.
+  - *Depends on*: The target class having type annotations for its fields.
+  - *Connects to*: Modifies the target class definition at creation time.
+  - *Shape*: Public API of the `dataclasses` standard library module.
+- **`field`**
+  - *What it is*: A function used to customize the behavior of individual fields in a dataclass.
+  - *Implementation*: `field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING)`
+  - *Its use*: We use it to supply a default factory for mutable defaults (like `tuple` or `list`) and to exclude a field from comparisons.
+  - *Type*: Function returning a `Field` instance.
+  - *Responsibility*: Provides per-field configuration that the `@dataclass` decorator reads when generating methods.
+  - *Depends on*: Being assigned to a class attribute inside a dataclass.
+  - *Connects to*: Used by the `@dataclass` decorator during class creation.
+  - *Shape*: Public API of the `dataclasses` standard library module.
 - **`collections.namedtuple`**
-  - *What it is:* A factory function for creating tuple subclasses with named fields.
-  - *Implementation:* `def namedtuple(typename, field_names, ...): ...`
-  - *Its use:* Used when data is a simple record, no methods are needed, and immutability is desired.
-  - *Type:* Free function.
-  - *Responsibility:* Generates a new subclass of `tuple` that allows accessing fields by name as well as by position.
-  - *Depends on:* The name of the new type and an iterable (or space-separated string) of field names.
-  - *Connects to:* Called by the developer; returns a class that can be instantiated.
-  - *Shape:* A standard library utility boundary for defining lightweight types.
+  - *What it is*: A factory function for creating tuple subclasses with named fields.
+  - *Implementation*: `namedtuple(typename, field_names, *, rename=False, defaults=None, module=None)`
+  - *Its use*: We use it to create simple, immutable data types that have both attribute access and tuple behavior.
+  - *Type*: Factory function.
+  - *Responsibility*: Generates and returns a new tuple subclass.
+  - *Depends on*: A string name and an iterable (or space-separated string) of field names.
+  - *Connects to*: Returns a new class type inheriting from `tuple`.
+  - *Shape*: Public API of the `collections` standard library module.
 - **`typing.NamedTuple`**
-  - *What it is:* A class-based syntax for creating named tuples with type hints.
-  - *Implementation:* `class NamedTuple(tuple): ...`
-  - *Its use:* Used when type annotations and default values are desired for a named tuple.
-  - *Type:* Class (used as a base class).
-  - *Responsibility:* Provides a structured way to define typed, immutable records with optional methods.
-  - *Depends on:* Class body with type-annotated fields.
-  - *Connects to:* Subclassed by the developer; instantiated to create record objects.
-  - *Shape:* A typing module boundary for typed immutable data.
-- **`dataclasses.dataclass`**
-  - *What it is:* A decorator that automatically adds generated special methods to classes.
-  - *Implementation:* `def dataclass(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False): ...`
-  - *Its use:* Used to eliminate boilerplate for classes that primarily store state.
-  - *Type:* Decorator function.
-  - *Responsibility:* Inspects a class for type annotations and injects `__init__`, `__repr__`, `__eq__`, etc.
-  - *Depends on:* A class definition with typed attributes.
-  - *Connects to:* Wraps a developer-defined class.
-  - *Shape:* A metaprogramming boundary altering class definition.
-- **`dataclasses.field`**
-  - *What it is:* A function to customize the behavior of a specific dataclass field.
-  - *Implementation:* `def field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING): ...`
-  - *Its use:* Used to provide default factories (like empty lists) or exclude fields from `__repr__` or `__init__`.
-  - *Type:* Free function.
-  - *Responsibility:* Returns an object that configures how the `@dataclass` decorator processes the field.
-  - *Depends on:* Configuration arguments like `default_factory`.
-  - *Connects to:* Assigned to class attributes within a dataclass.
-  - *Shape:* A configuration boundary for individual fields.
-- **`__post_init__`**
-  - *What it is:* A special method called by the generated `__init__` in a dataclass.
-  - *Implementation:* `def __post_init__(self): ...`
-  - *Its use:* Used for validation or initialization that depends on multiple fields.
-  - *Type:* Instance method.
-  - *Responsibility:* Executes custom logic immediately after the auto-generated `__init__` completes.
-  - *Depends on:* The instance being fully initialized by the generated `__init__`.
-  - *Connects to:* Called automatically by the generated `__init__`.
-  - *Shape:* A lifecycle hook boundary in dataclasses.
+  - *What it is*: A typed version of `collections.namedtuple`.
+  - *Implementation*: `class NamedTuple(tuple)`
+  - *Its use*: We use it as a base class to define a named tuple using class definition syntax and type annotations.
+  - *Type*: Class (acts as a metaclass/base class for typed named tuples).
+  - *Responsibility*: Generates a tuple subclass with named attributes based on type hints.
+  - *Depends on*: Subclassing and providing typed class attributes.
+  - *Connects to*: Creates an immutable tuple-like record class.
+  - *Shape*: Public API of the `typing` standard library module.
+- **`asdict`**
+  - *What it is*: A helper function to convert a dataclass instance to a dictionary.
+  - *Implementation*: `asdict(obj, *, dict_factory=dict)`
+  - *Its use*: We use it to easily serialize our dataclass instances into JSON.
+  - *Type*: Function.
+  - *Responsibility*: Recursively converts a dataclass instance and its nested dataclass fields into dictionaries.
+  - *Depends on*: A valid dataclass instance.
+  - *Connects to*: Returns a standard Python dictionary.
+  - *Shape*: Public API of the `dataclasses` standard library module.
+- **`astuple`**
+  - *What it is*: A helper function to convert a dataclass instance to a tuple.
+  - *Implementation*: `astuple(obj, *, tuple_factory=tuple)`
+  - *Its use*: We use it to extract just the values of a dataclass as a tuple.
+  - *Type*: Function.
+  - *Responsibility*: Recursively converts a dataclass instance and its nested dataclass fields into tuples.
+  - *Depends on*: A valid dataclass instance.
+  - *Connects to*: Returns a standard Python tuple.
+  - *Shape*: Public API of the `dataclasses` standard library module.
+- **`json.dumps`**
+  - *What it is*: A function to serialize an object to a JSON formatted string.
+  - *Implementation*: `json.dumps(obj, *, skipkeys=False, ensure_ascii=True, ...)`
+  - *Its use*: We use it to serialize our generated dictionary from `asdict` into JSON for storage or transmission.
+  - *Type*: Function.
+  - *Responsibility*: Converts Python objects into a JSON string representation.
+  - *Depends on*: A serializable Python object (like a dict from `asdict`).
+  - *Connects to*: Returns a string containing the JSON data.
+  - *Shape*: Public API of the `json` standard library module.
 
-## Concept Unit: `collections.namedtuple`
+## Concept Unit: @dataclass — auto-generated boilerplate
 
 ### The Problem
-When grouping simple data (like coordinates or a playing card), an ordinary tuple like `(3, 4)` is memory-efficient but forces you to remember what each index means. A dictionary `{"x": 3, "y": 4}` provides names but consumes more memory and doesn't guarantee immutability. How can we have the memory efficiency and immutability of a tuple, but access fields by name instead of index?
-- What would happen if you tried to add a property to a built-in tuple?
-- How could a function generate a new class definition dynamically?
-- What is the difference between a dictionary and an object with named attributes?
+If you need a class just to hold x and y coordinates, you have to write an `__init__` method to assign them, a `__repr__` method to print it nicely, and an `__eq__` method to compare two instances. Why should you have to write all this repetitive boilerplate code for something so simple? What if the language could generate it for you?
 
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating the built-in `collections` module.
-- **Files affected**: `src/records.py` (created)
+### Introduce the concept in isolation
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+p1 = Point(3.0, 4.0)
+print(p1)
+```
+Predicted confidently: `Point(x=3.0, y=4.0)`. This proves that the **@dataclass** decorator automatically generates a custom `__repr__` method behind the scenes just from reading the type annotations.
+
+### Discard the throwaway
+This isolated throwaway code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `lesson_27_dataclasses.py` (created)
 - **Change type**: add
-- **Location**: Top of file
-- **Dependencies**: The standard library `collections` module.
+- **Location**: brand-new file
+- **Dependencies**: None
+
+### The New Code
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+p1 = Point(3.0, 4.0)
+p2 = Point(3.0, 4.0)
+p3 = Point(1.0, 2.0)
+
+print(p1)
+print(p1 == p2)
+print(p1 == p3)
+print(p1.x)
+```
+
+### The Updated Project
+```python
+# 1: from dataclasses import dataclass, field # <- new
+# 2: 
+# 3: @dataclass # <- new
+# 4: class Point: # <- new
+# 5:     x: float # <- new
+# 6:     y: float # <- new
+# 7: 
+# 8: p1 = Point(3.0, 4.0) # <- new
+# 9: p2 = Point(3.0, 4.0) # <- new
+# 10: p3 = Point(1.0, 2.0) # <- new
+# 11: 
+# 12: print(p1) # <- new
+# 13: print(p1 == p2) # <- new
+# 14: print(p1 == p3) # <- new
+# 15: print(p1.x) # <- new
+```
+This is a brand new file defining our `@dataclass` point and demonstrating its automatically generated methods in action.
+
+### Mechanical walkthrough
+- `from dataclasses import dataclass, field`: Imports the decorator and field configurator from the standard library.
+- `@dataclass`: The decorator applied to the `Point` class. It tells Python to automatically add special methods like `__init__`, `__repr__`, and `__eq__` to the class based on the type annotations below.
+- `class Point:`: Defines the class `Point`.
+- `x: float` and `y: float`: Type annotations defining the fields of the dataclass. `@dataclass` reads these to know what attributes the class should have.
+- `Point(3.0, 4.0)`: Calls the automatically generated `__init__(self, x: float, y: float)` method, setting `self.x=3.0` and `self.y=4.0`.
+- `print(p1)`: Calls the automatically generated `__repr__`, formatting the output as `Point(x=3.0, y=4.0)`.
+- `p1 == p2`: Calls the automatically generated `__eq__`, comparing the `x` and `y` fields. Since `3.0 == 3.0` and `4.0 == 4.0`, it returns `True`.
+- `p1 == p3`: Compares the fields, which are different, returning `False`.
+- `p1.x`: Accesses the attribute `x` directly, returning `3.0`.
+
+### CS lens
+This is **Metaprogramming** / **Code Generation**. The program writes code for you dynamically at load time. Real-world examples include Object-Relational Mappers (ORMs) generating SQL queries, compilers generating boilerplate C code from schemas, and dependency injection frameworks auto-generating factory classes.
+
+### SE lens
+**Don't Repeat Yourself (DRY)**. The alternative not chosen is writing `__init__`, `__repr__`, and `__eq__` manually. The tradeoff is that there is a slight performance overhead when the class is first imported and decorated, and it obscures exactly what code is running (magic behavior). But it vastly reduces bug-prone boilerplate, making the intent clearer.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+Point(x=3.0, y=4.0)
+True
+False
+3.0
+```
+
+### One sentence connecting to previous unit
+Now that we have basic dataclasses, we can configure them further to be read-only or sortable.
+
+## Concept Unit: Default values, frozen, and ordering
+
+### The Problem
+What if we want to sort objects in a list, or ensure that once created, an object's fields cannot be altered? How can we enforce these properties without writing complex custom equality and hash methods?
+
+### Introduce the concept in isolation
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Score:
+    value: int
+
+s = Score(100)
+# s.value = 50  # This would crash!
+print(s.value)
+```
+Predicted confidently: `100`. This proves that the **frozen** parameter creates an immutable class where assigning to an attribute after instantiation is prevented.
+
+### Discard the throwaway
+This isolated throwaway code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `lesson_27_dataclasses.py` (modified)
+- **Change type**: add
+- **Location**: Append to the end of the file.
+- **Dependencies**: None
+
+### The New Code
+```python
+@dataclass(order=True, frozen=True)
+class Student:
+    name: str
+    grade: float
+    courses: tuple = field(default_factory=tuple, compare=False)
+
+    def gpa_letter(self):
+        if self.grade >= 90: return 'A'
+        if self.grade >= 80: return 'B'
+        return 'C'
+
+s1 = Student('Alice', 92.5)
+s2 = Student('Bob', 87.0)
+s3 = Student('Charlie', 92.5)
+
+print(s1 < s2)
+print(s1 == s3)
+print(sorted([s2, s3, s1]))
+```
+
+### The Updated Project
+```python
+# ...unchanged from here up
+# 16: 
+# 17: @dataclass(order=True, frozen=True) # <- new
+# 18: class Student: # <- new
+# 19:     name: str # <- new
+# 20:     grade: float # <- new
+# 21:     courses: tuple = field(default_factory=tuple, compare=False) # <- new
+# 22: 
+# 23:     def gpa_letter(self): # <- new
+# 24:         if self.grade >= 90: return 'A' # <- new
+# 25:         if self.grade >= 80: return 'B' # <- new
+# 26:         return 'C' # <- new
+# 27: 
+# 28: s1 = Student('Alice', 92.5) # <- new
+# 29: s2 = Student('Bob', 87.0) # <- new
+# 30: s3 = Student('Charlie', 92.5) # <- new
+# 31: 
+# 32: print(s1 < s2) # <- new
+# 33: print(s1 == s3) # <- new
+# 34: print(sorted([s2, s3, s1])) # <- new
+```
+We added a `Student` dataclass that is immutable, sortable, uses the `field` function for defaults, and contains a custom method.
+
+### Mechanical walkthrough
+- `@dataclass(order=True, frozen=True)`: Instructs the decorator to generate ordering methods (`__lt__`, `__le__`, etc.) and to make the instance immutable (raising an `AttributeError` on mutation).
+- `class Student:`: Declares the class.
+- `name: str` and `grade: float`: Fields that will be part of initialization, comparison, and ordering.
+- `courses: tuple = field(default_factory=tuple, compare=False)`: Uses the `field` function. `default_factory=tuple` means if no courses are provided, a new empty tuple is created. `compare=False` tells the dataclass to ignore this field when checking equality or ordering.
+- `def gpa_letter(self):`: Dataclasses can still have normal methods defined.
+- `s1 = Student('Alice', 92.5)`: Initializes the object. `courses` gets the default empty tuple.
+- `s1 < s2`: Uses the generated `__lt__` method. It compares fields in declaration order: first `name`, then `grade`. Since `'Alice' < 'Bob'`, it evaluates to `True`.
+- `s1 == s3`: Compares the generated `__eq__`. The names differ, so it's `False`.
+- `sorted([s2, s3, s1])`: Uses the generated ordering to sort the list of students by `name` then `grade`.
+
+### CS lens
+This is **Immutability**. An immutable object's state cannot be modified after it is created. Real-world examples include strings in most high-level languages, functional programming data structures, and database transaction logs.
+
+### SE lens
+**Configuration vs Boilerplate**. The alternative not chosen is implementing `__lt__`, `__le__`, `__gt__`, `__ge__`, `__eq__`, and `__hash__` manually just to allow sorting and immutability. The tradeoff is that the explicit ordering logic is hidden, meaning readers must know that `@dataclass` compares fields top-to-bottom sequentially.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+True
+False
+[Student(name='Alice', grade=92.5, courses=()), Student(name='Bob', grade=87.0, courses=()), Student(name='Charlie', grade=92.5, courses=())]
+```
+
+### One sentence connecting to previous unit
+Dataclasses are powerful, but sometimes we need a lightweight record that specifically acts like a built-in tuple.
+
+## Concept Unit: collections.namedtuple — immutable named tuple
+
+### The Problem
+If you need an object that can be accessed via dot notation (`p.x`) but MUST also be perfectly compatible with older code that unpacks a sequence (`x, y = p`), how do you bridge the gap? 
+
+### Introduce the concept in isolation
+```python
+from collections import namedtuple
+
+PointTuple = namedtuple('PointTuple', ['x', 'y'])
+pt = PointTuple(1, 2)
+print(pt[0])
+```
+Predicted confidently: `1`. This proves that **namedtuple** produces a real tuple subclass that allows index-based access, despite having named attributes.
+
+### Discard the throwaway
+This isolated throwaway code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `lesson_27_dataclasses.py` (modified)
+- **Change type**: add
+- **Location**: Append to the end of the file.
+- **Dependencies**: None
 
 ### The New Code
 ```python
 from collections import namedtuple
 
-Card = namedtuple('Card', ['rank', 'suit'])
-```
+PointNamed = namedtuple('PointNamed', ['x', 'y'])
+Color = namedtuple('Color', 'red green blue')
 
-### The Updated Project
-```python
-// 1: from collections import namedtuple
-// 2: 
-// 3: Card = namedtuple('Card', ['rank', 'suit']) // ← new
-```
-We now have a `Card` class that we can use to instantiate card objects.
+p = PointNamed(3, 4)
+c = Color(255, 128, 0)
 
-### Mechanical Walkthrough
-- **`from collections import namedtuple`**: Imports the `namedtuple` factory function from the standard library. A factory function creates and returns new classes or objects.
-- **`Card`**: A variable being assigned the newly created class object.
-- **`=`**: The assignment operator, binding the class to the name `Card`.
-- **`namedtuple(`**: Calls the factory function.
-- **`'Card'`**: A string literal providing the name for the new class.
-- **`['rank', 'suit']`**: A list of strings defining the field names for this record.
-- **`)`**: Closes the function call.
-
-### Isolate and Discard
-Let's isolate `namedtuple` to see how it works and what it proves.
-
-```python
-from collections import namedtuple
-
-Point = namedtuple('Point', ['x', 'y'])
-p = Point(3, 4)
 print(p)
 print(p.x)
 print(p[0])
 print(p._asdict())
 
-ace = namedtuple('Card', 'rank suit')('A', 'spades')
-print(ace)
-print(isinstance(p, tuple))
+x, y = p
+print(p == (3, 4))
 
-try:
-    ace.rank = 'K'
-except AttributeError as e:
-    print(f"Error: {e}")
-```
-Output:
-```text
-Point(x=3, y=4)
-3
-3
-{'x': 3, 'y': 4}
-Card(rank='A', suit='spades')
-True
-Error: can't set attribute
-```
-**This is called a named tuple.** The output proves that namedtuples are immutable, hashable, memory-efficient (because `isinstance(p, tuple)` is `True`), and self-documenting. They provide `__repr__` automatically. We will discard this throwaway code; it will not appear in our project.
-
-## Concept Unit: `typing.NamedTuple`
-
-### The Problem
-`collections.namedtuple` is great, but the fields have no type annotations. In modern Python, we rely on type hints for static analysis and IDE support. Furthermore, `collections.namedtuple` doesn't allow you to easily define default values or custom methods. How can we define a named tuple that includes type hints and allows method definitions?
-- If you wanted to add a method to a `collections.namedtuple`, how would you do it?
-- Why might type hinting a tuple be difficult?
-
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating the `typing` module.
-- **Files affected**: `src/records.py` (modified)
-- **Change type**: add
-- **Location**: Bottom of file
-- **Dependencies**: The standard library `typing` module.
-
-### The New Code
-```python
-from typing import NamedTuple
-
-class Employee(NamedTuple):
-    name: str
-    department: str
-    salary: float = 50000.0
+p2 = p._replace(x=10)
+print(p2)
+print(p)
 ```
 
 ### The Updated Project
 ```python
-// 1: from collections import namedtuple
-// 2: from typing import NamedTuple // ← new
-// 3: 
-// 4: Card = namedtuple('Card', ['rank', 'suit'])
-// 5: 
-// 6: class Employee(NamedTuple): // ← new
-// 7:     name: str               // ← new
-// 8:     department: str         // ← new
-// 9:     salary: float = 50000.0 // ← new
+# ...unchanged from here up
+# 35: 
+# 36: from collections import namedtuple # <- new
+# 37: 
+# 38: PointNamed = namedtuple('PointNamed', ['x', 'y']) # <- new
+# 39: Color = namedtuple('Color', 'red green blue') # <- new
+# 40: 
+# 41: p = PointNamed(3, 4) # <- new
+# 42: c = Color(255, 128, 0) # <- new
+# 43: 
+# 44: print(p) # <- new
+# 45: print(p.x) # <- new
+# 46: print(p[0]) # <- new
+# 47: print(p._asdict()) # <- new
+# 48: 
+# 49: x, y = p # <- new
+# 50: print(p == (3, 4)) # <- new
+# 51: 
+# 52: p2 = p._replace(x=10) # <- new
+# 53: print(p2) # <- new
+# 54: print(p) # <- new
 ```
-We now have an `Employee` class that extends `NamedTuple`, providing typed fields and a default salary.
+We demonstrate `namedtuple` factory function, showing both attribute access and pure tuple behavior.
 
-### Mechanical Walkthrough
-- **`class Employee(NamedTuple):`**: Defines a new class `Employee` that inherits from `NamedTuple`. This syntax triggers a metaclass that generates the underlying tuple structure.
-- **`name: str`**: A type annotation indicating the `name` field should be a string.
-- **`department: str`**: A type annotation indicating the `department` field should be a string.
-- **`salary: float = 50000.0`**: A type annotation indicating the `salary` field should be a float, and an assignment providing a default value of `50000.0` if not specified during instantiation.
+### Mechanical walkthrough
+- `from collections import namedtuple`: Imports the factory function.
+- `namedtuple('PointNamed', ['x', 'y'])`: Generates a new tuple subclass called `PointNamed` with fields `x` and `y`.
+- `namedtuple('Color', 'red green blue')`: An alternative syntax passing a space-separated string of field names instead of a list.
+- `PointNamed(3, 4)`: Instantiates the tuple.
+- `p.x`: Attribute access, returning `3`.
+- `p[0]`: Index access, demonstrating it is fundamentally a tuple, returning `3`.
+- `p._asdict()`: A built-in method of namedtuples to convert the tuple into a dictionary. Returns `{'x': 3, 'y': 4}`.
+- `x, y = p`: Demonstrates unpacking compatibility.
+- `p == (3, 4)`: Evaluates to `True`, because `namedtuple` instances are literally tuple instances and compare equal to plain tuples with the same elements.
+- `p._replace(x=10)`: Since it is immutable, `_replace` is used to return a *new* instance with the specified fields swapped out.
+- `print(p)`: The original object remains unchanged.
 
-### Isolate and Discard
-Let's isolate `typing.NamedTuple` to see how it works and what it proves.
+### CS lens
+This is **Structural Subtyping** (behavioral compatibility). The `namedtuple` perfectly mimics a tuple's structure, allowing it to seamlessly drop into older APIs expecting plain arrays or tuples. Real-world examples include Unix file descriptors, duck-typed iterables in dynamically typed languages, and standard POSIX interfaces.
 
+### SE lens
+**Backward Compatibility**. The alternative not chosen is rewriting every legacy function that expects a `(x, y)` tuple to instead take a custom class object. The tradeoff is that namedtuple exposes confusing internal methods prefixed with underscores (like `_asdict` or `_replace`) to avoid naming collisions with user fields, which looks messy.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+PointNamed(x=3, y=4)
+3
+3
+{'x': 3, 'y': 4}
+True
+PointNamed(x=10, y=4)
+PointNamed(x=3, y=4)
+```
+
+### One sentence connecting to previous unit
+`collections.namedtuple` is great, but it lacks the modern Python type hints that our `@dataclass` examples utilized.
+
+## Concept Unit: typing.NamedTuple — typed named tuple
+
+### The Problem
+If we want the perfect backwards compatibility of a namedtuple, but we *also* want the strict type hints and default values that we got from our dataclass, how do we combine them?
+
+### Introduce the concept in isolation
+```python
+from typing import NamedTuple
+
+class Simple(NamedTuple):
+    val: int
+
+s = Simple(5)
+print(s.val)
+```
+Predicted confidently: `5`. This proves that **NamedTuple** allows creating named tuples using modern class-based syntax and type hints.
+
+### Discard the throwaway
+This isolated throwaway code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `lesson_27_dataclasses.py` (modified)
+- **Change type**: add
+- **Location**: Append to the end of the file.
+- **Dependencies**: None
+
+### The New Code
 ```python
 from typing import NamedTuple
 
@@ -192,355 +433,181 @@ class Employee(NamedTuple):
 
 e1 = Employee('Alice', 'Engineering', 95000)
 e2 = Employee('Bob', 'Marketing')
+
 print(e1)
 print(e2.salary)
-print(e1 > e2)
-print(Employee._fields)
+print(e1._fields)
+print(list(e1))
+
+employees = [e1, e2]
+print(sorted(employees, key=lambda e: e.salary, reverse=True))
 ```
-Output:
-```text
-Employee(name='Alice', department='Engineering', salary=95000.0)
+
+### The Updated Project
+```python
+# ...unchanged from here up
+# 55: 
+# 56: from typing import NamedTuple # <- new
+# 57: 
+# 58: class Employee(NamedTuple): # <- new
+# 59:     name: str # <- new
+# 60:     department: str # <- new
+# 61:     salary: float = 50000.0 # <- new
+# 62: 
+# 63: e1 = Employee('Alice', 'Engineering', 95000) # <- new
+# 64: e2 = Employee('Bob', 'Marketing') # <- new
+# 65: 
+# 66: print(e1) # <- new
+# 67: print(e2.salary) # <- new
+# 68: print(e1._fields) # <- new
+# 69: print(list(e1)) # <- new
+# 70: 
+# 71: employees = [e1, e2] # <- new
+# 72: print(sorted(employees, key=lambda e: e.salary, reverse=True)) # <- new
+```
+We define an `Employee` as a typed named tuple, using type hints and defaults, while preserving tuple behavior.
+
+### Mechanical walkthrough
+- `from typing import NamedTuple`: Imports the base class for typed named tuples.
+- `class Employee(NamedTuple):`: Defines the new tuple by subclassing `NamedTuple`. This is syntax sugar that triggers a metaclass generation under the hood.
+- `name: str` and `department: str`: Typed fields.
+- `salary: float = 50000.0`: A typed field with a default value.
+- `Employee('Alice', 'Engineering', 95000)`: Uses `__new__` (since tuples are immutable) to instantiate the tuple.
+- `Employee('Bob', 'Marketing')`: Uses the default `salary`.
+- `e1._fields`: A generated property containing the tuple of field names: `('name', 'department', 'salary')`.
+- `list(e1)`: Since it's a tuple, it's iterable, so it easily converts to a list: `['Alice', 'Engineering', 95000]`.
+- `sorted(..., key=lambda e: e.salary, reverse=True)`: Sorts the iterable using a custom lambda function targeting the `salary` attribute.
+
+### CS lens
+This is **Static Typing Integration**. Python is fundamentally dynamic, but this construct allows static analysis tools (like `mypy`) to verify data correctness before the program ever runs. Real-world examples include TypeScript layering types over JavaScript, Rust's strict compiler checks, and GraphQL schema validation.
+
+### SE lens
+**Developer Experience (DX)**. The alternative not chosen is sticking with `collections.namedtuple`. The tradeoff is that the class-based syntax of `NamedTuple` is slightly more verbose, but it drastically improves IDE autocompletion and type checker visibility, saving debug time later.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently:
+```
+Employee(name='Alice', department='Engineering', salary=95000)
 50000.0
-False
 ('name', 'department', 'salary')
+['Alice', 'Engineering', 95000]
+[Employee(name='Alice', department='Engineering', salary=95000), Employee(name='Bob', department='Marketing', salary=50000.0)]
 ```
-**This is called a typed named tuple.** The output proves that `typing.NamedTuple` allows type annotations and default values, automatically handles default instantiation, and provides tuple-like comparison (left-to-right). We will discard this throwaway code; it will not appear in our project.
 
-## Concept Unit: `@dataclass` — the basics
+### One sentence connecting to previous unit
+Now that we have several ways to build lightweight records, we need a guide to choose between them and serialize them.
+
+## Concept Unit: Choosing between dataclass, NamedTuple, and plain class
 
 ### The Problem
-Named tuples are tuples, meaning they are immutable. Sometimes you want a record that is mutable (e.g., an entity in a database whose state changes). If you write a standard class, you have to manually implement `__init__`, `__repr__`, and `__eq__`, resulting in a lot of boilerplate. How can we have the convenience of auto-generated methods for a standard, mutable class?
-- What repetitive code do you usually write inside `__init__`?
-- How does Python normally compare two custom objects if you don't implement `__eq__`?
+When building a new system, how do you decide which of these data holder constructs is the right tool for the job, and how do you export that data to other systems?
 
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating the `dataclasses` module.
-- **Files affected**: `src/records.py` (modified)
+### Introduce the concept in isolation
+```python
+from dataclasses import dataclass, asdict
+
+@dataclass
+class SimpleConfig:
+    port: int = 80
+
+c = SimpleConfig()
+print(asdict(c))
+```
+Predicted confidently: `{'port': 80}`. This proves that the **asdict** function can dynamically inspect a dataclass and convert it to a standard dictionary.
+
+### Discard the throwaway
+This isolated throwaway code is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `lesson_27_dataclasses.py` (modified)
 - **Change type**: add
-- **Location**: Bottom of file
-- **Dependencies**: The standard library `dataclasses` module.
+- **Location**: Append to the end of the file.
+- **Dependencies**: None
 
 ### The New Code
 ```python
-from dataclasses import dataclass
+from dataclasses import asdict, astuple
+import json
 
 @dataclass
-class Point:
-    x: float
-    y: float
+class Config:
+    host: str = 'localhost'
+    port: int = 8080
+    debug: bool = False
+
+c = Config(port=9090)
+print(asdict(c))
+print(astuple(c))
+
+print(json.dumps(asdict(c)))
 ```
 
 ### The Updated Project
 ```python
-// 10: 
-// 11: from dataclasses import dataclass // ← new
-// 12: 
-// 13: @dataclass // ← new
-// 14: class Point: // ← new
-// 15:     x: float // ← new
-// 16:     y: float // ← new
+# ...unchanged from here up
+# 73: 
+# 74: from dataclasses import asdict, astuple # <- new
+# 75: import json # <- new
+# 76: 
+# 77: @dataclass # <- new
+# 78: class Config: # <- new
+# 79:     host: str = 'localhost' # <- new
+# 80:     port: int = 8080 # <- new
+# 81:     debug: bool = False # <- new
+# 82: 
+# 83: c = Config(port=9090) # <- new
+# 84: print(asdict(c)) # <- new
+# 85: print(astuple(c)) # <- new
+# 86: 
+# 87: print(json.dumps(asdict(c))) # <- new
 ```
-We now have a `Point` class decorated with `@dataclass`, which automatically writes the boilerplate methods for us.
+We define a mutable `Config` dataclass and demonstrate standard serialization helpers.
 
-### Mechanical Walkthrough
-- **`@dataclass`**: A decorator function applied to the `Point` class. It inspects the class annotations and automatically injects methods like `__init__`, `__repr__`, and `__eq__`.
-- **`class Point:`**: Defines a new standard Python class.
-- **`x: float`**: An annotated class attribute defining a field `x` of type float. The decorator uses this to build the `__init__` arguments.
-- **`y: float`**: An annotated class attribute defining a field `y` of type float.
+### Mechanical walkthrough
+- `from dataclasses import asdict, astuple`: Imports the helper functions that serialize dataclasses.
+- `import json`: Imports the standard library JSON module.
+- `@dataclass`: We choose a regular dataclass because configs might need to mutate later, and we don't need tuple compatibility.
+- `class Config:`: Defines the config block with default values.
+- `Config(port=9090)`: Instantiates the object, overriding just one default.
+- `asdict(c)`: Recursively converts the instance to a dictionary. Returns `{'host': 'localhost', 'port': 9090, 'debug': False}`.
+- `astuple(c)`: Converts the instance to a tuple: `('localhost', 9090, False)`.
+- `json.dumps(asdict(c))`: `asdict(c)` generates a raw dict, which is passed to `json.dumps`, which converts it to a serialized string for network transit: `'{"host": "localhost", "port": 9090, "debug": false}'`.
 
-### Isolate and Discard
-Let's isolate `@dataclass` to see how it works and what it proves.
+### CS lens
+This is **Serialization**. Converting an in-memory object into a flat string or binary format that can be stored or transmitted across a network. Real-world examples include writing to JSON, Google's Protocol Buffers, and XML payloads.
 
-```python
-from dataclasses import dataclass
+### SE lens
+**The Right Tool for the Job**. The alternative not chosen is using a plain dictionary for config. The tradeoff is that dicts lack type hints and dot-attribute access (`c.port` vs `c['port']`). 
+- Choose `NamedTuple` when you strictly need an immutable record and backwards compatibility with tuples.
+- Choose `@dataclass` as the default for readable, mutable, feature-rich data objects. 
+- Choose `@dataclass(frozen=True)` when you want immutability but richer features than a tuple.
+- Choose plain classes only when complex logic heavily outweighs pure data storage.
 
-@dataclass
-class Point:
-    x: float
-    y: float
+### Commands needed
+None for this unit.
 
-p1 = Point(1.0, 2.0)
-p2 = Point(1.0, 2.0)
-p3 = Point(3.0, 4.0)
-
-print(p1)
-print(p1 == p2)
-print(p1 == p3)
-print(p1.x)
-p1.x = 5.0
-print(p1)
+### Run it
+Predicted confidently:
 ```
-Output:
-```text
-Point(x=1.0, y=2.0)
-True
-False
-1.0
-Point(x=5.0, y=2.0)
-```
-**This is called a dataclass.** The output proves that `@dataclass` automatically generates `__repr__` (printing nicely) and `__eq__` (comparing by value, not memory address), and that fields are mutable by default. We will discard this throwaway code; it will not appear in our project.
-
-## Concept Unit: `@dataclass` — defaults, `field()`, and `post_init`
-
-### The Problem
-What if a dataclass field needs a default value that is mutable, like an empty list? In a standard class, using `[]` as a default argument creates the shared-mutable-default trap, where all instances share the same list. Also, what if we need to validate data right after initialization, but we didn't write the `__init__` method ourselves?
-- Why is `def __init__(self, history=[]):` dangerous in Python?
-- If the decorator generates `__init__`, how can you inject your own setup logic?
-
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating dataclass field configuration.
-- **Files affected**: `src/records.py` (modified)
-- **Change type**: add
-- **Location**: Bottom of file
-- **Dependencies**: `dataclasses.field`, `typing.List`
-
-### The New Code
-```python
-from dataclasses import field
-from typing import List
-
-@dataclass
-class BankAccount:
-    owner: str
-    balance: float = 0.0
-    history: List[str] = field(default_factory=list)
-
-    def __post_init__(self):
-        if self.balance < 0:
-            raise ValueError('Initial balance cannot be negative')
+{'host': 'localhost', 'port': 9090, 'debug': False}
+('localhost', 9090, False)
+{"host": "localhost", "port": 9090, "debug": false}
 ```
 
-### The Updated Project
-```python
-// 17: 
-// 18: from dataclasses import field // ← new
-// 19: from typing import List // ← new
-// 20: 
-// 21: @dataclass // ← new
-// 22: class BankAccount: // ← new
-// 23:     owner: str // ← new
-// 24:     balance: float = 0.0 // ← new
-// 25:     history: List[str] = field(default_factory=list) // ← new
-// 26:  // ← new
-// 27:     def __post_init__(self): // ← new
-// 28:         if self.balance < 0: // ← new
-// 29:             raise ValueError('Initial balance cannot be negative') // ← new
-```
-We now have a `BankAccount` dataclass with a safe mutable default field and validation logic.
+### One sentence connecting to previous unit
+Understanding how to choose and serialize data classes prepares us to build more robust data-processing applications in the future.
 
-### Mechanical Walkthrough
-- **`history: List[str]`**: A type hint for a list of strings.
-- **`=`**: Assignment operator.
-- **`field(`**: Calls the `dataclasses.field` function to configure this specific field.
-- **`default_factory=list`**: A keyword argument telling the dataclass to call `list()` to generate a new, distinct list for every new instance, avoiding the shared-mutable-default trap.
-- **`)`**: Closes the `field` call.
-- **`def __post_init__(self):`**: Defines the special method `__post_init__`, which the generated `__init__` will automatically call at the very end of its execution.
-- **`if self.balance < 0:`**: A standard conditional check.
-- **`raise ValueError(...)`**: Throws an exception if the condition is met.
+## Closing
 
-### Isolate and Discard
-Let's isolate `field()` and `__post_init__` to see how they work and what they prove.
+### Connect the pieces
+Throughout this lesson, we transitioned from writing repetitive boilerplate to cleanly defining data structures. If we trace a `Student` dataclass through its lifecycle:
+1. `Student('Alice', 92.5)` is created instantly without us writing `__init__`, thanks to the `@dataclass` decorator dynamically building it based on the `name` and `grade` type hints.
+2. Because it was defined with `order=True`, `s1 < s2` seamlessly delegates to a generated `__lt__` method that automatically checks fields sequentially.
+3. Sorting a list `sorted(students)` naturally uses that same ordering capability without any custom lambda functions.
+4. If we had needed that `Student` object to be sent as a JSON payload to a web API, `asdict(student)` would immediately convert it, ready for `json.dumps`.
 
-```python
-from dataclasses import dataclass, field
-from typing import List
-
-@dataclass
-class BankAccount:
-    owner: str
-    balance: float = 0.0
-    history: List[str] = field(default_factory=list)
-
-    def __post_init__(self):
-        if self.balance < 0:
-            raise ValueError('Initial balance cannot be negative')
-
-    def deposit(self, amount):
-        self.balance += amount
-        self.history.append(f'deposit: {amount}')
-
-a = BankAccount('Alice', 100.0)
-a.deposit(50)
-print(a.balance)
-print(a.history)
-print(a)
-
-b = BankAccount('Bob')
-print(b.balance)
-print(b.history)
-```
-Output:
-```text
-150.0
-['deposit: 50']
-BankAccount(owner='Alice', balance=150.0, history=['deposit: 50'])
-0.0
-[]
-```
-**This is called dataclass field configuration.** The output proves that `default_factory=list` creates a new, distinct list for each instance (because `b.history` is empty despite `a.history` having an item). It also shows `__post_init__` runs correctly for validation. We will discard this throwaway code; it will not appear in our project.
-
-## Concept Unit: `frozen=True` — immutable dataclasses
-
-### The Problem
-Sometimes you want a full class with methods and defaults, but you want to enforce immutability so that instances can be used as keys in a dictionary or placed in a set. A standard dataclass is mutable and therefore unhashable by default. How can we make a dataclass immutable?
-- What error do you get if you try to put a mutable object into a `set`?
-- How does Python know if an object should be allowed to change?
-
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating frozen dataclasses.
-- **Files affected**: `src/records.py` (modified)
-- **Change type**: add
-- **Location**: Bottom of file
-- **Dependencies**: None.
-
-### The New Code
-```python
-@dataclass(frozen=True)
-class FrozenPoint:
-    x: float
-    y: float
-```
-
-### The Updated Project
-```python
-// 30: 
-// 31: @dataclass(frozen=True) // ← new
-// 32: class FrozenPoint: // ← new
-// 33:     x: float // ← new
-// 34:     y: float // ← new
-```
-We now have a `FrozenPoint` dataclass that is immutable and hashable.
-
-### Mechanical Walkthrough
-- **`@dataclass(`**: Invokes the dataclass decorator with arguments.
-- **`frozen=True`**: A keyword argument instructing the decorator to generate a `__setattr__` method that raises an error on modification, effectively making the instance immutable, and to generate a `__hash__` method.
-- **`)`**: Closes the decorator call.
-- **`class FrozenPoint:`**: Defines the class.
-- **`x: float`**: Defines the `x` field.
-- **`y: float`**: Defines the `y` field.
-
-### Isolate and Discard
-Let's isolate `frozen=True` to see how it works and what it proves.
-
-```python
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class FrozenPoint:
-    x: float
-    y: float
-
-    def distance_from_origin(self):
-        return (self.x**2 + self.y**2) ** 0.5
-
-p = FrozenPoint(3.0, 4.0)
-print(p.distance_from_origin())
-print(hash(p) is not None)
-points = {FrozenPoint(0, 0), FrozenPoint(1, 1), FrozenPoint(0, 0)}
-print(len(points))
-
-try:
-    p.x = 10.0
-except Exception as e:
-    print(f"Error: {type(e).__name__}")
-```
-Output:
-```text
-5.0
-True
-2
-Error: FrozenInstanceError
-```
-**This is called a frozen dataclass.** The output proves that `frozen=True` generates a valid hash (allowing it to be placed in a set where duplicates are removed) and prevents mutation by raising a `FrozenInstanceError`. We will discard this throwaway code; it will not appear in our project.
-
-## Concept Unit: `order=True` — automatic comparison
-
-### The Problem
-If you have a list of dataclass instances, calling `sorted()` on the list will crash because Python doesn't know how to compare two instances (using `<`, `>`, etc.). Writing `__lt__`, `__le__`, `__gt__`, and `__ge__` manually is tedious. How can we make a dataclass sortable automatically?
-- How does Python compare two tuples `(3, "B")` and `(3, "A")`?
-- What boilerplate methods are required to support `>` and `<`?
-
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating ordered dataclasses.
-- **Files affected**: `src/records.py` (modified)
-- **Change type**: add
-- **Location**: Bottom of file
-- **Dependencies**: None.
-
-### The New Code
-```python
-@dataclass(order=True)
-class Student:
-    gpa: float
-    name: str
-```
-
-### The Updated Project
-```python
-// 35: 
-// 36: @dataclass(order=True) // ← new
-// 37: class Student: // ← new
-// 38:     gpa: float // ← new
-// 39:     name: str // ← new
-```
-We now have a `Student` dataclass that supports ordering based on its fields.
-
-### Mechanical Walkthrough
-- **`@dataclass(`**: Invokes the dataclass decorator.
-- **`order=True`**: A keyword argument instructing the decorator to generate `__lt__`, `__le__`, `__gt__`, and `__ge__` methods.
-- **`)`**: Closes the decorator call.
-- **`class Student:`**: Defines the class.
-- **`gpa: float`**: Defines the `gpa` field. This is the first field, so it acts as the primary sort key.
-- **`name: str`**: Defines the `name` field. This acts as the secondary sort key if the `gpa` fields are equal.
-
-### Isolate and Discard
-Let's isolate `order=True` to see how it works and what it proves.
-
-```python
-from dataclasses import dataclass
-
-@dataclass(order=True)
-class Student:
-    gpa: float
-    name: str
-
-students = [
-    Student(3.5, 'Bob'),
-    Student(3.9, 'Alice'),
-    Student(3.5, 'Aaron'),
-    Student(2.8, 'Carol'),
-]
-print(sorted(students))
-```
-Output:
-```text
-[Student(gpa=2.8, name='Carol'), Student(gpa=3.5, name='Aaron'), Student(gpa=3.5, name='Bob'), Student(gpa=3.9, name='Alice')]
-```
-**This is called an ordered dataclass.** The output proves that `order=True` enables automatic sorting by comparing fields left to right (like tuples). Here, GPA is compared first, then name alphabetically (Aaron comes before Bob). We will discard this throwaway code; it will not appear in our project.
-
-## Concept Unit: Choosing the right tool
-
-### The Problem
-We now have several ways to define a record in Python: plain tuples, named tuples, typed named tuples, dataclasses, frozen dataclasses, and standard classes. How do you decide which one to use?
-- If you just need to group an `x` and `y` quickly inside a function, what is the lightest option?
-- If you need a record with private state and complex invariants, should you use a dataclass?
-
-### The Project Change
-- **Reference Source**: No reference counterpart — this is a conceptual synthesis.
-- **Files affected**: None.
-- **Change type**: conceptual review.
-- **Location**: N/A.
-- **Dependencies**: N/A.
-
-### The Summary
-- **Plain tuple**: anonymous, by-position, immutable. Use for temporary groupings.
-- **namedtuple / NamedTuple**: named fields, immutable, hashable, lightweight. Use for pure data records.
-- **@dataclass**: named fields, type hints, defaults, optional mutability. Use for richer records with methods.
-- **@dataclass(frozen=True)**: like namedtuple but with methods and defaults. Use for immutable records with behavior.
-- **Full class with @property**: complex invariants, private state, heavy behavior. Use for domain objects.
-
-Dataclasses eliminate boilerplate and make Python data structures expressive and self-documenting. Lesson 28 is the OOP capstone.
-
-### Exercises
-1. Implement a `Color` frozen dataclass with `r`, `g`, `b` fields (0–255), a `to_hex()` method, and `__add__` for color mixing.
-2. Implement a `Config` dataclass loaded from a JSON file.
+By abstracting away the boilerplate, Python allows us to focus purely on the structure and types of the data we're handling.

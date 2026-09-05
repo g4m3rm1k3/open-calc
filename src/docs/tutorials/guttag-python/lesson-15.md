@@ -1,789 +1,520 @@
-# Lesson 15: Exceptions — `try`, `except`, `raise`, `finally`
+# Lesson 15: Exceptions — try, except, raise, finally
 
 **What you will build**
-In this lesson, we will build several small robust functions that use Python's exception handling system to deal with runtime errors gracefully. You will learn the transferable problem of dealing with abnormal conditions: an exception is an object representing an error, propagating up the call stack until caught or crashing the program. You will learn why catching the RIGHT exception type is essential to avoid hiding bugs, and how to use `finally` for guaranteed cleanup like releasing resources.
+The reader understands Python's exception mechanism: try/except/else/finally, raising exceptions with raise, defining custom exception classes, and the difference between EAFP (Easier to Ask Forgiveness than Permission) vs. LBYL (Look Before You Leap). The transferable insight: exceptions are not just for errors — they are Python's mechanism for communicating unexpected conditions between caller and callee. Raising an exception unwinds the call stack until a matching except clause catches it.
 
 **What you need to know first**
-- Lessons 0–14 (all prior Python through modules).
-- **Function definition** (`def`, `return`) — used to encapsulate code blocks.
-- **Control flow** (`if`, `else`) — used for conditional logic.
+Lessons 00-14.
 
 **Terms used in this lesson**
-- **Exception** — An object representing an abnormal condition or error that occurred during program execution. It propagates up the call stack until caught.
-- **Traceback** — The report of the active call stack at the point where an exception occurred, showing the sequence of function calls that led to the error.
-- **Catching** — Intercepting an exception using a `try`/`except` block to prevent it from crashing the program and to handle the error gracefully.
-- **Raising** — The act of generating and throwing an exception object when an error condition is detected using the `raise` keyword.
-- **Base class** — The parent class from which other classes inherit. Used heavily in the exception hierarchy.
+- **Exception** — Python's mechanism for handling errors and unexpected conditions during execution, allowing the program to respond rather than crash.
+- **EAFP (Easier to Ask Forgiveness than Permission)** — A coding style in Python where you assume valid keys or attributes exist and catch exceptions if the assumption proves false.
+- **LBYL (Look Before You Leap)** — A coding style where you explicitly check for pre-conditions before making calls or lookups.
 
 **Objects and methods used**
+- **Exception (class)**
+  - *What it is:* The base class for all built-in, non-system-exiting exceptions.
+  - *Implementation:* `class Exception(BaseException): pass`
+  - *Its use:* Used as the base class when defining custom exceptions.
+  - *Type:* Class
+  - *Responsibility:* Provides a common root for all regular error types, allowing broad except clauses to catch user-level errors without catching system exits.
+  - *Depends on:* Nothing explicitly, inherits from BaseException.
+  - *Connects to:* Subclassed by ValueError, TypeError, and custom exceptions.
+  - *Shape:* A standard library base class.
 
-- **`ZeroDivisionError`**
-  - *What it is:* A built-in exception class representing an arithmetic division by zero.
-  - *Implementation:* `class ZeroDivisionError(ArithmeticError)`
-  - *Its use:* Raised and caught when division operations fail due to a zero denominator.
-  - *Type:* Class.
-  - *Responsibility:* Represents a math error where the second argument to a division or modulo operation is zero.
-  - *Depends on:* Nothing (instantiated automatically by the Python runtime).
-  - *Connects to:* Subclass of `ArithmeticError`, inherits from `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **ValueError (class)**
+  - *What it is:* An exception raised when an operation or function receives an argument that has the right type but an inappropriate value.
+  - *Implementation:* `class ValueError(Exception): pass`
+  - *Its use:* Raised or caught when validating data, like string to int conversions.
+  - *Type:* Class
+  - *Responsibility:* Signals a mismatch in expected value ranges or formatting.
+  - *Depends on:* Inherits from Exception.
+  - *Connects to:* Python's parsing functions like `int()`.
+  - *Shape:* Standard library exception.
 
-- **`ValueError`**
-  - *What it is:* A built-in exception class representing an operation receiving an argument with the right type but inappropriate value.
-  - *Implementation:* `class ValueError(Exception)`
-  - *Its use:* Raised and caught when functions like `int()` receive unparseable strings.
-  - *Type:* Class.
-  - *Responsibility:* Signals that a value is unacceptable for an operation, despite being the correct type.
-  - *Depends on:* An error message string describing the invalid value.
-  - *Connects to:* Subclass of `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **TypeError (class)**
+  - *What it is:* An exception raised when an operation or function is applied to an object of inappropriate type.
+  - *Implementation:* `class TypeError(Exception): pass`
+  - *Its use:* Raised or caught to guard against wrong types being passed to logic.
+  - *Type:* Class
+  - *Responsibility:* Prevents operations on incompatible types.
+  - *Depends on:* Inherits from Exception.
+  - *Connects to:* Type-checking logic or built-in functions.
+  - *Shape:* Standard library exception.
 
-- **`TypeError`**
-  - *What it is:* A built-in exception class representing an operation applied to an object of inappropriate type.
-  - *Implementation:* `class TypeError(Exception)`
-  - *Its use:* Raised and caught when operations are applied to wrong types (e.g., concatenating a string with an integer).
-  - *Type:* Class.
-  - *Responsibility:* Signals that an operation or function was applied to an incompatible type.
-  - *Depends on:* An error message string describing the type mismatch.
-  - *Connects to:* Subclass of `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **ZeroDivisionError (class)**
+  - *What it is:* An exception raised when the second argument of a division or modulo operation is zero.
+  - *Implementation:* `class ZeroDivisionError(ArithmeticError): pass`
+  - *Its use:* Caught to handle attempts to divide by zero safely.
+  - *Type:* Class
+  - *Responsibility:* Prevents the program from crashing on illegal arithmetic.
+  - *Depends on:* Inherits from ArithmeticError.
+  - *Connects to:* The `/` and `%` operators.
+  - *Shape:* Standard library exception.
 
-- **`KeyError`**
-  - *What it is:* A built-in exception class representing a missing key in a dictionary lookup.
-  - *Implementation:* `class KeyError(LookupError)`
-  - *Its use:* Raised and caught when accessing a dictionary with a key that does not exist.
-  - *Type:* Class.
-  - *Responsibility:* Signals a failed dictionary lookup.
-  - *Depends on:* The missing key that caused the lookup to fail.
-  - *Connects to:* Subclass of `LookupError`, inherits from `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **FileNotFoundError (class)**
+  - *What it is:* An exception raised when a file or directory is requested but doesn't exist.
+  - *Implementation:* `class FileNotFoundError(OSError): pass`
+  - *Its use:* Caught when attempting to open a file for reading.
+  - *Type:* Class
+  - *Responsibility:* Signals that the OS cannot locate the specified path.
+  - *Depends on:* Inherits from OSError.
+  - *Connects to:* The `open()` built-in function.
+  - *Shape:* Standard library exception.
 
-- **`IndexError`**
-  - *What it is:* A built-in exception class representing an out-of-range sequence index.
-  - *Implementation:* `class IndexError(LookupError)`
-  - *Its use:* Raised and caught when accessing a list or sequence with an invalid index.
-  - *Type:* Class.
-  - *Responsibility:* Signals a failed sequence lookup due to range limits.
-  - *Depends on:* An error message string.
-  - *Connects to:* Subclass of `LookupError`, inherits from `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **isinstance()**
+  - *What it is:* A built-in function that returns True if the specified object is of the specified type.
+  - *Implementation:* `def isinstance(obj, class_or_tuple, /): ...`
+  - *Its use:* Used to explicitly check type before proceeding.
+  - *Type:* Built-in function
+  - *Responsibility:* Determines if an object matches a given class or tuple of classes.
+  - *Depends on:* The object to check, and the class to check against.
+  - *Connects to:* Type validation branches (LBYL).
+  - *Shape:* Global built-in.
 
-- **`FileNotFoundError`**
-  - *What it is:* A built-in exception class representing a failed attempt to open a non-existent file or directory.
-  - *Implementation:* `class FileNotFoundError(OSError)`
-  - *Its use:* Raised and caught when file I/O operations fail to find the requested path.
-  - *Type:* Class.
-  - *Responsibility:* Signals an OS-level failure to locate a file.
-  - *Depends on:* The file path requested.
-  - *Connects to:* Subclass of `OSError`, inherits from `Exception`.
-  - *Shape:* Standard library built-in exception.
+- **open()**
+  - *What it is:* A built-in function to open a file and return a corresponding file object.
+  - *Implementation:* `def open(file, mode='r', ...): ...`
+  - *Its use:* Used to read a file from the filesystem.
+  - *Type:* Built-in function
+  - *Responsibility:* Interfaces with the OS to provide a stream to a file.
+  - *Depends on:* File path string and mode string.
+  - *Connects to:* File objects, filesystem.
+  - *Shape:* Global built-in.
 
-- **`Exception`**
-  - *What it is:* The base class for all standard, catchable exceptions in Python.
-  - *Implementation:* `class Exception(BaseException)`
-  - *Its use:* Used as a base class for custom exceptions and to catch all standard errors.
-  - *Type:* Class.
-  - *Responsibility:* Serves as the root type for all standard errors in Python programs.
-  - *Depends on:* Tuple of arguments (`self.args`), usually an error message.
-  - *Connects to:* Subclass of `BaseException`.
-  - *Shape:* Root of the standard exception hierarchy.
+- **int()**
+  - *What it is:* A built-in function to convert a number or string to an integer.
+  - *Implementation:* `class int(x=0): ...`
+  - *Its use:* Parsing strings to integer types.
+  - *Type:* Built-in class/function
+  - *Responsibility:* Parses base-10 numerical representations into actual integer values.
+  - *Depends on:* A string or numeric argument.
+  - *Connects to:* `ValueError` on failure.
+  - *Shape:* Global built-in.
 
-- **`BaseException`**
-  - *What it is:* The absolute root class of the Python exception hierarchy.
-  - *Implementation:* `class BaseException(object)`
-  - *Its use:* Root hierarchy; generally not caught directly to avoid swallowing system exits.
-  - *Type:* Class.
-  - *Responsibility:* Root for all exception objects, including system-exiting ones.
-  - *Depends on:* Tuple of arguments.
-  - *Connects to:* Subclasses include `Exception`, `SystemExit`, and `KeyboardInterrupt`.
-  - *Shape:* Top of the exception hierarchy.
-
-- **`KeyboardInterrupt`**
-  - *What it is:* A built-in exception class raised when the user hits the interrupt key (Ctrl+C).
-  - *Implementation:* `class KeyboardInterrupt(BaseException)`
-  - *Its use:* Signals that the program should terminate due to user intervention.
-  - *Type:* Class.
-  - *Responsibility:* Handle user interruption signals cleanly without being swallowed by broad `Exception` handlers.
-  - *Depends on:* OS signal from the user.
-  - *Connects to:* Subclass of `BaseException`, bypassing `Exception`.
-  - *Shape:* System exception.
-
----
-
-## Concept Unit: What an exception is
+## Concept Unit: try / except — catching exceptions
 
 ### The Problem
-
-When Python encounters an operation that is impossible to perform — like dividing a number by zero or attempting to open a file that does not exist — it needs a way to signal this failure to the rest of the program.
-
-If you are asked to divide a number by zero, what should the result be? If Python just returned `0` or `None`, you would have to check the result of every single division to ensure it was valid, and worse, `0` or `None` might be a perfectly valid result in other contexts, making it ambiguous. How can Python definitively stop the current sequence of events and say "something went wrong"?
+When performing division, what happens if the denominator is zero? Does the program crash entirely? How can we handle this error gracefully without halting execution completely?
 
 ### Introduce the concept in isolation
-
-We can observe what happens when we intentionally try to perform an impossible mathematical operation.
-
 ```python
-# Predicted output without execution:
->>> 1 / 0
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-ZeroDivisionError: division by zero
-```
-
-This output proves that Python does not silently fail or return a garbage value. Instead, it creates an object representing the error, halts normal execution, and prints a detailed report. This object is called an **Exception**.
-
-### Discard the throwaway example
-
-The REPL example above is discarded; we will not divide by zero on purpose in our project code.
-
-### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are starting a new script to demonstrate various error states.
-
-- **Files affected:** `errors.py` (created)
-- **Change type:** Add
-- **Location:** The entire file.
-- **Dependencies:** None.
-
-### The New Code
-
-```python
-int('abc')
-[1, 2, 3][10]
-{'a': 1}['b']
-'hello' + 5
-open('nonexistent.txt')
-```
-
-### The Updated Project
-
-```python
-# errors.py
-# (Running any one of these lines in isolation produces an error)
-
-int('abc')
-# ValueError: invalid literal for int() with base 10: 'abc'
-
-[1, 2, 3][10]
-# IndexError: list index out of range
-
-{'a': 1}['b']
-# KeyError: 'b'
-
-'hello' + 5
-# TypeError: can only concatenate str (not "int") to str
-
-open('nonexistent.txt')
-# FileNotFoundError: [Errno 2] No such file or directory: 'nonexistent.txt'
-```
-
-Running any of these lines causes the program to crash immediately and display an error.
-
-### Mechanical walkthrough
-
-When Python encounters an error, it creates an exception object and **raises** it. If no code explicitly catches it, the exception propagates up the entire call stack, printing a traceback, and terminates the program.
-
-- **`int('abc')`** calls the built-in integer conversion function with a string that contains no numbers. It raises a **`ValueError`**, an exception signaling that the type is right (a string) but the value is inappropriate.
-- **`[1, 2, 3][10]`** attempts to access the 11th element of a 3-element list. It raises an **`IndexError`**, signaling an out-of-bounds sequence access.
-- **`{'a': 1}['b']`** attempts to look up the key `'b'` in a dictionary that only contains `'a'`. It raises a **`KeyError`**, signaling a missing dictionary key.
-- **`'hello' + 5`** attempts to concatenate a string and an integer. It raises a **`TypeError`**, signaling that the operation is invalid for these specific types.
-- **`open('nonexistent.txt')`** asks the operating system for a file that is not there. It raises a **`FileNotFoundError`**, signaling an I/O path failure.
-
-In every case, the traceback shows the full call stack at the moment of the exception. You read it from bottom to top to understand exactly what failed and what line of your code caused it.
-
----
-
-## Concept Unit: `try`/`except` — catching exceptions
-
-### The Problem
-
-If an exception stops execution and crashes the program by default, how do we prevent the crash? Often, an error is entirely predictable and manageable — a user typing a letter instead of a number, or a network request failing for a moment.
-
-If you have a function that divides two numbers, and you suspect the denominator might sometimes be zero, how can you intercept the error before it crashes the script and handle it on your own terms?
-
-### Introduce the concept in isolation
-
-We can use a new block structure to "listen" for errors and jump to a fallback plan if they occur.
-
-```python
-# Predicted output without execution:
 try:
-    print(1 / 0)
+    print(10 / 0)
 except ZeroDivisionError:
-    print("Intercepted!")
-
-# Output:
-# Intercepted!
+    print('Caught a division by zero!')
 ```
+This is called a **try/except block**. Output: `Caught a division by zero!`. This PROVES that dividing by zero raises an exception, which the `except` block catches, preventing a crash.
 
-This proves that by wrapping risky code in a special block, we can intercept the exception object as it flies by. Execution jumps to the fallback block and the program survives. This structure is called a **`try`/`except` block**.
-
-### Discard the throwaway example
-
-The isolated print example is discarded; we will use it in a real function structure instead.
+### Discard the throwaway
+The throwaway example above is discarded and will not appear in the project.
 
 ### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are expanding our script with a safe utility function.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** At the top of the file.
-- **Dependencies:** None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are illustrating basic error handling.
+- **Files affected**: `math_utils.py` (created)
+- **Change type**: add
+- **Location**: Top of file
+- **Dependencies**: None
 
 ### The New Code
-
 ```python
 def safe_divide(a, b):
     try:
-        result = a / b
+        result = a / b          # may raise ZeroDivisionError
         return result
     except ZeroDivisionError:
-        print('Error: division by zero')
+        print('Cannot divide by zero')
         return None
 ```
 
 ### The Updated Project
-
 ```python
-# errors.py
-def safe_divide(a, b):
-    try:
-        result = a / b
-        return result
-    except ZeroDivisionError:
-        print('Error: division by zero')
-        return None
-
-# ← new
-print(safe_divide(10, 2))
-print(safe_divide(10, 0))
+1: def safe_divide(a, b):
+2:     try: # ← new
+3:         result = a / b          # ← new
+4:         return result           # ← new
+5:     except ZeroDivisionError:   # ← new
+6:         print('Cannot divide by zero') # ← new
+7:         return None             # ← new
 ```
-
-This adds a function that safely divides two numbers and falls back to `None` if division fails, then tests it with two inputs.
+This structure creates a function that wraps a division in a try block, returning a safe default if a specific error is encountered.
 
 ### Mechanical walkthrough
+- `def safe_divide(a, b):` defines a new function taking two arguments.
+- `try:` opens a block of code that might raise an exception.
+- `result = a / b` performs the division. If `b` is 0, execution immediately halts here and jumps to the except block.
+- `return result` returns the answer if no exception occurred.
+- `except ZeroDivisionError:` catches specifically the ZeroDivisionError type.
+- `print('Cannot divide by zero')` outputs a user-friendly error message.
+- `return None` provides a fallback value instead of crashing.
 
-- **`try:`** defines a block of code to attempt. Python watches for exceptions raised inside this block.
-- **`result = a / b`** performs the division. If `b` is `2`, this evaluates to `5.0`. No exception is raised. The `except` block is skipped entirely, and `5.0` is returned.
-- When `safe_divide(10, 0)` is called, **`a / b`** attempts to divide by zero and raises a **`ZeroDivisionError`**.
-- Execution immediately aborts the `try` block. The `return result` line is never reached.
-- **`except ZeroDivisionError:`** catches the exact exception type named. Because the raised exception is a `ZeroDivisionError`, Python jumps into this block.
-- **`print('Error: division by zero')`** outputs a friendly message to the user instead of a traceback.
-- **`return None`** safely exits the function, allowing the program to continue running normally.
+### CS lens
+**Exception Handling**. This pattern appears in database connections (handling timeouts), network requests (handling dropped packets), and file parsing (handling corrupted formats).
 
----
+### SE lens
+**Graceful Degradation**. By returning None instead of crashing, we allow the caller to decide what to do next. The alternative (letting the program crash) forces the user out of the application entirely.
 
-## Concept Unit: Catching multiple exception types
+### Commands needed
+`None for this unit.`
+
+### Run it
+Predicted confidently: 
+`print(safe_divide(10, 2))` returns `5.0`. 
+`print(safe_divide(10, 0))` prints `Cannot divide by zero` and returns `None`.
+
+### One sentence connecting to previous unit
+Now that we can catch one error, let's look at handling multiple possible errors from the same operation.
+
+## Concept Unit: Multiple except clauses and exception hierarchy
 
 ### The Problem
-
-A block of code might fail in more than one way. If you read user input and try to convert it to an integer, it might fail because the input is completely empty, or because it contains letters.
-
-If your `try` block could raise a `ValueError` in one place and a `TypeError` in another, how do you provide different fallback plans for each distinct error without catching them all blindly?
+What if a single operation can fail in multiple different ways? If a user passes a string instead of a number, or an invalid string format, how do we distinguish between these distinct failure modes?
 
 ### Introduce the concept in isolation
-
-We can define multiple fallback plans by stacking them.
-
 ```python
-# Predicted output without execution:
 try:
     int(None)
 except ValueError:
-    print("Value issue")
+    print('ValueError')
 except TypeError:
-    print("Type issue")
-
-# Output:
-# Type issue
+    print('TypeError')
 ```
+This is called **multiple except clauses**. Output: `TypeError`. This PROVES that Python evaluates except clauses top-to-bottom and executes only the first one that matches the exception type raised.
 
-This proves that Python checks handlers from top to bottom and runs the first one that matches the exception type raised.
-
-### Discard the throwaway example
-
-The isolated type-checking example is discarded.
+### Discard the throwaway
+The throwaway example above is discarded and will not appear in the project.
 
 ### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are adding a flexible parsing function to our file.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** Below `safe_divide`.
-- **Dependencies:** None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are illustrating exception hierarchies.
+- **Files affected**: `math_utils.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: None
 
 ### The New Code
-
 ```python
 def parse_int(s):
     try:
         return int(s)
     except ValueError:
-        print(f'Cannot convert {s!r} to int')
+        print(f'Not a valid integer: {s!r}')
         return None
     except TypeError:
-        print(f'Expected a string, got {type(s).__name__}')
+        print(f'Expected string, got {type(s).__name__}')
         return None
 ```
 
 ### The Updated Project
-
 ```python
-# errors.py
-def parse_int(s):
-    try:
-        return int(s)
-    except ValueError:
-        print(f'Cannot convert {s!r} to int')
-        return None
-    except TypeError:
-        print(f'Expected a string, got {type(s).__name__}')
-        return None
-
-# ← new tests
-print(parse_int('42'))     # 42
-print(parse_int('abc'))    # Cannot convert 'abc' to int\nNone
-print(parse_int(None))     # Expected a string, got NoneType\nNone
+1: def safe_divide(a, b):
+...
+8: 
+9: def parse_int(s): # ← new
+10:     try: # ← new
+11:         return int(s) # ← new
+12:     except ValueError: # ← new
+13:         print(f'Not a valid integer: {s!r}') # ← new
+14:         return None # ← new
+15:     except TypeError: # ← new
+16:         print(f'Expected string, got {type(s).__name__}') # ← new
+17:         return None # ← new
 ```
-
-This function attempts to parse a string into an integer and provides tailored error messages for two different failure modes.
+This function safely attempts to convert an input to an integer, catching distinct errors separately.
 
 ### Mechanical walkthrough
+- `def parse_int(s):` defines a function taking a string `s`.
+- `try:` begins the block to attempt conversion.
+- `return int(s)` attempts to convert `s` to an integer. This can raise `ValueError` (for invalid formats like `'abc'`) or `TypeError` (for wrong types like `None`).
+- `except ValueError:` catches format errors.
+- `print(f'Not a valid integer: {s!r}')` logs the formatting issue.
+- `return None` handles the failure gracefully.
+- `except TypeError:` catches invalid data types.
+- `print(f'Expected string, got {type(s).__name__}')` logs the type error dynamically.
+- `return None` also handles this failure gracefully.
 
-- **`try:`** opens the block.
-- **`return int(s)`** attempts the conversion.
-- **`except ValueError:`** is the first handler. If `s` is `'abc'`, `int()` raises a **`ValueError`**. Execution jumps here.
-- **`print(f'Cannot convert {s!r} to int')`** uses an f-string to display the exact string that failed.
-- **`except TypeError:`** is the second handler. If `s` is `None`, `int()` raises a **`TypeError`** because it expects a string or number, not `NoneType`. Execution skips the `ValueError` block entirely and jumps here.
-- **`print(f'Expected a string, got {type(s).__name__}')`** prints the actual type passed in.
+### CS lens
+**Exception Hierarchy**. In Python, `Exception` acts as the base class for `ValueError` and `TypeError`. Catching an exception higher up the hierarchy catches all its subclasses. Always catch specific exceptions (leaf nodes) before generic ones.
 
-Multiple `except` clauses are evaluated in order; the first matching one runs, and the rest are ignored. You can also catch multiple exception types in a single clause using a tuple, such as `except (ValueError, EOFError):`, which catches either of those types using the exact same fallback code.
+### SE lens
+**Specificity in Error Handling**. By explicitly catching `ValueError` and `TypeError` instead of a bare `except:`, we ensure we don't accidentally swallow unrelated errors like `KeyboardInterrupt` (Ctrl+C), which could make the program un-killable.
 
----
+### Commands needed
+`None for this unit.`
 
-## Concept Unit: Accessing the exception object with `as`
+### Run it
+Predicted confidently:
+`print(parse_int('42'))` returns `42`.
+`print(parse_int('abc'))` prints `Not a valid integer: 'abc'` and returns `None`.
+`print(parse_int(None))` prints `Expected string, got NoneType` and returns `None`.
 
-### The Problem
+### One sentence connecting to previous unit
+We've seen how to catch exceptions raised by built-in Python functions, but what if our own logic detects an invalid condition?
 
-When you catch an exception, you know its type, but you might not know the specifics of what went wrong. A `FileNotFoundError` tells you a file is missing, but *which* file?
-
-How can we look inside the exception object to retrieve the specific data (like the filename or the exact error message) that the runtime packed into it when the error occurred?
-
-### Introduce the concept in isolation
-
-We can bind a variable to the flying exception object to inspect it.
-
-```python
-# Predicted output without execution:
-try:
-    1 / 0
-except ZeroDivisionError as err:
-    print(err)
-
-# Output:
-# division by zero
-```
-
-This proves that the exception itself is a real object containing data, and we can capture it into a local variable to read that data.
-
-### Discard the throwaway example
-
-The isolated print is discarded.
-
-### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are exploring exception object inspection.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** Below `parse_int`.
-- **Dependencies:** None.
-
-### The New Code
-
-```python
-try:
-    open('missing.txt')
-except FileNotFoundError as e:
-    print(e.filename)
-    print(e.strerror)
-    print(e.errno)
-```
-
-### The Updated Project
-
-```python
-# errors.py
-try:
-    open('missing.txt')
-except FileNotFoundError as e:
-    print(e.filename)    # missing.txt
-    print(e.strerror)    # No such file or directory
-    print(e.errno)       # 2
-```
-
-This code catches a file error and prints three distinct pieces of information from the error object itself.
-
-### Mechanical walkthrough
-
-- **`except FileNotFoundError as e:`** intercepts the exception and assigns the actual exception object to the local variable `e`. The keyword `as` binds the object so we can interact with it.
-- **`e.filename`** accesses the `filename` attribute on the exception object. Built-in OS errors store the exact path that failed here.
-- **`e.strerror`** accesses the human-readable string description from the operating system ("No such file or directory").
-- **`e.errno`** accesses the raw integer error code provided by the underlying system (in this case, 2 for ENOENT).
-
-Exception objects carry attributes that provide context. Even for simpler errors without custom attributes, printing `str(e)` or examining `e.args` will reveal the message that was passed when the error was created.
-
----
-
-## Concept Unit: `raise` — signaling errors from your own code
+## Concept Unit: raise — signalling errors from your own code
 
 ### The Problem
-
-If someone calls a function you wrote, but passes completely invalid arguments — like a negative age for a user profile — you need a way to reject the input. Returning `None` or `False` is ambiguous.
-
-How can you leverage Python's exception system to stop execution and throw an error yourself, using the exact same mechanism the built-in functions use?
+If a function receives arguments that are valid types but violate business logic (like a negative age), how can the function forcibly halt its execution and alert the caller to the invalid state?
 
 ### Introduce the concept in isolation
-
-We can generate and throw an exception object manually.
-
 ```python
-# Predicted output without execution:
-# raise ValueError("That is not a valid choice.")
-# Output: ValueError: That is not a valid choice.
+age = -5
+if age < 0:
+    raise ValueError("Age cannot be negative")
 ```
+This is called **raising an exception**. Output: `ValueError: Age cannot be negative`. This PROVES that we can manually trigger the exception mechanism from our own code using the `raise` keyword.
 
-This proves that exceptions are not just magical language features; they are regular objects we can instantiate and throw using a specific keyword.
-
-### Discard the throwaway example
-
-The manual `raise` is discarded.
+### Discard the throwaway
+The throwaway example above is discarded and will not appear in the project.
 
 ### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are adding input validation logic to our file.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** Below the file reading block.
-- **Dependencies:** None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are illustrating raising exceptions.
+- **Files affected**: `math_utils.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: None
 
 ### The New Code
-
 ```python
 def set_age(age):
     if not isinstance(age, int):
-        raise TypeError(f'age must be an int, got {type(age).__name__}')
+        raise TypeError(f'age must be int, got {type(age).__name__}')
     if age < 0 or age > 150:
-        raise ValueError(f'age must be between 0 and 150, got {age}')
+        raise ValueError(f'age must be 0-150, got {age}')
     return age
 ```
 
 ### The Updated Project
-
 ```python
-# errors.py
-def set_age(age):
-    if not isinstance(age, int):
-        raise TypeError(f'age must be an int, got {type(age).__name__}')
-    if age < 0 or age > 150:
-        raise ValueError(f'age must be between 0 and 150, got {age}')
-    return age
-
-# ← new tests
-# set_age(25)    # Returns 25
-# set_age(-1)    # ValueError: age must be between 0 and 150, got -1
-# set_age('25')  # TypeError: age must be an int, got str
+17:         return None
+18: 
+19: def set_age(age): # ← new
+20:     if not isinstance(age, int): # ← new
+21:         raise TypeError(f'age must be int, got {type(age).__name__}') # ← new
+22:     if age < 0 or age > 150: # ← new
+23:         raise ValueError(f'age must be 0-150, got {age}') # ← new
+24:     return age # ← new
 ```
-
-This function strictly validates its input and deliberately throws standard exceptions if the input is unacceptable.
+This logic explicitly rejects bad data by raising built-in exception types with custom messages.
 
 ### Mechanical walkthrough
+- `def set_age(age):` defines a function taking a single argument.
+- `if not isinstance(age, int):` checks if the provided argument is an integer type.
+- `raise TypeError(...)` halts execution and throws a type error up the call stack if it's not an int.
+- `if age < 0 or age > 150:` applies business logic bounds checking to the integer value.
+- `raise ValueError(...)` halts execution and throws a value error up the call stack if bounds are exceeded.
+- `return age` executes only if all checks pass.
 
-- **`raise`** is the keyword that actually throws an exception object up the call stack, immediately halting the current function just like a built-in error would.
-- **`TypeError(...)`** instantiates a new **`TypeError`** object. We pass it a formatted string explaining exactly what went wrong. We choose `TypeError` because the first validation checks if the argument is an integer.
-- **`ValueError(...)`** instantiates a new **`ValueError`** object. We choose `ValueError` because in the second check, the type is correct (it's an int), but the value itself (-1) is semantically invalid.
+### CS lens
+**Fail-Fast Design**. Raising an error immediately upon discovering invalid state prevents bad data from persisting and causing confusing side-effects later on.
 
-Your code should always raise the same built-in exception types (`ValueError`, `TypeError`, `KeyError`) that standard Python uses for similar situations. This makes your code predictable to other developers.
+### SE lens
+**LBYL vs EAFP**. Here we use LBYL (Look Before You Leap) to explicitly validate arguments before proceeding, returning precise exceptions. Python often prefers EAFP (Easier to Ask Forgiveness than Permission), but LBYL is appropriate for guarding business rules that don't trigger built-in operations.
 
----
+### Commands needed
+`None for this unit.`
 
-## Concept Unit: `finally` — always runs
+### Run it
+Predicted confidently:
+`try: set_age(-5)` catches `ValueError: age must be 0-150, got -5`.
+`try: set_age('old')` catches `TypeError: age must be int, got str`.
+
+### One sentence connecting to previous unit
+Sometimes, whether an exception occurs or not, there are cleanup tasks that must unconditionally happen.
+
+## Concept Unit: finally and else
 
 ### The Problem
-
-When an exception occurs inside a `try` block, execution jumps to the `except` block. This means any code at the end of the `try` block is skipped entirely.
-
-If you opened a file, and an error happened while reading it, the function might crash or return early without ever closing the file. How do you guarantee that a cleanup step runs no matter what — whether an exception occurred, whether it was caught, or whether the function returned normally?
+If a function opens a file, it must close that file when finished. If an exception happens while reading, how do we guarantee the file is closed, since a raised exception immediately halts normal block execution?
 
 ### Introduce the concept in isolation
-
-We can add a block that executes no matter the outcome.
-
 ```python
-# Predicted output without execution:
 try:
-    print("Trying")
+    print('Trying')
+except Exception:
+    print('Failed')
 finally:
-    print("Cleaning up")
-
-# Output:
-# Trying
-# Cleaning up
+    print('Cleanup')
 ```
+This is called the **finally block**. Output: `Trying\nCleanup`. This PROVES that the code inside a `finally` block runs unconditionally, even when no exception occurs (and even if one does).
 
-This proves that `finally` blocks execute even if no error occurs at all.
-
-### Discard the throwaway example
-
-The isolated `finally` test is discarded.
+### Discard the throwaway
+The throwaway example above is discarded and will not appear in the project.
 
 ### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are adding a file reader that requires guaranteed resource cleanup.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** Below `set_age`.
-- **Dependencies:** None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are illustrating finally blocks.
+- **Files affected**: `file_utils.py` (created)
+- **Change type**: add
+- **Location**: Top of file
+- **Dependencies**: None
 
 ### The New Code
-
 ```python
 def read_file(path):
     f = None
     try:
         f = open(path, 'r')
-        return f.read()
-    except FileNotFoundError as e:
-        print(f'File not found: {e.filename}')
+        content = f.read()
+        return content
+    except FileNotFoundError:
+        print(f'File not found: {path}')
         return None
+    else:
+        print('File read successfully')
     finally:
-        print('finally block runs!')
         if f is not None:
             f.close()
+        print('Cleanup done')
 ```
 
 ### The Updated Project
-
 ```python
-# errors.py
-def read_file(path):
-    f = None
-    try:
-        f = open(path, 'r')
-        return f.read()
-    except FileNotFoundError as e:
-        print(f'File not found: {e.filename}')
-        return None
-    finally:
-        print('finally block runs!')
-        if f is not None:
-            f.close()
-
-# ← new tests
-read_file('existing.txt')    # reads file; finally runs
-read_file('missing.txt')     # catches error; finally STILL runs
+1: def read_file(path): # ← new
+2:     f = None # ← new
+3:     try: # ← new
+4:         f = open(path, 'r') # ← new
+5:         content = f.read() # ← new
+6:         return content # ← new
+7:     except FileNotFoundError: # ← new
+8:         print(f'File not found: {path}') # ← new
+9:         return None # ← new
+10:     else: # ← new
+11:         print('File read successfully') # ← new
+12:     finally: # ← new
+13:         if f is not None: # ← new
+14:             f.close() # ← new
+15:         print('Cleanup done') # ← new
 ```
-
-This function safely opens a file, attempts to read it, and guarantees the file handle is closed whether it succeeds or fails.
+This handles opening a file, returning its content on success, and guaranteeing the file handle is closed regardless of outcome.
 
 ### Mechanical walkthrough
+- `f = None` initializes the variable so the `finally` block can safely check it.
+- `try:` starts the block where file operations happen.
+- `f = open(path, 'r')` attempts to open the file. This may raise `FileNotFoundError`.
+- `content = f.read()` reads the file contents into memory.
+- `return content` returns the string on success.
+- `except FileNotFoundError:` catches the error if `open()` fails.
+- `print(...)` and `return None` handle the missing file gracefully.
+- `else:` executes **only if** the try block completes successfully without raising any exceptions.
+- `print('File read successfully')` logs success (though note: standard `return` inside `try` bypasses `else`).
+- `finally:` executes unconditionally.
+- `if f is not None: f.close()` ensures we release system resources safely.
 
-- **`f = None`** initializes the variable before the `try` block, ensuring it exists in the function scope even if `open()` crashes immediately.
-- **`finally:`** defines a block of code that is guaranteed to execute unconditionally when the `try` (and `except`) blocks finish.
-- If **`open()`** succeeds, **`return f.read()`** schedules an exit from the function. Before actually returning the data, execution pauses, jumps down to the `finally` block, executes it, and *then* returns.
-- If **`open()`** fails, the **`except`** block catches it and schedules a `return None`. Execution pauses, jumps down to the `finally` block, executes it, and *then* returns.
-- **`f.close()`** is called safely because of the `if f is not None` check.
+### CS lens
+**Resource Management**. Operating systems have strict limits on open file handles or network sockets. Unconditionally releasing them using `finally` prevents resource leaks.
 
-The `finally` block is the correct place for all cleanup: closing files, releasing network connections, or freeing locks. Note that in Python, the `with` statement (which you will see in Lesson 18) is a more modern shorthand for this exact `try...finally` pattern when dealing with files.
+### SE lens
+**The `else` Clause Tradeoff**. The `else` clause in Python's try/except is relatively rare. It makes the distinction between "code that might raise" (in `try`) and "code that should only run if the try succeeded" (in `else`) explicit.
 
----
+### Commands needed
+`None for this unit.`
+
+### Run it
+Predicted confidently:
+`read_file('missing.txt')` traces: open() raises FileNotFoundError -> except FileNotFoundError catches -> else is skipped -> finally runs -> returns None.
+
+### One sentence connecting to previous unit
+When built-in errors aren't descriptive enough, we can define our own custom exception types to convey specific business logic failures.
 
 ## Concept Unit: Custom exception classes
 
 ### The Problem
-
-Built-in exceptions like `ValueError` and `TypeError` cover the basics, but sometimes your application has domain-specific errors. A banking application might need to signal an overdrawn account.
-
-If you just raise a generic `ValueError("Insufficient funds")`, the calling code has to inspect the string message to figure out what happened. How do you create a brand-new, strongly-typed exception that carries custom data, like the actual account balance?
+If a bank account attempts an invalid withdrawal, raising a standard `ValueError` conveys that something was wrong, but how do we bundle the context (balance vs amount) into the error itself?
 
 ### Introduce the concept in isolation
-
-We can define a new class that inherits from `Exception`.
-
 ```python
-# Predicted output without execution:
 class MyError(Exception):
     pass
 
-# raise MyError("Something custom broke")
-# Output: MyError: Something custom broke
+try:
+    raise MyError()
+except MyError:
+    print('Caught custom error!')
 ```
+This is called a **Custom exception class**. Output: `Caught custom error!`. This PROVES that we can define our own exceptions by subclassing `Exception` and use them in try/except flows exactly like built-in ones.
 
-This proves that custom exceptions are just standard Python classes that inherit from the built-in `Exception` base class.
-
-### Discard the throwaway example
-
-The empty exception class is discarded.
+### Discard the throwaway
+The throwaway example above is discarded and will not appear in the project.
 
 ### Project Change
-
-No reference counterpart — this is a from-scratch addition because we are defining domain-specific logic.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** Below `read_file`.
-- **Dependencies:** None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are illustrating custom exceptions.
+- **Files affected**: `bank.py` (created)
+- **Change type**: add
+- **Location**: Top of file
+- **Dependencies**: None
 
 ### The New Code
-
 ```python
 class InsufficientFundsError(Exception):
-    def __init__(self, amount, balance):
-        self.amount = amount
+    def __init__(self, balance, amount):
         self.balance = balance
-        super().__init__(
-            f'Cannot withdraw {amount}: balance is only {balance}'
-        )
+        self.amount = amount
+        super().__init__(f'Cannot withdraw {amount}: balance is {balance}')
 
-def withdraw(balance, amount):
-    if amount > balance:
-        raise InsufficientFundsError(amount, balance)
-    return balance - amount
+class BankAccount:
+    def __init__(self, balance):
+        self.balance = balance
+
+    def withdraw(self, amount):
+        if amount > self.balance:
+            raise InsufficientFundsError(self.balance, amount)
+        self.balance -= amount
+        return self.balance
 ```
 
 ### The Updated Project
-
 ```python
-# errors.py
-class InsufficientFundsError(Exception):
-    def __init__(self, amount, balance):
-        self.amount = amount
-        self.balance = balance
-        super().__init__(
-            f'Cannot withdraw {amount}: balance is only {balance}'
-        )
-
-def withdraw(balance, amount):
-    if amount > balance:
-        raise InsufficientFundsError(amount, balance)
-    return balance - amount
-
-# ← new tests
-try:
-    withdraw(100, 150)
-except InsufficientFundsError as e:
-    print(e)            # Cannot withdraw 150: balance is only 100
-    print(e.amount)     # 150
-    print(e.balance)    # 100
+1: class InsufficientFundsError(Exception): # ← new
+2:     def __init__(self, balance, amount): # ← new
+3:         self.balance = balance # ← new
+4:         self.amount = amount # ← new
+5:         super().__init__(f'Cannot withdraw {amount}: balance is {balance}') # ← new
+6: 
+7: class BankAccount: # ← new
+8:     def __init__(self, balance): # ← new
+9:         self.balance = balance # ← new
+10: 
+11:     def withdraw(self, amount): # ← new
+12:         if amount > self.balance: # ← new
+13:             raise InsufficientFundsError(self.balance, amount) # ← new
+14:         self.balance -= amount # ← new
+15:         return self.balance # ← new
 ```
-
-This creates a custom exception class specifically for banking logic, carrying detailed properties about the failed transaction.
+This creates a robust data model where specific domain errors are treated as their own identifiable class types.
 
 ### Mechanical walkthrough
+- `class InsufficientFundsError(Exception):` creates a custom error inheriting from the base `Exception`.
+- `def __init__(self, balance, amount):` allows the exception to accept specific context.
+- `self.balance = balance` and `self.amount = amount` save context as properties on the exception object.
+- `super().__init__(...)` delegates to the parent `Exception` class to set the main string message.
+- `class BankAccount:` sets up the consumer of the error.
+- `if amount > self.balance:` checks the business logic rule.
+- `raise InsufficientFundsError(self.balance, amount)` instantiates the custom error and raises it immediately, halting normal execution.
 
-- **`class InsufficientFundsError(Exception):`** defines a new class that inherits directly from **`Exception`**. This makes it a legal exception object that can be raised and caught.
-- **`def __init__(self, amount, balance):`** overrides the constructor to accept specific context about the error.
-- **`self.amount = amount`** saves the requested amount to an instance variable.
-- **`super().__init__(...)`** calls the parent `Exception` class constructor, passing it the formatted, human-readable error string. This ensures `print(e)` works perfectly.
-- **`raise InsufficientFundsError(amount, balance)`** throws the new custom exception object, passing the required data.
-- **`except InsufficientFundsError as e:`** catches only this specific banking error. It ignores other exceptions like `TypeError`. Callers can cleanly catch the specific type, which is the standard pattern used by all major Python libraries.
+### CS lens
+**Domain-Driven Exceptions**. By subclassing `Exception`, you create errors that speak the language of the business domain ("Insufficient Funds") rather than the language of the runtime ("Value Error").
 
----
+### SE lens
+**Exception Payloads**. Storing attributes like `.balance` and `.amount` directly on the exception instance allows the calling `except` block to programmatically react to the error (e.g., dynamically prompting the user for a top-up) without parsing string messages.
 
-## Concept Unit: Exception hierarchy and the danger of bare `except`
+### Commands needed
+`None for this unit.`
 
-### The Problem
+### Run it
+Predicted confidently:
+`acc = BankAccount(100)`
+`try: acc.withdraw(150)`
+`except InsufficientFundsError as e:` -> catches error, `e.balance` is `100`, `e.amount` is `150`.
 
-When writing a quick script, it is tempting to catch absolutely every error to prevent crashes by just writing `except:`.
+### One sentence connecting to previous unit
+With all the exception tools at our disposal, we can now trace exactly how Python resolves errors at runtime.
 
-If you write a blanket `except:` clause, you don't just catch math and file errors — you also catch the system signal that tries to shut down the program when the user presses `Ctrl+C`. How do exceptions relate to one another, and why is catching *everything* dangerous?
+## Closing
 
-### Introduce the concept in isolation
-
-We can look at the inheritance tree of built-in exceptions to see how they group together.
-
-```python
-# The hierarchy (partial):
-# BaseException
-#   Exception
-#     ValueError
-#     TypeError
-#     KeyError
-#     IndexError
-#     OSError
-#       FileNotFoundError
-#   KeyboardInterrupt
-#   SystemExit
-```
-
-This tree proves that `Exception` is not the absolute top. `BaseException` is the root, and critical system events like `KeyboardInterrupt` subclass `BaseException` directly, bypassing `Exception`.
-
-### Discard the throwaway example
-
-The text-based hierarchy tree is discarded.
-
-### Project Change
-
-No reference counterpart — this is a from-scratch addition showing what NOT to do.
-
-- **Files affected:** `errors.py` (modified)
-- **Change type:** Add
-- **Location:** At the bottom of the file.
-- **Dependencies:** None.
-
-### The New Code
-
-```python
-# BAD: bare except catches everything including KeyboardInterrupt!
-try:
-    risky_code()
-except:           # AVOID
-    pass          # swallows ALL errors silently
-
-# BETTER: catch only what you expect
-try:
-    risky_code()
-except (ValueError, KeyError) as e:
-    handle(e)
-```
-
-### The Updated Project
-
-```python
-# errors.py
-# (At the bottom of the file)
-
-# BAD: bare except catches everything including KeyboardInterrupt!
-# try:
-#     risky_code()
-# except:           # AVOID
-#     pass          # swallows ALL errors silently
-
-# BETTER: catch only what you expect
-# try:
-#     risky_code()
-# except (ValueError, KeyError) as e:
-#     handle(e)
-```
-
-This documents the best practice for targeting exception types.
-
-### Mechanical walkthrough
-
-- **`except:`** without any named type is called a "bare except." It acts as a catch-all for absolutely every object that inherits from **`BaseException`**. This catches your `ValueError`, but it also catches **`KeyboardInterrupt`** (Ctrl+C) and `SystemExit`, making your program incredibly difficult to interrupt or shut down cleanly. It also hides typos and syntax errors.
-- **`except Exception:`** catches all standard errors (like `TypeError` and `KeyError`) but correctly ignores `KeyboardInterrupt` because it only catches objects that subclass **`Exception`**. This is safer, but still generally discouraged because it can hide unexpected bugs.
-- **`except (ValueError, KeyError) as e:`** is the correct, safe pattern. Always specify the exact exception types you expect and are prepared to handle. If an error occurs that you didn't anticipate, the program *should* crash so you can fix the underlying bug.
-
----
-
-## Next Steps
-
-Exceptions are the standard error-handling mechanism in Python, allowing you to intercept predictable failures and define safe fallbacks. Lesson 16 covers testing — how to verify that your code handles both the happy path and these exact error cases correctly.
-
-### Exercises
-1. Write a `safe_sqrt(x)` function that returns the square root of a number, but explicitly raises a `ValueError` for negative input before doing any math.
-2. Write a function that reads a configuration file using the `json` module. Wrap the operation to handle both `FileNotFoundError` if the file doesn't exist, and `json.JSONDecodeError` if the file contains invalid JSON data.
-3. Implement a basic `Stack` class with `push()`, `pop()`, and `peek()` methods. Make sure that calling `pop()` or `peek()` on an empty stack raises a standard `IndexError`.
+### Connect the pieces
+When tracking how exceptions bubble up and are resolved, let's trace `safe_divide(10, 0)` from the start of the lesson through its entire lifecycle:
+- Python enters the `try` block and attempts the expression `10 / 0`.
+- The division operation immediately fails; Python intercepts the fault and instantiates a `ZeroDivisionError` object.
+- Normal line-by-line execution halts instantly; the remainder of the `try` block is abandoned.
+- Python looks for a matching `except` clause. It finds `except ZeroDivisionError`.
+- Execution jumps into this block. If we had a `finally` block here, Python would execute it immediately after the `except` block concluded.
+- The `except` block returns `None`, safely bypassing the error and returning control to the original caller without crashing the program.

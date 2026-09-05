@@ -1,856 +1,580 @@
 # Lesson 41: Statistical Thinking — Distributions, CLT, and Hypothesis Testing
 
-What you will build
-The reader will understand the normal distribution, plot histograms (using `matplotlib.pyplot`), verify the Central Limit Theorem experimentally, and perform a basic one-sample t-test and interpret the p-value. The transferable problems: (1) the normal distribution is not just a mathematical object — it emerges inevitably from summing many small random effects (CLT); (2) a histogram reveals the SHAPE of a distribution; knowing the shape determines which statistical tests apply; (3) a p-value is the probability of observing the data IF the null hypothesis were true — small p-value means the data is hard to explain by chance alone.
+What you will build: The reader understands descriptive statistics (mean, variance, std), the normal distribution, the Central Limit Theorem (CLT), and basic hypothesis testing (p-value, null hypothesis). ALL implemented from scratch in Python with no statistics library. The transferable insight: the CLT says that the MEAN of many independent samples from ANY distribution converges to a normal distribution. This is why normal distributions appear everywhere in nature and data science.
 
-What you need to know first
-- Lesson 40
+What you need to know first: Lessons 00-40.
 
-Terms used in this lesson
-- **Normal distribution** — A probability distribution that is symmetric about the mean, showing that data near the mean are more frequent in occurrence than data far from the mean. It solves the problem of modeling continuous random variables that cluster around a central value.
-- **Mean (μ)** — The central value of a discrete set of numbers, which represents the average. It exists to give a single summary measure of the center of a distribution.
-- **Standard deviation (σ)** — A measure of the amount of variation or dispersion of a set of values. It exists to quantify how spread out the numbers are from the mean.
-- **Probability Density Function (PDF)** — A function whose value at any given sample in the sample space can be interpreted as providing a relative likelihood that the value of the random variable would equal that sample. It exists to describe the continuous probability distribution.
-- **Cumulative Distribution Function (CDF)** — The probability that a real-valued random variable X will take a value less than or equal to x. It exists to calculate cumulative probabilities.
-- **Histogram** — An approximate representation of the distribution of numerical data. It solves the problem of visually estimating the probability distribution of a continuous variable.
-- **Central Limit Theorem (CLT)** — A statistical theory stating that given a sufficiently large sample size from a population with a finite level of variance, the mean of all samples from the same population will be approximately equal to the mean of the population. It exists to allow normal probability calculations for sample means even when the underlying distribution is not normal.
-- **Null hypothesis (H0)** — A general statement or default position that there is no relationship between two measured phenomena, or no association among groups. It exists as a baseline assumption to be tested against.
-- **p-value** — The probability of obtaining test results at least as extreme as the results actually observed, under the assumption that the null hypothesis is correct. It exists to measure the strength of evidence against the null hypothesis.
-- **Type I error** — The rejection of a true null hypothesis (also known as a "false positive" finding or conclusion). It exists as the risk we take when setting a significance level.
-- **Type II error** — The non-rejection of a false null hypothesis (also known as a "false negative" finding or conclusion). It exists as the risk of missing a true effect.
-- **Significance level (alpha)** — The probability of rejecting the null hypothesis when it is true. It exists to set a threshold for statistical significance.
-- **Confidence interval** — A range of values that's likely to include a population value with a certain degree of confidence. It exists to provide a range of plausible values for an unknown parameter.
-- **Effect size** — A quantitative measure of the magnitude of the experimental effect. It exists to determine the practical significance of a finding.
-- **Statistical significance** — A determination that a relationship between two or more variables is caused by something other than chance. It exists to provide a mathematical basis for evaluating experimental results.
-- **Practical significance** — The real-world importance of an effect. It exists to distinguish mathematically significant but trivially small effects from meaningfully large ones.
+**Terms used in this lesson**
+**Mean** — The arithmetic average of a dataset, representing the central value. Exists to summarize data with a single typical value.
+**Variance** — A measure of dispersion showing how far data points spread from the mean. Exists to quantify variability.
+**Standard Deviation** — The square root of variance, bringing the measure of dispersion back to the original units of the data. Exists to make variability interpretable.
+**Normal Distribution** — A continuous probability distribution forming a symmetric bell curve. Exists because natural variations often cluster symmetrically around a mean.
+**Central Limit Theorem (CLT)** — The mathematical property that the distribution of sample means approximates a normal distribution as sample size gets larger, regardless of the population's distribution. Exists to allow statistical inference even on unknown distributions.
+**Confidence Interval** — A range of values derived from sample statistics that is likely to contain the true population parameter. Exists to quantify the uncertainty of an estimate.
+**Hypothesis Testing** — A formal procedure for evaluating evidence against a default claim (the null hypothesis). Exists to provide a rigorous framework for decision making under uncertainty.
+**p-value** — The probability of obtaining test results at least as extreme as the observed results, assuming the null hypothesis is true. Exists to measure the strength of evidence against the default claim.
 
-Objects and methods used
+**Objects and methods used**
+**`sum`**
+- *What it is:* A built-in Python function that adds items in an iterable.
+- *Implementation:* `sum(iterable, /, start=0)`
+- *Its use:* Used to calculate totals for mean and variance calculations.
+- *Type:* Built-in function.
+- *Responsibility:* Computes the arithmetic sum of numeric elements.
+- *Depends on:* An iterable containing numeric types.
+- *Connects to:* Called by our statistical functions; calls the `__add__` method of the underlying objects.
+- *Shape:* A fundamental built-in utility.
 
-**`math.exp`**
-- *What it is:* A mathematical function that returns Euler's number `e` raised to the power of a given number.
-- *Implementation:* `def exp(x: float) -> float`
-- *Its use:* To calculate the exponential part of the normal PDF.
-- *Type:* Standard library function.
-- *Responsibility:* Computes the exponential function for floating-point inputs.
-- *Depends on:* A numeric input value.
-- *Connects to:* Mathematical calculations requiring exponentiation of `e`.
-- *Shape:* A low-level math utility.
+**`len`**
+- *What it is:* A built-in Python function that returns the number of items.
+- *Implementation:* `len(obj, /)`
+- *Its use:* Used to determine the sample size `n` for averages.
+- *Type:* Built-in function.
+- *Responsibility:* Reports the size of a collection.
+- *Depends on:* An object implementing `__len__`.
+- *Connects to:* Called by our code to divide sums.
+- *Shape:* A fundamental built-in utility.
 
 **`math.sqrt`**
-- *What it is:* A mathematical function that returns the square root of a number.
-- *Implementation:* `def sqrt(x: float) -> float`
-- *Its use:* To calculate standard deviations and components of the normal PDF.
-- *Type:* Standard library function.
-- *Responsibility:* Computes the square root of non-negative numeric inputs.
-- *Depends on:* A non-negative numeric input value.
-- *Connects to:* Mathematical calculations requiring square roots.
-- *Shape:* A low-level math utility.
+- *What it is:* A mathematical function to compute the square root.
+- *Implementation:* `math.sqrt(x, /)`
+- *Its use:* Used to convert variance back to standard deviation.
+- *Type:* Module function.
+- *Responsibility:* Calculates the principal square root of a number.
+- *Depends on:* A non-negative numeric argument.
+- *Connects to:* Provided by the `math` module.
+- *Shape:* Standard library mathematics utility.
 
-**`scipy.stats.norm.cdf`**
-- *What it is:* The Cumulative Distribution Function for the normal distribution.
-- *Implementation:* `def cdf(x, loc=0, scale=1)`
-- *Its use:* To find the probability of a value falling below a certain point in a normal distribution.
-- *Type:* Method on a continuous random variable object.
-- *Responsibility:* Evaluates the normal CDF at given points.
-- *Depends on:* An input value, mean (`loc`), and standard deviation (`scale`).
-- *Connects to:* Statistical queries about probability thresholds.
-- *Shape:* Part of the scipy stats module's distribution API.
+**`random.random`**
+- *What it is:* A random number generator returning a float in `[0.0, 1.0)`.
+- *Implementation:* `random.random()`
+- *Its use:* Provides uniform random variables for the Box-Muller transform.
+- *Type:* Module function.
+- *Responsibility:* Generates uniform pseudo-random numbers.
+- *Depends on:* The internal state of the random number generator.
+- *Connects to:* Provided by the `random` module.
+- *Shape:* Standard library random utility.
 
-**`matplotlib.pyplot.subplots`**
-- *What it is:* A utility function that creates a figure and a set of subplots.
-- *Implementation:* `def subplots(nrows=1, ncols=1, *, figsize=None, ...)`
-- *Its use:* To set up the canvas and axes for plotting our histogram.
-- *Type:* Library function.
-- *Responsibility:* Initializes a matplotlib Figure and one or more Axes objects.
-- *Depends on:* Optional parameters defining grid size and figure dimensions.
-- *Connects to:* Matplotlib's state-based and object-oriented plotting interfaces.
-- *Shape:* The primary entry point for creating complex plots.
-
-**`matplotlib.axes.Axes.hist`**
-- *What it is:* An axes method used to plot a histogram.
-- *Implementation:* `def hist(x, bins=None, density=False, ...)`
-- *Its use:* To visually represent the distribution of our simulated data.
-- *Type:* Instance method on Matplotlib Axes.
-- *Responsibility:* Computes and draws the histogram of x.
-- *Depends on:* A sequence of data `x` and configuration parameters like `bins`.
-- *Connects to:* The Axes object it is called on, drawing patches on it.
-- *Shape:* A core plotting command for 1D distributions.
-
-**`matplotlib.axes.Axes.plot`**
-- *What it is:* An axes method used to plot lines and/or markers to the Axes.
-- *Implementation:* `def plot(*args, scalex=True, scaley=True, data=None, **kwargs)`
-- *Its use:* To overlay the theoretical continuous normal curve.
-- *Type:* Instance method on Matplotlib Axes.
-- *Responsibility:* Draws lines connecting given points.
-- *Depends on:* x and y coordinates.
-- *Connects to:* The Axes object, adding Line2D objects to it.
-- *Shape:* A core plotting command for 2D line plots.
-
-**`numpy.linspace`**
-- *What it is:* A function that returns evenly spaced numbers over a specified interval.
-- *Implementation:* `def linspace(start, stop, num=50, ...)`
-- *Its use:* To generate the x-values for plotting the theoretical normal PDF.
-- *Type:* Library function.
-- *Responsibility:* Creates 1D arrays of linear sequences.
-- *Depends on:* Start, stop, and number of points.
-- *Connects to:* Plotting commands that need a continuous-looking domain.
-- *Shape:* An array creation routine.
-
-**`scipy.stats.norm.pdf`**
-- *What it is:* The Probability Density Function for the normal distribution.
-- *Implementation:* `def pdf(x, loc=0, scale=1)`
-- *Its use:* To calculate the y-values for the theoretical normal curve overlay.
-- *Type:* Method on a continuous random variable object.
-- *Responsibility:* Evaluates the normal PDF at given points.
-- *Depends on:* An input value, mean (`loc`), and standard deviation (`scale`).
-- *Connects to:* Plotting or likelihood calculations.
-- *Shape:* Part of the scipy stats module's distribution API.
-
-**`random.gauss`**
-- *What it is:* A function that generates random floating-point numbers with a Gaussian (normal) distribution.
-- *Implementation:* `def gauss(mu, sigma)`
-- *Its use:* To simulate data drawn from a normal distribution.
-- *Type:* Standard library function.
-- *Responsibility:* Produces normally distributed pseudo-random numbers.
-- *Depends on:* Mean (`mu`) and standard deviation (`sigma`).
-- *Connects to:* Simulations requiring normally distributed noise or populations.
-- *Shape:* A random number generator method.
+**`random.randint`**
+- *What it is:* A random integer generator returning an int in `[a, b]`.
+- *Implementation:* `random.randint(a, b)`
+- *Its use:* Used to simulate die rolls and coin flips.
+- *Type:* Module function.
+- *Responsibility:* Generates uniform pseudo-random integers in an inclusive range.
+- *Depends on:* Two integer endpoints.
+- *Connects to:* Provided by the `random` module.
+- *Shape:* Standard library random utility.
 
 **`random.seed`**
-- *What it is:* A function used to initialize the internal state of the random number generator.
-- *Implementation:* `def seed(a=None, version=2)`
-- *Its use:* To ensure our simulations produce reproducible, deterministic results.
-- *Type:* Standard library function.
-- *Responsibility:* Sets the starting state for pseudo-random generation.
-- *Depends on:* A hashable seed value.
-- *Connects to:* All subsequent calls to the `random` module.
-- *Shape:* Global configuration for the random module.
+- *What it is:* A function to initialize the random number generator state.
+- *Implementation:* `random.seed(a=None, version=2)`
+- *Its use:* Ensures reproducible randomized outputs in lessons.
+- *Type:* Module function.
+- *Responsibility:* Fixes the sequence of generated pseudo-random numbers.
+- *Depends on:* An optional hashable object (like an integer).
+- *Connects to:* Alters the global state of the `random` module.
+- *Shape:* Standard library configuration function.
 
-**`scipy.stats.ttest_1samp`**
-- *What it is:* A function that calculates the T-test for the mean of ONE group of scores.
-- *Implementation:* `def ttest_1samp(a, popmean, ...)`
-- *Its use:* To perform a hypothesis test checking if the sample mean significantly differs from a claimed population mean.
-- *Type:* Library function.
-- *Responsibility:* Computes the t-statistic and p-value for a one-sample test.
-- *Depends on:* A sample of data `a` and the hypothesized population mean `popmean`.
-- *Connects to:* Hypothesis testing workflows.
-- *Shape:* A statistical testing utility.
+**`math.log`**, **`math.cos`**, **`math.sin`**, **`math.pi`**, **`math.exp`**, **`abs`**
+- *What it is:* Mathematical functions and constants for logarithms, trigonometry, exponentiation, and absolute values.
+- *Implementation:* Standard math signatures (e.g., `math.log(x)`).
+- *Its use:* Required for the Box-Muller transform and p-value approximation.
+- *Type:* Module functions and constants.
+- *Responsibility:* Provide accurate float mathematical operations.
+- *Depends on:* Numeric inputs.
+- *Connects to:* Provided by the `math` module and built-ins.
+- *Shape:* Standard library mathematics utilities.
 
-**`scipy.stats.sem`**
-- *What it is:* A function that calculates the standard error of the mean.
-- *Implementation:* `def sem(a, ...)`
-- *Its use:* To compute the standard error needed for constructing a confidence interval.
-- *Type:* Library function.
-- *Responsibility:* Computes the standard deviation of the sample mean estimate.
-- *Depends on:* A sample of data `a`.
-- *Connects to:* Confidence interval calculations.
-- *Shape:* A descriptive statistics utility.
+**`list.extend`**
+- *What it is:* A list method that appends items from an iterable.
+- *Implementation:* `list.extend(iterable)`
+- *Its use:* Appends the two generated normal variables to our sample list.
+- *Type:* Instance method of `list`.
+- *Responsibility:* Mutates a list by adding multiple elements to the end.
+- *Depends on:* An iterable of items to append.
+- *Connects to:* Called on the `samples` list instance.
+- *Shape:* Fundamental list operation.
 
-**`scipy.stats.t.interval`**
-- *What it is:* A method that computes the confidence interval for a t-distribution.
-- *Implementation:* `def interval(confidence, df, loc=0, scale=1)`
-- *Its use:* To construct a 95% confidence interval around our sample mean.
-- *Type:* Method on a continuous random variable object.
-- *Responsibility:* Returns the endpoints of the interval containing the specified probability mass.
-- *Depends on:* Confidence level, degrees of freedom (`df`), mean (`loc`), and standard error (`scale`).
-- *Connects to:* Interval estimation workflows.
-- *Shape:* Part of the scipy stats module's distribution API.
-
-**`scipy.stats.ttest_ind`**
-- *What it is:* A function that calculates the T-test for the means of two independent samples of scores.
-- *Implementation:* `def ttest_ind(a, b, ...)`
-- *Its use:* To perform an A/B test checking if two samples differ significantly.
-- *Type:* Library function.
-- *Responsibility:* Computes the t-statistic and p-value for a two-sample test.
-- *Depends on:* Two samples of data, `a` and `b`.
-- *Connects to:* A/B testing and comparative workflows.
-- *Shape:* A statistical testing utility.
-
-
-## Concept Unit: The normal distribution — mean and standard deviation
+## Concept Unit: Mean, variance, and standard deviation from scratch
 
 ### The Problem
-
-We need a way to mathematically model real-world phenomena where values tend to cluster around a central average, with extreme values becoming increasingly rare. How can we write a function that describes this specific "bell-shaped" clustering behavior precisely?
+How do we summarize a collection of numbers into meaningful metrics? If we have a list of test scores or sensor readings, looking at raw data is overwhelming. How would you describe the "center" of the data? How would you describe how "spread out" the data is?
 
 ### Introduce the concept in isolation
-
-We can define the Probability Density Function (PDF) of the normal distribution directly in Python to see how it assigns likelihoods to different values.
-
+We will calculate the mean, variance, and standard deviation using basic arithmetic.
 ```python
 import math
 
-def normal_pdf(x, mu=0, sigma=1):
-    '''Probability density function of N(mu, sigma^2).'''
-    coeff = 1 / (sigma * math.sqrt(2 * math.pi))
-    exponent = -0.5 * ((x - mu) / sigma) ** 2
-    return coeff * math.exp(exponent)
+def mean(data):
+    return sum(data) / len(data)
 
-# Key values for N(0, 1):
-for x in [-3, -2, -1, 0, 1, 2, 3]:
-    print(f'pdf({x:+d}) = {normal_pdf(x):.6f}')
+def variance(data):
+    m = mean(data)
+    return sum((x - m)**2 for x in data) / len(data)  # population variance
+
+def std_dev(data):
+    return math.sqrt(variance(data))
+
+data = [2, 4, 4, 4, 5, 5, 7, 9]
+print(f'Mean:     {mean(data):.4f}')     
+print(f'Variance: {variance(data):.4f}') 
+print(f'Std dev:  {std_dev(data):.4f}')  
 ```
-
-Output:
+Predicted confidently:
 ```
-pdf(-3) = 0.004432
-pdf(-2) = 0.053991
-pdf(-1) = 0.241971
-pdf(+0) = 0.398942
-pdf(+1) = 0.241971
-pdf(+2) = 0.053991
-pdf(+3) = 0.004432
+Mean:     5.0000
+Variance: 4.0000
+Std dev:  2.0000
 ```
+This proves that we can manually compute the **Mean**, **Variance**, and **Standard Deviation** without any external statistical libraries.
 
-This output proves that the **normal distribution** is symmetric about its mean (0), peaking at the mean (0.398942) and dropping off rapidly and symmetrically as we move away in either direction.
-
-### Discard the throwaway example
-
-The manual `normal_pdf` function is discarded. We will use `scipy.stats` for real calculations moving forward.
+### Discard the throwaway
+This exact code is discarded; it will not appear in the project exactly as written.
 
 ### Project Change
-
-- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are starting our statistical analysis script.
-- **Files affected:** `stats_analysis.py` (created)
-- **Change type:** add
-- **Location:** At the top of the new file.
-- **Dependencies:** `scipy` must be installed.
-
-### The New Code
-
-```python
-from scipy import stats
-
-print(stats.norm.cdf(1.96))
-print(stats.norm.cdf(-1.96))
-print(stats.norm.cdf(1.96) - stats.norm.cdf(-1.96))
-```
-
-### The Updated Project
-
-```python
-# 1: from scipy import stats
-# 2: 
-# 3: print(stats.norm.cdf(1.96))
-# 4: print(stats.norm.cdf(-1.96))
-# 5: print(stats.norm.cdf(1.96) - stats.norm.cdf(-1.96))
-```
-
-This code uses the `scipy.stats` library to compute cumulative probabilities for the standard normal distribution, finding the proportion of values that fall within specific ranges.
-
-### Mechanical walkthrough
-
-- `from scipy import stats`: Imports the `stats` module from the `scipy` package, which contains statistical distributions and functions.
-- `stats.norm.cdf(1.96)`: Calls the `cdf` (Cumulative Distribution Function) method on the `norm` object (representing the normal distribution) with an input of 1.96. The **Cumulative Distribution Function (CDF)** calculates the probability that a random variable is less than or equal to the input value. By default, it uses a mean of 0 and standard deviation of 1.
-- `stats.norm.cdf(-1.96)`: Calls the same CDF method for -1.96.
-- `print(...)`: Outputs the result of the calculations.
-- `stats.norm.cdf(1.96) - stats.norm.cdf(-1.96)`: Subtracts the lower cumulative probability from the upper cumulative probability. This calculates the probability of a value falling exactly *between* -1.96 and +1.96 standard deviations from the mean.
-
-### Connect the Pieces
-
-The normal distribution is characterized by its mean (where it's centered) and standard deviation (how wide it is). While the PDF tells us the relative density at a specific point, practical statistics usually asks about ranges ("what is the chance it falls between X and Y?"). The CDF answers this directly. The result of the final subtraction is approximately 0.95 — revealing the famous statistical rule that roughly 95% of the data in a normal distribution falls within 1.96 standard deviations of the mean.
-
-
-## Concept Unit: Plotting a histogram with matplotlib
-
-### The Problem
-
-We have a mathematical model for a distribution, but in reality, we start with raw data. How can we visually inspect a dataset to see if it follows a bell curve shape, and how can we compare our raw data against the ideal mathematical model?
-
-### Introduce the concept in isolation
-
-We can generate random data and plot its shape using `matplotlib`.
-
-```python
-import matplotlib.pyplot as plt
-import random
-
-random.seed(42)
-data = [random.gauss(100, 15) for _ in range(1000)]
-
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.hist(data, bins=30, density=True, alpha=0.7, color='steelblue')
-plt.savefig('isolated_hist.png')
-plt.close()
-print("Isolated histogram plotted.")
-```
-
-Output:
-```
-Isolated histogram plotted.
-```
-
-This code generates normally distributed pseudo-random numbers and plots them as a **Histogram**. It proves that even random samples drawn from a theoretical distribution will roughly approximate the shape of that distribution when bucketed into bins.
-
-### Discard the throwaway example
-
-The isolated histogram script is discarded. We will build a more complete visualization directly into our project script.
-
-### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** `matplotlib` and `numpy` must be installed.
+No reference counterpart — this is a from-scratch addition because we are building our own stats module.
+Files affected: created `stats.py`
+Change type: add
+Location: brand new file
+Dependencies: `math` module
 
 ### The New Code
-
 ```python
-import matplotlib.pyplot as plt
-import random
-import numpy as np
-
-random.seed(42)
-data = [random.gauss(100, 15) for _ in range(1000)]
-
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.hist(data, bins=30, density=True, alpha=0.7, color='steelblue', label='Simulated data')
-
-xs = np.linspace(40, 160, 200)
-ax.plot(xs, stats.norm.pdf(xs, 100, 15), 'r-', linewidth=2, label='N(100, 15)')
-
-ax.set_xlabel('Value')
-ax.set_ylabel('Density')
-ax.set_title('Histogram vs Theoretical Normal Distribution')
-ax.legend()
-plt.tight_layout()
-plt.savefig('histogram.png')
-plt.close()
-print('Plot saved to histogram.png')
-```
-
-### The Updated Project
-
-```python
-# 1: from scipy import stats
-# 2: 
-# 3: print(stats.norm.cdf(1.96))
-# 4: print(stats.norm.cdf(-1.96))
-# 5: print(stats.norm.cdf(1.96) - stats.norm.cdf(-1.96))
-# 6: 
-# 7: import matplotlib.pyplot as plt
-# 8: import random
-# 9: import numpy as np
-# 10: 
-# 11: random.seed(42)
-# 12: data = [random.gauss(100, 15) for _ in range(1000)]
-# 13: 
-# 14: fig, ax = plt.subplots(figsize=(8, 5))
-# 15: ax.hist(data, bins=30, density=True, alpha=0.7, color='steelblue', label='Simulated data')
-# 16: 
-# 17: xs = np.linspace(40, 160, 200)
-# 18: ax.plot(xs, stats.norm.pdf(xs, 100, 15), 'r-', linewidth=2, label='N(100, 15)')
-# 19: 
-# 20: ax.set_xlabel('Value')
-# 21: ax.set_ylabel('Density')
-# 22: ax.set_title('Histogram vs Theoretical Normal Distribution')
-# 23: ax.legend()
-# 24: plt.tight_layout()
-# 25: plt.savefig('histogram.png')
-# 26: plt.close()
-# 27: print('Plot saved to histogram.png')
-```
-
-This updated script now generates simulated data, plots its distribution as a histogram, and overlays the theoretical normal curve perfectly on top of it, saving the result to an image file.
-
-### Mechanical walkthrough
-
-- `import matplotlib.pyplot as plt`: Imports the plotting module.
-- `import random`, `import numpy as np`: Imports required libraries.
-- `random.seed(42)`: Fixes the random number generator so the output is identical every time it runs.
-- `data = [random.gauss(100, 15) for _ in range(1000)]`: Uses a list comprehension to generate 1000 numbers from a normal distribution with mean 100 and standard deviation 15.
-- `fig, ax = plt.subplots(figsize=(8, 5))`: Creates a figure and an axes object, setting the figure size to 8x5 inches.
-- `ax.hist(data, bins=30, density=True, alpha=0.7, color='steelblue', label='Simulated data')`: Plots a **Histogram** of the `data`. `bins=30` splits the data into 30 contiguous intervals. `density=True` scales the y-axis so the total area of all bars equals 1 (matching a true probability density, rather than just raw counts). `alpha=0.7` makes the bars semi-transparent.
-- `xs = np.linspace(40, 160, 200)`: Creates an array of 200 evenly spaced numbers between 40 and 160 to serve as x-coordinates for the theoretical curve.
-- `ax.plot(xs, stats.norm.pdf(xs, 100, 15), 'r-', linewidth=2, label='N(100, 15)')`: Plots the theoretical normal **Probability Density Function (PDF)** over the same x-range, passing mean 100 and standard deviation 15, drawing it as a red solid line (`'r-'`).
-- `ax.set_xlabel(...)`, `ax.set_ylabel(...)`, `ax.set_title(...)`: Adds descriptive labels to the plot axes and a title.
-- `ax.legend()`: Displays the legend using the `label` arguments provided earlier.
-- `plt.tight_layout()`: Automatically adjusts subplot parameters so the plot fits nicely in the figure.
-- `plt.savefig('histogram.png')`: Renders and saves the plot to a file on disk.
-- `plt.close()`: Closes the figure, freeing up memory.
-
-### Connect the Pieces
-
-By setting `density=True` on the histogram, we changed its y-axis from absolute counts to probability density. This is crucial because it places the empirical data and the theoretical PDF (which always has an area of 1) on the exact same scale, allowing them to be overlaid. The histogram reveals the SHAPE of the distribution, which is the necessary first step before deciding which statistical tests are valid to apply to it.
-
-
-## Concept Unit: The Central Limit Theorem — empirical verification
-
-### The Problem
-
-Many real-world measurements are not intrinsically normal. If we roll dice or measure uniformly distributed noise, the distribution is flat, not bell-shaped. How is it that the normal distribution appears everywhere in statistics, even when the underlying events aren't normal?
-
-### Introduce the concept in isolation
-
-We will average samples drawn from a purely uniform distribution (where every number between 0 and 1 is equally likely, giving a flat shape) and see what happens to the shape of those averages as we average more and more numbers together.
-
-```python
-import random
-
-random.seed(42)
-def sample_mean(dist_fn, n):
-    return sum(dist_fn() for _ in range(n)) / n
-
-uniform = lambda: random.random()
-
-# Look at the mean of just 2 uniform numbers:
-means_n2 = [sample_mean(uniform, 2) for _ in range(5)]
-print([round(m, 3) for m in means_n2])
-
-# Look at the mean of 30 uniform numbers:
-means_n30 = [sample_mean(uniform, 30) for _ in range(5)]
-print([round(m, 3) for m in means_n30])
-```
-
-Output:
-```
-[0.323, 0.252, 0.706, 0.443, 0.225]
-[0.472, 0.493, 0.457, 0.505, 0.519]
-```
-
-This output proves that when $n$ is small, the averages are spread widely between 0 and 1. But when $n$ is 30, the averages cluster extremely tightly around 0.5. The **Central Limit Theorem (CLT)** states that as sample size increases, the distribution of the sample mean approaches a normal distribution, regardless of the original distribution's shape.
-
-### Discard the throwaway example
-
-The tiny numerical output script is discarded. We will build a visual proof into our project.
-
-### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** None additional.
-
-### The New Code
-
-```python
-def sample_mean(dist_fn, n):
-    return sum(dist_fn() for _ in range(n)) / n
-
-uniform = lambda: random.random()
-
-fig, axes = plt.subplots(1, 4, figsize=(16, 4))
-for ax, n in zip(axes, [1, 2, 10, 30]):
-    means = [sample_mean(uniform, n) for _ in range(5000)]
-    ax.hist(means, bins=30, density=True, color='steelblue')
-    ax.set_title(f'Sample means (n={n})')
-    ax.set_xlabel('Mean')
-
-plt.suptitle('Central Limit Theorem: Uniform Distribution')
-plt.tight_layout()
-plt.savefig('clt.png')
-plt.close()
-print('Plot saved to clt.png')
-
 import math
-for n in [1, 2, 10, 30]:
-    means = [sample_mean(uniform, n) for _ in range(5000)]
-    mu = sum(means)/len(means)
-    std = math.sqrt(sum((x-mu)**2 for x in means)/len(means))
-    print(f'n={n:>2}: mean={mu:.4f}, std={std:.4f}, theory_std={1/(math.sqrt(12)*math.sqrt(n)):.4f}')
+
+def mean(data):
+    return sum(data) / len(data)
+
+def variance(data):
+    m = mean(data)
+    return sum((x - m)**2 for x in data) / len(data)
+
+def std_dev(data):
+    return math.sqrt(variance(data))
 ```
 
 ### The Updated Project
-
-*(The previous histogram plotting code remains, and the new CLT code is appended below it.)*
 ```python
-# ... (lines 1-27 unchanged)
-# 28: def sample_mean(dist_fn, n):
-# 29:     return sum(dist_fn() for _ in range(n)) / n
-# 30: 
-# 31: uniform = lambda: random.random()
-# 32: 
-# 33: fig, axes = plt.subplots(1, 4, figsize=(16, 4))
-# 34: for ax, n in zip(axes, [1, 2, 10, 30]):
-# 35:     means = [sample_mean(uniform, n) for _ in range(5000)]
-# 36:     ax.hist(means, bins=30, density=True, color='steelblue')
-# 37:     ax.set_title(f'Sample means (n={n})')
-# 38:     ax.set_xlabel('Mean')
-# 39: 
-# 40: plt.suptitle('Central Limit Theorem: Uniform Distribution')
-# 41: plt.tight_layout()
-# 42: plt.savefig('clt.png')
-# 43: plt.close()
-# 44: print('Plot saved to clt.png')
-# 45: 
-# 46: import math
-# 47: for n in [1, 2, 10, 30]:
-# 48:     means = [sample_mean(uniform, n) for _ in range(5000)]
-# 49:     mu = sum(means)/len(means)
-# 50:     std = math.sqrt(sum((x-mu)**2 for x in means)/len(means))
-# 51:     print(f'n={n:>2}: mean={mu:.4f}, std={std:.4f}, theory_std={1/(math.sqrt(12)*math.sqrt(n)):.4f}')
+1: import math
+2: 
+3: def mean(data):
+4:     return sum(data) / len(data)
+5: 
+6: def variance(data):
+7:     m = mean(data)
+8:     return sum((x - m)**2 for x in data) / len(data)
+9: 
+10: def std_dev(data):
+11:     return math.sqrt(variance(data))
 ```
-
-This updated script simulates taking samples of varying sizes from a uniform distribution, calculates the mean of each sample, and plots the distributions of those means to visually prove they become normal. It then prints the empirical standard deviation alongside the theoretical prediction.
+The file now contains three core statistical functions to summarize lists of numerical data.
 
 ### Mechanical walkthrough
+- `import math`: Brings in the `math` module for the square root function.
+- `def mean(data):`: Defines a function taking a sequence of numbers.
+- `return sum(data) / len(data)`: Computes the arithmetic average by summing elements and dividing by the count.
+- `def variance(data):`: Defines a function for dispersion.
+- `m = mean(data)`: Calculates the mean first.
+- `(x - m)**2 for x in data`: A generator expression iterating through `data`, subtracting the mean from each element, and squaring the result.
+- `sum(...)`: Adds up all the squared differences.
+- `/ len(data)`: Divides by the total count to find the average squared difference (population variance).
+- `def std_dev(data):`: Defines a function for standard deviation.
+- `return math.sqrt(variance(data))`: Takes the square root of the variance to return to the original units.
 
-- `def sample_mean(dist_fn, n)`: Defines a helper function that takes a function `dist_fn` (which generates a single random number) and an integer `n`.
-- `sum(dist_fn() for _ in range(n)) / n`: Calls the generator function `n` times, sums the results, and divides by `n` to compute the average (mean) of the sample.
-- `uniform = lambda: random.random()`: Creates a simple lambda function that returns a uniform float between 0.0 and 1.0.
-- `fig, axes = plt.subplots(1, 4, figsize=(16, 4))`: Creates a figure with 1 row and 4 columns of subplots, returning the figure and an array of 4 Axes objects.
-- `for ax, n in zip(axes, [1, 2, 10, 30])`: Loops through the 4 subplots simultaneously with the sample sizes 1, 2, 10, and 30.
-- `means = [sample_mean(uniform, n) for _ in range(5000)]`: For each sample size `n`, it draws 5000 separate samples of size `n` and calculates their means.
-- `ax.hist(means, ...)`: Plots the histogram of these 5000 means on the current subplot.
-- `plt.suptitle(...)`, `plt.tight_layout()`, `plt.savefig(...)`: Adds a main title over the subplots, formats, and saves the image.
-- `for n in [1, 2, 10, 30]:`: Starts a second loop to calculate numerical statistics.
-- `mu = sum(means)/len(means)`: Calculates the empirical **Mean (μ)** of the 5000 sample means.
-- `std = math.sqrt(sum((x-mu)**2 for x in means)/len(means))`: Calculates the empirical **Standard deviation (σ)** of the 5000 sample means.
-- `print(...)`: Prints the results, including `theory_std`, which uses the known variance of a uniform distribution ($1/12$) scaled by $1/n$ per the CLT.
+### CS lens
+**Descriptive Statistics**. Summarizing large datasets into key metrics is foundational in data processing. This pattern appears in database query aggregation (e.g., SQL `AVG()`), monitoring dashboards reducing time-series metrics into summaries, and machine learning normalization steps.
 
-### Connect the Pieces
+### SE lens
+**Composability**. Each function relies on the previous one (`std_dev` calls `variance` which calls `mean`). The alternative is duplicating the mean calculation logic inside `variance` and `std_dev`. The chosen trade-off makes the code DRY (Don't Repeat Yourself) at the cost of a slight performance hit from iterating multiple times.
 
-When $n=1$, the histogram is flat — it just mirrors the uniform distribution. But as $n$ increases to 30, the histogram transforms into a perfect bell curve. This is the **Central Limit Theorem** in action: the distribution of the *sample mean* approaches a normal distribution as the sample size grows, regardless of the underlying data's shape. Furthermore, the spread of this normal distribution shrinks exactly according to the theoretical standard error ($\sigma/\sqrt{n}$). Because of the CLT, we can use normal distribution math to make inferences about averages in the real world, even when the underlying data is heavily skewed or flat.
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: X (no output, just definitions).
 
-## Concept Unit: The one-sample t-test
+### One sentence connecting to previous unit
+With the ability to summarize arbitrary data, we can now explore the most famous mathematical distribution in nature.
+
+## Concept Unit: Normal distribution and the empirical rule
 
 ### The Problem
-
-A manufacturer claims their computer chips run at 2.0 GHz. We test 30 chips and get an average speed of 1.95 GHz. Is this just normal random variance in manufacturing, or is the true average actually lower than 2.0? How do we formalize this question mathematically?
+How do we generate normally distributed (bell curve) random numbers if we only have a uniform random number generator? What mathematical property defines the spread of a normal distribution?
 
 ### Introduce the concept in isolation
-
-We can use `scipy.stats.ttest_1samp` to calculate the probability of seeing our data if the manufacturer's claim were perfectly true.
-
+We will use the Box-Muller transform to turn uniform random numbers into normally distributed numbers.
 ```python
-from scipy import stats
 import random
+import math
 
-random.seed(42)
-chip_speeds = [random.gauss(1.95, 0.1) for _ in range(30)]
+def sample_normal(mu, sigma, n, seed=None):
+    if seed is not None:
+        random.seed(seed)
+    samples = []
+    for _ in range(n // 2 + 1):
+        u1 = random.random()
+        u2 = random.random()
+        z0 = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+        z1 = math.sqrt(-2 * math.log(u1)) * math.sin(2 * math.pi * u2)
+        samples.extend([mu + sigma*z0, mu + sigma*z1])
+    return samples[:n]
 
-t_stat, p_value = stats.ttest_1samp(chip_speeds, popmean=2.0)
-print(f"p-value: {p_value:.4f}")
+def empirical_rule_check(samples, mu, sigma):
+    n = len(samples)
+    within_1 = sum(1 for x in samples if mu-sigma <= x <= mu+sigma) / n
+    within_2 = sum(1 for x in samples if mu-2*sigma <= x <= mu+2*sigma) / n
+    within_3 = sum(1 for x in samples if mu-3*sigma <= x <= mu+3*sigma) / n
+    print(f'Within 1 std: {within_1:.3f} (theory: 0.683)')
+    print(f'Within 2 std: {within_2:.3f} (theory: 0.954)')
+    print(f'Within 3 std: {within_3:.3f} (theory: 0.997)')
+
+samples = sample_normal(mu=0, sigma=1, n=10000, seed=42)
+empirical_rule_check(samples, 0, 1)
 ```
+Predicted confidently: Output showing roughly 0.683, 0.954, and 0.997 of samples falling within 1, 2, and 3 standard deviations.
+This proves that the **Normal Distribution** adheres strictly to the 68-95-99.7 empirical rule, even when synthesized from uniform random values.
 
-Output:
-```
-p-value: 0.0125
-```
-
-This proves that under the **Null hypothesis (H0)** (that the true mean is exactly 2.0), the probability of randomly observing a sample mean of 1.95 or worse is only 1.25%. Because this **p-value** is very small, we conclude the manufacturer's claim is likely false. This test is a one-sample t-test.
-
-### Discard the throwaway example
-
-The isolated t-test is discarded; we will write out a complete, well-commented test in our analysis script.
+### Discard the throwaway
+This isolated throwaway code is discarded.
 
 ### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** None additional.
+No reference counterpart — this is a from-scratch addition because we are simulating datasets.
+Files affected: modified `stats.py`
+Change type: add
+Location: appending to the end of the file.
+Dependencies: `random` module
 
 ### The New Code
-
 ```python
-random.seed(42)
-chip_speeds = [random.gauss(1.95, 0.1) for _ in range(30)]
+import random
 
-sample_mean = sum(chip_speeds) / len(chip_speeds)
-print(f'\nSample mean: {sample_mean:.4f} GHz')
-
-t_stat, p_value = stats.ttest_1samp(chip_speeds, popmean=2.0)
-print(f't-statistic: {t_stat:.4f}')
-print(f'p-value:     {p_value:.4f}')
-print(f'Reject H0 at alpha=0.05: {p_value < 0.05}')
+def sample_normal(mu, sigma, n, seed=None):
+    if seed is not None:
+        random.seed(seed)
+    samples = []
+    for _ in range(n // 2 + 1):
+        u1 = random.random()
+        u2 = random.random()
+        z0 = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+        z1 = math.sqrt(-2 * math.log(u1)) * math.sin(2 * math.pi * u2)
+        samples.extend([mu + sigma*z0, mu + sigma*z1])
+    return samples[:n]
 ```
 
 ### The Updated Project
-
 ```python
-# ... (lines 1-51 unchanged)
-# 52: random.seed(42)
-# 53: chip_speeds = [random.gauss(1.95, 0.1) for _ in range(30)]
-# 54: 
-# 55: sample_mean = sum(chip_speeds) / len(chip_speeds)
-# 56: print(f'\nSample mean: {sample_mean:.4f} GHz')
-# 57: 
-# 58: t_stat, p_value = stats.ttest_1samp(chip_speeds, popmean=2.0)
-# 59: print(f't-statistic: {t_stat:.4f}')
-# 60: print(f'p-value:     {p_value:.4f}')
-# 61: print(f'Reject H0 at alpha=0.05: {p_value < 0.05}')
+11:     return math.sqrt(variance(data))
+12: 
+13: import random # ← new
+14: 
+15: def sample_normal(mu, sigma, n, seed=None): # ← new
+16:     if seed is not None: # ← new
+17:         random.seed(seed) # ← new
+18:     samples = [] # ← new
+19:     for _ in range(n // 2 + 1): # ← new
+20:         u1 = random.random() # ← new
+21:         u2 = random.random() # ← new
+22:         z0 = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2) # ← new
+23:         z1 = math.sqrt(-2 * math.log(u1)) * math.sin(2 * math.pi * u2) # ← new
+24:         samples.extend([mu + sigma*z0, mu + sigma*z1]) # ← new
+25:     return samples[:n] # ← new
 ```
-
-This updated script simulates measuring 30 computer chips, computes their average speed, runs a formal one-sample t-test against the claimed speed of 2.0, and decides whether to reject the claim based on a 0.05 significance threshold.
+The file now contains a generator for normally distributed data.
 
 ### Mechanical walkthrough
+- `import random`: Brings in the random module for uniform number generation.
+- `def sample_normal(mu, sigma, n, seed=None):`: Defines a function with parameters for mean `mu`, standard deviation `sigma`, size `n`, and an optional seed.
+- `if seed is not None: random.seed(seed)`: Conditionally initializes the RNG state for reproducibility.
+- `samples = []`: Initializes an empty list.
+- `for _ in range(n // 2 + 1):`: Loops to generate enough pairs (since Box-Muller yields two values at once).
+- `u1 = random.random(); u2 = random.random()`: Draws two independent uniform random floats in `[0.0, 1.0)`.
+- `z0 = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)`: Applies the Box-Muller formula to get the first standard normal variable.
+- `z1 = math.sqrt(-2 * math.log(u1)) * math.sin(2 * math.pi * u2)`: Applies the Box-Muller formula for the second standard normal variable.
+- `samples.extend([mu + sigma*z0, mu + sigma*z1])`: Scales the variables by `sigma`, shifts them by `mu`, and appends them to the list.
+- `return samples[:n]`: Slices the list to return exactly `n` elements.
 
-- `chip_speeds = [random.gauss(1.95, 0.1) for _ in range(30)]`: Generates 30 random chip speeds. We secretly build them with a true mean of 1.95, meaning the manufacturer's claim of 2.0 is factually false in our simulation.
-- `sample_mean = sum(chip_speeds) / len(chip_speeds)`: Calculates the simple arithmetic **Mean (μ)** of our 30 samples.
-- `print(f'\nSample mean: {sample_mean:.4f} GHz')`: Outputs the sample mean.
-- `t_stat, p_value = stats.ttest_1samp(chip_speeds, popmean=2.0)`: Calls the `ttest_1samp` function. The first argument is the data; `popmean=2.0` defines the **Null hypothesis (H0)** — the assumption we are testing against. The function returns two values: a t-statistic (measuring how far the sample mean is from the population mean in units of standard error) and the **p-value**.
-- `print(f'Reject H0 at alpha=0.05: {p_value < 0.05}')`: Checks if the **p-value** is less than our chosen **Significance level (alpha)** of 0.05. If it is, we evaluate the expression as `True`, meaning we reject the null hypothesis.
+### CS lens
+**Transformation of Random Variables**. Converting uniformly distributed bytes or floats into other distributions is a core technique in computer simulation, physics modeling (Monte Carlo simulations), and cryptography (generating specific noise distributions).
 
-### Connect the Pieces
+### SE lens
+**Deterministic Randomness**. By accepting a `seed` argument, this function supports deterministic testability. The alternative is relying entirely on global RNG state, which leads to flaky, non-reproducible test failures. The tradeoff is explicitly threading seed arguments through APIs.
 
-The t-test crystallizes statistical thinking into a single decision rule. We start with a baseline assumption, the **Null hypothesis (H0)** (mean = 2.0). We collect data. The **p-value** asks: *if H0 were perfectly true, how likely is it that random chance would produce a sample mean as far off as ours?* Our p-value is roughly 0.0125. Since a 1.25% chance is very rare — rarer than our **Significance level (alpha)** of 5% (0.05) — we conclude that the discrepancy is not just random chance. We reject H0, providing statistical evidence that the chips are indeed slower than claimed.
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: X (no output, just definitions).
 
-## Concept Unit: Type I and Type II errors
+### One sentence connecting to previous unit
+Knowing what a normal distribution looks like, we can now see how it magically emerges from completely non-normal data.
+
+## Concept Unit: Central Limit Theorem in action
 
 ### The Problem
-
-If we reject the null hypothesis every time the p-value is less than 0.05, does that mean our conclusion is always right? What happens when we run this same test on chips that actually *do* meet the 2.0 GHz claim?
+If we roll a fair die, the results are uniformly distributed (1 through 6 are equally likely). What happens to the *average* of those rolls if we roll the die many times? Does the average stay uniform?
 
 ### Introduce the concept in isolation
-
-We can run the t-test 1000 times on simulated chips that genuinely have a true mean of 2.0, and count how many times the math wrongly tells us to reject the claim.
-
+We will simulate taking many samples of die rolls, and look at the distribution of the *means* of those samples.
 ```python
 import random
-from scipy import stats
+import math
 
-random.seed(42)
-alpha = 0.05
-type1_count = 0
+def sample_means(population_sampler, n_per_sample, n_samples, seed=None):
+    if seed is not None:
+        random.seed(seed)
+    return [sum(population_sampler() for _ in range(n_per_sample)) / n_per_sample
+            for _ in range(n_samples)]
 
-for _ in range(1000):
-    sample = [random.gauss(2.0, 0.1) for _ in range(30)]
-    _, p = stats.ttest_1samp(sample, 2.0)
-    if p < alpha:
-        type1_count += 1
+def die():
+    return random.randint(1, 6)
 
-print(f'Type I error rate: {type1_count/1000:.3f}')
+for n in [1, 5, 30, 100]:
+    means = sample_means(die, n, 10000, seed=0)
+    m = sum(means)/len(means)
+    s = math.sqrt(sum((x-m)**2 for x in means)/len(means))
+    print(f'n={n:3d}: mean={m:.3f}, std={s:.4f}, 1/sqrt(n)={1/math.sqrt(n):.4f}')
 ```
+Predicted confidently: As `n` increases, the standard deviation shrinks proportionally to `1/sqrt(n)`.
+This proves the **Central Limit Theorem (CLT)**: the distribution of sample means becomes normal, and its variance decreases as sample size increases, regardless of the underlying uniform die distribution.
 
-Output:
-```
-Type I error rate: 0.046
-```
-
-This output proves that even when the **Null hypothesis (H0)** is perfectly true, random variation will still cause us to observe extreme data about 5% of the time, leading us to falsely reject H0. This false positive is a **Type I error**.
-
-### Discard the throwaway example
-
-The isolated simulation is discarded. We will include this simulation in our analysis script to explicitly demonstrate error rates.
+### Discard the throwaway
+This throwaway code is discarded.
 
 ### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** None additional.
+No reference counterpart.
+Files affected: modified `stats.py`
+Change type: add
+Location: appending to the end of the file.
+Dependencies: existing `mean`, `variance`, `std_dev`
 
 ### The New Code
-
 ```python
-alpha = 0.05
-type1_count = 0
-
-for _ in range(1000):
-    sample = [random.gauss(2.0, 0.1) for _ in range(30)]
-    _, p = stats.ttest_1samp(sample, 2.0)
-    if p < alpha:
-        type1_count += 1
-
-print(f'\nType I error rate (simulated): {type1_count/1000:.3f}')
+def sample_means(population_sampler, n_per_sample, n_samples, seed=None):
+    if seed is not None:
+        random.seed(seed)
+    return [sum(population_sampler() for _ in range(n_per_sample)) / n_per_sample
+            for _ in range(n_samples)]
 ```
 
 ### The Updated Project
-
 ```python
-# ... (lines 1-61 unchanged)
-# 62: alpha = 0.05
-# 63: type1_count = 0
-# 64: 
-# 65: for _ in range(1000):
-# 66:     sample = [random.gauss(2.0, 0.1) for _ in range(30)]
-# 67:     _, p = stats.ttest_1samp(sample, 2.0)
-# 68:     if p < alpha:
-# 69:         type1_count += 1
-# 70: 
-# 71: print(f'\nType I error rate (simulated): {type1_count/1000:.3f}')
+24:         samples.extend([mu + sigma*z0, mu + sigma*z1])
+25:     return samples[:n]
+26: 
+27: def sample_means(population_sampler, n_per_sample, n_samples, seed=None): # ← new
+28:     if seed is not None: # ← new
+29:         random.seed(seed) # ← new
+30:     return [sum(population_sampler() for _ in range(n_per_sample)) / n_per_sample # ← new
+31:             for _ in range(n_samples)] # ← new
 ```
-
-This script simulates 1000 experiments where the manufacturer's claim is completely true, runs a t-test on each, and tracks how often the test erroneously rejects the valid claim.
+The file now includes a utility to demonstrate the Central Limit Theorem by sampling arbitrary population functions.
 
 ### Mechanical walkthrough
+- `def sample_means(population_sampler, n_per_sample, n_samples, seed=None):`: Defines a higher-order function that takes a callback `population_sampler`.
+- `if seed is not None: random.seed(seed)`: Sets the random seed for reproducibility.
+- `return [...]`: Returns a list comprehension building the sample means.
+- `for _ in range(n_samples)`: The outer loop generating `n_samples` separate means.
+- `sum(population_sampler() for _ in range(n_per_sample))`: The inner generator expression calling the callback `n_per_sample` times and summing the results.
+- `/ n_per_sample`: Divides the sum to calculate the mean for this specific sample.
 
-- `alpha = 0.05`: Sets our **Significance level (alpha)**.
-- `type1_count = 0`: Initializes a counter for false positives.
-- `for _ in range(1000):`: Loops 1000 times, simulating 1000 independent product tests.
-- `sample = [random.gauss(2.0, 0.1) for _ in range(30)]`: Generates 30 chips. Crucially, the mean passed to `gauss` is `2.0`. The **Null hypothesis (H0)** is TRUE in reality here.
-- `_, p = stats.ttest_1samp(sample, 2.0)`: Performs the one-sample t-test against the claim of 2.0. The `_` discards the t-statistic; we only care about the **p-value**.
-- `if p < alpha:`: Checks if the test result was statistically significant.
-- `type1_count += 1`: If it was, we increment our counter. Because H0 is known to be true, rejecting it is a **Type I error**.
-- `print(...)`: Prints the fraction of tests that resulted in a Type I error.
+### CS lens
+**Higher-Order Functions**. Passing a function (`population_sampler`) as an argument is a functional programming paradigm. This decoupling is used in callback architectures, event listeners, and mapping operations (like Hadoop MapReduce).
 
-### Connect the Pieces
+### SE lens
+**Dependency Injection**. By passing the sampling function into `sample_means`, the function doesn't need to know whether it's rolling dice, flipping coins, or reading network latency. The alternative is hardcoding the sampler, which makes the function rigid.
 
-The result is approximately 0.05. This is not a coincidence: the **Significance level (alpha)** *is* the **Type I error** rate. By choosing to reject H0 when $p < 0.05$, we are explicitly accepting a 5% chance of crying wolf when nothing is wrong. If we lowered alpha to 0.01 to avoid false positives, we would increase our **Type II error** rate — the risk of failing to detect when the chips actually *are* slower. Statistics is always a trade-off between these two errors.
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: X (no output).
 
-## Concept Unit: Confidence interval vs hypothesis test
+### One sentence connecting to previous unit
+Because the CLT guarantees that sample means form a normal distribution, we can mathematically calculate how confident we are in our mean estimates.
+
+## Concept Unit: Confidence intervals
 
 ### The Problem
-
-A p-value tells us if 2.0 is a plausible true mean, but it doesn't tell us what the true mean *actually is*. Can we provide a range of plausible values for the true speed of the chips, rather than just rejecting a single guess?
+When we flip a coin 1000 times and get 497 heads, our best guess for the probability of heads is 49.7%. But how much "wiggle room" is there? How confident can we be that the true probability is somewhere near 49.7%?
 
 ### Introduce the concept in isolation
-
-We can use `scipy.stats` to build an interval around our sample mean.
-
+We will calculate a 95% confidence interval using the sample standard deviation.
 ```python
-from scipy import stats
+import math
 import random
 
+def confidence_interval_95(samples):
+    n = len(samples)
+    m = sum(samples) / n
+    s = math.sqrt(sum((x-m)**2 for x in samples) / (n-1))
+    margin = 1.96 * s / math.sqrt(n)
+    return m, m - margin, m + margin
+
 random.seed(42)
-data = [random.gauss(1.95, 0.1) for _ in range(30)]
-
-mu = sum(data)/len(data)
-se = stats.sem(data)
-ci = stats.t.interval(0.95, df=len(data)-1, loc=mu, scale=se)
-print(f"95% CI: ({ci[0]:.4f}, {ci[1]:.4f})")
+flips = [random.randint(0, 1) for _ in range(1000)]
+m, lo, hi = confidence_interval_95(flips)
+print(f'P(heads) estimate: {m:.4f}')
+print(f'95% CI: ({lo:.4f}, {hi:.4f})')
+print(f'True value 0.5 in CI: {lo <= 0.5 <= hi}')
 ```
-
-Output:
+Predicted confidently: 
 ```
-95% CI: (1.9069, 1.9868)
+P(heads) estimate: 0.4970
+95% CI: (0.4660, 0.5280)
+True value 0.5 in CI: True
 ```
+This proves that we can construct a **Confidence Interval** around our sample mean that accurately captures the true population parameter.
 
-This output proves that based on our data, we are 95% confident that the true population mean lies between 1.9069 and 1.9868. This range is a **Confidence interval**.
-
-### Discard the throwaway example
-
-The isolated CI computation is discarded. We will add it to our main script to contrast it directly with the earlier hypothesis test.
+### Discard the throwaway
+This throwaway code is discarded.
 
 ### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** None additional.
+No reference counterpart.
+Files affected: modified `stats.py`
+Change type: add
+Location: appending to the end of the file.
+Dependencies: None (self-contained)
 
 ### The New Code
-
 ```python
-mu = sum(chip_speeds)/len(chip_speeds)
-se = stats.sem(chip_speeds)
-ci = stats.t.interval(0.95, df=len(chip_speeds)-1, loc=mu, scale=se)
-
-print(f'\n95% CI: ({ci[0]:.4f}, {ci[1]:.4f})')
-print(f'Does CI contain 2.0? {ci[0] <= 2.0 <= ci[1]}')
+def confidence_interval_95(samples):
+    n = len(samples)
+    m = sum(samples) / n
+    s = math.sqrt(sum((x-m)**2 for x in samples) / (n-1))  # sample std
+    margin = 1.96 * s / math.sqrt(n)
+    return m, m - margin, m + margin
 ```
 
 ### The Updated Project
-
 ```python
-# ... (lines 1-71 unchanged)
-# 72: mu = sum(chip_speeds)/len(chip_speeds)
-# 73: se = stats.sem(chip_speeds)
-# 74: ci = stats.t.interval(0.95, df=len(chip_speeds)-1, loc=mu, scale=se)
-# 75: 
-# 76: print(f'\n95% CI: ({ci[0]:.4f}, {ci[1]:.4f})')
-# 77: print(f'Does CI contain 2.0? {ci[0] <= 2.0 <= ci[1]}')
+30:     return [sum(population_sampler() for _ in range(n_per_sample)) / n_per_sample 
+31:             for _ in range(n_samples)] 
+32: 
+33: def confidence_interval_95(samples): # ← new
+34:     n = len(samples) # ← new
+35:     m = sum(samples) / n # ← new
+36:     s = math.sqrt(sum((x-m)**2 for x in samples) / (n-1))  # ← new
+37:     margin = 1.96 * s / math.sqrt(n) # ← new
+38:     return m, m - margin, m + margin # ← new
 ```
-
-This addition takes the original `chip_speeds` data, calculates its standard error, and computes the 95% confidence boundaries, then explicitly checks if the manufacturer's claimed 2.0 GHz falls inside those boundaries.
+The file now contains a function to establish 95% bounds on sample means.
 
 ### Mechanical walkthrough
+- `def confidence_interval_95(samples):`: Defines the function taking raw sample data.
+- `n = len(samples)`: Finds sample size.
+- `m = sum(samples) / n`: Calculates the sample mean.
+- `s = math.sqrt(sum((x-m)**2 for x in samples) / (n-1))`: Calculates the *sample* standard deviation, dividing by `n-1` (Bessel's correction) instead of `n` to provide an unbiased estimator.
+- `margin = 1.96 * s / math.sqrt(n)`: Computes the margin of error. 1.96 is the critical value for 95% confidence in a normal distribution (derived from the empirical rule).
+- `return m, m - margin, m + margin`: Returns a tuple of the mean, lower bound, and upper bound.
 
-- `mu = sum(chip_speeds)/len(chip_speeds)`: Calculates the sample **Mean (μ)** again.
-- `se = stats.sem(chip_speeds)`: Calls `stats.sem` to calculate the standard error of the mean (which is the sample standard deviation divided by $\sqrt{n}$).
-- `ci = stats.t.interval(0.95, df=len(chip_speeds)-1, loc=mu, scale=se)`: Calls `t.interval` to construct the **Confidence interval**. `0.95` specifies a 95% confidence level. `df` is degrees of freedom (sample size minus 1). `loc` is the center (our sample mean), and `scale` is the standard error.
-- `print(...)`: Prints the lower (`ci[0]`) and upper (`ci[1]`) bounds.
-- `print(f'Does CI contain 2.0? {ci[0] <= 2.0 <= ci[1]}')`: Evaluates to `False` because 2.0 is outside the interval.
+### CS lens
+**Estimation of Bounds**. Calculating bounds instead of just point estimates is critical in systems engineering, such as establishing Service Level Agreements (SLAs: "95% of requests return in < 200ms"), capacity planning, and load balancer health checks.
 
-### Connect the Pieces
+### SE lens
+**Tuple Return Types**. Returning `(m, lo, hi)` as a tuple allows the caller to unpack the results directly. The alternative is returning a dictionary or a custom class. The tuple is lighter and more idiomatic in Python for tightly coupled mathematical outputs, but risks position confusion if the caller unpacks in the wrong order.
 
-A **Confidence interval** and a hypothesis test are two sides of the exact same mathematical coin. If an alpha=0.05 hypothesis test rejects 2.0, then a 95% confidence interval will *exclude* 2.0. The CI contains every single possible **Null hypothesis (H0)** value that we would *fail to reject* given our data. While a p-value only tells you "it's not 2.0," a CI is much more informative because it tells you exactly what the true speed is likely to be (somewhere around 1.94 to 1.95).
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: X (no output).
 
-## Concept Unit: Practical significance vs statistical significance
+### One sentence connecting to previous unit
+Confidence intervals show us where the true mean probably is; next, we use the same math to definitively reject a false claim about the mean.
+
+## Concept Unit: Hypothesis testing — is this coin fair?
 
 ### The Problem
-
-If we gather enough data, we can detect extremely tiny differences. If we prove that a new website design increases conversion rates from 10.00% to 10.01% with a p-value of 0.001, should the company spend millions deploying it?
+If a friend gives you a coin and you flip it 1000 times, getting 600 heads, is the coin rigged? Or were you just incredibly "lucky"? How do we mathematically prove that a coin is biased?
 
 ### Introduce the concept in isolation
-
-We can simulate an A/B test with a massive sample size where the actual difference is negligibly small, yet the mathematical test screams "significant."
-
-For our isolation step, we demonstrate the principle directly:
+We will calculate the z-statistic and p-value to test if our coin is fair.
 ```python
+import math
 import random
-from scipy import stats
+
+def z_test_proportion(successes, n, p0=0.5):
+    p_hat = successes / n
+    se = math.sqrt(p0 * (1 - p0) / n)
+    z = (p_hat - p0) / se
+    t = 1 / (1 + 0.2316419 * abs(z))
+    poly = t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429))))
+    p_one_tail = math.exp(-z*z/2) / math.sqrt(2*math.pi) * poly
+    p_value = 2 * p_one_tail
+    return z, p_value
 
 random.seed(42)
-n = 1000000  # huge sample
-old_group = [random.random() < 0.100 for _ in range(n)]
-new_group = [random.random() < 0.102 for _ in range(n)]
-
-_, p = stats.ttest_ind(old_group, new_group)
-print(f"p-value: {p:.6f}")
+flips_biased = sum(1 if random.random() < 0.6 else 0 for _ in range(1000))
+z, p = z_test_proportion(flips_biased, 1000, p0=0.5)
+print(f'Biased coin: z={z:.3f}, p={p:.4f}, reject H0: {p < 0.05}')
 ```
+Predicted confidently: Output showing a large z-score (around 6) and a p-value near 0, rejecting the null hypothesis.
+This proves **Hypothesis Testing**: we can statistically reject the null assumption (fair coin, `p0=0.5`) because the probability of seeing 600 heads on a fair coin (**p-value**) is vanishingly small.
 
-Output:
-```
-p-value: 0.001099
-```
-
-This output proves that a tiny absolute difference in performance (about 0.2%) can yield a highly significant **p-value** (0.001) simply because the sample size is huge. This difference is **Statistical significance**, but it lacks **Practical significance**.
-
-### Discard the throwaway example
-
-The isolated A/B test simulation is discarded. We will add a final cautionary example to our script.
+### Discard the throwaway
+This throwaway code is discarded.
 
 ### Project Change
-
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `stats_analysis.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of the file.
-- **Dependencies:** None additional.
+No reference counterpart.
+Files affected: modified `stats.py`
+Change type: add
+Location: appending to the end of the file.
+Dependencies: `math` module
 
 ### The New Code
-
 ```python
-n = 1000000
-old_group = [random.random() < 0.100 for _ in range(n)]
-new_group = [random.random() < 0.102 for _ in range(n)]
-
-_, p = stats.ttest_ind(old_group, new_group)
-print(f'\nA/B Test p-value: {p:.6f}')
-print(f'Old mean: {sum(old_group)/n:.5f}')
-print(f'New mean: {sum(new_group)/n:.5f}')
-print(f'Difference: {(sum(new_group)-sum(old_group))/n:.5f}')
+def z_test_proportion(successes, n, p0=0.5):
+    p_hat = successes / n
+    se = math.sqrt(p0 * (1 - p0) / n)
+    z = (p_hat - p0) / se
+    t = 1 / (1 + 0.2316419 * abs(z))
+    poly = t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429))))
+    p_one_tail = math.exp(-z*z/2) / math.sqrt(2*math.pi) * poly
+    return z, 2 * p_one_tail
 ```
 
 ### The Updated Project
-
 ```python
-# ... (lines 1-77 unchanged)
-# 78: n = 1000000
-# 79: old_group = [random.random() < 0.100 for _ in range(n)]
-# 80: new_group = [random.random() < 0.102 for _ in range(n)]
-# 81: 
-# 82: _, p = stats.ttest_ind(old_group, new_group)
-# 83: print(f'\nA/B Test p-value: {p:.6f}')
-# 84: print(f'Old mean: {sum(old_group)/n:.5f}')
-# 85: print(f'New mean: {sum(new_group)/n:.5f}')
-# 86: print(f'Difference: {(sum(new_group)-sum(old_group))/n:.5f}')
+37:     margin = 1.96 * s / math.sqrt(n) 
+38:     return m, m - margin, m + margin
+39: 
+40: def z_test_proportion(successes, n, p0=0.5): # ← new
+41:     p_hat = successes / n # ← new
+42:     se = math.sqrt(p0 * (1 - p0) / n) # ← new
+43:     z = (p_hat - p0) / se # ← new
+44:     t = 1 / (1 + 0.2316419 * abs(z)) # ← new
+45:     poly = t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429)))) # ← new
+46:     p_one_tail = math.exp(-z*z/2) / math.sqrt(2*math.pi) * poly # ← new
+47:     return z, 2 * p_one_tail # ← new
 ```
-
-This block simulates an A/B test comparing two groups of one million users each, where the actual conversion rate difference is only 0.2%, running an independent t-test to compare them.
+The file now contains a formal hypothesis testing function using normal approximations.
 
 ### Mechanical walkthrough
+- `def z_test_proportion(successes, n, p0=0.5):`: Defines the function taking observed successes, total trials, and the assumed null proportion (`p0`).
+- `p_hat = successes / n`: Calculates the observed proportion.
+- `se = math.sqrt(p0 * (1 - p0) / n)`: Calculates the standard error expected under the null hypothesis (a property of the Bernoulli distribution).
+- `z = (p_hat - p0) / se`: Calculates the z-score (number of standard deviations away from the null mean).
+- `t = 1 / (1 + 0.2316419 * abs(z))`: Prepares an intermediate variable for the Abramowitz and Stegun numerical approximation of the normal cumulative distribution function (CDF).
+- `poly = ...`: Calculates the polynomial part of the approximation.
+- `p_one_tail = math.exp(-z*z/2) / math.sqrt(2*math.pi) * poly`: Combines the probability density with the polynomial to find the area in the tail of the normal curve.
+- `return z, 2 * p_one_tail`: Returns the z-statistic and the two-tailed p-value (multiplying by 2 to account for both extremes).
 
-- `n = 1000000`: Sets a massive sample size.
-- `old_group = [random.random() < 0.100 for _ in range(n)]`: Simulates 1 million users with exactly a 10.0% probability of converting. `random.random() < 0.100` evaluates to `True` (1) roughly 10% of the time, and `False` (0) otherwise.
-- `new_group = [random.random() < 0.102 for _ in range(n)]`: Simulates another million users with a 10.2% probability of converting.
-- `_, p = stats.ttest_ind(old_group, new_group)`: Calls `ttest_ind` to perform an independent two-sample t-test comparing the means of the two groups. It returns the t-statistic (ignored) and the **p-value**.
-- `print(...)`: Outputs the p-value and the absolute difference in means.
+### CS lens
+**Numerical Approximations**. The normal CDF has no closed-form analytical solution (you can't just write a simple `a + b` formula for it). Computing it requires numerical methods (like Abramowitz and Stegun). This pattern is everywhere in graphics programming, physics engines, and machine learning, where fast approximations are preferred over slow integrations.
 
-### Connect the Pieces
+### SE lens
+**Default Arguments**. Setting `p0=0.5` makes the function ergonomic for the most common use case (checking if something is 50/50 fair) without locking out other tests. The alternative is forcing the user to pass `0.5` every time, which increases friction.
 
-The **p-value** here will be extremely small ($p < 0.05$), granting the result **Statistical significance**. The math is confidently telling us "this difference is not zero." However, the **Effect size**—the actual real-world difference—is merely a 0.2% change. In reality, a business might decide that a 0.2% lift is not worth the engineering cost of maintaining the new design. This highlights the golden rule of applied statistics: a p-value only measures confidence that a difference exists, not whether that difference has any **Practical significance**.
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: X (no output).
 
-Statistical thinking is the foundation of data science. Module 5 is nearly complete. Lesson 42 covers curve fitting. Exercises: verify the CLT with a bimodal distribution (mixture of two Gaussians); run a two-sample t-test on two sets of chip speeds; compute the power of a test for various sample sizes.
+### One sentence connecting to previous unit
+We can now mathematically prove whether observed data conforms to our expectations.
+
+## Closing
+
+### Connect the pieces
+If a coin shows 530 heads in 1000 flips, how do we reason about it using everything we've built? We calculate the **mean** proportion (0.53) and its **variance** and **standard deviation**. Thanks to the **Central Limit Theorem**, we know the distribution of possible sample means forms a **Normal Distribution**, which lets us construct a 95% **Confidence Interval** (roughly 0.499 to 0.561). Because 0.50 (fair) is precariously close to the edge of that interval, we perform a formal **Hypothesis Test** (z-test). The resulting **p-value** (about 0.057) is slightly above 0.05, meaning we do *not* have enough statistical evidence to confidently reject the **null hypothesis** that the coin is fair. Every piece of statistical thinking connects back to the predictable behavior of the normal distribution!

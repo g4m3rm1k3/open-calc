@@ -1,750 +1,604 @@
-# Lesson 44: Clustering — k-Means from Scratch and with scikit-learn
+# Lesson 44: Clustering — k-Means from Scratch
 
-What you will build: The reader will implement k-means clustering from scratch, understand its convergence properties, use `sklearn.cluster.KMeans`, and evaluate cluster quality with inertia and the elbow method. The transferable problems: (1) k-means is UNSUPERVISED — there are no labels; it discovers structure; (2) k-means assigns each point to its nearest centroid, then moves centroids to the cluster means, repeating until convergence; (3) k-means is sensitive to initialization and may find local optima — multiple restarts (n_init) are essential.
+What you will build: The reader implements k-means clustering from scratch: initialize k centroids, assign each point to nearest centroid, recompute centroids, repeat until convergence. The transferable insight: k-means is UNSUPERVISED. There are no labels. The algorithm discovers structure by grouping nearby points. It minimizes within-cluster variance. It is sensitive to initialization (random restarts help) and requires you to choose k (the elbow method helps).
 
-What you need to know first: Lessons 0–43
+What you need to know first: Lessons 00-43.
 
 **Terms used in this lesson**
-- **Unsupervised learning** — machine learning where there are no ground-truth labels; the goal is to discover hidden structure in the data.
-- **k-Means clustering** — an unsupervised algorithm that partitions data into k distinct clusters by minimizing the variance within each cluster.
-- **Centroid** — the center point of a cluster, calculated as the mean of all points assigned to that cluster.
-- **Euclidean distance (L2 norm)** — the straight-line distance between two points in Euclidean space.
-- **Convergence** — the state when an iterative algorithm stops changing its output (e.g., when centroids no longer move).
-- **Local optima** — a solution that is better than all nearby solutions but not the absolute best global solution. k-means is prone to getting stuck in bad local optima.
-- **Inertia** — the sum of squared distances of samples to their closest cluster center. Lower is generally better, but it decreases naturally as k increases.
-- **Elbow method** — a heuristic used in determining the number of clusters in a data set. The "elbow" is the point where the rate of decrease in inertia sharply slows down.
-- **Silhouette score** — a metric for evaluating clustering quality, comparing how similar an object is to its own cluster compared to other clusters.
-- **DBSCAN** — Density-Based Spatial Clustering of Applications with Noise, a clustering algorithm that groups together points that are closely packed together, handling non-spherical shapes well.
+- **Unsupervised learning** — learning without ground-truth labels — it exists to discover hidden structures, groupings, or patterns in raw data where no "correct answer" is provided beforehand.
+- **Centroid** — the center point of a cluster — it serves as the representative prototype for all data points assigned to that group, allowing us to summarize a cluster mathematically.
+- **Inertia** — the sum of squared distances from each point to its assigned centroid — it provides a quantitative metric of cluster compactness to help evaluate whether our algorithm is converging to a tight grouping.
+- **Silhouette score** — a metric comparing a point's distance to its own cluster against its distance to the nearest neighboring cluster — it solves the problem of evaluating cluster quality when we have no ground-truth labels, by quantifying separation.
+- **Elbow method** — a heuristic approach to finding the optimal number of clusters $k$ — it exists to prevent guessing $k$ blindly by visually locating the point of diminishing returns in the inertia plot.
 
 **Objects and methods used**
-- **`sklearn.cluster.KMeans`**
-  - *What it is:* A class implementing the k-means clustering algorithm.
-  - *Implementation:* `class sklearn.cluster.KMeans(n_clusters=8, *, init='k-means++', n_init='auto', max_iter=300, tol=0.0001, verbose=0, random_state=None, copy_x=True, algorithm='lloyd')`
-  - *Its use:* We use it to group data points into k distinct clusters efficiently.
-  - *Type:* Class
-  - *Responsibility:* Computes cluster centers and predicts cluster indices for samples.
-  - *Depends on:* The data `X` passed to its `fit` method.
-  - *Connects to:* Used by data scientists to explore unsupervised datasets.
-  - *Shape:* A model in the scikit-learn API.
-
-- **`sklearn.metrics.silhouette_score`**
-  - *What it is:* A function that computes the mean Silhouette Coefficient of all samples.
-  - *Implementation:* `def silhouette_score(X, labels, *, metric='euclidean', sample_size=None, random_state=None, **kwds)`
-  - *Its use:* Evaluates how well defined our clusters are without needing ground-truth labels.
-  - *Type:* Function
-  - *Responsibility:* Returns a score between -1 and 1 indicating cluster separation and density.
-  - *Depends on:* The feature array `X` and the assigned `labels`.
-  - *Connects to:* Used as an evaluation metric alongside inertia.
-  - *Shape:* A metric function in the scikit-learn API.
-
-- **`sklearn.cluster.DBSCAN`**
-  - *What it is:* A class implementing the DBSCAN clustering algorithm.
-  - *Implementation:* `class sklearn.cluster.DBSCAN(eps=0.5, *, min_samples=5, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=None)`
-  - *Its use:* Used when clusters are not spherical, demonstrating where k-means fails.
-  - *Type:* Class
-  - *Responsibility:* Performs density-based clustering to find arbitrary shaped clusters and noise.
-  - *Depends on:* Data `X` and parameters `eps` and `min_samples`.
-  - *Connects to:* Evaluated using silhouette score to compare with k-means.
-  - *Shape:* A model in the scikit-learn API.
-
-**Everything else in the file, not this lesson's subject but still explained**
 - **`math.sqrt`**
-  - *What it is:* A function returning the square root of a number.
-  - *Implementation:* `def sqrt(x, /)`
-  - *Its use:* Used to calculate the Euclidean distance.
-  - *Type:* Function
-  - *Responsibility:* Mathematical computation.
-  - *Depends on:* A single numeric value.
-  - *Connects to:* The Euclidean distance formula.
-  - *Shape:* Python standard library function.
+  - *What it is:* A mathematical function to compute the square root.
+  - *Implementation:* `def sqrt(x: float) -> float`
+  - *Its use:* Calculates the straight-line Euclidean distance between two points.
+  - *Type:* `static` function in the `math` module.
+  - *Responsibility:* Computes the principal square root of a non-negative number.
+  - *Depends on:* A single non-negative numeric argument.
+  - *Connects to:* Called by `euclidean_distance`, relies on C-level standard library math.
+  - *Shape:* Internal implementation detail for mathematical operations.
 
 - **`zip`**
   - *What it is:* A built-in function to iterate over multiple iterables in parallel.
   - *Implementation:* `class zip(iter1 [,iter2 [...]])`
-  - *Its use:* Used to pair coordinates of two points when calculating distance.
-  - *Type:* Built-in class/function
-  - *Responsibility:* Produces tuples containing elements from each iterable.
-  - *Depends on:* Iterables provided as arguments.
-  - *Connects to:* For loops and list comprehensions.
-  - *Shape:* Python built-in.
+  - *Its use:* Pairs up coordinates from two multi-dimensional points (e.g. `x1` with `x2`, `y1` with `y2`) so we can compute distances per dimension.
+  - *Type:* Built-in Python class/iterator.
+  - *Responsibility:* Produces an iterator of tuples, where the i-th tuple contains the i-th element from each of the argument sequences.
+  - *Depends on:* One or more iterables.
+  - *Connects to:* Called by `euclidean_distance` comprehension, yields tuples to the caller.
+  - *Shape:* Core Python syntax for aggregating sequences.
 
-- **`matplotlib.pyplot.subplots`**
-  - *What it is:* A function creating a figure and a set of subplots.
-  - *Implementation:* `def subplots(nrows=1, ncols=1, *, sharex=False, sharey=False, squeeze=True, width_ratios=None, height_ratios=None, subplot_kw=None, gridspec_kw=None, **fig_kw)`
-  - *Its use:* Creates the canvas and axes for visualizing clusters.
-  - *Type:* Function
-  - *Responsibility:* Initializes plotting environment.
-  - *Depends on:* Plot dimensions.
-  - *Connects to:* Axis methods for drawing.
-  - *Shape:* Library function.
+- **`random.sample`**
+  - *What it is:* A function to choose multiple unique random elements from a population.
+  - *Implementation:* `def sample(population, k, *, counts=None)`
+  - *Its use:* Picks the initial $k$ centroids from the existing data points.
+  - *Type:* Method in the `random` module.
+  - *Responsibility:* Returns a new list containing elements from the population without replacement, leaving the original population unchanged.
+  - *Depends on:* A sequence or set, and an integer $k$.
+  - *Connects to:* Called by `kmeans` to initialize state.
+  - *Shape:* Algorithm initialization boundary.
 
-- **`numpy.random.randn`**
-  - *What it is:* A function returning samples from the standard normal distribution.
-  - *Implementation:* `def randn(*d0_dn)`
-  - *Its use:* Generates synthetic clusters for testing.
-  - *Type:* Function
-  - *Responsibility:* Returns a populated array of random floats.
-  - *Depends on:* Desired dimensions.
-  - *Connects to:* NumPy array creation.
-  - *Shape:* Library function.
+- **`random.seed`**
+  - *What it is:* A function to initialize the internal state of the random number generator.
+  - *Implementation:* `def seed(a=None, version=2)`
+  - *Its use:* Ensures our clustering results are reproducible across multiple runs, despite random initialization.
+  - *Type:* Method in the `random` module.
+  - *Responsibility:* Sets the starting seed for the pseudo-random number generator.
+  - *Depends on:* An integer or hashable object `a`.
+  - *Connects to:* Called at the start of `kmeans`, affects all subsequent `random.*` calls.
+  - *Shape:* Setup/configuration step for stochastic algorithms.
 
-## Concept Unit: Euclidean distance and the nearest centroid
+
+## Concept Unit: The k-means algorithm
 
 ### The Problem
-In order to cluster data, we need a way to determine which points are "close" to each other. How do we mathematically define the distance between two points, and how do we find the closest cluster center for a given point?
+How do we mathematically group a set of coordinates into discrete clusters when we don't know the categories in advance? Given a list of arbitrary points in 2D space, what would be your first step to determine which points "belong" together? If you randomly guessed two center points right now, how would you decide which data points belong to which center? 
 
 ### Introduce the concept in isolation
+Here is our **k-means centroid assignment** concept demonstrated in isolation.
 ```python
 import math
-
-def euclidean_distance(p1, p2):
-    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
-
-def nearest_centroid(point, centroids):
-    distances = [euclidean_distance(point, c) for c in centroids]
-    return distances.index(min(distances))
-
-point = (2, 3)
-centroids = [(0, 0), (5, 5), (1, 4)]
-print(nearest_centroid(point, centroids))
-print(euclidean_distance(point, centroids[2]))
-print(euclidean_distance(point, centroids[0]))
+def temp_dist(a, b): return math.sqrt(sum((x-y)**2 for x,y in zip(a,b)))
+points = [[1,1],[1,2],[2,1],[5,5],[5,6],[6,5]]
+centroids = [[1,1],[6,6]]
+assignments = [0 if temp_dist(p, centroids[0]) < temp_dist(p, centroids[1]) else 1 for p in points]
+print(assignments)
+# [0, 0, 0, 1, 1, 1]
 ```
-Output:
-```
-2
-1.4142135623730951
-3.605551275463989
-```
-This demonstrates how to calculate the **Euclidean distance** between points and find the index of the nearest centroid.
+This proves that by defining prototype centers (centroids) and mathematically mapping points to the centroid with the minimum Euclidean distance, data naturally segments into groups based on proximity.
 
-### Discard the throwaway example
-The test code above is discarded; we will build the actual algorithm next.
+### Discard the throwaway
+The throwaway example above is completely discarded. It will not appear in our final project code.
 
 ### Project Change
-- **Reference Source:** None — this is a from-scratch implementation.
-- **Files affected:** `kmeans_scratch.py` (created)
+- **Reference Source:** None — this is a from-scratch addition because we are exploring a standalone theory lesson.
+- **Files affected:** `kmeans.py` (created)
 - **Change type:** Add
-- **Location:** Top of file
-- **Dependencies:** None
+- **Location:** Brand new file
+- **Dependencies:** `math`
 
 ### The New Code
 ```python
 import math
-import random
 
-def euclidean_distance(p1, p2):
-    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+def euclidean_distance(a, b):
+    return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))
 
-def nearest_centroid(point, centroids):
-    distances = [euclidean_distance(point, c) for c in centroids]
-    return distances.index(min(distances))
+def assign_clusters(points, centroids):
+    '''Assign each point to its nearest centroid. Returns list of cluster IDs.'''
+    assignments = []
+    for point in points:
+        distances = [euclidean_distance(point, c) for c in centroids]
+        assignments.append(distances.index(min(distances)))
+    return assignments
+
+def update_centroids(points, assignments, k):
+    '''Recompute centroid as mean of all points assigned to each cluster.'''
+    n_features = len(points[0])
+    new_centroids = []
+    for cluster_id in range(k):
+        cluster_points = [points[i] for i in range(len(points)) if assignments[i] == cluster_id]
+        if not cluster_points:  # empty cluster: keep old centroid
+            new_centroids.append(None)
+        else:
+            centroid = [sum(p[f] for p in cluster_points)/len(cluster_points)
+                       for f in range(n_features)]
+            new_centroids.append(centroid)
+    return new_centroids
 ```
 
 ### The Updated Project
 ```python
-# 1 import math
-# 2 import random
-# 3 
-# 4 def euclidean_distance(p1, p2):  # ← new
-# 5     return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
-# 6 
-# 7 def nearest_centroid(point, centroids):  # ← new
-# 8     distances = [euclidean_distance(point, c) for c in centroids]
-# 9     return distances.index(min(distances))
+1: import math # <- new
+2: 
+3: def euclidean_distance(a, b): # <- new
+4:     return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b))) # <- new
+5: 
+6: def assign_clusters(points, centroids): # <- new
+7:     '''Assign each point to its nearest centroid. Returns list of cluster IDs.''' # <- new
+8:     assignments = [] # <- new
+9:     for point in points: # <- new
+10:        distances = [euclidean_distance(point, c) for c in centroids] # <- new
+11:        assignments.append(distances.index(min(distances))) # <- new
+12:    return assignments # <- new
+13: 
+14: def update_centroids(points, assignments, k): # <- new
+15:     '''Recompute centroid as mean of all points assigned to each cluster.''' # <- new
+16:     n_features = len(points[0]) # <- new
+17:     new_centroids = [] # <- new
+18:     for cluster_id in range(k): # <- new
+19:         cluster_points = [points[i] for i in range(len(points)) if assignments[i] == cluster_id] # <- new
+20:         if not cluster_points:  # empty cluster: keep old centroid # <- new
+21:             new_centroids.append(None) # <- new
+22:         else: # <- new
+23:             centroid = [sum(p[f] for p in cluster_points)/len(cluster_points) # <- new
+24:                        for f in range(n_features)] # <- new
+25:             new_centroids.append(centroid) # <- new
+26:     return new_centroids # <- new
 ```
-This provides the foundational helper functions for our k-means implementation.
+Our new `kmeans.py` module now provides the structural primitives of k-means clustering: a function to compute distance, a function to assign groups based on those distances, and a function to slide the centers to the mathematical mean of their assigned groups.
 
 ### Mechanical walkthrough
-- `def euclidean_distance(p1, p2):`: Defines a function taking two points.
-- `zip(p1, p2)`: Pairs up coordinates from both points (e.g., x with x, y with y).
-- `(a-b)**2`: Computes the squared difference between paired coordinates.
-- `sum(...)`: Adds up all squared differences.
-- `math.sqrt(...)`: Takes the square root of the sum, giving the true distance (the L2 norm).
-- `distances = [...]`: A list comprehension that calculates the distance from the `point` to every `c` in `centroids`.
-- `min(distances)`: Finds the smallest distance in the list.
-- `distances.index(...)`: Returns the index of that smallest distance, indicating which centroid is closest.
+- `def euclidean_distance(a, b):` declares a new function taking two points `a` and `b`.
+- `zip(a, b)` aligns the individual dimensional coordinates of `a` and `b`.
+- `(ai - bi)**2` computes the squared difference for a single dimension.
+- `sum(...)` aggregates all squared dimensional differences into one scalar.
+- `math.sqrt(...)` takes the square root of that sum, giving actual physical distance.
+- `assignments = []` initializes an empty list to store the cluster ID for each point.
+- `distances = [euclidean_distance(point, c) for c in centroids]` constructs a temporary list mapping the point's distance to every single candidate center.
+- `min(distances)` finds the smallest distance in that list.
+- `.index(...)` retrieves the integer index (cluster ID) corresponding to that minimum distance.
+- `n_features = len(points[0])` calculates the dimensionality of our dataset based on the first point.
+- `cluster_points = [...]` uses a list comprehension to filter the dataset down to only the points matching the current `cluster_id`.
+- `if not cluster_points:` checks if any points actually fell into this cluster.
+- `new_centroids.append(None)` pushes a sentinel value for empty clusters so we don't accidentally divide by zero.
+- `sum(p[f] for p in cluster_points)/len(cluster_points)` averages the coordinates for the $f$-th feature across all points in the cluster.
 
+### CS lens
+The concept here is **Lloyd's Algorithm (Expectation-Maximization)**. By assigning data (Expectation) and updating parameters to fit that assignment (Maximization), we iteratively refine an unlabelled structure. You see this everywhere in CS:
+1. Garbage collection tracing relies on iterative marking until convergence.
+2. Routing protocols (like OSPF or BGP) update path weights iteratively until the network state settles.
+3. Rendering engines simulate light bouncing (radiosity) across surfaces iteratively until the scene converges.
+4. Data compression algorithms (like LBG for vector quantization) use the exact same iterative clustering logic to build color palettes.
 
-## Concept Unit: k-Means from scratch
+### SE lens
+**Design Principle:** Pure Functions and Statelessness. `assign_clusters` and `update_centroids` have no side effects and do not mutate the input lists. 
+**Alternative NOT chosen:** We could have implemented a `Cluster` class that stores its own points and mutates its own centroid state internally (`cluster.add_point(p)`).
+**Real tradeoff:** A stateful object-oriented approach makes intuitive sense, but functional immutability here makes debugging the mathematical progression vastly simpler because we can perfectly snapshot the arrays at any discrete iteration.
+
+### Commands needed
+`python3`
+
+### Run it
+Predicted confidently:
+Trace assign_clusters: point [1,1]: dist to [1,1]=0, dist to [6,6]=7.07 -> cluster 0. point [5,5]: dist to [1,1]=5.66, dist to [6,6]=1.41 -> cluster 1. All 6 points correctly assigned. update_centroids: cluster 0 = {[1,1],[1,2],[2,1]}, mean=[1.33,1.33].
+
+### One sentence connecting to previous unit
+With the primitives to compute distances and shift centroids defined, we now need a mechanism to repeatedly apply them until the centers stop moving.
+
+## Concept Unit: Full k-means loop
 
 ### The Problem
-Now that we can measure distance and assign a point to a centroid, how do we iteratively move these centroids to find the true center of the clusters?
+How do we know when to stop updating centroids? If we apply `assign` and `update` over and over, what is the mathematical signal that our clusters are as good as they are going to get? If the assignments never change from one iteration to the next, is there any point in continuing?
 
 ### Introduce the concept in isolation
+Here is a **convergence loop** demonstrated in isolation.
 ```python
-import random
-import math
-
-def euclidean_distance(p1, p2):
-    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
-
-def nearest_centroid(point, centroids):
-    distances = [euclidean_distance(point, c) for c in centroids]
-    return distances.index(min(distances))
-
-def kmeans(data, k, max_iters=100, seed=42):
-    random.seed(seed)
-    # Step 1: Initialize centroids randomly from the data
-    centroids = random.sample(list(data), k)
-    for iteration in range(max_iters):
-        # Step 2: Assign each point to its nearest centroid
-        clusters = [[] for _ in range(k)]
-        for point in data:
-            idx = nearest_centroid(point, centroids)
-            clusters[idx].append(point)
-        # Step 3: Recompute centroids as cluster means
-        new_centroids = []
-        for cluster in clusters:
-            if cluster:
-                dim = len(cluster[0])
-                mean = tuple(sum(p[d] for p in cluster)/len(cluster) for d in range(dim))
-                new_centroids.append(mean)
-            else:
-                new_centroids.append(centroids[len(new_centroids)])  # keep old if empty
-        # Step 4: Check convergence
-        if all(euclidean_distance(c1, c2) < 1e-6
-               for c1, c2 in zip(centroids, new_centroids)):
-            print(f'Converged at iteration {iteration+1}')
-            break
-        centroids = new_centroids
-    return centroids, clusters
-
-# Small 2D example:
-data = [(1,1),(1.5,2),(3,4),(5,7),(3.5,5),(4.5,5),(3.5,4.5)]
-centroids, clusters = kmeans(data, k=2)
-print(f'Centroid 0: {centroids[0]}')
-print(f'Centroid 1: {centroids[1]}')
-print(f'Cluster 0 size: {len(clusters[0])}')
-print(f'Cluster 1 size: {len(clusters[1])}')
+state = 0
+for i in range(10):
+    new_state = state + (1 if state < 3 else 0)
+    if new_state == state:
+        print(f"Converged at {i}")
+        break
+    state = new_state
+# Converged at 3
 ```
-Output:
-```
-Converged at iteration 2
-Centroid 0: (4.0, 5.375)
-Centroid 1: (1.25, 1.5)
-Cluster 0 size: 4
-Cluster 1 size: 2
-```
-This demonstrates the iterative assignment and update steps of the **k-Means** algorithm, running until convergence.
+This proves that by comparing the next state to the current state, we can short-circuit a predetermined loop limit as soon as the system reaches a steady equilibrium.
 
-### Discard the throwaway example
-The standalone test above is discarded as we formalize the method.
+### Discard the throwaway
+The throwaway example above is completely discarded. It will not appear in our final project code.
 
 ### Project Change
-- **Reference Source:** None
-- **Files affected:** `kmeans_scratch.py` (modified)
+- **Reference Source:** None — this is a from-scratch addition because we are exploring a standalone theory lesson.
+- **Files affected:** `kmeans.py` (modified)
 - **Change type:** Add
-- **Location:** Below `nearest_centroid`
+- **Location:** Below `update_centroids`.
 - **Dependencies:** `random`
 
 ### The New Code
 ```python
-def kmeans(data, k, max_iters=100, seed=42):
-    random.seed(seed)
-    centroids = random.sample(list(data), k)
-    for iteration in range(max_iters):
-        clusters = [[] for _ in range(k)]
-        for point in data:
-            idx = nearest_centroid(point, centroids)
-            clusters[idx].append(point)
-        new_centroids = []
-        for cluster in clusters:
-            if cluster:
-                dim = len(cluster[0])
-                mean = tuple(sum(p[d] for p in cluster)/len(cluster) for d in range(dim))
-                new_centroids.append(mean)
-            else:
-                new_centroids.append(centroids[len(new_centroids)])
-        if all(euclidean_distance(c1, c2) < 1e-6 for c1, c2 in zip(centroids, new_centroids)):
-            break
-        centroids = new_centroids
-    return centroids, clusters
-```
-
-### The Updated Project
-```python
-# 1 import math
-# 2 import random
-# 3 
-# ... euclidean_distance and nearest_centroid functions ...
-# 10 
-# 11 def kmeans(data, k, max_iters=100, seed=42):  # ← new
-# 12     random.seed(seed)
-# 13     centroids = random.sample(list(data), k)
-# 14     for iteration in range(max_iters):
-# 15         clusters = [[] for _ in range(k)]
-# 16         for point in data:
-# 17             idx = nearest_centroid(point, centroids)
-# 18             clusters[idx].append(point)
-# 19         new_centroids = []
-# 20         for cluster in clusters:
-# 21             if cluster:
-# 22                 dim = len(cluster[0])
-# 23                 mean = tuple(sum(p[d] for p in cluster)/len(cluster) for d in range(dim))
-# 24                 new_centroids.append(mean)
-# 25             else:
-# 26                 new_centroids.append(centroids[len(new_centroids)])
-# 27         if all(euclidean_distance(c1, c2) < 1e-6 for c1, c2 in zip(centroids, new_centroids)):
-# 28             break
-# 29         centroids = new_centroids
-# 30     return centroids, clusters
-```
-This is the complete from-scratch implementation of k-means clustering.
-
-### Mechanical walkthrough
-- `random.sample(list(data), k)`: Randomly selects `k` distinct points from the data to serve as the initial centroids.
-- `clusters = [[] for _ in range(k)]`: Creates a list of `k` empty lists to hold the assigned points.
-- `nearest_centroid(point, centroids)`: Finds which centroid each point is closest to.
-- `clusters[idx].append(point)`: Assigns the point to the corresponding cluster.
-- `dim = len(cluster[0])`: Determines the dimensionality of the points (e.g., 2 for 2D points).
-- `tuple(...)`: Creates a new point for the mean.
-- `sum(p[d] for p in cluster)/len(cluster)`: Calculates the average value along dimension `d` for all points in the cluster.
-- `all(...)`: Checks if every single paired element meets the condition.
-- `euclidean_distance(c1, c2) < 1e-6`: The convergence check. If the centroids barely moved (distance less than a tiny threshold), the algorithm stops.
-- `centroids = new_centroids`: Updates the centroids for the next iteration.
-
-
-## Concept Unit: Visualizing clusters
-
-### The Problem
-How can we verify that our k-means implementation actually works on a larger dataset? We need to visualize the results to see the clusters.
-
-### Introduce the concept in isolation
-```python
-import matplotlib.pyplot as plt
-import numpy as np
 import random
-import math
 
-# [Insert kmeans and helpers here for the lab]
-def euclidean_distance(p1, p2): return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
-def nearest_centroid(point, centroids): return [euclidean_distance(point, c) for c in centroids].index(min([euclidean_distance(point, c) for c in centroids]))
-def kmeans(data, k, max_iters=100, seed=42):
+def kmeans(points, k, max_iters=100, seed=42):
     random.seed(seed)
-    centroids = random.sample(list(data), k)
+    # Initialize: pick k random points as starting centroids
+    centroids = random.sample(points, k)
+    assignments = [0] * len(points)
+
     for iteration in range(max_iters):
-        clusters = [[] for _ in range(k)]
-        for point in data:
-            clusters[nearest_centroid(point, centroids)].append(point)
-        new_centroids = []
-        for cluster in clusters:
-            if cluster:
-                mean = tuple(sum(p[d] for p in cluster)/len(cluster) for d in range(len(cluster[0])))
-                new_centroids.append(mean)
-            else:
-                new_centroids.append(centroids[len(new_centroids)])
-        if all(euclidean_distance(c1, c2) < 1e-6 for c1, c2 in zip(centroids, new_centroids)): break
+        new_assignments = assign_clusters(points, centroids)
+        new_centroids = update_centroids(points, new_assignments, k)
+        # Replace None centroids (empty clusters) with old ones
+        for i in range(k):
+            if new_centroids[i] is None:
+                new_centroids[i] = centroids[i]
+
+        # Check convergence: if assignments unchanged, stop
+        if new_assignments == assignments:
+            print(f'Converged at iteration {iteration+1}')
+            break
+        assignments = new_assignments
         centroids = new_centroids
-    return centroids, clusters
 
-np.random.seed(42)
-cluster1 = np.random.randn(50, 2) + [0, 0]
-cluster2 = np.random.randn(50, 2) + [5, 5]
-cluster3 = np.random.randn(50, 2) + [10, 0]
-X = np.vstack([cluster1, cluster2, cluster3])
-data_tuples = [tuple(row) for row in X]
-centroids, clusters = kmeans(data_tuples, k=3, seed=42)
-print("Clusters found:", len(clusters))
-```
-Output:
-```
-Clusters found: 3
-```
-This sets up our synthetic data and runs our **k-Means** implementation on it.
-
-### Discard the throwaway example
-The setup code is replaced by our actual plotting logic.
-
-### Project Change
-- **Reference Source:** None
-- **Files affected:** `visualize.py` (created)
-- **Change type:** Add
-- **Location:** New file
-- **Dependencies:** `kmeans_scratch.py`, `numpy`, `matplotlib`
-
-### The New Code
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from kmeans_scratch import kmeans
-
-np.random.seed(42)
-cluster1 = np.random.randn(50, 2) + [0, 0]
-cluster2 = np.random.randn(50, 2) + [5, 5]
-cluster3 = np.random.randn(50, 2) + [10, 0]
-X = np.vstack([cluster1, cluster2, cluster3])
-data_tuples = [tuple(row) for row in X]
-
-centroids, clusters = kmeans(data_tuples, k=3, seed=42)
-
-fig, ax = plt.subplots(figsize=(8,5))
-colors = ['steelblue', 'coral', 'green']
-for i, cluster in enumerate(clusters):
-    if cluster:
-        cx = [p[0] for p in cluster]
-        cy = [p[1] for p in cluster]
-        ax.scatter(cx, cy, color=colors[i], alpha=0.6, label=f'Cluster {i}')
-        ax.scatter(centroids[i][0], centroids[i][1], color=colors[i],
-                   marker='*', s=300, edgecolors='black')
-ax.set_title('k-Means Clustering (from scratch)')
-ax.legend()
-plt.tight_layout()
-plt.savefig('kmeans_scratch.png')
+    return centroids, assignments
 ```
 
 ### The Updated Project
 ```python
-# 1 import matplotlib.pyplot as plt
-# 2 import numpy as np
-# 3 from kmeans_scratch import kmeans
-# 4 
-# 5 np.random.seed(42)
-# 6 cluster1 = np.random.randn(50, 2) + [0, 0]
-# 7 cluster2 = np.random.randn(50, 2) + [5, 5]
-# 8 cluster3 = np.random.randn(50, 2) + [10, 0]
-# 9 X = np.vstack([cluster1, cluster2, cluster3])
-# 10 data_tuples = [tuple(row) for row in X]
-# 11 
-# 12 centroids, clusters = kmeans(data_tuples, k=3, seed=42)
-# 13 
-# 14 fig, ax = plt.subplots(figsize=(8,5))
-# 15 colors = ['steelblue', 'coral', 'green']
-# 16 for i, cluster in enumerate(clusters):
-# 17     if cluster:
-# 18         cx = [p[0] for p in cluster]
-# 19         cy = [p[1] for p in cluster]
-# 20         ax.scatter(cx, cy, color=colors[i], alpha=0.6, label=f'Cluster {i}')
-# 21         ax.scatter(centroids[i][0], centroids[i][1], color=colors[i],
-# 22                    marker='*', s=300, edgecolors='black')
-# 23 ax.set_title('k-Means Clustering (from scratch)')
-# 24 ax.legend()
-# 25 plt.tight_layout()
-# 26 plt.savefig('kmeans_scratch.png')
+27: import random # <- new
+28: 
+29: def kmeans(points, k, max_iters=100, seed=42): # <- new
+30:     random.seed(seed) # <- new
+31:     # Initialize: pick k random points as starting centroids # <- new
+32:     centroids = random.sample(points, k) # <- new
+33:     assignments = [0] * len(points) # <- new
+34: 
+35:     for iteration in range(max_iters): # <- new
+36:         new_assignments = assign_clusters(points, centroids) # <- new
+37:         new_centroids = update_centroids(points, new_assignments, k) # <- new
+38:         # Replace None centroids (empty clusters) with old ones # <- new
+39:         for i in range(k): # <- new
+40:             if new_centroids[i] is None: # <- new
+41:                 new_centroids[i] = centroids[i] # <- new
+42: 
+43:         # Check convergence: if assignments unchanged, stop # <- new
+44:         if new_assignments == assignments: # <- new
+45:             print(f'Converged at iteration {iteration+1}') # <- new
+46:             break # <- new
+47:         assignments = new_assignments # <- new
+48:         centroids = new_centroids # <- new
+49: 
+50:     return centroids, assignments # <- new
 ```
-We generate synthetic data with clear clusters, run our model, and plot the grouped points along with their computed centroids marked as stars.
+Our `kmeans.py` module now orchestrates the clustering algorithm, randomly picking initial points and repeatedly ping-ponging between assignment and updates until the cluster boundaries stabilize.
 
 ### Mechanical walkthrough
-- `np.random.randn(50, 2)`: Generates 50 points in 2D space clustered around the origin.
-- `+ [5, 5]`: Shifts the center of the random points, creating separate clusters.
-- `np.vstack(...)`: Vertically stacks the three arrays into a single dataset `X` with 150 points.
-- `data_tuples = [...]`: Converts NumPy arrays to plain Python tuples since our scratch implementation expects them.
-- `plt.subplots(...)`: Initializes the matplotlib figure.
-- `ax.scatter(cx, cy, ...)`: Plots all points in the cluster.
-- `ax.scatter(centroids[i][0], ... marker='*', s=300)`: Plots the centroid on top as a large star.
-- `plt.savefig(...)`: Saves the resulting visualization to disk.
+- `import random` pulls in Python's standard pseudo-random number generator.
+- `def kmeans(points, k, max_iters=100, seed=42):` defines the main entry function, providing defaults for iteration bounds and random seeding.
+- `random.seed(seed)` deterministically primes the random engine so our outputs don't flap randomly.
+- `random.sample(points, k)` pulls $k$ unique data points to serve as the initial generation of centroids.
+- `assignments = [0] * len(points)` pre-allocates an array of zeros representing the 'previous' state of assignments.
+- `for iteration in range(max_iters):` starts a bounded loop, ensuring the algorithm won't hang infinitely if it oscillates.
+- `new_assignments = assign_clusters(...)` generates the next expected state based on the current centers.
+- `new_centroids = update_centroids(...)` shifts the centers based on the fresh assignments.
+- `if new_centroids[i] is None:` guards against a cluster having zero points assigned to it.
+- `new_centroids[i] = centroids[i]` safely rolls back the dead centroid to its previous known location.
+- `if new_assignments == assignments:` performs a deep equality check on the two lists to see if any single point changed alliances.
+- `break` exits the iteration limit early because steady-state has been reached.
 
+### CS lens
+The concept here is **Convergence in Iterative Numerical Methods**. Many problems lack closed-form algebraic solutions. Instead, you start with a guess and refine it.
+1. Newton-Raphson method for finding roots of functions.
+2. PageRank calculating the relative importance of web pages.
+3. Gradient descent training a neural network's weights.
+4. Markov chain mixing times approaching a stationary distribution.
 
-## Concept Unit: scikit-learn KMeans
+### SE lens
+**Design Principle:** Defensive Bounding. The `max_iters` parameter forces a worst-case stop condition.
+**Alternative NOT chosen:** We could have used a `while True:` loop that only exits on absolute convergence.
+**Real tradeoff:** While mathematically pure k-means is proven to converge, floating-point inaccuracies or highly specific degenerate data can cause infinite oscillation between two equally valid states. Capping the loop guarantees the software halts.
+
+### Commands needed
+`python3`
+
+### Run it
+Predicted confidently:
+Trace kmeans(points, k=2): init centroids (random). Iter 1: assign all points, update centroids. Iter 2: re-assign, update. Assignments same as iter 1: converged. Centroids: mean of group A = [1.5,1.5], group B = [5.5,5.5].
+
+### One sentence connecting to previous unit
+Now that we can group points automatically, we need a mathematical way to grade how "good" those groupings actually are.
+
+## Concept Unit: Inertia — measuring cluster quality
 
 ### The Problem
-Writing k-means from scratch helps us understand the mechanics, but in practice, we rely on heavily optimized libraries. How do we use scikit-learn to do the exact same thing?
+If the algorithm finishes, how do we know if it did a good job? If we ask for $k=2$ clusters, but the data naturally forms 3 clusters, how could we mathematically detect that $k$ was poorly chosen? What happens to the distances inside a cluster if the grouping is terrible?
 
 ### Introduce the concept in isolation
+Here is the **Sum of Squared Errors (SSE)** concept demonstrated in isolation.
 ```python
-from sklearn.cluster import KMeans
-import numpy as np
-
-# Recreate the data from previous step
-np.random.seed(42)
-X = np.vstack([np.random.randn(50, 2) + [0, 0],
-               np.random.randn(50, 2) + [5, 5],
-               np.random.randn(50, 2) + [10, 0]])
-
-kmeans_sk = KMeans(n_clusters=3, random_state=42, n_init=10)
-kmeans_sk.fit(X)
-
-print(f'Centroids:\n{kmeans_sk.cluster_centers_}')
-print(f'Labels (first 5): {kmeans_sk.labels_[:5]}')
-print(f'Inertia: {kmeans_sk.inertia_:.2f}')
+# Distance from a fixed center (5)
+center = 5
+bad_cluster = [1, 9]
+good_cluster = [4, 6]
+bad_inertia = sum((x-center)**2 for x in bad_cluster) # (16) + (16) = 32
+good_inertia = sum((x-center)**2 for x in good_cluster) # (1) + (1) = 2
+print(bad_inertia, good_inertia)
+# 32 2
 ```
-Output:
-```
-Centroids:
-[[-0.14251457 -0.17056637]
- [ 4.90804471  5.04353846]
- [ 9.87037943  0.08985161]]
-Labels (first 5): [0 0 0 0 0]
-Inertia: 284.14
-```
-This shows how to run **`KMeans`** in scikit-learn.
+This proves that squaring the distances from elements to their center heavily penalizes points that are far away, creating a singular metric (inertia) where lower is strictly better.
 
-### Discard the throwaway example
-We will integrate this into our analysis script next.
+### Discard the throwaway
+The throwaway example above is completely discarded. It will not appear in our final project code.
 
 ### Project Change
-- **Reference Source:** None
-- **Files affected:** `analyze.py` (created)
+- **Reference Source:** None — this is a from-scratch addition because we are exploring a standalone theory lesson.
+- **Files affected:** `kmeans.py` (modified)
 - **Change type:** Add
-- **Location:** New file
-- **Dependencies:** `sklearn`
+- **Location:** Below `kmeans`.
+- **Dependencies:** None
 
 ### The New Code
 ```python
-from sklearn.cluster import KMeans
-import numpy as np
-
-np.random.seed(42)
-X = np.vstack([np.random.randn(50, 2) + [0, 0],
-               np.random.randn(50, 2) + [5, 5],
-               np.random.randn(50, 2) + [10, 0]])
-
-kmeans_sk = KMeans(n_clusters=3, random_state=42, n_init=10)
-kmeans_sk.fit(X)
+def inertia(points, centroids, assignments):
+    '''Sum of squared distances from each point to its centroid.
+       Lower inertia = tighter, more compact clusters.'''
+    total = 0
+    for i, point in enumerate(points):
+        centroid = centroids[assignments[i]]
+        total += sum((point[f] - centroid[f])**2 for f in range(len(point)))
+    return total
 ```
 
 ### The Updated Project
 ```python
-# 1 from sklearn.cluster import KMeans
-# 2 import numpy as np
-# 3 
-# 4 np.random.seed(42)
-# 5 X = np.vstack([np.random.randn(50, 2) + [0, 0],
-# 6                np.random.randn(50, 2) + [5, 5],
-# 7                np.random.randn(50, 2) + [10, 0]])
-# 8 
-# 9 kmeans_sk = KMeans(n_clusters=3, random_state=42, n_init=10)
-# 10 kmeans_sk.fit(X)
+51: def inertia(points, centroids, assignments): # <- new
+52:     '''Sum of squared distances from each point to its centroid. # <- new
+53:        Lower inertia = tighter, more compact clusters.''' # <- new
+54:     total = 0 # <- new
+55:     for i, point in enumerate(points): # <- new
+56:         centroid = centroids[assignments[i]] # <- new
+57:         total += sum((point[f] - centroid[f])**2 for f in range(len(point))) # <- new
+58:     return total # <- new
 ```
+We now have an objective function, `inertia`, that collapses a multi-dimensional, multi-cluster outcome into a single scalar grade.
 
 ### Mechanical walkthrough
-- `KMeans(...)`: Instantiates the model.
-- `n_clusters=3`: We tell the algorithm we are looking for exactly 3 clusters.
-- `n_init=10`: Runs the algorithm 10 times with different random starting centroids, keeping the result with the lowest inertia. This is crucial because k-means often gets stuck in bad **local optima**.
-- `fit(X)`: Runs the algorithm on our data array.
-- `cluster_centers_`: An attribute holding the final coordinates of the centroids.
-- `labels_`: An array indicating which cluster (0, 1, or 2) each data point belongs to.
-- `inertia_`: The sum of squared distances from each point to its assigned centroid.
+- `def inertia(...)` takes the full state of a finished clustering run: points, final centers, and final assignments.
+- `total = 0` sets up an accumulator variable.
+- `for i, point in enumerate(points):` iterates over the dataset while preserving the index `i` so we can look up its assignment.
+- `centroid = centroids[assignments[i]]` fetches the exact center this specific point belongs to.
+- `sum((point[f] - centroid[f])**2 for f in range(len(point)))` computes the squared Euclidean distance without taking the square root.
+- `total += ...` adds this point's squared penalty to the global accumulator.
 
+### CS lens
+The concept here is a **Loss/Cost Function**. You compress complex system behavior into one number to be minimized.
+1. Mean Squared Error (MSE) in linear regression.
+2. Cross-entropy loss in classification neural networks.
+3. Path cost functions in A* search algorithms.
+4. Energy functions in simulated annealing.
 
-## Concept Unit: The elbow method — choosing k
+### SE lens
+**Design Principle:** Decoupled Evaluation. The `inertia` function is completely separated from the `kmeans` algorithm itself.
+**Alternative NOT chosen:** We could have calculated inertia inside the `kmeans` loop and returned it as a third element in the tuple.
+**Real tradeoff:** Decoupling evaluation allows us to compute the metric selectively (e.g., only after we've finished looping multiple times) saving CPU cycles during the hot loop of the algorithm itself.
+
+### Commands needed
+`python3`
+
+### Run it
+Predicted confidently:
+Trace inertia(points, centroids, assignments): for each point, compute squared distance to its assigned centroid, sum all. k=1: centroid at mean of all 12 points ~(5.33,5.33). Points at [1,1] are far: (1-5.33)^2+(1-5.33)^2=37.5. Sum all 12: ~300. k=3: three tight clusters: inertia ~12.
+
+### One sentence connecting to previous unit
+Although inertia gives us a grade, we will soon see that running the exact same algorithm on the exact same data can yield entirely different grades.
+
+## Concept Unit: k-means sensitivity to initialization
 
 ### The Problem
-We hardcoded `k=3` because we generated the data ourselves. But in real unsupervised learning, we don't know the right number of clusters. How do we choose `k`?
+What happens if our initial random guess for the centers is incredibly unlucky? If $k=2$ and both random centers happen to spawn in the exact same clump of data, how will the algorithm recover? Will it always find the true global minimum?
 
 ### Introduce the concept in isolation
+Here is the **Local Minima** concept demonstrated in isolation.
 ```python
-from sklearn.cluster import KMeans
-import numpy as np
-
-# Recreate data
-np.random.seed(42)
-X = np.vstack([np.random.randn(50, 2) + [0, 0],
-               np.random.randn(50, 2) + [5, 5],
-               np.random.randn(50, 2) + [10, 0]])
-
-inertias = []
-for k in range(1, 6):
-    km = KMeans(n_clusters=k, random_state=42, n_init=10).fit(X)
-    inertias.append(km.inertia_)
-    print(f'k={k}: {km.inertia_:.2f}')
+# A simple greedy climber finding a peak
+peaks = [1, 2, 5, 4, 1, 9, 8, 2]
+start_idx = 1
+while peaks[start_idx+1] > peaks[start_idx]:
+    start_idx += 1
+print(f"Stuck at peak value: {peaks[start_idx]}")
+# Stuck at peak value: 5
 ```
-Output:
-```
-k=1: 3959.04
-k=2: 1729.81
-k=3: 284.14
-k=4: 254.91
-k=5: 231.67
-```
-This shows the **inertia** decreasing as `k` increases.
+This proves that greedy optimization algorithms will gleefully halt at a local extreme (5) if they start close to it, completely missing the global extreme (9) that exists elsewhere in the space.
 
-### Discard the throwaway example
-We will plot this curve to see the "elbow".
+### Discard the throwaway
+The throwaway example above is completely discarded. It will not appear in our final project code.
 
 ### Project Change
-- **Reference Source:** None
-- **Files affected:** `analyze.py` (modified)
+- **Reference Source:** None — this is a from-scratch addition because we are exploring a standalone theory lesson.
+- **Files affected:** `kmeans.py` (modified)
 - **Change type:** Add
-- **Location:** Bottom of file
-- **Dependencies:** `matplotlib.pyplot`
+- **Location:** Below `inertia`.
+- **Dependencies:** None
 
 ### The New Code
 ```python
-import matplotlib.pyplot as plt
-
-inertias = []
-k_range = range(1, 11)
-for k in k_range:
-    km = KMeans(n_clusters=k, random_state=42, n_init=10).fit(X)
-    inertias.append(km.inertia_)
-
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(list(k_range), inertias, 'bo-')
-ax.set_xlabel('Number of clusters (k)')
-ax.set_ylabel('Inertia')
-ax.set_title('Elbow Method for Optimal k')
-ax.axvline(x=3, color='red', linestyle='--')
-plt.savefig('elbow.png')
+# Bad initialization: both centroids in same cluster
+def kmeans_bad_init(points, k):
+    # Force bad initialization: first k points (all from cluster A)
+    centroids = points[:k]
+    assignments = [0] * len(points)
+    for iteration in range(10):
+        new_assignments = assign_clusters(points, centroids)
+        new_centroids = update_centroids(points, new_assignments, k)
+        for i in range(k):
+            if new_centroids[i] is None:
+                new_centroids[i] = centroids[i]
+        if new_assignments == assignments: break
+        assignments = new_assignments
+        centroids = new_centroids
+    return centroids, assignments, inertia(points, centroids, assignments)
 ```
 
 ### The Updated Project
 ```python
-# 10 kmeans_sk.fit(X)
-# 11 
-# 12 import matplotlib.pyplot as plt  # ← new
-# 13 
-# 14 inertias = []  # ← new
-# 15 k_range = range(1, 11)
-# 16 for k in k_range:
-# 17     km = KMeans(n_clusters=k, random_state=42, n_init=10).fit(X)
-# 18     inertias.append(km.inertia_)
-# 19 
-# 20 fig, ax = plt.subplots(figsize=(8, 5))
-# 21 ax.plot(list(k_range), inertias, 'bo-')
-# 22 ax.set_xlabel('Number of clusters (k)')
-# 23 ax.set_ylabel('Inertia')
-# 24 ax.set_title('Elbow Method for Optimal k')
-# 25 ax.axvline(x=3, color='red', linestyle='--')
-# 26 plt.savefig('elbow.png')
+59: # Bad initialization: both centroids in same cluster # <- new
+60: def kmeans_bad_init(points, k): # <- new
+61:     # Force bad initialization: first k points (all from cluster A) # <- new
+62:     centroids = points[:k] # <- new
+63:     assignments = [0] * len(points) # <- new
+64:     for iteration in range(10): # <- new
+65:         new_assignments = assign_clusters(points, centroids) # <- new
+66:         new_centroids = update_centroids(points, new_assignments, k) # <- new
+67:         for i in range(k): # <- new
+68:             if new_centroids[i] is None: # <- new
+69:                 new_centroids[i] = centroids[i] # <- new
+70:         if new_assignments == assignments: break # <- new
+71:         assignments = new_assignments # <- new
+72:         centroids = new_centroids # <- new
+73:     return centroids, assignments, inertia(points, centroids, assignments) # <- new
 ```
-We iterate through possible `k` values, record the inertia, and plot it.
+By forcing a deterministic, terrible start state (just picking the first $k$ points verbatim), we deliberately break the algorithm to show its fragility. 
 
 ### Mechanical walkthrough
-- `for k in range(1, 11):`: Loops testing `k` from 1 to 10.
-- `km.inertia_`: The internal metric of how tightly grouped the clusters are. It always goes down as `k` goes up, because more clusters mean every point is closer to its own center.
-- `ax.plot(..., 'bo-')`: Plots the data with blue color, circular markers, and solid lines.
-- `ax.axvline(x=3, ...)`: Draws a vertical line at 3. The **Elbow method** dictates we look for the "elbow" of the curve—the point where adding more clusters no longer produces a massive drop in inertia. Here, the true structure is captured at 3; beyond that, we are just splitting real clusters arbitrarily.
+- `def kmeans_bad_init(points, k):` defines a variant of our algorithm designed to fail.
+- `centroids = points[:k]` intentionally subverts the randomness by grabbing the first $k$ points, which in sorted data usually belong to the same cluster.
+- `for iteration in range(10):` runs a shortened identical loop to regular `kmeans`.
+- `return centroids, assignments, inertia(...)` returns the final state alongside its objective score so we can compare it to a good run.
 
+### CS lens
+The concept here is **Sensitivity to Initial Conditions**. Optimization algorithms behave wildly differently based on where they start.
+1. Chaotic systems (like double pendulums) diverging based on micro-adjustments.
+2. Weight initialization in neural nets causing vanishing/exploding gradients.
+3. K-means++ algorithm specifically designed to space out initial seeds to fix this exact bug.
+4. Ray marching artifacts depending on step size origins.
 
-## Concept Unit: Evaluating clusters without labels — silhouette score
+### SE lens
+**Design Principle:** Reproducibility through seeding.
+**Alternative NOT chosen:** We could have just let `random.sample()` use system time implicitly.
+**Real tradeoff:** If we rely on implicit seeding, a user will run `kmeans()` and get different cluster shapes and different inertia scores randomly on every execution. Explicit seeding (`seed=42`) allows us to deterministically prove that bad starts exist without relying on chance to demonstrate the flaw.
+
+### Commands needed
+`python3`
+
+### Run it
+Predicted confidently:
+Trace bad init: both initial centroids in cluster A. Some cluster B points may be assigned to the 'A-biased' centroid. Algorithm may converge to suboptimal solution. Solution: k-means++ initialization (choose centroids spread out), or run multiple random restarts and pick best inertia.
+
+### One sentence connecting to previous unit
+If inertia relies on distance to the center, it decreases naturally as we artificially inflate $k$, so we need a metric that measures actual separation quality instead.
+
+## Concept Unit: Evaluating clusters — when there are no labels
 
 ### The Problem
-The elbow method is a visual heuristic, which is sometimes ambiguous. Is there a more formal metric to evaluate cluster quality without having ground-truth labels?
+If $k=N$ (every point is its own cluster), inertia drops to zero, which looks "perfect" mathematically but is utterly useless functionally. How do we punish the algorithm for putting clusters too close together? If a point is tightly bound to its centroid, shouldn't we also verify that it is *far away* from the next closest cluster?
 
 ### Introduce the concept in isolation
+Here is the **Silhouette Ratio** concept demonstrated in isolation.
 ```python
-from sklearn.metrics import silhouette_score
-from sklearn.cluster import KMeans
-import numpy as np
-
-np.random.seed(42)
-X = np.vstack([np.random.randn(50, 2) + [0, 0],
-               np.random.randn(50, 2) + [5, 5],
-               np.random.randn(50, 2) + [10, 0]])
-
-km = KMeans(n_clusters=3, random_state=42, n_init=10)
-labels = km.fit_predict(X)
-score = silhouette_score(X, labels)
-print(f'Score: {score:.4f}')
+my_dist = 1.0     # very close to my friends
+other_dist = 10.0 # very far from the next group
+score = (other_dist - my_dist) / max(my_dist, other_dist)
+print(score)
+# 0.9
 ```
-Output:
-```
-Score: 0.7495
-```
-This shows how to compute the **silhouette score**.
+This proves that by comparing internal cohesion against external separation, we generate a normalized score between -1 and 1 where higher numbers strictly mean "well separated."
 
-### Discard the throwaway example
-We will loop over `k` values and compare the scores.
+### Discard the throwaway
+The throwaway example above is completely discarded. It will not appear in our final project code.
 
 ### Project Change
-- **Reference Source:** None
-- **Files affected:** `analyze.py` (modified)
+- **Reference Source:** None — this is a from-scratch addition because we are exploring a standalone theory lesson.
+- **Files affected:** `kmeans.py` (modified)
 - **Change type:** Add
-- **Location:** Bottom of file
-- **Dependencies:** `silhouette_score`
+- **Location:** Below `kmeans_bad_init`.
+- **Dependencies:** None
 
 ### The New Code
 ```python
-from sklearn.metrics import silhouette_score
+def silhouette_score_point(point_idx, points, assignments):
+    '''Silhouette coefficient for one point: (b-a)/max(a,b).
+       a = mean distance to points in same cluster.
+       b = mean distance to points in nearest other cluster.
+       Range: [-1, 1]. Higher = better separation.'''
+    assignments_list = assignments
+    cluster = assignments_list[point_idx]
+    point = points[point_idx]
 
-for k in range(2, 8):
-    km = KMeans(n_clusters=k, random_state=42, n_init=10)
-    labels = km.fit_predict(X)
-    score = silhouette_score(X, labels)
-    print(f'k={k}: silhouette={score:.4f}')
+    # a: mean intra-cluster distance
+    same = [points[i] for i in range(len(points))
+            if assignments_list[i] == cluster and i != point_idx]
+    a = sum(euclidean_distance(point, p) for p in same) / len(same) if same else 0
+
+    # b: mean distance to nearest other cluster
+    other_clusters = set(assignments_list) - {cluster}
+    b = min(
+        sum(euclidean_distance(point, points[i]) for i in range(len(points))
+            if assignments_list[i] == c) / sum(1 for a2 in assignments_list if a2 == c)
+        for c in other_clusters
+    )
+    return (b - a) / max(a, b) if max(a, b) > 0 else 0
 ```
 
 ### The Updated Project
 ```python
-# 25 ax.axvline(x=3, color='red', linestyle='--')
-# 26 plt.savefig('elbow.png')
-# 27
-# 28 from sklearn.metrics import silhouette_score  # ← new
-# 29 
-# 30 for k in range(2, 8):  # ← new
-# 31     km = KMeans(n_clusters=k, random_state=42, n_init=10)
-# 32     labels = km.fit_predict(X)
-# 33     score = silhouette_score(X, labels)
-# 34     print(f'k={k}: silhouette={score:.4f}')
+74: def silhouette_score_point(point_idx, points, assignments): # <- new
+75:     '''Silhouette coefficient for one point: (b-a)/max(a,b). # <- new
+76:        a = mean distance to points in same cluster. # <- new
+77:        b = mean distance to points in nearest other cluster. # <- new
+78:        Range: [-1, 1]. Higher = better separation.''' # <- new
+79:     assignments_list = assignments # <- new
+80:     cluster = assignments_list[point_idx] # <- new
+81:     point = points[point_idx] # <- new
+82: 
+83:     # a: mean intra-cluster distance # <- new
+84:     same = [points[i] for i in range(len(points)) # <- new
+85:             if assignments_list[i] == cluster and i != point_idx] # <- new
+86:     a = sum(euclidean_distance(point, p) for p in same) / len(same) if same else 0 # <- new
+87: 
+88:     # b: mean distance to nearest other cluster # <- new
+89:     other_clusters = set(assignments_list) - {cluster} # <- new
+90:     b = min( # <- new
+91:         sum(euclidean_distance(point, points[i]) for i in range(len(points)) # <- new
+92:             if assignments_list[i] == c) / sum(1 for a2 in assignments_list if a2 == c) # <- new
+93:         for c in other_clusters # <- new
+94:     ) # <- new
+95:     return (b - a) / max(a, b) if max(a, b) > 0 else 0 # <- new
 ```
+We now have a mechanism that evaluates the relative quality of the geometric structure discovered by the algorithm, entirely divorced from ground-truth labels.
 
 ### Mechanical walkthrough
-- `fit_predict(X)`: A convenience method that runs `fit` and returns the assigned `labels_` in one step.
-- `silhouette_score(X, labels)`: Computes the score. For a single point, it is calculated as `(b - a) / max(a, b)`, where `a` is the mean distance to all other points in its own cluster, and `b` is the mean distance to all points in the nearest other cluster.
-- The resulting score is bounded between -1 and 1. Values near 1 indicate the point is far away from neighboring clusters (good). Near 0 indicates it is on the boundary. Negative values indicate it was likely assigned to the wrong cluster. By taking the average over all points, the silhouette score determines the highest quality clustering happens at `k=3` (highest score).
+- `def silhouette_score_point(point_idx, points, assignments):` defines a scoring function aimed at exactly one point in the dataset.
+- `assignments_list = assignments` aliases the array for clarity.
+- `cluster = assignments_list[point_idx]` determines the point's home cluster.
+- `same = [...]` constructs a list of all other coordinate points residing in that exact same home cluster.
+- `sum(...) / len(same)` averages the Euclidean distances to all peer points, defining `a`.
+- `other_clusters = set(assignments_list) - {cluster}` leverages Python sets to construct a unique collection of all competing clusters.
+- `min(...)` evaluates the mean distance to *every* other cluster and selects the lowest one (i.e., the closest neighboring cluster), defining `b`.
+- `return (b - a) / max(a, b)` normalizes the difference, bounding it securely between -1.0 and 1.0.
 
+### CS lens
+The concept here is **Normalization of Unbounded Metrics**. `a` and `b` could be distances of 0.5 or 50,000 depending on the scale of the raw data.
+1. Audio volume compression capping massive dynamic range.
+2. Cosine similarity scaling raw dot products into the [-1, 1] range.
+3. TF-IDF normalizing word counts against document length.
+4. Sigmoid functions clamping arbitrary neural network activations into a (0, 1) probability space.
 
-## Concept Unit: K-means limitations — when it fails
+### SE lens
+**Design Principle:** O(N^2) computation tradeoffs. 
+**Alternative NOT chosen:** We calculate `silhouette` per-point, forcing the caller to loop over the dataset, meaning the overall operation compares every point against every other point.
+**Real tradeoff:** This metric is exceptionally expensive to compute on massive datasets compared to `inertia` (which just compares points to their centroids). In production ML systems, you often compute silhouette scores on a small random sample of the data rather than the entire dataset to save processing time.
 
-### The Problem
-k-Means is powerful, but it makes assumptions about the data. What happens when clusters are not spherical or are of wildly different sizes?
+### Commands needed
+`python3`
 
-### Introduce the concept in isolation
-```python
-from sklearn.datasets import make_moons
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.metrics import silhouette_score
+### Run it
+Predicted confidently:
+Trace silhouette for point [1,1] in cluster 0: same cluster: [1,2],[2,1],[2,2]. a=mean dist to those=mean(1,1,1.41)=1.14. Other cluster (1) points: [5,5],[5,6],[6,5],[6,6]. b=mean dist=5.66,6.08,6.40,7.07, mean=6.30. score=(6.30-1.14)/max=5.16/6.30=0.82. Good separation.
 
-X_moons, _ = make_moons(n_samples=200, noise=0.05, random_state=42)
+### One sentence connecting to previous unit
+With initialization limits, iterative shifting, inertia grading, and silhouette checking, we possess the complete structural pipeline of unsupervised discovery.
 
-km = KMeans(n_clusters=2, random_state=42, n_init=10)
-preds_km = km.fit_predict(X_moons)
-print(f'Moons silhouette (k-means): {silhouette_score(X_moons, preds_km):.4f}')
+## Closing
 
-db = DBSCAN(eps=0.2, min_samples=5)
-preds_db = db.fit_predict(X_moons)
-print(f'Moons silhouette (DBSCAN):  {silhouette_score(X_moons, preds_db):.4f}')
-```
-Output:
-```
-Moons silhouette (k-means): 0.4902
-Moons silhouette (DBSCAN):  0.3230
-```
-*(Note: while DBSCAN isolates the visual crescents perfectly, its silhouette score drops because the score itself assumes convex, spherical clusters! However, visual inspection proves DBSCAN assigns the intertwined crescents correctly while k-means slices them down the middle.)*
-
-### Discard the throwaway example
-The point is proven: k-means fails on crescent-shaped data.
-
-### Project Change
-- **Reference Source:** None
-- **Files affected:** `limitations.py` (created)
-- **Change type:** Add
-- **Location:** New file
-- **Dependencies:** `make_moons`, `KMeans`, `DBSCAN`
-
-### The New Code
-```python
-from sklearn.datasets import make_moons
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.metrics import silhouette_score
-
-X_moons, _ = make_moons(n_samples=200, noise=0.05, random_state=42)
-km = KMeans(n_clusters=2, random_state=42, n_init=10)
-preds = km.fit_predict(X_moons)
-
-db = DBSCAN(eps=0.2, min_samples=5)
-db_preds = db.fit_predict(X_moons)
-```
-
-### The Updated Project
-```python
-# 1 from sklearn.datasets import make_moons
-# 2 from sklearn.cluster import KMeans, DBSCAN
-# 3 from sklearn.metrics import silhouette_score
-# 4 
-# 5 X_moons, _ = make_moons(n_samples=200, noise=0.05, random_state=42)
-# 6 km = KMeans(n_clusters=2, random_state=42, n_init=10)
-# 7 preds = km.fit_predict(X_moons)
-# 8 
-# 9 db = DBSCAN(eps=0.2, min_samples=5)
-# 10 db_preds = db.fit_predict(X_moons)
-```
-
-### Mechanical walkthrough
-- `make_moons(...)`: Generates a dataset shaped like two interlocking crescents.
-- `km.fit_predict(X_moons)`: k-means assumes clusters are spherical and isotropic (drawing circular boundaries). It splits the interlocking crescents arbitrarily because it cannot model curved shapes.
-- `DBSCAN(eps=0.2, min_samples=5)`: Instantiates a density-based clustering algorithm. Instead of assuming spheres and minimizing variance, it groups points that are densely packed together, propagating through the crescent shapes naturally. `eps` is the maximum distance between two samples for one to be considered in the neighborhood of the other.
-
----
-Closing: clustering is the foundation of unsupervised learning. Lesson 45 covers classification — k-nearest neighbors. Exercises: apply k-means to the Iris dataset and compare with the true labels; implement k-means++ initialization; cluster a text dataset using TF-IDF features.
+### Connect the pieces
+Trace `kmeans(6-point-dataset, k=2)`:
+1. **Init centroids:** `random.sample` pulls two random starting coordinates, e.g., `[1, 1]` and `[6, 6]`.
+2. **Assign iteration 1:** We loop over all points. `[1, 2]` is physically closer to `[1, 1]`, so it receives cluster ID `0`. `[5, 5]` is closer to `[6, 6]`, getting cluster ID `1`.
+3. **Update centroids:** We average all coordinates in cluster `0`, shifting the center to `[1.33, 1.33]`. We average cluster `1`, shifting it to `[5.33, 5.33]`.
+4. **Assign iteration 2:** We evaluate distances again. The borders haven't shifted enough to cross over any points, so assignments remain unchanged.
+5. **Convergence check:** The deep equality check `new_assignments == assignments` passes. The `break` triggers.
+6. **Inertia & Silhouette:** The resulting compact groupings yield a low `inertia` (tight internal squared distance) and a high `silhouette` score (~0.82, showing clear separation between the two clusters), proving the algorithm successfully discovered the underlying geometric truth without labels.

@@ -1,544 +1,746 @@
-# Lesson 45: Classification — k-Nearest Neighbors from Scratch and with scikit-learn
+# Lesson 45: Classification — k-Nearest Neighbors from Scratch
 
-What you will build
-In this lesson, you will implement k-Nearest Neighbors (kNN) classification from scratch, then use `sklearn.neighbors.KNeighborsClassifier`, and understand the effect of k. The transferable problems are: (1) kNN is the simplest classification algorithm — to classify a new point, find its k nearest training examples and take the majority vote; (2) kNN is a NON-PARAMETRIC algorithm — it stores ALL training data and does no fitting; all computation happens at prediction time; (3) the choice of k is a hyperparameter — too small = overfitting (noisy), too large = underfitting (over-smoothing).
+What you will build: The reader implements k-Nearest Neighbors (kNN) from scratch: for a new point, find the k nearest training points, take a majority vote of their labels. They also implement feature normalization and leave-one-out cross-validation. The transferable insight: kNN is a non-parametric model: it stores the entire training set and makes decisions at prediction time. It has no 'training' phase (just memory). Prediction is O(n * d) where n=training size and d=features. Its weakness: slow at large scale; its strength: no assumptions about data distribution.
 
-What you need to know first
-Lessons 0–44.
+What you need to know first: Lessons 00-44.
 
-Terms used in this lesson
-**Euclidean distance** — The straight-line distance between two points in Euclidean space, calculated using the Pythagorean theorem. It solves the problem of quantifying how "far apart" two examples are.
-**Majority vote** — A decision rule that selects the most frequent class among a set of predictions. It solves the problem of aggregating multiple neighbor labels into a single prediction.
-**Non-parametric** — An algorithm that does not make strong assumptions about the form of the mapping function, meaning it does not learn a fixed set of parameters (like weights in linear regression). It solves the problem of modeling highly irregular data distributions.
-**Hyperparameter** — A configuration value set before the learning process begins, rather than derived from data during training. It solves the problem of controlling the behavior and capacity of the algorithm.
+## Terms used in this lesson
 
-Objects and methods used
+**k-Nearest Neighbors (kNN)** — A non-parametric classification algorithm that predicts the label of a new data point by finding the 'k' closest training examples and taking a majority vote among their labels. It has no separate training phase; it stores the dataset and computes distances at prediction time.
 
-**sklearn.datasets.load_iris**
-- *What it is:* A dataset loader function.
-- *Implementation:* `def load_iris(*, return_X_y=False, as_frame=False)`
-- *Its use:* We use it to load a standard benchmark dataset for classification.
-- *Type:* Free function.
-- *Responsibility:* Loads and returns the iris dataset as a Bunch object containing data and targets.
-- *Depends on:* Nothing (reads static dataset files).
-- *Connects to:* Called by the script, returns data arrays used by train_test_split.
-- *Shape:* A utility function in the scikit-learn datasets module.
+**Euclidean distance** — The straight-line distance between two points in Euclidean space, computed as the square root of the sum of squared differences of their coordinates. It is used here to measure how "close" two data points are.
 
-**sklearn.model_selection.train_test_split**
-- *What it is:* A function for splitting data into random train and test subsets.
-- *Implementation:* `def train_test_split(*arrays, test_size=None, random_state=None, stratify=None)`
-- *Its use:* We use it to evaluate our classifier on unseen data.
-- *Type:* Free function.
-- *Responsibility:* Shuffles and partitions data arrays into training and testing sets.
-- *Depends on:* Input arrays to split, test_size ratio, random_state for reproducibility.
-- *Connects to:* Receives full dataset, outputs partitioned sets for the model.
-- *Shape:* Utility function in model_selection.
+**Non-parametric model** — A machine learning model that makes no strong assumptions about the form of the mapping function, typically growing in complexity with the size of the dataset. kNN is non-parametric because it just memorizes the data.
 
-**sklearn.preprocessing.StandardScaler**
-- *What it is:* A feature scaling transformer.
-- *Implementation:* `class StandardScaler`
-- *Its use:* We use it to ensure all features contribute equally to the distance calculation by removing the mean and scaling to unit variance.
-- *Type:* Class.
-- *Responsibility:* Standardizes features by standardizing their distributions.
-- *Depends on:* Training data to compute mean and standard deviation.
-- *Connects to:* Placed in a pipeline before the estimator.
-- *Shape:* Data preprocessing transformer.
+**Feature normalization** — The process of scaling individual features to have a similar range (often [0, 1]). Without normalization, features with large numerical ranges will incorrectly dominate distance calculations.
 
-**sklearn.neighbors.KNeighborsClassifier**
-- *What it is:* The scikit-learn implementation of the kNN algorithm.
-- *Implementation:* `class KNeighborsClassifier(n_neighbors=5, ...)`
-- *Its use:* We use it to classify points efficiently instead of writing kNN from scratch.
-- *Type:* Class (Estimator).
-- *Responsibility:* Stores training data and predicts classes for new points based on neighborhood.
-- *Depends on:* n_neighbors hyperparameter, training data during fit.
-- *Connects to:* Called to predict on test data.
-- *Shape:* Supervised learning classifier.
+**Leave-one-out cross-validation** — An evaluation technique where each point in the dataset is used once as a test set while all other points serve as the training set, maximizing the data used for training in small datasets.
 
-**sklearn.pipeline.Pipeline**
-- *What it is:* A utility for chaining multiple estimators into one.
-- *Implementation:* `class Pipeline(steps)`
-- *Its use:* We use it to encapsulate the scaler and classifier so that cross-validation applies scaling correctly to each fold.
-- *Type:* Class.
-- *Responsibility:* Sequentially applies a list of transforms and a final estimator.
-- *Depends on:* A list of (name, object) tuples.
-- *Connects to:* Cross-validation functions, directly receives raw data.
-- *Shape:* Composite estimator model.
+## Objects and methods used
 
-**sklearn.model_selection.cross_val_score**
-- *What it is:* A function to evaluate a score by cross-validation.
-- *Implementation:* `def cross_val_score(estimator, X, y=None, cv=None)`
-- *Its use:* We use it to perform hyperparameter search for the best k.
-- *Type:* Free function.
-- *Responsibility:* Partitions data into folds, trains the estimator on the rest, evaluates on the fold, and returns all scores.
-- *Depends on:* Estimator, data, target, and cv (number of folds).
-- *Connects to:* Fits and predicts the provided estimator multiple times.
-- *Shape:* Model evaluation utility.
+**`math.sqrt`**
+- *What it is:* A mathematical function from the Python standard library that computes the square root.
+- *Implementation:* `def sqrt(x: float) -> float:`
+- *Its use:* To finalize the Euclidean distance calculation after summing the squared differences.
+- *Type:* Standard library function.
+- *Responsibility:* Returns the non-negative square root of a given number.
+- *Depends on:* A single numeric argument (x >= 0).
+- *Connects to:* Called by our distance function, returns a float to the caller.
+- *Shape:* Internal implementation detail for calculating distance.
 
-**sklearn.neighbors.KNeighborsRegressor**
-- *What it is:* A regression model based on k-nearest neighbors.
-- *Implementation:* `class KNeighborsRegressor(n_neighbors=5, ...)`
-- *Its use:* We use it to predict continuous values instead of class labels.
-- *Type:* Class (Estimator).
-- *Responsibility:* Predicts the target value by local interpolation of the targets associated with the nearest neighbors in the training set.
-- *Depends on:* Training data, n_neighbors.
-- *Connects to:* Pipeline for prediction.
-- *Shape:* Supervised learning regressor.
+**`sum`**
+- *What it is:* A built-in Python function that adds up the items of an iterable.
+- *Implementation:* `def sum(iterable, /, start=0):`
+- *Its use:* To add up the squared differences of all coordinates between two points.
+- *Type:* Built-in function.
+- *Responsibility:* Aggregates values into a single sum.
+- *Depends on:* An iterable yielding numeric values.
+- *Connects to:* Called within `euclidean_distance`, consuming a generator expression.
+- *Shape:* Internal helper for arithmetic.
 
-## Concept Unit: The kNN idea — learning by example
+**`zip`**
+- *What it is:* A built-in Python function that iterates over several iterables in parallel, producing tuples.
+- *Implementation:* `class zip(iter1 [,iter2 [...]])`
+- *Its use:* To pair up the corresponding coordinates of two n-dimensional points so their difference can be calculated.
+- *Type:* Built-in class / iterator.
+- *Responsibility:* Aggregates elements from each of the iterables into tuples.
+- *Depends on:* One or more iterable arguments.
+- *Connects to:* Provides paired elements to a list comprehension or generator expression.
+- *Shape:* Data transformation utility.
+
+**`list.sort`**
+- *What it is:* A built-in method of Python lists that sorts the list in place.
+- *Implementation:* `def sort(self, *, key=None, reverse=False):`
+- *Its use:* To order the list of distance-label pairs from shortest distance to longest.
+- *Type:* Instance method.
+- *Responsibility:* Sorts the items of the list in place, optionally using a custom `key` function.
+- *Depends on:* The list instance; optionally a `key` function to extract a comparison key from each element.
+- *Connects to:* Mutates the list it is called on.
+- *Shape:* Core algorithm step (sorting distances).
+
+**`collections.Counter.most_common`**
+- *What it is:* A method of the `Counter` class that returns a list of the n most common elements and their counts.
+- *Implementation:* `def most_common(self, n=None):`
+- *Its use:* To find the label that appears most frequently among the k nearest neighbors.
+- *Type:* Instance method.
+- *Responsibility:* Returns a sorted list of the most frequent items in the Counter.
+- *Depends on:* The `Counter` instance being populated with iterable data; an integer `n`.
+- *Connects to:* Called on a Counter initialized with labels, returning a list of `(element, count)` tuples.
+- *Shape:* Core algorithm step (majority voting).
+
+**`random.seed`**
+- *What it is:* A standard library function that initializes the internal state of the random number generator.
+- *Implementation:* `def seed(a=None, version=2):`
+- *Its use:* To ensure our synthetic cluster generation is reproducible across runs.
+- *Type:* Standard library function.
+- *Responsibility:* Seeds the PRNG to generate deterministic random sequences.
+- *Depends on:* An integer or hashable object `a`.
+- *Connects to:* Sets global random state for subsequent `random` module calls.
+- *Shape:* Test setup utility.
+
+**`random.gauss`**
+- *What it is:* A standard library function generating Gaussian (normal) distributed random numbers.
+- *Implementation:* `def gauss(mu, sigma):`
+- *Its use:* To add noise to points around a central cluster center.
+- *Type:* Standard library function.
+- *Responsibility:* Returns a random float from a Gaussian distribution with mean `mu` and standard deviation `sigma`.
+- *Depends on:* Numeric mean `mu` and standard deviation `sigma`.
+- *Connects to:* Called repeatedly in a list comprehension to build synthetic datasets.
+- *Shape:* Data generation utility.
+
+**`min`** and **`max`**
+- *What it is:* Built-in functions that find the smallest or largest item in an iterable.
+- *Implementation:* `def min(iterable, *[, default, key])` and `def max(iterable, *[, default, key])`
+- *Its use:* To find the bounds of a feature for min-max normalization.
+- *Type:* Built-in functions.
+- *Responsibility:* Return the minimum or maximum element from an iterable.
+- *Depends on:* An iterable of comparable items.
+- *Connects to:* Evaluates over each feature's column in the dataset.
+- *Shape:* Core algorithm step (calculating ranges for scaling).
+
+---
+
+## Concept Unit: kNN classification from scratch
 
 ### The Problem
-How do we classify a new data point without assuming a specific mathematical formula for the decision boundary?
+How can we classify a new data point based on existing data without fitting a mathematical curve? Given a set of points with known labels in a 2D space, what would be the most intuitive way to decide the label of a new, unknown point? How might looking at its closest neighbors help?
 
 ### Introduce the concept in isolation
-kNN makes no assumptions about the distribution of the data. To classify a new point x:
-1. Compute the distance from x to every training point
-2. Find the k nearest neighbors (smallest distances)
-3. Take the majority class among those k neighbors
-4. That is the prediction
+We will use **k-Nearest Neighbors (kNN)**, a non-parametric model. Let's see how distance and majority vote work in isolation.
 
 ```python
 import math
+from collections import Counter
 
-# Tiny 2D example: classify (3, 4) given labeled training data
-training = [
-    ((1, 2), 'A'),
-    ((2, 1), 'A'),
-    ((3, 2), 'A'),
-    ((6, 5), 'B'),
-    ((7, 6), 'B'),
-    ((8, 4), 'B'),
+# Calculate distance between [1, 1] and [4, 5]
+# delta_x = 3, delta_y = 4. Distance = sqrt(3^2 + 4^2) = 5.0
+dist = math.sqrt(sum((ai - bi)**2 for ai, bi in zip([1, 1], [4, 5])))
+print(f"Distance: {dist}")
+
+# Majority vote among 3 neighbors
+labels = ['A', 'A', 'B']
+vote = Counter(labels).most_common(1)[0][0]
+print(f"Vote: {vote}")
+```
+*Predicted confidently: Distance: 5.0, Vote: A.*
+This proves that we can easily compute the straight-line Euclidean distance between two points, and we can extract the most frequent label from a list using `Counter`.
+
+### Discard the throwaway
+This throwaway code is discarded and will not be used in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are building a fundamental machine learning algorithm without a library.
+- **Files affected**: `classifier.py` (created)
+- **Change type**: add
+- **Location**: Top of file
+- **Dependencies**: None.
+
+### The New Code
+```python
+import math
+from collections import Counter
+
+def euclidean_distance(a, b):
+    return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))
+
+def knn_predict(X_train, y_train, x_new, k):
+    '''Classify x_new using k nearest neighbors from X_train.'''
+    # Step 1: compute distance from x_new to every training point
+    distances = [(euclidean_distance(x_new, X_train[i]), y_train[i])
+                 for i in range(len(X_train))]
+    # Step 2: sort by distance, take k nearest
+    distances.sort(key=lambda pair: pair[0])
+    k_nearest = distances[:k]
+    # Step 3: majority vote among k nearest labels
+    labels = [label for _, label in k_nearest]
+    vote = Counter(labels).most_common(1)[0][0]
+    return vote
+
+X_train = [[1,1],[1,2],[2,1],[5,5],[5,6],[6,5]]
+y_train = ['A','A','A','B','B','B']
+
+for x_new in [[2,2],[3,3],[4,4],[5,4]]:
+    pred = knn_predict(X_train, y_train, x_new, k=3)
+    print(f'kNN(k=3) predict {x_new} -> {pred}')
+```
+
+### The Updated Project
+```python
+1: import math
+2: from collections import Counter
+3: 
+4: def euclidean_distance(a, b):
+5:     return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))
+6: 
+7: def knn_predict(X_train, y_train, x_new, k):
+8:     '''Classify x_new using k nearest neighbors from X_train.'''
+9:     # Step 1: compute distance from x_new to every training point
+10:     distances = [(euclidean_distance(x_new, X_train[i]), y_train[i])
+11:                  for i in range(len(X_train))]
+12:     # Step 2: sort by distance, take k nearest
+13:     distances.sort(key=lambda pair: pair[0])
+14:     k_nearest = distances[:k]
+15:     # Step 3: majority vote among k nearest labels
+16:     labels = [label for _, label in k_nearest]
+17:     vote = Counter(labels).most_common(1)[0][0]
+18:     return vote
+19: 
+20: X_train = [[1,1],[1,2],[2,1],[5,5],[5,6],[6,5]]
+21: y_train = ['A','A','A','B','B','B']
+22: 
+23: for x_new in [[2,2],[3,3],[4,4],[5,4]]:
+24:     pred = knn_predict(X_train, y_train, x_new, k=3)
+25:     print(f'kNN(k=3) predict {x_new} -> {pred}')
+```
+This module defines the full nearest neighbors classification pipeline: calculating distances, sorting them, and voting.
+
+### Mechanical walkthrough
+- `import math` — brings in mathematical functions, specifically `math.sqrt`.
+- `from collections import Counter` — imports the `Counter` class for tallying items.
+- `def euclidean_distance(a, b):` — defines a function taking two equal-length numeric lists.
+- `zip(a, b)` — pairs up the coordinates from lists `a` and `b`.
+- `(ai - bi)**2` — calculates the squared difference for each pair.
+- `sum(...)` — adds all the squared differences together.
+- `math.sqrt(...)` — takes the square root of the sum to get the final Euclidean distance.
+- `distances = [...]` — builds a list comprehension of tuples pairing each point's distance with its label.
+- `distances.sort(key=lambda pair: pair[0])` — sorts the list of tuples in-place using the distance (the first element of the tuple) as the key.
+- `distances[:k]` — slices the first `k` elements, which are the closest ones.
+- `labels = [label for _, label in k_nearest]` — extracts just the labels from those nearest neighbor tuples.
+- `Counter(labels)` — creates a dictionary-like tally of the labels.
+- `.most_common(1)` — returns a list of the 1 most frequent element, in the format `[(label, count)]`.
+- `[0][0]` — extracts the first tuple from that list, and then the first item of that tuple (the label string itself).
+- `return vote` — returns the majority label as the final prediction.
+
+### CS lens
+The **k-Nearest Neighbors (kNN)** algorithm is an example of instance-based learning. Instead of building a generalized mathematical model from the data (like a regression line), it simply stores the data and defers computation until prediction time. Real-world appearances:
+- Recommendation systems finding "users similar to you".
+- Image recognition matching feature vectors against a database of known images.
+- Anomaly detection spotting points that are unusually far from their neighbors.
+
+### SE lens
+Design principle: **Eager vs. Lazy Evaluation**. kNN is a "lazy" learner because it does zero work during training (it just stores the data `X_train`, `y_train`). The tradeoff is that training is instant `O(1)`, but prediction is expensive `O(n * d)` because it must scan the entire dataset for every new query. Eager models (like neural networks) take hours to train but milliseconds to predict.
+
+### Commands needed
+`python3 classifier.py`
+
+### Run it
+*Predicted confidently:*
+```
+kNN(k=3) predict [2, 2] -> A
+kNN(k=3) predict [3, 3] -> A
+kNN(k=3) predict [4, 4] -> B
+kNN(k=3) predict [5, 4] -> B
+```
+
+### One sentence connecting to previous unit
+Now that we can find nearest neighbors to predict labels, we need to understand how the choice of 'k' affects the shape of the decision boundary between classes.
+
+---
+
+## Concept Unit: Effect of k on the decision boundary
+
+### The Problem
+If `k=1`, the model listens to the single closest point; if `k` is the size of the whole dataset, it just picks the most common overall label. How does varying `k` change where the algorithm draws the line between "Class A" and "Class B"? How might a model perform if it listens too closely to individual noisy points?
+
+### Introduce the concept in isolation
+We will explore the **decision boundary** by writing a quick evaluation loop that measures accuracy for different values of `k`.
+
+```python
+# Throwaway evaluation logic
+preds = ['A', 'A', 'B', 'A']
+truths = ['A', 'A', 'B', 'B']
+correct = sum(1 for p, t in zip(preds, truths) if p == t)
+print(f"Accuracy: {correct / len(preds)}")
+```
+*Predicted confidently: Accuracy: 0.75*
+This proves we can evaluate how many predictions matched the ground truth by iterating through them and dividing by the total count.
+
+### Discard the throwaway
+This throwaway code is discarded and will not be used in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are analyzing hyperparameter behavior.
+- **Files affected**: `classifier.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: The `knn_predict` function defined in the previous unit.
+
+### The New Code
+```python
+def knn_accuracy(X_train, y_train, X_test, y_test, k):
+    correct = sum(1 for i in range(len(X_test))
+                  if knn_predict(X_train, y_train, X_test[i], k) == y_test[i])
+    return correct / len(X_test)
+
+import random
+random.seed(42)
+
+# Generate data: two Gaussian clusters
+def make_cluster(center, n, noise=0.5, seed=0):
+    random.seed(seed)
+    return [[center[0] + random.gauss(0, noise),
+             center[1] + random.gauss(0, noise)]
+            for _ in range(n)]
+
+cluster_A = make_cluster([1,1], 20, seed=0)
+cluster_B = make_cluster([3,3], 20, seed=1)
+X = cluster_A + cluster_B
+y = ['A']*20 + ['B']*20
+
+# Simple 80/20 split:
+split = 32
+X_tr, y_tr = X[:split], y[:split]
+X_te, y_te = X[split:], y[split:]
+
+for k in [1, 3, 5, 9, 15]:
+    acc = knn_accuracy(X_tr, y_tr, X_te, y_te, k)
+    print(f'k={k:2d}: accuracy={acc:.3f}')
+```
+
+### The Updated Project
+```python
+24:     pred = knn_predict(X_train, y_train, x_new, k=3)
+25:     print(f'kNN(k=3) predict {x_new} -> {pred}')
+26: 
+27: # ← new
+28: def knn_accuracy(X_train, y_train, X_test, y_test, k):
+29:     correct = sum(1 for i in range(len(X_test))
+30:                   if knn_predict(X_train, y_train, X_test[i], k) == y_test[i])
+31:     return correct / len(X_test)
+32: 
+33: import random
+34: random.seed(42)
+35: 
+36: def make_cluster(center, n, noise=0.5, seed=0):
+37:     random.seed(seed)
+38:     return [[center[0] + random.gauss(0, noise),
+39:              center[1] + random.gauss(0, noise)]
+40:             for _ in range(n)]
+41: 
+42: cluster_A = make_cluster([1,1], 20, seed=0)
+43: cluster_B = make_cluster([3,3], 20, seed=1)
+44: X = cluster_A + cluster_B
+45: y = ['A']*20 + ['B']*20
+46: 
+47: split = 32
+48: X_tr, y_tr = X[:split], y[:split]
+49: X_te, y_te = X[split:], y[split:]
+50: 
+51: for k in [1, 3, 5, 9, 15]:
+52:     acc = knn_accuracy(X_tr, y_tr, X_te, y_te, k)
+53:     print(f'k={k:2d}: accuracy={acc:.3f}')
+```
+This adds functions to generate synthetic clustered data and evaluate the accuracy of the model on a holdout test set using different values of `k`.
+
+### Mechanical walkthrough
+- `def knn_accuracy(...)` — defines a function to test predictions against true labels.
+- `sum(1 for i in range(len(X_test)) if ...)` — a generator expression that yields a `1` for every prediction that correctly matches the test label, and sums them up.
+- `import random` — brings in Python's random number generator module.
+- `random.seed(42)` — sets a global seed so runs are reproducible.
+- `def make_cluster(...)` — creates a localized group of points.
+- `random.gauss(0, noise)` — samples noise from a normal distribution centered at 0 with standard deviation `noise`.
+- `X = cluster_A + cluster_B` — concatenates the lists of points.
+- `y = ['A']*20 + ['B']*20` — creates a target label list matching the features list.
+- `X[:split]` and `X[split:]` — slice the data into a training segment (first 32) and test segment (last 8).
+- `for k in [1, 3, 5, 9, 15]:` — loops through a set of hyperparameter values for `k`.
+
+### CS lens
+The **Decision boundary** is the dividing line (or hypersurface) in the feature space where the model flips from predicting one class to another. k=1 creates a highly jagged boundary that perfectly surrounds every training point (overfitting noise). k=15 creates a smoother, more generalized boundary (but risks underfitting if details matter). Real-world applications:
+- Tuning a spam filter to balance aggressive catching versus false positives.
+- Edge detection thresholds in computer vision.
+- Setting credit score cutoffs for loan approvals.
+
+### SE lens
+Design principle: **Hyperparameter Parameterization**. Instead of hardcoding `k=3` deep inside the predict loop, `k` is bubbled up as an explicit parameter. This allows testing harnesses to iterate over it without changing the core algorithm. The alternative (hardcoding it) prevents automated tuning.
+
+### Commands needed
+`python3 classifier.py`
+
+### Run it
+*Predicted confidently:*
+```
+k= 1: accuracy=0.875
+k= 3: accuracy=1.000
+k= 5: accuracy=1.000
+k= 9: accuracy=1.000
+k=15: accuracy=0.750
+```
+
+### One sentence connecting to previous unit
+While our model successfully classifies points with similar scales, we must now fix what happens when one feature is measured in tiny numbers and another in massive ones.
+
+---
+
+## Concept Unit: Feature normalization — why distance metrics need it
+
+### The Problem
+If we use `euclidean_distance` on a dataset predicting student success based on "hours studied" (0 to 10) and "income" (0 to 100,000), a difference of 5 hours is dwarfed by a difference of 100 dollars. How do we prevent features with large numeric ranges from shouting down smaller, potentially more important features?
+
+### Introduce the concept in isolation
+We will use **Feature normalization** to squeeze every feature into a proportional range, specifically `[0, 1]`.
+
+```python
+# Scale 5 within a range of 2 to 9
+val = 5
+v_min, v_max = 2, 9
+scaled = (val - v_min) / (v_max - v_min)
+print(f"Scaled: {scaled:.3f}")
+```
+*Predicted confidently: Scaled: 0.429*
+This proves that subtracting the minimum and dividing by the range scales any number linearly between 0 and 1 relative to its minimum and maximum bounds.
+
+### Discard the throwaway
+This throwaway code is discarded and will not be used in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating data preprocessing requirements.
+- **Files affected**: `classifier.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: The `knn_predict` function.
+
+### The New Code
+```python
+data = [
+    {'hours': 2, 'income': 20000, 'label': 'fail'},
+    {'hours': 8, 'income': 21000, 'label': 'pass'},
+    {'hours': 3, 'income': 80000, 'label': 'fail'},
+    {'hours': 9, 'income': 81000, 'label': 'pass'},
 ]
 
-def euclidean(p1, p2):
-    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+X_raw = [[d['hours'], d['income']] for d in data]
+y = [d['label'] for d in data]
+new_point_raw = [5, 50000]
 
-def knn_predict(query, training, k):
-    distances = [(euclidean(query, point), label) for point, label in training]
-    distances.sort(key=lambda x: x[0])
-    k_nearest = distances[:k]
-    labels = [label for _, label in k_nearest]
-    return max(set(labels), key=labels.count)
+pred_raw = knn_predict(X_raw, y, new_point_raw, k=2)
+print(f'Without normalization: {pred_raw}')
 
-query = (3, 4)
+def normalize(X):
+    n_features = len(X[0])
+    mins  = [min(X[i][f] for i in range(len(X))) for f in range(n_features)]
+    maxs  = [max(X[i][f] for i in range(len(X))) for f in range(n_features)]
+    ranges = [maxs[f] - mins[f] if maxs[f] != mins[f] else 1 for f in range(n_features)]
+    return [[(X[i][f] - mins[f]) / ranges[f] for f in range(n_features)] for i in range(len(X))]
+
+X_norm = normalize(X_raw)
+new_norm = [(5 - 2)/(9-2), (50000-20000)/(81000-20000)]
+pred_norm = knn_predict(X_norm, y, new_norm, k=2)
+print(f'With normalization: {pred_norm}')
+```
+
+### The Updated Project
+```python
+51: for k in [1, 3, 5, 9, 15]:
+52:     acc = knn_accuracy(X_tr, y_tr, X_te, y_te, k)
+53:     print(f'k={k:2d}: accuracy={acc:.3f}')
+54:
+55: # ← new
+56: data = [
+57:     {'hours': 2, 'income': 20000, 'label': 'fail'},
+58:     {'hours': 8, 'income': 21000, 'label': 'pass'},
+59:     {'hours': 3, 'income': 80000, 'label': 'fail'},
+60:     {'hours': 9, 'income': 81000, 'label': 'pass'},
+61: ]
+62: 
+63: X_raw = [[d['hours'], d['income']] for d in data]
+64: y = [d['label'] for d in data]
+65: new_point_raw = [5, 50000]
+66: 
+67: pred_raw = knn_predict(X_raw, y, new_point_raw, k=2)
+68: print(f'Without normalization: {pred_raw}')
+69: 
+70: def normalize(X):
+71:     n_features = len(X[0])
+72:     mins  = [min(X[i][f] for i in range(len(X))) for f in range(n_features)]
+73:     maxs  = [max(X[i][f] for i in range(len(X))) for f in range(n_features)]
+74:     ranges = [maxs[f] - mins[f] if maxs[f] != mins[f] else 1 for f in range(n_features)]
+75:     return [[(X[i][f] - mins[f]) / ranges[f] for f in range(n_features)] for i in range(len(X))]
+76: 
+77: X_norm = normalize(X_raw)
+78: new_norm = [(5 - 2)/(9-2), (50000-20000)/(81000-20000)]
+79: pred_norm = knn_predict(X_norm, y, new_norm, k=2)
+80: print(f'With normalization: {pred_norm}')
+```
+This adds a manual normalization pipeline that scales features into a `[0, 1]` range, ensuring large values don't drown out smaller ones during distance calculations.
+
+### Mechanical walkthrough
+- `X_raw = [[d['hours'], d['income']] for d in data]` — converts a list of dicts into a 2D list of features.
+- `pred_raw = knn_predict(...)` — predicts the label using unscaled data, resulting in a distance computation completely dominated by income.
+- `def normalize(X):` — defines a function to scale the dataset.
+- `n_features = len(X[0])` — calculates the number of columns (features) based on the first row.
+- `mins = [min(...) ...]` — extracts the minimum value for each column using a list comprehension over the rows.
+- `maxs = [max(...) ...]` — extracts the maximum value for each column.
+- `ranges = [maxs[f] - mins[f] ...]` — computes the difference between max and min, falling back to 1 to prevent division by zero.
+- `(X[i][f] - mins[f]) / ranges[f]` — applies the min-max formula to scale the specific cell into a 0 to 1 range.
+- `new_norm = [...]` — manually normalizes the single test point using the exact same logic.
+- `pred_norm = knn_predict(...)` — makes a new prediction on the normalized dataset.
+
+### CS lens
+**Feature normalization** prevents dimension dominance. Because Euclidean distance uses squared differences, a difference of 10,000 becomes 100,000,000, completely overwriting a difference of 5 which becomes 25. Real-world applications:
+- Adjusting raw sensor data (e.g. pressure in Pascals vs temperature in Celsius).
+- Preparing image pixels (0-255) for neural networks (0-1).
+- Transforming financial metrics where stock prices and trade volumes have wildly different scales.
+
+### SE lens
+Design principle: **Separation of Concerns**. We normalize the data outside of `knn_predict`. The algorithm should only care about finding neighbors; it shouldn't also be responsible for sanitizing or reshaping the input space. The tradeoff is the developer must manually remember to normalize new test points before passing them in.
+
+### Commands needed
+`python3 classifier.py`
+
+### Run it
+*Predicted confidently:*
+```
+Without normalization: fail
+With normalization: pass
+```
+
+### One sentence connecting to previous unit
+Now that we have balanced inputs, how can we test accuracy reliably when our dataset is too small to safely split off 20% for testing?
+
+---
+
+## Concept Unit: Leave-one-out cross-validation
+
+### The Problem
+If you only have 8 data points, a 20% test split means testing on less than 2 points, which is completely unreliable. How can we test a model's accuracy on small datasets without losing precious training examples?
+
+### Introduce the concept in isolation
+We will use **Leave-one-out cross-validation**, an evaluation technique that iteratively pulls exactly one point out to test, training on the rest.
+
+```python
+# Throwaway leave-one-out simulation
+X_mock = ['p1', 'p2', 'p3']
+for i in range(len(X_mock)):
+    test = X_mock[i]
+    train = [X_mock[j] for j in range(len(X_mock)) if j != i]
+    print(f"Test: {test}, Train: {train}")
+```
+*Predicted confidently:*
+```
+Test: p1, Train: ['p2', 'p3']
+Test: p2, Train: ['p1', 'p3']
+Test: p3, Train: ['p1', 'p2']
+```
+This proves we can systematically exclude exactly one element via its index `i`, leaving all others for the training set, repeating until every point has been the test case once.
+
+### Discard the throwaway
+This throwaway code is discarded and will not be used in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are implementing a specific statistical testing method.
+- **Files affected**: `classifier.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: The `knn_predict` function.
+
+### The New Code
+```python
+def leave_one_out_cv(X, y, k):
+    '''Test each point by training on all others, predicting it.
+       Returns accuracy across all n folds.'''
+    n = len(X)
+    correct = 0
+    for i in range(n):
+        # Exclude point i from training
+        X_train = [X[j] for j in range(n) if j != i]
+        y_train = [y[j] for j in range(n) if j != i]
+        # Predict point i
+        pred = knn_predict(X_train, y_train, X[i], k)
+        if pred == y[i]:
+            correct += 1
+    return correct / n
+
+X = [[1,1],[1,2],[2,1],[2,2],[5,5],[5,6],[6,5],[6,6]]
+y = ['A','A','A','A','B','B','B','B']
+
 for k in [1, 3, 5]:
-    pred = knn_predict(query, training, k)
-    print(f'k={k}: {pred}')
-```
-Output:
-```text
-k=1: A
-k=3: A
-k=5: B
-```
-This proves that the choice of `k` directly affects the prediction. For k=3, the 3 nearest neighbors are (3,2) distance 2.0 (A), (2,1) distance 3.16 (A), and (6,5) distance 3.16 (B). Majority is A. For k=5, more B points are included, shifting the majority.
-
-### Discard the throwaway example
-The tiny 2D example is discarded and will not appear in the project again.
-
-### Project Change
-- Reference Source: No reference counterpart — this is a from-scratch addition because we are demonstrating the raw logic on a real dataset.
-- Files affected: `knn_iris.py`
-- Change type: Add
-- Location: Brand new file.
-- Dependencies: numpy, scikit-learn
-
-### The New Code
-```python
-import numpy as np
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-
-iris = load_iris()
-X_train, X_test, y_train, y_test = train_test_split(
-    iris.data, iris.target, test_size=0.2, random_state=42, stratify=iris.target
-)
-
-def knn_classify(X_train, y_train, x_query, k):
-    distances = np.sqrt(np.sum((X_train - x_query)**2, axis=1))
-    k_indices = np.argsort(distances)[:k]
-    k_labels = y_train[k_indices]
-    return np.bincount(k_labels).argmax()
+    cv_acc = leave_one_out_cv(X, y, k)
+    print(f'k={k}: LOO-CV accuracy = {cv_acc:.3f}')
 ```
 
 ### The Updated Project
 ```python
-# 1: import numpy as np
-# 2: from sklearn.datasets import load_iris
-# 3: from sklearn.model_selection import train_test_split
-# 4: 
-# 5: iris = load_iris()
-# 6: X_train, X_test, y_train, y_test = train_test_split(
-# 7:     iris.data, iris.target, test_size=0.2, random_state=42, stratify=iris.target
-# 8: )
-# 9: 
-# 10: def knn_classify(X_train, y_train, x_query, k):
-# 11:     distances = np.sqrt(np.sum((X_train - x_query)**2, axis=1))
-# 12:     k_indices = np.argsort(distances)[:k]
-# 13:     k_labels = y_train[k_indices]
-# 14:     return np.bincount(k_labels).argmax()
+80: print(f'With normalization: {pred_norm}')
+81:
+82: # ← new
+83: def leave_one_out_cv(X, y, k):
+84:     '''Test each point by training on all others, predicting it.
+85:        Returns accuracy across all n folds.'''
+86:     n = len(X)
+87:     correct = 0
+88:     for i in range(n):
+89:         # Exclude point i from training
+90:         X_train = [X[j] for j in range(n) if j != i]
+91:         y_train = [y[j] for j in range(n) if j != i]
+92:         # Predict point i
+93:         pred = knn_predict(X_train, y_train, X[i], k)
+94:         if pred == y[i]:
+95:             correct += 1
+96:     return correct / n
+97: 
+98: X = [[1,1],[1,2],[2,1],[2,2],[5,5],[5,6],[6,5],[6,6]]
+99: y = ['A','A','A','A','B','B','B','B']
+100: 
+101: for k in [1, 3, 5]:
+102:     cv_acc = leave_one_out_cv(X, y, k)
+103:     print(f'k={k}: LOO-CV accuracy = {cv_acc:.3f}')
 ```
-The file now sets up the Iris dataset and provides a vectorized numpy function to perform kNN classification.
+This adds a function to comprehensively test the model's accuracy on small datasets by using every single point as a test case once.
 
 ### Mechanical walkthrough
-- `np.sqrt` calculates the square root for the Euclidean distance.
-- `np.sum(..., axis=1)` sums the squared differences across the feature columns.
-- `np.argsort(distances)` returns the indices that would sort the array, allowing us to find the positions of the smallest distances.
-- `np.bincount(k_labels)` counts the occurrences of each class label.
-- `.argmax()` finds the index with the maximum count, giving us the majority vote.
+- `def leave_one_out_cv(X, y, k):` — defines the cross-validation function.
+- `n = len(X)` — captures the total number of data points.
+- `correct = 0` — initializes a counter for accurate predictions.
+- `for i in range(n):` — loops once for every single point in the dataset.
+- `X_train = [X[j] for j in range(n) if j != i]` — builds a new training list that includes every feature row except the `i`th one.
+- `y_train = [y[j] for j in range(n) if j != i]` — builds a matching label list excluding the `i`th label.
+- `pred = knn_predict(...)` — asks the model to predict the single left-out point `X[i]` using the rest of the data.
+- `if pred == y[i]:` — checks if the predicted label matches the actual left-out label.
+- `correct += 1` — increments the success count.
+- `return correct / n` — calculates the final accuracy ratio over all `n` folds.
 
+### CS lens
+**Leave-one-out cross-validation** (LOO-CV) is the extreme end of k-fold cross-validation, where the number of folds equals the number of data points. It provides an unbiased estimate of model performance because it tests every single point, but it requires retraining the model `n` times. Real-world uses:
+- Medical datasets with extremely low patient counts (e.g., rare diseases).
+- Early-stage prototype datasets.
+- Baseline robust accuracy metrics for deterministic models like kNN.
 
-## Concept Unit: kNN from scratch on Iris
+### SE lens
+Design principle: **Deterministic Testing**. In typical machine learning, random 80/20 splits mean accuracy bounces around on every run unless you manage seeds carefully. LOO-CV is completely deterministic: for a given dataset and `k`, the accuracy is a strict mathematical certainty, making it highly reproducible in unit tests. The tradeoff is compute time: looping `n` times scales poorly for large datasets.
+
+### Commands needed
+`python3 classifier.py`
+
+### Run it
+*Predicted confidently:*
+```
+k=1: LOO-CV accuracy = 1.000
+k=3: LOO-CV accuracy = 1.000
+k=5: LOO-CV accuracy = 0.875
+```
+
+### One sentence connecting to previous unit
+So far we have predicted discrete labels, but what if the target isn't a category like "A" or "pass", but a continuous number like a price or a temperature?
+
+---
+
+## Concept Unit: kNN for regression
 
 ### The Problem
-How do we evaluate our custom kNN implementation on a real dataset and measure its accuracy?
+If the training data points are prices, taking a "majority vote" of the 3 nearest prices doesn't make sense ($100.10, $100.12, $99.98 are all different values, so a vote ties 1-1-1). How can we modify our nearest-neighbor logic to predict a continuous numerical value instead of a category?
 
 ### Introduce the concept in isolation
-We will apply our function over an array of test examples.
+Instead of voting, we will use an average for **Regression**. Let's mock a simple list of numerical values and average them.
+
 ```python
-# Assuming X_train, y_train, X_test, y_test, and knn_classify from above
-k = 5
-predictions = np.array([knn_classify(X_train, y_train, x, k) for x in X_test])
-accuracy = np.mean(predictions == y_test)
-print(f'kNN (k={k}) accuracy: {accuracy:.4f}')
-
-for i, (pred, true) in enumerate(zip(predictions, y_test)):
-    if pred != true:
-        print(f'Misclassified test[{i}]: predicted={iris.target_names[pred]}, '
-              f'true={iris.target_names[true]}')
+# Throwaway average simulation
+nearest_values = [10.0, 12.0, 11.0]
+avg = sum(nearest_values) / len(nearest_values)
+print(f"Average: {avg}")
 ```
-Output:
-```text
-kNN (k=5) accuracy: 0.9667
-Misclassified test[23]: predicted=virginica, true=versicolor
-```
-This proves our custom implementation successfully predicts classes and mostly agrees with the true labels.
+*Predicted confidently: Average: 11.0*
+This proves that switching from a categorical tally to a simple mathematical mean transforms the final step into a continuous numerical prediction.
 
-### Discard the throwaway example
-This prediction script is discarded.
+### Discard the throwaway
+This throwaway code is discarded and will not be used in the project.
 
 ### Project Change
-- Reference Source: None.
-- Files affected: `knn_iris.py`
-- Change type: Add.
-- Location: Appended to file.
-- Dependencies: None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are pivoting the algorithm's objective type.
+- **Files affected**: `classifier.py` (modified)
+- **Change type**: add
+- **Location**: Bottom of file
+- **Dependencies**: The `euclidean_distance` function.
 
 ### The New Code
 ```python
-k = 5
-predictions = np.array([knn_classify(X_train, y_train, x, k) for x in X_test])
-accuracy = np.mean(predictions == y_test)
+def knn_regress(X_train, y_train, x_new, k):
+    '''Predict continuous value by averaging k nearest neighbors' values.'''
+    distances = [(euclidean_distance(x_new, X_train[i]), y_train[i])
+                 for i in range(len(X_train))]
+    distances.sort(key=lambda pair: pair[0])
+    k_nearest_values = [val for _, val in distances[:k]]
+    return sum(k_nearest_values) / len(k_nearest_values)
+
+# Approximate f(x) = x^2 from noisy samples:
+import random; random.seed(0)
+X_train = [[x] for x in range(0, 20, 2)]
+y_train = [x[0]**2 + random.gauss(0, 5) for x in X_train]
+
+# Predict at x=7:
+for k in [1, 3, 5]:
+    pred = knn_regress(X_train, y_train, [7], k)
+    print(f'k={k}: kNN-regression predict f(7)={pred:.2f}, true=49')
 ```
 
 ### The Updated Project
 ```python
-# 15: k = 5
-# 16: predictions = np.array([knn_classify(X_train, y_train, x, k) for x in X_test])
-# 17: accuracy = np.mean(predictions == y_test)
+103:     print(f'k={k}: LOO-CV accuracy = {cv_acc:.3f}')
+104:
+105: # ← new
+106: def knn_regress(X_train, y_train, x_new, k):
+107:     '''Predict continuous value by averaging k nearest neighbors' values.'''
+108:     distances = [(euclidean_distance(x_new, X_train[i]), y_train[i])
+109:                  for i in range(len(X_train))]
+110:     distances.sort(key=lambda pair: pair[0])
+111:     k_nearest_values = [val for _, val in distances[:k]]
+112:     return sum(k_nearest_values) / len(k_nearest_values)
+113: 
+114: import random; random.seed(0)
+115: X_train = [[x] for x in range(0, 20, 2)]
+116: y_train = [x[0]**2 + random.gauss(0, 5) for x in X_train]
+117: 
+118: for k in [1, 3, 5]:
+119:     pred = knn_regress(X_train, y_train, [7], k)
+120:     print(f'k={k}: kNN-regression predict f(7)={pred:.2f}, true=49')
 ```
-We now calculate the overall test accuracy of our manual implementation.
+This adds a regression variant of the kNN algorithm, which computes distances exactly the same way but averages the final values instead of tallying them.
 
 ### Mechanical walkthrough
-- We use a list comprehension to classify each query point in `X_test`.
-- `np.mean(predictions == y_test)` converts a boolean array of correct predictions into a float representing the proportion of correct guesses.
+- `def knn_regress(...)` — defines the regression variant of our model.
+- `distances = [...]` and `distances.sort(...)` — exactly mirrors the classification logic to find closest neighbors.
+- `k_nearest_values = [val for _, val in distances[:k]]` — extracts the target values (not categories) of the `k` closest neighbors.
+- `return sum(k_nearest_values) / len(k_nearest_values)` — computes and returns the arithmetic mean of those values.
+- `X_train = [[x] for x in range(0, 20, 2)]` — generates a 1D training dataset: `[[0], [2], [4], ...]`.
+- `y_train = [x[0]**2 + random.gauss(0, 5) ...]` — computes the target value as `x^2` but adds Gaussian noise to simulate messy real-world data.
+- `pred = knn_regress(X_train, y_train, [7], k)` — asks the model to predict the value for a point (`x=7`) that isn't in the training set.
 
+### CS lens
+**Regression** is a supervised learning task where the output is a continuous number. kNN handles this beautifully by simply changing the final step. Because it takes a local average, kNN regression naturally creates a stepped, jagged prediction curve that follows the data closely, unlike linear regression which forces a straight line through everything. Real-world uses:
+- Real estate algorithms estimating house prices based on comparable nearby homes.
+- Weather forecasting based on historical days with similar atmospheric conditions.
 
-## Concept Unit: Feature scaling — why it matters for kNN
+### SE lens
+Design principle: **Code Reuse vs. Duplication**. We duplicated the distance-sorting logic inside `knn_regress`. An alternative design would be extracting `get_nearest_neighbors()` into its own function, and having both `knn_predict` and `knn_regress` call it. The tradeoff: duplicating 3 lines of code keeps each function self-contained and easy to read top-to-bottom for a tutorial, whereas extracting it adds indirection. In a production library like `scikit-learn`, they share a common base class to prevent duplication.
 
-### The Problem
-Features with larger scales (like kilograms vs. grams) will dominate the Euclidean distance calculation. How do we equalize their impact?
+### Commands needed
+`python3 classifier.py`
 
-### Introduce the concept in isolation
-kNN uses Euclidean distance. `StandardScaler` subtracts the mean and divides by standard deviation.
-```python
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled  = scaler.transform(X_test)
-
-preds_scaled = np.array([knn_classify(X_train_scaled, y_train, x, k=5) for x in X_test_scaled])
-print(f'With scaling:    {np.mean(preds_scaled == y_test):.4f}')
+### Run it
+*Predicted confidently:*
 ```
-Output:
-```text
-With scaling:    0.9667
+k=1: kNN-regression predict f(7)=...
+k=3: kNN-regression predict f(7)=...
+k=5: kNN-regression predict f(7)=...
 ```
-This proves scaling can be applied without breaking the algorithm. IMPORTANT: fit the scaler on TRAINING DATA ONLY; then apply the same transform to test data. Never fit on test data.
+*(Exact values depend on noise generation, but approximate to 36, 67, and smooth averages.)*
 
-### Discard the throwaway example
-The scaling lab is discarded.
+### One sentence connecting to previous unit
+With both classification and regression complete, we have built a fully functional memory-based learning module from scratch.
 
-### Project Change
-- Reference Source: None.
-- Files affected: `knn_scaling.py`
-- Change type: Add
-- Location: New file.
-- Dependencies: StandardScaler
-
-### The New Code
-```python
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled  = scaler.transform(X_test)
-```
-
-### The Updated Project
-```python
-# 1: from sklearn.preprocessing import StandardScaler
-# 2: scaler = StandardScaler()
-# 3: X_train_scaled = scaler.fit_transform(X_train)
-# 4: X_test_scaled  = scaler.transform(X_test)
-```
-Features are now standardized for kNN distance calculations.
-
-### Mechanical walkthrough
-- `scaler.fit_transform` computes the training set mean/variance and scales it.
-- `scaler.transform` scales the test set using the already-computed mean/variance from the training set.
-
-
-## Concept Unit: Choosing k — the hyperparameter search
-
-### The Problem
-How do we systematically find the best value for the hyperparameter `k`?
-
-### Introduce the concept in isolation
-We can use cross-validation to search for the best `k`.
-```python
-from sklearn.model_selection import cross_val_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-
-X, y = iris.data, iris.target
-
-best_k, best_score = 1, 0
-for k in range(1, 31):
-    pipeline = Pipeline([
-        ('scaler', StandardScaler()),
-        ('knn', KNeighborsClassifier(n_neighbors=k))
-    ])
-    scores = cross_val_score(pipeline, X, y, cv=5)
-    mean_score = scores.mean()
-    if mean_score > best_score:
-        best_score = mean_score
-        best_k = k
-print(f'\nBest k={best_k} with CV accuracy={best_score:.4f}')
-```
-Output:
-```text
-Best k=6 with CV accuracy=0.9667
-```
-This proves that we can systematically evaluate hyperparameter choices.
-
-### Discard the throwaway example
-The grid search lab is discarded.
-
-### Project Change
-- Reference Source: None.
-- Files affected: `knn_cv.py`
-- Change type: Add
-- Location: New file.
-- Dependencies: Pipeline, cross_val_score
-
-### The New Code
-```python
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=k))
-])
-scores = cross_val_score(pipeline, X, y, cv=5)
-```
-
-### The Updated Project
-```python
-# 1: pipeline = Pipeline([
-# 2:     ('scaler', StandardScaler()),
-# 3:     ('knn', KNeighborsClassifier(n_neighbors=k))
-# 4: ])
-# 5: scores = cross_val_score(pipeline, X, y, cv=5)
-```
-We combine scaling and modeling into a single scikit-learn step.
-
-### Mechanical walkthrough
-- `Pipeline` takes a list of named steps. It fits the scaler inside each fold properly.
-- `cross_val_score` runs 5-fold cross-validation, automatically calling fit and predict correctly across the pipeline.
-
-
-## Concept Unit: scikit-learn KNeighborsClassifier with pipeline
-
-### The Problem
-How do we use the production-ready model for predictions and evaluation?
-
-### Introduce the concept in isolation
-```python
-from sklearn.metrics import accuracy_score, classification_report
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=7))
-])
-pipeline.fit(X_train, y_train)
-y_pred = pipeline.predict(X_test)
-print(f'Test accuracy: {accuracy_score(y_test, y_pred):.4f}')
-```
-Output:
-```text
-Test accuracy: 0.9667
-```
-This proves how to properly apply the pipeline to unseen test data.
-
-### Discard the throwaway example
-This prediction script is discarded.
-
-### Project Change
-- Reference Source: None
-- Files affected: `knn_cv.py`
-- Change type: Add
-- Location: Bottom of file
-- Dependencies: None
-
-### The New Code
-```python
-pipeline.fit(X_train, y_train)
-y_pred = pipeline.predict(X_test)
-print(classification_report(y_test, y_pred, target_names=iris.target_names))
-```
-
-### The Updated Project
-```python
-# 6: pipeline.fit(X_train, y_train)
-# 7: y_pred = pipeline.predict(X_test)
-# 8: print(classification_report(y_test, y_pred, target_names=iris.target_names))
-```
-The full model is evaluated and a report is printed.
-
-### Mechanical walkthrough
-- `pipeline.fit` first fits the scaler, transforms `X_train`, then fits the kNN model.
-- `pipeline.predict` transforms `X_test` with the already-fitted scaler, then predicts using the kNN model.
-- `classification_report` shows precision, recall, and f1-score per class.
-
-
-## Concept Unit: Regression with kNN
-
-### The Problem
-Can kNN be used for continuous targets instead of class labels?
-
-### Introduce the concept in isolation
-kNN works for regression too — instead of majority vote, take the MEAN of the k nearest neighbors' values.
-```python
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.datasets import fetch_california_housing
-from sklearn.metrics import mean_squared_error
-
-housing = fetch_california_housing()
-X_train_h, X_test_h, y_train_h, y_test_h = train_test_split(
-    housing.data, housing.target, test_size=0.2, random_state=42
-)
-
-pipeline_reg = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsRegressor(n_neighbors=10))
-])
-pipeline_reg.fit(X_train_h, y_train_h)
-y_pred_h = pipeline_reg.predict(X_test_h)
-rmse = np.sqrt(mean_squared_error(y_test_h, y_pred_h))
-print(f'RMSE: {rmse:.4f}')
-```
-Output:
-```text
-RMSE: 0.6550
-```
-This proves kNN adapts to regression via local averaging.
-
-### Discard the throwaway example
-The regression lab is discarded.
-
-### Project Change
-- Reference Source: None
-- Files affected: `knn_reg.py`
-- Change type: Add
-- Location: New file
-- Dependencies: KNeighborsRegressor
-
-### The New Code
-```python
-pipeline_reg = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsRegressor(n_neighbors=10))
-])
-rmse = np.sqrt(mean_squared_error(y_test_h, y_pred_h))
-```
-
-### The Updated Project
-```python
-# 1: pipeline_reg = Pipeline([
-# 2:     ('scaler', StandardScaler()),
-# 3:     ('knn', KNeighborsRegressor(n_neighbors=10))
-# 4: ])
-# 5: rmse = np.sqrt(mean_squared_error(y_test_h, y_pred_h))
-```
-We evaluate the RMSE for our regressor.
-
-### Mechanical walkthrough
-- `KNeighborsRegressor` replaces the classification voting step with computing the continuous mean of the neighbor's labels.
-- `mean_squared_error` computes the average squared difference between predictions and actual values.
-
-
-## Concept Unit: kNN strengths and weaknesses
-
-### The Problem
-What are the computational limits of kNN when the dataset is extremely large?
-
-### Introduce the concept in isolation
-kNN weaknesses: Slow prediction for large datasets (must compute distances to ALL training points), sensitive to irrelevant features, large memory footprint. 
-Optimizations: KD-tree and ball-tree data structures reduce prediction to O(log n).
-```python
-from sklearn.neighbors import KNeighborsClassifier
-import time
-import numpy as np
-
-rng = np.random.RandomState(42)
-X_large = rng.randn(10000, 4)
-y_large = rng.randint(0, 3, 10000)
-
-for algo in ['brute', 'kd_tree', 'ball_tree']:
-    clf = KNeighborsClassifier(n_neighbors=5, algorithm=algo)
-    clf.fit(X_large, y_large)
-    start = time.time()
-    clf.predict(X_large[:100])
-    print(f'{algo}: {(time.time()-start)*1000:.2f}ms for 100 predictions')
-```
-Output:
-```text
-brute: 15.00ms for 100 predictions
-kd_tree: 2.00ms for 100 predictions
-ball_tree: 3.00ms for 100 predictions
-```
-This proves tree-based approaches are significantly faster for querying neighbors than brute-force distance calculations across large data.
-
-### Discard the throwaway example
-The benchmarking lab is discarded.
-
-### Project Change
-- Reference Source: None
-- Files affected: None
-- Change type: Add
-- Location: None
-- Dependencies: None
-
-### The New Code
-```python
-clf = KNeighborsClassifier(n_neighbors=5, algorithm='kd_tree')
-```
-
-### The Updated Project
-```python
-# 1: clf = KNeighborsClassifier(n_neighbors=5, algorithm='kd_tree')
-```
-We explicitly set the algorithm backend to optimize distance queries.
-
-### Mechanical walkthrough
-- `algorithm='kd_tree'` instructs scikit-learn to pre-compute a space-partitioning data structure during `.fit()` to massively speed up prediction queries, transitioning the lookup from O(n) to O(log n).
+---
 
 ## Closing
-You have now implemented kNN from scratch and used it via scikit-learn. Lesson 46 covers model evaluation: confusion matrices, precision/recall/F1, ROC curves, cross-validation strategies. Exercises: implement weighted kNN (closer neighbors vote more); use kNN on the digits dataset (8x8 images of handwritten digits); compare kNN, Decision Tree, and a simple linear model on Iris.
+
+### Connect the pieces
+Let's trace what happens when we call `knn_predict([3,3], k=3)` on our initial 6-point training set `X_train = [[1,1],[1,2],[2,1],[5,5],[5,6],[6,5]]` with labels `['A','A','A','B','B','B']`:
+1. **Compute distances:** The model compares `[3,3]` to every point in memory.
+   - To `[1,1]`: `sqrt((3-1)^2 + (3-1)^2) = sqrt(8) = 2.83` -> A
+   - To `[1,2]`: `sqrt((3-1)^2 + (3-2)^2) = sqrt(5) = 2.24` -> A
+   - To `[2,1]`: `sqrt((3-2)^2 + (3-1)^2) = sqrt(5) = 2.24` -> A
+   - To `[5,5]`: `sqrt((3-5)^2 + (3-5)^2) = sqrt(8) = 2.83` -> B
+   - To `[5,6]`: `sqrt(13) = 3.61` -> B
+   - To `[6,5]`: `sqrt(13) = 3.61` -> B
+2. **Sort and slice:** It sorts these tuples by distance: `2.24(A), 2.24(A), 2.83(A), 2.83(B), 3.61(B), 3.61(B)`. It slices the top `k=3`: `[A, A, A]`.
+3. **Vote:** `Counter` tallies `[A, A, A]`. The most common label is `A`.
+
+This trace holds true whether we are validating with LOO-CV or scaling features first—the core logic remains a simple, non-parametric lookup and vote.

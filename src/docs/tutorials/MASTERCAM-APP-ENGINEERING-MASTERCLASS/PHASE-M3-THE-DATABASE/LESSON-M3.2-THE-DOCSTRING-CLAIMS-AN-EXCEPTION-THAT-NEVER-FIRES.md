@@ -217,6 +217,86 @@ Full saved run: `verification/mastercam-phase-03/lab_test_database_ta_resolution
 
 The unit above proved what NA-minting actually does; this unit proves what a real TA conflict actually does - and, unlike the docstring's claim, it's a warning, not an exception.
 
+## Concept Unit: Choosing the Fix: Correct the Claim, Not the Behavior
+
+### The Problem
+
+There are two different real fixes available here, not one: make the code match the docstring (actually raise), or make the docstring match the code (stop claiming it raises). They are not equivalent, and picking wrong has real consequences.
+
+Before reading on:
+
+- If DuplicateToolError/MismatchedTAError actually started raising, what would happen to a real save_part call partway through an 8-sequence upload, given Lesson M3.3's `with self._conn:` behavior?
+- This codebase runs on a shop floor with real deadlines. Which of the two fixes is safe to make without the person running it that day noticing any difference at all?
+
+### Project Change
+
+- **Reference Source:** mastercam_app/db/database.py:1-42 (the module docstring) and :60-104 (both exception classes' docstrings), quoted verbatim in the unit above - all three currently claim behavior the real code doesn't have.
+- **Files affected:** `verification/mastercam-app-copy/mastercam-app/mastercam_app/db/database.py` (modified)
+- **Change type:** configure
+- **Location:** module docstring, DuplicateToolError docstring, MismatchedTAError docstring
+- **Dependencies:** none - documentation only, zero behavior change
+
+### The New Code
+
+The real, applied fix - correcting the module docstring's Rules and Public API sections to state what save_part actually does.
+
+**File:** `verification/mastercam-app-copy/mastercam-app/mastercam_app/db/database.py` (already exists — modified)
+
+```python
+• On insert of a new TA:
+    - If a TA already exists with matching (holder_name, tool_code, stick_out)
+      but a different ta_number → the new TA is still inserted, and a real
+      warning string (not an exception) is returned describing the match,
+      so the UI can show it. See DuplicateToolError's own docstring - it
+      exists for callers that want to opt into raising instead.
+    - If ta_number already exists with DIFFERENT (holder, code, stickout) →
+      the existing row is silently overwritten with the new values, and a
+      real warning string is returned describing the conflict. See
+      MismatchedTAError's own docstring - same note.
+
+Public API
+----------
+  db = Database("mastercam.db")
+  warnings = db.save_part(part_dict)
+      Returns list of warning strings (non-fatal) - conflicts never raise;
+      see the Rules section above for what each warning means.
+```
+
+### Mechanical Walkthrough
+
+- `the new TA is still inserted, and a real warning string (not an exception) is returned` — This is the one-word difference that matters most: "Raised" became "a real warning string ... is returned." Nothing about save_part's actual code changed - only the sentence describing it, which now agrees with the two tests that already proved this from the previous unit.
+- `See DuplicateToolError's own docstring - it exists for callers that want to opt into raising instead` — Rather than deleting the two exception classes outright (real, structured, ready-to-use error types some future caller might legitimately want), the fix keeps them and is honest that they're not wired in - a real, working option, not dead code pretending to be active code.
+
+### CS Lens
+
+This is choosing to fix a **specification/implementation mismatch** by moving the specification to match reality, rather than the other way around - a legitimate, common resolution when the existing implementation's behavior is the one with real, tested value (Lesson M3.3 already relies on save_part's specific never-blocks-on-conflict behavior).
+
+### SE Lens
+
+The real alternative - making the exceptions actually fire - is a behavior change to a function real uploads depend on today, with a real cost: partway through an 8-sequence part, sequence 5's conflict would now abort the whole save_part call (Lesson M3.3's `with self._conn:` would roll back sequences 1-4 too), on a shop floor where "the upload failed" mid-shift is a real, costly interruption nobody asked for. Fixing the docstring costs nothing and changes no one's day; fixing the behavior is a real, separate decision that deserves its own deliberate choice, not one made as a side effect of "the docs said so."
+
+### Commands needed
+
+- `python -m pytest tests/test_database_ta_resolution.py -v` — Run from verification/mastercam-app-copy/mastercam-app/ - confirms the documentation-only fix changed no test outcome
+
+### Verification
+
+```text
+collected 3 items
+
+tests/test_database_ta_resolution.py::test_an_unknown_tool_with_no_ta_number_mints_na001 PASSED [ 33%]
+tests/test_database_ta_resolution.py::test_the_same_fingerprint_reuses_the_minted_na_number_instead_of_minting_again PASSED [ 66%]
+tests/test_database_ta_resolution.py::test_a_real_ta_number_with_a_changed_holder_does_not_raise_and_overwrites_silently PASSED [100%]
+
+============================== 3 passed in 0.10s ==============================
+```
+
+Full saved run: `verification/mastercam-phase-03/lab_all_fixes_verified_output.txt`.
+
+### Connection to the previous unit
+
+The two units above proved what the code actually does; this unit is the deliberate choice of which side of the mismatch to fix, and why that choice - not the other one - is the safe one to make without asking the person running this on a real shop floor first.
+
 ## Connect the pieces
 
 Trace TA0042 through both units: first resolve() with holder ER32 inserts it cleanly (no warning, matching the unit above's insert path); the second resolve() with holder ER40 hits the exact branch quoted in this unit - no exception, a real warning string, and get_ta("TA0042") afterward proves the row was actually overwritten to ER40, silently.

@@ -1,501 +1,510 @@
-# Lesson 8: Tuples — Immutable Sequences
+# Lesson 08: Tuples — Immutable Sequences
 
-What you will build: You will learn when to use tuples instead of lists, how tuple unpacking works, how functions use tuples to return multiple values, and how to use `zip()`. The transferable problems this lesson addresses are: (1) communicating intent with a tuple: "this collection should not change" — it is a CONTRACT, not just an optimization; (2) using tuple unpacking as a powerful pattern that appears everywhere in Python (e.g., swapping variables, function return values); (3) using `zip()` to pair elements from multiple sequences, enabling parallel iteration.
+What you will build: The reader understands tuples: immutable ordered sequences, when to choose tuple over list, packing/unpacking, multiple return values, and using tuples as dict keys. The transferable insight: immutability is a GUARANTEE. A tuple promises it will not change. This lets Python use tuples as dict keys (requires hashability), lets you use them as function return values safely, and signals to the reader that this collection is not meant to be modified.
 
-What you need to know first: Lessons 0–7 (REPL, types, variables, conditionals, iteration, functions, strings, lists).
+What you need to know first: Lessons 00-07.
 
-**Terms used in this lesson:**
-- **Tuple** — A sequence type in Python that is like a list, but immutable. It exists to represent fixed collections of items, such as a record (e.g., coordinates), where the structure and values should not change after creation.
-- **Immutable** — A property of an object meaning its state or contents cannot be modified after it is created. It solves the problem of unintended side effects and allows data to be safely shared and used as dictionary keys.
-- **Unpacking** — The act of assigning the individual elements of a sequence (like a tuple or list) to multiple variables in a single statement. It solves the problem of needing to write multiple lines of indexing assignments just to extract values.
-- **Hashable** — A property of an object that means it has a hash value that never changes during its lifetime, allowing it to be used as a dictionary key or in a set. Tuples are hashable (if all their elements are); lists are not.
+## Terms used in this lesson
 
-**Objects and methods used:**
-- `tuple`
-  - *What it is:* A built-in Python sequence type.
-  - *Implementation:* Created using parentheses `()` or a comma-separated sequence of values.
-  - *Its use:* Used when a collection represents a fixed record that should not change.
+- **Tuple literal** — A sequence of values separated by commas, often enclosed in parentheses, representing a fixed-size ordered collection.
+- **Immutability** — The property of an object whose state cannot be modified after it is created. It guarantees the data will not change.
+- **Packing** — The act of grouping multiple values into a single tuple object without explicitly writing parentheses.
+- **Unpacking** — The act of assigning the individual elements of a tuple to a sequence of variables in a single statement.
+- **Star unpacking** — Using an asterisk (`*`) during unpacking to gather multiple remaining elements of a sequence into a list.
+- **Hashability** — A property of an object that means it has a hash value which never changes during its lifetime, allowing it to be used as a dictionary key or in a set.
+- **Record** — A data structure (often a tuple in Python) that groups related, heterogeneous fields together (like a row in a database).
+
+## Objects and methods used
+
+- **`len`**
+  - *What it is:* A built-in function that returns the number of items in a container.
+  - *Implementation:* `def len(obj, /): ...`
+  - *Its use:* To count the number of elements in a tuple.
+  - *Type:* Built-in function.
+  - *Responsibility:* Computes and returns the size (length) of the given collection.
+  - *Depends on:* A collection or sequence passed as an argument.
+  - *Connects to:* Called by application code, queries the object's internal `__len__` method.
+  - *Shape:* A global built-in function boundary.
+
+- **`min`**
+  - *What it is:* A built-in function that returns the smallest item in an iterable.
+  - *Implementation:* `def min(iterable, *[, default=obj, key=func]): ...`
+  - *Its use:* To find the minimum value in a sequence to demonstrate multiple return values.
+  - *Type:* Built-in function.
+  - *Responsibility:* Identifies and returns the minimum element from a given iterable.
+  - *Depends on:* An iterable containing comparable elements.
+  - *Connects to:* Called by application code, queries the iterable's elements and their comparison operations.
+  - *Shape:* A global built-in function boundary.
+
+- **`max`**
+  - *What it is:* A built-in function that returns the largest item in an iterable.
+  - *Implementation:* `def max(iterable, *[, default=obj, key=func]): ...`
+  - *Its use:* To find the maximum value in a sequence to demonstrate multiple return values.
+  - *Type:* Built-in function.
+  - *Responsibility:* Identifies and returns the maximum element from a given iterable.
+  - *Depends on:* An iterable containing comparable elements.
+  - *Connects to:* Called by application code, queries the iterable's elements and their comparison operations.
+  - *Shape:* A global built-in function boundary.
+
+- **`hash`**
+  - *What it is:* A built-in function that returns the hash value of an object, if it has one.
+  - *Implementation:* `def hash(obj, /): ...`
+  - *Its use:* To demonstrate that tuples of hashable items are themselves hashable and thus valid as dictionary keys.
+  - *Type:* Built-in function.
+  - *Responsibility:* Computes an integer fingerprint for an object.
+  - *Depends on:* An object that implements a valid hash function.
+  - *Connects to:* Called by application code or internally by dictionaries and sets.
+  - *Shape:* A global built-in function boundary.
+
+- **`frozenset`**
+  - *What it is:* A built-in class representing an immutable set.
+  - *Implementation:* `class frozenset(iterable=(), /): ...`
+  - *Its use:* Mentioned as the immutable (and therefore hashable) equivalent to a set.
   - *Type:* Built-in class.
-  - *Responsibility:* Stores an ordered, immutable collection of elements.
-  - *Depends on:* The elements provided at creation time.
-  - *Connects to:* Supports sequence operations like indexing, slicing, and iteration.
-  - *Shape:* A core data structure in Python, often used at API boundaries for returning multiple values.
-- `zip()`
-  - *What it is:* A built-in function that iterates over several iterables in parallel.
-  - *Implementation:* Returns a zip object, which is an iterator of tuples where the i-th tuple contains the i-th element from each of the argument sequences or iterables.
-  - *Its use:* Used to pair elements from multiple sequences together, making parallel iteration clean and readable.
-  - *Type:* Built-in function (technically a type/class in Python 3).
-  - *Responsibility:* Pairs items from multiple iterables, stopping when the shortest iterable is exhausted.
-  - *Depends on:* One or more iterables passed as arguments.
-  - *Connects to:* Consumed by loops (`for` loops) or sequence constructors (`list()`, `tuple()`).
-  - *Shape:* A utility function operating on sequences, often used in data transformation pipelines.
-- `namedtuple`
-  - *What it is:* A factory function for creating tuple subclasses with named fields.
-  - *Implementation:* `collections.namedtuple(typename, field_names)`. Returns a new tuple subclass.
-  - *Its use:* Used to create lightweight, immutable data objects where fields can be accessed by name rather than position, improving readability.
-  - *Type:* Factory function from the `collections` module.
-  - *Responsibility:* Generates a new class that behaves like a tuple but adds attribute access for its fields.
-  - *Depends on:* A type name string and a sequence of field name strings.
-  - *Connects to:* Code that needs a simple record type without the overhead of a full custom class.
-  - *Shape:* A structural data type, sitting between basic tuples and full custom classes.
+  - *Responsibility:* Provides set operations without allowing modifications after creation.
+  - *Depends on:* An iterable to initialize its elements.
+  - *Connects to:* Called by application code to create immutable sets.
+  - *Shape:* A built-in type boundary.
 
 ---
 
-## Concept Unit: What a tuple is — immutable sequence
+## Concept Unit: Tuple literals and immutability
 
 ### The Problem
-We have learned how to use lists to store sequences of data. However, lists are mutable: any part of the program can append, sort, or overwrite elements. What if we want to define a point in 2D space `(x, y)` or an RGB color `(r, g, b)`? These are fixed records. If we use a list, someone might accidentally change the `x` coordinate later. We need a way to group data together with a guarantee—a contract—that it will not change once created.
 
-> What happens if you try to build a system where constants are stored in lists, but multiple functions share that list? How would you ensure no function breaks the others by modifying it?
+If you need a collection of items that should *never* change during the execution of your program, how do you prevent yourself or other code from accidentally modifying it? If you use a list, what happens if someone calls `.append()` or overwrites an index? How do you create an ordered collection that guarantees it will remain exactly as defined?
 
 ### Introduce the concept in isolation
-A **tuple** is exactly this: an immutable sequence. We create it with parentheses instead of square brackets.
 
 ```python
->>> t = (1, 2, 3)
->>> t[0]
+t = (1, 2, 3)
+single_t = (1,)
+print(t[0])
+try:
+    t[0] = 99
+except TypeError as e:
+    print(f"Error: {e}")
+```
+Output:
+```text
 1
->>> t[-1]
-3
->>> t[0:2]
-(1, 2)
->>> len(t)
-3
->>> t[0] = 99
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-TypeError: 'tuple' object does not support item assignment
->>> type(t)
-<class 'tuple'>
+Error: 'tuple' object does not support item assignment
 ```
+This proves that a **tuple** is an immutable sequence. Attempting to reassign an index raises a `TypeError`, guaranteeing the collection's structure cannot be changed once created.
 
-This output proves that tuples support the same indexing, slicing, and length operations as lists, but crucially, they reject any attempt to modify an element, raising a `TypeError`. The data is locked in.
+### Discard the throwaway
 
-### Discard the throwaway example
-This `t` tuple example is deleted and will not appear in the project again.
+This throwaway code is explicitly discarded and will not appear in our project.
 
 ### Project Change
-No reference counterpart — this is a from-scratch addition because we are exploring core language syntax in the REPL.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
+
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring Python sequence types.
+- **Files affected:** `tests/test_collections.py` (created)
+- **Change type:** Add
+- **Location:** At the top of the file
+- **Dependencies:** None
 
 ### The New Code
+
 ```python
-point = (10, 20)
-print(point[0])
+def check_tuple():
+    coordinates = (10, 20)
+    return len(coordinates)
 ```
 
 ### The Updated Project
+
 ```python
 # ← new
-point = (10, 20)
-print(point[0])
+1: def check_tuple():
+2:     coordinates = (10, 20)
+3:     return len(coordinates)
 ```
-This structure creates a tuple representing a fixed point and accesses its first element.
+This new file introduces a function that creates a tuple and returns its length.
 
 ### Mechanical walkthrough
-1. `point` — A variable name.
-2. `=` — The assignment operator.
-3. `(10, 20)` — A **tuple literal**, creating a new tuple object containing two integers.
-4. `print` — The built-in output function.
-5. `point[0]` — Tuple indexing. Just like lists, tuples are zero-indexed. This retrieves the first element, `10`, without modifying the tuple.
+
+- `def check_tuple():`: Defines a new function named `check_tuple` taking no arguments.
+- `coordinates = (10, 20)`: Assigns a tuple literal containing `10` and `20` to the variable `coordinates`.
+- The `(10, 20)` literal creates an ordered sequence of two integers in memory.
+- `return len(coordinates)`: Calls the built-in `len` function on the tuple and returns the resulting integer (`2`).
+
+### CS lens
+
+This is the concept of **Immutability**. In Computer Science, immutable data structures cannot be modified after creation. This appears in string representations in Java, state management in React (where state is treated as immutable), Git commits (which cannot be changed once written, only appended), and functional programming languages like Haskell where all data is immutable by default.
+
+### SE lens
+
+The design principle here is **Defense in Depth**. By using a tuple instead of a list, you statically prevent a whole class of bugs related to unintended state mutation. The alternative NOT chosen is using a list and just trying to be careful not to modify it. The tradeoff is that you lose the flexibility to append or modify elements in-place, meaning you must create a whole new tuple if a change is genuinely needed, which can have minor performance costs.
+
+### Commands needed
+
+`python3`
+
+### Run it
+
+Predicted confidently: `2`
+
+### One sentence connecting to previous unit
+
+With the guarantee that a tuple will not change, we can now look at how to easily extract its fixed values into distinct variables.
 
 ---
 
-## Concept Unit: Creating tuples — the tricky one-element case
+## Concept Unit: Packing and unpacking
 
 ### The Problem
-If parentheses create tuples, how do we create a tuple with exactly one element? In mathematics, parentheses are used for grouping operations, like `(4 + 5) * 2`. If we write `(42)`, does Python see a tuple or just the number 42 inside grouping parentheses?
 
-> Before reading on, if you type `type((42))` in Python, what do you predict it will say?
-
-### Introduce the concept in isolation
-The comma makes the tuple, not the parentheses.
-
-```python
->>> empty = ()
->>> empty
-()
->>> single = (42,)   # NOTE the trailing comma!
->>> single
-(42,)
->>> not_a_tuple = (42)  # just parentheses, not a tuple
->>> not_a_tuple
-42
->>> type(not_a_tuple)
-<class 'int'>
->>> type(single)
-<class 'tuple'>
->>> no_parens = 1, 2, 3  # parens are optional!
->>> no_parens
-(1, 2, 3)
->>> type(no_parens)
-<class 'tuple'>
-```
-
-This proves that `(42)` is evaluated as an integer, while `(42,)` is evaluated as a tuple. It also proves that multiple items separated by commas, even without parentheses, evaluate as a tuple (tuple packing).
-
-### Discard the throwaway example
-These test variables are deleted and will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition because we are demonstrating syntax rules.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
-
-### The New Code
-```python
-record = ("Alice",)
-```
-
-### The Updated Project
-```python
-# ← new
-record = ("Alice",)
-```
-This structure creates a single-element tuple safely.
-
-### Mechanical walkthrough
-1. `record` — Variable assignment.
-2. `("Alice",)` — A tuple containing one string. The trailing comma `,` tells Python that this is a tuple, not just a string inside grouping parentheses. Without the comma, `record` would just be the string `"Alice"`.
-
----
-
-## Concept Unit: Tuple unpacking
-
-### The Problem
-If you have a tuple representing a coordinate, `point = (3, 4)`, and you want to use the X and Y values separately, you could write `x = point[0]` and `y = point[1]`. But this is repetitive and noisy. Is there a way to extract all the elements into variables at once?
-
-> Given `point = (3, 4)`, how would you design a syntax to assign both `x` and `y` in a single line if you were creating the language?
+When you have a record containing multiple related values (like a name and an age), accessing them by index (`record[0]`, `record[1]`) is tedious and hard to read. How can we elegantly extract all the values of a tuple into distinct, named variables in a single line of code?
 
 ### Introduce the concept in isolation
-**Tuple unpacking** allows us to assign elements of a sequence to multiple variables simultaneously.
 
 ```python
->>> point = (3, 4)
->>> x, y = point
->>> x
-3
->>> y
-4
->>> a, b, c = (10, 20, 30)
->>> a
-10
->>> # Swap with tuple unpacking:
->>> a, b = b, a
->>> a
-20
->>> b
-10
->>> # Unpacking with *:
->>> first, *rest = (1, 2, 3, 4, 5)
->>> first
-1
->>> rest
-[2, 3, 4, 5]
->>> *front, last = (1, 2, 3, 4, 5)
->>> last
-5
+record = "Alice", 25, 95.5
+name, age, score = record
+print(name, score)
+
+a, b = 1, 2
+a, b = b, a
+print(a, b)
+
+first, *rest = (1, 2, 3, 4)
+print(rest)
 ```
+Output:
+```text
+Alice 95.5
+2 1
+[2, 3, 4]
+```
+This proves **packing and unpacking**. Values separated by commas are automatically packed into a tuple, and assigning a tuple to a comma-separated list of variables unpacks it. The `*` syntax gathers remaining elements.
 
-This output proves that Python unpacks the elements on the right into the variables on the left based on position. The swap `a, b = b, a` works because the right side `b, a` creates a new tuple first, and then it is unpacked into `a, b`. The `*rest` syntax captures any remaining elements as a list.
+### Discard the throwaway
 
-### Discard the throwaway example
-These unpacking examples are deleted and will not appear in the project again.
+This throwaway code is explicitly discarded and will not appear in our project.
 
 ### Project Change
-No reference counterpart — exploring unpacking mechanics.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
+
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring Python sequence types.
+- **Files affected:** `tests/test_collections.py` (modified)
+- **Change type:** Add
+- **Location:** Below `check_tuple`
+- **Dependencies:** None
 
 ### The New Code
-```python
-config = ("localhost", 8080)
-host, port = config
-```
 
-### The Updated Project
-```python
-# ← new
-config = ("localhost", 8080)
-host, port = config
-```
-This extracts configuration values from a tuple directly into named variables.
-
-### Mechanical walkthrough
-1. `config = ("localhost", 8080)` — Creates a two-element tuple.
-2. `host, port` — Two variables listed on the left side of the assignment.
-3. `=` — Assignment operator triggering unpacking.
-4. `config` — The tuple being unpacked. Python assigns `config[0]` to `host` and `config[1]` to `port`.
-
----
-
-## Concept Unit: Functions returning multiple values as tuples
-
-### The Problem
-In many languages, a function can only return one single value. If you need to return both a minimum and a maximum from a calculation, you have to create a custom class or pass in lists to be modified. How does Python handle functions that need to return multiple pieces of data?
-
-> If a function has `return a, b`, what data type is actually being returned to the caller?
-
-### Introduce the concept in isolation
-When a function returns multiple values separated by commas, it is implicitly creating and returning a **tuple**.
-
-```python
->>> def min_max(lst):
-...     return min(lst), max(lst)
-... 
->>> lo, hi = min_max([3, 1, 4, 1, 5, 9])
->>> print(lo, hi)
-1 9
->>> def divmod_manual(a, b):
-...     return a // b, a % b
-... 
->>> q, r = divmod_manual(17, 5)
->>> print(q, r)
-3 2
-```
-
-This proves that `return a, b` is simply returning a tuple `(a, b)`, and the caller can immediately use tuple unpacking (`q, r = ...`) to capture those returned values.
-
-### Discard the throwaway example
-These function examples are deleted and will not appear in the project again.
-
-### Project Change
-No reference counterpart.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
-
-### The New Code
 ```python
 def get_user_info():
-    return "Alice", 25
-
-name, age = get_user_info()
+    user = ("Bob", 30)
+    name, age = user
+    return name
 ```
 
 ### The Updated Project
-```python
-# ← new
-def get_user_info():
-    return "Alice", 25
 
-name, age = get_user_info()
+```python
+1: def check_tuple():
+2:     coordinates = (10, 20)
+3:     return len(coordinates)
+4: 
+5: # ← new
+6: def get_user_info():
+7:     user = ("Bob", 30)
+8:     name, age = user
+9:     return name
 ```
-This defines a function that returns two values and unpacks them immediately.
+This adds a function demonstrating unpacking a tuple into individual named variables.
 
 ### Mechanical walkthrough
-1. `def get_user_info():` — Function definition.
-2. `return "Alice", 25` — The `return` keyword. Because the values are separated by a comma, Python packs them into a tuple `("Alice", 25)` and returns that tuple.
-3. `name, age = get_user_info()` — The function call returns the tuple, which is immediately unpacked into `name` and `age`.
+
+- `def get_user_info():`: Defines a new function.
+- `user = ("Bob", 30)`: Assigns a tuple literal to `user`.
+- `name, age = user`: Unpacks the tuple `user`. The first element `"Bob"` is assigned to `name`, and the second element `30` is assigned to `age`.
+- `return name`: Returns the string assigned to `name`.
+
+### CS lens
+
+This is **Pattern Matching / Destructuring**. This idea appears in Lisp (via macros like `destructuring-bind`), Rust (pattern matching in `match` or `let`), JavaScript (object and array destructuring), and Erlang (where pattern matching is the primary way to bind variables and direct control flow).
+
+### SE lens
+
+The design principle is **Self-Documenting Code**. By unpacking `user` into `name, age`, the code explicitly documents what the tuple contains, rather than forcing the reader to guess what `user[0]` and `user[1]` mean. The alternative NOT chosen is index-based access. The tradeoff is that unpacking requires you to know the exact length of the tuple (or use star unpacking), otherwise Python raises a `ValueError`.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: `'Bob'`
+
+### One sentence connecting to previous unit
+
+Because packing and unpacking are so seamless, tuples become the perfect mechanism for a function to return more than one result at a time.
 
 ---
 
-## Concept Unit: Tuples as dictionary keys (lists cannot be)
+## Concept Unit: Multiple return values
 
 ### The Problem
-We haven't fully explored dictionaries yet (that's the next lesson), but know this: dictionaries map keys to values. Dictionary keys must be "hashable" — meaning they have a fixed, unchanging identity. Can we use a coordinate like `[1, 2]` as a key to look up what object is at that location on a grid?
 
-> If a list's contents can change at any time, how could a dictionary reliably keep track of it if used as a key?
+A function can only execute one `return` statement that yields one object. If you need a function to compute and return two distinct pieces of information—like the minimum and maximum of a sequence—how do you get both values back to the caller without creating a complex custom class?
 
 ### Introduce the concept in isolation
-Lists cannot be used as dictionary keys because they are mutable. Tuples are immutable and hashable, making them perfect for this.
 
 ```python
->>> d = {}
->>> d[(0, 0)] = 'origin'
->>> d[(1, 0)] = 'right'
->>> d[(0, 1)] = 'up'
->>> d[(0, 0)]
-'origin'
->>> d = {(1, 2): 'point A', (3, 4): 'point B'}
->>> # Lists CANNOT be keys:
->>> d[[1, 2]] = 'fail'
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-TypeError: unhashable type: 'list'
+def minmax(lst):
+    return min(lst), max(lst)
+
+lo, hi = minmax([3, 1, 4, 1, 5])
+print(lo, hi)
 ```
+Output:
+```text
+1 5
+```
+This proves that a function can return multiple values as a tuple, which the caller can immediately unpack. The return statement automatically packs the values.
 
-This proves that trying to use a `list` as a key raises a `TypeError: unhashable type`, while a `tuple` works perfectly.
+### Discard the throwaway
 
-### Discard the throwaway example
-This grid dictionary example is deleted.
+This throwaway code is explicitly discarded and will not appear in our project.
 
 ### Project Change
-No reference counterpart.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
+
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring Python sequence types.
+- **Files affected:** `tests/test_collections.py` (modified)
+- **Change type:** Add
+- **Location:** Below `get_user_info`
+- **Dependencies:** None
 
 ### The New Code
+
 ```python
-grid = {}
-grid[(10, 10)] = "Player"
+def bounds(numbers):
+    return min(numbers), max(numbers)
 ```
 
 ### The Updated Project
+
 ```python
-# ← new
-grid = {}
-grid[(10, 10)] = "Player"
+6: def get_user_info():
+7:     user = ("Bob", 30)
+8:     name, age = user
+9:     return name
+10:
+11: # ← new
+12: def bounds(numbers):
+13:     return min(numbers), max(numbers)
 ```
-This uses a tuple coordinate to store a value in a dictionary.
+This adds a function that computes the minimum and maximum of a collection and returns both.
 
 ### Mechanical walkthrough
-1. `grid = {}` — Creates an empty dictionary.
-2. `grid[...]` — Dictionary assignment.
-3. `(10, 10)` — A tuple used as the key. Because it is immutable, its hash value will never change, ensuring the dictionary can safely store and retrieve it.
-4. `="Player"` — The value stored at that key.
+
+- `def bounds(numbers):`: Defines a function accepting a collection.
+- `return min(numbers), max(numbers)`: Computes the minimum using the built-in `min` function, computes the maximum using the built-in `max` function, and returns them as an implicitly packed tuple.
+
+### CS lens
+
+This is the concept of **Multiple Return Values**. It appears in Go (where returning a result and an error is idiomatic), Lua (which natively supports multiple returns), Swift (using tuples for multiple returns), and SQL (where a `SELECT` statement returns a row with multiple columns).
+
+### SE lens
+
+The design principle is **Lightweight Abstraction**. Tuples provide a zero-overhead way to group values temporarily. The alternative NOT chosen is returning a dictionary or defining a custom class for the return type. The tradeoff is that tuples lack field names; the caller must remember the exact order of the returned elements, which can become confusing if a function returns more than three values.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: `(1, 5)` if called with `[3, 1, 4, 1, 5]`.
+
+### One sentence connecting to previous unit
+
+The fact that a tuple is a single, immutable object not only makes it great for returns, but also makes it safe to use as a unique identifier or key.
 
 ---
 
-## Concept Unit: `zip()` — pairing sequences together
+## Concept Unit: Tuples as dict keys — hashability
 
 ### The Problem
-Suppose you have a list of names and a separate list of scores. You want to iterate over both at the same time to print "Name: Score". You could use a `for` loop with an index variable `i`, but managing indexes manually is error-prone and un-Pythonic.
 
-> How would you combine `names = ["Alice", "Bob"]` and `scores = [10, 20]` so you can easily loop over both?
+Dictionaries require keys to be immutable so their internal hash values never change. You cannot use a list like `[0, 0]` as a dictionary key to represent a coordinate. How can we use a composite value—like a grid coordinate `(x, y)`—as a key to map to a location string?
 
 ### Introduce the concept in isolation
-The `zip()` function pairs up elements from multiple sequences, producing tuples.
 
 ```python
->>> names = ['Alice', 'Bob', 'Carol']
->>> scores = [95, 87, 92]
->>> list(zip(names, scores))
-[('Alice', 95), ('Bob', 87), ('Carol', 92)]
+d = {}
+t = (0, 0)
+d[t] = "start"
 
->>> for name, score in zip(names, scores):
-...     print(f'{name}: {score}')
-... 
-Alice: 95
-Bob: 87
-Carol: 92
-
->>> # zip stops at the shortest:
->>> list(zip([1, 2, 3], ['a', 'b']))
-[(1, 'a'), (2, 'b')]
-
->>> # Unzipping with zip(*):
->>> pairs = [(1, 'a'), (2, 'b'), (3, 'c')]
->>> numbers, letters = zip(*pairs)
->>> numbers
-(1, 2, 3)
->>> letters
-('a', 'b', 'c')
+try:
+    d[[0, 0]] = "end"
+except TypeError as e:
+    print(e)
+    
+print(hash(t) == hash((0, 0)))
 ```
+Output:
+```text
+unhashable type: 'list'
+True
+```
+This proves that tuples are **hashable** (if their contents are hashable), allowing them to be used as dictionary keys. Lists are unhashable and will raise a `TypeError`.
 
-This proves that `zip` takes parallel elements and combines them into tuples. We can unpack those tuples directly in the `for` loop definition (`for name, score in ...`). `zip` is lazy; `list()` forces it to evaluate immediately. The `zip(*pairs)` trick unpacks the list of tuples back into separate iterables.
+### Discard the throwaway
 
-### Discard the throwaway example
-These zip loops are deleted.
+This throwaway code is explicitly discarded and will not appear in our project.
 
 ### Project Change
-No reference counterpart.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
+
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring Python sequence types.
+- **Files affected:** `tests/test_collections.py` (modified)
+- **Change type:** Add
+- **Location:** Below `bounds`
+- **Dependencies:** None
 
 ### The New Code
+
 ```python
-keys = ["a", "b"]
-vals = [1, 2]
-combined = list(zip(keys, vals))
+def map_grid():
+    grid = {(0, 0): 'start', (3, 4): 'end'}
+    return grid[(0, 0)]
 ```
 
 ### The Updated Project
+
 ```python
-# ← new
-keys = ["a", "b"]
-vals = [1, 2]
-combined = list(zip(keys, vals))
+12: def bounds(numbers):
+13:     return min(numbers), max(numbers)
+14:
+15: # ← new
+16: def map_grid():
+17:     grid = {(0, 0): 'start', (3, 4): 'end'}
+18:     return grid[(0, 0)]
 ```
-This pairs two lists into a single list of tuples.
+This adds a function demonstrating a dictionary that uses tuples as its keys.
 
 ### Mechanical walkthrough
-1. `zip(keys, vals)` — The `zip()` built-in function pairs elements from `keys` and `vals`.
-2. `list(...)` — Converts the lazy zip iterator into a concrete list so we can see the results immediately.
-3. `combined` — The resulting list of tuples: `[('a', 1), ('b', 2)]`.
+
+- `def map_grid():`: Defines a function.
+- `grid = {(0, 0): 'start', (3, 4): 'end'}`: Creates a dictionary where the keys are tuple literals (`(0, 0)` and `(3, 4)`) and the values are strings.
+- `return grid[(0, 0)]`: Looks up the value associated with the tuple key `(0, 0)` and returns it.
+
+### CS lens
+
+This is **Hashability**. For a hash table to function, the hash of a key must remain constant over time. This appears in Java's `hashCode()` contract, Cryptographic hashes (SHA-256) where any change to input radically changes the output, database indexing strategies, and Content-Addressable Storage systems (like Git's internal objects).
+
+### SE lens
+
+The design principle is **Contract Enforcement**. Python enforces at runtime that only hashable types can be dict keys. The alternative NOT chosen is allowing mutable keys but warning the user not to change them (which C++'s `std::map` historically allowed, leading to hard-to-find bugs when elements were modified). The tradeoff is that if you have a tuple containing a list, that tuple is suddenly no longer hashable, meaning hashability depends deeply on the entire contents of the tuple.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: `'start'`
+
+### One sentence connecting to previous unit
+
+Understanding how tuples act as fixed records leads directly into the question of when to use a tuple versus a list.
 
 ---
 
-## Concept Unit: Named tuples — a preview of Lesson 27
+## Concept Unit: When to use tuple vs. list
 
 ### The Problem
-Accessing tuple elements by index, like `point[0]` and `point[1]`, works, but it isn't very readable. If we have a tuple representing a user `(id, name, email)`, reading `user[2]` doesn't clearly explain that it's the email. How can we get the immutability of a tuple but access fields by name like `user.email`?
 
-> Is there a way to give names to the slots in a tuple without writing a full class from scratch?
+Both lists and tuples hold ordered sequences of items, and both support indexing and slicing. If you can do almost everything with a list, why shouldn't you just use lists for everything? How do you decide which sequence type to use when designing a program?
 
 ### Introduce the concept in isolation
-Python provides `namedtuple` in the `collections` module. It creates a tuple subclass with named fields.
 
 ```python
->>> from collections import namedtuple
->>> 
->>> Point = namedtuple('Point', ['x', 'y'])
->>> p = Point(3, 4)
->>> print(p.x)
-3
->>> print(p.y)
-4
->>> print(p[0])
-3
->>> print(p)
-Point(x=3, y=4)
+import sys
+my_list = [1, "two", 3.0]
+my_tuple = (1, "two", 3.0)
+print(sys.getsizeof(my_list) > sys.getsizeof(my_tuple))
 ```
+Output:
+```text
+True
+```
+This proves that tuples are a lighter, fixed-size structure. A tuple is best used as a **heterogeneous record** (different types, fixed structure), while a list is best for a **homogeneous collection** (same type, variable size).
 
-This proves that `namedtuple` generates a class that behaves exactly like a tuple (you can still use `p[0]`), but also allows attribute access (`p.x`). It remains completely immutable.
+### Discard the throwaway
 
-### Discard the throwaway example
-This namedtuple example is deleted.
+This throwaway code is explicitly discarded and will not appear in our project.
 
 ### Project Change
-No reference counterpart.
-- Files affected: REPL / throwaway script.
-- Change type: add.
-- Location: REPL.
-- Dependencies: None.
+
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are exploring Python sequence types.
+- **Files affected:** `tests/test_collections.py` (modified)
+- **Change type:** Add
+- **Location:** Below `map_grid`
+- **Dependencies:** None
 
 ### The New Code
+
 ```python
-from collections import namedtuple
-Color = namedtuple('Color', ['r', 'g', 'b'])
-red = Color(255, 0, 0)
+def process_records():
+    # List of heterogeneous tuples
+    people = [("Alice", 25), ("Bob", 30)]
+    return people[0][1]
 ```
 
 ### The Updated Project
+
 ```python
-# ← new
-from collections import namedtuple
-Color = namedtuple('Color', ['r', 'g', 'b'])
-red = Color(255, 0, 0)
+16: def map_grid():
+17:     grid = {(0, 0): 'start', (3, 4): 'end'}
+18:     return grid[(0, 0)]
+19:
+20: # ← new
+21: def process_records():
+22:     # List of heterogeneous tuples
+23:     people = [("Alice", 25), ("Bob", 30)]
+24:     return people[0][1]
 ```
-This defines a named tuple for colors and instantiates one.
+This adds a function showing the standard convention: using a list to hold an unknown number of items, where each item is a fixed-structure tuple record.
 
 ### Mechanical walkthrough
-1. `from collections import namedtuple` — Imports the `namedtuple` factory function from the standard library.
-2. `namedtuple('Color', ['r', 'g', 'b'])` — Calls the factory. It creates and returns a new class type. The first argument is the name of the new type, and the second is a list of field names.
-3. `Color = ...` — Assigns the generated class to the variable `Color`.
-4. `Color(255, 0, 0)` — Instantiates the new named tuple, passing values for `r`, `g`, and `b`.
-5. `red` — The resulting immutable object, whose fields can be accessed as `red.r`.
+
+- `def process_records():`: Defines a function.
+- `people = [("Alice", 25), ("Bob", 30)]`: Creates a list named `people`. Inside the list are two tuple literals. The list can grow or shrink, but each tuple strictly holds a name string and an age integer.
+- `return people[0][1]`: Accesses the first element of the list (the tuple `("Alice", 25)`), and then accesses the second element of that tuple (the integer `25`).
+
+### CS lens
+
+This is **Data Modeling / Structuring**. This pattern appears in Relational Databases (a table is a list of rows, and each row is a fixed-schema tuple), JSON arrays of objects, CSV files (where lines are homogeneous, but columns are heterogeneous), and C `struct` arrays.
+
+### SE lens
+
+The design principle is **Intent Disclosure**. Using a tuple signals to any programmer reading your code: "This structure has a specific, unchanging shape." The alternative NOT chosen is using a list of lists. The tradeoff is that you cannot dynamically add new fields (like an address) to the tuple at runtime; if your data needs to morph, a dictionary or an object is a better choice.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: `25`
+
+### One sentence connecting to previous unit
+
+With the differences firmly established, we can see how all these properties of tuples interact across a system.
 
 ---
 
-## Summary
-Tuples are the right tool for fixed records, multiple return values, and dictionary keys. Their immutability is a feature, providing a contract that data will not change unexpectedly. Tuple unpacking allows for clean and readable extraction of values, and tools like `zip()` and `namedtuple` build upon tuples to organize related data easily.
+## Closing
 
-Lesson 9 will cover dictionaries — the key-value store, where you will see tuples used as keys in practice.
+### Connect the pieces
 
-### Exercises
-1. Write a function `statistics(lst)` that returns a named tuple with `.mean`, `.minimum`, and `.maximum` calculated from a list of numbers.
-2. Write a function that takes a list of `(name, score)` tuples and returns the name of the highest scorer.
-3. Use `zip` to implement a dot product of two vectors (e.g., given `[1, 2]` and `[3, 4]`, compute `(1*3) + (2*4)`).
+Consider the record `('Alice', 25, 95.5)` as it flows through a system across all these concepts.
+1. **Creation:** You create it as a literal: `record = ('Alice', 25, 95.5)`. Its immutability guarantees that no other part of the program can accidentally change Alice's score.
+2. **Unpacking:** When you need to process it, you can effortlessly extract the fields: `name, age, score = record`.
+3. **Use as a dict key:** Because it's a tuple of immutable values, it is hashable. You could use it as a key in a dictionary to cache results: `cache[record] = "Processed"`.
+4. **Sorting:** When placed in a list with other tuples (e.g., `records = [('Alice', 25, 95.5), ('Bob', 30, 80.0)]`), you can easily sort the list. Python will sort the tuples by comparing their first elements, then their second, and so on, taking advantage of the predictable structure a tuple provides.
+
+The immutability of the tuple is the core feature that enables all of these safe, efficient behaviors.

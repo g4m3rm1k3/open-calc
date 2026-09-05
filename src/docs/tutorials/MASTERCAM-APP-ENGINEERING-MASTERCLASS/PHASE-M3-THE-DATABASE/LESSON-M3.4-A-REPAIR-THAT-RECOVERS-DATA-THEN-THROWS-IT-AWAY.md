@@ -239,6 +239,73 @@ Full saved run: `verification/mastercam-phase-03/lab_test_connection_resilience_
 
 The unit above proved the corruption is real and detectable; this unit proves the response to it - officially "repair failed, nothing recovered" - isn't quite the full story of what happened internally.
 
+## Concept Unit: An Honest, Open Finding: the Obvious Fix Isn't Enough
+
+### The Problem
+
+The previous unit's se_lens named a specific fix - commit and detach right after the table-copy loop, before touching indexes/triggers/views. That fix was actually applied here. It did not change this test's result.
+
+Before reading on:
+
+- The test below still asserts repaired_path is None, unchanged. What real question does that leave open that the previous unit's analysis didn't anticipate?
+- Why is reporting 'I applied a fix and re-verified it didn't work' more valuable here than quietly leaving the previous unit's untested claim standing?
+
+### Project Change
+
+- **Reference Source:** mastercam_app/db/connection.py:58-76 (the applied reordering - commit and DETACH now happen immediately after the table-copy loop, before the index/trigger/view loop that used to precede them), quoted verbatim:
+for name, _ in tables:
+    try:
+        dest_conn.execute(f"INSERT OR IGNORE INTO '{name}' SELECT * FROM old_db.'{name}'")
+    except sqlite3.DatabaseError:
+        pass
+
+index_trigger_view_sql = dest_conn.execute(
+    "SELECT type, sql FROM old_db.sqlite_master "
+    "WHERE type IN ('index','trigger','view') AND sql NOT NULL;"
+).fetchall()
+dest_conn.commit() dest_conn.execute("DETACH DATABASE old_db;")
+for row in index_trigger_view_sql:
+    ...
+- **Files affected:** `verification/mastercam-app-copy/mastercam-app/mastercam_app/db/connection.py` (modified)
+- **Change type:** refactor
+- **Location:** _repair_database
+- **Dependencies:** none
+
+### Mechanical Walkthrough
+
+- `dest_conn.commit() right after the table-copy loop, before indexes/triggers` — This really does remove one real failure mode - a later commit() can no longer fail specifically because old_db is still attached during it. Re-running the exact same real corruption from the unit above afterward, by hand, showed the final commit() (after the index/trigger loop) still raises 'database disk image is malformed' - meaning dest_conn's own file, a brand-new file that was never corrupted itself, comes back malformed as a side effect of reading enough corrupted data from the attached old_db earlier. That's a deeper, different mechanism than "old_db was still attached," and this fix doesn't reach it.
+- `repaired_path is None, unchanged` — The test's assertion didn't need to change, because the real, measured outcome didn't change - which is itself the honest result of applying this fix and re-checking, not an assumption carried over from the previous unit.
+
+### CS Lens
+
+This is the real difference between a **plausible fix** and a **verified fix** - the previous unit's reasoning about the commit/ detach ordering was sound and the change was real, but soundness of reasoning isn't the same guarantee as re-running the test.
+
+### SE Lens
+
+The real alternative to reporting this honestly is quietly not mentioning that a fix was tried, since it didn't pan out - that would leave a false "fixed" impression standing on a real, production corruption-recovery path, which is exactly the kind of claim this whole phase has been about not making without verification. The actual root cause here - why a fresh destination file becomes internally malformed from attached reads against a sufficiently corrupted source - is real, open work, not solved by this lesson.
+
+### Commands needed
+
+- `python -m pytest tests/test_connection_resilience.py -v` — Run from verification/mastercam-app-copy/mastercam-app/ - confirms the fix attempt broke nothing and changed nothing about this outcome
+
+### Verification
+
+```text
+collected 3 items
+
+tests/test_connection_resilience.py::test_integrity_ok_is_true_for_a_real_freshly_saved_database PASSED [ 33%]
+tests/test_connection_resilience.py::test_integrity_ok_is_false_after_real_mid_file_corruption PASSED [ 66%]
+tests/test_connection_resilience.py::test_repair_database_returns_none_for_this_real_corruption_despite_partial_recovery PASSED [100%]
+
+============================== 3 passed in 0.36s ==============================
+```
+
+Full saved run: `verification/mastercam-phase-03/lab_all_fixes_verified_output.txt`.
+
+### Connection to the previous unit
+
+The unit above proposed a specific fix; this unit applied it for real and found it insufficient - a real, open finding to pick up later, not a closed one.
+
 ## Connect the pieces
 
 Trace the same 50-row, real corrupted file through both units: integrity_ok correctly reports False on it (unit one), and _repair_database, run against that identical file, silently recovers 5 of 11 tables' real data into a temp file before a late commit() failure against the still-attached corrupted source discards that temp file entirely, returning None - a real, measured gap between "repair failed" and what actually happened along the way.

@@ -1,0 +1,275 @@
+number: "M4.1"
+title: "A Field, a Button, and a Signal Connecting Them"
+path_note: >
+  File paths under mastercam-app/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same repository's
+  verification folder. This lesson adds a real, new file - ta_search_panel.py -
+  to verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/, not
+  the real mastercam-app/, per this phase's rule. This is the first lesson
+  of a real, growing feature this phase keeps extending.
+
+what_you_will_build: >
+  A brand-new dialog - TASearchPanel - with a real QLineEdit field, a
+  real QPushButton, and a real QTableWidget, wired together with a
+  signal/slot connection, using Phase M3's own fixed
+  Database.search_by_tool_code to actually populate the table.
+
+what_you_need_to_know_first: >
+  Lesson M4.0's QMainWindow/central-widget shape, and Phase M3.5's
+  real, fixed search_by_tool_code method - this lesson calls it for
+  real.
+
+terms:
+  - name: "Signal"
+    definition: >
+      A real, declared event source a Qt object can emit - QPushButton
+      already has a built-in `clicked` signal, emitted automatically
+      whenever the button is actually clicked (or activated via
+      keyboard).
+  - name: "Slot"
+    definition: >
+      Any callable connected to a signal - here, a plain method,
+      `self._run_search`, connected via `.connect(...)`. Nothing marks
+      it as special; anything callable can be a slot.
+  - name: "QLineEdit.text()"
+    definition: >
+      Reads whatever the user has currently typed into a single-line
+      text field, as a real, live Python string - not a snapshot taken
+      at field-creation time.
+
+objects_and_methods:
+  - name: "TASearchPanel"
+    what_it_is: "A new, real QDialog with a search field and a results table"
+    implementation: "mastercam_app/ui/ta_search_panel.py (new)"
+    its_use: "Standalone for now - not yet wired into DataViewer's menu (Lesson M4.4)"
+    type: "class (QDialog subclass)"
+    responsibility: "Take a tool code, query the database, show matching rows"
+    depends_on: "get_db, Database.search_by_tool_code (Phase M3)"
+    connects_to: "QPushButton.clicked -> self._run_search -> self._populate"
+    shape: "one field, one button, one table, connected by a single signal"
+
+concept_units:
+  - title: "Wiring a Button's clicked Signal to a Real Method"
+    problem: >
+      A button by itself does nothing when clicked - something has to
+      run in response. The panel needs: type a code, press Search, see
+      results.
+    socratic_prompt:
+      - "search_button.clicked.connect(self._run_search) - note there are no parentheses after self._run_search. What would happen instead if you wrote .connect(self._run_search())?"
+      - "self.query_field.text() is called fresh inside _run_search, not stored earlier - why does that matter for a field the user might still be typing into?"
+    project_change:
+      reference_source: >
+        No reference counterpart - this is a from-scratch addition,
+        built new for this lesson. mastercam_app/ui/dialogs.py's real
+        TAEditorDialog (Phase M3-adjacent) already shows the same
+        clicked.connect shape this unit teaches directly:
+        mastercam_app/ui/dialogs.py:273
+        (save_btn.clicked.connect(self._save)).
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+          status: new
+      change_type: add
+      location: "new file"
+      dependencies: "PySide6.QtWidgets, mastercam_app.db.connection.get_db"
+    new_code:
+      applicable: true
+      intro: >
+        The whole new file - a field, a button, an empty table, and the
+        signal connection. _run_search and _populate are covered in the
+        next unit.
+      file: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+      status: new
+      language: python
+      code: |
+        """
+        A new, real search panel for tools by code - a small, standalone
+        QDialog built for Lesson M4.1, using the real, fixed
+        Database.search_by_tool_code from Phase M3.
+        """
+
+        from PySide6.QtWidgets import (
+            QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
+            QTableWidget, QTableWidgetItem, QLabel,
+        )
+
+        from mastercam_app.db.connection import get_db
+
+        COLUMNS = ["TA Number", "Holder", "Tool Code", "Diameter", "Part"]
+
+
+        class TASearchPanel(QDialog):
+            def __init__(self, parent=None):
+                super().__init__(parent)
+                self.setWindowTitle("Search Tools by Code")
+                self.resize(700, 400)
+
+                layout = QVBoxLayout(self)
+
+                search_row = QHBoxLayout()
+                search_row.addWidget(QLabel("Tool code:"))
+                self.query_field = QLineEdit()
+                self.query_field.setPlaceholderText("e.g. T0101")
+                search_row.addWidget(self.query_field)
+                self.search_button = QPushButton("Search")
+                self.search_button.clicked.connect(self._run_search)
+                search_row.addWidget(self.search_button)
+                layout.addLayout(search_row)
+
+                self.results_table = QTableWidget(0, len(COLUMNS))
+                self.results_table.setHorizontalHeaderLabels(COLUMNS)
+                layout.addWidget(self.results_table)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "self.search_button.clicked.connect(self._run_search)"
+          explanation: >
+            self._run_search (no parentheses) is a bound method object -
+            connect stores it and calls it later, when clicked actually
+            fires. Writing self._run_search() here would call it
+            immediately, once, during __init__, and pass whatever it
+            returns (None) to connect instead - a real, common mistake.
+        - element: "self.query_field.setPlaceholderText(\"e.g. T0101\")"
+          explanation: >
+            Placeholder text shows only when the field is empty and
+            disappears the moment the user types - it's not a default
+            value; text() would still return "" until real input exists.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **callback registration** - storing a reference to code to
+      run later, in response to an event, rather than running it now.
+      Qt's signal/slot system is a strongly-typed, introspectable version
+      of the same pattern JavaScript's addEventListener or a plain
+      Python callback list would use.
+    se_lens: >
+      The real alternative - polling the button's state in a loop
+      ("check every 100ms whether it was clicked") - would waste CPU and
+      still be less precise than an event fired exactly once, at the
+      exact moment of the click. Signals/slots exist specifically so
+      widgets don't need polling.
+    commands:
+      - command: "python -c \"from PySide6.QtWidgets import QApplication; import sys; app = QApplication(sys.argv); from mastercam_app.ui.ta_search_panel import TASearchPanel; p = TASearchPanel(); print(p.query_field.placeholderText())\""
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/ - confirms the panel constructs without error"
+    verification:
+      applicable: true
+      real_output: |
+        e.g. T0101
+      output_file: "verification/mastercam-phase-04/lab_test_ta_search_panel_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      Lesson M4.0 built a minimal QMainWindow; this unit is the first
+      real, growing feature this phase adds - a QDialog instead, since
+      this panel isn't the app's main window.
+
+  - title: "The Signal Fires - Now Something Has to Query and Display"
+    problem: >
+      Connecting clicked to _run_search only matters once _run_search
+      actually does something real: read the field, query the database,
+      and put rows into the table.
+    socratic_prompt:
+      - "_populate sets self.results_table.setRowCount(len(rows)) before filling any cells - what would happen to old rows from a previous search if this line were removed?"
+      - "row.get('ta_number', '') uses .get with a default instead of row['ta_number'] - what real situation would make that difference matter?"
+    project_change:
+      reference_source: >
+        No reference counterpart - new code, using
+        mastercam_app/db/database.py:767's real, fixed
+        search_by_tool_code (Phase M3.5) as its data source.
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+          status: modified
+      change_type: add
+      location: "end of ta_search_panel.py"
+      dependencies: "get_db, Database.search_by_tool_code"
+    new_code:
+      applicable: true
+      intro: "The two real methods the signal connection above calls."
+      file: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+      status: new
+      language: python
+      code: |
+        def _run_search(self):
+            db = get_db()
+            query = self.query_field.text()
+            rows = db.search_by_tool_code(query)
+            self._populate(rows)
+
+        def _populate(self, rows):
+            self.results_table.setRowCount(len(rows))
+            for row_index, row in enumerate(rows):
+                values = [
+                    row.get("ta_number", ""),
+                    row.get("holder_name", ""),
+                    row.get("tool_code", ""),
+                    row.get("tool_diameter", ""),
+                    row.get("partnumber", ""),
+                ]
+                for col_index, value in enumerate(values):
+                    self.results_table.setItem(row_index, col_index, QTableWidgetItem(str(value)))
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "self.results_table.setRowCount(len(rows))"
+          explanation: >
+            This both grows AND shrinks the table to match the new
+            result count - a second search with fewer matches than the
+            first automatically drops the extra old rows, rather than
+            leaving stale ones from before mixed in with new results.
+        - element: "row.get(\"ta_number\", \"\")"
+          explanation: >
+            search_by_tool_code returns real dict rows built from
+            sqlite3.Row objects via _rows_to_list - every real row does
+            have this key, so .get's default never actually triggers
+            here. It's defensive against a future column rename breaking
+            silently into a KeyError crash instead of an empty cell.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the real end of the callback chain from the unit above:
+      event (click) -> signal (clicked) -> slot (_run_search) -> real
+      side effect (a database query and a UI update) - the same shape
+      every event-driven system uses, traced here through one real,
+      concrete path.
+    se_lens: >
+      The real alternative - querying the database once at panel
+      construction and never again - would show stale results forever.
+      Querying inside the slot, triggered by the user's own action,
+      keeps the displayed data as current as the last real search the
+      user actually asked for.
+    commands:
+      - command: "python -m pytest tests/test_ta_search_panel.py -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/"
+    verification:
+      applicable: true
+      real_output: |
+        collected 2 items
+
+        tests/test_ta_search_panel.py::test_search_populates_the_table_with_a_real_match PASSED [ 50%]
+        tests/test_ta_search_panel.py::test_search_with_no_match_clears_the_table PASSED [100%]
+
+        ============================== 2 passed in 0.13s ==============================
+      output_file: "verification/mastercam-phase-04/lab_test_ta_search_panel_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above wired the signal; this unit is what actually runs
+      when it fires - together, a complete, real, working feature.
+
+closing:
+  connect_the_pieces: >
+    Trace tool code "T0101" through both units: typing it into
+    query_field and clicking Search fires the signal wired in unit one,
+    which runs _run_search (unit two) - reading the field's real text,
+    calling Phase M3's own fixed search_by_tool_code, and landing "TA0060"
+    in the table's first cell, proven by a real, passing test using a
+    real in-memory database.
+  next_lesson_pointer: >
+    Next: turning a selected search result into an editable form -
+    QFormLayout and multiple QLineEdit fields, wired to Phase M3.3's
+    fixed, atomic update_ta.

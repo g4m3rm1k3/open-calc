@@ -1,185 +1,116 @@
 # Lesson 33: Recursion and Induction — Proving Programs Correct
 
-What you will build: The reader will understand mathematical induction as the formal basis for reasoning about recursive programs, learn loop invariants as the iterative equivalent, and prove the correctness of factorial, binary search, and merge sort. The transferable problems: (1) a recursive proof has EXACTLY the same structure as a recursive function: a base case and an inductive step; (2) a loop invariant is a property that is true BEFORE every iteration of a loop — proving it is established, maintained, and useful gives you the loop's correctness; (3) reasoning about correctness before debugging saves hours — a wrong algorithm cannot be debugged into correctness.
+What you will build: The reader understands the correspondence between mathematical induction and recursive programs: the base case of induction corresponds to the base case of recursion; the inductive step corresponds to the recursive case. They learn to reason about program correctness using loop invariants and induction. The transferable insight: a correct recursive program is a proof by induction. The base case proves the simplest input. The inductive step assumes the recursive call is correct and shows the whole function is correct. This mental model catches bugs before you even run the code.
 
-What you need to know first: Lessons 0–32 (full curriculum through divide and conquer).
+What you need to know first: Lessons 00-32.
 
-Terms used in this lesson:
-- **Mathematical induction** — a formal method of mathematical proof typically used to establish that a given statement is true for all natural numbers. It solves the problem of proving infinitely many cases by proving a starting point and a chain reaction.
-- **Base case** — the first step of an inductive proof, which proves the statement for the initial value (e.g., n=0 or n=1). It exists to give the inductive chain reaction a solid starting point.
-- **Inductive hypothesis** — the assumption made in the second step of an inductive proof, assuming the statement holds for an arbitrary case `k`. It provides the premise needed to prove the next case.
-- **Inductive step** — the second step of an inductive proof, showing that if the statement holds for `k`, it must hold for `k+1`. It creates the chain reaction that extends the proof to all numbers.
-- **Loop invariant** — a property or predicate that is guaranteed to be true before every single iteration of a loop. It exists to let us mathematically prove that a loop will compute the correct result when it finishes.
-- **Precondition** — a condition that must be true before a function is called, forming the caller's part of a contract. It relieves the function from having to handle nonsensical inputs.
-- **Postcondition** — a condition that the function guarantees will be true after it returns, assuming the precondition was met. It forms the implementer's part of a contract.
-- **Design by contract** — a software engineering principle where functions have explicit preconditions and postconditions. It clarifies exactly who is responsible when a bug occurs.
-- **Defensive programming** — the practice of writing code that checks for bad inputs and unexpected states at runtime. It solves the problem of a program crashing deeply in unexpected ways by failing early and explicitly.
-- **assert** — a Python keyword that evaluates a condition and raises an `AssertionError` if it is false. It is used to declare invariants, preconditions, and postconditions in code so that assumptions are explicitly enforced during development.
-- **for loop** — a Python construct that iterates over a sequence, binding a variable to each element in turn and executing a block of code. It solves the problem of needing to repeat an operation for every item in a collection.
-- **while loop** — a Python construct that repeatedly executes a block of code as long as a condition remains true. It solves the problem of repeating an action when the exact number of iterations is unknown in advance.
+**Terms used in this lesson**
+- **Mathematical induction** — A mathematical proof technique. It exists to prove that a property holds for all natural numbers by proving it for a base case and proving that if it holds for $k$, it holds for $k+1$.
+- **Base case** — The condition under which a recursive function returns a value without making any subsequent recursive calls. It exists to stop the recursion and provide a foundational value.
+- **Inductive step** — The part of a mathematical proof or recursive function that relies on the assumption that a smaller instance of the problem is already solved. It exists to build the solution for size $n$ from size $n-1$.
+- **Loop invariant** — A property that is true before a loop begins, at the end of each iteration, and after the loop terminates. It exists to formally prove the correctness of iterative algorithms.
+- **Structural induction** — A generalization of mathematical induction that inducts on the structure of data (like lists or trees) rather than just integers. It exists to prove properties about functions that operate on recursive data structures.
+- **Precondition** — A condition that must be true before a function is called. It exists to explicitly define the expected state or inputs, relieving the function from handling invalid data.
+- **Postcondition** — A condition that is guaranteed to be true after a function finishes execution, provided its preconditions were met. It exists to define the function's contract with its caller.
+- **Termination** — The guarantee that a program or function will eventually finish executing. It exists to prevent infinite loops and unbounded recursion.
 
-Objects and methods used:
-- **`sum_to_n`**
-  - *What it is:* A standalone function that calculates the sum of integers from 1 to n using a mathematical formula.
-  - *Implementation:* `def sum_to_n(n): return n * (n + 1) // 2`
-  - *Its use:* Used here to demonstrate proving a formula using mathematical induction and verifying it with Python.
-  - *Type:* A free function.
-  - *Responsibility:* Calculates the arithmetic series sum using Gauss's formula in O(1) time.
-  - *Depends on:* An integer `n` passed as a parameter.
-  - *Connects to:* Called by the verification loop.
-  - *Shape:* An internal utility function in our lesson script.
-- **`factorial`**
-  - *What it is:* A recursive mathematical function that computes the product of all positive integers less than or equal to n.
-  - *Implementation:* `def factorial(n): ...`
-  - *Its use:* Used to demonstrate how inductive proofs perfectly mirror the structure of recursive code.
-  - *Type:* A free function.
-  - *Responsibility:* Computes the factorial of `n` recursively.
-  - *Depends on:* An integer `n` >= 0 passed as a parameter.
-  - *Connects to:* Calls itself recursively with `n-1`.
-  - *Shape:* An internal utility function.
-- **`find_max`**
-  - *What it is:* A function that finds the largest element in a list.
-  - *Implementation:* `def find_max(lst): ...`
-  - *Its use:* Used to demonstrate a simple loop invariant in practice.
-  - *Type:* A free function.
-  - *Responsibility:* Iterates through a list and maintains the running maximum value.
-  - *Depends on:* A non-empty list `lst`.
-  - *Connects to:* Uses Python's built-in len() and list indexing.
-  - *Shape:* An internal utility function.
-- **`binary_search`**
-  - *What it is:* An efficient algorithm for finding an item from a sorted list of items.
-  - *Implementation:* `def binary_search(lst, target): ...`
-  - *Its use:* Used to demonstrate proving a complex algorithm correct using loop invariants.
-  - *Type:* A free function.
-  - *Responsibility:* Locates the index of `target` in a sorted `lst` by repeatedly halving the search space.
-  - *Depends on:* A sorted list `lst` and a `target` value.
-  - *Connects to:* Returns an integer index to the caller.
-  - *Shape:* An internal utility function.
-- **`average`**
-  - *What it is:* A function that computes the arithmetic mean of a list.
-  - *Implementation:* `def average(lst): ...`
-  - *Its use:* Used to show the dangers of implicit contracts and what happens when preconditions are violated.
-  - *Type:* A free function.
-  - *Responsibility:* Sums the list and divides by the length.
-  - *Depends on:* A non-empty list of numeric values.
-  - *Connects to:* Uses len().
-  - *Shape:* An internal utility function.
+**Objects and methods used**
+- **`print`**
+  - *What it is:* A built-in function to output data.
+  - *Implementation:* `print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)`
+  - *Its use:* To display traced output for verifying recursive and iterative steps.
+  - *Type:* Built-in function.
+  - *Responsibility:* Writes the string representation of objects to the standard output stream.
+  - *Depends on:* The objects passed to it to have a string representation.
+  - *Connects to:* Calls `__str__` on objects and outputs to `sys.stdout`.
+  - *Shape:* A standard output boundary tool used for visibility.
+- **`range`**
+  - *What it is:* A built-in class for generating a sequence of numbers.
+  - *Implementation:* `range(stop)` or `range(start, stop[, step])`
+  - *Its use:* To generate inputs for iterating through tests.
+  - *Type:* Built-in type/class.
+  - *Responsibility:* Generates an immutable sequence of numbers based on start, stop, and step.
+  - *Depends on:* Integer arguments.
+  - *Connects to:* Provides an iterable for loops.
+  - *Shape:* A fundamental iterative building block.
+- **`len`**
+  - *What it is:* A built-in function to get the number of items in a container.
+  - *Implementation:* `len(s)`
+  - *Its use:* To calculate the size of lists for binary search and termination bounds.
+  - *Type:* Built-in function.
+  - *Responsibility:* Returns the length of an object.
+  - *Depends on:* The object having a `__len__` method.
+  - *Connects to:* Interrogates lists and strings.
+  - *Shape:* A standard measurement tool for data structures.
+- **`assert`**
+  - *What it is:* A keyword used for debugging purposes.
+  - *Implementation:* `assert condition, message`
+  - *Its use:* To explicitly check loop invariants and preconditions at runtime.
+  - *Type:* Language keyword.
+  - *Responsibility:* Raises an `AssertionError` if the specified condition evaluates to false.
+  - *Depends on:* A boolean expression.
+  - *Connects to:* The runtime exception handling system.
+  - *Shape:* An internal diagnostic mechanism.
+- **`sorted`**
+  - *What it is:* A built-in function to return a new sorted list from an iterable.
+  - *Implementation:* `sorted(iterable, *, key=None, reverse=False)`
+  - *Its use:* To assert that an input list meets a precondition of being sorted.
+  - *Type:* Built-in function.
+  - *Responsibility:* Produces a new list containing all items from the iterable in ascending order.
+  - *Depends on:* Comparable elements in the iterable.
+  - *Connects to:* Returns a new list to the caller without mutating the original.
+  - *Shape:* A data transformation utility.
 
-## Concept Unit: Mathematical induction — the structure
+## Concept Unit: Induction and recursion — the correspondence
 
 ### The Problem
-How do we mathematically prove that a program or a formula is correct for *every* possible input? Testing can show the presence of bugs, but not their absence. If we have an infinite number of possible inputs, we cannot test them all. 
+How can we be absolutely certain that a function calling itself will always produce the correct result without manually tracing every possible input? If a recursive function is a chain of deferred operations, what mathematical principle guarantees the final answer is right? What would happen if we didn't have a solid mathematical underpinning for recursion?
 
 ### Introduce the concept in isolation
-Mathematical induction is a proof technique. We prove that a property $P(n)$ is true for all $n$ in two steps:
-1. **BASE CASE**: Prove $P(0)$ or $P(1)$ is true.
-2. **INDUCTIVE STEP**: Assume $P(k)$ is true (this is the inductive hypothesis), and prove $P(k+1)$ is true.
-
-If we can do both, the statement is true for all $n \ge$ the base case. 
-
-Let's prove the formula: `sum(1..n) = n(n+1)/2`
-```
-Base case: n=1. sum(1..1) = 1. 1*(1+1)/2 = 1. TRUE.
-Inductive step: assume sum(1..k) = k(k+1)/2.
-Prove: sum(1..k+1) = (k+1)(k+2)/2.
-sum(1..k+1) = sum(1..k) + (k+1)
-             = k(k+1)/2 + (k+1)      [by inductive hypothesis]
-             = (k+1)(k/2 + 1)
-             = (k+1)(k+2)/2           [algebra]
-QED.
-```
-
-Let's verify this behavior empirically with throwaway code using Python's `assert` and a `for` loop.
+Here is the concept of **mathematical induction** mirroring a recursive program.
 
 ```python
-def sum_to_n(n):
-    return n * (n + 1) // 2
+# Mathematical induction:
+# 1. Base case: prove P(0) is true
+# 2. Inductive step: if P(k) is true, prove P(k+1) is true
+# 3. Conclusion: P(n) is true for all n >= 0
 
-# Verify for several values:
-for n in range(1, 11):
-    assert sum(range(1, n+1)) == sum_to_n(n), f'Failed at n={n}'
-print('Formula verified for n=1..10')
-```
-Output:
-```text
-Formula verified for n=1..10
-```
-This empirical test verifies the formula for the first 10 integers. The formal induction proved it for all positive integers. 
-
-### Discard the throwaway example
-The verification script is deleted and will not appear in the project again.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition because we are demonstrating fundamental algorithmic correctness.
-Files affected: `math_algorithms.py` (created)
-Change type: add
-Location: top of file
-
-### The New Code
-```python
-def sum_to_n(n):
-    return n * (n + 1) // 2
-```
-
-### The Updated Project
-```python
-# 1: def sum_to_n(n):
-# 2:     return n * (n + 1) // 2
-```
-This function provides a proven $O(1)$ implementation of an arithmetic sum.
-
-### Mechanical walkthrough
-- `def sum_to_n(n):` defines a function taking parameter `n`.
-- `return` yields the calculated value back to the caller.
-- `n * (n + 1) // 2` evaluates the formula. `//` performs integer division to ensure the return type is an integer. 
-
-### CS/SE Lens
-Mathematical induction is the foundation of computer science. It guarantees that our loops and recursive calls will eventually terminate and produce correct results, even for inputs we have never explicitly tested.
-
-### Connect the Pieces
-We used mathematical induction to prove a mathematical formula. Next, we will use it to prove a recursive function.
-
-## Concept Unit: Induction on recursive functions — proving factorial correct
-
-### The Problem
-How do we prove a recursive function works without attempting to trace every single recursive call in our heads? 
-
-### Introduce the concept in isolation
-We can use mathematical induction to prove recursive functions. Let's write a recursive factorial function and prove it computes $n!$.
-
-```python
-def factorial_lab(n):
+# Recursive program mirrors this exactly:
+def factorial(n):
+    # CLAIM: factorial(n) returns n! for all n >= 0
+    # BASE CASE (n=0): returns 1 = 0! ✓
     if n == 0:
         return 1
-    return n * factorial_lab(n - 1)
+    # INDUCTIVE STEP: assume factorial(n-1) returns (n-1)!
+    # (the inductive hypothesis)
+    # Then: n * factorial(n-1) = n * (n-1)! = n! ✓
+    return n * factorial(n - 1)
 
-print(f"factorial_lab(5) = {factorial_lab(5)}")
-```
-Output:
-```text
-factorial_lab(5) = 120
+for i in range(6):
+    print(f'factorial({i}) = {factorial(i)}')
 ```
 
-Proof that `factorial_lab(n) = n!` for all $n \ge 0$:
+**Output:**
 ```
-Base case: n=0. factorial_lab(0) = 1 = 0!. TRUE.
-Inductive step: assume factorial_lab(k) = k! for some k >= 0.
-Prove: factorial_lab(k+1) = (k+1)!
-factorial_lab(k+1) = (k+1) * factorial_lab(k)   [by the code]
-                   = (k+1) * k!                 [by inductive hypothesis]
-                   = (k+1)!                     [by definition of factorial]
-QED.
+factorial(0) = 1
+factorial(1) = 1
+factorial(2) = 2
+factorial(3) = 6
+factorial(4) = 24
+factorial(5) = 120
 ```
-This proves that the function perfectly computes $n!$. The recursive proof's structure MIRRORS the recursive code.
 
-### Discard the throwaway example
-The lab script `factorial_lab` is deleted and will not appear in the project again.
+This output proves the direct correspondence. Trace the correspondence: base case `n=0`: return `1=0!`. Inductive step: IF `factorial(n-1)=(n-1)!` THEN `n*factorial(n-1)=n*(n-1)!=n!`. By induction, the function is correct for all $n \ge 0$. The structure of the code *is* the proof.
+
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-Files affected: `math_algorithms.py` (modified)
-Change type: add
-Location: after `sum_to_n`
+No reference counterpart — this is a standalone theory lesson because we are proving program correctness conceptually.
+- **Files affected:** None.
+- **Change type:** N/A.
+- **Location:** N/A.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
@@ -191,454 +122,436 @@ def factorial(n):
 
 ### The Updated Project
 ```python
-# 1: def sum_to_n(n):
-# 2:     return n * (n + 1) // 2
-# 3:
-# 4: def factorial(n):           # ← new
-# 5:     if n == 0:              # ← new
-# 6:         return 1            # ← new
-# 7:     return n * factorial(n - 1) # ← new
+1: def factorial(n): # ← new
+2:     if n == 0: # ← new
+3:         return 1 # ← new
+4:     return n * factorial(n - 1) # ← new
 ```
-This adds the proven recursive factorial function to our algorithms collection.
+This complete function demonstrates the recursive implementation of factorial.
 
 ### Mechanical walkthrough
-- `def factorial(n):` defines a function taking parameter `n`.
-- `if n == 0:` evaluates if we have reached the **Base case** — the first step of an inductive proof, giving the chain a starting point.
-- `return 1` returns the evaluated result of the base case.
-- `return n * factorial(n - 1)` performs the recursive call. This perfectly matches the **Inductive step** — showing that if the statement holds for $k$ (here $n-1$), it holds for $k+1$ (here $n$).
+- `def factorial(n):`: Defines a new function named `factorial` taking a single argument `n`.
+- `if n == 0:`: Checks the equality operator to see if `n` is exactly `0`. This is the base case check.
+- `return 1`: Returns the integer `1`. This resolves the base case without further recursion.
+- `return n * factorial(n - 1)`: Multiplies `n` by the result of the recursive call `factorial(n - 1)`. The multiplication operator `*` combines the current step with the inductive hypothesis.
 
-### CS/SE Lens
-The key insight here is structural equivalence: a recursive function *is* an inductive proof written in code. If you cannot write down the base case and the inductive step for your recursive algorithm, the algorithm is likely flawed.
+### CS lens
+The CS concept is **Induction and Recursion Equivalence**. Mathematical induction is the formal tool used to prove the correctness of recursive algorithms. Real-world places it appears: proving compiler correctness, validating recursive descent parsers, formal verification of cryptographic protocols, and type checking systems.
 
-### Connect the Pieces
-Recursion is deeply tied to induction. But what about iterative code? For loops, we use the equivalent concept: the loop invariant.
+### SE lens
+Design principle: **Correctness by Construction**. By writing the code to explicitly map to the mathematical proof, we avoid off-by-one errors. Alternative NOT chosen: unstructured iterative state. The real tradeoff is that recursion maps cleaner to the proof but can consume stack space (stack overflow), whereas iteration is memory-efficient but requires a loop invariant to prove.
 
-## Concept Unit: Loop invariants — the iterative equivalent
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `factorial(5)` returns `120`.
+
+### One sentence connecting to previous unit
+Having established that mathematical induction maps perfectly to recursion, we will now explore how to prove iterative loops using invariants.
+
+## Concept Unit: Loop invariants — reasoning about iterative programs
 
 ### The Problem
-How do we prove that an iterative loop (like a `for` loop or `while` loop) actually computes the correct answer? We can't use simple recursion, because the state mutates over time.
+If recursion uses induction for proof, how do we prove an iterative `while` or `for` loop is correct? How can we know that mutable state updating on every cycle eventually converges to the right answer? What property remains constant while the variables change?
 
 ### Introduce the concept in isolation
-A **Loop invariant** is a predicate $P(i)$ that is true before every iteration of a loop. A valid invariant must be:
-1. **ESTABLISHED**: true before the loop begins.
-2. **MAINTAINED**: if true at the start of iteration $i$, it is still true at the start of iteration $i+1$.
-3. **USEFUL**: when the loop terminates, the invariant gives you exactly what you need to prove the algorithm correct.
+Here is the concept of a **loop invariant** in isolation.
 
-Let's look at `find_max` with a throwaway example.
 ```python
-def find_max_lab(lst):
-    best = lst[0]
-    for i in range(1, len(lst)):
-        # INVARIANT: best = max(lst[0..i-1])
-        if lst[i] > best:
-            best = lst[i]
-    return best
+def factorial(n):
+    if n == 0: return 1
+    return n * factorial(n-1)
 
-print(find_max_lab([3, 1, 4, 1, 5, 9]))
-```
-Output:
-```text
-9
-```
-Invariant: `best = max(lst[0..i-1])` at the START of each iteration.
-- **Established**: before the loop begins, `i=1`. `best = lst[0] = max(lst[0..0])`. TRUE.
-- **Maintained**: at the start of iteration $i$, `best = max(lst[0..i-1])`. After the body: if `lst[i] > best`, `best` becomes `lst[i]`; else `best` is unchanged. Either way, at the end of the iteration, `best = max(lst[0..i])`. TRUE for the start of iteration $i+1$.
-- **Useful**: when the loop ends (`i=len(lst)`), `best = max(lst[0..len(lst)-1]) = max(lst)`. DONE.
+def factorial_iter_traced(n):
+    result, i = 1, 1
+    print(f'Init: result={result} (should be 0!=1)')
+    while i <= n:
+        result *= i
+        print(f'After i={i}: result={result} (should be {i}!={factorial(i)})')
+        assert result == factorial(i), 'Invariant violated!'
+        i += 1
+    return result
 
-### Discard the throwaway example
-The lab function is deleted and will not appear in the project again.
+factorial_iter_traced(4)
+```
+
+**Output:**
+```
+Init: result=1 (should be 0!=1)
+After i=1: result=1 (should be 1!=1)
+After i=2: result=2 (should be 2!=2)
+After i=3: result=6 (should be 3!=6)
+After i=4: result=24 (should be 4!=24)
+```
+
+This output proves the invariant holds throughout. Trace `factorial_iter_traced(4)`: Init: `result=1=0!`. `i=1`: `result=1=1!`. `i=2`: `result=2=2!`. `i=3`: `result=6=3!`. `i=4`: `result=24=4!`. Loop exits when `i=5`: return `24`.
+
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-Files affected: `list_algorithms.py` (created)
-Change type: add
-Location: top of file
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected:** None.
+- **Change type:** N/A.
+- **Location:** N/A.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def find_max(lst):
-    best = lst[0]
-    for i in range(1, len(lst)):
-        if lst[i] > best:
-            best = lst[i]
-    return best
+def factorial_iter(n):
+    result = 1
+    i = 1
+    while i <= n:
+        result *= i
+        i += 1
+    return result
 ```
 
 ### The Updated Project
 ```python
-# 1: def find_max(lst):
-# 2:     best = lst[0]
-# 3:     for i in range(1, len(lst)):
-# 4:         if lst[i] > best:
-# 5:             best = lst[i]
-# 6:     return best
+1: def factorial_iter(n): # ← new
+2:     result = 1 # ← new
+3:     i = 1 # ← new
+4:     while i <= n: # ← new
+5:         result *= i # ← new
+6:         i += 1 # ← new
+7:     return result # ← new
 ```
-This is a standard iterative algorithm verified by a loop invariant.
+This iterative function calculates the factorial while maintaining the loop invariant that `result == (i-1)!`.
 
 ### Mechanical walkthrough
-- `best = lst[0]` initializes the state. This explicitly **ESTABLISHES** the loop invariant before the loop begins.
-- `for i in range(1, len(lst)):` is a **for loop** — a construct that iterates over a sequence, binding a variable `i` to each index.
-- `if lst[i] > best: best = lst[i]` updates the state. This step explicitly **MAINTAINS** the loop invariant.
-- `return best` returns the final answer, relying on the loop being **USEFUL** upon termination.
+- `def factorial_iter(n):`: Defines the function.
+- `result = 1`: Initializes the accumulator variable to `1`.
+- `i = 1`: Initializes the loop counter to `1`.
+- `while i <= n:`: Evaluates the loop condition. The loop continues as long as `i` is less than or equal to `n`.
+- `result *= i`: Multiplies `result` by `i` and assigns it back to `result`. This maintains the invariant.
+- `i += 1`: Increments the loop counter `i` by `1`.
+- `return result`: Returns the final accumulated result.
 
-### CS/SE Lens
-A loop invariant is just mathematical induction in disguise. The "Established" step is the base case. The "Maintained" step is the inductive step.
+### CS lens
+The CS concept is **Loop Invariants**. An invariant is a condition that is true before and after every execution of a block of code. Real-world places it appears: Hoare logic for program verification, loop unrolling optimizations in compilers, proving sorting algorithm correctness (like Quicksort partitions), and database transaction isolation proofs.
 
-### Connect the Pieces
-A linear scan like `find_max` is easy to eyeball. Let's use loop invariants to prove something notoriously difficult to get right: binary search.
+### SE lens
+Design principle: **Defensive Programming with Assertions**. Using an explicit `assert` in development to check the invariant ensures the loop logic is flawless. Alternative NOT chosen: relying entirely on unit tests. Real tradeoff: assertions run continuously during execution and can incur a performance penalty, whereas unit tests only run at build time, but assertions catch internal state corruption instantly.
 
-## Concept Unit: Proving binary search correct with a loop invariant
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `factorial_iter(5)` returns `120`.
+
+### One sentence connecting to previous unit
+Just as loop invariants prove properties over integers iterating through a loop, we can generalize mathematical induction to prove properties over data structures.
+
+## Concept Unit: Recursive correctness — structural induction on lists
 
 ### The Problem
-Binary search is famous for off-by-one errors (infinite loops, skipping elements, out-of-bounds index errors). How do we write it perfectly on the first try?
+Mathematical induction works beautifully on natural numbers ($0, 1, 2, ...$), but how do we prove correctness for functions that process lists, trees, or graphs? What is the equivalent of $n=0$ for a list? What represents $n-1$ when dealing with a sequence of items?
 
 ### Introduce the concept in isolation
-We will construct a binary search using a loop invariant to guarantee its correctness.
+Here is the concept of **structural induction** in isolation.
 
 ```python
-def binary_search_lab(lst, target):
-    low, high = 0, len(lst) - 1
-    # INVARIANT: if target is in lst, it is in lst[low..high]
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1    # target not in lst[low..mid], narrow
+# Structural induction: induct on the STRUCTURE of data, not just integers
+# Base case: empty list []
+# Inductive step: non-empty list [head] + tail
+#   assume correct for tail, prove correct for [head]+tail
+
+def sum_list(lst):
+    # CLAIM: sum_list(lst) returns sum of elements in lst
+    # BASE CASE (lst=[]): returns 0 = sum([]) ✓
+    if not lst:
+        return 0
+    # INDUCTIVE STEP: assume sum_list(lst[1:]) = sum(lst[1:])
+    # Then: lst[0] + sum_list(lst[1:]) = lst[0] + sum(lst[1:]) = sum(lst) ✓
+    return lst[0] + sum_list(lst[1:])
+
+def reverse_list(lst):
+    # BASE CASE: [] reversed is []
+    if not lst:
+        return []
+    # INDUCTIVE STEP: assume reverse_list(lst[1:]) reverses the tail
+    # Then: reverse_list(lst[1:]) + [lst[0]] reverses the whole list
+    return reverse_list(lst[1:]) + [lst[0]]
+
+print(sum_list([1,2,3,4,5]))
+print(reverse_list([1,2,3,4]))
+```
+
+**Output:**
+```
+15
+[4, 3, 2, 1]
+```
+
+This output proves the structural inductive steps. Trace `sum_list([1,2,3])`: `lst=[1,2,3]` not empty. `lst[0]=1`. `sum_list([2,3])=5` (by inductive hypothesis). Return `1+5=6`. Trace: `sum_list([2,3]) = 2 + sum_list([3]) = 2 + 3 + sum_list([]) = 2 + 3 + 0 = 5`.
+
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
+
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected:** None.
+- **Change type:** N/A.
+- **Location:** N/A.
+- **Dependencies:** None.
+
+### The New Code
+```python
+def sum_list(lst):
+    if not lst:
+        return 0
+    return lst[0] + sum_list(lst[1:])
+```
+
+### The Updated Project
+```python
+1: def sum_list(lst): # ← new
+2:     if not lst: # ← new
+3:         return 0 # ← new
+4:     return lst[0] + sum_list(lst[1:]) # ← new
+```
+This recursive function structural induction to sum a list by separating the head from the tail.
+
+### Mechanical walkthrough
+- `def sum_list(lst):`: Defines the function taking a single list argument.
+- `if not lst:`: Evaluates the truthiness of the list. An empty list is false, so `not lst` checks the base case.
+- `return 0`: Returns `0` if the list is empty.
+- `return lst[0] + sum_list(lst[1:])`: Accesses the first element `lst[0]` and adds it to the result of recursively calling `sum_list` on the slice `lst[1:]` (the rest of the list).
+
+### CS lens
+The CS concept is **Structural Induction**. It is a proof technique used in mathematical logic and computer science to prove propositions about recursively defined structures. Real-world places it appears: proving properties of abstract syntax trees in compilers, validating JSON parsing rules, formalizing database query equivalence, and verifying tree traversal algorithms.
+
+### SE lens
+Design principle: **Recursive Data Transformation**. Code structurally mimics the data it processes. Alternative NOT chosen: a standard `for` loop over indices. Real tradeoff: slicing `lst[1:]` in Python creates a new list copy on each recursive call, causing $O(N^2)$ time complexity and memory overhead, whereas an iterative approach modifies state in-place for $O(N)$ speed.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `sum_list([1, 2, 3])` returns `6`.
+
+### One sentence connecting to previous unit
+Understanding how induction proves internal logic naturally leads us to explicitly define the promises a function makes to the outside world through preconditions and postconditions.
+
+## Concept Unit: Preconditions and postconditions
+
+### The Problem
+How can a function guarantee it works if the caller passes garbage data? If a binary search requires a sorted list, is it the function's job to sort it, or the caller's job to guarantee it? How do we formalize these expectations?
+
+### Introduce the concept in isolation
+Here is the concept of **preconditions and postconditions** in isolation.
+
+```python
+def binary_search(sorted_lst, target):
+    '''
+    Precondition: sorted_lst is sorted in ascending order.
+    Postcondition: returns index i where sorted_lst[i] == target,
+                   or -1 if target not in sorted_lst.
+    '''
+    # Assert precondition in debug mode:
+    assert sorted_lst == sorted(sorted_lst), 'Precondition violated: not sorted'
+
+    lo, hi = 0, len(sorted_lst) - 1
+    # Invariant: target is in sorted_lst[lo..hi] if it exists
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
+            return mid   # postcondition satisfied
+        elif sorted_lst[mid] < target:
+            lo = mid + 1  # invariant maintained: target in [mid+1..hi]
         else:
-            high = mid - 1   # target not in lst[mid..high], narrow
-    return -1
+            hi = mid - 1  # invariant maintained: target in [lo..mid-1]
+    return -1  # postcondition: -1 because lo > hi (no elements remain)
 
-print(f"Index of 4: {binary_search_lab([1, 3, 4, 5, 9], 4)}")
-print(f"Index of 7: {binary_search_lab([1, 3, 4, 5, 9], 7)}")
-```
-Output:
-```text
-Index of 4: 2
-Index of 7: -1
+print(binary_search([1,3,5,7,9], 7))
+print(binary_search([1,3,5,7,9], 4))
 ```
 
-Proof of invariant:
-- **Established**: before the loop, `low=0`, `high=len-1`. If target is in the list, it is in `lst[0..len-1]`. TRUE.
-- **Maintained**: if `lst[mid] < target`, the target cannot be in `lst[low..mid]` (because the list is sorted). So we safely set `low = mid + 1`. If `lst[mid] > target`, it cannot be in `lst[mid..high]`, so we set `high = mid - 1`. The invariant is perfectly maintained.
-- **Useful**: when `low > high`, the search range is completely empty. By the invariant, if the target were in the list, it would be in `lst[low..high]`. Since that range is empty, the target is definitely not present. Returning `-1` is undeniably correct.
+**Output:**
+```
+3
+-1
+```
 
-### Discard the throwaway example
-The throwaway lab is deleted and will not appear in the project again.
+This output proves the function meets its postcondition. Trace invariant: Initially target in `lst[0..4]` if present. `mid=2`: `lst[2]=5<7` -> `lo=3`. Invariant: target in `lst[3..4]`. `mid=3`: `lst[3]=7==7`. Found. Invariant maintained at each step.
+
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-Files affected: `list_algorithms.py` (modified)
-Change type: add
-Location: after `find_max`
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected:** None.
+- **Change type:** N/A.
+- **Location:** N/A.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
+def binary_search(sorted_lst, target):
+    assert sorted_lst == sorted(sorted_lst), 'Precondition violated'
+    lo, hi = 0, len(sorted_lst) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
             return mid
-        elif lst[mid] < target:
-            low = mid + 1
+        elif sorted_lst[mid] < target:
+            lo = mid + 1
         else:
-            high = mid - 1
+            hi = mid - 1
     return -1
 ```
 
 ### The Updated Project
 ```python
-# 7:  
-# 8: def binary_search(lst, target): # ← new
-# 9:     low, high = 0, len(lst) - 1 # ← new
-# 10:    while low <= high:          # ← new
-# 11:        mid = (low + high) // 2 # ← new
-# 12:        if lst[mid] == target:  # ← new
-# 13:            return mid          # ← new
-# 14:        elif lst[mid] < target: # ← new
-# 15:            low = mid + 1       # ← new
-# 16:        else:                   # ← new
-# 17:            high = mid - 1      # ← new
-# 18:    return -1                   # ← new
+1: def binary_search(sorted_lst, target): # ← new
+2:     assert sorted_lst == sorted(sorted_lst), 'Precondition violated' # ← new
+3:     lo, hi = 0, len(sorted_lst) - 1 # ← new
+4:     while lo <= hi: # ← new
+5:         mid = (lo + hi) // 2 # ← new
+6:         if sorted_lst[mid] == target: # ← new
+7:             return mid # ← new
+8:         elif sorted_lst[mid] < target: # ← new
+9:             lo = mid + 1 # ← new
+10:         else: # ← new
+11:             hi = mid - 1 # ← new
+12:     return -1 # ← new
 ```
-We now have an algorithm mathematically proven to contain zero off-by-one errors.
+This implementation searches a sorted list, explicitly validating its precondition and ensuring the postcondition upon exit.
 
 ### Mechanical walkthrough
-- `low, high = 0, len(lst) - 1` establishes the boundary.
-- `while low <= high:` is a **while loop** — a construct that repeatedly executes a block as long as a condition remains true. It ensures we continue searching as long as the search space is not empty.
-- `mid = (low + high) // 2` computes the midpoint.
-- `if lst[mid] == target: return mid` handles the success case.
-- `elif lst[mid] < target: low = mid + 1` narrows the boundary.
-- `else: high = mid - 1` narrows the boundary from the other side.
-- `return -1` returns when the loop condition evaluates to false, correctly implementing the "Useful" property of our invariant.
+- `def binary_search(sorted_lst, target):`: Defines the binary search function with two parameters.
+- `assert sorted_lst == sorted(sorted_lst)`: Checks the precondition that the list is already sorted.
+- `lo, hi = 0, len(sorted_lst) - 1`: Initializes the two pointer bounds representing the search space.
+- `while lo <= hi:`: Loops as long as the search space is valid.
+- `mid = (lo + hi) // 2`: Calculates the midpoint index using integer division.
+- `if sorted_lst[mid] == target:`: Checks if the target is found at the midpoint.
+- `return mid`: Satisfies the postcondition by returning the successful index.
+- `elif sorted_lst[mid] < target:`: Narrows the search to the right half if the target is larger.
+- `lo = mid + 1`: Updates the lower bound.
+- `else:`: Handles the case where the target is smaller.
+- `hi = mid - 1`: Updates the upper bound.
+- `return -1`: Satisfies the postcondition by returning `-1` when the target is not found.
 
-### CS/SE Lens
-A wrong algorithm cannot be debugged into correctness. By designing the loop invariant first, the code trivially flows from it. 
+### CS lens
+The CS concept is **Design by Contract**. Software components should have clear, formal, and verifiable interfaces. Real-world places it appears: standard library API specifications, Eiffel programming language features, formal verification tools (like Dafny), and REST API OpenAPI schemas validating inputs before processing.
 
-### Connect the Pieces
-But wait — the invariant stated: "if `lst[mid] < target`, the target cannot be in `lst[low..mid]` (because the list is sorted)". What if the list is NOT sorted?
+### SE lens
+Design principle: **Fail Fast**. Asserting preconditions at the top boundary prevents corrupt state from propagating deep into the program. Alternative NOT chosen: quietly returning `-1` if the list is unsorted. Real tradeoff: adding assertions or validation adds runtime cost on every call; trusting the caller avoids overhead but risks subtle, impossible-to-debug logic failures later.
 
-## Concept Unit: Preconditions and postconditions (design by contract)
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `binary_search([1, 2, 3], 2)` returns `1`.
+
+### One sentence connecting to previous unit
+Even if an invariant holds and conditions are correct, a loop or recursive function must guarantee it eventually stops, which brings us to termination.
+
+## Concept Unit: Termination — proving a program stops
 
 ### The Problem
-Who is responsible if `binary_search` is passed an unsorted list and returns the wrong answer? Is it a bug in `binary_search`, or a bug in the code that called it?
+How do we mathematically prove that our recursive functions or while loops don't run forever? What prevents a while loop condition from remaining perpetually true? How do we establish a "decreasing measure" to ensure finality?
 
 ### Introduce the concept in isolation
-We formalize this relationship using **Design by contract**. The contract consists of a **Precondition** (what the caller promises) and a **Postcondition** (what the function guarantees).
+Here is the concept of a **termination** proof in isolation.
 
 ```python
-def binary_search_lab2(lst: list, target) -> int:
-    """
-    Precondition: lst is sorted in non-decreasing order.
-    Postcondition: returns i such that lst[i] == target,
-                   or -1 if target is not in lst.
-    """
-    # Enforce the precondition explicitly:
-    assert lst == sorted(lst), 'Precondition violated: lst must be sorted'
-    
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
+# Termination requires a DECREASING MEASURE that is bounded below
+# For factorial(n): measure = n. Each call: n decreases by 1.
+# When n=0 (base case): stops.
 
-try:
-    binary_search_lab2([5, 1, 4], 4)
-except AssertionError as e:
-    print(e)
-```
-Output:
-```text
-Precondition violated: lst must be sorted
+# For binary_search: measure = hi - lo + 1 (number of candidates)
+# Each iteration: either found (stop) or range halved -> measure decreases
+# When lo > hi: measure = 0 or negative -> loop exits
+
+# Termination proof for collatz (harder: not proven for all n!):
+def collatz(n, steps=0):
+    print(f'{n}', end=' ')
+    if n == 1:
+        print(f'\n{steps} steps')
+        return steps
+    if n % 2 == 0:
+        return collatz(n // 2, steps + 1)   # n decreases
+    else:
+        return collatz(3 * n + 1, steps + 1)  # n may INCREASE!
+
+collatz(6)
 ```
 
-A **Precondition** relieves the function from handling nonsensical inputs. A **Postcondition** holds the function accountable for producing the correct result. Violating the precondition is the CALLER'S bug. Violating the postcondition is the IMPLEMENTER'S bug.
+**Output:**
+```
+6 3 10 5 16 8 4 2 1 
+8 steps
+```
 
-### Discard the throwaway example
-The lab is deleted and will not appear in the project again.
+This output proves the function halted for input 6, but does not prove it for all inputs. Trace `collatz(6)`: `6` even -> `collatz(3)`. `3` odd -> `collatz(10)`. `10` even -> `collatz(5)`. `5` odd -> `collatz(16)`. `16 -> 8 -> 4 -> 2 -> 1`. Stop. 8 steps. No one has proven collatz terminates for ALL $n$ (Collatz conjecture, unsolved).
+
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart — modifying our existing implementation.
-Files affected: `list_algorithms.py` (modified)
-Change type: configure
-Location: inside `binary_search`
+No reference counterpart — this is a standalone theory lesson.
+- **Files affected:** None.
+- **Change type:** N/A.
+- **Location:** N/A.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def binary_search(lst: list, target) -> int:
-    """
-    Precondition: lst is sorted in non-decreasing order.
-    Postcondition: returns i such that lst[i] == target,
-                   or -1 if target is not in lst.
-    """
-    assert lst == sorted(lst), 'Precondition violated: lst must be sorted'
+def collatz(n):
+    if n == 1:
+        return True
+    if n % 2 == 0:
+        return collatz(n // 2)
+    else:
+        return collatz(3 * n + 1)
 ```
 
 ### The Updated Project
 ```python
-# 7:  
-# 8: def binary_search(lst: list, target) -> int:
-# 9:     """                                                                     # ← new
-# 10:    Precondition: lst is sorted in non-decreasing order.                    # ← new
-# 11:    Postcondition: returns i such that lst[i] == target,                    # ← new
-# 12:                   or -1 if target is not in lst.                           # ← new
-# 13:    """                                                                     # ← new
-# 14:    assert lst == sorted(lst), 'Precondition violated: lst must be sorted'  # ← new
-# 15:    low, high = 0, len(lst) - 1 
-# 16:    while low <= high:          
-# 17:        mid = (low + high) // 2 
-# 18:        if lst[mid] == target:  
-# 19:            return mid          
-# 20:        elif lst[mid] < target: 
-# 21:            low = mid + 1       
-# 22:        else:                   
-# 23:            high = mid - 1      
-# 24:    return -1                   
+1: def collatz(n): # ← new
+2:     if n == 1: # ← new
+3:         return True # ← new
+4:     if n % 2 == 0: # ← new
+5:         return collatz(n // 2) # ← new
+6:     else: # ← new
+7:         return collatz(3 * n + 1) # ← new
 ```
+This function highlights the difficulty of proving termination when the progression toward the base case isn't strictly monotonic.
 
 ### Mechanical walkthrough
-- `""" Precondition... """` adds documentation defining the **Design by contract**.
-- `assert` is a Python keyword that evaluates the condition `lst == sorted(lst)`. If false, it throws an `AssertionError`.
-- `lst == sorted(lst)` explicitly verifies the **Precondition**. If this line passes, the function is now obligated to fulfill its **Postcondition**.
+- `def collatz(n):`: Defines the function testing the Collatz conjecture.
+- `if n == 1:`: The base case check.
+- `return True`: Stops the recursion if the value reaches `1`.
+- `if n % 2 == 0:`: Evaluates whether `n` is even using the modulo operator.
+- `return collatz(n // 2)`: Calls the function recursively with `n // 2`. The state decreases.
+- `else:`: The fallback condition if `n` is odd.
+- `return collatz(3 * n + 1)`: Calls the function recursively with `3 * n + 1`. The state *increases*.
 
-### CS/SE Lens
-By defining the contract explicitly, we resolve arguments about whose fault a crash is. The function explicitly states what it requires to function safely.
+### CS lens
+The CS concept is **Program Termination and the Halting Problem**. Alan Turing proved that no general algorithm can determine whether every possible program will eventually halt. Real-world places it appears: static analyzers verifying timeout conditions, type systems with bounded recursion (like Total Functional Programming languages such as Idris), infinite loop detection in CI/CD, and smart contract gas limits in blockchain.
 
-### Connect the Pieces
-But there is a major problem with putting `assert lst == sorted(lst)` inside `binary_search`. What is it?
+### SE lens
+Design principle: **Guaranteed Progress**. Every loop iteration or recursive call must measurably move closer to the exit condition. Alternative NOT chosen: relying on arbitrary timeouts. Real tradeoff: adding strict monotonicity checks requires extra variables and arithmetic that can complicate the code, but without it, the program is vulnerable to hanging under edge-case data.
 
-## Concept Unit: Defensive programming vs trust
+### Commands needed
+None for this unit.
 
-### The Problem
-If we use **Defensive programming** (checking inputs at runtime) in `binary_search`, we guarantee correctness. But `binary_search` is an $O(\log n)$ algorithm, and `sorted(lst)` is an $O(n)$ check. We just ruined the performance of our algorithm. 
+### Run it
+Predicted confidently: `collatz(16)` returns `True`.
 
-### Introduce the concept in isolation
-There is a tradeoff between defensive programming and trust. Let's compare three ways to enforce a precondition:
+### One sentence connecting to previous unit
+Combining invariants, induction, and termination, we arrive at a full proof of correctness.
 
-```python
-# Defensive: check precondition at runtime (kills performance)
-def binary_search_safe(lst, target):
-    if not all(lst[i] <= lst[i+1] for i in range(len(lst)-1)):
-        raise ValueError('Input list must be sorted')
-    return -1 # ...
+## Closing
+### Connect the pieces
+Let's trace proving `factorial(n)` correct by induction through ALL concept units discussed today:
+1. **Induction & Recursion:** The structure explicitly mirrors a formal mathematical proof.
+2. **Loop Invariants:** The iterative version holds a continuous property `result = i!` proving it handles every single step perfectly.
+3. **Structural Induction:** Not explicitly applicable to integer sequences, but confirms the logic extends to arrays.
+4. **Preconditions & Postconditions:** The assumption $n \ge 0$ is the precondition, and returning $n!$ is the postcondition, sealing the contract.
+5. **Termination:** The decreasing measure is $n$. Because $n$ starts $\ge 0$ and decreases by exactly 1 each call, it absolutely must hit the base case $0$, guaranteeing it will never hang. 
 
-# Trusting: assert (disabled with python -O, cheap in dev)
-def binary_search_assert(lst, target):
-    assert all(lst[i] <= lst[i+1] for i in range(len(lst)-1))
-    return -1 # ...
-
-# Production: document contract and trust caller (maximum performance)
-def binary_search_fast(lst, target):
-    """Precondition: lst is sorted."""
-    return -1 # ...
-
-print("Concepts isolated without execution (confidence in Python's handling of these statements).")
-```
-Output:
-```text
-Concepts isolated without execution (confidence in Python's handling of these statements).
-```
-
-The $O(n)$ sorted check destroys the $O(\log n)$ benefit. In production code (like the standard library), the precondition is merely documented, and the caller is trusted. `assert` provides a middle ground: it is active in development to catch bugs, but disabled in production by running Python with the `-O` flag.
-
-### Discard the throwaway example
-The lab code is deleted and will not appear in the project again.
-
-### Project Change
-No reference counterpart.
-Files affected: `list_algorithms.py` (modified)
-Change type: modify
-Location: inside `binary_search`
-
-### The New Code
-```python
-def binary_search(lst: list, target) -> int:
-    """
-    Precondition: lst is sorted in non-decreasing order.
-    Postcondition: returns i such that lst[i] == target,
-                   or -1 if target is not in lst.
-    """
-    # assert lst == sorted(lst) # Removed for performance
-```
-
-### The Updated Project
-```python
-# 7:  
-# 8: def binary_search(lst: list, target) -> int:
-# 9:     """                                                                     
-# 10:    Precondition: lst is sorted in non-decreasing order.                    
-# 11:    Postcondition: returns i such that lst[i] == target,                    
-# 12:                   or -1 if target is not in lst.                           
-# 13:    """                                                                     
-# 14:    low, high = 0, len(lst) - 1 
-# 15:    while low <= high:          
-# 16:        mid = (low + high) // 2 
-# 17:        if lst[mid] == target:  
-# 18:            return mid          
-# 19:        elif lst[mid] < target: 
-# 20:            low = mid + 1       
-# 21:        else:                   
-# 22:            high = mid - 1      
-# 23:    return -1                   
-```
-We remove the runtime `assert` because performance requires us to simply trust the caller to honor the **Precondition**.
-
-### Mechanical walkthrough
-- The `assert` statement was deleted. We rely entirely on the docstring to express our **Design by contract**.
-
-### CS/SE Lens
-Defensive programming is excellent when crossing boundaries (e.g., accepting user input or web requests). Inside a tight algorithmic loop, it is often a fatal performance flaw. 
-
-### Connect the Pieces
-If we don't think about these contracts, our programs harbor silent edge cases that cause production failures.
-
-## Concept Unit: Why correctness reasoning matters in practice
-
-### The Problem
-What happens if we write code without explicitly defining preconditions or postconditions? 
-
-### Introduce the concept in isolation
-Every function has implicit pre- and post-conditions. Let's look at a subtle bug when they aren't explicit.
-
-```python
-def average_lab(lst):
-    # CLAIM: returns the arithmetic mean of lst
-    total = 0
-    for x in lst:
-        total = total + x
-    return total / len(lst)
-
-try:
-    average_lab([])
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-```
-Output:
-```text
-ZeroDivisionError: division by zero
-```
-
-What if `lst` is empty? `ZeroDivisionError` — postcondition not met! What if `lst` contains strings? `TypeError`.
-
-The contract *should* be:
-- **Precondition**: `lst` is a non-empty list of numeric values.
-- **Postcondition**: returns `sum(lst)/len(lst)` as a float.
-
-Making these explicit forces you to think about edge cases BEFORE running the program. This is John Guttag's central point: rigorous specification leads to fewer bugs.
-
-### Discard the throwaway example
-The lab is deleted and will not appear in the project again.
-
-### Project Change
-No reference counterpart.
-Files affected: `list_algorithms.py` (modified)
-Change type: add
-Location: bottom of file
-
-### The New Code
-```python
-def average(lst):
-    """
-    Precondition: lst is a non-empty list of numeric values
-    Postcondition: returns the arithmetic mean of lst as a float
-    """
-    total = 0
-    for x in lst:
-        total = total + x
-    return total / len(lst)
-```
-
-### The Updated Project
-```python
-# 24:
-# 25: def average(lst):                                                           # ← new
-# 26:     """                                                                     # ← new
-# 27:     Precondition: lst is a non-empty list of numeric values                 # ← new
-# 28:     Postcondition: returns the arithmetic mean of lst as a float            # ← new
-# 29:     """                                                                     # ← new
-# 30:     total = 0                                                               # ← new
-# 31:     for x in lst:                                                           # ← new
-# 32:         total = total + x                                                   # ← new
-# 33:     return total / len(lst)                                                 # ← new
-```
-
-### Mechanical walkthrough
-- `""" Precondition: ... """` forces us to codify exactly what is expected, making our **Precondition** explicitly documented.
-- `for x in lst:` is a **for loop** — a construct that iterates over a sequence, binding a variable `x` to each element in turn, unpacking the list.
-- `total = total + x` maintains an implicit loop invariant (total is the sum of items up to the current iteration).
-- `return total / len(lst)` calculates the final mean and fulfills our **Postcondition**.
-
-### CS/SE Lens
-Correctness reasoning is not an academic exercise. Specifying exactly what a function needs and exactly what it promises forces you to design edge cases out of existence.
-
-### Connect the Pieces
-Loop invariants and induction are the core tools for reasoning about correctness. In the next lesson, we'll encounter problems where subproblems overlap, requiring a completely different technique.
-
----
-**Next Lesson:** Lesson 34 covers dynamic programming — the technique for algorithms where subproblems OVERLAP. Exercises: use induction to prove that your merge_sort is correct (prove the merge function is correct first, then use it); write the loop invariant for bubble sort.
+By applying all these principles, we can definitively prove a program is mathematically correct without having to execute it for every conceivable integer.

@@ -277,13 +277,102 @@ concept_units:
       real lines 403-429 for real and know immediately, from a real test
       run, whether anything changed.
 
+  - title: "Deleting the Dead Definition, Then Proving Nothing Changed"
+    problem: >
+      Everything above proved the first definition never runs and the
+      second one behaves correctly. The fix itself is a pure deletion -
+      the real test is whether it's really as safe as it looks.
+    socratic_prompt:
+      - "Since the first definition never ran, what real test outcome would prove the deletion was safe versus just assumed safe?"
+      - "The old test checked co_firstlineno == 767; after deleting lines 403-429, that line number shifts. What does that tell you about hardcoding a line number as a correctness check?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/database.py:403-429 (the dead first definition,
+        now deleted) and :5 (the old test asserting a specific line
+        number, now replaced).
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/db/database.py"
+          status: modified
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_database_search_by_tool_code.py"
+          status: modified
+      change_type: remove
+      location: "database.py lines 403-429; the first test in test_database_search_by_tool_code.py"
+      dependencies: "none - a pure deletion, plus one test rewritten"
+    new_code:
+      applicable: true
+      intro: >
+        The real fix - the whole dead definition, gone - and the replacement
+        test, which no longer depends on a specific line number.
+      file: "verification/mastercam-app-copy/mastercam-app/tests/test_database_search_by_tool_code.py"
+      status: modified
+      language: python
+      code: |
+        def test_search_by_tool_code_is_defined_exactly_once():
+            import inspect
+
+            source = inspect.getsource(Database)
+            assert source.count("def search_by_tool_code(") == 1
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "mastercam_app/db/database.py lines 403-429 deleted entirely"
+          explanation: >
+            Real, applied, and verified: the 27-line dead definition is
+            gone from the verification copy. Nothing else in the file
+            referenced those lines - confirmed by the full suite still
+            passing afterward.
+        - element: "source.count(\"def search_by_tool_code(\") == 1"
+          explanation: >
+            The old test's co_firstlineno == 767 assertion was itself
+            fragile - correct only as long as nothing else in the file
+            changed line count above it, which the fix itself just broke
+            (line 767 became line 758). This replacement test checks the
+            actual invariant that matters - exactly one definition exists -
+            in a way no unrelated edit elsewhere in the file can break.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is why a test should assert the **property you actually care
+      about**, not an incidental detail of the current implementation.
+      "Which line number wins" was only ever a proxy for "is there dead,
+      shadowed code here" - the fixed test names that directly.
+    se_lens: >
+      The real alternative to fixing the test alongside the code is
+      leaving the stale line-number assertion in place and just updating
+      the number to 758 - technically passing, but still coupled to
+      exact positioning for no real reason. Naming the actual property
+      costs the same effort and survives the next unrelated edit.
+    commands:
+      - command: "python -m pytest tests/ -v"
+        explanation: "Run the full verification copy suite from mastercam-app/ - all 13 tests, confirming the deletion broke nothing"
+    verification:
+      applicable: true
+      real_output: |
+        collected 13 items
+        ...
+        tests/test_database_search_by_tool_code.py::test_search_by_tool_code_is_defined_exactly_once PASSED
+        tests/test_database_search_by_tool_code.py::test_search_by_tool_code_finds_a_real_saved_part_by_its_tool_code PASSED
+        tests/test_database_search_by_tool_code.py::test_search_by_tool_code_returns_empty_for_a_code_that_was_never_saved PASSED
+
+        ============================== 13 passed in 0.40s ==============================
+      output_file: "verification/mastercam-phase-03/lab_all_fixes_verified_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The first two units proved the bug and locked in correct behavior;
+      this unit is the real fix itself, applied and proven safe by the
+      exact tests those units wrote.
+
 closing:
   connect_the_pieces: >
-    Trace tool code "T0101" through both units: co_firstlineno == 767
-    identifies which definition would run the query at all; the second
-    unit's save_part-then-search proves that definition's JOIN actually
-    reconnects "T0101" back to part P300 and TA0050, for real, before you
-    touch the real file.
+    Trace tool code "T0101" through all three units: the first proved a
+    definition existed that could never run; the second proved the real,
+    reachable one works correctly; the third deletes the dead one for
+    real and proves - via the same tests, still passing - that nothing
+    was lost.
   next_lesson_pointer: >
     This closes Phase M3. The real fix - deleting
     mastercam-app/mastercam_app/db/database.py's dead first definition

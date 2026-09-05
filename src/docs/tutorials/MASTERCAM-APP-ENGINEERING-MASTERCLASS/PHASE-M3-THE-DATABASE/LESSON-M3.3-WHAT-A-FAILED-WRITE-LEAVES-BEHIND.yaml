@@ -308,15 +308,131 @@ concept_units:
       dangling rows only disappeared because the test called rollback()
       manually, standing in for cleanup update_ta doesn't do.
 
+  - title: "Applying the Same with self._conn: Pattern to update_ta"
+    problem: >
+      Unit one already proved `with self._conn:` gives save_part
+      automatic rollback for free. update_ta needs exactly the same
+      thing - wrapping its body is the whole fix, and the real test is
+      whether that's actually true.
+    socratic_prompt:
+      - "update_ta has two early `return` statements inside what becomes the with-block (one for a missing TA, one for no allowed fields) - does returning from inside a with block skip the commit, or still trigger it correctly?"
+      - "Before this fix, the test asserted 2 dangling ta_changes rows after the failure. What should that same assertion become once the fix is applied?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/database.py:807-811 (Database.update_ta, right
+        before the fix), quoted verbatim:
+
+        now = datetime.now().isoformat()
+
+        # Log changes
+        for field, new_value in fields.items():
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/db/database.py"
+          status: modified
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_database_transactions.py"
+          status: modified
+      change_type: refactor
+      location: "Database.update_ta, from the ta_changes loop through the final UPDATE"
+      dependencies: "none - the same self._conn already in scope"
+    new_code:
+      applicable: true
+      intro: >
+        The real fix - one `with self._conn:` wrapping the ta_changes
+        loop and the UPDATE, replacing the manual commit() at the end -
+        and the test rewritten to prove the new, correct behavior.
+      file: "verification/mastercam-app-copy/mastercam-app/mastercam_app/db/database.py"
+      status: modified
+      language: python
+      code: |
+        now = datetime.now().isoformat()
+
+        with self._conn:
+            # Log changes
+            for field, new_value in fields.items():
+                if field in allowed_fields:
+                    old_value = str(current.get(field, ""))
+                    new_value_str = str(new_value)
+                    if old_value != new_value_str:
+                        self._conn.execute(
+                            """INSERT INTO ta_changes
+                                (ta_number, changed_at, changed_by, field_name, old_value, new_value)
+                                VALUES (?, ?, ?, ?, ?, ?)""",
+                            (ta_number, now, changed_by, field, old_value, new_value_str)
+                        )
+
+            # Perform the update
+            updates = []
+            values = []
+            for field, value in fields.items():
+                if field in allowed_fields:
+                    updates.append(f"{field} = ?")
+                    values.append(value)
+
+            if not updates:
+                return
+
+            values.append(ta_number)
+            query = f"UPDATE tas SET {', '.join(updates)} WHERE ta_number = ?"
+            self._conn.execute(query, values)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "self._conn.execute(query, values)  # no more self._conn.commit() after it"
+          explanation: >
+            The manual commit() is gone entirely - `with self._conn:`'s
+            own __exit__ handles it now, exactly like save_part. Removing
+            the old commit() isn't optional cleanup - leaving both would
+            mean committing twice in the success case (harmless) but
+            would defeat the whole point if the block still had a
+            standalone commit() sitting after a possible failure point.
+        - element: "if not updates: return  (now inside the with block)"
+          explanation: >
+            A `return` inside a `with` block still runs `__exit__`
+            correctly - Python guarantees this the same way a `return`
+            inside a `try/finally` still runs the finally. Since nothing
+            was written yet at this early return, `__exit__` commits an
+            empty transaction, which is a real no-op, not a bug.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the same **atomicity** fix as the unit above, applied to a
+      second, independent method - proof that the pattern generalizes
+      rather than being a one-off patch specific to save_part's shape.
+    se_lens: >
+      The real alternative - leaving update_ta as-is and just documenting
+      the dangling-row risk - would mean every future caller has to
+      remember an undocumented gotcha. Wrapping the method costs one
+      keyword and a re-indent; it's the same cost save_part already paid.
+    commands:
+      - command: "python -m pytest tests/test_database_transactions.py -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/ - both tests, including the rewritten second one"
+    verification:
+      applicable: true
+      real_output: |
+        collected 2 items
+
+        tests/test_database_transactions.py::test_with_conn_rolls_back_everything_on_a_raised_exception PASSED [ 50%]
+        tests/test_database_transactions.py::test_update_ta_now_rolls_back_everything_on_a_mid_call_failure PASSED [100%]
+
+        ============================== 2 passed in 0.10s ==============================
+      output_file: "verification/mastercam-phase-03/lab_all_fixes_verified_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above found the gap; this unit closes it, using the exact
+      mechanism unit one already proved works - not a new idea, the same
+      one applied a second place.
+
 closing:
   connect_the_pieces: >
-    Trace ta_number "TA0099" through both units: it never appears in the
-    first (that one's about the general mechanism), but in the second, a
-    single update_ta call with a bad tool_code leaves two real,
-    already-executed ta_changes rows sitting uncommitted - visible to the
-    connection, invisible to a fresh read, and cleaned up only because
-    the test called rollback() itself, standing in for cleanup update_ta
-    doesn't do.
+    Trace ta_number "TA0099" through all three units: unit one proves the
+    general mechanism; unit two finds update_ta doesn't use it and shows
+    the real, measured consequence (2 dangling rows); unit three applies
+    the identical fix and the same test now proves 0 dangling rows,
+    verified by an actual re-run, not assumed from the pattern matching.
   next_lesson_pointer: >
     Next: connection.py's resilience layer - what happens when the
     database file itself is corrupted, tested by actually corrupting one

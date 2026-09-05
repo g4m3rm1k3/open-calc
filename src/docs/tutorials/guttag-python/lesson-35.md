@@ -1,756 +1,641 @@
 # Lesson 35: The Knapsack Problem — Greedy, Exhaustive, and DP
 
-What you will build: The reader will work through Guttag's canonical example — the 0/1 knapsack problem — in three ways: greedy (fast but wrong), exhaustive (correct but O(2^n)), and DP (correct and O(n·W)). This lesson demonstrates that the right algorithm for a problem is not always the most obvious one. The transferable problems: (1) greedy algorithms make locally optimal choices; they are fast but often give wrong answers for the 0/1 knapsack; (2) exhaustive search is always correct but intractable for large inputs; (3) DP for the 0/1 knapsack is the classic example of trading space for time.
+**What you will build**
+The reader understands the 0/1 knapsack problem and three approaches: greedy (fast, suboptimal), exhaustive/brute-force (optimal, exponential), and dynamic programming (optimal, polynomial). The transferable insight: the knapsack problem is a canonical NP-hard problem in its general form, but with integer weights, DP gives O(n * capacity) pseudo-polynomial time. This is the pattern for resource allocation, scheduling, and portfolio optimization.
 
-What you need to know first:
-- Lessons 0–34 (full curriculum through dynamic programming).
+**What you need to know first**
+Lessons 00-34.
 
-Terms used in this lesson:
-- **0/1 Knapsack Problem** — an optimization problem where you must select a subset of items, each with a weight and a value, to maximize total value without exceeding a weight capacity constraint W. "0/1" means you must either take the whole item or leave it; no fractions allowed.
-- **Greedy Algorithm** — an algorithm that makes the locally optimal choice at each step with the hope of finding a global optimum. It works for fractional knapsack but often fails for 0/1 knapsack.
-- **Exhaustive Search** — an algorithm that enumerates every possible candidate solution to a problem and evaluates each one to find the absolute best. Always correct, but runs in exponential time (O(2^n) for subsets).
-- **Dynamic Programming (DP)** — a method for solving complex problems by breaking them down into simpler, overlapping subproblems, and storing the results of subproblems to avoid redundant computation.
-- **Bitmask** — a technique for representing subsets using the bits of an integer, where a 1 at the i-th bit means the i-th item is included, and 0 means it is excluded.
-- **Optimal Substructure** — a property of a problem indicating that the optimal solution to the problem contains optimal solutions to sub-problems.
-- **Overlapping Subproblems** — a property of a problem indicating that the problem can be broken down into sub-problems which are reused multiple times.
+**Terms used in this lesson**
+- **0/1 Knapsack Problem** — A combinatorial optimization problem where items have weights and values, and the goal is to maximize total value without exceeding a weight limit. Each item can be taken at most once (0 or 1).
+- **Greedy approach** — A heuristic algorithm that makes the locally optimal choice at each stage with the intent of finding a global optimum. Fast but suboptimal for this problem.
+- **Exhaustive search** — A brute-force algorithm that checks every possible combination of items to find the global optimum. Optimal but computationally explosive (exponential time).
+- **Dynamic programming (DP)** — An algorithm design technique that breaks a problem down into overlapping subproblems, solving each once and storing the result to avoid redundant work. Optimal and pseudo-polynomial time for integer knapsack.
+- **Pseudo-polynomial time** — A time complexity that is polynomial in the numeric value of the input (like the capacity), but exponential in the length of the input (number of bits to represent it).
 
-Objects and methods used:
-
-- **`dataclass`**
-  - *What it is:* A decorator in Python's standard library used to automatically generate boilerplate code for classes that primarily store data.
-  - *Implementation:* `@dataclass` function from the `dataclasses` module.
-  - *Its use:* Used to succinctly define the `Item` class with `name`, `weight`, and `value` fields.
-  - *Type:* Decorator function.
-  - *Responsibility:* Generates standard methods like `__init__`, `__repr__`, and `__eq__` for a class based on its type-annotated fields.
-  - *Depends on:* The class it decorates and its type annotations.
-  - *Connects to:* Modifies the decorated class structure before runtime.
-  - *Shape:* A standard library utility used at the class definition boundary.
-
-- **`sorted`**
-  - *What it is:* A built-in Python function that returns a new sorted list from the items in an iterable.
-  - *Implementation:* `sorted(iterable, key=None, reverse=False)`
-  - *Its use:* Used in the greedy algorithm to sort items by their value-to-weight ratio.
+**Objects and methods used**
+- `dataclass`
+  - *What it is:* A Python decorator used to automatically generate special methods like `__init__` and `__repr__` for user-defined classes.
+  - *Implementation:* `@dataclass` decorator on a class definition.
+  - *Its use:* Used to define the `Item` class concisely.
+  - *Type:* Decorator (function taking a class and returning a class).
+  - *Responsibility:* Automatically creates boilerplate code for classes that primarily store state.
+  - *Depends on:* Class definition with type-hinted attributes.
+  - *Connects to:* Modifies the class to include standard methods; called by Python runtime when reading the class.
+  - *Shape:* A utility from the `dataclasses` module, standard library.
+- `sorted`
+  - *What it is:* A built-in Python function that returns a new sorted list from an iterable.
+  - *Implementation:* `sorted(iterable, key=key_func, reverse=True)`
+  - *Its use:* Used to sort the items by density for the greedy approach.
   - *Type:* Built-in function.
-  - *Responsibility:* Produces a deterministically ordered sequence of elements.
-  - *Depends on:* The input iterable and an optional key function.
-  - *Connects to:* Receives an iterable, outputs a new list.
-  - *Shape:* A core language utility for data manipulation.
-
-- **`time.time`**
-  - *What it is:* A function in the `time` module that returns the current time in seconds since the Epoch.
-  - *Implementation:* `time.time() -> float`
-  - *Its use:* Used to measure and compare the execution time of the three algorithms.
-  - *Type:* Standard library function.
-  - *Responsibility:* Interrogates the OS clock to yield a timestamp.
-  - *Depends on:* The system's real-time clock.
-  - *Connects to:* Called by benchmarking code.
-  - *Shape:* An OS boundary layer function.
-
-- **Everything else in the file, not this lesson's subject but still explained:**
-
-- **`Item`**
-  - *What it is:* The data structure holding a single item's properties.
-  - *Implementation:* A `dataclass` with `name`, `weight`, `value`, and a computed `value_per_weight` property.
-  - *Its use:* Represents the domain entities for the knapsack problem.
-  - *Type:* Custom class.
-  - *Responsibility:* Stores properties of an item.
-  - *Depends on:* `dataclass`.
-  - *Connects to:* Used by all the knapsack algorithms.
-  - *Shape:* Domain model.
-
-- **`greedy_knapsack`**
-  - *What it is:* Function implementing the greedy strategy.
-  - *Implementation:* `def greedy_knapsack(items, capacity)`
-  - *Its use:* Demonstrates a fast but non-optimal heuristic for the 0/1 knapsack problem.
-  - *Type:* Custom function.
-  - *Responsibility:* Selects items greedily by value density until capacity is reached.
-  - *Depends on:* The list of items and capacity constraint.
-  - *Connects to:* Called by the benchmarking code.
-  - *Shape:* Algorithm implementation.
-
-- **`exhaustive_knapsack`**
-  - *What it is:* Function implementing brute-force search over all possible item subsets.
-  - *Implementation:* `def exhaustive_knapsack(items, capacity)`
-  - *Its use:* Demonstrates a correct but extremely slow O(2^n) baseline.
-  - *Type:* Custom function.
-  - *Responsibility:* Tests all 2^n subsets to find the absolute maximum value fitting in the knapsack.
-  - *Depends on:* The list of items and capacity.
-  - *Connects to:* Called by the benchmarking code.
-  - *Shape:* Algorithm implementation.
-
-- **`dp_knapsack`**
-  - *What it is:* Function implementing the dynamic programming table approach.
-  - *Implementation:* `def dp_knapsack(items, capacity)`
-  - *Its use:* Demonstrates an O(n*W) efficient solution that guarantees correctness for 0/1 knapsack.
-  - *Type:* Custom function.
-  - *Responsibility:* Builds a 2D memoization table to accumulate optimal solutions for sub-capacities.
-  - *Depends on:* The list of items and capacity.
-  - *Connects to:* Called by the benchmarking code.
-  - *Shape:* Algorithm implementation.
-
-- **`dp_knapsack_with_items`**
-  - *What it is:* An augmented version of the DP function that traces backward to recover the actual items.
-  - *Implementation:* `def dp_knapsack_with_items(items, capacity)`
-  - *Its use:* Shows how to extract the winning subset from a completed DP table.
-  - *Type:* Custom function.
-  - *Responsibility:* Computes the DP table, then backtracks through state changes to assemble the optimal subset.
-  - *Depends on:* The list of items and capacity.
-  - *Connects to:* Called by the main execution block.
-  - *Shape:* Algorithm implementation.
-
-## Concept Unit: The Problem Statement
-
-### The Problem
-We have a set of items, each with a specific weight and a monetary value, and a knapsack that can only hold a certain maximum weight constraint W. Our objective is to choose a subset of these items to pack in the knapsack such that we maximize the total value without exceeding the maximum weight. The "0/1" nature of this problem signifies that we must either pack a full item or leave it behind—we cannot take fractional parts of items. How might we represent this data cleanly in Python?
-
-### Introduce the concept in isolation
-Let's see how `dataclass` is perfect for this.
-```python
-from dataclasses import dataclass
-
-@dataclass
-class DemoItem:
-    name: str
-    weight: float
-    value: float
-
-d = DemoItem('apple', 0.5, 1.2)
-print(d)
-```
-Output:
-```
-DemoItem(name='apple', weight=0.5, value=1.2)
-```
-This proves that using a `dataclass` automatically generates a readable `__repr__` and handles initialization for us without writing boilerplate `__init__` code.
-
-### Discard the throwaway example
-We discard the `DemoItem` throwaway example; it will not appear in the project again.
-
-### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition to set up our algorithms.
-- **Files affected**: `knapsack.py` (created)
-- **Change type**: add
-- **Location**: Top of the file
-- **Dependencies**: None
-
-### The New Code
-```python
-from dataclasses import dataclass
-
-@dataclass
-class Item:
-    name: str
-    weight: float
-    value: float
-
-    @property
-    def value_per_weight(self):
-        return self.value / self.weight
-
-items = [
-    Item('clock',    7.5,  175),
-    Item('picture',  3.5,   90),
-    Item('radio',    2.0,   20),
-    Item('vase',     2.0,   50),
-    Item('book',     1.0,   10),
-    Item('computer', 20.0, 200),
-]
-CAPACITY = 20.0
-```
-
-### The Updated Project
-```python
-# knapsack.py
-# ← new
-from dataclasses import dataclass
-
-@dataclass
-class Item:
-    name: str
-    weight: float
-    value: float
-
-    @property
-    def value_per_weight(self):
-        return self.value / self.weight
-
-items = [
-    Item('clock',    7.5,  175),
-    Item('picture',  3.5,   90),
-    Item('radio',    2.0,   20),
-    Item('vase',     2.0,   50),
-    Item('book',     1.0,   10),
-    Item('computer', 20.0, 200),
-]
-CAPACITY = 20.0
-```
-This sets up our domain model with six standard Guttag items and a knapsack capacity of 20.0.
-
-### Mechanical walkthrough
-- `@dataclass` decorates the `Item` class, auto-generating an `__init__` constructor that accepts `name`, `weight`, and `value`.
-- `@property` creates a computed attribute `value_per_weight` which divides `self.value` by `self.weight`, giving a density metric useful for greedy heuristics.
-- `items` is a global list initialized with 6 `Item` instances.
-- `CAPACITY` is a constant integer set to 20.0, representing the maximum weight.
+  - *Responsibility:* Creates a new list containing all items from the iterable in ascending (or descending) order.
+  - *Depends on:* An iterable and optionally a `key` function and `reverse` boolean flag.
+  - *Connects to:* Calls the `key` function on each element if provided; returns a list.
+  - *Shape:* Python built-in standard library function.
+- `time.perf_counter`
+  - *What it is:* A function that returns the value of a performance counter, a clock with the highest available resolution to measure a short duration.
+  - *Implementation:* `time.perf_counter()` returns a float.
+  - *Its use:* Used to time the execution of different approaches in the complexity comparison.
+  - *Type:* Standard library function from the `time` module.
+  - *Responsibility:* Provides a precise monotonic time value for benchmarking.
+  - *Depends on:* Nothing (takes no arguments).
+  - *Connects to:* The operating system's highest resolution clock.
+  - *Shape:* A utility from the standard library used for benchmarking.
 
 ## Concept Unit: Greedy Approach
 
 ### The Problem
-Now that we have items and a capacity constraint, what is the most intuitive way to fill the knapsack? A natural heuristic is to always pick the most valuable item per unit of weight until the knapsack is full. This is a Greedy Algorithm. But does making the locally best choice at each step guarantee the globally optimal final outcome?
+How can we select items to maximize value without exceeding a weight capacity? If you were packing a backpack and could only take so much weight, what would you naturally try first? Would picking the most valuable items first work? What about picking the lightest? Or perhaps the ones with the highest value-to-weight ratio?
 
 ### Introduce the concept in isolation
-Let's see how `sorted` works with a custom key function.
 ```python
-words = ["apple", "banana", "fig"]
-# sort by length descending
-longest = sorted(words, key=lambda w: len(w), reverse=True)
-print(longest)
-```
-Output:
-```
-['banana', 'apple', 'fig']
-```
-This proves that we can extract a metric (like length) from each element to govern the sort order.
+def example_greedy(items_dict, limit):
+    # Take items by highest value first
+    sorted_items = sorted(items_dict.items(), key=lambda x: x[1], reverse=True)
+    total = 0
+    taken = []
+    for name, val in sorted_items:
+        if total + val <= limit:
+            taken.append(name)
+            total += val
+    return taken
 
-### Discard the throwaway example
-The `longest` sort example is discarded and will not be used in the project.
+print(example_greedy({'A': 3, 'B': 4, 'C': 5}, 5))
+```
+Predicted confidently: `['C']`
+
+This proves that a **greedy approach** takes the locally best option (highest value) but may miss better combinations (like taking A and B, which sum to 7, while C is only 5).
+
+### Discard the throwaway
+The code above is discarded and will not appear in the project again.
 
 ### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `knapsack.py` (modified)
+- **Reference Source**: None - this is a standalone theory lesson.
+- **Files affected**: `knapsack.py` (created)
 - **Change type**: add
-- **Location**: After `CAPACITY`
-- **Dependencies**: `Item` class
+- **Location**: brand-new file
+- **Dependencies**: none
 
 ### The New Code
 ```python
-def greedy_knapsack(items, capacity):
-    # Sort by value-per-weight descending
-    sorted_items = sorted(items, key=lambda i: i.value_per_weight, reverse=True)
+from dataclasses import dataclass
+
+@dataclass
+class Item:
+    name: str
+    weight: float
+    value: float
+
+    def density(self):
+        return self.value / self.weight
+
+def greedy_knapsack(items, capacity, key=None):
+    if key is None:
+        key = lambda x: x.density()
+    sorted_items = sorted(items, key=key, reverse=True)
+    total_weight = 0.0
+    total_value = 0.0
     taken = []
-    remaining = capacity
-    total_value = 0
     for item in sorted_items:
-        if item.weight <= remaining:
-            taken.append(item)
-            remaining -= item.weight
+        if total_weight + item.weight <= capacity:
+            taken.append(item.name)
+            total_weight += item.weight
             total_value += item.value
     return taken, total_value
-
-taken, value = greedy_knapsack(items, CAPACITY)
-print(f'Greedy value: {value}')
-for item in taken:
-    print(f'  {item.name}: weight={item.weight}, value={item.value}')
-
-better = [Item('gold', 5, 100), Item('silver1', 3, 55), Item('silver2', 3, 55)]
-cap2 = 6
-taken2, val2 = greedy_knapsack(better, cap2)
-print(f'\nCounterexample Greedy: {val2}')
-print('Counterexample Optimal: 110')
 ```
 
 ### The Updated Project
 ```python
-# knapsack.py (appended)
-# ... previous Item class and items list ...
-
-# ← new
-def greedy_knapsack(items, capacity):
-    # Sort by value-per-weight descending
-    sorted_items = sorted(items, key=lambda i: i.value_per_weight, reverse=True)
-    taken = []
-    remaining = capacity
-    total_value = 0
-    for item in sorted_items:
-        if item.weight <= remaining:
-            taken.append(item)
-            remaining -= item.weight
-            total_value += item.value
-    return taken, total_value
-
-taken, value = greedy_knapsack(items, CAPACITY)
-print(f'Greedy value: {value}')
-for item in taken:
-    print(f'  {item.name}: weight={item.weight}, value={item.value}')
-
-better = [Item('gold', 5, 100), Item('silver1', 3, 55), Item('silver2', 3, 55)]
-cap2 = 6
-taken2, val2 = greedy_knapsack(better, cap2)
-print(f'\nCounterexample Greedy: {val2}')
-print('Counterexample Optimal: 110')
+1: from dataclasses import dataclass
+2: 
+3: @dataclass
+4: class Item:
+5:     name: str
+6:     weight: float
+7:     value: float
+8: 
+9:     def density(self):
+10:         return self.value / self.weight
+11: 
+12: def greedy_knapsack(items, capacity, key=None):
+13:     if key is None:
+14:         key = lambda x: x.density()
+15:     sorted_items = sorted(items, key=key, reverse=True)
+16:     total_weight = 0.0
+17:     total_value = 0.0
+18:     taken = []
+19:     for item in sorted_items:
+20:         if total_weight + item.weight <= capacity:
+21:             taken.append(item.name)
+22:             total_weight += item.weight
+23:             total_value += item.value
+24:     return taken, total_value
 ```
-Running this code outputs:
-```
-Greedy value: 255.0
-  picture: weight=3.5, value=90.0
-  clock: weight=7.5, value=175.0
-
-Counterexample Greedy: 100
-Counterexample Optimal: 110
-```
-This shows that the greedy approach takes the gold, locking out both silvers, whereas the optimal subset was to skip the greedy choice and take both silvers.
+The file now defines the items and a greedy function that sorts and packs them.
 
 ### Mechanical walkthrough
-- `sorted_items = sorted(items, key=lambda i: i.value_per_weight, reverse=True)` creates a list of items ordered from most valuable per unit weight to least.
-- `taken`, `remaining`, and `total_value` initialize our state tracking variables.
-- The `for item in sorted_items:` loop iterates through our candidates.
-- `if item.weight <= remaining:` checks if the current item fits in the remaining space. Since it's greedy, if it fits, we take it unconditionally.
-- `taken.append(item)`, `remaining -= item.weight`, and `total_value += item.value` mutate our tracking variables to reflect including the item.
-- The counterexample array `better` demonstrates that sorting by value/weight ratio is optimal for the FRACTIONAL knapsack but NOT for the 0/1 knapsack, where skipping the locally optimal choice could yield a globally better combination.
+- `@dataclass` decorates the `Item` class, automatically giving it an initializer and representation based on its attributes.
+- `class Item:` defines a new class named `Item`.
+- `name: str` defines a string attribute.
+- `weight: float` defines a float attribute.
+- `value: float` defines a float attribute.
+- `def density(self):` defines a method to calculate value per unit weight.
+- `return self.value / self.weight` calculates and returns the density.
+- `def greedy_knapsack(items, capacity, key=None):` defines the greedy algorithm function.
+- `if key is None:` checks if a sorting key function was provided.
+- `key = lambda x: x.density()` provides a default sorting key using density.
+- `sorted_items = sorted(items, key=key, reverse=True)` creates a new list sorted highest-to-lowest by the key.
+- `total_weight = 0.0` initializes the accumulator for weight.
+- `total_value = 0.0` initializes the accumulator for value.
+- `taken = []` initializes a list to hold selected item names.
+- `for item in sorted_items:` iterates over the sorted items.
+- `if total_weight + item.weight <= capacity:` checks if adding the current item exceeds the limit.
+- `taken.append(item.name)` adds the item's name to the list of chosen items.
+- `total_weight += item.weight` adds the item's weight to the running total.
+- `total_value += item.value` adds the item's value to the running total.
+- `return taken, total_value` returns the final selection and its value.
+
+### CS lens
+The **greedy approach** makes a locally optimal choice at each step. Real-world uses: coin change (when denominations are standard), Huffman coding, Dijkstra's algorithm.
+
+### SE lens
+Design principle: **Heuristics vs. Optimality**. A real tradeoff: getting a "good enough" answer in a fraction of a millisecond versus finding the absolute best answer but taking years to compute.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `(['A', 'B'], 7)`
+
+### One sentence connecting to previous unit
+The greedy approach was fast but missed the best combination, so we must explore other methods.
+
 
 ## Concept Unit: Exhaustive Search
 
 ### The Problem
-If greedy fails to find the global maximum, what algorithm guarantees we never miss it? We can simply try every possible combination of items and pick the one with the highest value that fits. How can we generate every possible subset of a list?
+Since the greedy approach isn't perfect, how can we guarantee we find the absolute best combination? What if we literally just try every single possible way to pack the backpack? How many ways are there?
 
 ### Introduce the concept in isolation
-Let's see how a bitmask generates subsets.
 ```python
-arr = ['x', 'y']
-n = len(arr)
-for bitmask in range(2**n):
-    subset = []
-    for i in range(n):
-        if bitmask & (1 << i):
-            subset.append(arr[i])
-    print(subset)
-```
-Output:
-```
-[]
-['x']
-['y']
-['x', 'y']
-```
-This proves that by mapping the bits of integers 0 through (2^n - 1) to array indices, we uniquely generate every possible subset (the power set).
+def example_combinations(n):
+    for mask in range(2**n):
+        combo = []
+        for i in range(n):
+            if mask & (1 << i):
+                combo.append(i)
+        print(combo)
 
-### Discard the throwaway example
-The bitmask throwaway code is discarded and will not be used in the project.
+example_combinations(3)
+```
+Predicted confidently: 
+`[]`
+`[0]`
+`[1]`
+`[0, 1]`
+`[2]`
+`[0, 2]`
+`[1, 2]`
+`[0, 1, 2]`
+
+This proves that bitmasking can generate an **exhaustive search** of all subsets.
+
+### Discard the throwaway
+The code above is discarded and will not appear in the project again.
 
 ### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition.
+- **Reference Source**: None - this is a standalone theory lesson.
 - **Files affected**: `knapsack.py` (modified)
 - **Change type**: add
-- **Location**: After `greedy_knapsack` block
-- **Dependencies**: None
+- **Location**: bottom of the file
+- **Dependencies**: previous code
 
 ### The New Code
 ```python
 def exhaustive_knapsack(items, capacity):
     n = len(items)
     best_value = 0
-    best_subset = []
-    for bitmask in range(2**n):
-        subset = []
-        total_weight = total_value = 0
+    best_combo = []
+
+    for mask in range(2**n):    # iterate all 2^n subsets
+        total_weight = 0
+        total_value = 0
+        taken = []
         for i in range(n):
-            if bitmask & (1 << i):
-                subset.append(items[i])
+            if mask & (1 << i):   # bit i is set: item i is included
                 total_weight += items[i].weight
                 total_value  += items[i].value
+                taken.append(items[i].name)
         if total_weight <= capacity and total_value > best_value:
             best_value = total_value
-            best_subset = subset
-    return best_subset, best_value
+            best_combo = taken
 
-taken, value = exhaustive_knapsack(items, CAPACITY)
-print(f'\nExhaustive value: {value}')
-for item in taken:
-    print(f'  {item.name}')
+    return best_combo, best_value
 ```
 
 ### The Updated Project
 ```python
-# knapsack.py (appended)
-# ... previous greedy_knapsack ...
-
-# ← new
-def exhaustive_knapsack(items, capacity):
-    n = len(items)
-    best_value = 0
-    best_subset = []
-    for bitmask in range(2**n):
-        subset = []
-        total_weight = total_value = 0
-        for i in range(n):
-            if bitmask & (1 << i):
-                subset.append(items[i])
-                total_weight += items[i].weight
-                total_value  += items[i].value
-        if total_weight <= capacity and total_value > best_value:
-            best_value = total_value
-            best_subset = subset
-    return best_subset, best_value
-
-taken, value = exhaustive_knapsack(items, CAPACITY)
-print(f'\nExhaustive value: {value}')
-for item in taken:
-    print(f'  {item.name}')
+25: def exhaustive_knapsack(items, capacity): # <- new
+26:     n = len(items)
+27:     best_value = 0
+28:     best_combo = []
+29: 
+30:     for mask in range(2**n):    # iterate all 2^n subsets
+31:         total_weight = 0
+32:         total_value = 0
+33:         taken = []
+34:         for i in range(n):
+35:             if mask & (1 << i):   # bit i is set: item i is included
+36:                 total_weight += items[i].weight
+37:                 total_value  += items[i].value
+38:                 taken.append(items[i].name)
+39:         if total_weight <= capacity and total_value > best_value:
+40:             best_value = total_value
+41:             best_combo = taken
+42: 
+43:     return best_combo, best_value
 ```
-Running this code outputs:
-```
-Exhaustive value: 275.0
-  clock
-  picture
-  vase
-```
-This correctly identifies the absolute best combination within the 20.0 capacity constraint.
+The file now contains a brute-force approach to guarantee the optimal result.
 
 ### Mechanical walkthrough
-- `n = len(items)` gives the count of items.
-- `best_value` and `best_subset` store the global maximum observed.
-- `for bitmask in range(2**n):` loops over every integer from 0 to 2^n - 1. The bits of `bitmask` represent whether an item is included.
-- `for i in range(n):` iterates over the indices of our items.
-- `if bitmask & (1 << i):` uses bitwise AND to check if the i-th bit is set to 1 in the current bitmask. If it is, the item is considered taken in this subset scenario.
-- `total_weight += items[i].weight` and `total_value += items[i].value` tally the characteristics of the currently generated subset.
-- `if total_weight <= capacity and total_value > best_value:` checks validity and optimality. If this subset fits and beats the previous record, it becomes the new `best_subset`.
-- Complexity is O(2^n * n), which is intractable for n > 40.
+- `def exhaustive_knapsack(items, capacity):` defines the function.
+- `n = len(items)` gets the number of items.
+- `best_value = 0` tracks the highest valid value found.
+- `best_combo = []` tracks the item names for the highest valid value.
+- `for mask in range(2**n):` loops from `0` to `2^n - 1`, representing all binary combinations.
+- `total_weight = 0` resets the weight for the current subset.
+- `total_value = 0` resets the value for the current subset.
+- `taken = []` resets the list of taken items for the current subset.
+- `for i in range(n):` loops through each item index.
+- `if mask & (1 << i):` checks if the `i`-th bit is set in `mask`.
+- `total_weight += items[i].weight` adds the item's weight if the bit is set.
+- `total_value += items[i].value` adds the item's value if the bit is set.
+- `taken.append(items[i].name)` adds the item's name to the subset list.
+- `if total_weight <= capacity and total_value > best_value:` checks if the subset is valid and better than the previous best.
+- `best_value = total_value` updates the best value.
+- `best_combo = taken` updates the best combination of items.
+- `return best_combo, best_value` returns the overall optimal choice.
 
-## Concept Unit: DP Solution
+### CS lens
+**Exhaustive search** or brute-force guarantees correctness but explodes combinatorially. Real-world uses: password cracking, small-scale traveling salesperson problems, verifying optimization algorithms.
+
+### SE lens
+Design principle: **Scalability**. An O(2^n) algorithm works fine for n=10, but fails completely for n=50. The tradeoff is knowing your input bounds before choosing an algorithm.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `(['A', 'B'], 7)`
+
+### One sentence connecting to previous unit
+Exhaustive search gave us the perfect answer, but at a terrible computational cost, leading us to look for a middle ground.
+
+
+## Concept Unit: Dynamic Programming
 
 ### The Problem
-Exhaustive search is correct but mathematically unscalable. Is there a way to solve the knapsack problem optimally but in polynomial time? The 0/1 knapsack problem exhibits both **Optimal Substructure** and **Overlapping Subproblems**. We can trade space for time by building a table of subproblem solutions up to the final capacity.
+If greedy is too inaccurate and exhaustive is too slow, is there a way to reuse work so we don't recalculate the same subsets over and over? What if we built up the solution item by item, capacity by capacity?
 
 ### Introduce the concept in isolation
-Let's see how a 2D table is initialized.
 ```python
-rows = 3
-cols = 4
-dp = [[0] * cols for _ in range(rows)]
-dp[1][2] = 5
-print(dp)
-```
-Output:
-```
-[[0, 0, 0, 0], [0, 0, 5, 0], [0, 0, 0, 0]]
-```
-This proves that a list comprehension of lists correctly generates an independent 2D matrix (unlike `[[0]*cols]*rows`, which clones references).
+def example_dp():
+    # A simple 1D DP array building up sums
+    dp = [0, 0, 0, 0, 0]
+    for i in range(1, 5):
+        dp[i] = dp[i-1] + i
+    return dp
 
-### Discard the throwaway example
-The 2D list throwaway is discarded and will not be used in the project.
+print(example_dp())
+```
+Predicted confidently: `[0, 1, 3, 6, 10]`
+
+This proves that **dynamic programming** stores intermediate results to build up a final answer step-by-step.
+
+### Discard the throwaway
+The code above is discarded and will not appear in the project again.
 
 ### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition.
+- **Reference Source**: None - this is a standalone theory lesson.
 - **Files affected**: `knapsack.py` (modified)
 - **Change type**: add
-- **Location**: After `exhaustive_knapsack`
-- **Dependencies**: None
+- **Location**: bottom of the file
+- **Dependencies**: previous code
 
 ### The New Code
 ```python
 def dp_knapsack(items, capacity):
-    # Convert capacity to integer units (multiply by 10 to handle floats)
-    W = int(capacity * 10)
-    weights = [int(item.weight * 10) for item in items]
-    values  = [item.value for item in items]
     n = len(items)
-
-    # dp[i][w] = max value using items 0..i-1 with capacity w
-    dp = [[0] * (W + 1) for _ in range(n + 1)]
+    # dp[i][w] = max value using items[0..i-1] with weight limit w
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
 
     for i in range(1, n + 1):
-        for w in range(W + 1):
-            # Don't take item i-1:
-            dp[i][w] = dp[i-1][w]
-            # Take item i-1 (if it fits):
-            if weights[i-1] <= w:
-                take_val = values[i-1] + dp[i-1][w - weights[i-1]]
-                if take_val > dp[i][w]:
-                    dp[i][w] = take_val
+        item = items[i-1]
+        w = int(item.weight)  # assume integer weights for DP
+        v = item.value
+        for c in range(capacity + 1):
+            # Option 1: don't take item i
+            dp[i][c] = dp[i-1][c]
+            # Option 2: take item i (if it fits)
+            if c >= w:
+                take = dp[i-1][c-w] + v
+                if take > dp[i][c]:
+                    dp[i][c] = take
 
-    return dp[n][W]
-
-print(f'\nDP value: {dp_knapsack(items, CAPACITY)}')
+    return dp[n][capacity]
 ```
 
 ### The Updated Project
 ```python
-# knapsack.py (appended)
-# ... previous exhaustive_knapsack ...
-
-# ← new
-def dp_knapsack(items, capacity):
-    # Convert capacity to integer units (multiply by 10 to handle floats)
-    W = int(capacity * 10)
-    weights = [int(item.weight * 10) for item in items]
-    values  = [item.value for item in items]
-    n = len(items)
-
-    # dp[i][w] = max value using items 0..i-1 with capacity w
-    dp = [[0] * (W + 1) for _ in range(n + 1)]
-
-    for i in range(1, n + 1):
-        for w in range(W + 1):
-            # Don't take item i-1:
-            dp[i][w] = dp[i-1][w]
-            # Take item i-1 (if it fits):
-            if weights[i-1] <= w:
-                take_val = values[i-1] + dp[i-1][w - weights[i-1]]
-                if take_val > dp[i][w]:
-                    dp[i][w] = take_val
-
-    return dp[n][W]
-
-print(f'\nDP value: {dp_knapsack(items, CAPACITY)}')
+45: def dp_knapsack(items, capacity): # <- new
+46:     n = len(items)
+47:     # dp[i][w] = max value using items[0..i-1] with weight limit w
+48:     dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+49: 
+50:     for i in range(1, n + 1):
+51:         item = items[i-1]
+52:         w = int(item.weight)  # assume integer weights for DP
+53:         v = item.value
+54:         for c in range(capacity + 1):
+55:             # Option 1: don't take item i
+56:             dp[i][c] = dp[i-1][c]
+57:             # Option 2: take item i (if it fits)
+58:             if c >= w:
+59:                 take = dp[i-1][c-w] + v
+60:                 if take > dp[i][c]:
+61:                     dp[i][c] = take
+62: 
+63:     return dp[n][capacity]
 ```
-Running this code outputs:
-```
-DP value: 275.0
-```
-This algorithm calculates the optimal solution much faster than brute force, confirming the result found by the exhaustive search.
+The file now contains a polynomial-time dynamic programming solution for integer weights.
 
 ### Mechanical walkthrough
-- `W = int(capacity * 10)` converts our float capacity to an integer since list indices must be integers. We multiply by 10 because our items' weights use 1 decimal place.
-- `weights` and `values` lists are extracted and integerized for convenience.
-- `dp = [[0] * (W + 1) for _ in range(n + 1)]` initializes our 2-dimensional Dynamic Programming matrix.
-- `for i in range(1, n + 1):` loops through the count of items we are allowed to consider.
-- `for w in range(W + 1):` loops through every sub-capacity from 0 up to our max capacity W.
-- `dp[i][w] = dp[i-1][w]` assigns the baseline maximum value if we completely skip the current item (falling back to the best configuration using one less item).
-- `if weights[i-1] <= w:` checks if our knapsack currently has enough capacity `w` to hold the i-th item.
-- `take_val = values[i-1] + dp[i-1][w - weights[i-1]]` determines the optimal value if we DO take the item. It adds the item's value to the optimal value found in the subproblem with remaining space.
-- `if take_val > dp[i][w]:` updates the DP table cell if taking the item is superior to skipping it.
+- `def dp_knapsack(items, capacity):` defines the function.
+- `n = len(items)` gets the number of items.
+- `dp = [[0] * (capacity + 1) for _ in range(n + 1)]` creates a 2D list filled with zeroes.
+- `for i in range(1, n + 1):` iterates over the items (1-indexed for the DP table).
+- `item = items[i-1]` gets the actual item from the 0-indexed list.
+- `w = int(item.weight)` casts the weight to an integer to use as an array index.
+- `v = item.value` extracts the item's value.
+- `for c in range(capacity + 1):` iterates through every possible capacity up to the limit.
+- `dp[i][c] = dp[i-1][c]` carries over the max value found without using the current item.
+- `if c >= w:` checks if the current capacity can hold the current item's weight.
+- `take = dp[i-1][c-w] + v` calculates the value if we *do* take the item (value of the remaining capacity plus this item's value).
+- `if take > dp[i][c]:` compares the "take" option against the "don't take" option.
+- `dp[i][c] = take` updates the table if taking the item is better.
+- `return dp[n][capacity]` returns the value in the bottom-right corner of the table, which represents considering all items at full capacity.
 
-## Concept Unit: Reconstructing Chosen Items
+### CS lens
+**Dynamic programming** uses memoization or tabulation to avoid repeating work. Real-world uses: DNA sequence alignment, route planning, git diff algorithms.
+
+### SE lens
+Design principle: **Space-Time Tradeoff**. We use O(n * capacity) memory to reduce time complexity from exponential to pseudo-polynomial.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `7`
+
+### One sentence connecting to previous unit
+The DP approach gave us the optimal value extremely fast, but it didn't tell us *which* items we actually picked to get that value.
+
+
+## Concept Unit: Backtracking
 
 ### The Problem
-The standard DP algorithm returns the maximum total value but loses the specific list of items that achieved it. How can we recover the subset of items that created that optimal value?
+We know the maximum value is 7, but how do we extract the list of items? If you traced your steps forward to build the answer, how can you walk backward to see the choices you made?
 
 ### Introduce the concept in isolation
-Let's see how matrix backtracking generally works.
 ```python
-matrix = [[0, 0, 0], [0, 5, 5], [0, 5, 10]]
-# We can tell a change occurred at row 2, col 2:
-change = matrix[2][2] != matrix[1][2]
-print(change)
-```
-Output:
-```
-True
-```
-This proves that by comparing a cell `[i][w]` to the cell directly above it `[i-1][w]`, we can determine if item `i` was part of the optimal decision.
+def example_backtrack():
+    path = [0, 1, 3, 6]
+    steps = []
+    for i in range(3, 0, -1):
+        if path[i] != path[i-1]:
+            steps.append(path[i] - path[i-1])
+    return steps
 
-### Discard the throwaway example
-The backtracking matrix code is discarded and will not be used in the project.
+print(example_backtrack())
+```
+Predicted confidently: `[3, 2, 1]`
+
+This proves that **backtracking** through intermediate states allows us to reconstruct the individual decisions that led to the final outcome.
+
+### Discard the throwaway
+The code above is discarded and will not appear in the project again.
 
 ### Project Change
-- **Reference Source**: No reference counterpart.
+- **Reference Source**: None - this is a standalone theory lesson.
 - **Files affected**: `knapsack.py` (modified)
 - **Change type**: add
-- **Location**: After `dp_knapsack`
-- **Dependencies**: None
+- **Location**: bottom of the file
+- **Dependencies**: previous code
 
 ### The New Code
 ```python
 def dp_knapsack_with_items(items, capacity):
-    W = int(capacity * 10)
-    weights = [int(item.weight * 10) for item in items]
-    values  = [item.value for item in items]
     n = len(items)
-    dp = [[0]*(W+1) for _ in range(n+1)]
-    for i in range(1, n+1):
-        for w in range(W+1):
-            dp[i][w] = dp[i-1][w]
-            if weights[i-1] <= w:
-                take = values[i-1] + dp[i-1][w-weights[i-1]]
-                if take > dp[i][w]:
-                    dp[i][w] = take
-    # Backtrack to find which items were taken:
-    taken = []
-    w = W
-    for i in range(n, 0, -1):
-        if dp[i][w] != dp[i-1][w]:  # item i-1 was taken
-            taken.append(items[i-1])
-            w -= weights[i-1]
-    return taken, dp[n][W]
+    dp = [[0]*(capacity+1) for _ in range(n+1)]
 
-taken, value = dp_knapsack_with_items(items, CAPACITY)
-print(f'\nDP value: {value}')
-for item in taken:
-    print(f'  {item.name}: weight={item.weight}, value={item.value}')
+    for i in range(1, n+1):
+        w = int(items[i-1].weight)
+        v = items[i-1].value
+        for c in range(capacity+1):
+            dp[i][c] = dp[i-1][c]
+            if c >= w and dp[i-1][c-w] + v > dp[i][c]:
+                dp[i][c] = dp[i-1][c-w] + v
+
+    # Backtrack to find which items
+    taken = []
+    c = capacity
+    for i in range(n, 0, -1):
+        if dp[i][c] != dp[i-1][c]:  # item i was taken
+            taken.append(items[i-1].name)
+            c -= int(items[i-1].weight)
+
+    return dp[n][capacity], taken[::-1]
 ```
 
 ### The Updated Project
 ```python
-# knapsack.py (appended)
-# ... previous dp_knapsack ...
-
-# ← new
-def dp_knapsack_with_items(items, capacity):
-    W = int(capacity * 10)
-    weights = [int(item.weight * 10) for item in items]
-    values  = [item.value for item in items]
-    n = len(items)
-    dp = [[0]*(W+1) for _ in range(n+1)]
-    for i in range(1, n+1):
-        for w in range(W+1):
-            dp[i][w] = dp[i-1][w]
-            if weights[i-1] <= w:
-                take = values[i-1] + dp[i-1][w-weights[i-1]]
-                if take > dp[i][w]:
-                    dp[i][w] = take
-    # Backtrack to find which items were taken:
-    taken = []
-    w = W
-    for i in range(n, 0, -1):
-        if dp[i][w] != dp[i-1][w]:  # item i-1 was taken
-            taken.append(items[i-1])
-            w -= weights[i-1]
-    return taken, dp[n][W]
-
-taken, value = dp_knapsack_with_items(items, CAPACITY)
-print(f'\nDP value: {value}')
-for item in taken:
-    print(f'  {item.name}: weight={item.weight}, value={item.value}')
+65: def dp_knapsack_with_items(items, capacity): # <- new
+66:     n = len(items)
+67:     dp = [[0]*(capacity+1) for _ in range(n+1)]
+68: 
+69:     for i in range(1, n+1):
+70:         w = int(items[i-1].weight)
+71:         v = items[i-1].value
+72:         for c in range(capacity+1):
+73:             dp[i][c] = dp[i-1][c]
+74:             if c >= w and dp[i-1][c-w] + v > dp[i][c]:
+75:                 dp[i][c] = dp[i-1][c-w] + v
+76: 
+77:     # Backtrack to find which items
+78:     taken = []
+79:     c = capacity
+80:     for i in range(n, 0, -1):
+81:         if dp[i][c] != dp[i-1][c]:  # item i was taken
+82:             taken.append(items[i-1].name)
+83:             c -= int(items[i-1].weight)
+84: 
+85:     return dp[n][capacity], taken[::-1]
 ```
-Running this code outputs:
-```
-DP value: 275.0
-  vase: weight=2.0, value=50.0
-  picture: weight=3.5, value=90.0
-  clock: weight=7.5, value=175.0
-```
-This shows how the table yields the items without running exhaustive search.
+The DP solution now also tracks and returns the specific items chosen.
 
 ### Mechanical walkthrough
-- The DP construction loop builds the matrix identically to `dp_knapsack`.
-- `taken = []` prepares an array for our results.
-- `w = W` starts our backtracking pointer at the bottom-right corner of the table (max items, max capacity).
-- `for i in range(n, 0, -1):` steps backwards from the last item down to the first.
-- `if dp[i][w] != dp[i-1][w]:` determines if the maximum value changed upon introducing item `i`. If it differs from the cell directly above it, it means the item was part of the optimal sub-solution.
-- `taken.append(items[i-1])` records the item.
-- `w -= weights[i-1]` subtracts the item's weight from `w` to jump to the remaining capacity's optimal subproblem, allowing us to trace back the rest of the items.
+- `def dp_knapsack_with_items(items, capacity):` defines the function.
+- `n = len(items)` gets the number of items.
+- `dp = [[0]*(capacity+1) for _ in range(n+1)]` creates the 2D DP table.
+- `for i in range(1, n+1):` iterates items to fill the table.
+- `w = int(items[i-1].weight)` extracts integer weight.
+- `v = items[i-1].value` extracts value.
+- `for c in range(capacity+1):` iterates capacities.
+- `dp[i][c] = dp[i-1][c]` defaults to not taking the item.
+- `if c >= w and dp[i-1][c-w] + v > dp[i][c]:` checks if taking the item yields a strictly better value.
+- `dp[i][c] = dp[i-1][c-w] + v` updates the table with the higher value.
+- `taken = []` initializes the backtracking list.
+- `c = capacity` starts backtracking at the maximum capacity.
+- `for i in range(n, 0, -1):` loops backward through the items.
+- `if dp[i][c] != dp[i-1][c]:` checks if the value changed between the previous row and current row, which implies the item was taken.
+- `taken.append(items[i-1].name)` adds the item to the list of chosen items.
+- `c -= int(items[i-1].weight)` reduces the remaining capacity by the taken item's weight.
+- `return dp[n][capacity], taken[::-1]` returns the max value and the reversed list of taken items (since backtracking finds them in reverse order).
 
-## Concept Unit: Comparing Approaches
+### CS lens
+**Backtracking** through a DP table reconstructs the sequence of optimal choices without needing to store full arrays of items inside the table itself. Real-world uses: routing protocol path reconstruction, reconstructing the edits in a Levenshtein distance calculation.
+
+### SE lens
+Design principle: **Data Representation**. Storing just the values and backtracking to reconstruct the path is much more memory efficient than storing the actual lists of items in every cell of the DP table.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `(7, ['A', 'B'])`
+
+### One sentence connecting to previous unit
+Now that we have optimal code that also gives us the items, we need to prove why going through the trouble of writing DP is necessary.
+
+
+## Concept Unit: Complexity Comparison
 
 ### The Problem
-We have seen that DP is correct while greedy is wrong, and that DP is polynomial while exhaustive is exponential. How drastically do their execution times differ as the number of items increases?
+Does algorithm choice actually matter in practice? When the number of items grows, how does O(2^n) compare to O(n * W)?
 
 ### Introduce the concept in isolation
-Let's measure time using `time.time()`.
 ```python
-import time
-start = time.time()
-# trivial loop
-for _ in range(1000): pass
-diff = time.time() - start
-print(f"{diff:.5f}")
-```
-Output:
-```
-0.00010
-```
-This proves that by capturing the clock float before and after a routine, their difference represents the elapsed time.
+def example_growth():
+    print("Linear vs Exponential:")
+    for n in [10, 20]:
+        print(f"n={n}: 50*n={50*n}, 2^n={2**n}")
 
-### Discard the throwaway example
-The `time.time()` benchmark is discarded and will not be used in the project.
+example_growth()
+```
+Predicted confidently:
+`Linear vs Exponential:`
+`n=10: 50*n=500, 2^n=1024`
+`n=20: 50*n=1000, 2^n=1048576`
+
+This proves that **exponential growth** rapidly overtakes polynomial growth, even for small inputs.
+
+### Discard the throwaway
+The code above is discarded and will not appear in the project again.
 
 ### Project Change
-- **Reference Source**: No reference counterpart.
+- **Reference Source**: None - this is a standalone theory lesson.
 - **Files affected**: `knapsack.py` (modified)
 - **Change type**: add
-- **Location**: End of file
-- **Dependencies**: `random`, `time` modules.
+- **Location**: bottom of the file
+- **Dependencies**: previous code
 
 ### The New Code
 ```python
 import time
-import random
 
-for n_items in [10, 20, 25]:
-    test_items = [Item(f'item{i}', random.uniform(1,10), random.uniform(10,100))
-                  for i in range(n_items)]
-    cap = 30
+def time_all(n_items, capacity):
+    import random
+    items = [Item(f'I{i}', random.randint(1,10), random.randint(1,20))
+             for i in range(n_items)]
 
-    start = time.time()
-    greedy_knapsack(test_items, cap)
-    t_greedy = time.time() - start
-
-    start = time.time()
-    dp_knapsack(test_items, cap)
-    t_dp = time.time() - start
-
-    print(f'n={n_items}: greedy={t_greedy:.5f}s, dp={t_dp:.4f}s')
+    # Exhaustive: O(2^n)
     if n_items <= 20:
-        start = time.time()
-        exhaustive_knapsack(test_items, cap)
-        t_ex = time.time() - start
-        print(f'          exhaustive={t_ex:.4f}s')
+        t0 = time.perf_counter()
+        exhaustive_knapsack(items, capacity)
+        t_ex = time.perf_counter() - t0
+    else:
+        t_ex = float('inf')
+
+    # DP: O(n * capacity)
+    t0 = time.perf_counter()
+    dp_knapsack(items, capacity)
+    t_dp = time.perf_counter() - t0
+
+    print(f'n={n_items}, cap={capacity}: exhaustive={t_ex:.4f}s, dp={t_dp:.4f}s')
 ```
 
 ### The Updated Project
 ```python
-# knapsack.py (appended)
-# ... previous functions ...
-
-# ← new
-import time
-import random
-
-for n_items in [10, 20, 25]:
-    test_items = [Item(f'item{i}', random.uniform(1,10), random.uniform(10,100))
-                  for i in range(n_items)]
-    cap = 30
-
-    start = time.time()
-    greedy_knapsack(test_items, cap)
-    t_greedy = time.time() - start
-
-    start = time.time()
-    dp_knapsack(test_items, cap)
-    t_dp = time.time() - start
-
-    print(f'n={n_items}: greedy={t_greedy:.5f}s, dp={t_dp:.4f}s')
-    if n_items <= 20:
-        start = time.time()
-        exhaustive_knapsack(test_items, cap)
-        t_ex = time.time() - start
-        print(f'          exhaustive={t_ex:.4f}s')
+87: import time # <- new
+88: 
+89: def time_all(n_items, capacity): # <- new
+90:     import random
+91:     items = [Item(f'I{i}', random.randint(1,10), random.randint(1,20))
+92:              for i in range(n_items)]
+93: 
+94:     # Exhaustive: O(2^n)
+95:     if n_items <= 20:
+96:         t0 = time.perf_counter()
+97:         exhaustive_knapsack(items, capacity)
+98:         t_ex = time.perf_counter() - t0
+99:     else:
+100:         t_ex = float('inf')
+101: 
+102:     # DP: O(n * capacity)
+103:     t0 = time.perf_counter()
+104:     dp_knapsack(items, capacity)
+105:     t_dp = time.perf_counter() - t0
+106: 
+107:     print(f'n={n_items}, cap={capacity}: exhaustive={t_ex:.4f}s, dp={t_dp:.4f}s')
 ```
-Running this code yields output similar to:
-```
-n=10: greedy=0.00001s, dp=0.0004s
-          exhaustive=0.0008s
-n=20: greedy=0.00001s, dp=0.0008s
-          exhaustive=0.5501s
-n=25: greedy=0.00001s, dp=0.0010s
-```
-This concretely demonstrates that exhaustive search's exponential O(2^n) time is intractable as n grows past 20, while greedy's O(n log n) and DP's O(n*W) times barely increase.
+The file now includes a profiling function to empirically test execution times.
 
 ### Mechanical walkthrough
-- `import time` and `import random` load the standard modules required for testing.
-- `for n_items in [10, 20, 25]:` iterates through increasing item quantities.
-- `test_items` constructs random `Item`s using list comprehension.
-- `start = time.time()` records the clock.
-- `t_greedy = time.time() - start` measures elapsed seconds for the greedy algorithm.
-- `if n_items <= 20:` avoids running the exhaustive search for `n=25`, as it would hang the process for minutes due to O(2^n) growth.
+- `import time` imports the standard library time module.
+- `def time_all(n_items, capacity):` defines the profiling function.
+- `import random` imports the random module locally.
+- `items = [Item(f'I{i}', random.randint(1,10), random.randint(1,20)) for i in range(n_items)]` creates a list of random items using a list comprehension.
+- `if n_items <= 20:` restricts exhaustive search to small inputs.
+- `t0 = time.perf_counter()` captures the precise start time.
+- `exhaustive_knapsack(items, capacity)` runs the brute-force search.
+- `t_ex = time.perf_counter() - t0` calculates the elapsed time for exhaustive.
+- `else: t_ex = float('inf')` assigns infinity if the input is too large, avoiding locking up the machine.
+- `t0 = time.perf_counter()` captures the start time for DP.
+- `dp_knapsack(items, capacity)` runs the DP function.
+- `t_dp = time.perf_counter() - t0` calculates the elapsed time for DP.
+- `print(...)` outputs the formatted timing results.
 
-## Concept Unit: When to use each approach
+### CS lens
+**Algorithmic complexity** dictates whether a solution is viable. An O(n * W) pseudo-polynomial algorithm is practically fast for reasonable weights, while O(2^n) is entirely unscalable. Real-world uses: cryptography relies on the fact that some problems only have exponential-time solutions.
 
-### The Problem
-Now that we have three distinct implementations, how do we select the right tool for a given optimization problem in practice?
+### SE lens
+Design principle: **Empirical Measurement**. Theoretical Big-O notation is crucial, but writing small benchmark scripts proves the practical impact of those choices on real hardware.
 
-### Introduce the concept in isolation
-We don't need code to compare abstract use cases. Instead, let's analyze when these properties hold.
-If items could be broken into fractions (like gold dust instead of a solid block), the greedy approach is mathematically proven to be 100% optimal.
+### Commands needed
+python3
 
-### Discard the throwaway example
-Not applicable; conceptual analysis.
+### Run it
+Predicted confidently:
+`n=10, cap=50: exhaustive=0.0010s, dp=0.0001s`
+`n=20, cap=50: exhaustive=1.2000s, dp=0.0002s`
+`n=50, cap=50: exhaustive=inf, dp=0.0005s`
 
-### Project Change
-- **Reference Source**: Conceptual summary.
-- **Files affected**: None.
-- **Change type**: configure
-- **Location**: N/A
-- **Dependencies**: N/A
+### One sentence connecting to previous unit
+By comparing the running times, we proved why learning the DP pattern was worth the extra cognitive load.
 
-### The New Code
-No new code is required.
-
-### The Updated Project
-No changes to `knapsack.py`.
-
-### Mechanical walkthrough
-- **GREEDY**: Use when the greedy choice property holds (e.g., fractional knapsack, task scheduling, Huffman coding). It is extremely fast (usually O(n log n) due to sorting) and simple to implement.
-- **EXHAUSTIVE**: Use when the dataset `n` is trivially small (< 20), correctness is critical, and dynamic programming properties don't apply. It is the only provably optimal approach without DP constraints.
-- **DYNAMIC PROGRAMMING**: Use when optimal substructure and overlapping subproblems exist, and memory allows building the memoization table. It operates in polynomial time (O(n*W)), trading memory usage for incredible speedups over brute force.
-
-Closing: The knapsack problem is Guttag's capstone example, bringing together computational complexity, searching, and trading space for time. Module 4 is complete. Module 5 covers probability, simulation, and statistics. Exercises: modify the DP solution to count the NUMBER of optimal solutions; implement the fractional knapsack and prove greedy is optimal for it.
+## Closing
+### Connect the pieces
+We traced solving the knapsack problem with `capacity=5` and `items=[(w=2,v=3),(w=3,v=4),(w=4,v=5)]` across three different techniques. 
+1. The **greedy approach** picked the items with the highest value-to-weight ratio (density). It selected A and then B for a total weight of 5 and value of 7. It was fast but risky.
+2. The **exhaustive search** evaluated all 8 subsets: `{}`, `{A}`, `{B}`, `{C}`, `{A,B}`, `{A,C}`, `{B,C}`, `{A,B,C}`. It saw that `{A,B}` gave a valid 7, while `{B,C}` was too heavy, proving 7 was the optimal answer.
+3. The **dynamic programming** approach constructed a table from the bottom up, recording `dp[3][5]=7`, and **backtracking** proved that skipping C and taking B and A led exactly to the optimal value of 7. DP gave us the certainty of exhaustive search with the speed required for large real-world applications.

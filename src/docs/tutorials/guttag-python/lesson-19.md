@@ -1,437 +1,405 @@
-# Lesson 19: Closures and Decorators — Functions That Wrap Functions
+# Lesson 19: Closures and Decorators
 
-What you will build: The reader will understand closures (functions that capture variables from their enclosing scope), write decorators manually, and use the `@decorator` syntax for timing, logging, and memoization. The transferable problems: (1) a closure is a function that remembers the environment in which it was created — it carries its captured variables with it; (2) a decorator is a higher-order function that takes a function and returns a modified version of it — `@decorator` is syntactic sugar for `f = decorator(f)`; (3) `functools.wraps` preserves the wrapped function's metadata so `help()` and introspection still work.
+What you will build: The reader understands closures (a function that captures variables from its enclosing scope) and decorators (`@` syntax, wrapping functions to add behavior). The transferable insight: a decorator is a function that takes a function and returns a new function. `@decorator` is just syntactic sugar for `func = decorator(func)`. This pattern enables cross-cutting concerns (logging, timing, caching, auth) to be added to any function without modifying it.
 
-What you need to know first: Lessons 0–18.
+What you need to know first: Lessons 00-18.
 
-**Terms used in this lesson**
-- **Closure** — A function that remembers the environment in which it was created. It carries its captured variables with it, solving the problem of maintaining state across function calls without using global variables or object-oriented classes.
-- **Decorator** — A higher-order function that takes a function and returns a modified version of it. It solves the problem of extending or altering the behavior of existing functions without modifying their source code directly.
-- **Syntactic sugar** — Syntax within a programming language that is designed to make things easier to read or to express. It does not add new functionality but provides a more convenient way to write existing functionality.
-- **Scope** — The region of a program where a particular variable name is valid and can be accessed. It solves the problem of naming collisions by keeping variables isolated to specific contexts.
-- **Variable** — A named storage location in a program's memory. It solves the problem of needing to store, update, and retrieve data dynamically during execution.
-- **Function** — A reusable block of code that takes inputs, performs a computation, and returns an output. It solves the problem of code duplication.
-- **`@` (Decorator Syntax)** — Syntactic sugar in Python for applying a decorator. It solves the problem of making function wrapping readable by placing the transformation directly above the function definition.
-- **`!r` (Format specifier)** — Syntactic sugar in f-strings to call `repr()` on the value instead of `str()`. It solves the problem of needing to clearly distinguish types like strings (which gain quotes) in formatted output.
+## Terms used in this lesson
 
-**Objects and methods used**
+- **First-class function** — A function that can be treated like any other object (assigned to variables, passed as arguments, returned from other functions), because it is fundamentally just a value in memory, allowing functions to operate on functions.
+- **Closure** — A function that remembers and has access to variables from its enclosing scope even after that outer scope has finished executing, because it captures those variables in a hidden data structure (`__closure__`), solving the problem of maintaining state without global variables or classes.
+- **Enclosing scope** — The local namespace of an outer function that surrounds an inner function, because lexical scoping dictates that inner functions can read variables defined outside them.
+- **Decorator** — A design pattern and syntax (`@`) for taking a function, wrapping it in another function to add behavior, and returning the new function, because it allows separating cross-cutting concerns (like timing or caching) from core business logic.
+- **Syntactic sugar** — Syntax designed to make things easier to read or express, because `@decorator` is just a shorthand for `func = decorator(func)`, not a fundamentally new capability.
+- **`*args` and `**kwargs`** — Syntax used in function definitions to accept an arbitrary number of positional and keyword arguments respectively, because a wrapper function must be able to accept whatever arguments the original function takes and forward them perfectly.
 
-- **`nonlocal`**
-  - *What it is:* A keyword used in nested functions to declare that a variable refers to a previously bound variable in the closest enclosing scope.
-  - *Implementation:* `nonlocal variable_name`
-  - *Its use:* To allow an inner function to reassign a variable defined in an outer function's scope.
-  - *Type:* Language keyword.
-  - *Responsibility:* Binds a local variable name to a variable in an enclosing non-global scope, allowing reassignment.
-  - *Depends on:* An existing variable in an enclosing scope.
-  - *Connects to:* Modifies the state of variables in outer functions.
-  - *Shape:* Internal implementation detail within nested functions.
+## Objects and methods used
 
-- **`functools.wraps`**
-  - *What it is:* A decorator from the standard library used when writing other decorators.
-  - *Implementation:* `@functools.wraps(wrapped_function)`
-  - *Its use:* To preserve the metadata (like `__name__` and `__doc__`) of the original function being decorated.
-  - *Type:* Function decorator.
-  - *Responsibility:* Copies attributes from the wrapped function to the wrapper function.
-  - *Depends on:* The original function being decorated.
-  - *Connects to:* Updates the metadata of the returned wrapper function.
-  - *Shape:* A decorator applied to the inner wrapper function within a decorator factory.
+**`type`**
+- *What it is:* A built-in Python function that returns the type/class of an object.
+- *Implementation:* `class type(object)`
+- *Its use:* To prove that a function is actually an object of class `function`.
+- *Type:* Built-in class/function.
+- *Responsibility:* Returns the type of the given object.
+- *Depends on:* An object passed as an argument.
+- *Connects to:* Called by our script, prints the type.
+- *Shape:* A fundamental inspection tool in Python's core.
 
-- **`time.time`**
-  - *What it is:* A standard library function that returns the current time.
-  - *Implementation:* `time.time() -> float`
-  - *Its use:* To record start and end times for measuring execution duration.
-  - *Type:* Free function in the `time` module.
-  - *Responsibility:* Provides the current time in seconds since the Epoch.
-  - *Depends on:* The system clock.
-  - *Connects to:* Used by profiling and timing code.
-  - *Shape:* A standard library utility function.
+**`str.upper`**
+- *What it is:* A string method that returns a copy of the string with all characters uppercase.
+- *Implementation:* `def upper(self) -> str`
+- *Its use:* Passed as a function object to demonstrate first-class functions.
+- *Type:* Instance method of the `str` class.
+- *Responsibility:* Creates an uppercase version of a string.
+- *Depends on:* The string object it is called on (or passed to it as `self`).
+- *Connects to:* Passed into our `apply` function.
+- *Shape:* A standard library string manipulation method.
 
-- **`functools.lru_cache`**
-  - *What it is:* A standard library decorator for memoization.
-  - *Implementation:* `@functools.lru_cache(maxsize=None)`
-  - *Its use:* To cache the results of expensive function calls based on their arguments.
-  - *Type:* Function decorator factory.
-  - *Responsibility:* Caches function return values to avoid redundant computations.
-  - *Depends on:* A target function whose arguments are hashable.
-  - *Connects to:* Intercepts function calls and returns cached values when possible.
-  - *Shape:* A public API surface for performance optimization.
+**`time.perf_counter`**
+- *What it is:* A function from the `time` module that returns a high-resolution time counter.
+- *Implementation:* `def perf_counter() -> float`
+- *Its use:* To measure the execution time of a wrapped function by taking a start and end timestamp.
+- *Type:* Function in the `time` module.
+- *Responsibility:* Provides a high-resolution clock for short-duration timing.
+- *Depends on:* The system's underlying high-resolution clock.
+- *Connects to:* Called before and after the original function in the decorator wrapper.
+- *Shape:* A standard library timing utility.
 
-- **Everything else in the file, not this lesson's subject but still explained:**
+**`sum`**
+- *What it is:* A built-in function that sums an iterable.
+- *Implementation:* `def sum(iterable, /, start=0) -> number`
+- *Its use:* To create a slow mathematical operation we can time.
+- *Type:* Built-in function.
+- *Responsibility:* Computes the arithmetic sum of an iterable of numbers.
+- *Depends on:* An iterable (like a range or list) of numbers.
+- *Connects to:* Called inside `slow_sum`.
+- *Shape:* A standard built-in reduction function.
 
-- **`sum`**
-  - *What it is:* A built-in function that adds the items of an iterable.
-  - *Implementation:* `sum(iterable, start=0) -> number`
-  - *Its use:* Used in our example to create a slow-running computation.
-  - *Type:* Built-in function.
-  - *Responsibility:* Calculates the sum of a sequence of numbers.
-  - *Depends on:* An iterable containing numbers.
-  - *Connects to:* Returns the aggregated sum.
-  - *Shape:* Utility function.
+**`range`**
+- *What it is:* A built-in type that represents an immutable sequence of numbers.
+- *Implementation:* `class range(stop)`
+- *Its use:* To generate a large sequence of numbers for `sum` to process.
+- *Type:* Built-in class/type.
+- *Responsibility:* Generates a sequence of integers efficiently without storing them all in memory.
+- *Depends on:* An integer `stop` value (and optional `start` and `step`).
+- *Connects to:* Fed into the `sum` function.
+- *Shape:* A standard built-in sequence generator.
 
-- **`range`**
-  - *What it is:* A built-in type that represents an immutable sequence of numbers.
-  - *Implementation:* `range(stop) -> range object`
-  - *Its use:* Generates a large sequence of numbers for our timing example.
-  - *Type:* Built-in class.
-  - *Responsibility:* Yields sequential integers efficiently.
-  - *Depends on:* Integer bounds.
-  - *Connects to:* Often used as an iterable in loops or functions like `sum`.
-  - *Shape:* Utility sequence generator.
+**`functools.wraps`**
+- *What it is:* A decorator from the `functools` module used for creating well-behaved decorators.
+- *Implementation:* `def wraps(wrapped, assigned=..., updated=...)`
+- *Its use:* Applied to the `wrapper` function inside a decorator to copy metadata from the original function.
+- *Type:* Function/decorator in the `functools` module.
+- *Responsibility:* Preserves the identity (like `__name__` and `__doc__`) of the original function when it is wrapped.
+- *Depends on:* The original function being wrapped.
+- *Connects to:* Decorates the inner `wrapper` function.
+- *Shape:* A utility decorator provided by the standard library.
 
-- **`str`**
-  - *What it is:* A built-in type representing a text string.
-  - *Implementation:* `str(object) -> string`
-  - *Its use:* Converts results to strings for manipulation.
-  - *Type:* Built-in class.
-  - *Responsibility:* Represents and converts objects to human-readable string formats.
-  - *Depends on:* Any object.
-  - *Connects to:* Used for output formatting.
-  - *Shape:* Core data type.
+**`functools.lru_cache`**
+- *What it is:* A standard library decorator that caches the return values of a function.
+- *Implementation:* `def lru_cache(maxsize=128, typed=False)`
+- *Its use:* To demonstrate a production-ready, built-in decorator for memoization.
+- *Type:* Function/decorator in the `functools` module.
+- *Responsibility:* Caches function results to avoid redundant computation (memoization).
+- *Depends on:* The function it decorates and the arguments passed to that function (which must be hashable).
+- *Connects to:* Wraps our recursive `fib2` function.
+- *Shape:* A powerful performance optimization decorator in the standard library.
 
-- **`repr`**
-  - *What it is:* A built-in function that returns a printable representation of an object.
-  - *Implementation:* `repr(object) -> string`
-  - *Its use:* Used to format arguments safely for logging.
-  - *Type:* Built-in function.
-  - *Responsibility:* Provides a string representation of an object, ideally one that could recreate the object.
-  - *Depends on:* Any object.
-  - *Connects to:* Diagnostic output and logging.
-  - *Shape:* Utility function.
-
-- **`filter`**
-  - *What it is:* A built-in function that constructs an iterator from elements of an iterable for which a function returns true.
-  - *Implementation:* `filter(function or None, iterable) -> filter object`
-  - *Its use:* Used to filter out empty strings when constructing log messages.
-  - *Type:* Built-in class.
-  - *Responsibility:* Filters elements of a sequence based on a condition.
-  - *Depends on:* A filtering condition (or `None` for truthy values) and an iterable.
-  - *Connects to:* Feeds filtered data to other functions like `join`.
-  - *Shape:* Utility sequence processor.
-
-- **`str.join`**
-  - *What it is:* A string method that concatenates strings from an iterable.
-  - *Implementation:* `separator.join(iterable) -> string`
-  - *Its use:* Combines lists of string arguments into a single comma-separated string.
-  - *Type:* Instance method of `str`.
-  - *Responsibility:* Joins multiple strings using the calling string as a separator.
-  - *Depends on:* An iterable of strings.
-  - *Connects to:* Produces composite string outputs.
-  - *Shape:* String manipulation utility.
-
-- **`str.upper`**
-  - *What it is:* A string method that returns a copy of the string converted to uppercase.
-  - *Implementation:* `string.upper() -> string`
-  - *Its use:* Used in our manual decorator example to modify a function's string output.
-  - *Type:* Instance method of `str`.
-  - *Responsibility:* Converts all lowercase characters in a string to uppercase.
-  - *Depends on:* The calling string instance.
-  - *Connects to:* Returns a new transformed string.
-  - *Shape:* String manipulation utility.
-
----
-
-## Concept Unit: Closures — functions that remember their environment
+## Concept Unit: First-class functions
 
 ### The Problem
 
-If we want to keep track of how many times a function has been called, we might normally use a global variable. But global variables can be modified by any part of the program, leading to unpredictable behavior. How can we give a function its own private, persistent state without creating a whole class just to hold one counter?
+How do we write code that manipulates or extends the behavior of existing functions without copying their source code?
+If a function is just an instruction set, can we pass it around like a variable?
+What would happen if you tried to assign a function to a variable, without calling it?
+Pause and imagine what `my_var = print` might do. How would you then use `my_var`?
 
 ### Introduce the concept in isolation
 
 ```python
-def make_counter():
-    count = 0
-    def counter():
-        nonlocal count
-        count += 1
-        return count
-    return counter
+def greet(name):
+    return f'Hello, {name}!'
 
-c1 = make_counter()
-c2 = make_counter()
-print(c1())
-print(c1())
-print(c1())
-print(c2())
-print(c1())
-```
-**Output:**
-```
-1
-2
-3
-1
-4
-```
-This demonstrates a **closure**. Each time we call `make_counter()`, it creates a new scope with its own `count` variable. The inner function `counter` is returned, and it *closes over* (remembers) that specific `count` variable. The `nonlocal` keyword allows the inner function to reassign the `count` variable from the outer scope.
+# Functions are objects:
+print(type(greet))      
+print(greet)            
 
-### Discard the throwaway example
+# Assign to a variable:
+say_hi = greet          
+print(say_hi('Alice'))  
 
-This specific counter example is a throwaway demonstration of closures and is discarded. It will not appear in the project again.
+# Pass as argument:
+def apply(func, value):
+    return func(value)
+
+print(apply(greet, 'Bob'))   
+print(apply(str.upper, 'hello'))  
+```
+
+Predicted confidently:
+```
+<class 'function'>
+<function greet at 0x...>
+Hello, Alice!
+Hello, Bob!
+HELLO
+```
+
+This proves that functions are objects in Python, meaning they have a type (`<class 'function'>`) and can be assigned to variables, passed into other functions, and invoked through those variables. This is called a **first-class function**. 
+
+### Discard the throwaway
+
+This throwaway code is discarded and will not appear in the project again.
 
 ### Project Change
 
-No reference counterpart — this is a from-scratch addition to demonstrate closures, as this lesson focuses on isolated concept mastery rather than an ongoing project build.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating Python's function objects.
+- **Files affected**: `examples/functions.py` (created)
+- **Change type**: add
+- **Location**: Entire file.
+- **Dependencies**: None.
 
 ### The New Code
 
 ```python
-def make_counter():
-    count = 0
-    def counter():
-        nonlocal count
-        count += 1
-        return count
-    return counter
+def apply(func, value):
+    return func(value)
 ```
 
 ### The Updated Project
 
 ```python
-# 1: def make_counter():
-# 2:     count = 0
-# 3:     def counter():
-# 4:         nonlocal count
-# 5:         count += 1
-# 6:         return count
-# 7:     return counter
+1: def apply(func, value): # ← new
+2:     return func(value)  # ← new
 ```
-The entire snippet represents the new structure. It defines a function that returns another function with attached state.
+
+The file now defines a function `apply` that takes another function `func` and a `value`, and returns the result of calling `func` with `value`.
 
 ### Mechanical walkthrough
 
-- `def make_counter():`
-  - Defines the outer function that acts as a factory.
-- `count = 0`
-  - Initializes a local variable `count` in the scope of `make_counter`.
-- `def counter():`
-  - Defines an inner function nested within `make_counter`. This is the function that will become the closure.
-- `nonlocal count`
-  - The `nonlocal` keyword declares that assignments to `count` inside this inner function should modify the `count` variable defined in the closest enclosing scope (`make_counter`), rather than creating a new local variable named `count` inside `counter`.
-- `count += 1`
-  - Increments the captured `count` variable by 1.
-- `return count`
-  - Returns the updated integer value.
-- `return counter`
-  - The outer function returns the inner function object itself, not the result of calling it. The returned `counter` function carries its captured environment (the `count` variable) with it.
+- `def apply(func, value):`: Defines a new function named `apply` that takes two parameters: `func` (expected to be a callable object) and `value`.
+- `return func(value)`: Calls the `func` object passing `value` as its argument, and returns the result back to the caller.
 
----
+### CS lens
 
-## Concept Unit: Closure with parameters — the factory pattern
+First-class functions are a foundational concept in functional programming languages (like Lisp, Scheme, Haskell) and modern multi-paradigm languages (JavaScript, Python, Go). They allow for higher-order functions (functions that take or return other functions). Real-world applications include passing callback functions to event listeners in UI programming, providing sorting keys to sorting algorithms, passing map/filter operations to data processing pipelines, and structuring strategy patterns without needing heavy class hierarchies.
+
+### SE lens
+
+The design principle here is treating behavior as data. The alternative NOT chosen is passing strings or enums that tell a switch-statement which hardcoded behavior to run. The tradeoff is that passing functions directly is highly flexible and decoupled, but can make the code harder to trace statically because you don't always know exactly which function will be passed at runtime until it executes.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: nothing happens until `apply` is called.
+
+### One sentence connecting to previous unit
+
+Now that we know functions can be passed as arguments, we need to understand how functions behave when they are returned from other functions.
+
+## Concept Unit: Closures
 
 ### The Problem
 
-We often need functions that perform similar tasks but with slight variations. For example, we might want one function that doubles a number, another that triples it, and another that squares it. Writing separate functions for every variation is repetitive. How can we generate customized functions dynamically?
+If a function is returned from another function, what happens to the local variables of the outer function once it finishes executing?
+Normally, local variables are destroyed when a function returns. If an inner function needs them, how can it survive?
+If you create two different inner functions from the same outer function, do they share variables or get their own?
+Pause and sketch a function that returns another function. How would the inner one use a parameter from the outer one?
 
 ### Introduce the concept in isolation
 
 ```python
 def make_multiplier(n):
-    def multiply(x):
-        return x * n
-    return multiply
+    def inner(x):
+        return x * n    
+    return inner        
 
 double = make_multiplier(2)
 triple = make_multiplier(3)
-print(double(7))
-print(triple(7))
-print(double(triple(4)))
 
-def make_power(exp):
-    return lambda x: x ** exp
+print(double(5))   
+print(triple(5))   
+print(double(7))   
 
-square = make_power(2)
-cube   = make_power(3)
-print(square(5))
-print(cube(3))
+print(double.__closure__[0].cell_contents)  
+print(triple.__closure__[0].cell_contents)  
 ```
-**Output:**
+
+Predicted confidently:
 ```
+10
+15
 14
-21
-24
-25
-27
+2
+3
 ```
-This demonstrates the **factory pattern** using closures. `make_multiplier` creates specialized functions on demand. Each returned function carries its own captured value of `n`. For `double(triple(4))`, `triple(4)` evaluates to 12, and then `double(12)` evaluates to 24.
 
-### Discard the throwaway example
+This proves that the inner function captures and remembers the variables from its enclosing scope (like `n`), even after the outer function `make_multiplier` has returned. Each instance gets its own independent snapshot of those variables. This is called a **closure**.
 
-This multiplier and power generation example is discarded. It serves only to teach function factories.
+### Discard the throwaway
+
+This throwaway code is discarded and will not appear in the project again.
 
 ### Project Change
 
-No reference counterpart.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are explaining closures.
+- **Files affected**: `examples/closures.py` (created)
+- **Change type**: add
+- **Location**: Entire file.
+- **Dependencies**: None.
 
 ### The New Code
 
 ```python
 def make_multiplier(n):
-    def multiply(x):
+    def inner(x):
         return x * n
-    return multiply
+    return inner
 ```
 
 ### The Updated Project
 
 ```python
-# 1: def make_multiplier(n):
-# 2:     def multiply(x):
-# 3:         return x * n
-# 4:     return multiply
+1: def make_multiplier(n):      # ← new
+2:     def inner(x):            # ← new
+3:         return x * n         # ← new
+4:     return inner             # ← new
 ```
-This structure represents a function factory that leverages parameters to create customized closures.
+
+The file defines `make_multiplier`, a function factory that creates and returns new `inner` functions, each uniquely remembering its own `n` value.
 
 ### Mechanical walkthrough
 
-- `def make_multiplier(n):`
-  - Defines the outer factory function, accepting a parameter `n`.
-- `def multiply(x):`
-  - Defines the inner function, accepting a parameter `x`.
-- `return x * n`
-  - The inner function multiplies its own argument `x` by the captured environment variable `n`. `n` is remembered from when `make_multiplier` was called.
-- `return multiply`
-  - Returns the customized inner function.
+- `def make_multiplier(n):`: Defines the outer function taking parameter `n`.
+- `def inner(x):`: Defines an inner function taking parameter `x`.
+- `return x * n`: Multiplies `x` by `n`. Because `n` is not defined in `inner`, Python looks at the enclosing scope (`make_multiplier`) and captures `n` in a closure.
+- `return inner`: Returns the `inner` function object itself (without calling it).
 
----
+### CS lens
 
-## Concept Unit: What a decorator is — manually
+A closure is a record storing a function together with an environment (a mapping associating each free variable of the function with the value or reference to which the name was bound when the closure was created). Real-world applications include state encapsulation (simulating private object fields), function currying/partial application, callback handlers in asynchronous code that need to remember request IDs, and decorator implementations.
+
+### SE lens
+
+The design principle is encapsulation of state without requiring a full class definition. The alternative NOT chosen is defining a class with an `__init__` method to store `n` and a `__call__` method to perform the multiplication. The real tradeoff is that closures are lightweight and concise for simple single-method state, but classes scale better when you need multiple methods or complex shared state manipulation.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: defining the function produces no output.
+
+### One sentence connecting to previous unit
+
+Since functions can be passed as objects and can capture state via closures, we can combine these ideas to create functions that wrap and modify other functions.
+
+## Concept Unit: Writing a decorator manually
 
 ### The Problem
 
-Suppose we have a set of existing functions, and we want to modify their behavior slightly—perhaps to format their output, log their calls, or check permissions—without rewriting the functions themselves. How can we wrap an existing function inside another function to alter what it does?
+If we want to time how long several different functions take to run, how can we add timing code without copying and pasting `time.perf_counter()` into every single function?
+How can we use first-class functions and closures to intercept a function call, do something before it, call it, and do something after?
+If the wrapper function replaces the original, how does it handle the original function's arguments?
+Pause and think: write a function `timer(func)` that returns a new function. What should that new function do?
 
 ### Introduce the concept in isolation
 
 ```python
-def shout(func):
+import time
+
+def timer(func):
     def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        return str(result).upper()
+        start = time.perf_counter()
+        result = func(*args, **kwargs)   
+        end = time.perf_counter()
+        print(f'{func.__name__} took {end-start:.6f}s')
+        return result
     return wrapper
 
-def greet(name):
-    return f'Hello, {name}'
+def slow_sum(n):
+    return sum(range(n))
 
-greet = shout(greet)
-print(greet('Alice'))
+slow_sum = timer(slow_sum)
+print(slow_sum(1_000_000))
 ```
-**Output:**
-```
-HELLO, ALICE
-```
-This demonstrates a **decorator** applied manually. `shout` is a higher-order function that receives the `greet` function and returns a new function `wrapper`. We then reassign the name `greet` to point to this new `wrapper`. When we call `greet('Alice')`, it executes the wrapper, which calls the original function and uppercases the result.
 
-### Discard the throwaway example
+Predicted confidently (time may vary):
+```
+slow_sum took 0.034521s
+499999500000
+```
 
-This manual decoration example is discarded to make way for the proper syntax.
+This proves that we can write a function `timer` that takes `slow_sum`, creates a `wrapper` closure capturing `func`, and returns that `wrapper`. Assigning `slow_sum = timer(slow_sum)` completely replaces the original function with the wrapper, automatically adding timing logic. This pattern is called a **decorator**.
+
+### Discard the throwaway
+
+This throwaway code is discarded and will not appear in the project again.
 
 ### Project Change
 
-No reference counterpart.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are teaching decorators manually.
+- **Files affected**: `examples/manual_decorator.py` (created)
+- **Change type**: add
+- **Location**: Entire file.
+- **Dependencies**: None.
 
 ### The New Code
 
 ```python
-def shout(func):
+import time
+
+def timer(func):
     def wrapper(*args, **kwargs):
+        start = time.perf_counter()
         result = func(*args, **kwargs)
-        return str(result).upper()
+        end = time.perf_counter()
+        print(f'{func.__name__} took {end-start:.6f}s')
+        return result
     return wrapper
 ```
 
 ### The Updated Project
 
 ```python
-# 1: def shout(func):
-# 2:     def wrapper(*args, **kwargs):
-# 3:         result = func(*args, **kwargs)
-# 4:         return str(result).upper()
-# 5:     return wrapper
+1: import time                                         # ← new
+2:                                                     # ← new
+3: def timer(func):                                    # ← new
+4:     def wrapper(*args, **kwargs):                   # ← new
+5:         start = time.perf_counter()                 # ← new
+6:         result = func(*args, **kwargs)              # ← new
+7:         end = time.perf_counter()                   # ← new
+8:         print(f'{func.__name__} took {end-start:.6f}s') # ← new
+9:         return result                               # ← new
+10:     return wrapper                                 # ← new
 ```
-This is the structure of a basic decorator function.
+
+The file now defines a `timer` function that takes any function and returns a new `wrapper` function that times its execution.
 
 ### Mechanical walkthrough
 
-- `def shout(func):`
-  - Defines the decorator function, which takes a target function `func` as its argument.
-- `def wrapper(*args, **kwargs):`
-  - Defines the inner closure. `*args` and `**kwargs` capture any positional and keyword arguments passed to the function, making this wrapper highly generic.
-- `result = func(*args, **kwargs)`
-  - Calls the original captured function `func` with whatever arguments were provided, storing the return value.
-- `return str(result).upper()`
-  - Converts the result to a string (using the `str` class), calls the `upper` method on that string instance, and returns the modified string.
-- `return wrapper`
-  - Returns the new wrapper function, which now serves as a substitute for the original function.
+- `import time`: Imports the time module.
+- `def timer(func):`: Defines the outer function that takes a target `func` to be wrapped.
+- `def wrapper(*args, **kwargs):`: Defines the inner closure. `*args` and `**kwargs` catch any positional or keyword arguments so this wrapper can wrap functions with any signature.
+- `start = time.perf_counter()`: Records the high-resolution start time.
+- `result = func(*args, **kwargs)`: Calls the original `func` (captured via closure) passing along all arguments, and stores the return value.
+- `end = time.perf_counter()`: Records the end time.
+- `print(f'{func.__name__} took {end-start:.6f}s')`: Prints the original function's name and elapsed time.
+- `return result`: Returns the result from the original function call so the wrapper behaves exactly like the original.
+- `return wrapper`: Returns the inner function object.
 
----
+### CS lens
 
-## Concept Unit: The `@` syntax — syntactic sugar
+The decorator pattern is a structural design pattern that allows behavior to be added to an individual object, statically or dynamically, without affecting the behavior of other objects from the same class. Real-world applications include Aspect-Oriented Programming (AOP), adding authentication checks to web routes, adding logging/telemetry, and transaction management in database layers.
 
-### The Problem
+### SE lens
 
-Writing `greet = shout(greet)` after every function definition is repetitive and detaches the modification from the function signature itself. It's easy to miss. How can we express this decoration more cleanly and visibly?
+The design principle is the Open/Closed Principle and separation of concerns: the core function remains unchanged (closed for modification), while the new behavior is added from the outside (open for extension). The alternative NOT chosen is modifying the source code of `slow_sum` directly to add `perf_counter` calls. The real tradeoff is that decorators keep the core business logic clean, but they add layers of indirection that can make stack traces deeper and debugging slightly harder.
 
-### Introduce the concept in isolation
+### Commands needed
 
-```python
-def shout(func):
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        return str(result).upper()
-    return wrapper
+None for this unit.
 
-@shout
-def greet(name):
-    return f'Hello, {name}'
+### Run it
 
-print(greet('Bob'))
-```
-**Output:**
-```
-HELLO, BOB
-```
-This demonstrates the **`@` decorator syntax**. Placing `@shout` immediately above the `def greet` line is **syntactic sugar** that Python transforms precisely into `greet = shout(greet)` behind the scenes.
+Predicted confidently: defining the function produces no output.
 
-### Discard the throwaway example
+### One sentence connecting to previous unit
 
-This `@` syntax example is discarded to move on to practical decorators.
+Manually typing `slow_sum = timer(slow_sum)` works, but Python provides a built-in, cleaner syntax to do exactly the same thing.
 
-### Project Change
-
-No reference counterpart.
-
-### The New Code
-
-```python
-@shout
-def greet(name):
-    return f'Hello, {name}'
-```
-
-### The Updated Project
-
-```python
-# 1: @shout
-# 2: def greet(name):
-# 3:     return f'Hello, {name}'
-```
-This illustrates the standard way to apply a decorator in Python.
-
-### Mechanical walkthrough
-
-- `@shout`
-  - The `@` syntactic sugar instructs Python to pass the function defined on the next line as an argument to `shout`, and bind the function's name to whatever `shout` returns.
-- `def greet(name):`
-  - Defines the function. Because of the decorator, the name `greet` is immediately rebound to the wrapper returned by `shout`.
-
----
-
-## Concept Unit: A timing decorator — measuring execution time
+## Concept Unit: The @ decorator syntax
 
 ### The Problem
 
-We want to measure how long a function takes to execute, but adding timer code inside every function we want to measure pollutes their logic. Furthermore, when we wrap a function with a decorator, the returned wrapper replaces the original, losing its original name and docstring (e.g., `help(greet)` would show information for `wrapper`). How can we time functions transparently while preserving their identity?
+Writing `my_func = decorator(my_func)` after every function definition is repetitive and detaches the wrapping from the definition itself.
+How can we tell Python to apply the decorator immediately when the function is defined?
+If we replace the original function with `wrapper`, what happens to metadata like the function's name (`__name__`) or docstring?
+Pause and consider: what if you need to inspect the function later and it says its name is "wrapper"? How would you fix it?
 
 ### Introduce the concept in isolation
 
@@ -442,186 +410,99 @@ import functools
 def timer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        start = time.time()
+        start = time.perf_counter()
         result = func(*args, **kwargs)
-        end = time.time()
-        print(f'{func.__name__} took {end - start:.4f}s')
+        elapsed = time.perf_counter() - start
+        print(f'{func.__name__}({args}, {kwargs}) -> {elapsed:.4f}s')
         return result
     return wrapper
 
-@timer
+@timer               
 def slow_sum(n):
     return sum(range(n))
 
-print(slow_sum(10_000_000))
-```
-**Output:**
-```
-slow_sum took 0.2341s
-49999995000000
-```
-This demonstrates a practical **timing decorator** that uses `functools.wraps`. The `wraps` decorator copies the `__name__` and `__doc__` attributes from `func` to `wrapper`. Without it, `slow_sum.__name__` would incorrectly report as `'wrapper'`.
+@timer
+def greet(name, greeting='Hello'):
+    return f'{greeting}, {name}!'
 
-### Discard the throwaway example
+print(slow_sum(100_000))
+print(greet('Alice'))
+```
 
-This timing decorator is discarded.
+Predicted confidently (time varies):
+```
+slow_sum((100000,), {}) -> 0.0031s
+4999950000
+greet(('Alice',), {}) -> 0.0000s
+Hello, Alice!
+```
+
+This proves that placing `@timer` directly above the function definition automatically passes the function to `timer` and replaces it with the returned wrapper. `functools.wraps` copies the original function's name to the wrapper. The `@` syntax is called **syntactic sugar** for the decorator pattern.
+
+### Discard the throwaway
+
+This throwaway code is discarded and will not appear in the project again.
 
 ### Project Change
 
-No reference counterpart.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition to demonstrate decorator syntax.
+- **Files affected**: `examples/sugar_decorator.py` (created)
+- **Change type**: add
+- **Location**: Entire file.
+- **Dependencies**: None.
 
 ### The New Code
 
 ```python
-def timer(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print(f'{func.__name__} took {end - start:.4f}s')
-        return result
-    return wrapper
+@timer
+def slow_sum(n):
+    return sum(range(n))
 ```
 
 ### The Updated Project
 
 ```python
-# 1: def timer(func):
-# 2:     @functools.wraps(func)
-# 3:     def wrapper(*args, **kwargs):
-# 4:         start = time.time()
-# 5:         result = func(*args, **kwargs)
-# 6:         end = time.time()
-# 7:         print(f'{func.__name__} took {end - start:.4f}s')
-# 8:         return result
-# 9:     return wrapper
+1: @timer                       # ← new
+2: def slow_sum(n):             # ← new
+3:     return sum(range(n))     # ← new
 ```
-This structure represents a complete, metadata-preserving decorator.
+
+The file defines `slow_sum`, using the `@timer` syntax to automatically wrap it.
 
 ### Mechanical walkthrough
 
-- `def timer(func):`
-  - Defines the outer decorator.
-- `@functools.wraps(func)`
-  - Applies the `wraps` decorator from the `functools` module to the `wrapper` function, instructing it to copy metadata from the captured `func`.
-- `def wrapper(*args, **kwargs):`
-  - Defines the inner closure.
-- `start = time.time()`
-  - Calls `time.time()` to record the current timestamp before execution.
-- `result = func(*args, **kwargs)`
-  - Executes the wrapped function.
-- `end = time.time()`
-  - Records the timestamp after execution.
-- `print(f'{func.__name__} took {end - start:.4f}s')`
-  - Calculates the difference and prints it. It accesses the original function's name via `func.__name__`.
-- `return result`
-  - Returns the computed result.
+- `@timer`: Syntactic sugar placed on the line immediately preceding a function definition. At load time, Python evaluates `def slow_sum(n): ...`, creates the function object, then immediately calls `timer(slow_sum)`, and assigns the returned wrapper back to the name `slow_sum`.
+- `def slow_sum(n):`: Defines the original function.
+- `return sum(range(n))`: The body of the original function.
 
----
+### CS lens
 
-## Concept Unit: A logging decorator
+Syntactic sugar describes language features that do not add new functionality but make the language sweeter for humans to read and write. Real-world applications include `+=` instead of `x = x + 1`, list comprehensions instead of loops, `async`/`await` instead of manual promise chaining, and `@decorator` syntax in Python/TypeScript.
 
-### The Problem
+### SE lens
 
-We want to trace function calls, seeing exactly what arguments they were called with and what they returned. Printing this manually inside the function is tedious. How can a decorator automatically log function inputs and outputs?
+The design principle is readability and declarative programming. The alternative NOT chosen is leaving the manual `slow_sum = timer(slow_sum)` at the bottom of the file. The real tradeoff is that `@decorator` makes it immediately obvious to the reader that the function is wrapped, right where the function is declared, but it hides the explicit function call and reassignment, which can confuse beginners about what is actually happening at runtime.
 
-### Introduce the concept in isolation
+### Commands needed
 
-```python
-import functools
+None for this unit.
 
-def log_calls(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        arg_str = ', '.join(repr(a) for a in args)
-        kwarg_str = ', '.join(f'{k}={v!r}' for k, v in kwargs.items())
-        all_args = ', '.join(filter(None, [arg_str, kwarg_str]))
-        print(f'Calling {func.__name__}({all_args})')
-        result = func(*args, **kwargs)
-        print(f'{func.__name__} returned {result!r}')
-        return result
-    return wrapper
+### Run it
 
-@log_calls
-def add(a, b):
-    return a + b
+Predicted confidently: defining the function produces no output.
 
-add(3, 4)
-add(1, b=10)
-```
-**Output:**
-```
-Calling add(3, 4)
-add returned 7
-Calling add(1, b=10)
-add returned 11
-```
-This demonstrates a **logging decorator**. It constructs a string representing all passed arguments and prints it before the function executes, then prints the result afterward. The `!r` format specifier is used to render string representations (like `repr()`) so that types are clear.
+### One sentence connecting to previous unit
 
-### Discard the throwaway example
+Now that we have the elegant `@` syntax, we can use decorators to solve complex performance problems transparently.
 
-This logging decorator is discarded.
-
-### Project Change
-
-No reference counterpart.
-
-### The New Code
-
-```python
-def log_calls(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        arg_str = ', '.join(repr(a) for a in args)
-        kwarg_str = ', '.join(f'{k}={v!r}' for k, v in kwargs.items())
-        all_args = ', '.join(filter(None, [arg_str, kwarg_str]))
-        print(f'Calling {func.__name__}({all_args})')
-        result = func(*args, **kwargs)
-        print(f'{func.__name__} returned {result!r}')
-        return result
-    return wrapper
-```
-
-### The Updated Project
-
-```python
-# 1: def log_calls(func):
-# 2:     @functools.wraps(func)
-# 3:     def wrapper(*args, **kwargs):
-# 4:         arg_str = ', '.join(repr(a) for a in args)
-# 5:         kwarg_str = ', '.join(f'{k}={v!r}' for k, v in kwargs.items())
-# 6:         all_args = ', '.join(filter(None, [arg_str, kwarg_str]))
-# 7:         print(f'Calling {func.__name__}({all_args})')
-# 8:         result = func(*args, **kwargs)
-# 9:         print(f'{func.__name__} returned {result!r}')
-# 10:        return result
-# 11:    return wrapper
-```
-This is a decorator that inspects and logs arguments and return values.
-
-### Mechanical walkthrough
-
-- `arg_str = ', '.join(repr(a) for a in args)`
-  - Iterates over positional arguments, converting each to its representation via the `repr` function, and calls the `join` method on a comma string to concatenate them.
-- `kwarg_str = ', '.join(f'{k}={v!r}' for k, v in kwargs.items())`
-  - Iterates over keyword arguments. The `!r` format specifier inside the f-string acts as syntactic sugar for calling `repr(v)`.
-- `all_args = ', '.join(filter(None, [arg_str, kwarg_str]))`
-  - Places both strings in a list and uses the `filter` built-in function to remove empty strings (if there were no args or kwargs). It then joins the remaining strings.
-- `print(f'Calling {func.__name__}({all_args})')`
-  - Outputs the traced call signature.
-- `result = func(*args, **kwargs)`
-  - Executes the wrapped function.
-- `print(f'{func.__name__} returned {result!r}')`
-  - Logs the formatted result.
-
----
-
-## Concept Unit: A memoization decorator
+## Concept Unit: Practical decorators — memoize
 
 ### The Problem
 
-Some functions perform expensive calculations (like a deep recursive Fibonacci sequence). If called repeatedly with the same arguments, they waste time recomputing known results. How can we cache the output of a function so subsequent calls with identical arguments return instantly?
+If a function performs an expensive calculation (like recursive Fibonacci) and is called with the same arguments repeatedly, how can we avoid re-doing the work?
+How can a decorator maintain state (like a dictionary of saved results) that persists across multiple calls to the wrapper?
+Is there a built-in way to do this in Python?
+Pause and think: write a `cache = {}` inside a decorator. When should the wrapper check the cache, and when should it call the original function?
 
 ### Introduce the concept in isolation
 
@@ -629,7 +510,7 @@ Some functions perform expensive calculations (like a deep recursive Fibonacci s
 import functools
 
 def memoize(func):
-    cache = {}
+    cache = {}   
     @functools.wraps(func)
     def wrapper(*args):
         if args not in cache:
@@ -643,76 +524,102 @@ def fib(n):
         return n
     return fib(n-1) + fib(n-2)
 
-print(fib(40))
-print(fib(50))
+print(fib(50))  
 
-@functools.lru_cache(maxsize=None)
-def fib_std(n):
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib2(n):
     if n <= 1:
         return n
-    return fib_std(n-1) + fib_std(n-2)
+    return fib2(n-1) + fib2(n-2)
+
+print(fib2(100))  
 ```
-**Output:**
+
+Predicted confidently:
 ```
-102334155
 12586269025
+354224848179261915075
 ```
-This demonstrates a **memoization decorator**. The manual `memoize` uses a closure over a `cache` dictionary to remember previous inputs and outputs. Calling `fib(40)` evaluates instantly because overlapping recursive branches fetch values from the cache instead of recalculating them. Python's standard library provides the exact same functionality robustly via `functools.lru_cache`.
 
-### Discard the throwaway example
+This proves that the closure in `memoize` captures the `cache` dictionary. Because dictionaries are mutable, the `wrapper` can read and write to it across multiple calls. If the result is already in the cache, it returns instantly instead of recursing exponentially. This specific caching technique is called **memoization**.
 
-This memoization example is discarded.
+### Discard the throwaway
+
+This throwaway code is discarded and will not appear in the project again.
 
 ### Project Change
 
-No reference counterpart.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating memoization.
+- **Files affected**: `examples/memoize.py` (created)
+- **Change type**: add
+- **Location**: Entire file.
+- **Dependencies**: None.
 
 ### The New Code
 
 ```python
-def memoize(func):
-    cache = {}
-    @functools.wraps(func)
-    def wrapper(*args):
-        if args not in cache:
-            cache[args] = func(*args)
-        return cache[args]
-    return wrapper
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib2(n):
+    if n <= 1:
+        return n
+    return fib2(n-1) + fib2(n-2)
 ```
 
 ### The Updated Project
 
 ```python
-# 1: def memoize(func):
-# 2:     cache = {}
-# 3:     @functools.wraps(func)
-# 4:     def wrapper(*args):
-# 5:         if args not in cache:
-# 6:             cache[args] = func(*args)
-# 7:         return cache[args]
-# 8:     return wrapper
+1: from functools import lru_cache     # ← new
+2:                                     # ← new
+3: @lru_cache(maxsize=None)            # ← new
+4: def fib2(n):                        # ← new
+5:     if n <= 1:                      # ← new
+6:         return n                    # ← new
+7:     return fib2(n-1) + fib2(n-2)    # ← new
 ```
-This structure implements basic caching as a decorator.
+
+The file defines `fib2`, wrapped in Python's standard library `lru_cache` to automatically cache its recursive results.
 
 ### Mechanical walkthrough
 
-- `cache = {}`
-  - Initializes a dictionary in the outer scope to serve as the cache.
-- `def wrapper(*args):`
-  - Defines the inner closure. Note it only accepts positional `*args` to ensure they are hashable dictionary keys (tuples).
-- `if args not in cache:`
-  - Checks if the current sequence of arguments (a tuple) exists as a key in the `cache` dictionary.
-- `cache[args] = func(*args)`
-  - If not found, calls the original function, computes the result, and stores it in the `cache` under the key `args`.
-- `return cache[args]`
-  - Returns the cached value, bypassing the computation on future calls with the same arguments.
-- `@functools.lru_cache(maxsize=None)`
-  - (From the isolated example) Uses the built-in decorator factory from the `functools` module to achieve the same caching behavior. `maxsize=None` configures it to hold an unbounded number of cached items, exactly matching our custom `memoize` logic.
+- `from functools import lru_cache`: Imports the built-in decorator for caching.
+- `@lru_cache(maxsize=None)`: Applies the decorator. `maxsize=None` tells it to cache an unlimited number of arguments. Note that `lru_cache` is a decorator factory (a function that returns a decorator), which is why it has `()`.
+- `def fib2(n):`: Defines the recursive Fibonacci function.
+- `if n <= 1: return n`: The base case for the recursion.
+- `return fib2(n-1) + fib2(n-2)`: The recursive step.
 
----
+### CS lens
 
-**Closing:** Closures and decorators are one of Python's most expressive features. They are used throughout major frameworks: Flask uses `@app.route`, Django uses `@login_required`, and pytest uses `@pytest.fixture`. Lesson 20 covers iterators and generators. 
+Memoization is an optimization technique used primarily to speed up computer programs by storing the results of expensive function calls and returning the cached result when the same inputs occur again. Real-world applications include Dynamic Programming algorithms, rendering engines skipping UI repaints for unchanged components, database query result caching, and HTTP proxy caching.
 
-**Exercises:** 
-1. Write a `retry(n)` decorator that retries a failing function up to n times before re-raising.
-2. Write a `validate_positive` decorator that raises ValueError if any argument is negative.
+### SE lens
+
+The design principle is cross-cutting concerns and the single responsibility principle. The alternative NOT chosen is modifying `fib2` to manually pass a `cache` dictionary around in its arguments. The real tradeoff is that decorators keep the core math logic absolutely pure and readable, while caching is handled externally, but decorators can mask performance characteristics—a reader looking only at `fib2` without noticing the `@` might incorrectly assume it runs in exponential time.
+
+### Commands needed
+
+None for this unit.
+
+### Run it
+
+Predicted confidently: defining the function produces no output.
+
+### One sentence connecting to previous unit
+
+By layering closures and first-class functions together, decorators offer a powerful way to add capabilities like timing and caching with just one line of code.
+
+## Closing
+
+### Connect the pieces
+
+Let's trace how the `@timer` decorator applies to `slow_sum` from start to finish, using all the concepts we learned:
+
+1. **First-class functions**: When Python reads `def slow_sum(n):`, it creates a function object in memory. Because functions are first-class, this object can be passed around.
+2. **The @ decorator syntax**: Python sees `@timer` above `slow_sum`. This is syntactic sugar. Instead of just assigning `slow_sum` to the new function object, Python immediately executes `timer(slow_sum)`.
+3. **Closures**: Inside `timer`, a new `wrapper` function is defined. This `wrapper` needs access to the original `slow_sum` function, so it captures it in a closure. Even though `timer` finishes executing and returns, `wrapper` permanently remembers the original `slow_sum`.
+4. **Returning the wrapper**: The `timer` function returns the `wrapper` function object.
+5. **Reassignment**: Python takes the returned `wrapper` and assigns it to the name `slow_sum`. The original function object still exists in memory (inside the closure), but the name `slow_sum` now points to the wrapper.
+6. **Execution**: When you call `slow_sum(100)`, you are actually calling `wrapper(100)`. The wrapper records the start time, uses its closure to call the original `func(100)`, records the end time, prints the duration, and returns the result. The caller receives the correct sum and never even realizes the function was wrapped.

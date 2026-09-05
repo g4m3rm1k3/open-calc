@@ -1,763 +1,683 @@
-# Lesson 43: Introduction to Machine Learning — What It Is and What It Isn’t
+# Lesson 43: Introduction to Machine Learning — What It Is and What It Isn't
 
-**What you will build**
-In this lesson, you will build your first real machine learning model to classify iris flowers. The transferable problems you will solve are understanding that ML is curve fitting with more powerful curves (aiming for a model that generalizes to new data), realizing that the train/test split is not optional (evaluating on training data always lies), and executing the four steps of every ML project: load data, split, train, and evaluate. We will implement a decision tree from scratch first to understand it mechanically, then show scikit-learn for production use.
+What you will build:
+The reader understands what machine learning IS: learning a function from labeled examples (supervised) or discovering structure in unlabeled data (unsupervised). They implement a nearest-centroid classifier from scratch in Python. No libraries. The transferable insight: machine learning does not 'think'. It finds the function f such that f(x) approximately equals y on the training data. Generalization (doing well on NEW data) is the entire challenge. Overfitting (doing well on training data, poorly on new data) is the central failure mode.
 
-**What you need to know first**
-- Lessons 0–42
+What you need to know first:
+- Lessons 00-42.
 
-**Terms used in this lesson**
-- **Supervised learning** — given labeled examples (X, y), learn f such that f(X) ≈ y for new X. Examples: spam detection, image classification, price prediction.
-- **Unsupervised learning** — given unlabeled data X, find structure. Examples: clustering customers, dimensionality reduction, anomaly detection.
-- **Reinforcement learning** — an agent takes actions in an environment; receives rewards. Not covered in this series.
-- **Features (X)** — the input variables or measurements used to make predictions.
-- **Labels (y)** — the target output or ground truth we are trying to predict.
-- **Model** — the learned mathematical function or set of rules that maps X to y.
-- **Training** — the process of fitting the model to the training data.
-- **Inference** — using a trained model to make predictions on new, unseen data.
-- **Overfitting** — when a model learns the noise in the training data rather than the underlying pattern, leading to poor generalization.
-- **Underfitting** — when a model is too simple to capture the underlying pattern in the data.
-- **Generalization** — how well a model performs on unseen data, which is the ultimate goal of machine learning.
-- **Hyperparameters** — parameters of the model itself (like maximum depth) that are set before training, not learned from data.
-- **Decision tree** — a model that asks a sequence of yes/no questions about features to classify an example.
-- **Gini impurity** — a metric used to measure how often a randomly chosen element would be incorrectly labeled if randomly labeled according to the distribution in the subset.
+Terms used in this lesson:
+- **Rule-based programming** — Writing explicit if/then logic to solve a problem. It exists because some domains have clear, specifiable rules.
+- **Machine learning** — Inferring rules from data pairs (input, output). It exists to solve problems where rules are too complex to write by hand.
+- **Feature** — A measurable property of the input (x values). It exists to represent raw data as structured numbers a model can process.
+- **Label** — The output category or number to predict (y values). It exists to give the model a target to learn from (in supervised learning).
+- **Training set** — (feature, label) pairs used to learn. It exists to teach the model the underlying relationship.
+- **Test set** — Held-out (feature, label) pairs. It exists to measure the model's generalization to unseen data.
+- **Model** — The learned function `f(features) -> predicted_label`. It exists to make predictions on new data.
+- **Feature vector** — One row of input data. It exists to group all features for a single example.
+- **Centroid** — The mean position of a set of points. It exists to represent the "center" of a class in geometric space.
+- **Euclidean distance** — The straight-line distance between two points. It exists to measure similarity (closer = more similar).
+- **Generalization** — How well the model performs on data it has NOT seen. It exists because the goal is not memorizing the past, but predicting the future.
+- **Overfitting** — The model learns training data TOO well and fails on new data. It exists as the primary failure mode of complex models.
+- **Underfitting** — The model is too simple and fails even on training data. It exists when the model lacks capacity to learn the relationship.
 
-**Objects and methods used**
+Objects and methods used:
 
-**`numpy`**
-- *What it is:* The core library for scientific computing in Python.
-- *Implementation:* An imported module `import numpy as np`.
-- *Its use:* We use it for fast array manipulations and mathematical operations.
-- *Type:* Module.
-- *Responsibility:* Provides high-performance multidimensional arrays and math tools.
-- *Depends on:* Python environment.
-- *Connects to:* Serves as the foundation for almost all ML libraries, including scikit-learn.
-- *Shape:* Fundamental dependency layer.
+- **math.sqrt**
+  - *What it is:* A mathematical function to calculate the square root of a number.
+  - *Implementation:* A function in the `math` module taking one numeric argument and returning a float.
+  - *Its use:* Used to calculate the Euclidean distance formula.
+  - *Type:* Standard library function.
+  - *Responsibility:* Computes the principal square root of a given non-negative number.
+  - *Depends on:* The `math` module being imported and a non-negative numeric input.
+  - *Connects to:* Called by `euclidean_distance`, returns a float value to the caller.
+  - *Shape:* An internal implementation detail within a distance calculation function.
 
-**`numpy.array`**
-- *What it is:* A multidimensional, homogeneous array of fixed-size items.
-- *Implementation:* `def array(object, dtype=None, ...)`
-- *Its use:* Creating arrays to represent our features and labels.
-- *Type:* Function/Class constructor.
-- *Responsibility:* Allocates memory and constructs a fast numerical array.
-- *Depends on:* An iterable of data.
-- *Connects to:* Returns an `ndarray` object.
-- *Shape:* Core data structure.
+- **sum**
+  - *What it is:* A built-in function to add items of an iterable.
+  - *Implementation:* A built-in function taking an iterable and an optional start value.
+  - *Its use:* Used to sum up the squared differences in Euclidean distance, and to sum coordinates for centroid calculation.
+  - *Type:* Built-in function.
+  - *Responsibility:* Calculates the total sum of a sequence of numbers.
+  - *Depends on:* An iterable yielding numeric values.
+  - *Connects to:* Called by math functions and list comprehensions, returns a numeric sum to the caller.
+  - *Shape:* Core language feature used for data aggregation.
 
-**`numpy.polyfit`**
-- *What it is:* Least squares polynomial fit.
-- *Implementation:* `def polyfit(x, y, deg)`
-- *Its use:* To demonstrate that ML is essentially advanced curve fitting.
-- *Type:* Module-level function.
-- *Responsibility:* Finds the coefficients of a polynomial of degree `deg` that best fits the data `(x, y)`.
-- *Depends on:* Input arrays `x` and `y`, and an integer `deg`.
-- *Connects to:* Returns an array of coefficients.
-- *Shape:* Algorithmic utility.
+- **zip**
+  - *What it is:* A built-in function that aggregates elements from two or more iterables.
+  - *Implementation:* Returns an iterator of tuples, where the i-th tuple contains the i-th element from each of the argument iterables.
+  - *Its use:* Used to pair up coordinates of two points for distance calculation, and to pair true and predicted labels for accuracy calculation.
+  - *Type:* Built-in function.
+  - *Responsibility:* Pairs up corresponding elements of multiple sequences into tuples.
+  - *Depends on:* Two or more iterable inputs.
+  - *Connects to:* Provides paired data to comprehensions or loops.
+  - *Shape:* A functional data transformation tool.
 
-**`numpy.poly1d`**
-- *What it is:* A one-dimensional polynomial class.
-- *Implementation:* `class poly1d(c_or_r, r=False, variable=None)`
-- *Its use:* To evaluate the polynomial learned by `polyfit`.
-- *Type:* Class.
-- *Responsibility:* Wraps polynomial coefficients into a callable function.
-- *Depends on:* Coefficients array.
-- *Connects to:* Callable object returning predicted values.
-- *Shape:* Evaluator wrapper.
+- **random.seed**
+  - *What it is:* A function to initialize the random number generator.
+  - *Implementation:* A function in the `random` module taking an integer seed.
+  - *Its use:* Used to ensure reproducible train/test splits.
+  - *Type:* Standard library function.
+  - *Responsibility:* Sets the starting state of the random number generator so random operations yield the exact same sequence.
+  - *Depends on:* The `random` module and an integer seed.
+  - *Connects to:* Affects subsequent calls to `random.shuffle`.
+  - *Shape:* Global state configuration for reproducibility.
 
-**`numpy.pi`**
-- *What it is:* The mathematical constant π.
-- *Implementation:* A float constant `3.141592653589793`.
-- *Its use:* Used as the true function we are trying to learn in our toy example.
-- *Type:* Float constant.
-- *Responsibility:* Provides high-precision Pi.
-- *Depends on:* Nothing.
-- *Connects to:* Mathematical expressions.
-- *Shape:* Static value.
+- **random.shuffle**
+  - *What it is:* A function to shuffle a list in place.
+  - *Implementation:* A function in the `random` module modifying a mutable sequence.
+  - *Its use:* Used to randomize the order of data indices before splitting.
+  - *Type:* Standard library function.
+  - *Responsibility:* Randomizes the order of elements in a sequence.
+  - *Depends on:* The `random` module and a mutable sequence (like a list).
+  - *Connects to:* Modifies the list passed to it.
+  - *Shape:* Data preparation utility.
 
-**`sklearn.datasets.load_iris`**
-- *What it is:* A function to load the classic Iris dataset.
-- *Implementation:* `def load_iris(*, return_X_y=False, as_frame=False)`
-- *Its use:* Provides our real dataset of flower measurements for classification.
-- *Type:* Function.
-- *Responsibility:* Fetches and returns the dataset from scikit-learn's built-in data directory.
-- *Depends on:* Scikit-learn datasets module.
-- *Connects to:* Returns a `Bunch` object with `data` and `target` attributes.
-- *Shape:* Data ingestion boundary.
+- **collections.Counter**
+  - *What it is:* A dict subclass for counting hashable objects.
+  - *Implementation:* A class in the `collections` module.
+  - *Its use:* Used to find the most common label in the underfitting demonstration.
+  - *Type:* Standard library class.
+  - *Responsibility:* Tallies the occurrences of elements in an iterable.
+  - *Depends on:* The `collections` module and an iterable input.
+  - *Connects to:* Passed an iterable, provides methods like `most_common()`.
+  - *Shape:* Data summarization utility.
 
-**`sklearn.model_selection.train_test_split`**
-- *What it is:* A utility to split arrays or matrices into random train and test subsets.
-- *Implementation:* `def train_test_split(*arrays, test_size=None, train_size=None, random_state=None, shuffle=True, stratify=None)`
-- *Its use:* Splitting our Iris data to evaluate generalization.
-- *Type:* Function.
-- *Responsibility:* Randomly shuffles and partitions data while keeping features and labels aligned.
-- *Depends on:* Input arrays `X` and `y`.
-- *Connects to:* Returns 4 arrays: `X_train, X_test, y_train, y_test`.
-- *Shape:* Preprocessing utility.
+## Concept Unit: What machine learning is: learning from examples
 
-**`numpy.bincount`**
-- *What it is:* Count number of occurrences of each value in array of non-negative ints.
-- *Implementation:* `def bincount(x, weights=None, minlength=0)`
-- *Its use:* Finding the most common class in a leaf node.
-- *Type:* Function.
-- *Responsibility:* Tallies frequencies of integer values.
-- *Depends on:* A 1D array of integers.
-- *Connects to:* Returns a 1D array of counts.
-- *Shape:* Statistical utility.
+### The Problem
+How do we program a computer to solve a problem when the rules are too complicated to write down? What if we don't know the exact threshold between "cold" and "comfortable" temperatures, but we have a list of past examples? How can we make the computer figure out the rules from the examples?
 
-**`numpy.unique`**
-- *What it is:* Find the unique elements of an array.
-- *Implementation:* `def unique(ar, return_counts=False, ...)`
-- *Its use:* Identifying all possible threshold values for splitting our tree.
-- *Type:* Function.
-- *Responsibility:* Sorts the array and removes duplicate elements.
-- *Depends on:* Input array.
-- *Connects to:* Returns an array of unique values (and optionally counts).
-- *Shape:* Data analysis utility.
-
-**`numpy.sum`**
-- *What it is:* Sum of array elements.
-- *Implementation:* `def sum(a, axis=None, ...)`
-- *Its use:* Calculating the total Gini impurity.
-- *Type:* Function.
-- *Responsibility:* Computes the arithmetic sum of array elements.
-- *Depends on:* Input array.
-- *Connects to:* Returns a scalar sum.
-- *Shape:* Mathematical utility.
-
-**`numpy.where`**
-- *What it is:* Return elements chosen from x or y depending on condition.
-- *Implementation:* `def where(condition, x=None, y=None)`
-- *Its use:* Vectorized conditional assignment for our stump predictions.
-- *Type:* Function.
-- *Responsibility:* Yields `x` if condition is true, otherwise `y`.
-- *Depends on:* A boolean mask array.
-- *Connects to:* Returns a new array of chosen elements.
-- *Shape:* Control flow utility.
-
-**`numpy.mean`**
-- *What it is:* Compute the arithmetic mean.
-- *Implementation:* `def mean(a, axis=None, ...)`
-- *Its use:* Calculating accuracy by averaging boolean arrays of correct predictions.
-- *Type:* Function.
-- *Responsibility:* Sums elements and divides by count.
-- *Depends on:* Input array.
-- *Connects to:* Returns a scalar mean.
-- *Shape:* Statistical utility.
-
-**`sklearn.tree.DecisionTreeClassifier`**
-- *What it is:* A class capable of performing multi-class classification on a dataset.
-- *Implementation:* `class DecisionTreeClassifier(criterion='gini', max_depth=None, ...)`
-- *Its use:* The production implementation of the decision tree we built from scratch.
-- *Type:* Class.
-- *Responsibility:* Builds a decision tree classifier from the training set (X, y).
-- *Depends on:* Scikit-learn tree module.
-- *Connects to:* Provides `fit` and `predict` methods.
-- *Shape:* Core ML algorithm layer.
-
-**`DecisionTreeClassifier.fit`**
-- *What it is:* Build a decision tree classifier from the training set (X, y).
-- *Implementation:* `def fit(self, X, y, sample_weight=None)`
-- *Its use:* Training the model on our training data.
-- *Type:* Instance method.
-- *Responsibility:* Modifies the classifier's internal state to store the learned tree structure.
-- *Depends on:* An instance of the classifier, and training data `X, y`.
-- *Connects to:* Returns the fitted estimator.
-- *Shape:* Mutating training operation.
-
-**`DecisionTreeClassifier.predict`**
-- *What it is:* Predict class or regression value for X.
-- *Implementation:* `def predict(self, X)`
-- *Its use:* Generating predictions for our test set.
-- *Type:* Instance method.
-- *Responsibility:* Traverses the learned tree for each sample in X to output a class label.
-- *Depends on:* A fitted estimator and input features `X`.
-- *Connects to:* Returns an array of predicted labels `y`.
-- *Shape:* Inference operation.
-
-**`sklearn.metrics.accuracy_score`**
-- *What it is:* Accuracy classification score.
-- *Implementation:* `def accuracy_score(y_true, y_pred, ...)`
-- *Its use:* Evaluating how many predictions matched the ground truth exactly.
-- *Type:* Function.
-- *Responsibility:* Calculates the ratio of correct predictions to total predictions.
-- *Depends on:* Arrays `y_true` and `y_pred`.
-- *Connects to:* Returns a float between 0 and 1.
-- *Shape:* Evaluation metric.
-
-**`sklearn.metrics.classification_report`**
-- *What it is:* Build a text report showing the main classification metrics.
-- *Implementation:* `def classification_report(y_true, y_pred, target_names=None, ...)`
-- *Its use:* Examining precision, recall, and F1-score per class.
-- *Type:* Function.
-- *Responsibility:* Aggregates multiple metrics into a readable string format.
-- *Depends on:* True labels and predicted labels.
-- *Connects to:* Returns a formatted string block.
-- *Shape:* Diagnostic utility.
-
----
-
-## Concept Unit: What machine learning is — and what it isn't
-
-### 1. The Problem
-In traditional programming, you write the rules to process data and produce answers. But what if the rules are too complex? For example, how do you write `if` statements to detect a cat in a grid of pixels? You can't. You need the computer to learn the rules from examples.
-
-### 2. Introduce the concept in isolation
-Machine learning is essentially function approximation — learning a curve that maps inputs to outputs. Let's see this in isolation by trying to "learn" the formula for the area of a circle.
+### Introduce the concept in isolation
+Here is a demonstration of the difference between traditional rule-based programming and machine learning. In rule-based programming, we write the exact `if` statements. In **machine learning**, we provide data pairs and let an algorithm infer the boundaries.
 
 ```python
-import numpy as np
+# Traditional programming: you write the rules
+def classify_temperature_rule_based(temp_celsius):
+    if temp_celsius < 0:
+        return 'freezing'
+    elif temp_celsius < 15:
+        return 'cold'
+    elif temp_celsius < 25:
+        return 'comfortable'
+    else:
+        return 'hot'
 
-radii = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=float)
-areas = np.pi * radii**2  # true areas
+# Machine learning: learn the rules FROM DATA
+# Training data: (input, correct_output) pairs
+training_data = [
+    (-10, 'freezing'), (-5, 'freezing'), (0, 'freezing'),
+    (5, 'cold'),  (10, 'cold'),  (14, 'cold'),
+    (18, 'comfortable'), (22, 'comfortable'), (24, 'comfortable'),
+    (28, 'hot'), (32, 'hot'), (38, 'hot'),
+]
 
-# Given (radius, area) pairs, LEARN the formula
-coeffs = np.polyfit(radii, areas, deg=2)
-p = np.poly1d(coeffs)
-
-print(f'Learned: {coeffs[0]:.4f}*r^2 + {coeffs[1]:.4f}*r + {coeffs[2]:.4f}')
-print(f'True: pi = {np.pi:.4f}')
-print(f'Prediction for r=11: {p(11):.4f}, True: {np.pi*121:.4f}')
+# The ML system learns the threshold values from data, not from programmer
+# If we got the data but not the rules, we could still make a classifier
+for temp, label in training_data[:3]:
+    print(f'temp={temp}: rule_based={classify_temperature_rule_based(temp)}, true={label}')
 ```
 
-**Output:**
-```
-Learned: 3.1416*r^2 + -0.0000*r + 0.0000
-True: pi = 3.1416
-Prediction for r=11: 380.1327, True: 380.1327
-```
-This proves that given only inputs (`radii`) and outputs (`areas`), an algorithm can reverse-engineer the underlying relationship (approximating π).
+This output proves that the rule-based system correctly classifies the data because we explicitly wrote the thresholds. A machine learning approach would infer these thresholds directly from the `training_data` pairs without the `classify_temperature_rule_based` function.
 
-### 3. Discard the throwaway example
-We will not use `polyfit` or circle areas in our project. This throwaway example is discarded.
+### Discard the throwaway
+This throwaway demonstration is discarded. It will not appear in the final project.
 
-### 4. Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `iris_classifier.py` (created)
-- **Change type:** Add
-- **Location:** Top of file
-- **Dependencies:** `numpy`
+### Project Change
+No reference counterpart — this is a from-scratch addition because we are starting a standalone theory lesson.
+- Files affected: `classifier.py` (created)
+- Change type: Add
+- Location: Brand new file.
+- Dependencies: None.
 
-### 5. The New Code
+### The New Code
 ```python
-import numpy as np
+# classifier.py
+def classify_temperature_rule_based(temp_celsius):
+    if temp_celsius < 0:
+        return 'freezing'
+    elif temp_celsius < 15:
+        return 'cold'
+    elif temp_celsius < 25:
+        return 'comfortable'
+    else:
+        return 'hot'
 ```
 
-### 6. The Updated Project
+### The Updated Project
 ```python
-1: import numpy as np
+1 # classifier.py
+2 def classify_temperature_rule_based(temp_celsius): # <- new
+3     if temp_celsius < 0:                           # <- new
+4         return 'freezing'                          # <- new
+5     elif temp_celsius < 15:                        # <- new
+6         return 'cold'                              # <- new
+7     elif temp_celsius < 25:                        # <- new
+8         return 'comfortable'                       # <- new
+9     else:                                          # <- new
+10        return 'hot'                               # <- new
 ```
-This sets up our project file with the mathematical foundation.
+We now have a file with a rule-based function representing the traditional approach to programming.
 
-### 7. Mechanical walkthrough
-- `import numpy as np` is the standard alias for NumPy, providing fast arrays that our machine learning tools will rely on.
+### Mechanical walkthrough
+- `def classify_temperature_rule_based(temp_celsius):` defines a traditional function taking one argument.
+- `if temp_celsius < 0:` checks an explicit, hardcoded threshold.
+- `return 'freezing'` returns the explicit label.
+- `elif temp_celsius < 15:` checks the next explicit threshold.
+- `return 'cold'` returns the next label.
+- `elif temp_celsius < 25:` checks the next explicit threshold.
+- `return 'comfortable'` returns the label.
+- `else:` provides the default case.
+- `return 'hot'` returns the final label.
 
----
+### CS lens
+**Machine Learning Paradigm.** In computer science, this represents the shift from deduction (rules -> data -> answers) to induction (data -> answers -> rules). Real-world applications include spam filtering, image recognition, and language translation.
 
-## Concept Unit: The Iris dataset — loading and exploring
+### SE lens
+**Design Principle: Explicit Rules vs. Learned Models.** Writing explicit rules is deterministic and easy to debug. The alternative NOT chosen here is immediately using an ML model for a simple problem. The tradeoff: ML models are harder to interpret and debug, but they scale to problems where rules are impossible to write by hand (like vision).
 
-### 1. The Problem
-To do machine learning, we need data. We need a dataset that has features (measurements) and labels (categories). The Iris dataset is the canonical toy dataset in ML.
+### Commands needed
+None for this unit.
 
-### 2. Introduce the concept in isolation
-Let's see what happens when we load a dummy scikit-learn dataset to inspect its structure.
+### Run it
+Predicted confidently: The function returns labels based on explicit thresholds.
 
-```python
-from sklearn.datasets import load_breast_cancer
-dummy = load_breast_cancer()
-print(list(dummy.keys()))
-```
-**Predicted Output:**
-```
-['data', 'target', 'frame', 'target_names', 'DESCR', 'feature_names', 'filename', 'data_module']
-```
-This proves that scikit-learn datasets return a dictionary-like object with `data` (our X) and `target` (our y).
+### One sentence connecting to previous unit
+We start with traditional programming as a baseline to understand what machine learning replaces.
 
-### 3. Discard the throwaway example
-The breast cancer dataset was just to show the structure. It is discarded.
+## Concept Unit: Features and labels — the vocabulary of ML
 
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Below the imports.
-- **Dependencies:** `sklearn.datasets`
+### The Problem
+How do we represent data so a computer can learn from it? How do we separate the information we know from the answer we want to predict?
 
-### 5. The New Code
-```python
-from sklearn.datasets import load_iris
-
-iris = load_iris()
-X = iris.data    
-y = iris.target  
-
-print(f'Features: {iris.feature_names}')
-print(f'Classes: {iris.target_names}')
-print(f'X shape: {X.shape}')    
-print(f'y shape: {y.shape}')    
-print(f'X[0]: {X[0]}')          
-print(f'y[0]: {y[0]}')          
-
-for i, name in enumerate(iris.feature_names):
-    print(f'{name}: mean={X[:,i].mean():.2f}, std={X[:,i].std():.2f}')
-```
-
-### 6. The Updated Project
-```python
-1: import numpy as np
-2: from sklearn.datasets import load_iris
-3: 
-4: iris = load_iris()
-5: X = iris.data    
-6: y = iris.target  
-7: 
-8: print(f'Features: {iris.feature_names}')
-9: print(f'Classes: {iris.target_names}')
-10: print(f'X shape: {X.shape}')    
-11: print(f'y shape: {y.shape}')    
-12: print(f'X[0]: {X[0]}')          
-13: print(f'y[0]: {y[0]}')          
-14: 
-15: for i, name in enumerate(iris.feature_names):
-16:     print(f'{name}: mean={X[:,i].mean():.2f}, std={X[:,i].std():.2f}')
-```
-
-**Output:**
-```
-Features: ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
-Classes: ['setosa' 'versicolor' 'virginica']
-X shape: (150, 4)
-y shape: (150,)
-X[0]: [5.1 3.5 1.4 0.2]
-y[0]: 0
-sepal length (cm): mean=5.84, std=0.83
-sepal width (cm): mean=3.06, std=0.43
-petal length (cm): mean=3.76, std=1.76
-petal width (cm): mean=1.20, std=0.76
-```
-
-### 7. Mechanical walkthrough
-- `from sklearn.datasets import load_iris` imports the loading function.
-- `iris = load_iris()` fetches the dataset.
-- `X = iris.data` extracts the 150x4 feature matrix.
-- `y = iris.target` extracts the 150 labels (0, 1, or 2).
-- `X.shape` returns the dimensions of the array.
-- `X[:,i].mean()` and `X[:,i].std()` compute statistics across all rows for a specific feature column `i`.
-
----
-
-## Concept Unit: Train/test split — the non-negotiable
-
-### 1. The Problem
-If we train a model on all 150 flowers and then evaluate it on those same 150 flowers, we are lying to ourselves. A model could just memorize the data (overfitting) and fail on new flowers. We must split the data.
-
-### 2. Introduce the concept in isolation
-Let's see how `train_test_split` behaves on a tiny array.
+### Introduce the concept in isolation
+Here we demonstrate the vocabulary of **features and labels**. A feature is an input, and a label is the target output.
 
 ```python
-from sklearn.model_selection import train_test_split
-dummy_X = np.array([1, 2, 3, 4, 5])
-dummy_y = np.array([0, 0, 1, 1, 1])
+# Example: predict study outcome from hours studied
+training_features = [1, 2, 3, 4, 5, 6, 7, 8]
+training_labels   = ['fail','fail','fail','pass','pass','pass','pass','pass']
 
-Xt, Xte, yt, yte = train_test_split(dummy_X, dummy_y, test_size=0.4, random_state=42)
-print("Train X:", Xt)
-print("Test X:", Xte)
+# Feature matrix (multiple features per example):
+students = [
+    {'hours': 1, 'prev_score': 50},
+    {'hours': 3, 'prev_score': 60},
+    {'hours': 5, 'prev_score': 70},
+    {'hours': 7, 'prev_score': 80},
+]
+for s in students:
+    print(f'hours={s["hours"]}, prev={s["prev_score"]}')
 ```
-**Predicted Output:**
-```
-Train X: [5 3 1]
-Test X: [2 4]
-```
-This proves the function shuffles and partitions the arrays simultaneously, keeping inputs and labels aligned.
 
-### 3. Discard the throwaway example
-The dummy array is discarded.
+This proves that complex data can be structured into arrays of features paired with a target outcome labels.
 
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Bottom of file.
-- **Dependencies:** `train_test_split`
+### Discard the throwaway
+This throwaway data definition is discarded. It will not appear in the project.
 
-### 5. The New Code
+### Project Change
+- Files affected: `classifier.py`
+- Change type: Add
+- Location: Below the `classify_temperature_rule_based` function.
+- Dependencies: None.
+
+### The New Code
 ```python
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-
-print(f'Training samples: {len(X_train)}')
-print(f'Test samples:     {len(X_test)}')
-print(f'Train class distribution: {np.bincount(y_train)}')
-print(f'Test class distribution:  {np.bincount(y_test)}')
+training_data = [
+    (-10, 'freezing'), (-5, 'freezing'), (0, 'freezing'),
+    (5, 'cold'),  (10, 'cold'),  (14, 'cold'),
+    (18, 'comfortable'), (22, 'comfortable'), (24, 'comfortable'),
+    (28, 'hot'), (32, 'hot'), (38, 'hot'),
+]
 ```
 
-### 6. The Updated Project
+### The Updated Project
 ```python
-17: from sklearn.model_selection import train_test_split
-18: 
-19: X_train, X_test, y_train, y_test = train_test_split(
-20:     X, y, test_size=0.2, random_state=42, stratify=y
-21: )
-22: 
-23: print(f'Training samples: {len(X_train)}')
-24: print(f'Test samples:     {len(X_test)}')
-25: print(f'Train class distribution: {np.bincount(y_train)}')
-26: print(f'Test class distribution:  {np.bincount(y_test)}')
+10        return 'hot'
+11
+12 training_data = [                                                        # <- new
+13     (-10, 'freezing'), (-5, 'freezing'), (0, 'freezing'),                # <- new
+14     (5, 'cold'),  (10, 'cold'),  (14, 'cold'),                           # <- new
+15     (18, 'comfortable'), (22, 'comfortable'), (24, 'comfortable'),       # <- new
+16     (28, 'hot'), (32, 'hot'), (38, 'hot'),                               # <- new
+17 ]                                                                        # <- new
 ```
-**Output:**
-```
-Training samples: 120
-Test samples:     30
-Train class distribution: [40 40 40]
-Test class distribution:  [10 10 10]
-```
+We added structured training data, separating features (temperatures) from labels (categories).
 
-### 7. Mechanical walkthrough
-- `test_size=0.2` reserves 20% (30 samples) of the data for testing.
-- `random_state=42` is a seed that ensures the random shuffle is identical every time you run the script, allowing reproducibility.
-- `stratify=y` guarantees that the 33/33/33% class balance in `y` is perfectly preserved in both the training and test sets.
-- `np.bincount(y_train)` counts how many 0s, 1s, and 2s are in the training set, confirming the perfect `[40, 40, 40]` split.
+### Mechanical walkthrough
+- `training_data = [` assigns a new list to a variable.
+- `(-10, 'freezing'),` creates a tuple where `-10` is the feature and `'freezing'` is the label.
+- `(-5, 'freezing'),` adds another tuple with a feature and label.
+- `(0, 'freezing'),` adds another tuple with a feature and label.
+- `(5, 'cold'),` adds another tuple.
+- `(10, 'cold'),` adds another tuple.
+- `(14, 'cold'),` adds another tuple.
+- `(18, 'comfortable'),` adds another tuple.
+- `(22, 'comfortable'),` adds another tuple.
+- `(24, 'comfortable'),` adds another tuple.
+- `(28, 'hot'),` adds another tuple.
+- `(32, 'hot'),` adds another tuple.
+- `(38, 'hot'),` adds another tuple.
+- `]` closes the list.
 
----
+### CS lens
+**Data Representation.** In computer science, abstract concepts must be encoded as quantifiable data structures. Real-world uses include encoding images as pixel matrices, audio as frequency arrays, and text as word embeddings.
 
-## Concept Unit: A decision tree from scratch — the idea
+### SE lens
+**Design Principle: Separation of Data and Logic.** Here, data is stored separately from rules. The alternative NOT chosen is hardcoding data inside the function logic. The tradeoff: separating data makes the system flexible to new data, but requires building a mechanism to parse and use it.
 
-### 1. The Problem
-How does a machine actually *learn* a rule? A decision tree does this by asking yes/no questions (e.g., "is petal length < 2.5?"). To find the best question, it scores every possible question using a math formula called Gini impurity.
+### Commands needed
+None for this unit.
 
-### 2. Introduce the concept in isolation
-Let's see Gini impurity in action. A pure set (all same class) should have Gini = 0. A mixed set has a higher score.
+### Run it
+Predicted confidently: The `training_data` variable simply holds a list of tuples.
 
-```python
-def gini_demo(labels):
-    classes, counts = np.unique(labels, return_counts=True)
-    probs = counts / len(labels)
-    return 1 - np.sum(probs**2)
+### One sentence connecting to previous unit
+Now that we have explicitly separated data into features and labels, we can build a mechanism to learn from it.
 
-print("Pure set [0,0,0]:", gini_demo([0,0,0]))
-print("Mixed set [0,0,1,1]:", gini_demo([0,0,1,1]))
-```
-**Output:**
-```
-Pure set [0,0,0]: 0.0
-Mixed set [0,0,1,1]: 0.5
-```
-This proves Gini impurity is minimized when the data is completely separated by class.
+## Concept Unit: Nearest-centroid classifier from scratch
 
-### 3. Discard the throwaway example
-We will rewrite this properly in our project.
+### The Problem
+Given new data points, how do we classify them automatically? If we know the average position of each class, can we use distance to guess the label of a new point?
 
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Bottom of file.
-- **Dependencies:** None.
-
-### 5. The New Code
-```python
-def gini(labels):
-    n = len(labels)
-    if n == 0: return 0
-    classes, counts = np.unique(labels, return_counts=True)
-    probs = counts / n
-    return 1 - np.sum(probs**2)
-
-def best_split(X, y):
-    best_gini = float('inf')
-    best_feat, best_thresh = None, None
-    for feat in range(X.shape[1]):
-        thresholds = np.unique(X[:, feat])
-        for thresh in thresholds:
-            left  = y[X[:, feat] <= thresh]
-            right = y[X[:, feat] >  thresh]
-            if len(left) == 0 or len(right) == 0:
-                continue
-            weighted = (len(left)*gini(left) + len(right)*gini(right)) / len(y)
-            if weighted < best_gini:
-                best_gini = weighted
-                best_feat, best_thresh = feat, thresh
-    return best_feat, best_thresh, best_gini
-
-feat, thresh, g = best_split(X_train, y_train)
-print(f'Best split: feature {feat} ({iris.feature_names[feat]}) <= {thresh:.2f}')
-print(f'Gini impurity after split: {g:.4f}')
-```
-
-### 6. The Updated Project
-```python
-27: def gini(labels):
-28:     n = len(labels)
-29:     if n == 0: return 0
-30:     classes, counts = np.unique(labels, return_counts=True)
-31:     probs = counts / n
-32:     return 1 - np.sum(probs**2)
-33: 
-34: def best_split(X, y):
-35:     best_gini = float('inf')
-36:     best_feat, best_thresh = None, None
-37:     for feat in range(X.shape[1]):
-38:         thresholds = np.unique(X[:, feat])
-39:         for thresh in thresholds:
-40:             left  = y[X[:, feat] <= thresh]
-41:             right = y[X[:, feat] >  thresh]
-42:             if len(left) == 0 or len(right) == 0:
-43:                 continue
-44:             weighted = (len(left)*gini(left) + len(right)*gini(right)) / len(y)
-45:             if weighted < best_gini:
-46:                 best_gini = weighted
-47:                 best_feat, best_thresh = feat, thresh
-48:     return best_feat, best_thresh, best_gini
-49: 
-50: feat, thresh, g = best_split(X_train, y_train)
-51: print(f'Best split: feature {feat} ({iris.feature_names[feat]}) <= {thresh:.2f}')
-52: print(f'Gini impurity after split: {g:.4f}')
-```
-**Output:**
-```
-Best split: feature 2 (petal length (cm)) <= 2.45
-Gini impurity after split: 0.3333
-```
-
-### 7. Mechanical walkthrough
-- `gini(labels)` computes the probability `probs` of each class, squares them, and subtracts the sum from 1.
-- `best_split(X, y)` iterates over every feature column (`for feat in range(X.shape[1])`).
-- `np.unique(X[:, feat])` finds every unique value in that feature column to test as a `thresh` (threshold).
-- `left = y[X[:, feat] <= thresh]` splits the labels into a left bucket (yes to the question) and a right bucket (no).
-- `weighted` calculates the combined impurity of the two buckets. We keep the split that minimizes this value.
-
----
-
-## Concept Unit: Predicting with the stump
-
-### 1. The Problem
-Now that we have learned the best single rule (a 1-level decision tree, called a "stump"), how do we use it to predict the species of new, unseen flowers in the test set?
-
-### 2. Introduce the concept in isolation
-Let's see how `np.where` can apply a threshold across a whole array instantly.
+### Introduce the concept in isolation
+We will build a **nearest-centroid classifier**. This calculates the mathematical center of each group and assigns new points to whichever center is closest.
 
 ```python
-dummy_feat = np.array([1.0, 3.0, 2.0, 4.0])
-thresh = 2.5
-preds = np.where(dummy_feat <= thresh, "LeftClass", "RightClass")
-print(preds)
-```
-**Predicted Output:**
-```
-['LeftClass' 'RightClass' 'LeftClass' 'RightClass']
-```
-This proves `np.where` acts as an element-wise `if/else` statement.
+import math
 
-### 3. Discard the throwaway example
-The dummy prediction array is discarded.
+def euclidean_distance(a, b):
+    return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))
 
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Bottom of file.
-- **Dependencies:** None.
+def train_nearest_centroid(X_train, y_train):
+    classes = set(y_train)
+    centroids = {}
+    for cls in classes:
+        class_points = [X_train[i] for i in range(len(y_train)) if y_train[i] == cls]
+        n = len(class_points)
+        n_features = len(class_points[0])
+        centroid = [sum(p[f] for p in class_points) / n for f in range(n_features)]
+        centroids[cls] = centroid
+    return centroids
 
-### 5. The New Code
+def predict_nearest_centroid(centroids, x):
+    best_class = None
+    best_dist = float('inf')
+    for cls, centroid in centroids.items():
+        d = euclidean_distance(x, centroid)
+        if d < best_dist:
+            best_dist = d
+            best_class = cls
+    return best_class
+
+X_train = [[1,1],[1,2],[2,1],[5,5],[5,6],[6,5]]
+y_train = ['A','A','A','B','B','B']
+
+centroids = train_nearest_centroid(X_train, y_train)
+print(f'Centroid A: {centroids["A"]}')
+print(f'Centroid B: {centroids["B"]}')
+
+for point in [[2,2],[4,4],[6,6]]:
+    pred = predict_nearest_centroid(centroids, point)
+    print(f'Point {point} -> class {pred}')
+```
+
+This run proves that by computing the center of known groups, we can accurately classify unknown points by finding their shortest distance to those centers.
+
+### Discard the throwaway
+This isolated throwaway code is discarded. We will rebuild it directly inside our project.
+
+### Project Change
+- Files affected: `classifier.py`
+- Change type: Add
+- Location: Top of file for imports, bottom for functions.
+- Dependencies: `math` module.
+
+### The New Code
 ```python
-def predict_stump(X, y_train, feat, thresh):
-    left_labels  = y_train[X_train[:, feat] <= thresh]
-    right_labels = y_train[X_train[:, feat] >  thresh]
-    left_class   = np.bincount(left_labels).argmax()
-    right_class  = np.bincount(right_labels).argmax()
-    predictions = np.where(X[:, feat] <= thresh, left_class, right_class)
-    return predictions
+import math
 
-train_preds = predict_stump(X_train, y_train, feat, thresh)
-test_preds  = predict_stump(X_test, y_train, feat, thresh)
+def euclidean_distance(a, b):
+    return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))
 
-train_acc = np.mean(train_preds == y_train)
-test_acc  = np.mean(test_preds == y_test)
-print(f'Train accuracy: {train_acc:.4f}')  
-print(f'Test accuracy:  {test_acc:.4f}')   
+def train_nearest_centroid(X_train, y_train):
+    classes = set(y_train)
+    centroids = {}
+    for cls in classes:
+        class_points = [X_train[i] for i in range(len(y_train)) if y_train[i] == cls]
+        n = len(class_points)
+        n_features = len(class_points[0])
+        centroid = [sum(p[f] for p in class_points) / n for f in range(n_features)]
+        centroids[cls] = centroid
+    return centroids
+
+def predict_nearest_centroid(centroids, x):
+    best_class = None
+    best_dist = float('inf')
+    for cls, centroid in centroids.items():
+        d = euclidean_distance(x, centroid)
+        if d < best_dist:
+            best_dist = d
+            best_class = cls
+    return best_class
 ```
 
-### 6. The Updated Project
+### The Updated Project
 ```python
-53: def predict_stump(X, y_train, feat, thresh):
-54:     left_labels  = y_train[X_train[:, feat] <= thresh]
-55:     right_labels = y_train[X_train[:, feat] >  thresh]
-56:     left_class   = np.bincount(left_labels).argmax()
-57:     right_class  = np.bincount(right_labels).argmax()
-58:     predictions = np.where(X[:, feat] <= thresh, left_class, right_class)
-59:     return predictions
-60: 
-61: train_preds = predict_stump(X_train, y_train, feat, thresh)
-62: test_preds  = predict_stump(X_test, y_train, feat, thresh)
-63: 
-64: train_acc = np.mean(train_preds == y_train)
-65: test_acc  = np.mean(test_preds == y_test)
-66: print(f'Train accuracy: {train_acc:.4f}')  
-67: print(f'Test accuracy:  {test_acc:.4f}')   
-```
-**Output:**
-```
-Train accuracy: 0.6667
-Test accuracy:  0.6667
-```
-
-### 7. Mechanical walkthrough
-- `left_labels` uses boolean indexing on the training data to see which original labels fell into the left bucket.
-- `np.bincount(...).argmax()` finds the most common label in that bucket (e.g., if it's mostly 0s, `left_class` becomes 0).
-- `np.where(X[:, feat] <= thresh, left_class, right_class)` checks the new data `X`, assigning `left_class` if the condition is met, and `right_class` if not.
-- `train_preds == y_train` creates a boolean array (`True` for correct, `False` for wrong). `np.mean()` treats `True` as 1 and `False` as 0, giving the accuracy percentage. Our stump achieves ~66.7% accuracy because it can perfectly separate setosa from the others, but cannot distinguish versicolor from virginica with just one rule.
-
----
-
-## Concept Unit: scikit-learn's full decision tree
-
-### 1. The Problem
-Writing ML algorithms from scratch is educational but extremely slow. A single stump gives 67% accuracy. To get a deep, multi-level tree, we should use a production-ready library.
-
-### 2. Introduce the concept in isolation
-Let's initialize a scikit-learn tree and look at its shape.
-
-```python
-from sklearn.tree import DecisionTreeClassifier
-dummy_clf = DecisionTreeClassifier(max_depth=1)
-print(dummy_clf)
-```
-**Predicted Output:**
-```
-DecisionTreeClassifier(max_depth=1)
-```
-This proves the object is configured with hyperparameters (like `max_depth`) before any training happens.
-
-### 3. Discard the throwaway example
-The un-trained dummy classifier is discarded.
-
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Bottom of file.
-- **Dependencies:** `DecisionTreeClassifier`, `accuracy_score`, `classification_report`
-
-### 5. The New Code
-```python
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, classification_report
-
-clf = DecisionTreeClassifier(max_depth=3, random_state=42)
-clf.fit(X_train, y_train)
-
-y_pred_train = clf.predict(X_train)
-y_pred_test  = clf.predict(X_test)
-
-print(f'Train accuracy: {accuracy_score(y_train, y_pred_train):.4f}')
-print(f'Test accuracy:  {accuracy_score(y_test, y_pred_test):.4f}')
-print(classification_report(y_test, y_pred_test, target_names=iris.target_names))
-```
-
-### 6. The Updated Project
-```python
-68: from sklearn.tree import DecisionTreeClassifier
-69: from sklearn.metrics import accuracy_score, classification_report
-70: 
-71: clf = DecisionTreeClassifier(max_depth=3, random_state=42)
-72: clf.fit(X_train, y_train)
-73: 
-74: y_pred_train = clf.predict(X_train)
-75: y_pred_test  = clf.predict(X_test)
-76: 
-77: print(f'Train accuracy: {accuracy_score(y_train, y_pred_train):.4f}')
-78: print(f'Test accuracy:  {accuracy_score(y_test, y_pred_test):.4f}')
-79: print(classification_report(y_test, y_pred_test, target_names=iris.target_names))
-```
-**Output:**
-```
-Train accuracy: 0.9750
-Test accuracy:  0.9667
-              precision    recall  f1-score   support
-
-      setosa       1.00      1.00      1.00        10
-  versicolor       0.91      1.00      0.95        10
-   virginica       1.00      0.90      0.95        10
-
-    accuracy                           0.97        30
-   macro avg       0.97      0.97      0.97        30
-weighted avg       0.97      0.97      0.97        30
-```
-
-### 7. Mechanical walkthrough
-- `clf = DecisionTreeClassifier(max_depth=3, random_state=42)` instantiates the model with a hyperparameter `max_depth=3` to allow 3 levels of questions instead of 1.
-- `clf.fit(X_train, y_train)` runs a fast, optimized version of our `best_split` function recursively to build the tree.
-- `clf.predict(X_test)` runs the test data down the tree to get label predictions.
-- `accuracy_score(y_test, y_pred_test)` compares predictions to ground truth, replacing our `np.mean()` logic.
-- `classification_report` shows advanced metrics. Precision means "of predicted positives, how many are correct." Recall means "of actual positives, how many were found." F1 is the harmonic mean of both.
-
----
-
-## Concept Unit: Overfitting in decision trees — `max_depth` matters
-
-### 1. The Problem
-What happens if we let the tree grow as deep as it wants? It will perfectly separate every single training point, getting 100% training accuracy. But it will learn the noise (overfitting), and perform worse on the test set.
-
-### 2. Introduce the concept in isolation
-A depth-100 tree has an astronomical number of possible leaf nodes. By definition, if a tree is unconstrained, it continues splitting until every leaf contains only 1 sample, perfectly memorizing the dataset. 
-
-### 3. Discard the throwaway example
-We will prove this dynamically by looping over depths.
-
-### 4. Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `iris_classifier.py`
-- **Change type:** Add
-- **Location:** Bottom of file.
-- **Dependencies:** None.
-
-### 5. The New Code
-```python
-train_accs, test_accs = [], []
-for depth in range(1, 15):
-    clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
-    clf.fit(X_train, y_train)
-    train_accs.append(accuracy_score(y_train, clf.predict(X_train)))
-    test_accs.append(accuracy_score(y_test, clf.predict(X_test)))
-    print(f'depth={depth:>2}: train={train_accs[-1]:.4f}, test={test_accs[-1]:.4f}')
-```
-
-### 6. The Updated Project
-```python
-80: train_accs, test_accs = [], []
-81: for depth in range(1, 15):
-82:     clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
-83:     clf.fit(X_train, y_train)
-84:     train_accs.append(accuracy_score(y_train, clf.predict(X_train)))
-85:     test_accs.append(accuracy_score(y_test, clf.predict(X_test)))
-86:     print(f'depth={depth:>2}: train={train_accs[-1]:.4f}, test={test_accs[-1]:.4f}')
-```
-**Output:**
-```
-depth= 1: train=0.6750, test=0.6667
-depth= 2: train=0.9583, test=0.9333
-depth= 3: train=0.9750, test=0.9667
-depth= 4: train=0.9833, test=0.9333
-depth= 5: train=1.0000, test=0.9333
-depth= 6: train=1.0000, test=0.9333
+1  import math                                                              # <- new
+2
+3  # classifier.py
 ...
-depth=14: train=1.0000, test=0.9333
+17 ]
+18 
+19 def euclidean_distance(a, b):                                            # <- new
+20     return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))          # <- new
+21                                                                          # <- new
+22 def train_nearest_centroid(X_train, y_train):                            # <- new
+23     classes = set(y_train)                                               # <- new
+24     centroids = {}                                                       # <- new
+25     for cls in classes:                                                  # <- new
+26         class_points = [X_train[i] for i in range(len(y_train)) if y_train[i] == cls] # <- new
+27         n = len(class_points)                                            # <- new
+28         n_features = len(class_points[0])                                # <- new
+29         centroid = [sum(p[f] for p in class_points) / n for f in range(n_features)] # <- new
+30         centroids[cls] = centroid                                        # <- new
+31     return centroids                                                     # <- new
+32                                                                          # <- new
+33 def predict_nearest_centroid(centroids, x):                              # <- new
+34     best_class = None                                                    # <- new
+35     best_dist = float('inf')                                             # <- new
+36     for cls, centroid in centroids.items():                              # <- new
+37         d = euclidean_distance(x, centroid)                              # <- new
+38         if d < best_dist:                                                # <- new
+39             best_dist = d                                                # <- new
+40             best_class = cls                                             # <- new
+41     return best_class                                                    # <- new
+```
+We introduced the math import and the three core functions necessary to train a model and predict labels for new data based on geometric distance.
+
+### Mechanical walkthrough
+- `import math` imports the standard library math functions.
+- `def euclidean_distance(a, b):` defines a function to compute distance between two vectors.
+- `return math.sqrt(sum((ai - bi)**2 for ai, bi in zip(a, b)))` pairs coordinates with `zip`, computes squared differences, sums them, and takes the square root.
+- `def train_nearest_centroid(X_train, y_train):` defines the training function mapping features to labels.
+- `classes = set(y_train)` finds unique labels.
+- `centroids = {}` initializes a dictionary for class centers.
+- `for cls in classes:` iterates over each unique label.
+- `class_points = [X_train[i] for i in range(len(y_train)) if y_train[i] == cls]` filters feature vectors matching the current label.
+- `n = len(class_points)` gets the count of points in the class.
+- `n_features = len(class_points[0])` gets the dimensionality of the vectors.
+- `centroid = [sum(p[f] for p in class_points) / n for f in range(n_features)]` computes the mean coordinate across all dimensions.
+- `centroids[cls] = centroid` stores the computed centroid.
+- `return centroids` returns the model state.
+- `def predict_nearest_centroid(centroids, x):` defines the prediction function.
+- `best_class = None` starts with no prediction.
+- `best_dist = float('inf')` starts with infinite distance.
+- `for cls, centroid in centroids.items():` iterates through learned class centers.
+- `d = euclidean_distance(x, centroid)` calculates distance to the center.
+- `if d < best_dist:` checks if this is the closest center yet.
+- `best_dist = d` updates the shortest distance.
+- `best_class = cls` updates the predicted class.
+- `return best_class` yields the final prediction.
+
+### CS lens
+**Geometric Representation.** In computer science, data items can be mapped into a high-dimensional space where similarity is quantified by geometric distance. Real-world applications include recommendation engines mapping user preferences and search engines comparing document relevance.
+
+### SE lens
+**Design Principle: Model State Independence.** The training function returns a standard dictionary rather than keeping state inside a class. The alternative NOT chosen is an Object-Oriented approach encapsulating the data. The tradeoff: pure functions returning plain data are extremely easy to test and serialize, but lack built-in boundaries for enforcing usage constraints.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: These functions correctly define a training and inference loop for a centroid-based classifier.
+
+### One sentence connecting to previous unit
+Now that our model can learn from data, we must figure out how to evaluate if its learning is actually correct on new data.
+
+## Concept Unit: Train/test split and accuracy
+
+### The Problem
+If a model memorizes all the answers, it will look perfectly accurate on the data it has seen. How do we measure if the model has actually learned the underlying pattern instead of just memorizing the past?
+
+### Introduce the concept in isolation
+We introduce the **train/test split**. We hold back some data during training and use it exclusively for testing.
+
+```python
+import random
+
+def train_test_split(X, y, test_size=0.2, seed=42):
+    random.seed(seed)
+    indices = list(range(len(X)))
+    random.shuffle(indices)
+    split = int(len(X) * (1 - test_size))
+    train_idx = indices[:split]
+    test_idx  = indices[split:]
+    X_train = [X[i] for i in train_idx]
+    y_train = [y[i] for i in train_idx]
+    X_test  = [X[i] for i in test_idx]
+    y_test  = [y[i] for i in test_idx]
+    return X_train, X_test, y_train, y_test
+
+def accuracy(y_true, y_pred):
+    correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)
+    return correct / len(y_true)
+
+X = [[1,1],[1,2],[2,1],[2,2],[4,4],[5,5],[5,6],[6,5],[6,6],[5,4]]
+y = ['A','A','A','A','B','B','B','B','B','B']
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3)
+print(f"Train size: {len(X_tr)}, Test size: {len(X_te)}")
 ```
 
-### 7. Mechanical walkthrough
-- `for depth in range(1, 15):` tests every hyperparameter value from 1 to 14.
-- `clf = DecisionTreeClassifier(max_depth=depth)` applies the current depth.
-- `train_accs.append(...)` and `test_accs.append(...)` track the scores.
-- As the loop progresses, we see that at `depth=1` (our stump), the model underfits. 
-- At `depth=3`, it hits the sweet spot (train=0.97, test=0.96).
-- At `depth=5` and beyond, it overfits (train=1.00, test=0.93). The training accuracy becomes perfect, but the test accuracy *drops*, proving that the extra rules were just memorizing noise.
+This execution proves that the data can be cleanly divided into two non-overlapping sets to fairly evaluate model performance.
 
----
+### Discard the throwaway
+This throwaway demonstration is discarded. It will not appear in the project.
 
-**Closing:** You have fit your first real ML classifier. Lesson 44 covers clustering — unsupervised learning.
-**Exercises:** 
-1. Try `DecisionTreeClassifier` without `max_depth` and compare.
-2. Try `criterion='entropy'` instead of `'gini'`.
-3. Load the wine dataset from `sklearn.datasets` and repeat the full workflow.
+### Project Change
+- Files affected: `classifier.py`
+- Change type: Add
+- Location: Top for imports, bottom for functions.
+- Dependencies: `random` module.
+
+### The New Code
+```python
+import random
+
+def train_test_split(X, y, test_size=0.2, seed=42):
+    random.seed(seed)
+    indices = list(range(len(X)))
+    random.shuffle(indices)
+    split = int(len(X) * (1 - test_size))
+    train_idx = indices[:split]
+    test_idx  = indices[split:]
+    X_train = [X[i] for i in train_idx]
+    y_train = [y[i] for i in train_idx]
+    X_test  = [X[i] for i in test_idx]
+    y_test  = [y[i] for i in test_idx]
+    return X_train, X_test, y_train, y_test
+
+def accuracy(y_true, y_pred):
+    correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)
+    return correct / len(y_true)
+```
+
+### The Updated Project
+```python
+2  import random                                                            # <- new
+3 
+...
+42 
+43 def train_test_split(X, y, test_size=0.2, seed=42):                      # <- new
+44     random.seed(seed)                                                    # <- new
+45     indices = list(range(len(X)))                                        # <- new
+46     random.shuffle(indices)                                              # <- new
+47     split = int(len(X) * (1 - test_size))                                # <- new
+48     train_idx = indices[:split]                                          # <- new
+49     test_idx  = indices[split:]                                          # <- new
+50     X_train = [X[i] for i in train_idx]                                  # <- new
+51     y_train = [y[i] for i in train_idx]                                  # <- new
+52     X_test  = [X[i] for i in test_idx]                                   # <- new
+53     y_test  = [y[i] for i in test_idx]                                   # <- new
+54     return X_train, X_test, y_train, y_test                              # <- new
+55                                                                          # <- new
+56 def accuracy(y_true, y_pred):                                            # <- new
+57     correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)           # <- new
+58     return correct / len(y_true)                                         # <- new
+```
+We added functions to split the dataset and quantify the classifier's performance by checking correctness on held-out test data.
+
+### Mechanical walkthrough
+- `import random` imports the standard random number tools.
+- `def train_test_split(X, y, test_size=0.2, seed=42):` defines a split function with defaults.
+- `random.seed(seed)` fixes the random number generator so splits are reproducible.
+- `indices = list(range(len(X)))` creates a list of all row indices.
+- `random.shuffle(indices)` randomly reorders the indices in-place.
+- `split = int(len(X) * (1 - test_size))` calculates the cutoff index for training.
+- `train_idx = indices[:split]` gets the training indices.
+- `test_idx = indices[split:]` gets the test indices.
+- `X_train = [X[i] for i in train_idx]` selects training features.
+- `y_train = [y[i] for i in train_idx]` selects training labels.
+- `X_test = [X[i] for i in test_idx]` selects test features.
+- `y_test = [y[i] for i in test_idx]` selects test labels.
+- `return X_train, X_test, y_train, y_test` yields the four separated components.
+- `def accuracy(y_true, y_pred):` defines a function to measure success rate.
+- `correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)` counts how many predicted labels equal the true labels.
+- `return correct / len(y_true)` calculates the ratio of correct predictions.
+
+### CS lens
+**Generalization vs Memorization.** In computer science, algorithms are often evaluated on their ability to generalize to unseen situations, not just on their performance on historical data. Real-world implementations include A/B testing web features or cross-validating statistical models.
+
+### SE lens
+**Design Principle: Determinism in Testing.** The use of a fixed random seed makes the data split reproducible. The alternative NOT chosen is fully random splits on every run. The tradeoff: fixed seeds allow for predictable test cases and debugging, but may hide performance variations that random splits would expose.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: The functions cleanly partition arrays into non-overlapping groups and calculate percentages.
+
+### One sentence connecting to previous unit
+Testing generalization naturally leads us to the two main ways a machine learning model can fail.
+
+## Concept Unit: Overfitting vs. underfitting
+
+### The Problem
+What happens when a model learns the training data perfectly but performs horribly on new data? Conversely, what if the model is so simple it fails to learn anything useful at all from the training data?
+
+### Introduce the concept in isolation
+We explore **overfitting** (memorization) and **underfitting** (over-simplification).
+
+```python
+# Overfitting: memorizing classifier
+class MemorizingClassifier:
+    def fit(self, X, y):
+        self.memory = dict(zip(map(tuple, X), y))
+
+    def predict(self, x):
+        return self.memory.get(tuple(x), 'UNKNOWN')
+
+mc = MemorizingClassifier()
+X_tr = [[1,1],[2,2],[5,5]]
+y_tr = ['A','A','B']
+mc.fit(X_tr, y_tr)
+print(mc.predict([1,1]))   # A (seen in training)
+print(mc.predict([3,3]))   # UNKNOWN (not seen!)
+
+# Underfitting: majority classifier
+class MajorityClassifier:
+    def fit(self, X, y):
+        from collections import Counter
+        self.majority = Counter(y).most_common(1)[0][0]
+
+    def predict(self, x):
+        return self.majority
+```
+
+This output proves that a memorizing classifier fails entirely on data it has never seen because it captures noise as rules (overfitting), whereas the majority classifier ignores data altogether and returns a single guess (underfitting).
+
+### Discard the throwaway
+This throwaway demonstration is discarded. It will not appear in the project.
+
+### Project Change
+- Files affected: `classifier.py`
+- Change type: Add
+- Location: Bottom of file.
+- Dependencies: `collections.Counter` module.
+
+### The New Code
+```python
+from collections import Counter
+
+class MemorizingClassifier:
+    def fit(self, X, y):
+        self.memory = dict(zip(map(tuple, X), y))
+
+    def predict(self, x):
+        return self.memory.get(tuple(x), 'UNKNOWN')
+
+class MajorityClassifier:
+    def fit(self, X, y):
+        self.majority = Counter(y).most_common(1)[0][0]
+
+    def predict(self, x):
+        return self.majority
+```
+
+### The Updated Project
+```python
+3  from collections import Counter                                          # <- new
+...
+59
+60 class MemorizingClassifier:                                              # <- new
+61     def fit(self, X, y):                                                 # <- new
+62         self.memory = dict(zip(map(tuple, X), y))                        # <- new
+63                                                                          # <- new
+64     def predict(self, x):                                                # <- new
+65         return self.memory.get(tuple(x), 'UNKNOWN')                      # <- new
+66                                                                          # <- new
+67 class MajorityClassifier:                                                # <- new
+68     def fit(self, X, y):                                                 # <- new
+69         self.majority = Counter(y).most_common(1)[0][0]                  # <- new
+70                                                                          # <- new
+71     def predict(self, x):                                                # <- new
+72         return self.majority                                             # <- new
+```
+We added two extreme classifier examples to represent the boundary failure modes of machine learning: perfect memorization and complete simplification.
+
+### Mechanical walkthrough
+- `from collections import Counter` imports the counting utility.
+- `class MemorizingClassifier:` begins the overfit class definition.
+- `def fit(self, X, y):` defines the training method.
+- `self.memory = dict(zip(map(tuple, X), y))` turns list features into hashable tuples and zips them into a dictionary with labels.
+- `def predict(self, x):` defines the prediction method.
+- `return self.memory.get(tuple(x), 'UNKNOWN')` performs an exact lookup, failing if the point wasn't perfectly memorized.
+- `class MajorityClassifier:` begins the underfit class definition.
+- `def fit(self, X, y):` defines the training method.
+- `self.majority = Counter(y).most_common(1)[0][0]` counts label frequencies and stores only the most common one.
+- `def predict(self, x):` defines the prediction method.
+- `return self.majority` completely ignores the input features and always returns the majority guess.
+
+### CS lens
+**Bias-Variance Tradeoff.** In computer science, models balance bias (simplifying assumptions leading to underfitting) and variance (sensitivity to small data fluctuations leading to overfitting). Real-world applications manage this by using regularization, dropping out neural network nodes, or pruning decision trees.
+
+### SE lens
+**Design Principle: The Simplest Baseline.** The `MajorityClassifier` represents a dummy baseline. The alternative NOT chosen is comparing complex models only against each other. The tradeoff: dummy models provide a minimum performance floor for sanity-checking, but do not provide real business value on their own.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: The classifiers return either perfectly memorized exact matches or the single majority label.
+
+### One sentence connecting to previous unit
+Understanding how extreme models fail teaches us that the goal of machine learning is to find a model safely between memorizing the past and ignoring the data.
+
+## Closing
+
+### Connect the pieces
+Let's trace classifying a new data point `[3,3]` using a nearest-centroid classifier through all the concept units we built today:
+1. **Feature Extraction:** The raw input is quantified into a feature vector `[3, 3]`.
+2. **Label Lookup:** The model separates known data into features and true labels to understand what categories exist.
+3. **Centroid Computation:** The model groups the training vectors by their labels and calculates their geometric centers (centroids).
+4. **Distance Comparison:** The `predict_nearest_centroid` function computes the Euclidean distance between `[3,3]` and each computed center, avoiding the trap of memorizing previous points (overfitting) or guessing blindly (underfitting).
+5. **Generalization Check:** By holding out `[3,3]` in a test set, we calculate accuracy to prove that our model learned the real structure of the data and can predict entirely new scenarios.

@@ -1,699 +1,603 @@
 # Lesson 25: Special Methods — Making Objects Feel Like Python
 
-What you will build: You will implement special (dunder) methods on a `Vector` class to make it work seamlessly with Python's native operators and built-in functions like `+`, `-`, `*`, `len()`, `abs()`, `[]`, `in`, and `with`. The transferable problems you will solve are: (1) how Python's operators and built-in functions dispatch to your class (e.g., `a + b` calls `a.__add__(b)`); (2) how implementing `__len__` and `__getitem__` makes your class a sequence that works with `for`, `list()`, `len()`, `in`, and slicing for free; and (3) how `__enter__` and `__exit__` implement the context manager protocol used by the `with` statement.
+What you will build: The reader understands Python's special (dunder) methods: `__repr__`, `__str__`, `__eq__`, `__lt__`, `__add__`, `__len__`, `__contains__`, `__iter__`, `__getitem__`. These make user-defined classes work with Python's built-in functions and operators. The transferable insight: Python's operators and built-ins are backed by method calls. `+` calls `__add__`. `len()` calls `__len__`. `in` calls `__contains__`. By implementing these methods, your class integrates with Python's entire ecosystem of tools (`sorted`, `max`, `in`, `print`, `==`, etc.).
 
-What you need to know first: Lessons 0–24 (full curriculum through inheritance).
+What you need to know first: Lessons 00-24.
 
-Terms used in this lesson:
-- **Special methods (dunder methods)** — Methods with double underscores before and after their names (e.g., `__add__`). They exist to allow user-defined classes to hook into Python's built-in syntax and operators, providing a native feel.
-- **Operator overloading** — The ability to define custom behavior for operators like `+` or `*` when applied to instances of a class. It exists so that objects can interact using standard, readable mathematical notation.
-- **Context manager** — An object that defines the setup and teardown logic for a block of code, usually used with the `with` statement. It exists to guarantee that resources (like files or network connections) are properly released regardless of whether the block succeeds or raises an exception.
-- **Iterable** — An object capable of returning its members one at a time. It exists to allow objects to be looped over in a `for` loop.
-- **Iterator** — An object representing a stream of data, returned by an iterable. It exists to maintain the state of iteration and produce the next value when requested.
-- **Callable** — An object that can be called like a function using parentheses `()`. It exists to allow objects that represent actions or computations to present a function-like interface.
-- **Horner's method** — An algorithm for polynomial evaluation. It exists to evaluate polynomials efficiently with fewer multiplications than the naive approach.
+**Terms used in this lesson**
+- **Special methods (dunder methods)** — Methods with double underscores before and after their names (e.g., `__init__`). They are called implicitly by Python when objects are used with standard operators and built-in functions, allowing custom classes to emulate built-in behavior.
+- **Generator** — A function that returns an iterator that produces a sequence of values one at a time using `yield`, preserving state between calls. It solves the problem of returning multiple values without storing them all in memory at once.
+- **Context manager** — An object that defines the runtime context established when executing a `with` statement. It guarantees that setup and teardown actions (like closing a file or stopping a timer) happen reliably, even if an exception occurs.
 
-Objects and methods used:
+**Objects and methods used**
+- **`__repr__`**
+  - *What it is:* A special method for the "official" string representation of an object.
+  - *Implementation:* `def __repr__(self): ...` returning a string.
+  - *Its use:* Used for debugging and logging.
+  - *Type:* Instance method.
+  - *Responsibility:* Returns a string that ideally looks like a valid Python expression that could be used to recreate an object with the same value.
+  - *Depends on:* The object's internal state.
+  - *Connects to:* Called by the built-in `repr()` function and when an object is inspected in the interactive interpreter.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__str__`**
+  - *What it is:* A special method for the "informal" or nicely printable string representation of an object.
+  - *Implementation:* `def __str__(self): ...` returning a string.
+  - *Its use:* Used to present the object to an end user.
+  - *Type:* Instance method.
+  - *Responsibility:* Returns a human-readable string.
+  - *Depends on:* The object's internal state.
+  - *Connects to:* Called by the built-in `str()` function and `print()`.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__eq__`**
+  - *What it is:* A special method for equality comparison.
+  - *Implementation:* `def __eq__(self, other): ...` returning a boolean or `NotImplemented`.
+  - *Its use:* Used to define when two objects of the class are considered equal.
+  - *Type:* Instance method.
+  - *Responsibility:* Evaluates `self == other`.
+  - *Depends on:* The object and the `other` operand.
+  - *Connects to:* Called by the `==` operator.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__lt__`**
+  - *What it is:* A special method for less-than comparison.
+  - *Implementation:* `def __lt__(self, other): ...` returning a boolean.
+  - *Its use:* Used for sorting and `<` operator.
+  - *Type:* Instance method.
+  - *Responsibility:* Evaluates `self < other`.
+  - *Depends on:* The object and the `other` operand.
+  - *Connects to:* Called by the `<` operator and built-ins like `sorted()`.
+  - *Shape:* A standard part of Python's data model interface.
+- **`functools.total_ordering`**
+  - *What it is:* A class decorator.
+  - *Implementation:* `@total_ordering` placed above a class definition.
+  - *Its use:* Automatically supplies missing comparison methods if at least `__eq__` and one ordering method are defined.
+  - *Type:* Class decorator.
+  - *Responsibility:* Reduces boilerplate code for rich comparisons.
+  - *Depends on:* A class defining `__eq__` and one of `__lt__`, `__le__`, `__gt__`, or `__ge__`.
+  - *Connects to:* Injected into the class dictionary to provide missing comparison methods.
+  - *Shape:* Utility decorator in the `functools` standard library.
+- **`__add__`**
+  - *What it is:* A special method for addition.
+  - *Implementation:* `def __add__(self, other): ...` returning a new object.
+  - *Its use:* Used to define how two instances are added together.
+  - *Type:* Instance method.
+  - *Responsibility:* Evaluates `self + other`.
+  - *Depends on:* The object and the `other` operand.
+  - *Connects to:* Called by the `+` operator.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__len__`**
+  - *What it is:* A special method for length.
+  - *Implementation:* `def __len__(self): ...` returning an integer.
+  - *Its use:* Used to define the "size" or number of items in an object.
+  - *Type:* Instance method.
+  - *Responsibility:* Returns the length of the container.
+  - *Depends on:* The object's internal collection.
+  - *Connects to:* Called by the built-in `len()` function.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__iter__`**
+  - *What it is:* A special method for iteration.
+  - *Implementation:* `def __iter__(self): ...` returning an iterator.
+  - *Its use:* Used to define how to iterate over the object.
+  - *Type:* Instance method.
+  - *Responsibility:* Provides an iterator for the container.
+  - *Depends on:* The object's internal state.
+  - *Connects to:* Called by `for` loops, `iter()`, and functions like `list()`.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__getitem__`**
+  - *What it is:* A special method for indexing.
+  - *Implementation:* `def __getitem__(self, index): ...` returning a value.
+  - *Its use:* Used to access elements via `obj[index]`.
+  - *Type:* Instance method.
+  - *Responsibility:* Returns the item at the specified index or key.
+  - *Depends on:* The given index.
+  - *Connects to:* Called by the subscript operator `[]`.
+  - *Shape:* A standard part of Python's data model interface.
+- **`__enter__`** and **`__exit__`**
+  - *What it is:* Special methods for context management.
+  - *Implementation:* `def __enter__(self): ...` and `def __exit__(self, exc_type, exc_val, exc_tb): ...`.
+  - *Its use:* Used to define setup and teardown for `with` blocks.
+  - *Type:* Instance methods.
+  - *Responsibility:* Manage resources deterministically around a block of code.
+  - *Depends on:* Execution context.
+  - *Connects to:* Called automatically by the `with` statement.
+  - *Shape:* A standard part of Python's data model interface.
 
-**`Vector`**
-- What it is: A class representing a two-dimensional mathematical vector.
-- Implementation: `class Vector:`
-- Its use: Acts as the primary project code to demonstrate arithmetic, comparison, and container special methods.
-- Type: Class.
-- Responsibility: Holds x and y coordinates and implements mathematical vector operations.
-- Depends on: Numeric `x` and `y` coordinates provided at initialization.
-- Connects to: Python's arithmetic and comparison operators.
-- Shape: A standalone domain object representing mathematical data.
-
-**`Polynomial`**
-- What it is: A class representing a mathematical polynomial.
-- Implementation: `class Polynomial:`
-- Its use: Demonstrates container special methods and callable objects.
-- Type: Class.
-- Responsibility: Manages polynomial coefficients and computes values.
-- Depends on: A list of coefficients.
-- Connects to: Python's slicing, iteration, and function call syntaxes.
-- Shape: A standalone domain object representing a mathematical function.
-
-**`CountDown`**
-- What it is: A class representing a countdown sequence.
-- Implementation: `class CountDown:`
-- Its use: Demonstrates the iterator protocol.
-- Type: Class.
-- Responsibility: Maintains iteration state and yields decreasing values.
-- Depends on: A starting integer.
-- Connects to: Python's `for` loops and `list()` constructors.
-- Shape: An iterator object.
-
-**`ManagedFile`**
-- What it is: A class managing file resources safely.
-- Implementation: `class ManagedFile:`
-- Its use: Demonstrates the context manager protocol.
-- Type: Class.
-- Responsibility: Opens a file and ensures it is closed after a block of code executes.
-- Depends on: A filename and file mode.
-- Connects to: Python's `with` statement and the operating system's file handles.
-- Shape: A resource management wrapper.
-
-**`len()`**
-- What it is: A built-in Python function that returns the number of items in a container.
-- Implementation: `def len(obj, /):`
-- Its use: To compute the dimension or size of our custom objects.
-- Type: Built-in function.
-- Responsibility: Requests the length from an object by calling its `__len__` method.
-- Depends on: An object that implements `__len__`.
-- Connects to: The `__len__` method of the target object.
-- Shape: Public built-in utility.
-
-**`abs()`**
-- What it is: A built-in Python function that returns the absolute value or magnitude of a number.
-- Implementation: `def abs(x, /):`
-- Its use: To compute the magnitude of our `Vector`.
-- Type: Built-in function.
-- Responsibility: Requests the absolute value from an object by calling its `__abs__` method.
-- Depends on: An object that implements `__abs__`.
-- Connects to: The `__abs__` method of the target object.
-- Shape: Public built-in utility.
-
-**`bool()`**
-- What it is: A built-in Python function that returns the boolean truth value of an object.
-- Implementation: `class bool(x=False):`
-- Its use: To evaluate whether our custom objects are considered true or false.
-- Type: Built-in type/function.
-- Responsibility: Requests the truth value from an object by calling its `__bool__` method, falling back to `__len__`.
-- Depends on: An object.
-- Connects to: The `__bool__` or `__len__` methods of the target object.
-- Shape: Public built-in utility.
-
-**`hash()`**
-- What it is: A built-in Python function that returns the hash value of an object.
-- Implementation: `def hash(obj, /):`
-- Its use: To allow our custom objects to be used as dictionary keys or in sets.
-- Type: Built-in function.
-- Responsibility: Requests an integer hash from an object by calling its `__hash__` method.
-- Depends on: A hashable object.
-- Connects to: The `__hash__` method of the target object.
-- Shape: Public built-in utility.
-
-**`isinstance()`**
-- What it is: A built-in Python function that checks if an object is an instance or subclass of a class.
-- Implementation: `def isinstance(obj, class_or_tuple, /):`
-- Its use: To ensure safe comparisons in our `__eq__` method.
-- Type: Built-in function.
-- Responsibility: Validates the type of an object at runtime.
-- Depends on: An object and a class or tuple of classes.
-- Connects to: The object's type metadata.
-- Shape: Public built-in utility.
-
-**`callable()`**
-- What it is: A built-in Python function that returns True if the object appears callable.
-- Implementation: `def callable(obj, /):`
-- Its use: To verify that our object implementing `__call__` can be invoked as a function.
-- Type: Built-in function.
-- Responsibility: Inspects an object to see if it implements the `__call__` method.
-- Depends on: An object.
-- Connects to: The object's `__call__` method.
-- Shape: Public built-in utility.
-
-**`open()`**
-- What it is: A built-in Python function that opens a file and returns a file object.
-- Implementation: `def open(file, mode='r', ...):`
-- Its use: To acquire a file resource within our custom context manager.
-- Type: Built-in function.
-- Responsibility: Interacts with the operating system to open a file descriptor.
-- Depends on: A filepath and an access mode.
-- Connects to: The filesystem and OS file APIs.
-- Shape: System boundary function.
-
-## Concept Unit: Arithmetic Special Methods
+## Concept Unit: `__repr__` and `__str__` — string representations
 
 ### The Problem
-When you create a custom class representing mathematical entities, like a `Vector` with `x` and `y` coordinates, you often want to add them together. If you just write `v1 + v2`, Python will throw a `TypeError`, stating it doesn't know how to add two `Vector` objects. How do you tell Python that `+` should combine their `x` and `y` coordinates? What if you want to multiply a vector by a scalar number?
+When you print an object in Python, you often get a generic string like `<__main__.Point object at 0x...>`. If you want to log what's actually inside the object, this is useless. How can we make our object format itself nicely when printed, or precisely when debugged?
 
-### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating Python's unique special method protocols.
-- **Files affected**: `vector.py` (created).
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
-### The New Code
+### Introduce the concept in isolation
 ```python
-class Vector:
+class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
     def __repr__(self):
-        return f'Vector({self.x}, {self.y})'
+        return f'Point({self.x!r}, {self.y!r})'
 
-    def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
+    def __str__(self):
+        return f'({self.x}, {self.y})'
 
-    def __sub__(self, other):
-        return Vector(self.x - other.x, self.y - other.y)
+p = Point(3, 4)
+print(repr(p))   # Point(3, 4)
+print(str(p))    # (3, 4)
+print(p)         # (3, 4)
+```
+This proves that Python hooks the built-in functions `repr()`, `str()`, and `print()` directly to the **special methods** `__repr__` and `__str__` defined on the class. `__repr__` returns an unambiguous representation, while `__str__` returns a readable one.
 
-    def __mul__(self, scalar):
-        return Vector(self.x * scalar, self.y * scalar)
+### Discard the throwaway
+This isolated `Point` code is discarded and will not appear in our project.
 
-    def __rmul__(self, scalar):
-        return self.__mul__(scalar)
+### Project Change
+- **Reference Source**: No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `point.py` (created)
+- **Change type**: add
+- **Location**: brand-new file
+- **Dependencies**: None.
 
-    def __neg__(self):
-        return Vector(-self.x, -self.y)
+### The New Code
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        # Goal: unambiguous, ideally evaluable: eval(repr(p)) == p
+        return f'Point({self.x!r}, {self.y!r})'
+
+    def __str__(self):
+        # Goal: human-readable
+        return f'({self.x}, {self.y})'
 ```
 
 ### The Updated Project
 ```python
-# 1: class Vector:
-# 2:     def __init__(self, x, y):
-# 3:         self.x = x
-# 4:         self.y = y
-# 5: 
-# 6:     def __repr__(self):
-# 7:         return f'Vector({self.x}, {self.y})'
-# 8: 
-# 9:     def __add__(self, other):  # ← new
-# 10:        return Vector(self.x + other.x, self.y + other.y)  # ← new
-# 11:
-# 12:    def __sub__(self, other):  # ← new
-# 13:        return Vector(self.x - other.x, self.y - other.y)  # ← new
-# 14:
-# 15:    def __mul__(self, scalar):  # ← new
-# 16:        return Vector(self.x * scalar, self.y * scalar)  # ← new
-# 17:
-# 18:    def __rmul__(self, scalar):  # ← new
-# 19:        return self.__mul__(scalar)  # ← new
-# 20:
-# 21:    def __neg__(self):  # ← new
-# 22:        return Vector(-self.x, -self.y)  # ← new
+1: class Point:
+2:     def __init__(self, x, y):
+3:         self.x = x
+4:         self.y = y
+5: 
+6:     def __repr__(self): # ← new
+7:         # Goal: unambiguous, ideally evaluable: eval(repr(p)) == p
+8:         return f'Point({self.x!r}, {self.y!r})' # ← new
+9: 
+10:    def __str__(self): # ← new
+11:        # Goal: human-readable
+12:        return f'({self.x}, {self.y})' # ← new
 ```
-We now have a `Vector` class with standard coordinate initialization, string representation, and mathematical operations defined via special methods.
+We now have a class with dedicated methods for string formatting.
+
+### Mechanical walkthrough
+- `def __repr__(self):` defines the method called by `repr()`.
+- `return f'Point({self.x!r}, {self.y!r})'` uses an f-string to inject the values. The `!r` suffix specifically calls `repr()` on `self.x` and `self.y`, ensuring strings get quotes around them.
+- `def __str__(self):` defines the method called by `str()` and implicitly by `print()`.
+- `return f'({self.x}, {self.y})'` returns a purely human-readable format.
+
+### CS lens
+Data representation. Every system distinguishes between "how data is stored" and "how data is serialized for communication." This mirrors serialization formats like JSON, debugging views in IDEs, and logging payloads.
+
+### SE lens
+Separation of concerns for output. By having two different methods, Python explicitly acknowledges that developers need rigorous detail (for debugging and logging) and users need clean summaries (for display). We don't have to pollute one with the constraints of the other.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `Point(3, 4)` for `repr(p)` and `(3, 4)` for `str(p)`.
+
+### One sentence connecting to previous unit
+Now that we can display objects meaningfully, we need a way to compare them structurally instead of just by identity.
+
+## Concept Unit: `__eq__` and `__lt__` — comparison operators
+
+### The Problem
+If you create `Point(1, 2)` and another `Point(1, 2)`, Python considers them unequal by default because they occupy different memory addresses. How do we tell Python that equality should be based on their coordinates?
 
 ### Introduce the concept in isolation
 ```python
-v1 = Vector(1, 2)
-v2 = Vector(3, 4)
-print(v1 + v2)
-print(v1 - v2)
-print(v1 * 3)
-print(3 * v1)
-print(-v1)
+from functools import total_ordering
+
+@total_ordering
+class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __eq__(self, other):
+        if not isinstance(other, Point):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+    def __lt__(self, other):
+        return (self.x**2 + self.y**2) < (other.x**2 + other.y**2)
+
+    def __repr__(self):
+        return f'Point({self.x}, {self.y})'
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+p3 = Point(3, 4)
+print(p1 == p2)
+print(sorted([p3, p1, p2]))
 ```
+This proves that overriding **special methods** `__eq__` and `__lt__` completely redefines how `==` and sorting behave for these instances.
 
-Output:
-```text
-Vector(4, 6)
-Vector(-2, -2)
-Vector(3, 6)
-Vector(3, 6)
-Vector(-1, -2)
-```
-This proves that Python automatically translates the `+`, `-`, `*`, and `-` (unary) operators into calls to the corresponding **special methods (dunder methods)** like `__add__` and `__mul__`. For `3 * v1`, Python first tries `int.__mul__(3, v1)` which returns `NotImplemented`; Python then tries `v1.__rmul__(3)`. The `r` prefix stands for "reflected."
-
-### Discard the throwaway example
-The test variables and print statements are discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__add__`**: A special method called by Python when the `+` operator is used. It takes `self` and `other`, adds their respective `x` and `y` attributes, and returns a new `Vector`.
-- **`__sub__`**: A special method called by Python when the `-` operator is used. It subtracts the components and returns a new `Vector`.
-- **`__mul__`**: A special method called by Python when the `*` operator is used with the object on the left side. It multiplies the components by the given `scalar`.
-- **`__rmul__`**: A special method called by Python when the `*` operator is used and the left-hand operand does not support the operation with the right-hand operand. It handles reflected multiplication. Here, it simply delegates to `__mul__` since scalar multiplication is commutative.
-- **`__neg__`**: A special method called by Python when the unary `-` operator is placed before an object. It negates both coordinates.
-
-## Concept Unit: Comparison and Hashing
-
-### The Problem
-If you create two `Vector(1, 2)` objects, they represent the same mathematical vector. However, if you test `v1 == v2`, Python returns `False` by default because they are two distinct objects in memory. How do you teach Python that equality for vectors means having the same coordinates? How do you allow vectors to be used as keys in a dictionary?
+### Discard the throwaway
+This throwaway code is discarded.
 
 ### Project Change
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating Python's unique special method protocols.
-- **Files affected**: `vector.py` (modified).
-- **Change type**: Add.
-- **Location**: Inside `Vector` class, after `__neg__`.
-- **Dependencies**: The `math` module.
+- **Reference Source**: No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `point.py` (modified)
+- **Change type**: configure
+- **Location**: added directly into the `Point` class.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
     def __eq__(self, other):
-        if not isinstance(other, Vector):
+        if not isinstance(other, Point):
             return NotImplemented
         return self.x == other.x and self.y == other.y
 
-    def __abs__(self):
-        import math
-        return math.sqrt(self.x**2 + self.y**2)
-
-    def __bool__(self):
-        return self.x != 0 or self.y != 0
-
-    def __hash__(self):
-        return hash((self.x, self.y))
+    def __lt__(self, other):
+        # Compare by distance from origin
+        return (self.x**2 + self.y**2) < (other.x**2 + other.y**2)
 ```
 
 ### The Updated Project
 ```python
-# 21:    def __neg__(self):
-# 22:        return Vector(-self.x, -self.y)
-# 23:
-# 24:    def __eq__(self, other):  # ← new
-# 25:        if not isinstance(other, Vector):  # ← new
-# 26:            return NotImplemented  # ← new
-# 27:        return self.x == other.x and self.y == other.y  # ← new
-# 28:
-# 29:    def __abs__(self):  # ← new
-# 30:        import math  # ← new
-# 31:        return math.sqrt(self.x**2 + self.y**2)  # ← new
-# 32:
-# 33:    def __bool__(self):  # ← new
-# 34:        return self.x != 0 or self.y != 0  # ← new
-# 35:
-# 36:    def __hash__(self):  # ← new
-# 37:        return hash((self.x, self.y))  # ← new
+1: class Point:
+2:     def __init__(self, x, y):
+3:         self.x, self.y = x, y
+4: 
+5:     def __eq__(self, other): # ← new
+6:         if not isinstance(other, Point): # ← new
+7:             return NotImplemented # ← new
+8:         return self.x == other.x and self.y == other.y # ← new
+9: 
+10:    def __lt__(self, other): # ← new
+11:        # Compare by distance from origin
+12:        return (self.x**2 + self.y**2) < (other.x**2 + other.y**2) # ← new
+13: 
+14:    def __repr__(self):
+15:        return f'Point({self.x}, {self.y})'
 ```
-We have added methods to evaluate equality, absolute value (magnitude), truthiness, and a hash representation for our vector.
+The `Point` class now supports rich comparison operators natively.
+
+### Mechanical walkthrough
+- `def __eq__(self, other):` is called when `p1 == p2` is evaluated. `self` is `p1`, `other` is `p2`.
+- `if not isinstance(other, Point):` guards against comparing a `Point` to unrelated types like strings.
+- `return NotImplemented` tells Python to fall back to other comparison strategies or return `False`.
+- `return self.x == other.x and self.y == other.y` defines structural equality based on fields.
+- `def __lt__(self, other):` is called when `p1 < p2` is evaluated.
+- `return (self.x**2 + self.y**2) < (other.x**2 + other.y**2)` compares the squared distance from the origin for each point.
+
+### CS lens
+Value semantics vs. Reference semantics. By default, user-defined classes in Python use reference equality (memory address). Overriding `__eq__` switches the class to value equality, treating objects with identical data as mathematically identical.
+
+### SE lens
+Fail-safe typing. Returning `NotImplemented` instead of raising an error allows Python's operator resolution to attempt the comparison from the reverse direction (`other.__eq__(self)`) before cleanly giving up. It is cooperative rather than destructive.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `p1 == p2` evaluates to `True`. `sorted` yields `[Point(1, 2), Point(1, 2), Point(3, 4)]`.
+
+### One sentence connecting to previous unit
+If we can redefine comparison operators like `==`, we can also redefine mathematical operators like `+`.
+
+## Concept Unit: `__add__`, `__mul__`, `__len__` — arithmetic and sizing
+
+### The Problem
+If we have two vectors, mathematically we should be able to add them directly like `v1 + v2`. Python natively restricts `+` to numbers and strings. How do we teach the `+` operator to understand a custom `Vector` class?
 
 ### Introduce the concept in isolation
 ```python
-v1 = Vector(1, 2)
-v2 = Vector(1, 2)
-v3 = Vector(0, 0)
-print(v1 == v2)
-print(v1 is v2)
-print(abs(v1))
-print(bool(v3))
-if v1:
-    print('v1 is non-zero')
+class Vector:
+    def __init__(self, *components):
+        self.components = tuple(components)
+
+    def __add__(self, other):
+        return Vector(*(a + b for a, b in zip(self.components, other.components)))
+
+    def __mul__(self, scalar):
+        return Vector(*(x * scalar for x in self.components))
+
+    def __rmul__(self, scalar):
+        return self.__mul__(scalar)
+
+    def __len__(self):
+        return len(self.components)
+        
+v1 = Vector(1, 2, 3)
+print(v1 + Vector(4, 5, 6))
 ```
+This proves that by defining **special methods** for arithmetic (`__add__`, `__mul__`) and sizing (`__len__`), custom objects act identical to built-in numbers and collections.
 
-Output:
-```text
-True
-False
-2.23606797749979
-False
-v1 is non-zero
-```
-This proves that defining **special methods** for equality and absolute value allows `==` and `abs()` to work seamlessly. The `__bool__` method is used by `if obj:`, `while obj:`, and `bool(obj)`. If not defined, Python falls back to `__len__` (falsy if length is 0), and then to `True`.
-
-### Discard the throwaway example
-The test variables and print statements are discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__eq__`**: Called by the `==` operator. It first checks if `other` is a `Vector` using `isinstance()`. If not, it returns `NotImplemented`, signaling Python to try the right-hand object's equality logic. If it is a `Vector`, it compares coordinates.
-- **`__abs__`**: Called by the `abs()` built-in function. It computes the mathematical magnitude of the vector.
-- **`__bool__`**: Called when evaluating an object in a boolean context. Returns `True` if the vector is not the zero vector.
-- **`__hash__`**: Called by the `hash()` built-in function. By hashing a tuple of its immutable coordinate values, we allow `Vector` instances to be used as dictionary keys or stored in sets.
-
-## Concept Unit: Container Special Methods
-
-### The Problem
-If you write a class that stores a collection of items—like coefficients in a mathematical polynomial—you might want to access a specific item using `p[2]`, check the length with `len(p)`, or check if a value exists with `3 in p`. How do you make a custom class behave like a Python list or tuple?
+### Discard the throwaway
+This vector throwaway code is discarded.
 
 ### Project Change
-- **Reference Source**: No reference counterpart.
-- **Files affected**: `polynomial.py` (created).
-- **Change type**: Add.
-- **Location**: Top of file.
+- **Reference Source**: No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `vector.py` (created)
+- **Change type**: add
+- **Location**: brand-new file
 - **Dependencies**: None.
 
 ### The New Code
 ```python
-class Polynomial:
-    def __init__(self, coefficients):
-        self._coeffs = list(coefficients)
+class Vector:
+    def __init__(self, *components):
+        self.components = tuple(components)
+
+    def __add__(self, other):
+        if len(self) != len(other):
+            raise ValueError('Vectors must have same dimension')
+        return Vector(*(a + b for a, b in zip(self.components, other.components)))
+
+    def __mul__(self, scalar):
+        return Vector(*(x * scalar for x in self.components))
+
+    def __rmul__(self, scalar):  # scalar * vector
+        return self.__mul__(scalar)
 
     def __len__(self):
-        return len(self._coeffs)
-
-    def __getitem__(self, index):
-        return self._coeffs[index]
-
-    def __contains__(self, value):
-        return value in self._coeffs
+        return len(self.components)
 
     def __repr__(self):
-        terms = [f'{c}x^{i}' for i, c in enumerate(self._coeffs)]
-        return ' + '.join(terms)
+        return f'Vector{self.components}'
 ```
 
 ### The Updated Project
 ```python
-# 1: class Polynomial:
-# 2:     def __init__(self, coefficients):
-# 3:         self._coeffs = list(coefficients)
-# 4: 
-# 5:     def __len__(self):  # ← new
-# 6:         return len(self._coeffs)  # ← new
-# 7: 
-# 8:     def __getitem__(self, index):  # ← new
-# 9:         return self._coeffs[index]  # ← new
-# 10:
-# 11:    def __contains__(self, value):  # ← new
-# 12:        return value in self._coeffs  # ← new
-# 13:
-# 14:    def __repr__(self):
-# 15:        terms = [f'{c}x^{i}' for i, c in enumerate(self._coeffs)]
-# 16:        return ' + '.join(terms)
+1: class Vector: # ← new
+2:     def __init__(self, *components): # ← new
+3:         self.components = tuple(components) # ← new
+4: 
+5:     def __add__(self, other): # ← new
+6:         if len(self) != len(other): # ← new
+7:             raise ValueError('Vectors must have same dimension') # ← new
+8:         return Vector(*(a + b for a, b in zip(self.components, other.components))) # ← new
+9: 
+10:    def __mul__(self, scalar): # ← new
+11:        return Vector(*(x * scalar for x in self.components)) # ← new
+12: 
+13:    def __rmul__(self, scalar):  # scalar * vector # ← new
+14:        return self.__mul__(scalar) # ← new
+15: 
+16:    def __len__(self): # ← new
+17:        return len(self.components) # ← new
+18: 
+19:    def __repr__(self): # ← new
+20:        return f'Vector{self.components}' # ← new
 ```
-The `Polynomial` class now acts like a sequence because it defines the necessary special methods to report its length, retrieve items by index, and check for membership.
+We now have a mathematically functional vector.
+
+### Mechanical walkthrough
+- `def __add__(self, other):` binds to the `+` operator.
+- `len(self) != len(other)` checks dimensions by implicitly calling `self.__len__()`.
+- `Vector(*(a + b for a, b in zip(self.components, other.components)))` pairwise-adds the elements and unpacks them into a new `Vector` instance.
+- `def __mul__(self, scalar):` binds to `*` when the vector is on the left (`v * 3`).
+- `def __rmul__(self, scalar):` binds to `*` when the vector is on the right (`3 * v`). Python tries `3.__mul__(v)`, fails, and falls back to `v.__rmul__(3)`.
+- `def __len__(self):` binds to the built-in `len()` function, delegating to the tuple's length.
+
+### CS lens
+Operator overloading. By enabling user types to participate in native language syntax (like `+` or `len`), languages reduce boilerplate function calls (`v1.add(v2)`) and increase readability for domains like math and graphics.
+
+### SE lens
+Immutability. `__add__` and `__mul__` return entirely new `Vector` instances rather than modifying `self`. This prevents side effects when passing vectors around the system.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `v1 + v2` creates `Vector(5, 7, 9)`. `len(v1)` yields `3`.
+
+### One sentence connecting to previous unit
+Beyond arithmetic, collections also need to support being looped over.
+
+## Concept Unit: `__iter__` and `__getitem__` — iteration protocol
+
+### The Problem
+If we have a custom range of numbers, how do we make `for x in my_range:` work? Python's `for` loop doesn't inherently know how to get the "next" item from a custom class.
 
 ### Introduce the concept in isolation
 ```python
-p = Polynomial([1, 0, 3, -2])
-print(len(p))
-print(p[0])
-print(p[2])
-print(p[1:3])
-print(3 in p)
-print(5 in p)
-for coeff in p:
-    print(coeff)
-```
-
-Output:
-```text
-4
-1
-3
-[0, 3]
-True
-False
-1
-0
-3
--2
-```
-This proves that once you implement `__len__` and `__getitem__`, Python gives you iteration (`for`), `list()`, `sum()`, `min()`, `max()`, `in` (via `__contains__` if defined, else falling back to iteration), and slicing for free. Slicing passes a `slice` object to `__getitem__`, which our underlying list handles natively.
-
-### Discard the throwaway example
-The testing logic is discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__len__`**: Called by `len()`. Delegates to the length of the internal list.
-- **`__getitem__`**: Called by square bracket notation `[]` for both single indexing and slicing. Delegates directly to the internal list.
-- **`__contains__`**: Called by the `in` operator. Checks if a value exists within the internal list.
-- **Iteration**: Because `__getitem__` is implemented, Python can automatically iterate over the object by requesting indexes 0, 1, 2, until an `IndexError` is raised.
-
-## Concept Unit: Callable Instances
-
-### The Problem
-Sometimes an object fundamentally represents an action or a mathematical function. In our case, a polynomial is mathematically evaluated at a given `x`. Instead of writing `p.evaluate(2)`, it is more natural to write `p(2)`. How do we make an instance object executable like a function?
-
-### Project Change
-- **Reference Source**: No reference counterpart.
-- **Files affected**: `polynomial.py` (modified).
-- **Change type**: Add.
-- **Location**: Inside `Polynomial` class, at the bottom.
-- **Dependencies**: None.
-
-### The New Code
-```python
-    def __call__(self, x):
-        result = 0
-        for coeff in reversed(self._coeffs):
-            result = result * x + coeff
-        return result
-```
-
-### The Updated Project
-```python
-# 14:    def __repr__(self):
-# 15:        terms = [f'{c}x^{i}' for i, c in enumerate(self._coeffs)]
-# 16:        return ' + '.join(terms)
-# 17:
-# 18:    def __call__(self, x):  # ← new
-# 19:        result = 0  # ← new
-# 20:        for coeff in reversed(self._coeffs):  # ← new
-# 21:            result = result * x + coeff  # ← new
-# 22:        return result  # ← new
-```
-We have added the `__call__` method which uses **Horner's method** to evaluate the polynomial at a given value of `x`.
-
-### Introduce the concept in isolation
-```python
-p = Polynomial([1, 0, 3, -2])
-print(p(0))
-print(p(1))
-print(p(2))
-print(callable(p))
-```
-
-Output:
-```text
-1
-2
--3
-True
-```
-This proves that implementing `__call__` makes an instance usable as a function, making it a **callable** object. For `p(2)`, Python calls `p.__call__(2)`, which returns `-3` (calculated as `1 + 0 + 12 - 16 = -3`).
-
-### Discard the throwaway example
-The test variables are discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__call__`**: A special method that allows instances to be invoked like functions using parentheses. Here, it accepts an argument `x`.
-- **Horner's method logic**: Evaluates the polynomial efficiently by keeping a running result, multiplying by `x`, and adding coefficients starting from the highest degree.
-
-## Concept Unit: Iterators
-
-### The Problem
-We saw that defining `__getitem__` gives free iteration. But what if your sequence doesn't have an index, or isn't backed by a list? What if it generates values on the fly, like a countdown? How do you hook directly into Python's `for` loop mechanics?
-
-### Project Change
-- **Reference Source**: No reference counterpart.
-- **Files affected**: `countdown.py` (created).
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
-### The New Code
-```python
-class CountDown:
-    def __init__(self, start):
-        self._start = start
-        self._current = start
+class NumberRange:
+    def __init__(self, start, stop):
+        self.start, self.stop = start, stop
 
     def __iter__(self):
-        self._current = self._start
-        return self
+        current = self.start
+        while current < self.stop:
+            yield current
+            current += 1
 
-    def __next__(self):
-        if self._current < 0:
-            raise StopIteration
-        value = self._current
-        self._current -= 1
-        return value
+r = NumberRange(3, 8)
+print(list(r))
 ```
+This proves that by yielding values via the **special method** `__iter__`, an object acts as an iterable sequence.
 
-### The Updated Project
-```python
-# 1: class CountDown:
-# 2:     def __init__(self, start):
-# 3:         self._start = start
-# 4:         self._current = start
-# 5: 
-# 6:     def __iter__(self):  # ← new
-# 7:         self._current = self._start  # ← new
-# 8:         return self  # ← new
-# 9: 
-# 10:    def __next__(self):  # ← new
-# 11:        if self._current < 0:  # ← new
-# 12:            raise StopIteration  # ← new
-# 13:        value = self._current  # ← new
-# 14:        self._current -= 1  # ← new
-# 15:        return value  # ← new
-```
-We created a class that follows the iterator protocol by implementing both `__iter__` and `__next__`.
-
-### Introduce the concept in isolation
-```python
-cd = CountDown(3)
-for n in cd:
-    print(n)
-
-print(list(cd))
-```
-
-Output:
-```text
-3
-2
-1
-0
-[3, 2, 1, 0]
-```
-This proves how an **iterator** works. When the `for` loop begins, it calls `__iter__` to get an iterator object. In this case, `__iter__` resets the countdown and returns `self`. The loop repeatedly calls `__next__` to get values until `StopIteration` is raised. Since `__iter__` resets the internal state, we can iterate over the same object multiple times (as shown by `list(cd)` working right after).
-
-### Discard the throwaway example
-The loop and list output test are discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__iter__`**: Called to initiate iteration. Must return an **iterator** object. Here, it resets `_current` and returns `self` (since the object itself acts as the iterator).
-- **`__next__`**: Called to produce the next value in the sequence. Once no values remain, it must raise a `StopIteration` exception to signal the end of the loop.
-- **`StopIteration`**: A built-in exception specifically designed to signal the end of an iteration stream.
-
-## Concept Unit: Context Managers
-
-### The Problem
-When dealing with external resources—like files, network sockets, or database connections—you must ensure they are closed or released when you're done. If an exception occurs during processing, the cleanup step might be skipped. How do you hook into Python's `with` statement to guarantee setup and teardown?
+### Discard the throwaway
+This throwaway code is discarded.
 
 ### Project Change
-- **Reference Source**: No reference counterpart.
-- **Files affected**: `managed_file.py` (created).
-- **Change type**: Add.
-- **Location**: Top of file.
+- **Reference Source**: No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `range.py` (created)
+- **Change type**: add
+- **Location**: brand-new file
 - **Dependencies**: None.
 
 ### The New Code
 ```python
-class ManagedFile:
-    def __init__(self, filename, mode='r'):
-        self.filename = filename
-        self.mode = mode
-        self.file = None
+class NumberRange:
+    def __init__(self, start, stop):
+        self.start = start
+        self.stop = stop
 
-    def __enter__(self):
-        self.file = open(self.filename, self.mode)
-        return self.file
+    def __iter__(self):
+        current = self.start
+        while current < self.stop:
+            yield current         # generator: one value at a time
+            current += 1
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.file:
-            self.file.close()
-        return False
-```
+    def __contains__(self, item):
+        return self.start <= item < self.stop
 
-### The Updated Project
-```python
-# 1: class ManagedFile:
-# 2:     def __init__(self, filename, mode='r'):
-# 3:         self.filename = filename
-# 4:         self.mode = mode
-# 5:         self.file = None
-# 6: 
-# 7:     def __enter__(self):  # ← new
-# 8:         self.file = open(self.filename, self.mode)  # ← new
-# 9:         return self.file  # ← new
-# 10:
-# 11:    def __exit__(self, exc_type, exc_val, exc_tb):  # ← new
-# 12:        if self.file:  # ← new
-# 13:            self.file.close()  # ← new
-# 14:        return False  # ← new
-```
-We define a **context manager** that safely opens a file in `__enter__` and guarantees it will be closed in `__exit__`.
-
-### Introduce the concept in isolation
-```python
-with ManagedFile('test.txt', 'w') as f:
-    f.write('Hello from context manager!')
-
-print(f.closed)
-```
-
-Output:
-```text
-True
-```
-This proves that `with ManagedFile(...) as f:` calls `ManagedFile.__enter__()`, which opens the file and returns it. `f` is bound to the return value. On exit, `__exit__` is called, closing the file.
-
-### Discard the throwaway example
-The file write block and printing is discarded and will not appear in the project again.
-
-### Mechanical walkthrough
-- **`__enter__`**: A special method executed when execution enters the `with` block. It allocates resources and its return value is bound to the variable in the `as` clause.
-- **`__exit__`**: A special method executed when execution leaves the `with` block, regardless of whether it left normally or via an exception. It receives exception information (`exc_type`, `exc_val`, `exc_tb`) which are all `None` if no exception occurred.
-- **Return False in `__exit__`**: Returning `False` (or `None`) allows any exception raised within the `with` block to propagate normally. Returning `True` would suppress the exception.
-
-## Concept Unit: The Full Vector Class
-
-### The Problem
-We built multiple powerful special methods across previous units. How do they look when combined into a single, comprehensive domain object representing a mathematical vector that supports arithmetic, sequence unpacking, dimension checking, and callable operations?
-
-### Project Change
-- **Reference Source**: No reference counterpart.
-- **Files affected**: `vector.py` (modified).
-- **Change type**: Refactor/Add.
-- **Location**: Throughout the `Vector` class.
-- **Dependencies**: None.
-
-### The New Code
-```python
     def __len__(self):
-        return 2
+        return max(0, self.stop - self.start)
 
     def __getitem__(self, index):
-        return (self.x, self.y)[index]
-
-    def __iter__(self):
-        yield self.x
-        yield self.y
-
-    def __call__(self, other):
-        # Compute dot product
-        return self.x * other.x + self.y * other.y
+        if index < 0 or index >= len(self):
+            raise IndexError(index)
+        return self.start + index
 ```
 
 ### The Updated Project
 ```python
-# 1: class Vector:
-# 2:     def __init__(self, x, y):
-# 3:         self.x = x
-# 4:         self.y = y
-# 5: 
-# ... (existing arithmetic and comparison methods) ...
-# 37:    def __hash__(self):
-# 38:        return hash((self.x, self.y))
-# 39:
-# 40:    def __len__(self):  # ← new
-# 41:        return 2  # ← new
-# 42:
-# 43:    def __getitem__(self, index):  # ← new
-# 44:        return (self.x, self.y)[index]  # ← new
-# 45:
-# 46:    def __iter__(self):  # ← new
-# 47:        yield self.x  # ← new
-# 48:        yield self.y  # ← new
-# 49:
-# 50:    def __call__(self, other):  # ← new
-# 51:        return self.x * other.x + self.y * other.y  # ← new
+1: class NumberRange: # ← new
+2:     def __init__(self, start, stop): # ← new
+3:         self.start = start # ← new
+4:         self.stop = stop # ← new
+5: 
+6:     def __iter__(self): # ← new
+7:         current = self.start # ← new
+8:         while current < self.stop: # ← new
+9:             yield current         # generator: one value at a time # ← new
+10:            current += 1 # ← new
+11: 
+12:    def __contains__(self, item): # ← new
+13:        return self.start <= item < self.stop # ← new
+14: 
+15:    def __len__(self): # ← new
+16:        return max(0, self.stop - self.start) # ← new
+17: 
+18:    def __getitem__(self, index): # ← new
+19:        if index < 0 or index >= len(self): # ← new
+20:            raise IndexError(index) # ← new
+21:        return self.start + index # ← new
 ```
-We integrated `__len__`, `__getitem__`, `__iter__`, and `__call__` into `Vector` to make it a fully-featured sequence and mathematical operator.
+We now have a custom container that fully integrates with iteration and indexing.
+
+### Mechanical walkthrough
+- `def __iter__(self):` binds to `iter()`, which is called implicitly by `for` loops.
+- `yield current` turns `__iter__` into a **Generator**. It pauses execution, returns `current`, and resumes from that spot on the next loop iteration.
+- `def __contains__(self, item):` binds to the `in` operator (e.g., `5 in r`).
+- `def __getitem__(self, index):` binds to the bracket syntax `r[index]`.
+- `raise IndexError(index)` adheres to Python's contract: invalid indices must raise an `IndexError` to stop implicit iterations appropriately.
+
+### CS lens
+Lazy Evaluation. The `NumberRange` does not allocate memory for a list of numbers. It computes them only exactly when asked, via the generator, saving unbounded memory overhead.
+
+### SE lens
+Adhering to interfaces without inheritance. Python relies on "duck typing". `NumberRange` doesn't need to inherit from `List` or `Iterable` base classes; simply implementing `__iter__` and `__getitem__` is enough for Python to treat it as a full-fledged collection.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `list(r)` creates `[3, 4, 5, 6, 7]`. `5 in r` evaluates to `True`. `r[2]` yields `5`.
+
+### One sentence connecting to previous unit
+Beyond data representation and operations, we can also manage execution contexts around our code.
+
+## Concept Unit: `__enter__` and `__exit__` — context managers
+
+### The Problem
+When you open a file, you must close it, even if an error occurs while reading it. The `with open(...) as f:` syntax guarantees this cleanup. How do we create our own objects that safely setup and teardown resources automatically in a `with` block?
 
 ### Introduce the concept in isolation
 ```python
-v1 = Vector(2, 3)
-v2 = Vector(4, 5)
+class Timer:
+    import time as _time
+    def __enter__(self):
+        self.start = self._time.perf_counter()
+        return self
 
-print(len(v1))
-print(v1[0])
-for coord in v1:
-    print(coord)
-print(v1(v2))  # Dot product
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.elapsed = self._time.perf_counter() - self.start
+        print(f'Elapsed: {self.elapsed:.4f}s')
+        return False
+
+import time
+with Timer() as t:
+    time.sleep(0.1)
+```
+This proves that the **special methods** `__enter__` and `__exit__` hook directly into the lifecycle of a `with` statement, executing predictably before and after the block.
+
+### Discard the throwaway
+This throwaway timer code is discarded.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a standalone theory lesson.
+- **Files affected**: `timer.py` (created)
+- **Change type**: add
+- **Location**: brand-new file
+- **Dependencies**: None.
+
+### The New Code
+```python
+class Timer:
+    import time as _time
+
+    def __enter__(self):
+        self.start = self._time.perf_counter()
+        return self                 # bound to 'as' variable
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.elapsed = self._time.perf_counter() - self.start
+        print(f'Elapsed: {self.elapsed:.4f}s')
+        return False  # False: don't suppress exceptions
 ```
 
-Output:
-```text
-2
-2
-2
-3
-23
+### The Updated Project
+```python
+1: class Timer: # ← new
+2:     import time as _time # ← new
+3: 
+4:     def __enter__(self): # ← new
+5:         self.start = self._time.perf_counter() # ← new
+6:         return self                 # bound to 'as' variable # ← new
+7: 
+8:     def __exit__(self, exc_type, exc_val, exc_tb): # ← new
+9:         self.elapsed = self._time.perf_counter() - self.start # ← new
+10:        print(f'Elapsed: {self.elapsed:.4f}s') # ← new
+11:        return False  # False: don't suppress exceptions # ← new
 ```
-This proves that by defining sequence and callable special methods on our `Vector`, it integrates fully into Python's native toolset. The `Vector` now has a dimension of 2, allows indexed access to its coordinates, can be iterated over unpacking `x` then `y`, and acts as a function to compute a mathematical dot product.
-
-### Discard the throwaway example
-The test variables are discarded and will not appear in the project again.
+We have a custom context manager for profiling code duration safely.
 
 ### Mechanical walkthrough
-- **`__len__`**: Hardcoded to return 2 since this is a two-dimensional vector.
-- **`__getitem__`**: Creates a temporary tuple `(self.x, self.y)` and indexes into it, cleanly mapping `0` to `x` and `1` to `y`.
-- **`__iter__`**: Uses the `yield` keyword to return an iterator that yields `x` first, then `y`. This allows `v1` to be unpacked like `x, y = v1`.
-- **`__call__`**: Now calculates the dot product between this vector and another vector.
+- `def __enter__(self):` is called exactly when the `with Timer() as t:` block begins.
+- `return self` specifies that the returned value is assigned to `t`, the variable named after `as`.
+- `def __exit__(self, exc_type, exc_val, exc_tb):` is called exactly when the block ends, regardless of success or failure.
+- `exc_type, exc_val, exc_tb` hold exception information if an error occurred inside the `with` block.
+- `return False` tells Python not to silently suppress exceptions, allowing them to propagate up normally.
 
----
+### CS lens
+Resource acquisition is initialization (RAII). This pattern ensures that resources (locks, files, sockets, or timers) are tied inextricably to the lifespan of an object, guaranteeing cleanup upon destruction.
 
-Special methods make your classes first-class citizens in Python's ecosystem — they work with all built-in functions and operators. Lesson 26 covers polymorphism and duck typing. 
+### SE lens
+Deterministic teardown. By embedding teardown directly into `__exit__`, the caller physically cannot forget to invoke it. The API protects itself against misuse.
 
-**Exercises:** 
-1. Implement `__lt__` (less-than by magnitude), `__le__`, `__gt__`, and `__ge__` on `Vector` so they can be sorted.
-2. Implement a `Matrix` class with `__add__`, `__mul__` (matrix product), `__getitem__`, and `__repr__`.
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: The output will print approximately `Elapsed: 0.1001s`.
+
+### One sentence connecting to previous unit
+These dunder methods all serve to make our classes feel natively integrated with Python.
+
+## Closing
+
+### Connect the pieces
+Let's trace a `Vector(1, 2, 3)` through these concepts:
+- **`__repr__`**: If we inspect the vector, `Vector(1, 2, 3)` is clearly logged.
+- **`__add__`**: If we calculate `Vector(1, 2, 3) + Vector(4, 5, 6)`, `__add__` yields a new Vector instance `Vector(5, 7, 9)`.
+- **`__mul__`**: If we do `3 * Vector(1, 2, 3)`, `__rmul__` catches the reverse operation and calls `__mul__`, returning `Vector(3, 6, 9)`.
+- **`__len__`**: We can call `len(Vector(1, 2, 3))` directly, and `__len__` returns `3`.
+- **`__iter__`**: Though we didn't add it to `Vector` above, if we implemented `__iter__` to yield components, we could do `for component in Vector(1, 2, 3):`.
+
+Python's data model uses methods starting and ending with double underscores to integrate your objects with the language syntax. Overriding them transforms a basic class into a native citizen of the Python environment.

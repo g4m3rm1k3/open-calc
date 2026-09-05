@@ -1,186 +1,207 @@
 # Lesson 34: Dynamic Programming — Memoization and Tabulation
 
-What you will build
-The reader will understand dynamic programming (DP) as the technique for problems with OVERLAPPING subproblems: solve each subproblem once, cache the result, look it up when needed again. They will implement top-down (memoization) and bottom-up (tabulation) DP for Fibonacci, rod cutting, and longest common subsequence. The transferable problems: (1) DP applies when a problem has OPTIMAL SUBSTRUCTURE (the optimal solution uses optimal solutions to subproblems) and OVERLAPPING SUBPROBLEMS (the same subproblems recur); (2) top-down DP (memoization) adds a cache to a recursive solution; bottom-up DP (tabulation) computes subproblems iteratively in the right order; (3) DP often transforms O(2^n) or O(n^2) exponential to O(n) or O(n^2) polynomial.
+What you will build: The reader understands dynamic programming (DP): the technique of caching results of overlapping subproblems to avoid redundant computation. They implement both top-down DP (memoization) and bottom-up DP (tabulation) for Fibonacci and the coin change problem. The transferable insight: DP applies when: (1) the problem has OVERLAPPING SUBPROBLEMS (same sub-inputs computed multiple times) and (2) OPTIMAL SUBSTRUCTURE (optimal solution built from optimal sub-solutions). If both hold, caching turns exponential into polynomial.
 
-What you need to know first
-- Lessons 0–33
+What you need to know first: Lessons 00-33.
 
-Terms used in this lesson
-- **Dynamic Programming** — A method for solving complex problems by breaking them down into simpler subproblems, solving each of those subproblems just once, and storing their solutions. This exists to avoid the exponential time complexity of recomputing overlapping subproblems.
-- **Memoization** — An optimization technique used primarily to speed up computer programs by storing the results of expensive function calls and returning the cached result when the same inputs occur again. This is a top-down approach to DP.
-- **Tabulation** — A bottom-up approach to dynamic programming where a table is built iteratively to store the results of subproblems from the smallest to the largest, avoiding the overhead of recursive call stacks.
-- **Overlapping Subproblems** — A property of a problem where any recursive algorithm solving the problem solves the same subproblems over and over, rather than generating new subproblems. DP is designed to take advantage of this property.
-- **Optimal Substructure** — A property of a problem where its optimal solution can be constructed efficiently from optimal solutions of its subproblems. This is the foundation that makes recursive definitions (and thus DP) possible.
+## Terms used in this lesson
+- **Dynamic Programming (DP)** — The technique of caching results of overlapping subproblems to avoid redundant computation. It solves complex problems by breaking them down into simpler subproblems.
+- **Overlapping Subproblems** — When a recursive algorithm visits the same subproblems repeatedly. Caching prevents this redundancy.
+- **Optimal Substructure** — When an optimal solution to a larger problem can be built efficiently from optimal solutions to its subproblems.
+- **Memoization** — A top-down dynamic programming approach that recursively solves a problem while caching the results of expensive function calls to return the cached result when the same inputs occur again.
+- **Tabulation** — A bottom-up dynamic programming approach that iteratively solves all subproblems from smallest to largest, storing their answers in a table to compute the final solution.
+- **Greedy Algorithm** — An algorithm that makes a locally optimal choice at each step with the hope of finding a global optimum. It is fast but may fail to find the optimal solution if the problem does not possess the greedy-choice property.
 
-Objects and methods used
+## Objects and methods used
 
-- **`dict`**
-  - What it is: A built-in Python dictionary type.
-  - Implementation: Hash map.
-  - Its use: To cache results of subproblems in memoization.
-  - Type: Class.
-  - Responsibility: Store key-value pairs with O(1) average time complexity for lookups and insertions.
-  - Depends on: Hashable keys.
-  - Connects to: Recursive function calls that check the dictionary before computing.
-  - Shape: Internal implementation detail for caching.
+**`sys.setrecursionlimit`**
+- *What it is:* A function to set the maximum depth of the Python interpreter stack.
+- *Implementation:* `def setrecursionlimit(limit: int) -> None`
+- *Its use:* Used to increase the recursion limit to accommodate deep recursive calls in naive or memoized implementations before they hit a `RecursionError`.
+- *Type:* A built-in function in the `sys` module.
+- *Responsibility:* Controls the maximum depth of the Python call stack to prevent infinite recursion from crashing the interpreter in C.
+- *Depends on:* An integer representing the new maximum stack depth.
+- *Connects to:* Modifies internal Python runtime state.
+- *Shape:* A global configuration boundary for the runtime environment.
 
-- **`functools.lru_cache`**
-  - What it is: A decorator to wrap a function with a memoizing callable that saves up to the maxsize most recent calls.
-  - Implementation: Python decorator.
-  - Its use: To automatically memoize recursive functions without managing a cache dictionary manually.
-  - Type: Function / Decorator.
-  - Responsibility: Cache function return values based on arguments to prevent redundant execution.
-  - Depends on: Hashable arguments of the decorated function.
-  - Connects to: The function it decorates and the caller of that function.
-  - Shape: Public API wrapper around a function.
+**`functools.lru_cache`**
+- *What it is:* A decorator that wraps a function with a memoizing callable that saves up to the `maxsize` most recent calls.
+- *Implementation:* `@lru_cache(maxsize=128, typed=False)`
+- *Its use:* Used as an out-of-the-box memoization mechanism for recursive functions to instantly turn them into top-down DP solutions without manual cache management.
+- *Type:* A decorator function from the standard library `functools` module.
+- *Responsibility:* Intercepts function calls, checks if the result for the given arguments is already cached, and either returns the cached result or computes and stores it.
+- *Depends on:* The function it decorates and the arguments passed to that function (which must be hashable).
+- *Connects to:* Sits between the caller and the decorated function, maintaining an internal dictionary for the cache.
+- *Shape:* A wrapper at the function definition boundary.
 
-- **`time.time`**
-  - What it is: A function that returns the time in seconds since the epoch as a floating point number.
-  - Implementation: Built-in C function in Python's `time` module.
-  - Its use: To measure the execution time of algorithms to compare performance.
-  - Type: Function.
-  - Responsibility: Provide the current system time to enable duration measurements.
-  - Depends on: System clock.
-  - Connects to: Timing blocks around function calls in our diagnostic scripts.
-  - Shape: Diagnostic tool.
+**`dict`**
+- *What it is:* Python's built-in dictionary type, a hash map.
+- *Implementation:* `class dict(**kwarg)`
+- *Its use:* Used to manually build a cache for memoization, storing input parameters as keys and computed results as values.
+- *Type:* A built-in class.
+- *Responsibility:* Stores key-value pairs with O(1) average time complexity for lookups and insertions.
+- *Depends on:* Hashable keys.
+- *Connects to:* Used internally by memoized functions to store and retrieve past results.
+- *Shape:* An internal data structure for state storage.
 
-- **`max`**
-  - What it is: A built-in Python function that returns the largest item in an iterable or the largest of two or more arguments.
-  - Implementation: Built-in Python function.
-  - Its use: To find the maximum value among different subproblem choices.
-  - Type: Function.
-  - Responsibility: Compare items and return the largest one.
-  - Depends on: Comparable arguments.
-  - Connects to: Value comparisons in recurrence relations during DP.
-  - Shape: Core logic component in finding optimal substructure.
+**`list`**
+- *What it is:* Python's built-in mutable sequence type.
+- *Implementation:* `class list([iterable])`
+- *Its use:* Used to create the table in the tabulation (bottom-up) approach, storing solutions to subproblems sequentially.
+- *Type:* A built-in class.
+- *Responsibility:* Maintains an ordered, mutable sequence of items with O(1) time complexity for index-based access.
+- *Depends on:* The items placed into it.
+- *Connects to:* Used iteratively to build up solutions from base cases to the final answer.
+- *Shape:* An internal data structure for linear state storage.
 
-## Concept Unit: The problem with naive recursion — repeated computation
+**`float('inf')`**
+- *What it is:* A representation of positive infinity in Python.
+- *Implementation:* `float(x: str)`
+- *Its use:* Used to initialize the DP table with a maximum impossible value when seeking a minimum (like minimum coin change).
+- *Type:* A float object.
+- *Responsibility:* Acts as an upper bound that is greater than any other finite numeric value.
+- *Depends on:* Built-in numeric type handling.
+- *Connects to:* Compared against computed minimums to iteratively refine the best solution.
+- *Shape:* A sentinel constant value for algorithms.
+
+## Concept Unit: The overlapping subproblems problem
 
 ### The Problem
-When we solve problems recursively, such as calculating the Fibonacci sequence, we often define the solution in terms of smaller versions of the exact same problem. The problem is that many of these smaller subproblems are identical. Without a way to remember past work, a naive recursive algorithm will recompute the same answers over and over again, leading to an exponential explosion in function calls and execution time. How can we demonstrate exactly how much wasted effort occurs? 
+Why does calculating Fibonacci numbers naively take so long? What happens if you try to calculate `fib(40)` using the standard mathematical recurrence? If you draw out the function calls for `fib(5)`, how many times do you see `fib(2)` being evaluated from scratch?
 
 ### Introduce the concept in isolation
-We will write a naive recursive Fibonacci function and wrap it with execution time and call-count tracking to see the exponential growth in action.
-
 ```python
-import time
+import sys
+sys.setrecursionlimit(10000)
 
-# A global variable to track how many times the function is called
 call_count = 0
 
-def fib_counted(n):
+def fib_naive(n):
     global call_count
     call_count += 1
     if n <= 1:
         return n
-    return fib_counted(n-1) + fib_counted(n-2)
+    return fib_naive(n-1) + fib_naive(n-2)
 
-start = time.time()
-result = fib_counted(20)
-end = time.time()
-
-print(f"fib(20) = {result}")
-print(f"Time taken: {end - start:.4f} seconds")
-print(f"Function called {call_count} times")
+for n in [10, 20, 30]:
+    call_count = 0
+    result = fib_naive(n)
+    print(f'fib({n})={result}, calls={call_count}')
+# fib(10)=55, calls=177
+# fib(20)=6765, calls=21891
+# fib(30)=832040, calls=2692537
+# calls grow as ~2^n: fib(6) is computed MANY times
 ```
+Trace `fib_naive(5)`: calls `fib(4)+fib(3)`. `fib(4)` calls `fib(3)+fib(2)`. `fib(3)` called TWICE. `fib(2)` called THREE times. Redundant: same inputs, same outputs, recomputed. This proves that an algorithm with **overlapping subproblems** will perform redundant work, driving execution time up exponentially.
 
-Output:
-```text
-fib(20) = 6765
-Time taken: 0.0020 seconds
-Function called 21891 times
-```
-
-This output proves that to compute `fib(20)`, the function had to be called 21,891 times. If we traced the full call tree for `fib(5)`, we would see `fib(3)` computed twice and `fib(2)` computed three times. This is the hallmark of **Overlapping Subproblems**. The number of calls grows at an O(2^n) exponential rate.
-
-### Discard the throwaway example
-We discard this tracking implementation. The naive recursive approach with global counters is just a diagnostic tool; it will not appear in our final solutions.
+### Discard the throwaway
+This naive overlapping implementation is deleted and will not appear in the project again.
 
 ### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `fibonacci.py` (created)
-- Change type: Add
-- Location: N/A
-- Dependencies: Python 3
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are demonstrating algorithmic performance differences standalone.
+- **Files affected:** `dynamic_programming.py` (created)
+- **Change type:** Add
+- **Location:** At the top of the file
+- **Dependencies:** None
 
 ### The New Code
 ```python
-import time
+import sys
+sys.setrecursionlimit(10000)
+
+call_count = 0
 
 def fib_naive(n):
+    global call_count
+    call_count += 1
     if n <= 1:
         return n
     return fib_naive(n-1) + fib_naive(n-2)
-
-start = time.time()
-print(fib_naive(35))
-print(f'Time: {time.time()-start:.3f}s')
 ```
 
 ### The Updated Project
 ```python
-# 1: import time
-# 2: 
-# 3: def fib_naive(n):
-# 4:     if n <= 1:
-# 5:         return n
-# 6:     return fib_naive(n-1) + fib_naive(n-2)
-# 7: 
-# 8: start = time.time()
-# 9: print(fib_naive(35))
-# 10: print(f'Time: {time.time()-start:.3f}s')
+1: import sys
+2: sys.setrecursionlimit(10000)
+3: 
+4: call_count = 0
+5: 
+6: def fib_naive(n):
+7:     global call_count
+8:     call_count += 1
+9:     if n <= 1:
+10:        return n
+11:    return fib_naive(n-1) + fib_naive(n-2)
 ```
-This is the complete baseline project file. It defines a standard recursive Fibonacci function and times its execution for `n=35`, demonstrating the severe performance penalty of repeated computation.
+The file now contains a standard recursive implementation of the Fibonacci sequence that tracks the number of times it is called.
 
 ### Mechanical walkthrough
-- `def fib_naive(n):` defines a function taking a single integer `n`.
-- `if n <= 1:` is the base case. If `n` is 0 or 1, it directly returns `n`.
-- `return fib_naive(n-1) + fib_naive(n-2)` is the recursive step. It calls itself twice. Because there is no mechanism to store the result of `fib_naive(n-1)`, when `fib_naive(n-2)` is evaluated later in the tree, the exact same work is done again.
-- `time.time()` captures the current time in seconds as a float. By subtracting the `start` time from a second call to `time.time()`, we compute the elapsed duration. The execution time for `n=35` is approximately 2.5 seconds, returning 9227465, which is astronomically slow for such a small input.
+- `import sys`: Imports the system module to access interpreter settings.
+- `sys.setrecursionlimit(10000)`: Sets the recursion limit to 10,000 to prevent deep recursive calls from crashing.
+- `call_count = 0`: Initializes a global counter to track function executions.
+- `def fib_naive(n):`: Defines a function taking an integer `n`.
+- `global call_count`: Declares intent to modify the global `call_count` variable.
+- `call_count += 1`: Increments the counter each time the function is invoked.
+- `if n <= 1:`: Checks if the base case has been reached (0 or 1).
+- `return n`: Returns the base case value directly.
+- `return fib_naive(n-1) + fib_naive(n-2)`: The recursive step, returning the sum of the two preceding Fibonacci numbers.
+
+### CS lens
+**Overlapping Subproblems** are a characteristic of problems where naive recursive algorithms solve the same subproblems over and over. This appears in string matching (like Edit Distance), graph problems (like Shortest Path in a DAG), and computational biology (DNA sequence alignment).
+
+### SE lens
+Design principle: **Separation of state and logic**. Here, `call_count` is a global variable. Alternatively, we could have passed a state object down the call stack or encapsulated it in a class. The tradeoff is that a global variable is quick for a throwaway script but breaks thread safety and reusability in real applications.
+
+### Commands needed
+`python3 dynamic_programming.py`
+
+### Run it
+Predicted confidently: Output matches the trace, proving exponential growth in calls for linear increases in `n`.
+
+### One sentence connecting to previous unit
+Having seen how redundant computation balloons execution time, we need a way to remember past results to avoid repeating work.
 
 ## Concept Unit: Memoization — top-down DP
 
 ### The Problem
-We have seen that naive recursion repeats the same function calls endlessly. If the function is deterministic (it always returns the same output for the same input), we should only ever compute the answer for a given `n` once. How can we intercept a recursive call, check if we already know the answer, and return it instantly if we do?
+If we are computing `fib(3)` multiple times, how can we compute it just once? What data structure allows us to look up previously computed answers instantly? If we have the answer for `fib(3)`, what should the function do instead of branching?
 
 ### Introduce the concept in isolation
-We will use a Python `dict` to store the results of function calls. We call this technique **Memoization**.
-
 ```python
-def expensive_square(n, cache={}):
+def fib_memo(n, cache=None):
+    if cache is None:
+        cache = {}   # fresh cache each top-level call
     if n in cache:
-        print(f"Returning cached result for {n}")
-        return cache[n]
-    
-    print(f"Computing result for {n}")
-    result = n * n
-    cache[n] = result
+        return cache[n]       # already computed
+    if n <= 1:
+        return n
+    result = fib_memo(n-1, cache) + fib_memo(n-2, cache)
+    cache[n] = result         # store before returning
     return result
 
-print(expensive_square(4))
-print(expensive_square(4))
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib_lru(n):
+    if n <= 1:
+        return n
+    return fib_lru(n-1) + fib_lru(n-2)
+
+print(fib_memo(50))   # 12586269025 (instant)
+print(fib_lru(100))   # 354224848179261915075 (instant)
+# Each subproblem computed ONCE: O(n) calls vs O(2^n)
 ```
+Trace `fib_memo(5)`: cache={}. fib(5): not in cache. fib(4): not in cache. fib(3): not in cache. fib(2): not in cache. fib(1)=1, fib(0)=0. cache[2]=1. cache[3]=2. fib(4): needs fib(2)=cache[2]=1 (instant). cache[4]=3. cache[5]=5. Total: 9 calls vs 15 naive. This proves that **memoization** eliminates redundant recursive calls by trading space (the cache) for time.
 
-Output:
-```text
-Computing result for 4
-16
-Returning cached result for 4
-16
-```
-
-This output proves that the actual computation (the print statement "Computing...") only runs the first time. The second time, the dictionary lookup intercepts the request and returns the saved value immediately. 
-
-### Discard the throwaway example
-We discard this isolated caching demonstration. It will not appear in the project.
+### Discard the throwaway
+This throwaway demonstration of `lru_cache` is discarded to focus on the manual dictionary implementation first.
 
 ### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `fibonacci.py` (modified)
-- Change type: Add
-- Location: Appended to the end of the file.
-- Dependencies: None.
+- **Reference Source:** No reference counterpart — this is a from-scratch addition.
+- **Files affected:** `dynamic_programming.py` (modified)
+- **Change type:** Add
+- **Location:** Below `fib_naive`
+- **Dependencies:** None
 
 ### The New Code
 ```python
@@ -194,97 +215,100 @@ def fib_memo(n, cache=None):
     result = fib_memo(n-1, cache) + fib_memo(n-2, cache)
     cache[n] = result
     return result
-
-start = time.time()
-print(fib_memo(100))
-print(f'Time: {time.time()-start:.6f}s')
-
-from functools import lru_cache
-
-@lru_cache(maxsize=None)
-def fib_lru(n):
-    if n <= 1: return n
-    return fib_lru(n-1) + fib_lru(n-2)
-
-print(fib_lru(200))
 ```
 
 ### The Updated Project
 ```python
-# 12: def fib_memo(n, cache=None):
-# 13:     if cache is None:
-# 14:         cache = {}
-# 15:     if n in cache:
-# 16:         return cache[n]
-# 17:     if n <= 1:
-# 18:         return n
-# 19:     result = fib_memo(n-1, cache) + fib_memo(n-2, cache)
-# 20:     cache[n] = result
-# 21:     return result
-# 22: 
-# 23: start = time.time()
-# 24: print(fib_memo(100))
-# 25: print(f'Time: {time.time()-start:.6f}s')
-# 26: 
-# 27: from functools import lru_cache
-# 28: 
-# 29: @lru_cache(maxsize=None)
-# 30: def fib_lru(n):
-# 31:     if n <= 1: return n
-# 32:     return fib_lru(n-1) + fib_lru(n-2)
-# 33: 
-# 34: print(fib_lru(200))
+... unchanged from here up
+11:    return fib_naive(n-1) + fib_naive(n-2)
+12: 
+13: def fib_memo(n, cache=None): # ← new
+14:     if cache is None:        # ← new
+15:         cache = {}           # ← new
+16:     if n in cache:           # ← new
+17:         return cache[n]      # ← new
+18:     if n <= 1:               # ← new
+19:         return n             # ← new
+20:     result = fib_memo(n-1, cache) + fib_memo(n-2, cache) # ← new
+21:     cache[n] = result        # ← new
+22:     return result            # ← new
 ```
-This adds a manual memoization implementation using a default argument and dictionary, and an automated one using Python's built-in `@lru_cache` decorator.
+The file now contains a `fib_memo` function that uses a dictionary to store previously computed Fibonacci numbers, returning them instantly on subsequent calls.
 
 ### Mechanical walkthrough
-- `def fib_memo(n, cache=None):` defines the function with an optional `cache` parameter. We use `None` and initialize it to `{}` inside to avoid mutable default argument bugs.
-- `if n in cache:` checks if the key `n` exists in our dictionary. If it does, `return cache[n]` immediately returns the saved result.
-- `result = fib_memo(n-1, cache) + fib_memo(n-2, cache)` performs the recursive calls, passing the `cache` dictionary down the call stack so all recursive branches share the same memory.
-- `cache[n] = result` stores the newly computed answer into the dictionary before returning it. 
-- The result of `fib_memo(100)` is `354224848179261915075`, and the time is around `0.00003s`. The exponential `O(2^n)` call tree has been transformed into a Directed Acyclic Graph (DAG) with only `O(n)` nodes, because each subproblem `fib(k)` is computed exactly once.
-- `from functools import lru_cache` imports the caching decorator.
-- `@lru_cache(maxsize=None)` wraps the `fib_lru` function. When `fib_lru` is called, the decorator automatically checks a hidden dictionary. If the arguments are in the dictionary, it returns the value; otherwise, it runs the function and saves the result. This achieves the exact same Top-Down Dynamic Programming as `fib_memo`, but with cleaner syntax.
+- `def fib_memo(n, cache=None):`: Defines a recursive function with an optional `cache` parameter that defaults to `None`.
+- `if cache is None:`: Checks if the cache was omitted (signifying a top-level call).
+- `cache = {}`: Initializes an empty dictionary to store results.
+- `if n in cache:`: Checks if the result for `n` has already been computed and stored.
+- `return cache[n]`: Returns the stored result, skipping further recursion.
+- `if n <= 1:`: Base case condition.
+- `return n`: Returns the base case directly.
+- `result = fib_memo(n-1, cache) + fib_memo(n-2, cache)`: Computes the Fibonacci number recursively, passing down the shared cache object.
+- `cache[n] = result`: Stores the newly computed result in the cache dictionary.
+- `return result`: Returns the final computed value.
+
+### CS lens
+**Memoization (Top-Down DP)** is the process of wrapping a recursive algorithm with a caching mechanism. It appears in parsing (packrat parsers), rendering (caching layout calculations), and web servers (caching expensive database queries by ID).
+
+### SE lens
+Design principle: **Default arguments and mutable state**. We use `cache=None` rather than `cache={}` because default arguments are evaluated once at function definition in Python. If we used `cache={}`, the same dictionary instance would persist across independent top-level calls, leaking state between unrelated computations.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `fib_memo(50)` will execute instantly and return `12586269025`.
+
+### One sentence connecting to previous unit
+Memoization solves the performance issue by working top-down, but it still relies on deep recursion which can consume stack space; what if we build the solution bottom-up instead?
 
 ## Concept Unit: Tabulation — bottom-up DP
 
 ### The Problem
-Top-down memoization is incredibly fast, but it still relies on recursion. Every function call adds a frame to the system's call stack. If `n` is large enough (e.g., `n = 2000`), a recursive solution will hit Python's maximum recursion depth and crash with a `RecursionError`. Furthermore, function calls have overhead. How can we achieve the same O(n) performance without recursion at all?
+What if the recursion is so deep that even memoization hits the maximum recursion depth? How could you compute the answers starting from `fib(0)` and `fib(1)` and working your way up to `fib(n)`? Do we need to store all the answers, or just the recent ones?
 
 ### Introduce the concept in isolation
-We will build a list iteratively from the smallest index to the largest. This is called **Tabulation**.
-
 ```python
-# Demonstrating iterative table building
-table = [0] * 5
-table[0] = 0
-table[1] = 10
-for i in range(2, 5):
-    table[i] = table[i-1] + 5
+def fib_tab(n):
+    if n <= 1:
+        return n
+    # Build table from smallest subproblems up
+    table = [0] * (n + 1)
+    table[0] = 0
+    table[1] = 1
+    for i in range(2, n + 1):
+        table[i] = table[i-1] + table[i-2]
+    return table[n]
 
-print(table)
+# Space-optimized: only need last two values
+def fib_opt(n):
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+print(fib_tab(10))   # 55
+print(fib_opt(50))   # 12586269025
+# table[i] only depends on table[i-1] and table[i-2]
+# O(n) time, O(n) space (tab) or O(1) space (opt)
 ```
+Trace `fib_tab(6)`: `table=[0,1,0,0,0,0,0]`. `i=2: table[2]=1`. `i=3: table[3]=2`. `i=4: table[4]=3`. `i=5: table[5]=5`. `i=6: table[6]=8`. Return 8. This proves that **tabulation** avoids recursion entirely, iterating strictly from smallest to largest.
 
-Output:
-```text
-[0, 10, 15, 20, 25]
-```
-
-This output proves that we can pre-allocate an array (`[0] * 5`), set the base cases (`table[0]` and `table[1]`), and then use a simple `for` loop to compute each subsequent value based on previously computed values in the table. There is no recursion.
-
-### Discard the throwaway example
-We discard this abstract array iteration example.
+### Discard the throwaway
+This throwaway `fib_opt` space-optimized version is discarded to focus solely on standard tabulation.
 
 ### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `fibonacci.py` (modified)
-- Change type: Add
-- Location: Appended to the end of the file.
-- Dependencies: None.
+- **Reference Source:** No reference counterpart — this is a from-scratch addition.
+- **Files affected:** `dynamic_programming.py` (modified)
+- **Change type:** Add
+- **Location:** Below `fib_memo`
+- **Dependencies:** None
 
 ### The New Code
 ```python
-def fib_table(n):
+def fib_tab(n):
     if n <= 1:
         return n
     table = [0] * (n + 1)
@@ -293,371 +317,235 @@ def fib_table(n):
     for i in range(2, n + 1):
         table[i] = table[i-1] + table[i-2]
     return table[n]
-
-print(fib_table(10))
-print(fib_table(100))
-
-def fib_optimal(n):
-    if n <= 1: return n
-    a, b = 0, 1
-    for _ in range(2, n+1):
-        a, b = b, a + b
-    return b
-
-print(fib_optimal(100))
 ```
 
 ### The Updated Project
 ```python
-# 36: def fib_table(n):
-# 37:     if n <= 1:
-# 38:         return n
-# 39:     table = [0] * (n + 1)
-# 40:     table[0] = 0
-# 41:     table[1] = 1
-# 42:     for i in range(2, n + 1):
-# 43:         table[i] = table[i-1] + table[i-2]
-# 44:     return table[n]
-# 45: 
-# 46: print(fib_table(10))
-# 47: print(fib_table(100))
-# 48: 
-# 49: def fib_optimal(n):
-# 50:     if n <= 1: return n
-# 51:     a, b = 0, 1
-# 52:     for _ in range(2, n+1):
-# 53:         a, b = b, a + b
-# 54:     return b
-# 55: 
-# 56: print(fib_optimal(100))
+... unchanged from here up
+20:     result = fib_memo(n-1, cache) + fib_memo(n-2, cache)
+21:     cache[n] = result
+22:     return result
+23: 
+24: def fib_tab(n):                         # ← new
+25:     if n <= 1:                            # ← new
+26:         return n                          # ← new
+27:     table = [0] * (n + 1)                 # ← new
+28:     table[0] = 0                          # ← new
+29:     table[1] = 1                          # ← new
+30:     for i in range(2, n + 1):             # ← new
+31:         table[i] = table[i-1] + table[i-2] # ← new
+32:     return table[n]                       # ← new
 ```
-This code adds two bottom-up DP implementations: one using a full table (array), and one optimized to only use two variables since we only need the last two values.
+The file now contains `fib_tab`, an iterative approach that builds solutions to larger problems starting from the base cases.
 
 ### Mechanical walkthrough
-- `table = [0] * (n + 1)` creates a list of zeros of length `n+1`. This is the "table" in Tabulation. We need indices from 0 to `n` inclusive.
-- `table[0] = 0` and `table[1] = 1` populate the base cases directly.
-- `for i in range(2, n + 1):` iterates from 2 up to `n`. Because we iterate upwards, we guarantee that `table[i-1]` and `table[i-2]` have already been computed and stored by the time we need them to compute `table[i]`.
-- Tabulation fills a table bottom-up; memoization fills it top-down lazily. Both achieve O(n) time, but tabulation has O(1) recursion overhead. For `n=6`, the table fills as `[0,1,1,2,3,5,8]`.
-- `fib_optimal(n)` demonstrates space optimization. Notice that `table[i]` only ever looks back at `table[i-1]` and `table[i-2]`. The rest of the table is dead memory.
-- `a, b = 0, 1` stores just the two most recent values.
-- `a, b = b, a + b` simultaneously updates `a` to become the old `b`, and `b` to become the sum. This reduces the space complexity from O(n) to O(1). Output for `fib_optimal(100)` is identically `354224848179261915075`.
+- `def fib_tab(n):`: Defines an iterative function for Fibonacci.
+- `if n <= 1:`: Handles base cases instantly.
+- `return n`: Returns the base case value.
+- `table = [0] * (n + 1)`: Initializes a list of zeros with length `n + 1` to hold all intermediate answers up to `n`.
+- `table[0] = 0`: Sets the first base case in the table.
+- `table[1] = 1`: Sets the second base case in the table.
+- `for i in range(2, n + 1):`: Iterates from `2` up to and including `n`.
+- `table[i] = table[i-1] + table[i-2]`: Fills the current table cell using the two previous adjacent cells.
+- `return table[n]`: Returns the fully computed answer located at the end of the table.
 
-## Concept Unit: Rod cutting — classic DP problem
+### CS lens
+**Tabulation (Bottom-Up DP)** is an algorithmic technique that builds solutions up from the smallest base cases iteratively. It appears in spreadsheet software (resolving cell dependencies topologically), database query planning (joining tables optimally), and string analysis (Longest Common Subsequence).
+
+### SE lens
+Design principle: **Space-Time Tradeoff**. By allocating an array of size `n + 1`, we trade memory for an O(n) execution time while completely avoiding the function call overhead of recursion. The alternative, a purely recursive approach, used O(n) stack space but incurred function call costs.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `fib_tab(10)` returns `55` with no recursive calls made.
+
+### One sentence connecting to previous unit
+Fibonacci is a 1D sequence where each value depends on the previous two; how do we apply DP when the choices aren't just previous indices, but a set of possible options?
+
+## Concept Unit: Coin change — DP on a harder problem
 
 ### The Problem
-Fibonacci is a toy example. Let's look at an optimization problem. You have a rod of length `n`, and a list of prices `prices` where `prices[i]` is the price you can sell a rod of length `i+1` for. You can cut the rod into as many pieces as you want. How do you find the maximum revenue possible?
+If you have coins of values 1, 5, 10, and 25, how do you find the minimum number of coins to make an exact amount? Does the optimal solution for `amount = X` relate to the optimal solution for `amount = X - coin_value`?
 
 ### Introduce the concept in isolation
-We will demonstrate the idea of choosing a cut by evaluating the price of a piece plus the recursive maximum of the remainder.
-
 ```python
-def max_choice(a, b):
-    return max(a, b)
+def coin_change(coins, amount):
+    '''
+    Returns minimum number of coins to make 'amount'.
+    Returns -1 if impossible.
+    '''
+    # dp[i] = min coins to make amount i
+    INF = float('inf')
+    dp = [INF] * (amount + 1)
+    dp[0] = 0   # base case: 0 coins to make 0
 
-print(max_choice(10, 5 + 6))
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin <= i and dp[i - coin] + 1 < dp[i]:
+                dp[i] = dp[i - coin] + 1
+
+    return dp[amount] if dp[amount] != INF else -1
+
+print(coin_change([1, 5, 10, 25], 36))  # 3 (25+10+1)
+print(coin_change([1, 5, 10, 25], 30))  # 2 (25+5)
+print(coin_change([2], 3))              # -1 (impossible)
 ```
+Trace `coin_change([1,5,10,25], 11)`: `dp=[0,INF,...]`. `i=1: coin=1: dp[0]+1=1 < INF -> dp[1]=1`. `i=5: coin=5: dp[0]+1=1 < INF -> dp[5]=1`. `i=10: coin=10: dp[0]+1=1 < INF -> dp[10]=1`. `i=11: coin=1: dp[10]+1=2 < INF -> dp[11]=2`. `coin=10: dp[1]+1=2` (no improvement). Return `2` (10+1). This proves that DP correctly identifies the minimal combination by trying all valid subproblems.
 
-Output:
-```text
-11
-```
-
-This output proves we can use the `max` function to compare multiple potential scenarios (e.g., selling the rod whole for 10 vs cutting it into two pieces worth 5 and 6) and return the optimal choice.
-
-### Discard the throwaway example
-We discard this simple `max` demonstration.
+### Discard the throwaway
+This isolated throwaway trace example is discarded to integrate the function fully.
 
 ### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `rod_cutting.py` (created)
-- Change type: Add
-- Location: N/A
-- Dependencies: Python 3
+- **Reference Source:** No reference counterpart — this is a from-scratch addition.
+- **Files affected:** `dynamic_programming.py` (modified)
+- **Change type:** Add
+- **Location:** Below `fib_tab`
+- **Dependencies:** None
 
 ### The New Code
 ```python
-def rod_cut_memo(prices, n, cache=None):
-    '''prices[i] is the price for a rod of length i+1.
-       Returns the maximum revenue from cutting a rod of length n.'''
-    if cache is None:
-        cache = {}
-    if n in cache:
-        return cache[n]
-    if n == 0:
-        return 0
-    
-    max_val = 0
-    for cut in range(1, n+1):
-        val = prices[cut-1] + rod_cut_memo(prices, n-cut, cache)
-        max_val = max(max_val, val)
-        
-    cache[n] = max_val
-    return max_val
+def coin_change(coins, amount):
+    INF = float('inf')
+    dp = [INF] * (amount + 1)
+    dp[0] = 0
 
-prices = [1, 5, 8, 9, 10, 17, 17, 20]
-print(rod_cut_memo(prices, 4))
-print(rod_cut_memo(prices, 8))
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin <= i and dp[i - coin] + 1 < dp[i]:
+                dp[i] = dp[i - coin] + 1
+
+    return dp[amount] if dp[amount] != INF else -1
 ```
 
 ### The Updated Project
 ```python
-# 1: def rod_cut_memo(prices, n, cache=None):
-# 2:     '''prices[i] is the price for a rod of length i+1.
-# 3:        Returns the maximum revenue from cutting a rod of length n.'''
-# 4:     if cache is None:
-# 5:         cache = {}
-# 6:     if n in cache:
-# 7:         return cache[n]
-# 8:     if n == 0:
-# 9:         return 0
-# 10:     
-# 11:     max_val = 0
-# 12:     for cut in range(1, n+1):
-# 13:         val = prices[cut-1] + rod_cut_memo(prices, n-cut, cache)
-# 14:         max_val = max(max_val, val)
-# 15:         
-# 16:     cache[n] = max_val
-# 17:     return max_val
-# 18: 
-# 19: prices = [1, 5, 8, 9, 10, 17, 17, 20]
-# 20: print(rod_cut_memo(prices, 4))
-# 21: print(rod_cut_memo(prices, 8))
+... unchanged from here up
+29:     table[1] = 1
+30:     for i in range(2, n + 1):
+31:         table[i] = table[i-1] + table[i-2]
+32:     return table[n]
+33: 
+34: def coin_change(coins, amount):              # ← new
+35:     INF = float('inf')                       # ← new
+36:     dp = [INF] * (amount + 1)                # ← new
+37:     dp[0] = 0                                # ← new
+38:                                              # ← new
+39:     for i in range(1, amount + 1):           # ← new
+40:         for coin in coins:                   # ← new
+41:             if coin <= i and dp[i - coin] + 1 < dp[i]: # ← new
+42:                 dp[i] = dp[i - coin] + 1     # ← new
+43:                                              # ← new
+44:     return dp[amount] if dp[amount] != INF else -1 # ← new
 ```
-This introduces our first classic DP optimization problem using top-down memoization.
+The file now contains `coin_change`, a function demonstrating tabulation on a problem where multiple branches exist at each subproblem.
 
 ### Mechanical walkthrough
-- `def rod_cut_memo(prices, n, cache=None):` takes the price table, the current remaining length `n`, and the memoization `cache`.
-- `if n == 0: return 0` is the base case. A rod of length 0 has 0 value.
-- `for cut in range(1, n+1):` loops through every possible first cut we could make (from length 1 up to the whole length `n`).
-- `val = prices[cut-1] + rod_cut_memo(prices, n-cut, cache)` calculates the total revenue of this choice: the price of the piece we just cut off (`prices[cut-1]`) *plus* the optimal revenue of whatever is left (`n-cut`). This embodies **Optimal Substructure**: the optimal way to cut a rod of length `n` uses the optimal way to cut the remainder.
-- `max_val = max(max_val, val)` updates our running maximum. The built-in `max` function evaluates the current best known value against this new scenario.
-- `cache[n] = max_val` stores the best result we found for length `n` before returning it. 
-- For `n=4`, it outputs `10` (two pieces of length 2: 5+5 is better than a whole rod of length 4 which is 9). For `n=8`, it outputs `22` (lengths 6+2: 17+5). The memoization avoids evaluating the same subproblem branches (like cutting `n=2`) repeatedly.
+- `def coin_change(coins, amount):`: Defines a function taking a list of coin denominations and an integer target amount.
+- `INF = float('inf')`: Assigns positive infinity to a local variable to act as a sentinel for unreachable states.
+- `dp = [INF] * (amount + 1)`: Creates a table to hold the minimum coins needed for every amount up to the target, initialized to infinity.
+- `dp[0] = 0`: Sets the base case: it takes zero coins to make an amount of zero.
+- `for i in range(1, amount + 1):`: Iterates through every amount from 1 up to the target amount.
+- `for coin in coins:`: Iterates through each available coin denomination.
+- `if coin <= i and dp[i - coin] + 1 < dp[i]:`: Checks if the coin can fit in the current amount `i` and if using it leads to a smaller number of coins than the current best for `dp[i]`.
+- `dp[i] = dp[i - coin] + 1`: Updates the table with the new minimum coin count.
+- `return dp[amount] if dp[amount] != INF else -1`: Returns the value in the final cell, or `-1` if it is still infinity (meaning the amount cannot be made).
 
-## Concept Unit: Tabulation for rod cutting
+### CS lens
+**Optimal Substructure** dictates that an optimal solution to the overall problem can be constructed efficiently from optimal solutions to its subproblems. In `coin_change`, the optimal way to make amount `X` relies on the optimal way to make `X - coin`. This is seen in shortest path algorithms (Dijkstra's) and game theory.
+
+### SE lens
+Design principle: **Sentinel values**. We initialize the table with `float('inf')`. The alternative is using a distinct type like `None`, which would force us to perform type checks (`if dp[i] is None: ...`) inside the hot loop. The tradeoff is that `float('inf')` acts like a standard number, allowing simple `<` comparisons at the expense of potentially masking bugs if math is improperly applied to it elsewhere.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: `coin_change([1, 5, 10, 25], 36)` returns `3`.
+
+### One sentence connecting to previous unit
+If dynamic programming checks every combination, is there a faster way that just picks the biggest coin first?
+
+## Concept Unit: When to use DP vs. greedy vs. brute force
 
 ### The Problem
-Just as with Fibonacci, the recursive top-down rod cutting approach runs the risk of stack overflow and has recursive call overhead. Can we restructure this to build the optimal solutions from length 1 up to length `n` iteratively?
+Why use dynamic programming if we can just pick the largest coin that fits? Does a "greedy" approach always yield the optimal answer for any set of coins?
 
 ### Introduce the concept in isolation
-We will look at how an inner loop can check all previous states to build a new state in an array.
-
 ```python
-table = [0] * 4
-table[0] = 0
-for length in range(1, 4):
-    for cut in range(1, length + 1):
-        # Dummy operation representing looking back
-        _ = table[length - cut]
-print("Nested loops completed.")
+# DP vs Greedy:
+# Greedy: make locally optimal choice at each step (fast but may fail)
+# DP: consider ALL subproblems, cache overlapping ones (slower but correct)
+
+def greedy_coins(coins, amount):
+    coins = sorted(coins, reverse=True)  # largest first
+    result = []
+    for coin in coins:
+        while amount >= coin:
+            result.append(coin)
+            amount -= coin
+    return result if amount == 0 else None
+
+# Coins [1, 3, 4], amount 6:
+# Greedy: 4, 1, 1 -> 3 coins
+# DP:     3, 3    -> 2 coins (optimal)
+print(greedy_coins([1, 3, 4], 6))  # [4, 1, 1]: 3 coins
+print(coin_change([1, 3, 4], 6))   # 2: optimal
 ```
+Trace `greedy_coins([1,3,4], 6)`: `sorted=[4,3,1]`. `coin=4`: `6>=4`: append `4`, `amount=2`. `coin=3`: `2<3` skip. `coin=1`: append `1` (x2). Result=`[4,1,1]`, 3 coins. DP: `dp[6]`: `coin=3`: `dp[3]+1=dp[3]+1`. `dp[3]`: `coin=3`: `dp[0]+1=1` -> `dp[3]=1`. `dp[6]=dp[3]+1=2`. This proves that **greedy algorithms** can yield sub-optimal results on non-standard coin systems.
 
-Output:
-```text
-Nested loops completed.
-```
-
-This dummy loop structure proves we can iterate over the total `length` in an outer loop, and then iterate over every possible `cut` size in an inner loop, looking back into `table` at indices `length - cut`. Because the inner loop only subtracts positive integers, it only ever looks at smaller, already-computed values.
-
-### Discard the throwaway example
-We discard this loop structure test.
+### Discard the throwaway
+The `greedy_coins` implementation is discarded as it fails correctness for arbitrary systems.
 
 ### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `rod_cutting.py` (modified)
-- Change type: Add
-- Location: Appended to the end of the file.
-- Dependencies: None.
+- **Reference Source:** No reference counterpart — this is a standalone theory lesson.
+- **Files affected:** None
+- **Change type:** None
+- **Location:** None
+- **Dependencies:** None
 
 ### The New Code
 ```python
-def rod_cut_table(prices, n):
-    table = [0] * (n + 1)
-    for length in range(1, n + 1):
-        max_val = 0
-        for cut in range(1, length + 1):
-            if cut <= len(prices):
-                val = prices[cut-1] + table[length - cut]
-                max_val = max(max_val, val)
-        table[length] = max_val
-    return table[n]
-
-for n in range(1, 9):
-    print(f'rod({n}) = {rod_cut_table(prices, n)}')
+# No new code added to the project for this theory unit.
 ```
 
 ### The Updated Project
 ```python
-# 23: def rod_cut_table(prices, n):
-# 24:     table = [0] * (n + 1)
-# 25:     for length in range(1, n + 1):
-# 26:         max_val = 0
-# 27:         for cut in range(1, length + 1):
-# 28:             if cut <= len(prices):
-# 29:                 val = prices[cut-1] + table[length - cut]
-# 30:                 max_val = max(max_val, val)
-# 31:         table[length] = max_val
-# 32:     return table[n]
-# 33: 
-# 34: for n in range(1, 9):
-# 35:     print(f'rod({n}) = {rod_cut_table(prices, n)}')
+# Project remains unchanged.
 ```
-This is the bottom-up, tabular equivalent to our top-down rod cutting function.
+The file is unchanged, demonstrating that the greedy approach is excluded from our robust DP solution toolkit.
 
 ### Mechanical walkthrough
-- `table = [0] * (n + 1)` creates a table where `table[k]` will store the maximum revenue for a rod of exactly length `k`.
-- `for length in range(1, n + 1):` is the outer loop solving progressively larger subproblems. By the time we solve for `length`, all answers for 0 to `length-1` are guaranteed to be correct and stored.
-- `for cut in range(1, length + 1):` tries making a first cut of every possible size up to the current `length`.
-- `val = prices[cut-1] + table[length - cut]` looks up the price of the cut, and adds it to the optimal solution for the remainder, which we instantly read from the `table` instead of recursively calling a function.
-- `table[length] = max_val` locks in the best configuration found.
-- The output loop prints the sequence: 
-  `rod(1) = 1`
-  `rod(2) = 5`
-  `rod(3) = 8`
-  `rod(4) = 10`
-  `rod(5) = 13`
-  `rod(6) = 17`
-  `rod(7) = 18`
-  `rod(8) = 22`.
+- `coins = sorted(coins, reverse=True)`: Sorts the coins in descending order to prioritize the largest denomination.
+- `result = []`: Initializes a list to hold the chosen coins.
+- `for coin in coins:`: Iterates over each coin, largest to smallest.
+- `while amount >= coin:`: Continuously subtracts the coin while it fits into the remaining amount.
+- `result.append(coin)`: Records the chosen coin.
+- `amount -= coin`: Reduces the remaining amount.
+- `return result if amount == 0 else None`: Returns the list of chosen coins if the exact amount was reached, otherwise `None`.
 
-## Concept Unit: Longest Common Subsequence (LCS)
+### CS lens
+**Greedy Algorithms** solve problems by making locally optimal choices without looking ahead. They work perfectly for fractional knapsack or standard US currency (which has the "greedy-choice property"), but fail on 0-1 knapsack or arbitrary coin systems.
 
-### The Problem
-Dynamic programming frequently applies to strings and 2D matrices. The Longest Common Subsequence (LCS) problem asks: given two sequences (e.g., strings), find the length of the longest subsequence present in both. A subsequence doesn't have to be contiguous, but it must maintain relative order. How do we build a 2D table to track states involving two different strings?
+### SE lens
+Design principle: **Correctness vs. Heuristics**. A greedy algorithm is a heuristic that is computationally much cheaper (O(n log n) for sorting plus O(amount) iteration) than full DP. The tradeoff is choosing between guaranteed optimality (DP) versus "good enough and fast" (greedy).
 
-### Introduce the concept in isolation
-We will construct a 2D matrix in Python and access it using two indices.
+### Commands needed
+None for this unit.
 
-```python
-m, n = 3, 2
-dp = [[0] * (n+1) for _ in range(m+1)]
-dp[1][1] = 5
-print(dp)
-```
+### Run it
+Predicted confidently: `greedy_coins([1, 3, 4], 6)` returns `[4, 1, 1]` while DP correctly returns `2`.
 
-Output:
-```text
-[[0, 0, 0], [0, 5, 0], [0, 0, 0], [0, 0, 0]]
-```
+### One sentence connecting to previous unit
+Understanding when to reach for DP (guaranteed optimal) versus Greedy (fast but potentially incorrect) dictates how you approach performance scaling.
 
-This output proves we can use a list comprehension `[[0] * columns for _ in range(rows)]` to safely build a 2D matrix without duplicating list references (which is a common bug if you use `[[0]*n]*m`). We index it as `dp[row][col]`.
+## Closing
 
-### Discard the throwaway example
-We discard this matrix creation example.
+### Connect the pieces
+Trace `fib(6)` across our strategies:
+- **Naive:** The function blindly branches `fib(5) + fib(4)`. By the time it computes `fib(6)`, `fib(2)` is redundantly calculated multiple times across a sprawling tree of `15` function calls.
+- **Memoized:** The function branches, but caches. When `fib(6)` evaluates `fib(5)`, it caches all intermediate steps down to `0`. When the right side, `fib(4)`, is called, it instantly returns the cached value. Redundancy is destroyed, taking only `9` calls.
+- **Tabulated:** The function builds an array `[0, 1, 0, 0, 0, 0, 0]`. It walks forward exactly `6` times. `table[2] = 1`, `table[3] = 2`, `table[4] = 3`, `table[5] = 5`, `table[6] = 8`. `8` is returned.
 
-### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: `lcs.py` (created)
-- Change type: Add
-- Location: N/A
-- Dependencies: Python 3
-
-### The New Code
-```python
-def lcs(s1, s2):
-    m, n = len(s1), len(s2)
-    dp = [[0] * (n+1) for _ in range(m+1)]
-    for i in range(1, m+1):
-        for j in range(1, n+1):
-            if s1[i-1] == s2[j-1]:
-                dp[i][j] = dp[i-1][j-1] + 1
-            else:
-                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
-    return dp[m][n]
-
-print(lcs('ABCBDAB', 'BDCAB'))
-print(lcs('AGGTAB', 'GXTXAYB'))
-print(lcs('abc', 'abc'))
-print(lcs('abc', 'def'))
-```
-
-### The Updated Project
-```python
-# 1: def lcs(s1, s2):
-# 2:     m, n = len(s1), len(s2)
-# 3:     dp = [[0] * (n+1) for _ in range(m+1)]
-# 4:     for i in range(1, m+1):
-# 5:         for j in range(1, n+1):
-# 6:             if s1[i-1] == s2[j-1]:
-# 7:                 dp[i][j] = dp[i-1][j-1] + 1
-# 8:             else:
-# 9:                 dp[i][j] = max(dp[i-1][j], dp[i][j-1])
-# 10:     return dp[m][n]
-# 11: 
-# 12: print(lcs('ABCBDAB', 'BDCAB'))
-# 13: print(lcs('AGGTAB', 'GXTXAYB'))
-# 14: print(lcs('abc', 'abc'))
-# 15: print(lcs('abc', 'def'))
-```
-This introduces a 2D dynamic programming solution.
-
-### Mechanical walkthrough
-- `dp = [[0] * (n+1) for _ in range(m+1)]` creates a table where `dp[i][j]` stores the length of the LCS of the prefix `s1[:i]` and the prefix `s2[:j]`. The extra `+1` is for the base case where a prefix is empty (length 0).
-- `for i in range(1, m+1):` and `for j in range(1, n+1):` iterates through every prefix combination of the two strings.
-- `if s1[i-1] == s2[j-1]:` checks if the current characters match. (We use `i-1` and `j-1` because string indices are 0-based, while our table is 1-based to accommodate the empty prefix).
-- `dp[i][j] = dp[i-1][j-1] + 1` handles the match case. If they match, the LCS length is 1 plus the LCS of the prefixes without these characters.
-- `dp[i][j] = max(dp[i-1][j], dp[i][j-1])` handles the mismatch case. We take the best answer by either ignoring the current character of `s1` or the current character of `s2`. This leverages the built-in `max` function.
-- `return dp[m][n]` returns the value in the bottom right of the matrix, representing the entire strings.
-- This algorithm runs in O(m*n) time and space. The output is `4` (for BCAB or BDAB), `4` (for GTAB), `3`, and `0`. LCS has **Optimal Substructure**: the LCS of two strings depends entirely on the LCS of smaller prefixes.
-
-## Concept Unit: The DP recipe — how to approach any DP problem
-
-### The Problem
-We have seen three different problems solved with Dynamic Programming. It is easy to understand an existing solution, but how do you write one from scratch for a new problem? We need a transferable methodology.
-
-### Introduce the concept in isolation
-We will conceptually map out a recipe for DP. There is no isolated code to run here, as the concept is an algorithmic framework rather than a language feature. Instead, we state the recipe directly:
-
-1. **Identify the SUBPROBLEM:** What smaller version of the problem leads to the answer?
-2. **Write the RECURRENCE:** Express the answer for a subproblem in terms of smaller subproblems.
-3. **Identify the BASE CASES:** What are the smallest subproblems with known answers?
-4. **Choose top-down or bottom-up:** Use memoization (recursion + cache) or tabulation (iterative array).
-5. **Reconstruct the solution:** If the problem asks for the actual choices made (not just the max value), backtrace through the table.
-
-### Discard the throwaway example
-No code to discard.
-
-### Project Change
-- Reference Source: No reference counterpart.
-- Files affected: None.
-- Change type: Configure (Mental Model)
-- Location: N/A
-- Dependencies: None.
-
-### The New Code
-```python
-# The DP Recipe Applied:
-# 
-# 1. Fibonacci
-# Subproblem: fib(i)
-# Recurrence: fib(i) = fib(i-1) + fib(i-2)
-# Base: fib(0) = 0, fib(1) = 1
-# 
-# 2. Rod Cutting
-# Subproblem: max_revenue(length)
-# Recurrence: max_revenue(L) = max(price[cut] + max_revenue(L - cut)) for all valid cuts
-# Base: max_revenue(0) = 0
-# 
-# 3. LCS
-# Subproblem: lcs(prefix_A, prefix_B)
-# Recurrence: if match -> lcs(A-1, B-1) + 1; else -> max(lcs(A-1, B), lcs(A, B-1))
-# Base: lcs(empty, anything) = 0
-```
-
-### The Updated Project
-No file is updated. The block above serves as a summary reference.
-
-### Mechanical walkthrough
-- **Identify the SUBPROBLEM:** For Fibonacci, it was the Nth number. For rod cutting, it was the optimal revenue for a rod of length `L`. For LCS, it was the longest sequence for string prefixes of lengths `i` and `j`. 
-- **Write the RECURRENCE:** This is the mathematical relationship. `fib(i) = fib(i-1) + fib(i-2)`. If you cannot write this equation, you cannot write the code.
-- **Identify the BASE CASES:** Without a base case (like `fib(0) = 0`), the recurrence would infinite loop or access negative indices.
-- **Choose top-down or bottom-up:** If you need every subproblem, Tabulation avoids recursion overhead. If you only need a sparse set of subproblems, Memoization might be faster.
-- **Reconstruct the solution:** In LCS, `dp[m][n]` tells us the length is 4. If we wanted the string `"GTAB"`, we would write a loop to walk backwards from `dp[m][n]` following the path of maximum values.
-
----
-
-Closing: Dynamic programming is one of the most powerful algorithmic techniques, capable of transforming an O(2^n) exponential brute-force search into a swift O(n) or O(n^2) polynomial sweep. It hinges entirely on identifying Optimal Substructure and Overlapping Subproblems. Next, Lesson 35 applies DP to the 0/1 knapsack problem. 
-
-Exercises: 
-- Implement DP for coin change (minimum coins to make amount n).
-- Implement DP for longest increasing subsequence.
+Both memoization and tabulation exploit overlapping subproblems and optimal substructure, transforming exponential explosions into simple linear sequences.

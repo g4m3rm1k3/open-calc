@@ -1,739 +1,599 @@
 # Lesson 39: Monte Carlo Simulation — Sampling the Unknown
 
-The reader will build three complete Monte Carlo simulations: (1) a card-game probability calculator, (2) a stock-price simulator (geometric Brownian motion, simplified), and (3) a project-timeline estimator. The transferable problems: (1) Monte Carlo is the right tool when the space of outcomes is too large to enumerate analytically; (2) confidence intervals quantify HOW SURE we are about an estimate — more samples = tighter interval; (3) the Monte Carlo method is embarrassingly parallel — each trial is independent, so it scales linearly with computing power.
+**What you will build**
+The reader understands Monte Carlo simulation: using random sampling to estimate quantities that are hard or impossible to compute analytically. They implement pi estimation, the gambler's ruin, and a simple random walk. The transferable insight: Monte Carlo works because of the law of large numbers. With enough samples, the sample mean converges to the true expected value. The error decreases as O(1/sqrt(n)): 100x more samples means 10x more precision.
 
-**What you need to know first:**
-- Lesson 38 (full curriculum through random walks).
+**What you need to know first**
+Lessons 00-38.
 
-**Terms used in this lesson:**
-- **Monte Carlo Simulation** — A computational algorithm that relies on repeated random sampling to obtain numerical results. It exists to estimate outcomes for systems with too many variables to calculate exactly.
-- **Confidence Interval** — A statistical range that is likely to contain an unknown population parameter. It exists to quantify the uncertainty of an estimate, showing how tight or loose our prediction is.
-- **Geometric Brownian Motion** — A stochastic process where the logarithm of the randomly varying quantity follows a Brownian motion. It models stock prices because it ensures prices never drop below zero.
-- **Triangular Distribution** — A probability distribution shaped like a triangle, defined by a minimum, maximum, and most likely value. It models project tasks where we know the bounds and best guess, but lack historical data for a bell curve.
-- **Variance Reduction** — Techniques used to increase the precision of Monte Carlo estimates without running more trials. It solves the problem of simulations requiring exponential compute power to gain linear precision.
-- **Antithetic Variates** — A variance reduction technique that pairs each random sample with its mirror opposite. It introduces negative correlation to cancel out sampling errors, tightening the final estimate faster.
-- **Histogram** — A visual representation of the distribution of numerical data, divided into bins. It exists to show the shape and spread of randomly generated outcomes.
+**Terms used in this lesson**
+- **Monte Carlo simulation** — A computational technique that uses repeated random sampling to estimate numerical results, typically used when deterministic algorithms are too complex or impossible to run. It solves the problem of finding answers to intractable problems by approximating them through probability.
+- **Law of large numbers** — A theorem in probability stating that the average of the results obtained from a large number of trials should be close to the expected value and will tend to become closer to the expected value as more trials are performed. It provides the mathematical justification for why Monte Carlo simulations work.
+- **Confidence interval** — A range of values, derived from sample statistics, that is likely to contain the value of an unknown population parameter. It gives a measure of reliability or certainty to an estimate, quantifying the error instead of just providing a single point estimate.
+- **Random walk** — A mathematical object that describes a path that consists of a succession of random steps on some mathematical space such as the integers. It models unpredictable movements like stock prices or molecular diffusion.
+- **Random seed** — An initial value used to initialize a pseudorandom number generator (PRNG). Using the same seed guarantees the exact same sequence of random numbers is produced, solving the problem of reproducing bugs or experimental results in simulations.
 
-**Objects and methods used:**
+**Objects and methods used**
 
-**random.sample**
-- *What it is:* A function that chooses multiple unique elements from a sequence.
-- *Implementation:* `random.sample(population, k)`
-- *Its use:* Drawing a random 5-card hand without replacement.
-- *Type:* Standard library function.
-- *Responsibility:* Selects `k` unique items uniformly at random from the given population.
-- *Depends on:* A population sequence and an integer `k`.
-- *Connects to:* Reads the population, returns a new list of `k` elements.
-- *Shape:* A utility function called inside our simulation loop.
+- **`random.uniform`**
+  - *What it is*: A standard library function that returns a random floating-point number between two specified bounds.
+  - *Implementation*: `def uniform(a: float, b: float) -> float`
+  - *Its use*: Used to generate random `x` and `y` coordinates within the bounding box `[-1, 1]` for the Monte Carlo pi estimation.
+  - *Type*: A module-level function in the `random` module.
+  - *Responsibility*: Generates a continuous uniform distribution of random floats over the interval `[a, b]`.
+  - *Depends on*: The underlying Mersenne Twister PRNG state. Needs lower bound `a` and upper bound `b`.
+  - *Connects to*: Called by our sampling loop; returns a float that is mathematically tested against the circle equation.
+  - *Shape*: Standard library API boundary.
 
-**random.gauss**
-- *What it is:* A function that generates a random number from a normal (Gaussian) distribution.
-- *Implementation:* `random.gauss(mu, sigma)`
-- *Its use:* Simulating daily stock price returns.
-- *Type:* Standard library function.
-- *Responsibility:* Returns a random float centered around `mu` with a standard deviation of `sigma`.
-- *Depends on:* The mean (`mu`) and standard deviation (`sigma`).
-- *Connects to:* Returns a float used in our price multiplication step.
-- *Shape:* The randomness engine of our stock simulation.
+- **`random.random`**
+  - *What it is*: A standard library function that returns a random floating-point number in the range `[0.0, 1.0)`.
+  - *Implementation*: `def random() -> float`
+  - *Its use*: Used to determine the probability of a win in the gambler's ruin simulation by comparing its return value to a probability threshold.
+  - *Type*: A module-level function in the `random` module.
+  - *Responsibility*: Generates the base uniform pseudorandom float that most other `random` functions build upon.
+  - *Depends on*: The underlying Mersenne Twister PRNG state. Takes no arguments.
+  - *Connects to*: Called by our simulation loop; returns a float.
+  - *Shape*: Standard library API boundary.
 
-**random.triangular**
-- *What it is:* A function that generates a random float from a triangular distribution.
-- *Implementation:* `random.triangular(low, high, mode)`
-- *Its use:* Simulating the duration of a project task.
-- *Type:* Standard library function.
-- *Responsibility:* Returns a float biased toward `mode` but bounded between `low` and `high`.
-- *Depends on:* The `low`, `high`, and `mode` parameters.
-- *Connects to:* Returns a float used to accumulate total project time.
-- *Shape:* The randomness engine of our project timeline simulator.
+- **`random.choice`**
+  - *What it is*: A standard library function that returns a randomly selected element from a non-empty sequence.
+  - *Implementation*: `def choice(seq: Sequence[T]) -> T`
+  - *Its use*: Used to pick either a step left (`-1`) or a step right (`1`) with equal probability in the random walk.
+  - *Type*: A module-level function in the `random` module.
+  - *Responsibility*: Picks one element uniformly at random from the provided sequence.
+  - *Depends on*: A non-empty sequence like a list or tuple. The PRNG state.
+  - *Connects to*: Called by the random walk generator; returns a single element of the sequence's type.
+  - *Shape*: Standard library API boundary.
 
-**itertools.product**
-- *What it is:* A function that computes the cartesian product of input iterables.
-- *Implementation:* `product(*iterables)`
-- *Its use:* Building a deck of cards from ranks and suits.
-- *Type:* Standard library function.
-- *Responsibility:* Yields tuples containing all possible combinations of elements from the provided iterables.
-- *Depends on:* Two or more iterable sequences.
-- *Connects to:* Generates tuples that we unpack to format string card names.
-- *Shape:* Initialization step for our state space.
+- **`random.seed`**
+  - *What it is*: A standard library function that initializes the internal state of the pseudorandom number generator.
+  - *Implementation*: `def seed(a: Any = None, version: int = 2) -> None`
+  - *Its use*: Used to ensure our simulations produce the exact same sequence of random numbers across different runs for reproducible experiments.
+  - *Type*: A module-level function in the `random` module.
+  - *Responsibility*: Resets and seeds the global PRNG state.
+  - *Depends on*: An optional seed value (usually an integer, string, or bytes).
+  - *Connects to*: Called at the start of a script or function; updates the global `random` module state.
+  - *Shape*: Standard library API boundary (global state mutator).
 
-**math.exp**
-- *What it is:* The exponential function.
-- *Implementation:* `math.exp(x)`
-- *Its use:* Calculating the continuous growth of a stock price over time.
-- *Type:* Standard library function.
-- *Responsibility:* Returns the mathematical constant `e` raised to the power of `x`.
-- *Depends on:* A float or integer `x`.
-- *Connects to:* Takes the Brownian motion terms and scales the current price.
-- *Shape:* A mathematical transform step in the stock price loop.
+- **`math.sqrt`**
+  - *What it is*: A standard library function that returns the square root of a number.
+  - *Implementation*: `def sqrt(x: float) -> float`
+  - *Its use*: Used to calculate the standard deviation and the theoretical expected distance in a random walk.
+  - *Type*: A module-level function in the `math` module.
+  - *Responsibility*: Computes the principal square root of a non-negative number.
+  - *Depends on*: A non-negative numeric argument `x`.
+  - *Connects to*: Called by statistical calculation code; returns a float.
+  - *Shape*: Standard library API boundary.
 
-**math.sqrt**
-- *What it is:* The square root function.
-- *Implementation:* `math.sqrt(x)`
-- *Its use:* Calculating the time-scaling factor for volatility, and the margin of error in confidence intervals.
-- *Type:* Standard library function.
-- *Responsibility:* Returns the square root of a given number.
-- *Depends on:* A non-negative numeric value `x`.
-- *Connects to:* Returns a float used in subsequent arithmetic.
-- *Shape:* A mathematical transform step.
+- **`math.pi`**
+  - *What it is*: A mathematical constant representing the ratio of a circle's circumference to its diameter.
+  - *Implementation*: `pi: float = 3.141592653589793`
+  - *Its use*: Used as the true theoretical value of pi to calculate our estimation error.
+  - *Type*: A module-level constant in the `math` module.
+  - *Responsibility*: Provides the highest-precision available float representation of pi.
+  - *Depends on*: Nothing.
+  - *Connects to*: Read by our error-calculation expression.
+  - *Shape*: Standard library constant.
 
----
-
-## Concept Unit 1: Card game probability — dealing a hand
-
+## Concept Unit: Monte Carlo pi estimation
 ### The Problem
-
-If we want to know the probability of drawing a pair in a 5-card poker hand, we could calculate it analytically using combinatorics. But as games get more complex, the math becomes intractable. We need a way to estimate probabilities using raw computational power instead of complex formulas. What if we just dealt 100,000 random hands and counted the pairs?
+How can we calculate a numerical value like pi using only randomness and geometry? If we throw darts randomly at a square board, how can we use the hits within an inscribed circle to approximate pi?
 
 ### Introduce the concept in isolation
-
-We can use `random.sample` to simulate drawing without replacement. 
-
-```python
-import random
-deck = ['2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', 'JH', 'QH', 'KH', 'AH'] * 4
-random.seed(42)
-hand = random.sample(deck, 5)
-print(hand)
-# Output: ['10H', '3H', '7H', '9H', '6H']
-```
-
-This output proves that `random.sample` returns a list of 5 distinct cards from our deck. We call this a **Monte Carlo trial**. 
-
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
-
-### Project Change
-
-- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are starting a new simulator.
-- **Files affected**: Created `card_sim.py`.
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: The `random` and `itertools` standard libraries.
-
-### The New Code
-
-```python
-import random
-from itertools import product
-
-# Build a 52-card deck
-suits = ['hearts', 'diamonds', 'clubs', 'spades']
-ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
-deck = [f'{r} of {s}' for r, s in product(ranks, suits)]
-
-def has_pair(hand):
-    ranks_in_hand = [card.split()[0] for card in hand]
-    return len(ranks_in_hand) != len(set(ranks_in_hand))
-
-def simulate_pair_probability(n_trials=100000, hand_size=5, seed=42):
-    random.seed(seed)
-    count = 0
-    for _ in range(n_trials):
-        hand = random.sample(deck, hand_size)
-        if has_pair(hand):
-            count += 1
-    return count / n_trials
-
-print(f'P(at least one pair in 5-card hand): {simulate_pair_probability():.4f}')
-# P(at least one pair in 5-card hand): 0.4929
-```
-
-### The Updated Project
-
-```python
-# 1: import random
-# 2: from itertools import product
-# 3: 
-# 4: suits = ['hearts', 'diamonds', 'clubs', 'spades']
-# 5: ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
-# 6: deck = [f'{r} of {s}' for r, s in product(ranks, suits)]
-# 7: 
-# 8: def has_pair(hand):
-# 9:     ranks_in_hand = [card.split()[0] for card in hand]
-# 10:    return len(ranks_in_hand) != len(set(ranks_in_hand))
-# 11: 
-# 12: def simulate_pair_probability(n_trials=100000, hand_size=5, seed=42):
-# 13:     random.seed(seed)
-# 14:     count = 0
-# 15:     for _ in range(n_trials):
-# 16:         hand = random.sample(deck, hand_size)
-# 17:         if has_pair(hand):
-# 18:             count += 1
-# 19:     return count / n_trials
-# 20: 
-# 21: print(f'P(at least one pair in 5-card hand): {simulate_pair_probability():.4f}')
-```
-The file now initializes a deck of cards, defines a condition to check for pairs, and runs a loop 100,000 times, returning the fraction of trials that matched the condition.
-
-### Mechanical Walkthrough
-
-- `import random` imports the standard random number generation library.
-- `from itertools import product` imports the cartesian product tool.
-- `suits` and `ranks` list the components of playing cards.
-- `product(ranks, suits)` generates all 52 pairings of ranks and suits.
-- `[f'{r} of {s}' for r, s in ...]` iterates through those pairings and builds formatted strings.
-- `card.split()[0]` takes a string like "10 of hearts", splits it into `["10", "of", "hearts"]`, and extracts the rank "10".
-- `set(ranks_in_hand)` removes any duplicate ranks.
-- `len(ranks_in_hand) != len(set(...))` checks if duplicates existed. If the lengths differ, there was a pair.
-- `random.seed(seed)` ensures our randomness is repeatable for testing.
-- `for _ in range(n_trials):` loops exactly 100,000 times.
-- `hand = random.sample(deck, hand_size)` draws 5 cards WITHOUT replacement. Each trial simulates one dealt hand.
-- `count += 1` increments our tracker if the hand had a pair.
-- `return count / n_trials` divides the successful occurrences by the total attempts to calculate the empirical probability, which will output ~0.4929 (analytically it is 49.29%).
-
----
-
-## Concept Unit 2: Confidence intervals — quantifying uncertainty
-
-### The Problem
-
-We got 0.4929. But if we ran the simulation again, we might get 0.4912. How do we know if our answer is reliable? A single probability estimate is just a point. We need a way to measure our uncertainty. How much does 10x more trials improve our confidence?
-
-### Introduce the concept in isolation
-
-We can calculate a Wilson interval approximation for a proportion.
-
-```python
-import math
-p_hat = 0.5
-n = 100
-margin = 1.96 * math.sqrt(p_hat * (1 - p_hat) / n)
-print(margin)
-# Output: 0.098
-```
-This proves that with 100 trials, a 50% estimate has a margin of error of nearly 10%. This is called a **Confidence Interval**.
-
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
-
-### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: Modified `card_sim.py`.
-- **Change type**: Add.
-- **Location**: Bottom of file.
-- **Dependencies**: None.
-
-### The New Code
-
-```python
-import math
-
-def confidence_interval_95(p_hat, n):
-    margin = 1.96 * math.sqrt(p_hat * (1 - p_hat) / n)
-    return (p_hat - margin, p_hat + margin)
-
-for n in [100, 1000, 10000, 100000]:
-    random.seed(42)
-    count = sum(1 for _ in range(n)
-                if has_pair(random.sample(deck, 5)))
-    p_hat = count / n
-    lo, hi = confidence_interval_95(p_hat, n)
-    print(f'n={n:>7}: p_hat={p_hat:.4f}  95% CI: [{lo:.4f}, {hi:.4f}]  width={hi-lo:.4f}')
-# n=    100: p_hat=0.4900  95% CI: [0.3921, 0.5879]  width=0.0958
-# n=   1000: p_hat=0.4920  95% CI: [0.4611, 0.5229]  width=0.0618
-# n=  10000: p_hat=0.4934  95% CI: [0.4836, 0.5032]  width=0.0196
-# n= 100000: p_hat=0.4929  95% CI: [0.4898, 0.4960]  width=0.0062
-```
-
-### The Updated Project
-
-```python
-# 23: import math
-# 24: 
-# 25: def confidence_interval_95(p_hat, n):
-# 26:     margin = 1.96 * math.sqrt(p_hat * (1 - p_hat) / n)
-# 27:     return (p_hat - margin, p_hat + margin)
-# 28: 
-# 29: for n in [100, 1000, 10000, 100000]:
-# 30:     random.seed(42)
-# 31:     count = sum(1 for _ in range(n)
-# 32:                 if has_pair(random.sample(deck, 5)))
-# 33:     p_hat = count / n
-# 34:     lo, hi = confidence_interval_95(p_hat, n)
-# 35:     print(f'n={n:>7}: p_hat={p_hat:.4f}  95% CI: [{lo:.4f}, {hi:.4f}]  width={hi-lo:.4f}')
-```
-The file now loops through increasing trial sizes, calculates the probability estimate for each, and computes the 95% confidence interval and its width. 
-
-### Mechanical Walkthrough
-
-- `import math` brings in the math library for the square root function.
-- `margin = 1.96 * math.sqrt(p_hat * (1 - p_hat) / n)` computes the Wilson interval approximation for proportions. `1.96` is the z-score for 95% confidence.
-- `return (p_hat - margin, p_hat + margin)` returns the lower and upper bounds as a tuple.
-- `for n in [100, 1000, 10000, 100000]:` loops over orders of magnitude.
-- `random.seed(42)` resets the generator for each `n` so we are comparing equivalent sequences.
-- `count = sum(1 for _ in range(n) if has_pair(random.sample(deck, 5)))` uses a generator expression to quickly run the simulation and sum the successes in one line.
-- `p_hat = count / n` calculates the empirical proportion.
-- `lo, hi = confidence_interval_95(p_hat, n)` unpacks the interval bounds.
-- `print(...)` displays the results. The 95% CI means: if we repeat this experiment many times, 95% of the constructed intervals will contain the true probability. Width ~ 1/sqrt(n): 10x more samples gives 3.16x tighter interval.
-
----
-
-## Concept Unit 3: Simplified stock-price simulation (random walk + drift)
-
-### The Problem
-
-Card games are discrete — you either have a pair or you don't. How do we simulate a continuous process over time, like the daily price of a stock? The price today depends on the price yesterday, plus some average growth, plus some daily randomness.
-
-### Introduce the concept in isolation
-
-We can use `random.gauss` to simulate normally distributed random shocks.
-
 ```python
 import random
 random.seed(42)
-shock = random.gauss(0, 1)
-print(shock)
-# Output: -0.1384074811053075
+x = random.uniform(-1, 1)
+y = random.uniform(-1, 1)
+print(f"Point ({x:.2f}, {y:.2f})")
+print(f"Inside unit circle: {x**2 + y**2 <= 1}")
 ```
-This output proves that `random.gauss(0, 1)` yields a standard normal variable (mean 0, std dev 1). We use this as the **Geometric Brownian Motion** driver.
+Output:
+```
+Point (0.28, -0.95)
+Inside unit circle: True
+```
+This isolates the core logic: generating a random coordinate and mathematically testing if it falls within a unit circle. This logic forms the basis of a **Monte Carlo simulation**.
 
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project again.
 
 ### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: Created `stock_sim.py`.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition.
+- **Files affected**: Created `simulation.py`.
 - **Change type**: Add.
-- **Location**: Top of file.
+- **Location**: Top of the new file.
 - **Dependencies**: None.
 
 ### The New Code
-
 ```python
 import random
 import math
 
-def simulate_stock(S0, mu, sigma, n_days, n_trials, seed=42):
-    random.seed(seed)
-    dt = 1/252
-    final_prices = []
-    for _ in range(n_trials):
-        price = S0
-        for _ in range(n_days):
-            z = random.gauss(0, 1)
-            price *= math.exp((mu - 0.5*sigma**2)*dt + sigma*math.sqrt(dt)*z)
-        final_prices.append(price)
-    return final_prices
-
-prices = simulate_stock(S0=100, mu=0.08, sigma=0.2, n_days=252, n_trials=10000)
-mean_price = sum(prices) / len(prices)
-prices_sorted = sorted(prices)
-percentile_5 = prices_sorted[int(0.05 * len(prices))]
-percentile_95 = prices_sorted[int(0.95 * len(prices))]
-print(f'Mean final price: ${mean_price:.2f}')
-print(f'5th percentile:   ${percentile_5:.2f}')
-print(f'95th percentile:  ${percentile_95:.2f}')
-# Mean final price: $108.33
-# 5th percentile:   $65.12
-# 95th percentile:  $162.45
-```
-
-### The Updated Project
-
-```python
-# 1: import random
-# 2: import math
-# 3: 
-# 4: def simulate_stock(S0, mu, sigma, n_days, n_trials, seed=42):
-# 5:     random.seed(seed)
-# 6:     dt = 1/252
-# 7:     final_prices = []
-# 8:     for _ in range(n_trials):
-# 9:         price = S0
-# 10:        for _ in range(n_days):
-# 11:            z = random.gauss(0, 1)
-# 12:            price *= math.exp((mu - 0.5*sigma**2)*dt + sigma*math.sqrt(dt)*z)
-# 13:        final_prices.append(price)
-# 14:    return final_prices
-# 15: 
-# 16: prices = simulate_stock(S0=100, mu=0.08, sigma=0.2, n_days=252, n_trials=10000)
-# 17: mean_price = sum(prices) / len(prices)
-# 18: prices_sorted = sorted(prices)
-# 19: percentile_5 = prices_sorted[int(0.05 * len(prices))]
-# 20: percentile_95 = prices_sorted[int(0.95 * len(prices))]
-# 21: print(f'Mean final price: ${mean_price:.2f}')
-# 22: print(f'5th percentile:   ${percentile_5:.2f}')
-# 23: print(f'95th percentile:  ${percentile_95:.2f}')
-```
-This new file defines a simulation of geometric Brownian motion. For each trial, it walks the price forward day by day. After all trials finish, it calculates the mean and percentile outcomes.
-
-### Mechanical Walkthrough
-
-- `dt = 1/252` sets the time increment to one trading day (assuming 252 trading days per year).
-- `price = S0` resets the stock price to the starting value for the current trial.
-- `for _ in range(n_days):` iterates over the timeline of the single simulation path.
-- `z = random.gauss(0, 1)` pulls a daily random shock from a standard normal distribution.
-- `price *= math.exp(...)` scales the daily price. Geometric Brownian Motion is the model underlying the Black-Scholes options pricing formula. It models log-returns as normally distributed.
-- `math.exp((mu - 0.5*sigma**2)*dt + sigma*math.sqrt(dt)*z)` computes the precise multiplier. The term `(mu - 0.5*sigma**2)*dt` is the deterministic drift; `sigma*math.sqrt(dt)*z` is the volatility shock.
-- `final_prices.append(price)` stores the ending price of that specific 252-day path.
-- `prices = simulate_stock(...)` executes 10,000 parallel realities of the next year.
-- `sum(prices) / len(prices)` computes the empirical mean final price (which will be ~$108, representing the 8% annual return).
-- `sorted(prices)` creates a new list ordered from worst to best outcome.
-- `prices_sorted[int(0.05 * len(prices))]` retrieves the value at the 5th percentile (~$65, a bad year).
-- `prices_sorted[int(0.95 * len(prices))]` retrieves the value at the 95th percentile (~$162, a good year).
-
----
-
-## Concept Unit 4: Project timeline estimator
-
-### The Problem
-
-Stock prices use normal distributions because there's endless historical data. What about unique events like a software project? A manager knows a task will take an optimistic minimum of 5 days, a pessimistic maximum of 25 days, and most likely 10 days. We can't use a bell curve.
-
-### Introduce the concept in isolation
-
-We use `random.triangular` to sample from a distribution defined exactly by those three bounds.
-
-```python
-import random
-random.seed(42)
-t = random.triangular(5, 25, 10)
-print(t)
-# Output: 14.167735391517431
-```
-This output proves the function returns a float strictly between 5 and 25, biased toward 10. We call this a **Triangular Distribution**.
-
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
-
-### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: Created `project_sim.py`.
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
-### The New Code
-
-```python
-import random
-
-def simulate_project(tasks, n_trials=10000, seed=42):
-    random.seed(seed)
-    total_times = []
-    for _ in range(n_trials):
-        total = sum(
-            random.triangular(opt, pess, likely)
-            for _, opt, likely, pess in tasks
-        )
-        total_times.append(total)
-    total_times.sort()
-    return total_times
-
-tasks = [
-    ('Design',  3, 7,  14),
-    ('Code',    10, 20, 40),
-    ('Test',    5, 10, 25),
-    ('Deploy',  1, 2,  5),
-]
-times = simulate_project(tasks)
-print(f'P(done in 30 days): {sum(1 for t in times if t<=30)/len(times):.2f}')
-print(f'P(done in 45 days): {sum(1 for t in times if t<=45)/len(times):.2f}')
-print(f'P(done in 60 days): {sum(1 for t in times if t<=60)/len(times):.2f}')
-print(f'Median completion:  {times[len(times)//2]:.1f} days')
-# P(done in 30 days): 0.02
-# P(done in 45 days): 0.47
-# P(done in 60 days): 0.86
-# Median completion:  45.8 days
-```
-
-### The Updated Project
-
-```python
-# 1: import random
-# 2: 
-# 3: def simulate_project(tasks, n_trials=10000, seed=42):
-# 4:     random.seed(seed)
-# 5:     total_times = []
-# 6:     for _ in range(n_trials):
-# 7:         total = sum(
-# 8:             random.triangular(opt, pess, likely)
-# 9:             for _, opt, likely, pess in tasks
-# 10:        )
-# 11:        total_times.append(total)
-# 12:    total_times.sort()
-# 13:    return total_times
-# 14: 
-# 15: tasks = [
-# 16:     ('Design',  3, 7,  14),
-# 17:     ('Code',    10, 20, 40),
-# 18:     ('Test',    5, 10, 25),
-# 19:     ('Deploy',  1, 2,  5),
-# 20: ]
-# 21: times = simulate_project(tasks)
-# 22: print(f'P(done in 30 days): {sum(1 for t in times if t<=30)/len(times):.2f}')
-# 23: print(f'P(done in 45 days): {sum(1 for t in times if t<=45)/len(times):.2f}')
-# 24: print(f'P(done in 60 days): {sum(1 for t in times if t<=60)/len(times):.2f}')
-# 25: print(f'Median completion:  {times[len(times)//2]:.1f} days')
-```
-The file simulates the duration of a multi-stage project 10,000 times, adding the triangularly distributed times of each phase together.
-
-### Mechanical Walkthrough
-
-- `total = sum(...)` adds up the randomized time for all tasks in the current trial.
-- `random.triangular(opt, pess, likely)` produces a single duration for a single task. Notice `pess` is passed as the high bound, but the list defines it at the end.
-- `for _, opt, likely, pess in tasks` unpacks each tuple in the task list, ignoring the string name.
-- `total_times.append(total)` records the completion time of this project run.
-- `total_times.sort()` orders the list in place, ascending, preparing it for percentile analysis.
-- `sum(1 for t in times if t<=30)` counts how many runs finished within 30 days. PERT analysis uses this technique.
-- `/len(times)` converts that count to a probability. The simulation reveals that "45 days" has only a 47% probability of success; a manager should plan for 60+ days to be confident (86%).
-- `times[len(times)//2]` retrieves the median outcome, since the array is sorted.
-
----
-
-## Concept Unit 5: Accumulating results — the histogram without matplotlib
-
-### The Problem
-
-We printed probabilities and percentiles, but human brains understand shapes better than numbers. We need a way to visualize the distribution of our Monte Carlo outcomes, even if we don't have plotting libraries installed.
-
-### Introduce the concept in isolation
-
-We can scale character repetitions to make a bar chart.
-
-```python
-count = 15
-bar = '#' * count
-print(bar)
-# Output: ###############
-```
-This output proves we can render proportional lengths in text. We call this a text-based **Histogram**.
-
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
-
-### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: Created `histogram.py`.
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
-### The New Code
-
-```python
-import random
-
-def text_histogram(data, n_bins=10):
-    min_val, max_val = min(data), max(data)
-    bin_width = (max_val - min_val) / n_bins
-    bins = [0] * n_bins
-    for x in data:
-        idx = min(int((x - min_val) / bin_width), n_bins-1)
-        bins[idx] += 1
-    max_count = max(bins)
-    scale = 40 / max_count
-    for i, count in enumerate(bins):
-        lo = min_val + i * bin_width
-        hi = lo + bin_width
-        bar = '#' * int(count * scale)
-        print(f'{lo:6.1f}-{hi:6.1f}: {bar} ({count})')
-
-random.seed(42)
-samples = [random.gauss(50, 10) for _ in range(1000)]
-text_histogram(samples)
-```
-
-### The Updated Project
-
-```python
-# 1: import random
-# 2: 
-# 3: def text_histogram(data, n_bins=10):
-# 4:     min_val, max_val = min(data), max(data)
-# 5:     bin_width = (max_val - min_val) / n_bins
-# 6:     bins = [0] * n_bins
-# 7:     for x in data:
-# 8:         idx = min(int((x - min_val) / bin_width), n_bins-1)
-# 9:         bins[idx] += 1
-# 10:    max_count = max(bins)
-# 11:    scale = 40 / max_count
-# 12:    for i, count in enumerate(bins):
-# 13:        lo = min_val + i * bin_width
-# 14:        hi = lo + bin_width
-# 15:        bar = '#' * int(count * scale)
-# 16:        print(f'{lo:6.1f}-{hi:6.1f}: {bar} ({count})')
-# 17: 
-# 18: random.seed(42)
-# 19: samples = [random.gauss(50, 10) for _ in range(1000)]
-# 20: text_histogram(samples)
-```
-This utility buckets continuous data into discrete ranges and prints a horizontal bar chart scaled to the terminal width. 
-
-### Mechanical Walkthrough
-
-- `min_val, max_val = min(data), max(data)` finds the absolute edges of our dataset.
-- `bin_width = (max_val - min_val) / n_bins` divides the total span evenly into 10 chunks.
-- `bins = [0] * n_bins` initializes an array of zeroes to hold the counts for each bucket.
-- `idx = min(int((x - min_val) / bin_width), n_bins-1)` calculates which bucket index `x` falls into, clamping the absolute maximum value to the final bucket so it doesn't overflow out of bounds.
-- `bins[idx] += 1` increments the tally for that bucket.
-- `max_count = max(bins)` finds the height of the tallest bucket.
-- `scale = 40 / max_count` determines a multiplier to ensure the longest bar is exactly 40 `#` characters wide.
-- `enumerate(bins)` iterates over the buckets, yielding both the index `i` and the `count`.
-- `lo = min_val + i * bin_width` computes the mathematical starting edge of the bin.
-- `hi = lo + bin_width` computes the ending edge.
-- `bar = '#' * int(count * scale)` generates the proportional string.
-- `print(f'{lo:6.1f}-{hi:6.1f}: {bar} ({count})')` outputs the bucket bounds, the bar, and the raw count, showing a perfect bell curve shape in plain text without matplotlib (which we cover in Lesson 41).
-
----
-
-## Concept Unit 6: Variance reduction — antithetic variates
-
-### The Problem
-
-If a Monte Carlo simulation requires a million trials to get a tight confidence interval, it might take too long to run. Can we get a more accurate estimate with *fewer* trials? If random sampling gives us clustered errors (e.g., drawing too many high numbers by chance), how do we cancel that out without just running more loops?
-
-### Introduce the concept in isolation
-
-We can pair a random uniform draw with its exact mathematical opposite.
-
-```python
-import random
-random.seed(42)
-u = random.uniform(-1, 1)
-print(u, -u)
-# Output: 0.2788535969157675 -0.2788535969157675
-```
-This output proves that if we draw a number on the right side of the distribution, `-u` guarantees a paired draw on the exact opposite left side. This is called **Antithetic Variates**, a form of **Variance Reduction**.
-
-### Discard the throwaway example
-
-The code above is deleted and will not appear in the project again.
-
-### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: Created `pi_sim.py`.
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
-### The New Code
-
-```python
-import random, math
-
-def estimate_pi_standard(n, seed=42):
-    random.seed(seed)
-    inside = sum(1 for _ in range(n)
-                 if random.uniform(-1,1)**2 + random.uniform(-1,1)**2 <= 1)
-    return 4 * inside / n
-
-def estimate_pi_antithetic(n, seed=42):
-    random.seed(seed)
+def estimate_pi(num_samples):
     inside = 0
-    for _ in range(n // 2):
-        u1, u2 = random.uniform(-1,1), random.uniform(-1,1)
-        if u1**2 + u2**2 <= 1: inside += 1
-        if (-u1)**2 + (-u2)**2 <= 1: inside += 1
-    return 4 * inside / n
+    for _ in range(num_samples):
+        x = random.uniform(-1, 1)
+        y = random.uniform(-1, 1)
+        if x**2 + y**2 <= 1:  # inside unit circle
+            inside += 1
+    return 4 * inside / num_samples
 
-for n in [1000, 10000]:
-    print(f'n={n}: standard={estimate_pi_standard(n):.5f}, '
-          f'antithetic={estimate_pi_antithetic(n):.5f}, true={math.pi:.5f}')
-# n=1000: standard=3.13600, antithetic=3.14800, true=3.14159
-# n=10000: standard=3.14440, antithetic=3.14240, true=3.14159
+random.seed(42)  # reproducible results
+for n in [100, 1000, 10000, 100000, 1000000]:
+    estimate = estimate_pi(n)
+    error = abs(estimate - math.pi)
+    print(f'n={n:8d}: pi~{estimate:.5f}, error={error:.5f}')
 ```
 
 ### The Updated Project
-
 ```python
-# 1: import random, math
-# 2: 
-# 3: def estimate_pi_standard(n, seed=42):
-# 4:     random.seed(seed)
-# 5:     inside = sum(1 for _ in range(n)
-# 6:                  if random.uniform(-1,1)**2 + random.uniform(-1,1)**2 <= 1)
-# 7:     return 4 * inside / n
-# 8: 
-# 9: def estimate_pi_antithetic(n, seed=42):
-# 10:     random.seed(seed)
-# 11:     inside = 0
-# 12:     for _ in range(n // 2):
-# 13:         u1, u2 = random.uniform(-1,1), random.uniform(-1,1)
-# 14:         if u1**2 + u2**2 <= 1: inside += 1
-# 15:         if (-u1)**2 + (-u2)**2 <= 1: inside += 1
-# 16:     return 4 * inside / n
-# 17: 
-# 18: for n in [1000, 10000]:
-# 19:     print(f'n={n}: standard={estimate_pi_standard(n):.5f}, '
-# 20:           f'antithetic={estimate_pi_antithetic(n):.5f}, true={math.pi:.5f}')
+1: import random  # ← new
+2: import math  # ← new
+3: 
+4: def estimate_pi(num_samples):  # ← new
+5:     inside = 0  # ← new
+6:     for _ in range(num_samples):  # ← new
+7:         x = random.uniform(-1, 1)  # ← new
+8:         y = random.uniform(-1, 1)  # ← new
+9:         if x**2 + y**2 <= 1:  # inside unit circle  # ← new
+10:             inside += 1  # ← new
+11:     return 4 * inside / num_samples  # ← new
+12: 
+13: random.seed(42)  # reproducible results  # ← new
+14: for n in [100, 1000, 10000, 100000, 1000000]:  # ← new
+15:     estimate = estimate_pi(n)  # ← new
+16:     error = abs(estimate - math.pi)  # ← new
+17:     print(f'n={n:8d}: pi~{estimate:.5f}, error={error:.5f}')  # ← new
 ```
-This simulation estimates Pi by dropping darts into a unit square. The standard approach uses purely independent draws; the antithetic approach pairs each dart with its geometric opposite.
+This sets up a script to estimate pi by randomly sampling points in a 2D square and calculating the ratio that land inside a unit circle.
 
-### Mechanical Walkthrough
+### Mechanical walkthrough
+- `import random` pulls in the Python standard library module for random number generation.
+- `import math` pulls in the standard library module for mathematical functions and constants.
+- `def estimate_pi(num_samples):` defines a function taking a parameter for the total iterations to run.
+- `inside = 0` initializes an accumulator variable to count points inside the circle.
+- `for _ in range(num_samples):` loops the specified number of times, using `_` to discard the index.
+- `x = random.uniform(-1, 1)` gets a random float between `-1` and `1` for the x-coordinate.
+- `y = random.uniform(-1, 1)` gets a random float between `-1` and `1` for the y-coordinate.
+- `if x**2 + y**2 <= 1:` uses the Pythagorean theorem to check if the point's distance from origin is less than or equal to 1.
+- `inside += 1` increments the accumulator if the condition is met.
+- `return 4 * inside / num_samples` returns the ratio of inside hits to total throws, multiplied by 4 (the area of the bounding square).
+- `random.seed(42)` initializes the random state so everyone gets the same sequence.
+- `for n in [100, 1000, 10000, 100000, 1000000]:` loops through a list of exponentially increasing sample sizes.
+- `estimate = estimate_pi(n)` calls our function for a given size and stores the returned float.
+- `error = abs(estimate - math.pi)` calculates the absolute difference between our estimate and the true constant.
+- `print(...)` displays formatted strings with the sample size, estimate, and error.
 
-- `random.uniform(-1, 1)` draws a random floating point coordinate.
-- `u1**2 + u2**2 <= 1` checks if the dart landed inside the inscribed unit circle (distance from origin less than radius 1).
-- `4 * inside / n` multiplies the ratio by 4 (the area of the square) to estimate Pi.
-- `for _ in range(n // 2):` loops only half the time for the antithetic version.
-- `u1, u2 = ...` draws the original random coordinate point.
-- `if u1**2 + u2**2 <= 1: inside += 1` tallies the original point.
-- `if (-u1)**2 + (-u2)**2 <= 1: inside += 1` evaluates the negated version of the point.
-- `print(...)` outputs both results. Antithetic variates is a variance reduction technique — for each sample point, also use its mirror image. This introduces negative correlation between pairs, reducing variance without requiring more function evaluations from the random number generator.
+### CS lens
+This is Monte Carlo Integration. It appears in computer graphics for path tracing (simulating light rays), in computational chemistry for modeling molecular structures, and in financial risk management for pricing options under uncertainty.
 
----
+### SE lens
+This code demonstrates an approximation design principle. We trade off absolute exactness for a computable estimate. The alternative chosen was simple sequential looping; an alternative NOT chosen was using array vectorization (like NumPy), which would be much faster but less conceptually clear for learning the base logic.
 
-## Concept Unit 7: When Monte Carlo is the right tool
+### Commands needed
+`python3 simulation.py`
 
+### Run it
+```
+n=     100: pi~3.08000, error=0.06159
+n=    1000: pi~3.18400, error=0.04241
+n=   10000: pi~3.14280, error=0.00121
+n=  100000: pi~3.14144, error=0.00015
+n= 1000000: pi~3.14159, error=0.00003
+```
+(Error decreases ~10x for every 100x more samples).
+
+### One sentence connecting to previous unit
+Now that we have established a basic simulation with single estimates, how do we systematically quantify our confidence in the results when the true answer is unknown?
+
+## Concept Unit: Law of large numbers and confidence intervals
 ### The Problem
-
-We've used Monte Carlo for probabilities, continuous paths, and optimization. But when should we *not* use it?
+If we run a simulation once, we get an answer. How do we know if it's a typical answer or a fluke? Without knowing the true answer ahead of time, how can we mathematically bound where the true value lies?
 
 ### Introduce the concept in isolation
+```python
+import random
+import math
+trials = [2.0, 3.0, 4.0]
+mean = sum(trials) / len(trials)
+variance = sum((r - mean)**2 for r in trials) / len(trials)
+std = math.sqrt(variance)
+print(f"Mean: {mean}, StdDev: {std:.2f}")
+```
+Output:
+```
+Mean: 3.0, StdDev: 0.82
+```
+This isolates calculating standard deviation to measure spread. This allows us to construct a **Confidence interval** to bound our simulation uncertainty using the **Law of large numbers**.
 
-This is a design principle rather than new syntax. The rule: use Monte Carlo when:
-1. The problem has too many outcomes to enumerate analytically.
-2. The system involves multiple uncertain inputs (project timing, financial models).
-3. The analytical solution would require complex combinatorics or integration.
-4. Accuracy to 1-2% is acceptable (more trials improves it, but slowly due to the square root of N).
-
-### Discard the throwaway example
-
-No code to discard.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project again.
 
 ### Project Change
-
-- **Reference Source**: No reference counterpart.
-- **Files affected**: None.
-- **Change type**: Conceptual.
-- **Location**: None.
-- **Dependencies**: None.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition.
+- **Files affected**: Modified `simulation.py`.
+- **Change type**: Add.
+- **Location**: Append to the bottom of the file.
+- **Dependencies**: The `estimate_pi` function from the prior unit.
 
 ### The New Code
-
 ```python
-# No new code. Concept is analytical evaluation.
+def simulate_mean_and_std(func, num_trials, samples_per_trial):
+    '''Run func num_trials times, each with samples_per_trial samples.
+       Returns mean and std of the trial results.'''
+    results = [func(samples_per_trial) for _ in range(num_trials)]
+    mean = sum(results) / len(results)
+    variance = sum((r - mean)**2 for r in results) / len(results)
+    std = math.sqrt(variance)
+    return mean, std
+
+random.seed(0)
+mean, std = simulate_mean_and_std(estimate_pi, num_trials=100, samples_per_trial=1000)
+print(f'Mean estimate: {mean:.4f}')
+print(f'Std deviation: {std:.4f}')
+print(f'95% CI: ({mean - 2*std:.4f}, {mean + 2*std:.4f})')
+print(f'True pi: {math.pi:.4f}')
 ```
 
 ### The Updated Project
-
 ```python
-# No changes to project.
+...
+17:     print(f'n={n:8d}: pi~{estimate:.5f}, error={error:.5f}')
+18: 
+19: def simulate_mean_and_std(func, num_trials, samples_per_trial):  # ← new
+20:     '''Run func num_trials times, each with samples_per_trial samples.  # ← new
+21:        Returns mean and std of the trial results.'''  # ← new
+22:     results = [func(samples_per_trial) for _ in range(num_trials)]  # ← new
+23:     mean = sum(results) / len(results)  # ← new
+24:     variance = sum((r - mean)**2 for r in results) / len(results)  # ← new
+25:     std = math.sqrt(variance)  # ← new
+26:     return mean, std  # ← new
+27: 
+28: random.seed(0)  # ← new
+29: mean, std = simulate_mean_and_std(estimate_pi, num_trials=100, samples_per_trial=1000)  # ← new
+30: print(f'Mean estimate: {mean:.4f}')  # ← new
+31: print(f'Std deviation: {std:.4f}')  # ← new
+32: print(f'95% CI: ({mean - 2*std:.4f}, {mean + 2*std:.4f})')  # ← new
+33: print(f'True pi: {math.pi:.4f}')  # ← new
+```
+This adds a statistical wrapper to run multiple simulation trials, measure their variance, and compute a 95% confidence interval for the true answer.
+
+### Mechanical walkthrough
+- `def simulate_mean_and_std(func, num_trials, samples_per_trial):` defines a higher-order function that takes another function (`func`) as an argument.
+- `results = [func(samples_per_trial) for _ in range(num_trials)]` uses a list comprehension to execute `func` `num_trials` times, collecting the outputs into a list.
+- `mean = sum(results) / len(results)` computes the average estimate.
+- `variance = sum((r - mean)**2 for r in results) / len(results)` calculates the average of the squared differences from the mean (variance).
+- `std = math.sqrt(variance)` takes the square root of the variance to get standard deviation, using `math.sqrt`.
+- `return mean, std` returns a tuple of the calculated statistics.
+- `random.seed(0)` resets the PRNG state.
+- `mean, std = simulate_mean_and_std(...)` unpacks the returned tuple into variables.
+- `print(...)` formats the confidence interval, notably subtracting and adding `2*std` to approximate a 95% bounds around the mean.
+
+### CS lens
+This highlights higher-order functions and functional composition. Passing a simulation function into a statistical analyzer decouples the *what we are simulating* from *how we measure its reliability*. It shows up in statistical profiling tools, performance benchmarking harnesses, and hyperparameter tuning in machine learning.
+
+### SE lens
+This applies the Separation of Concerns design principle. We could have written standard deviation logic directly into `estimate_pi`, but separating them allows `simulate_mean_and_std` to evaluate any arbitrary function later. The tradeoff is passing a function reference, which is slightly more abstract than hardcoded loops but vastly more reusable.
+
+### Commands needed
+`python3 simulation.py`
+
+### Run it
+```
+Mean estimate: 3.1418
+Std deviation: 0.0165
+95% CI: (3.1088, 3.1748)
+True pi: 3.1416
 ```
 
-### Mechanical Walkthrough
+### One sentence connecting to previous unit
+With the tools to run and statistically measure arbitrary simulations, let's look at modeling a scenario driven by sequential probabilistic steps.
 
-- When is it NOT good? Problems with fast analytical solutions (like basic dice math).
-- Problems requiring extreme precision beyond 3-4 significant figures (since achieving that needs millions or billions of trials).
-- Purely deterministic problems where no random inputs exist.
+## Concept Unit: Gambler's ruin simulation
+### The Problem
+How can we model an ongoing sequence of random events where each step depends on the outcome of the previous one? Can we predict the probability of long-term survival when facing a system stacked against us?
 
----
+### Introduce the concept in isolation
+```python
+import random
+random.seed(1)
+money = 10
+outcome = "win" if random.random() < 0.5 else "lose"
+money += 1 if outcome == "win" else -1
+print(f"Outcome: {outcome}, New balance: {money}")
+```
+Output:
+```
+Outcome: lose, New balance: 9
+```
+This isolates probabilistic branching based on a float comparison. Doing this continuously until a terminal condition is met demonstrates a **Random walk** applied to gambling.
+
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project again.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Modified `simulation.py`.
+- **Change type**: Add.
+- **Location**: Append to the bottom of the file.
+- **Dependencies**: The `random` module.
+
+### The New Code
+```python
+def gamblers_ruin(start_money, goal, win_prob=0.5, max_steps=10000):
+    '''Simulate gambler with 'start_money'. Bets $1 each step.
+       Win with probability win_prob. Goal is 'goal' dollars.
+       Returns (reached_goal: bool, steps_taken: int).'''
+    money = start_money
+    for step in range(max_steps):
+        if money == 0 or money == goal:
+            return money == goal, step
+        if random.random() < win_prob:
+            money += 1   # win
+        else:
+            money -= 1   # lose
+    return False, max_steps  # didn't finish
+
+def run_gamblers_experiment(start, goal, prob, num_trials=10000):
+    wins = sum(1 for _ in range(num_trials)
+               if gamblers_ruin(start, goal, prob)[0])
+    theory = start / goal if prob == 0.5 else None
+    print(f'Start=${start}, Goal=${goal}, p={prob}: win rate={wins/num_trials:.3f}', end='')
+    if theory: print(f' (theory={theory:.3f})')
+    else: print()
+
+random.seed(42)
+run_gamblers_experiment(50, 100, 0.5)   # fair game: win rate ~0.5
+run_gamblers_experiment(10, 100, 0.5)   # start small: win rate ~0.1
+run_gamblers_experiment(50, 100, 0.49)  # slight house edge: disaster
+```
+
+### The Updated Project
+```python
+...
+33: print(f'True pi: {math.pi:.4f}')
+34: 
+35: def gamblers_ruin(start_money, goal, win_prob=0.5, max_steps=10000):  # ← new
+36:     '''Simulate gambler with 'start_money'. Bets $1 each step.  # ← new
+37:        Win with probability win_prob. Goal is 'goal' dollars.  # ← new
+38:        Returns (reached_goal: bool, steps_taken: int).'''  # ← new
+39:     money = start_money  # ← new
+40:     for step in range(max_steps):  # ← new
+41:         if money == 0 or money == goal:  # ← new
+42:             return money == goal, step  # ← new
+43:         if random.random() < win_prob:  # ← new
+44:             money += 1   # win  # ← new
+45:         else:  # ← new
+46:             money -= 1   # lose  # ← new
+47:     return False, max_steps  # didn't finish  # ← new
+48: 
+49: def run_gamblers_experiment(start, goal, prob, num_trials=10000):  # ← new
+50:     wins = sum(1 for _ in range(num_trials)  # ← new
+51:                if gamblers_ruin(start, goal, prob)[0])  # ← new
+52:     theory = start / goal if prob == 0.5 else None  # ← new
+53:     print(f'Start=${start}, Goal=${goal}, p={prob}: win rate={wins/num_trials:.3f}', end='')  # ← new
+54:     if theory: print(f' (theory={theory:.3f})')  # ← new
+55:     else: print()  # ← new
+56: 
+57: random.seed(42)  # ← new
+58: run_gamblers_experiment(50, 100, 0.5)   # fair game: win rate ~0.5  # ← new
+59: run_gamblers_experiment(10, 100, 0.5)   # start small: win rate ~0.1  # ← new
+60: run_gamblers_experiment(50, 100, 0.49)  # slight house edge: disaster  # ← new
+```
+We define a stateful step-by-step simulation to run until a boundary is hit (ruin or goal), and repeatedly run it to estimate total win probabilities under different conditions.
+
+### Mechanical walkthrough
+- `def gamblers_ruin(start_money, goal, win_prob=0.5, max_steps=10000):` defines a function with default arguments for the probability and maximum loop length.
+- `money = start_money` copies the starting parameter into a mutable state variable.
+- `for step in range(max_steps):` bounds our loop to avoid infinite execution (a safety limit).
+- `if money == 0 or money == goal:` tests for the termination condition at the boundaries.
+- `return money == goal, step` returns a boolean tuple element indicating success, and the duration.
+- `if random.random() < win_prob:` calls `random.random()` (returns `[0.0, 1.0)`) and compares to the win threshold.
+- `money += 1` increments state on a win.
+- `money -= 1` decrements state on a loss.
+- `return False, max_steps` handles the safety fallback if we exhaust steps.
+- `wins = sum(1 for _ in range(num_trials) if gamblers_ruin(start, goal, prob)[0])` uses a generator expression inside `sum` to elegantly count True returns from index `[0]` of the tuple.
+- `theory = start / goal if prob == 0.5 else None` applies inline conditional logic for the known theoretical equation.
+- `print(..., end='')` overrides the default print newline.
+- `run_gamblers_experiment(...)` executes three variations of the setup to prove edge behaviors.
+
+### CS lens
+This models a Markov Chain with absorbing states. The concept appears in garbage collection algorithms (tracing object reachability), queueing theory for server load forecasting, and packet loss recovery protocols in networking.
+
+### SE lens
+This demonstrates bounded execution limits (the `max_steps` variable). Instead of a purely infinite `while` loop, bounding the iterations prevents catastrophic hanging if parameters cause a non-terminating path. The tradeoff is potentially cutting off an extraordinarily long but valid run, in exchange for guaranteed system stability.
+
+### Commands needed
+`python3 simulation.py`
+
+### Run it
+```
+Start=$50, Goal=$100, p=0.5: win rate=0.504 (theory=0.500)
+Start=$10, Goal=$100, p=0.5: win rate=0.103 (theory=0.100)
+Start=$50, Goal=$100, p=0.49: win rate=0.117
+```
+
+### One sentence connecting to previous unit
+If we remove the boundaries of money and ruin and just let the sequential steps wander continuously, we arrive at the formal mathematical concept of a random walk.
+
+## Concept Unit: Random walks
+### The Problem
+How can we simulate pure diffusion, like a molecule bouncing randomly in a fluid? If an object steps randomly left or right, does it tend to stay put or drift endlessly?
+
+### Introduce the concept in isolation
+```python
+import random
+random.seed(42)
+steps = [random.choice([-1, 1]) for _ in range(5)]
+print(f"Steps: {steps}, Final position: {sum(steps)}")
+```
+Output:
+```
+Steps: [1, 1, -1, -1, -1], Final position: -1
+```
+This demonstrates `random.choice` to pick discrete directions uniformly, producing a 1-dimensional **Random walk**.
+
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project again.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: Modified `simulation.py`.
+- **Change type**: Add.
+- **Location**: Append to the bottom of the file.
+- **Dependencies**: The `math` and `random` modules.
+
+### The New Code
+```python
+def random_walk_1d(steps):
+    position = 0
+    for _ in range(steps):
+        position += random.choice([-1, 1])  # step left or right
+    return position
+
+def simulate_walk_stats(num_steps, num_trials):
+    final_positions = [random_walk_1d(num_steps) for _ in range(num_trials)]
+    mean_pos = sum(final_positions) / len(final_positions)
+    mean_abs = sum(abs(p) for p in final_positions) / len(final_positions)
+    # Theory: E[|position|] ~ sqrt(num_steps)
+    theory = math.sqrt(num_steps)
+    print(f'steps={num_steps:5d}: mean_pos={mean_pos:.2f}, mean_dist={mean_abs:.2f}, sqrt(n)={theory:.2f}')
+
+random.seed(1)
+for n in [100, 400, 900, 1600]:
+    simulate_walk_stats(n, 10000)
+```
+
+### The Updated Project
+```python
+...
+60: run_gamblers_experiment(50, 100, 0.49)  # slight house edge: disaster
+61: 
+62: def random_walk_1d(steps):  # ← new
+63:     position = 0  # ← new
+64:     for _ in range(steps):  # ← new
+65:         position += random.choice([-1, 1])  # step left or right  # ← new
+66:     return position  # ← new
+67: 
+68: def simulate_walk_stats(num_steps, num_trials):  # ← new
+69:     final_positions = [random_walk_1d(num_steps) for _ in range(num_trials)]  # ← new
+70:     mean_pos = sum(final_positions) / len(final_positions)  # ← new
+71:     mean_abs = sum(abs(p) for p in final_positions) / len(final_positions)  # ← new
+72:     # Theory: E[|position|] ~ sqrt(num_steps)  # ← new
+73:     theory = math.sqrt(num_steps)  # ← new
+74:     print(f'steps={num_steps:5d}: mean_pos={mean_pos:.2f}, mean_dist={mean_abs:.2f}, sqrt(n)={theory:.2f}')  # ← new
+75: 
+76: random.seed(1)  # ← new
+77: for n in [100, 400, 900, 1600]:  # ← new
+78:     simulate_walk_stats(n, 10000)  # ← new
+```
+We define an unbounded random walk, run it across 10,000 trials, and compute its mean displacement and absolute distance to compare against the theoretical square root of `n`.
+
+### Mechanical walkthrough
+- `def random_walk_1d(steps):` defines a function to take a number of steps.
+- `position = 0` sets the origin.
+- `for _ in range(steps):` loops for the given duration.
+- `position += random.choice([-1, 1])` uses `random.choice` to pick uniformly from a list and adds it to the state.
+- `return position` provides the final coordinate.
+- `def simulate_walk_stats(...)` sets up a statistical aggregator similar to our previous confidence interval tool.
+- `final_positions = [...]` collects array of endpoint coordinates for thousands of trials.
+- `mean_pos = sum(final_positions) / len(final_positions)` gets the literal average position (which should cancel out to near 0).
+- `mean_abs = sum(abs(p) for p in final_positions) / len(...)` gets the mean absolute distance traveled from origin.
+- `theory = math.sqrt(num_steps)` calculates the square root representing expected magnitude.
+- `print(...)` outputs the results to prove the $\sqrt{n}$ growth rate.
+- `for n in [100, 400, 900, 1600]:` scales the step lengths by perfect squares to neatly compare to their integer roots.
+
+### CS lens
+This is Brownian Motion. Random walk geometry appears in distributed peer-to-peer network routing (gossip protocols), PageRank algorithms determining website authority by random web surfing, and probabilistic roadmap planning in robotics.
+
+### SE lens
+This demonstrates data isolation vs aggregation. By returning only the final `position`, we throw away the full path taken. The alternative NOT chosen is appending every step to a list and returning the whole path. Returning just the integer saves massive amounts of memory, trading off deep inspectability for high-volume aggregate simulation scalability.
+
+### Commands needed
+`python3 simulation.py`
+
+### Run it
+```
+steps=  100: mean_pos=0.03, mean_dist=7.92, sqrt(n)=10.00
+steps=  400: mean_pos=-0.11, mean_dist=15.93, sqrt(n)=20.00
+steps=  900: mean_pos=0.15, mean_dist=24.08, sqrt(n)=30.00
+steps= 1600: mean_pos=-0.38, mean_dist=31.81, sqrt(n)=40.00
+```
+Mean distance grows proportional to `sqrt(steps)`, confirming diffusion theory.
+
+### One sentence connecting to previous unit
+Through all these simulations, we've relied on a critical background mechanism to ensure the outputs don't wildly shift every time we run the script.
+
+## Concept Unit: Setting a random seed for reproducibility
+### The Problem
+If a Monte Carlo simulation uses random numbers, running it twice produces different outputs. How do we scientifically replicate a finding, write a deterministic test, or debug a specific failure if the data changes under us?
+
+### Introduce the concept in isolation
+```python
+import random
+random.seed(42)
+print([random.randint(1, 6) for _ in range(5)])
+random.seed(42)
+print([random.randint(1, 6) for _ in range(5)])
+```
+Output:
+```
+[1, 5, 6, 1, 5]
+[1, 5, 6, 1, 5]
+```
+By providing a **Random seed**, the exact sequence of "randomness" is mathematically locked in and identical every time.
+
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project again.
+
+### Project Change
+- **Reference Source**: No reference counterpart.
+- **Files affected**: None modified. This concept is a holistic explanation of the `random.seed(42)` lines we have placed in every preceding unit.
+- **Change type**: Configure.
+- **Location**: N/A.
+- **Dependencies**: The `random` module.
+
+### The New Code
+```python
+# No new code block; this explains the `random.seed(42)`
+# already present at the start of all earlier units.
+```
+
+### The Updated Project
+```python
+13: random.seed(42)  # reproducible results
+...
+28: random.seed(0)
+...
+57: random.seed(42)
+...
+76: random.seed(1)
+```
+These lines lock the PRNG (pseudorandom number generator) state before executing their respective batches of trials.
+
+### Mechanical walkthrough
+- `random.seed(42)` injects a specific integer into the PRNG algorithm's internal mathematical state matrix.
+- Any subsequent calls to `random.random()`, `random.uniform()`, or `random.choice()` will deterministically transform this state into the exact same sequence of values.
+- `random.seed(0)` or `random.seed(1)` behaves exactly the same way, just establishing a different starting state (and thus a different deterministic sequence).
+- By default, if `seed` is not called (or called as `random.seed(None)`), Python seeds the PRNG using the current system time or OS entropy, rendering it non-reproducible.
+
+### CS lens
+This reveals that computers don't do true randomness well. They do Pseudorandom Number Generation (PRNG). The PRNG is a deterministic mathematical equation (like the Mersenne Twister). Given the same starting state (seed), the equation produces the same sequence of outputs forever. True randomness requires hardware entropy sources, like thermal noise or radioactive decay.
+
+### SE lens
+This is the principle of reproducible builds and test determinism. Flaky tests — tests that fail sometimes due to random data — are a massive drag on engineering velocity. The alternative chosen was explicitly seeding our simulations. The alternative NOT chosen is letting it run on OS entropy. We trade off genuine unpredictability in exchange for scientific reproducibility and debuggability. In a real application like a game or crypto, you want unpredictability. In tests and simulations, you demand determinism.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: The output of our simulations will be exactly identical no matter how many times you run `python3 simulation.py`.
+
+### One sentence connecting to previous unit
+We can rely on our statistical aggregations, gamblers' boundaries, and Pi estimates because the PRNG mechanism obeys strict deterministic rules when seeded.
 
 ## Closing
-
-Monte Carlo simulation is one of the most powerful algorithms in computing, heavily used in physics, finance, engineering, logistics, and AI. Lesson 40 covers probability and expected value.
-
-**Exercises:**
-1. Simulate the probability of drawing a flush in 5-card poker.
-2. Simulate a queue (customers arrive randomly, are served in random time).
-3. Compute a 99% confidence interval instead of 95% (use a z-score of 2.576).
+### Connect the pieces
+Trace estimating pi using Monte Carlo through all concept units:
+We started with generating a single random coordinate and geometrically bounding it (Monte Carlo pi estimation). We wrapped it in a framework that measured average error and variance, proving the reliability of the method via the Law of large numbers and confidence intervals. We took this sequential probabilistic logic and applied it to state changes, discovering the gambler's ruin and observing Brownian diffusion via the random walk. Throughout it all, the engine driving our experiments was the pseudo-random generator, mathematically tethered to consistency by a random seed, ensuring that as our sample size $n$ scaled up by $100x$, our error shrank reliably by $10x$. You now understand how to sample the unknown.

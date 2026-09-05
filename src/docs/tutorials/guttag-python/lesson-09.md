@@ -1,693 +1,482 @@
-# Lesson 9: Dictionaries — Key-Value Stores
+# Lesson 09: Dictionaries — Key-Value Stores
 
-The reader will master Python dictionaries: creation, key lookup, `.get()`, `.keys()`, `.values()`, `.items()`, mutation, iteration patterns, and using dicts as frequency counters and dispatch tables. The transferable problems: (1) a dict maps unique keys to values — lookup by key is O(1), not O(n) like a list search; (2) `.get(key, default)` is the safe way to look up a key that might not exist; (3) dicts as counters and dicts as dispatch tables are two of the most powerful Python patterns.
+What you will build: The reader understands Python dicts: O(1) key lookup, creation, get/set/delete, iteration patterns, common dict methods, and dict comprehensions. The transferable insight: a dict is a hash map. It trades memory for speed: O(1) average lookup instead of O(n) linear search. Any algorithm that repeatedly searches a list for a value should use a dict instead. This is one of the most important performance insights in Python programming.
 
-**What you need to know first:**
-Lessons 0–8 (REPL, types, variables, conditionals, iteration, functions, strings, lists, tuples).
+What you need to know first: Lessons 00-08.
 
-**Terms used in this lesson:**
-- **dict** — short for dictionary, a data structure that maps unique keys to values. Exists to provide fast, direct O(1) lookups by a name or identifier instead of relying on sequential indexing.
-- **KeyError** — an error raised when trying to look up a key that does not exist in a dictionary. Exists to fail fast and prevent silent bugs from undefined access.
-- **hashable** — a property of an object meaning its value never changes during its lifetime and it has a hash value. Keys in dictionaries must be hashable so their internal location remains constant.
-- **O(1)** — constant time complexity. It means an operation takes the same amount of time regardless of how much data is in the structure.
-- **O(n)** — linear time complexity. It means the time taken scales linearly with the size of the data.
-- **lambda** — a keyword for creating anonymous inline functions. Exists to pass simple functionality without needing a formal `def` block.
-- **def** — a keyword that defines a named function block. Exists to create reusable pieces of executable code.
-- **for** — a keyword that starts an iteration loop. Exists to systematically iterate through collections.
-- **in** — a keyword that tests membership within a collection. Exists to provide an O(1) existence check for keys in dictionaries.
+**Terms used in this lesson**
+- **Dictionary** — A data structure that stores key-value pairs, providing average O(1) time complexity for lookups, insertions, and deletions. It trades memory for speed, avoiding linear searches.
+- **Key** — The unique identifier used to look up a value in a dictionary. Keys must be immutable (hashable), such as strings, integers, floats, or tuples.
+- **Value** — The data associated with a key in a dictionary. Values can be of any type, can be mutable, and can be duplicated across different keys.
+- **Hash Map** — The underlying computer science data structure that powers Python dictionaries, using a hash function to compute an index into an array of buckets or slots.
+- **Hashable** — An object is hashable if it has a hash value which never changes during its lifetime, and can be compared to other objects. Immutable types like strings and numbers are hashable.
+- **KeyError** — An exception raised when a dictionary key is not found in the set of existing keys.
+- **Iterable** — An object capable of returning its members one at a time, allowing it to be iterated over in a for-loop.
+- **Comprehension** — A concise syntax for creating a new dictionary by iterating over an iterable and applying an expression to each item.
+- **In-place** — An operation that modifies the original data structure directly, rather than returning a new copy.
 
-**Objects and methods used:**
-
-- **`len()`**
-  - *What it is:* A built-in function that returns the number of items in a container.
-  - *Implementation:* `def len(__obj: Sized) -> int`
-  - *Its use:* Used to determine how many key-value pairs are stored in the dictionary.
-  - *Type:* Built-in function.
-  - *Responsibility:* Accurately count and return the number of elements in a given collection.
-  - *Depends on:* An object that implements the `__len__` magic method.
-  - *Connects to:* Called by user code, calls the object's `__len__`.
-  - *Shape:* Python global namespace.
-
-- **`type()`**
-  - *What it is:* A built-in function that returns the class type of an object.
-  - *Implementation:* `class type(object)`
-  - *Its use:* Used to prove that a literal `{}` or `dict()` creates a `<class 'dict'>`.
-  - *Type:* Built-in function/class.
-  - *Responsibility:* Identify and return the exact runtime type of the provided instance.
-  - *Depends on:* Any Python object.
-  - *Connects to:* Called by user code, interacts with the CPython object header.
-  - *Shape:* Python global namespace.
-
+**Objects and methods used**
+- **`dict`**
+  - *What it is:* The built-in dictionary type in Python.
+  - *Implementation:* `class dict(**kwarg)`
+  - *Its use:* To create a new dictionary to map keys to values.
+  - *Type:* Built-in class.
+  - *Responsibility:* Manages a collection of key-value pairs, ensuring unique keys and providing fast O(1) lookups.
+  - *Depends on:* Keys being hashable objects.
+  - *Connects to:* Can be iterated over, returning keys.
+  - *Shape:* A core Python language data structure.
 - **`dict.get()`**
-  - *What it is:* A method to retrieve a value for a key with an optional default.
+  - *What it is:* A method to safely retrieve a value from a dictionary.
   - *Implementation:* `def get(self, key, default=None)`
-  - *Its use:* Used to safely access dictionary values without risking a `KeyError`.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Return the value for `key` if it exists, otherwise return `default`.
-  - *Depends on:* The dictionary instance, a key, and optionally a fallback value.
-  - *Connects to:* Called by user code.
+  - *Its use:* To look up a key without risking a `KeyError` if the key does not exist.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Returns the value for `key` if `key` is in the dictionary, otherwise returns the `default` value.
+  - *Depends on:* A target key, and optionally a default value.
+  - *Connects to:* Called on a dictionary instance.
   - *Shape:* Public API of the `dict` class.
-
 - **`dict.pop()`**
   - *What it is:* A method to remove a specified key and return its value.
-  - *Implementation:* `def pop(self, key, default=...)`
-  - *Its use:* Used to extract and simultaneously remove a key-value pair.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Remove the item with the specified key and return its value, raising an error or returning a default if missing.
-  - *Depends on:* The dictionary instance and a key.
-  - *Connects to:* Mutates the dictionary internally.
+  - *Implementation:* `def pop(self, key)`
+  - *Its use:* To extract and remove a key-value pair in one step.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Removes the key from the dictionary and returns its value. Raises `KeyError` if the key is not found.
+  - *Depends on:* A target key.
+  - *Connects to:* Called on a dictionary instance.
   - *Shape:* Public API of the `dict` class.
-
-- **`dict.update()`**
-  - *What it is:* A method to merge another dictionary (or iterable of pairs) into this one.
-  - *Implementation:* `def update(self, *args, **kwargs)`
-  - *Its use:* Used to add or overwrite multiple key-value pairs at once.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Update the dictionary in-place with elements from another dictionary object or from an iterable of key/value pairs.
-  - *Depends on:* The dictionary instance and a source of new keys/values.
-  - *Connects to:* Mutates the dictionary internally.
-  - *Shape:* Public API of the `dict` class.
-
 - **`dict.keys()`**
-  - *What it is:* A method that returns a dynamic view of the dictionary's keys.
-  - *Implementation:* `def keys(self) -> dict_keys`
-  - *Its use:* Used to explicitly iterate or check membership only against keys.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Provide a set-like view object representing the keys.
+  - *What it is:* A method that returns a view object of the dictionary's keys.
+  - *Implementation:* `def keys(self)`
+  - *Its use:* To iterate over or inspect the keys of a dictionary.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Provides a dynamic view of the dictionary's keys.
   - *Depends on:* The dictionary instance.
-  - *Connects to:* Provides access to the dictionary's internal hash table keys.
+  - *Connects to:* Called on a dictionary instance; returns a view object.
   - *Shape:* Public API of the `dict` class.
-
 - **`dict.values()`**
-  - *What it is:* A method that returns a dynamic view of the dictionary's values.
-  - *Implementation:* `def values(self) -> dict_values`
-  - *Its use:* Used to iterate over the values in a dictionary.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Provide a view object representing all values in the dictionary.
+  - *What it is:* A method that returns a view object of the dictionary's values.
+  - *Implementation:* `def values(self)`
+  - *Its use:* To iterate over or inspect the values of a dictionary.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Provides a dynamic view of the dictionary's values.
   - *Depends on:* The dictionary instance.
-  - *Connects to:* Provides access to the dictionary's internal hash table values.
+  - *Connects to:* Called on a dictionary instance; returns a view object.
   - *Shape:* Public API of the `dict` class.
-
 - **`dict.items()`**
-  - *What it is:* A method that returns a dynamic view of the dictionary's key-value tuple pairs.
-  - *Implementation:* `def items(self) -> dict_items`
-  - *Its use:* Used to iterate over both keys and values simultaneously.
-  - *Type:* Instance method on `dict`.
-  - *Responsibility:* Provide a set-like view of `(key, value)` tuples.
+  - *What it is:* A method that returns a view object of the dictionary's key-value pairs.
+  - *Implementation:* `def items(self)`
+  - *Its use:* To iterate over both keys and values simultaneously.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Provides a dynamic view of the dictionary's items as tuples `(key, value)`.
   - *Depends on:* The dictionary instance.
-  - *Connects to:* Provides paired access to the dictionary's internal hash table.
+  - *Connects to:* Called on a dictionary instance; returns a view object.
   - *Shape:* Public API of the `dict` class.
-
-- **`str.split()`**
-  - *What it is:* A method that splits a string into a list of words.
-  - *Implementation:* `def split(self, sep=None, maxsplit=-1) -> list[str]`
-  - *Its use:* Used to break a sentence into words for frequency counting.
-  - *Type:* Instance method on `str`.
-  - *Responsibility:* Divide a string into substrings based on a delimiter.
-  - *Depends on:* A string instance.
-  - *Connects to:* Creates and returns a new list of strings.
-  - *Shape:* Public API of the `str` class.
-
-- **`str.lower()`**
-  - *What it is:* A method that returns a lowercase copy of a string.
-  - *Implementation:* `def lower(self) -> str`
-  - *Its use:* Used to normalize words so 'The' and 'the' are counted as the same word.
-  - *Type:* Instance method on `str`.
-  - *Responsibility:* Convert all cased characters in the string to lowercase.
-  - *Depends on:* A string instance.
-  - *Connects to:* Returns a newly allocated string.
-  - *Shape:* Public API of the `str` class.
-
-- **`list.append()`**
-  - *What it is:* A method to add a single item to the end of a list.
-  - *Implementation:* `def append(self, object)`
-  - *Its use:* Used to accumulate values into the lists managed by a `defaultdict`.
-  - *Type:* Instance method on `list`.
-  - *Responsibility:* Append an element to the end of the list in-place.
-  - *Depends on:* A list instance and an element to add.
-  - *Connects to:* Mutates the list internally.
-  - *Shape:* Public API of the `list` class.
-
+- **`dict.update()`**
+  - *What it is:* A method to update the dictionary with elements from another dictionary object.
+  - *Implementation:* `def update(self, other)`
+  - *Its use:* To merge another dictionary into the current one, overwriting existing keys.
+  - *Type:* Instance method of `dict`.
+  - *Responsibility:* Modifies the dictionary in-place by adding or updating key-value pairs.
+  - *Depends on:* Another dictionary.
+  - *Connects to:* Called on a dictionary instance.
+  - *Shape:* Public API of the `dict` class.
 - **`collections.Counter`**
-  - *What it is:* A specialized dictionary subclass designed specifically for counting hashable objects.
+  - *What it is:* A dictionary subclass for counting hashable objects.
   - *Implementation:* `class Counter(dict)`
-  - *Its use:* Used as the standard library, optimized version of the frequency counter pattern.
-  - *Type:* Class in `collections` module.
-  - *Responsibility:* Keep track of how many times equivalent values are added.
+  - *Its use:* To cleanly and efficiently count frequencies of items in an iterable.
+  - *Type:* Class in the `collections` module.
+  - *Responsibility:* Maintains a mapping of elements to their counts, defaulting missing elements to 0.
   - *Depends on:* An iterable or mapping to initialize counts.
-  - *Connects to:* Inherits from `dict` and extends it with counting-specific methods.
-  - *Shape:* Standard library utility class.
-
+  - *Connects to:* Inherits from `dict`.
+  - *Shape:* Standard library utility.
 - **`collections.defaultdict`**
   - *What it is:* A dictionary subclass that calls a factory function to supply missing values.
-  - *Implementation:* `class defaultdict(dict)`
-  - *Its use:* Used to automatically initialize empty lists when grouping items.
-  - *Type:* Class in `collections` module.
-  - *Responsibility:* Provide a default value for missing keys automatically without raising KeyError.
-  - *Depends on:* A default factory callable (e.g., `list`, `int`).
-  - *Connects to:* Overrides `__missing__` method of standard dictionary.
-  - *Shape:* Standard library utility class.
+  - *Implementation:* `class defaultdict(default_factory=None)`
+  - *Its use:* To handle missing keys gracefully by automatically creating a default value when a key is first accessed.
+  - *Type:* Class in the `collections` module.
+  - *Responsibility:* Overrides missing key lookup to provide default values using the `default_factory`.
+  - *Depends on:* A callable `default_factory` (like `int` or `list`).
+  - *Connects to:* Inherits from `dict`.
+  - *Shape:* Standard library utility.
 
-- **`ValueError`**
-  - *What it is:* An exception raised when an operation or function receives an argument that has the right type but an inappropriate value.
-  - *Implementation:* `class ValueError(Exception)`
-  - *Its use:* Raised in the dispatch table example when an unknown operator string is passed.
-  - *Type:* Built-in Exception class.
-  - *Responsibility:* Signal that a value is semantically incorrect for the requested operation.
-  - *Depends on:* The error message string.
-  - *Connects to:* The Python exception handling system.
-  - *Shape:* Python global namespace.
-
-## Concept Unit: Creating dicts and basic access
+## Concept Unit: Dict literals and basic operations
 
 ### The Problem
-How do we store data that relates a unique identifier to a specific value? If we want to map a person's name to their age, a list of ages isn't enough, because we don't know which age belongs to which person. We need a way to look up a value by its name, instantly.
+If you have a list of user IDs and want to look up a user's name, searching through a list of pairs `[('id1', 'Alice'), ('id2', 'Bob')]` takes O(n) time. How can you find the name associated with an ID in O(1) time? What data structure maps unique keys to values directly?
 
 ### Introduce the concept in isolation
-We can use a Python dictionary to map keys to values.
-
 ```python
->>> temp_dict = {'x': 100}
->>> temp_dict['x']
-100
+user = {'name': 'Alice', 'age': 30}
+print(user['name'])
+user['age'] = 31
+print(user.get('email', 'No Email'))
+deleted_age = user.pop('age')
+print(user)
 ```
-This proves that providing a key inside square brackets retrieves the associated value in O(1) time. This is called **dictionary access**.
+Output:
+```
+Alice
+No Email
+{'name': 'Alice'}
+```
+This proves that **dictionaries** can be created with literal syntax `{}`, values can be accessed and modified via `[key]`, missing keys can be safely retrieved with `.get()`, and `.pop()` removes a key and returns its value. 
 
-### Discard the throwaway example
-The `temp_dict` example is discarded and will not be used again.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are demonstrating core dictionary mechanics.
-- **Files affected:** `main.py` (created)
-- **Change type:** add
-- **Location:** At the top of the file.
+- **Reference Source:** No reference counterpart — this is a from-scratch addition to build a text analyzer.
+- **Files affected:** `analyzer.py` (created)
+- **Change type:** Add
+- **Location:** Brand new file.
 - **Dependencies:** None.
 
 ### The New Code
 ```python
-d = {'name': 'Alice', 'age': 30, 'city': 'Boston'}
-print(d['name'])
-print(d['age'])
-print(len(d))
-print(type(d))
-
-d2 = dict(name='Bob', age=25)
-print(d2)
+config = {'case_sensitive': False, 'min_length': 3}
+config['language'] = 'en'
+print("Language:", config.get('language'))
 ```
 
 ### The Updated Project
 ```python
-# main.py
-d = {'name': 'Alice', 'age': 30, 'city': 'Boston'} # ← new
-print(d['name']) # ← new
-print(d['age']) # ← new
-print(len(d)) # ← new
-print(type(d)) # ← new
-
-d2 = dict(name='Bob', age=25) # ← new
-print(d2) # ← new
+1: config = {'case_sensitive': False, 'min_length': 3} # ← new
+2: config['language'] = 'en' # ← new
+3: print("Language:", config.get('language')) # ← new
 ```
-This script creates a dictionary mapping person details, retrieves two specific values, inspects the dictionary's size and type, and demonstrates an alternative creation syntax.
+This establishes a basic dictionary with configuration settings, adds a new key, and safely retrieves it.
 
 ### Mechanical walkthrough
-- `d = {'name': 'Alice', 'age': 30, 'city': 'Boston'}`: The `{}` syntax creates a dictionary literal. `name` is the key, mapping to the string value `Alice`. Keys must be hashable.
-- `print(d['name'])`: Looks up the key `'name'` in `d`. If the key doesn't exist, it raises a `KeyError`.
-- `print(d['age'])`: Looks up the key `'age'` in `d`, returning `30`.
-- `print(len(d))`: Calls the built-in `len()` function, returning `3` since there are three key-value pairs.
-- `print(type(d))`: Calls the built-in `type()` function, outputting `<class 'dict'>`.
-- `d2 = dict(name='Bob', age=25)`: Calls the `dict()` constructor using keyword arguments. This is an alternative way to build a dictionary when keys are valid Python identifiers.
-- `print(d2)`: Prints the dictionary `{name: 'Bob', age: 25}`.
+- `{}` creates a new dictionary literal containing key-value pairs.
+- `'case_sensitive': False` defines a string key `'case_sensitive'` mapping to the boolean value `False`.
+- `,` separates the key-value pairs.
+- `'min_length': 3` maps another string key to an integer value.
+- `config['language'] = 'en'` assigns the value `'en'` to the key `'language'` in the `config` dictionary. If the key exists, it is overwritten; if not, it is created.
+- `print(...)` calls the built-in print function.
+- `"Language:"` is a literal string.
+- `config.get('language')` calls the `get` method on the `config` dictionary with the key `'language'`. It returns the value safely without raising a `KeyError`.
 
-## Concept Unit: .get() — safe lookup with a default
+### CS lens
+This is a Hash Map. It appears in databases for indexing, in caches (like Memcached or Redis) for fast retrieval, and in symbol tables in compilers to track variable definitions. It provides average O(1) time complexity for insertions and lookups by passing the key through a hash function.
 
-### The Problem
-When you use `d['key']` and the key doesn't exist, Python crashes with a `KeyError`. How can we attempt to look up a key and gracefully handle the case where it's missing, without writing an `if/else` block every time?
+### SE lens
+Using a dictionary for configuration over multiple separate variables is a design principle of grouping related state. The alternative NOT chosen is having standalone variables like `config_language` and `config_min_length`. The real tradeoff is that dictionaries lack formal structure (you can misspell a key at runtime), whereas formal classes or objects enforce schema but require more boilerplate.
 
-### Introduce the concept in isolation
-We can use the `.get()` method.
+### Commands needed
+`python3 analyzer.py`
 
-```python
->>> test_dict = {'a': 1}
->>> test_dict.get('b', 0)
-0
-```
-This proves that `.get()` returns the provided default value instead of crashing. This is called **safe lookup**.
+### Run it
+Predicted confidently: Language: en
 
-### Discard the throwaway example
-The `test_dict` example is discarded.
+### One sentence connecting to previous unit
+Now that we can store key-value pairs and look them up efficiently, we need a way to iterate through all the data stored in a dictionary.
 
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
-- **Dependencies:** None.
-
-### The New Code
-```python
-d3 = {'a': 1, 'b': 2}
-print(d3.get('a'))
-print(d3.get('z'))
-print(d3.get('z', 0))
-print(d3.get('a', 99))
-```
-
-### The Updated Project
-```python
-# main.py
-d = {'name': 'Alice', 'age': 30, 'city': 'Boston'}
-print(d['name'])
-print(d['age'])
-print(len(d))
-print(type(d))
-
-d2 = dict(name='Bob', age=25)
-print(d2)
-
-d3 = {'a': 1, 'b': 2} # ← new
-print(d3.get('a')) # ← new
-print(d3.get('z')) # ← new
-print(d3.get('z', 0)) # ← new
-print(d3.get('a', 99)) # ← new
-```
-This adds safe lookup demonstrations to our script, showing how missing keys return `None` or a specified default.
-
-### Mechanical walkthrough
-- `d3 = {'a': 1, 'b': 2}`: Creates a new dictionary literal.
-- `print(d3.get('a'))`: Calls `.get('a')`. Since `'a'` exists, it prints `1`.
-- `print(d3.get('z'))`: Calls `.get('z')`. Since `'z'` is absent, it prints `None`.
-- `print(d3.get('z', 0))`: Calls `.get('z', 0)`. Since `'z'` is absent, it returns the provided default `0` and prints it.
-- `print(d3.get('a', 99))`: Calls `.get('a', 99)`. Since `'a'` exists, it ignores the default `99` and prints the actual value `1`.
-
-## Concept Unit: Adding, updating, and deleting entries
+## Concept Unit: Dict methods — keys, values, items
 
 ### The Problem
-Once a dictionary is created, how do we modify it? Real-world data changes: new users register, existing users update their profiles, and old records get removed.
+You have a dictionary full of configuration settings and you want to print all of them. How do you loop over a dictionary? Does looping give you the keys, the values, or both?
 
 ### Introduce the concept in isolation
-Dictionaries are mutable, meaning we can change them in place.
-
 ```python
->>> mut_dict = {'x': 1}
->>> mut_dict['x'] = 2
->>> mut_dict
-{'x': 2}
+d = {'a': 1, 'b': 2}
+for k, v in d.items():
+    print(f"{k}: {v}")
+print('a' in d)
+d.update({'c': 3, 'a': 99})
+print(d)
 ```
-This proves that assigning to an existing key overwrites its value. This is called **dictionary mutation**.
-
-### Discard the throwaway example
-The `mut_dict` example is discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
-- **Dependencies:** None.
-
-### The New Code
-```python
-d4 = {'a': 1, 'b': 2}
-d4['c'] = 3
-d4['a'] = 99
-print(d4)
-del d4['b']
-print(d4)
-print(d4.pop('c'))
-print(d4)
-d4.update({'x': 10, 'y': 20})
-print(d4)
+Output:
 ```
-
-### The Updated Project
-```python
-# main.py
-# ... previous code unchanged ...
-
-d4 = {'a': 1, 'b': 2} # ← new
-d4['c'] = 3 # ← new
-d4['a'] = 99 # ← new
-print(d4) # ← new
-del d4['b'] # ← new
-print(d4) # ← new
-print(d4.pop('c')) # ← new
-print(d4) # ← new
-d4.update({'x': 10, 'y': 20}) # ← new
-print(d4) # ← new
-```
-This adds dictionary mutation operations to the script, demonstrating adding, updating, and two forms of deletion, plus bulk merging.
-
-### Mechanical walkthrough
-- `d4 = {'a': 1, 'b': 2}`: Creates a new dictionary instance.
-- `d4['c'] = 3`: Adds a new key `'c'` with value `3`.
-- `d4['a'] = 99`: Updates the existing key `'a'` to a new value `99`.
-- `print(d4)`: Prints the dictionary `{'a': 99, 'b': 2, 'c': 3}`.
-- `del d4['b']`: Uses the `del` statement to remove the key `'b'` completely.
-- `print(d4)`: Prints the dictionary `{'a': 99, 'c': 3}`.
-- `print(d4.pop('c'))`: Calls `.pop('c')`, which removes the key `'c'` and simultaneously returns its value (`3`), which is printed.
-- `print(d4)`: Prints the dictionary `{'a': 99}`.
-- `d4.update({'x': 10, 'y': 20})`: Calls `.update()`, which merges the provided dictionary into `d4`, adding keys `'x'` and `'y'`.
-- `print(d4)`: Prints the dictionary `{'a': 99, 'x': 10, 'y': 20}`.
-
-## Concept Unit: Iterating over dicts
-
-### The Problem
-How do we loop over a dictionary if we want to print out all of its contents, or perform an operation on every value?
-
-### Introduce the concept in isolation
-A dictionary can be iterated over using a `for` loop.
-
-```python
->>> loop_dict = {'a': 1}
->>> for k in loop_dict:
-...     print(k)
-a
-```
-This proves that iterating directly on a dictionary yields its keys. This is called **dictionary iteration**.
-
-### Discard the throwaway example
-The `loop_dict` example is discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
-- **Dependencies:** None.
-
-### The New Code
-```python
-d5 = {'one': 1, 'two': 2, 'three': 3}
-
-for key in d5:
-    print(key)
-
-for val in d5.values():
-    print(val)
-
-for key, val in d5.items():
-    print(f'{key} -> {val}')
-```
-
-### The Updated Project
-```python
-# main.py
-# ... previous code unchanged ...
-
-d5 = {'one': 1, 'two': 2, 'three': 3} # ← new
-
-for key in d5: # ← new
-    print(key) # ← new
-
-for val in d5.values(): # ← new
-    print(val) # ← new
-
-for key, val in d5.items(): # ← new
-    print(f'{key} -> {val}') # ← new
-```
-This shows the three standard ways to loop through a dictionary: by keys, by values, and by both.
-
-### Mechanical walkthrough
-- `d5 = {'one': 1, 'two': 2, 'three': 3}`: Creates a dictionary.
-- `for key in d5:`: Iterates over the dictionary directly using the `for` keyword. By default, this loops through the keys.
-- `print(key)`: Prints each key.
-- `d5.values()`: Calls `.values()`, returning a view of the dictionary's values.
-- `for val in d5.values():`: Iterates through just the values (`1`, `2`, `3`).
-- `print(val)`: Prints each value.
-- `d5.items()`: Calls `.items()`, returning a view of `(key, value)` tuples.
-- `for key, val in d5.items():`: Iterates through the tuple pairs, unpacking them into `key` and `val` on each iteration.
-- `print(f'{key} -> {val}')`: Prints the formatted string of the pair. Note that these are dynamic views; they reflect changes in real-time, but for stable snapshots you would wrap them in `list()`.
-
-## Concept Unit: Membership testing — in checks KEYS
-
-### The Problem
-If we have a dictionary, how do we quickly check if it contains a specific piece of data without looping through the entire thing?
-
-### Introduce the concept in isolation
-The `in` keyword checks for presence.
-
-```python
->>> mem_dict = {'a': 1}
->>> 'a' in mem_dict
+a: 1
+b: 2
 True
+{'a': 99, 'b': 2, 'c': 3}
 ```
-This proves that `in` works on dictionaries. This is called **membership testing**.
+This proves that `.items()` provides both the key and the value for iteration, the `in` operator provides O(1) membership testing for keys, and `.update()` merges dictionaries and overwrites conflicts. These are core **dictionary methods**.
 
-### Discard the throwaway example
-The `mem_dict` example is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
 - **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
+- **Files affected:** `analyzer.py` (modified)
+- **Change type:** Add
+- **Location:** At the end of the file.
 - **Dependencies:** None.
 
 ### The New Code
 ```python
-d6 = {'a': 1, 'b': 2}
-print('a' in d6)
-print(1 in d6)
-print(1 in d6.values())
-print('a' in d6.keys())
+for key, val in config.items():
+    print(f"Config {key} -> {val}")
+if 'language' in config:
+    print("Language is configured.")
 ```
 
 ### The Updated Project
 ```python
-# main.py
-# ... previous code unchanged ...
-
-d6 = {'a': 1, 'b': 2} # ← new
-print('a' in d6) # ← new
-print(1 in d6) # ← new
-print(1 in d6.values()) # ← new
-print('a' in d6.keys()) # ← new
+1: config = {'case_sensitive': False, 'min_length': 3}
+2: config['language'] = 'en'
+3: print("Language:", config.get('language'))
+4: for key, val in config.items(): # ← new
+5:     print(f"Config {key} -> {val}") # ← new
+6: if 'language' in config: # ← new
+7:     print("Language is configured.") # ← new
 ```
-This demonstrates how membership testing works against keys versus values.
+This loops through the configuration dictionary to display all settings and performs an O(1) check to see if a specific key exists.
 
 ### Mechanical walkthrough
-- `d6 = {'a': 1, 'b': 2}`: Creates a dictionary.
-- `print('a' in d6)`: Uses the `in` operator. For a dictionary, this specifically checks the keys, returning `True`. This is an O(1) operation.
-- `print(1 in d6)`: Returns `False` because `1` is a value, not a key.
-- `print(1 in d6.values())`: Explicitly checks the `.values()` view, returning `True`.
-- `print('a' in d6.keys())`: Explicitly checks the `.keys()` view, returning `True`.
+- `for key, val in` starts an iteration unpacking two variables at once.
+- `config.items()` returns a view object of all key-value tuple pairs in the dictionary.
+- `print(f"Config {key} -> {val}")` prints each key and value using an f-string.
+- `if 'language' in config:` tests whether the string `'language'` is a key currently present in the dictionary.
+- `print("Language is configured.")` executes if the `in` check returns `True`.
 
-## Concept Unit: Dict as a frequency counter
+### CS lens
+Iterating over dictionary views and performing membership tests are core operations on Collections. This appears in JSON parsing (iterating over object properties), routing tables in networking (iterating paths), and file system directory listings (where filenames are keys). The `in` operator uses the underlying hash map to achieve O(1) time complexity.
+
+### SE lens
+Using `.items()` is a design principle of idiomatic iteration. The alternative NOT chosen is looping over keys (`for key in config:`) and then looking up the value (`val = config[key]`). The real tradeoff is that `.items()` is more readable and slightly faster since it avoids the secondary hash lookup, but it unpacks pairs which is unnecessary if you only need the keys.
+
+### Commands needed
+`python3 analyzer.py`
+
+### Run it
+Predicted confidently:
+Config case_sensitive -> False
+Config min_length -> 3
+Config language -> en
+Language is configured.
+
+### One sentence connecting to previous unit
+With the ability to traverse and check membership efficiently, we can use dictionaries to aggregate data, such as counting how many times words appear in a text.
+
+## Concept Unit: Dict as counter — the frequency pattern
 
 ### The Problem
-Given a sequence of items, like words in a text, how do we count how many times each item appears?
+You have a list of words and want to know how many times each word occurs. If you loop through the words, how do you add 1 to a dictionary key's count without crashing when the key doesn't exist yet?
 
 ### Introduce the concept in isolation
-We can use a dictionary where the keys are the items and the values are the counts.
-
 ```python
->>> text = 'apple apple banana'
->>> count = {}
->>> for w in text.split():
-...     count[w] = count.get(w, 0) + 1
->>> count
+from collections import defaultdict, Counter
+words = ['apple', 'banana', 'apple']
+counts = {}
+for w in words:
+    counts[w] = counts.get(w, 0) + 1
+print(counts)
+print(Counter(words))
+```
+Output:
+```
 {'apple': 2, 'banana': 1}
+Counter({'apple': 2, 'banana': 1})
 ```
-This proves that `.get(key, 0) + 1` is an effective pattern for incrementing counts. This is called the **frequency counter pattern**.
+This proves that `.get(w, 0)` is a safe way to initialize and increment counters in one line, and that the `collections.Counter` class provides this exact **frequency pattern** out of the box.
 
-### Discard the throwaway example
-The `count` example is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
 - **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
+- **Files affected:** `analyzer.py` (modified)
+- **Change type:** Add
+- **Location:** At the end of the file.
 - **Dependencies:** None.
 
 ### The New Code
 ```python
-def count_words(text):
-    counts = {}
-    for word in text.split():
-        word = word.lower()
-        counts[word] = counts.get(word, 0) + 1
-    return counts
-
-print(count_words('the cat sat on the mat the cat'))
-
 from collections import Counter
-print(Counter('the cat sat on the mat the cat'.split()))
+text = "the cat sat on the mat"
+words = text.split()
+word_counts = Counter(words)
+print("Top word count:", word_counts['the'])
 ```
 
 ### The Updated Project
 ```python
-# main.py
-# ... previous code unchanged ...
-
-def count_words(text): # ← new
-    counts = {} # ← new
-    for word in text.split(): # ← new
-        word = word.lower() # ← new
-        counts[word] = counts.get(word, 0) + 1 # ← new
-    return counts # ← new
-
-print(count_words('the cat sat on the mat the cat')) # ← new
-
-from collections import Counter # ← new
-print(Counter('the cat sat on the mat the cat'.split())) # ← new
+1:  config = {'case_sensitive': False, 'min_length': 3}
+...
+6:  if 'language' in config:
+7:      print("Language is configured.")
+8:  from collections import Counter # ← new
+9:  text = "the cat sat on the mat" # ← new
+10: words = text.split() # ← new
+11: word_counts = Counter(words) # ← new
+12: print("Top word count:", word_counts['the']) # ← new
 ```
-This implements a text frequency counter from scratch and then shows the standard library equivalent.
+This splits a sentence into words and uses a `Counter` to build a frequency dictionary of those words instantly.
 
 ### Mechanical walkthrough
-- `def count_words(text):`: Defines a new function named `count_words` receiving `text`.
-- `counts = {}`: Initializes an empty dictionary to hold the tallies.
-- `for word in text.split():`: Calls `.split()` on the string to break it into a list of words, iterating over each `word`.
-- `word = word.lower()`: Normalizes the word by making it lowercase.
-- `counts.get(word, 0)`: Retrieves the current count. If the word hasn't been seen yet, it safely defaults to `0`.
-- `+ 1`: Increments the count.
-- `counts[word] = ...`: Stores the updated count back under the word's key. This avoids a clunky `if word in counts:` check.
-- `return counts`: Returns the assembled frequency map.
-- `print(count_words(...))`: Calls the function and prints `{'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}`.
-- `from collections import Counter`: Imports the `Counter` class from the `collections` module.
-- `Counter('...'.split())`: Passes the split word list into `Counter`, which internally applies this exact frequency counting logic and returns a specialized dictionary containing the results.
+- `from collections import Counter` imports the `Counter` class from the standard library's `collections` module.
+- `text = "the cat sat on the mat"` assigns a string literal to `text`.
+- `words = text.split()` calls the string method `split()` to break the string into a list of words on whitespace.
+- `word_counts = Counter(words)` instantiates a `Counter` object, passing in the list of words. It automatically counts the occurrences of each element.
+- `print(...)` prints the result.
+- `word_counts['the']` looks up the frequency of the string `'the'` in the Counter dictionary.
 
-## Concept Unit: Dict as a dispatch table
+### CS lens
+The frequency pattern is a form of a Histogram. It appears in data analytics for summarizing event occurrences, in natural language processing (NLP) for bag-of-words models, and in image processing to count pixel intensities.
+
+### SE lens
+Using the standard library `Counter` is a principle of reusing robust primitives. The alternative NOT chosen is manually looping and using `counts[w] = counts.get(w, 0) + 1`. The real tradeoff is that `Counter` is highly optimized in C and clearly communicates intent, but introduces an import that might feel like overhead for a trivial single-use script.
+
+### Commands needed
+`python3 analyzer.py`
+
+### Run it
+Predicted confidently: Top word count: 2
+
+### One sentence connecting to previous unit
+Counting is a common way to build a dictionary from a list, but sometimes we want to dynamically generate a dictionary based on arbitrary rules and transformations.
+
+## Concept Unit: Dict comprehensions
 
 ### The Problem
-If we have a program that needs to run different functions based on a string command (like a calculator parsing `+`, `-`, `*`), a long chain of `if / elif` statements becomes hard to read and modify. Is there a better way?
+You have a dictionary of word counts, but you want to create a new dictionary containing only the words that appear more than once, or maybe map each word to its length. How can you build and filter a new dictionary in a single readable line without writing a full loop?
 
 ### Introduce the concept in isolation
-We can map strings directly to functions inside a dictionary.
-
 ```python
->>> fns = {'say_hi': lambda: print('hi')}
->>> fns['say_hi']()
-hi
+base_dict = {'a': 1, 'b': 2, 'c': 3}
+filtered = {k: v * 10 for k, v in base_dict.items() if v > 1}
+inverted = {v: k for k, v in base_dict.items()}
+print(filtered)
+print(inverted)
 ```
-This proves that functions are objects and can be stored in dictionaries and called later. This is called a **dispatch table**.
+Output:
+```
+{'b': 20, 'c': 30}
+{1: 'a', 2: 'b', 3: 'c'}
+```
+This proves that **dictionary comprehensions** can iterate, filter, and transform an existing dictionary (or any iterable) to build a new dictionary concisely, even swapping keys and values.
 
-### Discard the throwaway example
-The `fns` example is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
 - **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
+- **Files affected:** `analyzer.py` (modified)
+- **Change type:** Add
+- **Location:** At the end of the file.
 - **Dependencies:** None.
 
 ### The New Code
 ```python
-def operate(op, a, b):
-    operations = {
-        '+': lambda a, b: a + b,
-        '-': lambda a, b: a - b,
-        '*': lambda a, b: a * b,
-        '/': lambda a, b: a / b,
-    }
-    if op not in operations:
-        raise ValueError(f'Unknown operation: {op}')
-    return operations[op](a, b)
-
-print(operate('+', 3, 4))
-print(operate('*', 5, 6))
+long_words = {word: count for word, count in word_counts.items() if len(word) >= config['min_length']}
+print("Filtered counts:", long_words)
 ```
 
 ### The Updated Project
 ```python
-# main.py
-# ... previous code unchanged ...
-
-def operate(op, a, b): # ← new
-    operations = { # ← new
-        '+': lambda a, b: a + b, # ← new
-        '-': lambda a, b: a - b, # ← new
-        '*': lambda a, b: a * b, # ← new
-        '/': lambda a, b: a / b, # ← new
-    } # ← new
-    if op not in operations: # ← new
-        raise ValueError(f'Unknown operation: {op}') # ← new
-    return operations[op](a, b) # ← new
-
-print(operate('+', 3, 4)) # ← new
-print(operate('*', 5, 6)) # ← new
+...
+11: word_counts = Counter(words)
+12: print("Top word count:", word_counts['the'])
+13: long_words = {word: count for word, count in word_counts.items() if len(word) >= config['min_length']} # ← new
+14: print("Filtered counts:", long_words) # ← new
 ```
-This demonstrates replacing an `if/elif` chain with a dispatch table that routes the correct lambda function based on an operator string.
+This uses a dictionary comprehension to filter out short words, applying the minimum length setting from the `config` dictionary.
 
 ### Mechanical walkthrough
-- `def operate(op, a, b):`: Defines the calculate function.
-- `operations = { ... }`: Creates a dictionary where the keys are string operators.
-- `lambda a, b: a + b`: Defines an anonymous, inline function that takes two arguments and returns their sum. These functions are stored as the values in the dictionary.
-- `if op not in operations:`: Uses membership testing to check if the requested operator exists as a key.
-- `raise ValueError(...)`: Halts execution and raises an error if the operation is invalid.
-- `operations[op]`: Looks up the correct lambda function using the operator string.
-- `(a, b)`: Immediately calls the retrieved lambda function, passing in `a` and `b`. By looking up the behavior in the dictionary, adding a new operation means adding one key-value pair, not a new `elif` branch.
-- `print(operate('+', 3, 4))`: Evaluates to `7` and prints it.
-- `print(operate('*', 5, 6))`: Evaluates to `30` and prints it.
+- `{ ... }` curly braces surrounding a `for` loop signify a dictionary comprehension (because of the `key: value` syntax inside).
+- `word: count` is the expression defining the key-value pair to insert into the new dictionary.
+- `for word, count in word_counts.items()` iterates over every key-value pair in the `word_counts` dictionary.
+- `if len(word) >= config['min_length']` is an optional filter condition. The key-value pair is only included if the length of the string `word` is greater than or equal to the integer stored in `config['min_length']`.
+- `print("Filtered counts:", long_words)` prints the resulting dictionary.
 
-## Concept Unit: collections.defaultdict
+### CS lens
+Comprehensions represent declarative programming and map/filter operations. This declarative approach appears in SQL queries (`SELECT ... WHERE`), in functional programming languages (like Haskell's list comprehensions), and in big data processing pipelines (like Spark transformations).
+
+### SE lens
+Using a comprehension embraces Pythonic expressiveness. The alternative NOT chosen is initializing an empty dictionary, looping, and using an `if` block with assignment. The real tradeoff is that comprehensions are concise and faster (implemented in C), but they can become unreadable if the filtering or mapping logic grows too complex.
+
+### Commands needed
+`python3 analyzer.py`
+
+### Run it
+Predicted confidently: Filtered counts: {'the': 2, 'cat': 1, 'sat': 1, 'mat': 1}
+
+### One sentence connecting to previous unit
+Sometimes after processing and filtering our dictionaries, we need to guarantee the order of the items or merge them with other dictionaries.
+
+## Concept Unit: Ordered dicts and merging (Python 3.7+)
 
 ### The Problem
-When grouping items, you often want to append to a list in a dictionary. But if the key doesn't exist yet, you can't append to it without first initializing an empty list.
+If you have two configuration dictionaries, how do you combine them so that the settings from the second one override the first? And when you print them, will the keys come out in random order or the order you added them?
 
 ### Introduce the concept in isolation
-`defaultdict` solves this by automatically running a factory function for missing keys.
-
 ```python
->>> from collections import defaultdict
->>> test_dd = defaultdict(list)
->>> test_dd['a'].append(1)
->>> test_dd['a']
-[1]
+d1 = {'a': 1, 'b': 2}
+d2 = {'b': 99, 'c': 3}
+merged = {**d1, **d2}
+merged_op = d1 | d2
+print(merged)
+print(merged_op)
 ```
-This proves that accessing a missing key in a `defaultdict` automatically creates it and assigns it the default value (an empty list). This is called an **automatic default value**.
+Output:
+```
+{'a': 1, 'b': 99, 'c': 3}
+{'a': 1, 'b': 99, 'c': 3}
+```
+This proves that dictionaries can be **merged** using the unpacking syntax `{**d1, **d2}` or the union operator `|` (Python 3.9+). It also implicitly demonstrates that modern Python dictionaries preserve insertion order.
 
-### Discard the throwaway example
-The `test_dd` example is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
 - **Reference Source:** No reference counterpart.
-- **Files affected:** `main.py` (modified)
-- **Change type:** add
-- **Location:** Appended to the end of `main.py`.
-- **Dependencies:** None.
+- **Files affected:** `analyzer.py` (modified)
+- **Change type:** Add
+- **Location:** At the end of the file.
+- **Dependencies:** Requires Python 3.9+ for the `|` operator.
 
 ### The New Code
 ```python
-from collections import defaultdict
-
-words = ['apple', 'avocado', 'banana', 'blueberry', 'cherry']
-by_letter = defaultdict(list)
-for word in words:
-    by_letter[word[0]].append(word)
-print(dict(by_letter))
+user_config = {'language': 'fr', 'theme': 'dark'}
+final_config = config | user_config
+print("Final Config:", final_config)
+sorted_counts = dict(sorted(long_words.items(), key=lambda kv: kv[1], reverse=True))
+print("Sorted Counts:", sorted_counts)
 ```
 
 ### The Updated Project
 ```python
-# main.py
-# ... previous code unchanged ...
-
-from collections import defaultdict # ← new
-
-words = ['apple', 'avocado', 'banana', 'blueberry', 'cherry'] # ← new
-by_letter = defaultdict(list) # ← new
-for word in words: # ← new
-    by_letter[word[0]].append(word) # ← new
-print(dict(by_letter)) # ← new
+...
+13: long_words = {word: count for word, count in word_counts.items() if len(word) >= config['min_length']}
+14: print("Filtered counts:", long_words)
+15: user_config = {'language': 'fr', 'theme': 'dark'} # ← new
+16: final_config = config | user_config # ← new
+17: print("Final Config:", final_config) # ← new
+18: sorted_counts = dict(sorted(long_words.items(), key=lambda kv: kv[1], reverse=True)) # ← new
+19: print("Sorted Counts:", sorted_counts) # ← new
 ```
-This groups a list of words by their starting letter using `defaultdict` to seamlessly handle list initialization.
+This merges a base configuration with a user configuration using the union operator, and creates a new dictionary sorted by frequency count, taking advantage of modern Python's insertion-ordered dictionaries.
 
 ### Mechanical walkthrough
-- `from collections import defaultdict`: Imports the `defaultdict` class.
-- `words = ['apple', 'avocado', 'banana', 'blueberry', 'cherry']`: A list of words to group.
-- `by_letter = defaultdict(list)`: Creates a new dictionary that will call the `list` factory function (which returns `[]`) anytime a non-existent key is accessed.
-- `for word in words:`: Iterates through each string.
-- `word[0]`: Extracts the first character of the string to use as the grouping key.
-- `by_letter[word[0]]`: Looks up the list for that letter. If it doesn't exist, `defaultdict` quietly creates an empty list and stores it under that key.
-- `.append(word)`: Calls the `.append()` method on that list, appending the full word.
-- `print(dict(by_letter))`: Converts the `defaultdict` back to a plain dictionary for cleaner printing and outputs `{'a': ['apple', 'avocado'], 'b': ['banana', 'blueberry'], 'c': ['cherry']}`.
+- `user_config = {'language': 'fr', 'theme': 'dark'}` creates a new dictionary.
+- `final_config = config | user_config` uses the dictionary union operator `|` to merge `config` and `user_config`. Conflicts are resolved by keeping the value from `user_config` (the right operand).
+- `print(...)` prints the merged configuration.
+- `sorted(...)` is a built-in function that takes an iterable and returns a sorted list.
+- `long_words.items()` provides the iterable of key-value pairs to sort.
+- `key=lambda kv: kv[1]` provides a lambda function to sort by the dictionary values (the second element, index 1, of each tuple).
+- `reverse=True` sorts the values in descending order.
+- `dict(...)` takes the sorted list of tuples and converts it back into a dictionary. Because Python 3.7+ preserves insertion order, this new dictionary remains sorted.
+- `print("Sorted Counts:", sorted_counts)` prints the sorted dictionary.
+
+### CS lens
+Merging structures and maintaining insertion order are foundational concepts. This appears in configuration management systems (cascading overrides like base config -> env config -> user config), in LRU caches (which depend on insertion/access order), and in log aggregators that merge structured JSON logs.
+
+### SE lens
+Using the `|` operator provides declarative clarity. The alternative NOT chosen is using `config.copy()` and then `config.update(user_config)`. The real tradeoff is that the union operator creates a new dictionary cleanly and functional-style, but it requires Python 3.9+.
+
+### Commands needed
+`python3 analyzer.py`
+
+### Run it
+Predicted confidently:
+Final Config: {'case_sensitive': False, 'min_length': 3, 'language': 'fr', 'theme': 'dark'}
+Sorted Counts: {'the': 2, 'cat': 1, 'sat': 1, 'mat': 1}
+
+### One sentence connecting to previous unit
+We've traced the complete lifecycle of a dictionary, from creation and querying to filtering, merging, and relying on its ordered nature.
 
 ## Closing
-Dictionaries are the key-value store of Python. They enable frequency counting, grouping, caching, dispatch tables, and named-field records. Lesson 10 covers sets — dicts without values, optimized for membership testing and set operations.
 
-**Exercises:**
-- Write a function `invert_dict(d)` that swaps keys and values.
-- Write `most_common(text)` that returns the most frequent word.
-- Write a phone book using a dict that supports lookup, add, and delete.
+### Connect the pieces
+Building a word-frequency dictionary from the sentence `"the cat sat on the mat"` perfectly traces all these concepts in action. You start by splitting the string into an iterable of words. You can manually loop through this list using `word_counts[word] = word_counts.get(word, 0) + 1` to safely initialize and increment counts, proving O(1) key access and avoiding `KeyError`. Alternatively, passing the words directly into `collections.Counter()` leverages the frequency pattern instantly. Once counted, you can use a dictionary comprehension to filter out words below a certain length. Finally, by sorting the `.items()` and passing them back into `dict()`, you rely on Python's insertion-order guarantee to maintain a frequency-ranked list of words, which you could then cleanly merge with other text analyses using the `|` operator.

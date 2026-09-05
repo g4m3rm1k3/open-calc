@@ -1,0 +1,266 @@
+number: "M4.2"
+title: "Editing Fields That Edit Real Data"
+path_note: >
+  File paths under mastercam-app/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same repository's
+  verification folder. This lesson extends ta_search_panel.py in
+  verification/mastercam-app-copy/mastercam-app/, not the real
+  mastercam-app/, per this phase's rule.
+
+what_you_will_build: >
+  Extending TASearchPanel with a real QFormLayout of editable fields that
+  populate from a selected row and save back through Phase M3.3's fixed,
+  atomic Database.update_ta - the same real method TAEditorDialog already
+  calls in this app.
+
+what_you_need_to_know_first: >
+  Lesson M4.1's TASearchPanel - this lesson adds directly onto it, not a
+  new file.
+
+terms:
+  - name: "cellDoubleClicked"
+    definition: >
+      A real QTableWidget signal, emitted with (row, column) whenever a
+      cell is double-clicked - unlike clicked, which fires on a single
+      click, this is Qt's own, separate signal for the double-click
+      gesture specifically.
+  - name: "QFormLayout"
+    definition: >
+      A layout built specifically for label/field pairs - addRow(label,
+      widget) places both side by side and handles their alignment
+      automatically, which is why TAEditorDialog already uses it for
+      exactly this shape.
+
+objects_and_methods:
+  - name: "TASearchPanel._open_edit_fields"
+    what_it_is: "Loads a selected TA's real data into the edit form"
+    implementation: "mastercam_app/ui/ta_search_panel.py (extended this lesson)"
+    its_use: "Connected to results_table.cellDoubleClicked"
+    type: "method (slot)"
+    responsibility: "Fetch the real row via get_ta, populate fields, remember which TA is being edited"
+    depends_on: "get_db, Database.get_ta"
+    connects_to: "_save_edits, which uses the same remembered ta_number"
+    shape: "one lookup, then one loop setting field text"
+  - name: "TASearchPanel._save_edits"
+    what_it_is: "Writes the edited fields back to the database"
+    implementation: "mastercam_app/ui/ta_search_panel.py (extended this lesson)"
+    its_use: "Connected to a Save Changes button"
+    type: "method (slot)"
+    responsibility: "Collect field values into a dict, pass them to update_ta"
+    depends_on: "get_db, Database.update_ta (Phase M3.3, now atomic)"
+    connects_to: "_open_edit_fields, which sets self._editing_ta_number first"
+    shape: "one dict comprehension, one real database call"
+
+concept_units:
+  - title: "A Double-Click Loads a Real Row Into Editable Fields"
+    problem: >
+      The results table shows data, but read-only QTableWidgetItems
+      aren't meant for sustained editing across multiple related fields.
+      Selecting a row needs to open a real, dedicated edit form.
+    socratic_prompt:
+      - "_open_edit_fields reads ta_number from results_table.item(row, 0).text() - the same string already shown in the table - rather than re-querying the database for it. What real round-trip does that avoid?"
+      - "save_button starts disabled (setEnabled(False)) - what real mistake does that prevent if a user clicks Save before ever double-clicking a row?"
+    project_change:
+      reference_source: >
+        mastercam_app/ui/dialogs.py:243-267 (TAEditorDialog._build's real
+        QFormLayout of QLineEdit fields, one per TA property) - the same
+        shape this unit builds fresh, wired to a table selection instead
+        of a dialog's whole constructor.
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+          status: modified
+      change_type: add
+      location: "TASearchPanel.__init__ and a new _open_edit_fields method"
+      dependencies: "QFormLayout, Database.get_ta"
+    new_code:
+      applicable: true
+      intro: >
+        The new form fields, the double-click connection, and the method
+        that populates the form from a real row.
+      file: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+      status: new
+      language: python
+      code: |
+        EDITABLE_FIELDS = [
+            ("Holder Name", "holder_name"),
+            ("Tool Code", "tool_code"),
+            ("Tool Diameter", "tool_diameter"),
+        ]
+
+        # inside __init__, after results_table is created:
+        self.results_table.cellDoubleClicked.connect(self._open_edit_fields)
+
+        self.edit_form = QFormLayout()
+        self.edit_fields = {}
+        for label, field_key in EDITABLE_FIELDS:
+            field = QLineEdit()
+            self.edit_fields[field_key] = field
+            self.edit_form.addRow(label, field)
+        layout.addLayout(self.edit_form)
+
+        self.save_button = QPushButton("Save Changes")
+        self.save_button.setEnabled(False)
+        self.save_button.clicked.connect(self._save_edits)
+        layout.addWidget(self.save_button)
+
+        self._editing_ta_number = None
+
+        def _open_edit_fields(self, row, column):
+            ta_number = self.results_table.item(row, 0).text()
+            db = get_db()
+            ta = db.get_ta(ta_number)
+            if not ta:
+                return
+            for field_key, field in self.edit_fields.items():
+                field.setText(str(ta.get(field_key, "")))
+            self._editing_ta_number = ta_number
+            self.save_button.setEnabled(True)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "def _open_edit_fields(self, row, column):"
+          explanation: >
+            cellDoubleClicked always passes both row and column, even
+            though this method only needs row - Qt calls the connected
+            slot with the signal's real, full argument list, and Python
+            requires the method's signature to accept all of them (or use
+            *args), not just the ones you plan to use.
+        - element: "ta = db.get_ta(ta_number); if not ta: return"
+          explanation: >
+            Between the search populating the table and a user
+            double-clicking a row, nothing guarantees the row's TA still
+            exists (a real, if narrow, race with anything else touching
+            the same database) - this guard means a vanished TA just
+            silently declines to open edit fields, rather than crashing
+            on ta.get(...) against None.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      Remembering self._editing_ta_number here is real, minimal **UI
+      state** - a fact the widget itself doesn't store anywhere else,
+      which is exactly why Lesson M4.0's "central widget" framing matters:
+      state like this has to live somewhere, and a plain instance
+      attribute on the dialog is the simplest place that works.
+    se_lens: >
+      The real alternative - storing the TA number as hidden data on the
+      QTableWidgetItem itself (Qt supports this via setData with a custom
+      role) - would avoid a separate instance attribute, at the cost of
+      needing to know that convention when reading _open_edit_fields
+      later. A plain attribute is more obvious to a future reader for one
+      value like this.
+    commands:
+      - command: "python -m pytest tests/test_ta_search_panel.py::test_double_clicking_a_row_populates_the_edit_fields_and_enables_save -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/"
+    verification:
+      applicable: true
+      real_output: |
+        collected 1 item
+
+        tests/test_ta_search_panel.py::test_double_clicking_a_row_populates_the_edit_fields_and_enables_save PASSED [100%]
+      output_file: "verification/mastercam-phase-04/lab_test_ta_search_panel_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      Lesson M4.1 built the search half of this panel; this unit is the
+      first half of "edit" - loading real data into fields the user can
+      actually change.
+
+  - title: "Saving Writes Through the Same Atomic update_ta From Phase M3.3"
+    problem: >
+      Editable fields are useless if editing them doesn't reach the
+      database. Saving needs to collect every field's current text and
+      write it back through a method already proven atomic.
+    socratic_prompt:
+      - "field.text() for field in self.edit_fields.values() reads whatever's in each box right now - if a user edited holder_name but left tool_code untouched, what does update_ta actually do with the unchanged tool_code value?"
+      - "Lesson M3.3 proved update_ta rolls back everything on a mid-call failure. If _save_edits passed a bad value here, what real, existing test already proves the database wouldn't end up half-updated?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/database.py:795-840 (Database.update_ta, as
+        fixed in Lesson M3.3 with with self._conn:) - this unit's
+        _save_edits is the first new caller of that fixed method.
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+          status: modified
+      change_type: add
+      location: "new _save_edits method"
+      dependencies: "Database.update_ta"
+    new_code:
+      applicable: true
+      intro: "The method the Save Changes button already connects to."
+      file: "verification/mastercam-app-copy/mastercam-app/mastercam_app/ui/ta_search_panel.py"
+      status: new
+      language: python
+      code: |
+        def _save_edits(self):
+            if not self._editing_ta_number:
+                return
+            updates = {field_key: field.text() for field_key, field in self.edit_fields.items()}
+            db = get_db()
+            db.update_ta(self._editing_ta_number, updates)
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "if not self._editing_ta_number: return"
+          explanation: >
+            This is what save_button's initial setEnabled(False) is
+            backed by mechanically - even if something enabled the button
+            before a row was ever selected, this guard is the real thing
+            preventing update_ta from being called with None.
+        - element: "updates = {field_key: field.text() for field_key, field in self.edit_fields.items()}"
+          explanation: >
+            Every field is included every time, whether its text changed
+            or not - update_ta's own SET clause (Lesson M3.3) writes all
+            of them regardless, which is harmless here since an unchanged
+            field just gets set to the value it already had.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the last link in a real, complete **UI-to-persistence**
+      chain traced across two phases: a double-click (M4.2) reads state
+      into fields, a click writes fields back through a database method
+      whose atomicity was independently proven (M3.3) - two different
+      lessons' work composing into one real, working feature.
+    se_lens: >
+      The real alternative - saving each field individually as it's
+      edited (no explicit Save button) - would call update_ta far more
+      often and make "did my edit actually save" harder to reason about.
+      Batching into one explicit Save matches TAEditorDialog's own real
+      convention in this app, not just this new panel's choice.
+    commands:
+      - command: "python -m pytest tests/test_ta_search_panel.py -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/, all four tests"
+    verification:
+      applicable: true
+      real_output: |
+        collected 4 items
+
+        tests/test_ta_search_panel.py::test_search_populates_the_table_with_a_real_match PASSED [ 25%]
+        tests/test_ta_search_panel.py::test_search_with_no_match_clears_the_table PASSED [ 50%]
+        tests/test_ta_search_panel.py::test_double_clicking_a_row_populates_the_edit_fields_and_enables_save PASSED [ 75%]
+        tests/test_ta_search_panel.py::test_save_edits_writes_the_change_through_the_real_atomic_update_ta PASSED [100%]
+
+        ============================== 4 passed in 0.15s ==============================
+      output_file: "verification/mastercam-phase-04/lab_test_ta_search_panel_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above loaded real data into fields; this unit is what
+      makes editing them mean something - a real write, through a real,
+      previously-hardened method.
+
+closing:
+  connect_the_pieces: >
+    Trace TA0060 through both units: double-clicking its row (unit one)
+    loads "ER32" into the holder_name field; typing "ER40-NEW" and
+    clicking Save (unit two) calls the real, atomic update_ta, and
+    db.get_ta("TA0060") afterward proves the change actually persisted -
+    a complete, real, tested field-to-database round trip.
+  next_lesson_pointer: >
+    Next: showing tabular data for editing directly in a table's own
+    cells, grounded in the real ToolEditorDialog's QTableWidget pattern.

@@ -1,535 +1,461 @@
 # Lesson 29: Algorithmic Complexity — Big-O Notation
 
-**What you will build**
-In this lesson, you will build an understanding of Big-O notation, a mathematical tool used to describe how an algorithm's running time scales with the size of its input. You will classify common algorithms into growth rates ($O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$, $O(n^2)$, $O(2^n)$) and empirically measure their running times using the `time` module. The transferable problems you will master include understanding that Big-O describes the *rate of growth*, not the actual elapsed time; distinguishing between best, worst, and average-case performance; and recognizing why choosing the right algorithm often matters far more than hardware speed.
+What you will build: The reader understands Big-O notation: O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), how to derive complexity by counting operations, and why it matters. The transferable insight: Big-O measures how WORK GROWS relative to INPUT SIZE. A function that is 10x slower on 10x the data is O(n). A function that is 100x slower is O(n^2). The complexity class determines whether an algorithm is usable at scale, not the constant factor.
 
-**What you need to know first**
-- Lessons 0–28 (full curriculum through OOP capstone).
+What you need to know first: Lessons 00-28.
 
-**Terms used in this lesson**
-- **Algorithm** — A sequence of computational steps that transforms input into a desired output.
-- **Big-O notation** — A mathematical notation used in computer science to describe the limiting behavior of a function when the argument tends towards a particular value or infinity, primarily used to classify algorithms according to how their run time or space requirements grow as the input size grows.
-- **Rate of growth** — How quickly the time (or space) required by an algorithm increases as the input size increases.
-- **Constant time ($O(1)$)** — An algorithm whose execution time is independent of the input size.
-- **Linear time ($O(n)$)** — An algorithm whose execution time grows directly in proportion to the input size.
-- **Logarithmic time ($O(\log n)$)** — An algorithm whose execution time grows proportionally to the logarithm of the input size, typically because it repeatedly divides the problem size.
-- **Quadratic time ($O(n^2)$)** — An algorithm whose execution time grows proportionally to the square of the input size, often seen in algorithms with nested iterations over the data.
-- **Exponential time ($O(2^n)$)** — An algorithm whose execution time doubles with each addition to the input data set.
-- **Worst-case scenario** — The maximum amount of time an algorithm could possibly take for any given input of a specific size.
-- **Best-case scenario** — The minimum amount of time an algorithm could take for a given input size.
-- **Average-case scenario** — The expected running time of an algorithm over all possible inputs of a given size.
+**Terms used in this lesson:**
+- **Big-O Notation** — A mathematical notation that describes the limiting behavior of a function when the argument tends towards a particular value or infinity. Here, it measures how the runtime or space requirements grow as input size grows.
+- **Constant Time (O(1))** — The runtime is independent of the input size.
+- **Linear Time (O(n))** — The runtime grows directly in proportion to the input size.
+- **Logarithmic Time (O(log n))** — The runtime grows logarithmically as the input size increases (e.g., halving the search space each step).
+- **Quadratic Time (O(n^2))** — The runtime grows proportionally to the square of the input size.
+- **Exponential Time (O(2^n))** — The runtime doubles with each addition to the input data set.
+- **Linearithmic Time (O(n log n))** — The runtime grows in proportion to n multiplied by log n, typical of efficient comparison-based sorts.
 
-**Objects and methods used**
+**Objects and methods used:**
+- **`time.perf_counter`**
+  - *What it is:* A function that returns the value (in fractional seconds) of a performance counter.
+  - *Implementation:* `def perf_counter() -> float` in the `time` module.
+  - *Its use:* Used to measure elapsed time with high resolution.
+  - *Type:* Free function in the `time` module.
+  - *Responsibility:* Returns a clock with the highest available resolution to measure short durations.
+  - *Depends on:* Nothing explicitly passed, depends on OS clock.
+  - *Connects to:* Called by benchmarking code to calculate elapsed time.
+  - *Shape:* A diagnostic/benchmarking utility, used in development/testing.
+- **`list.sort()`**
+  - *What it is:* An in-place sorting method for lists.
+  - *Implementation:* `def sort(self, *, key=None, reverse=False) -> None`
+  - *Its use:* Used to sort the elements of a list efficiently in O(n log n) time using Timsort.
+  - *Type:* Instance method on the `list` class.
+  - *Responsibility:* Rearranges the elements of the list in place based on the standard less-than operator or a provided key function.
+  - *Depends on:* The list it is called on.
+  - *Connects to:* Modifies the underlying array of the list.
+  - *Shape:* Core data structure utility.
+- **`set()`**
+  - *What it is:* A built-in Python class for unordered collections of unique elements.
+  - *Implementation:* `class set(iterable=(), /)`
+  - *Its use:* Used to store seen items for O(1) average case lookup to avoid O(n^2) nested loops.
+  - *Type:* Built-in class.
+  - *Responsibility:* Provides fast membership testing and guarantees element uniqueness via hashing.
+  - *Depends on:* Optionally takes an iterable to initialize.
+  - *Connects to:* Used by application code to filter or track elements.
+  - *Shape:* Core data structure.
+- **`set.add()`**
+  - *What it is:* A method to add a single element to a set.
+  - *Implementation:* `def add(self, element: Any) -> None`
+  - *Its use:* Used to add seen items into the set during iteration.
+  - *Type:* Instance method on the `set` class.
+  - *Responsibility:* Mutates the set by adding the given element if it is not already present.
+  - *Depends on:* The element being added (which must be hashable).
+  - *Connects to:* Modifies the underlying hash table of the set.
+  - *Shape:* Core data structure utility.
+- **`str.join()`**
+  - *What it is:* A method to concatenate an iterable of strings.
+  - *Implementation:* `def join(self, iterable: Iterable[str]) -> str`
+  - *Its use:* Used to efficiently combine many strings into one without quadratic reallocation.
+  - *Type:* Instance method on the `str` class.
+  - *Responsibility:* Creates a new string by concatenating all items in the iterable, separated by the string providing the method.
+  - *Depends on:* An iterable of strings.
+  - *Connects to:* Returns a newly allocated string.
+  - *Shape:* Core string manipulation utility.
 
-- **`time.time()`**
-  - *What it is:* A built-in function in Python's standard `time` library.
-  - *Implementation:* `def time() -> float:` Returns the current time in seconds since the Epoch.
-  - *Its use:* Used here to empirically measure the actual execution time of algorithms by taking the difference between start and end times.
-  - *Type:* Standard library function.
-  - *Responsibility:* Provides a high-resolution timestamp representing the current system time.
-  - *Depends on:* The underlying operating system's system clock.
-  - *Connects to:* Called by application code to measure durations or record timestamps.
-  - *Shape:* A procedural utility function.
-
-- **`math.log2()`**
-  - *What it is:* A built-in mathematical function for computing base-2 logarithms.
-  - *Implementation:* `def log2(x) -> float:` Returns the base-2 logarithm of `x`.
-  - *Its use:* Used to calculate the theoretical number of iterations required by $O(\log n)$ algorithms like binary search.
-  - *Type:* Standard library function.
-  - *Responsibility:* Computes logarithmic values precisely.
-  - *Depends on:* A numerical argument `x`.
-  - *Connects to:* Called by application code performing mathematical modeling.
-  - *Shape:* A procedural mathematical utility.
-
-- **`math.ceil()`**
-  - *What it is:* A built-in function to round numbers up to the nearest integer.
-  - *Implementation:* `def ceil(x) -> int:` Returns the ceiling of `x` as an Integral.
-  - *Its use:* Used in calculating the maximum number of iterations for binary search, as iterations must be whole numbers.
-  - *Type:* Standard library function.
-  - *Responsibility:* Provides the smallest integer greater than or equal to a given number.
-  - *Depends on:* A numerical argument `x`.
-  - *Connects to:* Called by application code to enforce integral bounds.
-  - *Shape:* A procedural mathematical utility.
-
----
-
-## Concept Unit: What Big-O measures — rate of growth
-
+## Concept Unit: O(1) and O(n) — constant and linear
 ### The Problem
-When we write code, we often want to know if it's "fast enough." But measuring "speed" in pure seconds is flawed. If a program takes 2 seconds on a slow, older laptop and 0.5 seconds on a modern desktop, is the code fast or slow? We need a way to describe an algorithm's efficiency that is independent of hardware, programming language, and compiler optimizations. We need a way to describe how the number of operations *scales* as the size of the input data increases.
-
-### Introduce the concept in isolation
-Big-O notation describes how the number of operations grows as the input size $n$ grows. We focus only on the dominant terms, ignoring constants and lower-order terms. For example, if an algorithm takes exactly $3n + 5$ operations, we ignore the constant $3$ and the lower-order $+5$, describing it simply as $O(n)$.
-
-Let's look at a concrete growth table to see the difference between common complexity classes:
-
-```text
-n       | O(1) | O(log n) | O(n)  | O(n log n) | O(n²)     | O(2^n)
---------|------|----------|-------|------------|-----------|-------
-10      | 1    | 3        | 10    | 33         | 100       | 1,024
-100     | 1    | 7        | 100   | 664        | 10,000    | huge
-1,000   | 1    | 10       | 1,000 | 9,966      | 1,000,000 | astronomical
-10,000  | 1    | 13       | 10k   | 132,877    | 100M      | impossible
-```
-
-This table reveals something crucial: for an input size of $10,000$, an $O(n^2)$ algorithm requires 100 million operations, while an $O(n \log n)$ algorithm requires only about 132,877. The choice of algorithm dictates performance far more than hardware upgrades ever could.
-
-### Discard the throwaway example
-This table is for theoretical understanding and does not represent project code.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition because we are demonstrating foundational algorithmic concepts in isolated scripts.
-- **Files affected:** `scratch_growth.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** None
-
-### The New Code
-```python
-# The concepts here are theoretical. No specific new code is required for the table above.
-```
-
-### The Updated Project
-N/A
-
-### Mechanical walkthrough
-The table demonstrates that as $n$ (the input size) grows, different algorithmic complexities diverge wildly in the amount of work they require. A constant time algorithm ($O(1)$) takes the exact same number of steps regardless of $n$. An exponential algorithm ($O(2^n)$) quickly becomes impossible to compute for even modestly sized inputs.
-
----
-
-## Concept Unit: O(1) — constant time
-
-### The Problem
-How long does it take to find the very first item in a list of a million items? What about finding out if a specific key exists in a large dictionary? 
-
+How can we mathematically describe how long a piece of code takes to run? If you have ten times as much data, does the code take ten times as long, or a hundred times as long? Why is it that some operations feel instantaneous regardless of the dataset size, while others bog down the system?
 ### Introduce the concept in isolation
 ```python
 import time
 
-def get_first(lst):
-    return lst[0]  # O(1): one operation, regardless of list length
+def get_first(lst):      # O(1): same work regardless of list size
+    return lst[0]
 
-def is_even(n):
-    return n % 2 == 0  # O(1)
+def linear_search(lst, target):  # O(n): worst case checks all n elements
+    for item in lst:
+        if item == target:
+            return True
+    return False
 
-# Dict and set lookup are O(1):
-d = {i: i**2 for i in range(1000000)}
+# Verify empirically:
+for n in [1000, 10000, 100000]:
+    data = list(range(n))
+    t0 = time.perf_counter()
+    for _ in range(1000): get_first(data)
+    t_const = time.perf_counter() - t0
 
-start = time.time()
-_ = d[999999]
-print(f'Dict lookup: {(time.time()-start)*1e6:.2f} microseconds')
+    t0 = time.perf_counter()
+    linear_search(data, -1)   # worst case: target not present
+    t_linear = time.perf_counter() - t0
 
-start = time.time()
-_ = d[0]
-print(f'Dict lookup: {(time.time()-start)*1e6:.2f} microseconds')
+    print(f'n={n:6d}: O(1)={t_const:.4f}s, O(n)={t_linear:.5f}s')
 ```
-*Expected output:*
-```text
-Dict lookup: 1.20 microseconds
-Dict lookup: 1.15 microseconds
-```
-
-This output proves that finding the millionth element's key takes roughly the exact same microscopic amount of time as finding the very first key. The time does not depend on $n$. This is called **constant time** or **O(1)**.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
+This proves that **Constant Time (O(1))** stays flat regardless of `n`, while **Linear Time (O(n))** grows proportionally with `n`. Trace `linear_search([0,1,...,999], -1)`: checks 0,1,...,999. Target -1 not found. Returns False. Work = n comparisons. 10x n -> 10x comparisons -> 10x time.
+### Discard the throwaway
+This empirical verification code is discarded and will not appear in the project again.
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `constant_time.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** Python `time` module.
-
+No reference counterpart — this is a standalone theory lesson.
 ### The New Code
 ```python
 def get_first(lst):
     return lst[0]
-```
 
+def linear_search(lst, target):
+    for item in lst:
+        if item == target:
+            return True
+    return False
+```
 ### The Updated Project
 ```python
-# ← new
-def get_first(lst):
-    return lst[0]
+1: def get_first(lst):
+2:     return lst[0]
+3: 
+4: def linear_search(lst, target):
+5:     for item in lst:
+6:         if item == target:
+7:             return True
+8:     return False
 ```
-This simple function returns the first element of any list.
-
+This defines two functions showing O(1) and O(n) complexity.
 ### Mechanical walkthrough
-1. `def get_first(lst):` defines the function.
-2. `return lst[0]` directly accesses the memory offset for the first element. Because the location is calculated instantly via arithmetic rather than by searching, the operation takes the exact same amount of time regardless of how massive `lst` is. Python list indexing, dictionary lookups, set membership checks, `len()`, and list `append()` operations are all $O(1)$.
+- `def get_first(lst):` defines a function taking a list.
+- `return lst[0]` accesses the first element. Array indexing is O(1) because the memory address is calculated directly.
+- `def linear_search(lst, target):` defines a search function.
+- `for item in lst:` iterates through every element.
+- `if item == target:` performs a comparison.
+- `return True` exits early if found.
+- `return False` is reached only if all `n` elements are checked.
+### CS lens
+Algorithmic Complexity (Big-O). It measures the worst-case growth rate of an algorithm's resource consumption (usually time or memory) as a function of the input size `n`. Real-world examples: finding a name in an unsorted pile of papers (O(n)), looking up a word in a dictionary (O(log n)), or matching every person in a room with every other person (O(n^2)).
+### SE lens
+Design Principle: Scalability. We must choose algorithms based on expected data volume. A simple O(n) linear search is perfectly fine for 10 items, but disastrous for 10 billion. The alternative (always optimizing prematurely) wastes developer time for small datasets, but choosing the wrong complexity class for large datasets causes system failures.
+### Commands needed
+`python3`
+### Run it
+Predicted confidently: The printed output will show O(1) times remaining roughly equal across all `n`, while O(n) times increase by a factor of 10 as `n` increases by a factor of 10.
+### One sentence connecting to previous unit
+Now that we've seen how a linear search must check every item, let's look at how we can do better if the data is already sorted.
 
----
-
-## Concept Unit: O(n) — linear time
-
+## Concept Unit: O(log n) — binary search
 ### The Problem
-If we want to find the largest number in an unsorted list, we have no choice but to look at every single number. If the list doubles in size, how does the time required change?
-
+If we have a billion items, a linear search might take a billion steps. If those items are sorted, can we find our target without looking at every single one? How can we systematically eliminate large chunks of the search space?
 ### Introduce the concept in isolation
 ```python
-import time
+def binary_search(sorted_lst, target):
+    lo, hi = 0, len(sorted_lst) - 1
+    steps = 0
+    while lo <= hi:
+        steps += 1
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
+            print(f'Found in {steps} steps')
+            return mid
+        elif sorted_lst[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    print(f'Not found in {steps} steps')
+    return -1
 
-def find_max(lst):
-    best = lst[0]
-    for x in lst:      # n iterations
-        if x > best:
-            best = x
-    return best
-
-for size in [10_000, 100_000, 1_000_000]:
-    data = list(range(size))
-    start = time.time()
-    find_max(data)
-    elapsed = time.time() - start
-    print(f'n={size:>9}: {elapsed:.4f}s')
+binary_search(list(range(1000)), 999)
+binary_search(list(range(1000000)), 999999)
 ```
-*Expected output:*
-```text
-n=    10000: 0.0007s
-n=   100000: 0.0068s
-n=  1000000: 0.0693s
-```
-This output proves that when $n$ increases by a factor of 10, the elapsed time also increases by a factor of exactly 10. The work scales directly in proportion to the input size. This is called **linear time** or **O(n)**.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
+This proves **Logarithmic Time (O(log n))**. 1000x more data -> only 2x more steps (log2(1000) ~ 10). Trace `binary_search([0..999], 999)`: lo=0, hi=999. mid=499: 499 < 999 -> lo=500. mid=749: 749<999 -> lo=750. mid=874 -> lo=875. mid=937 -> lo=938. mid=968 -> lo=969. mid=984 -> lo=985. mid=992 -> lo=993. mid=996 -> lo=997. mid=998 -> lo=999. mid=999 == target: found in 10 steps.
+### Discard the throwaway
+This empirical verification code is discarded and will not appear in the project again.
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `linear_time.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** Python `time` module.
-
+No reference counterpart — this is a standalone theory lesson.
 ### The New Code
 ```python
-def find_max(lst):
-    best = lst[0]
-    for x in lst:
-        if x > best:
-            best = x
-    return best
+def binary_search(sorted_lst, target):
+    lo, hi = 0, len(sorted_lst) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
+            return mid
+        elif sorted_lst[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
 ```
-
 ### The Updated Project
 ```python
-# ← new
-def find_max(lst):
-    best = lst[0]
-    for x in lst:
-        if x > best:
-            best = x
-    return best
+ 1: def get_first(lst):
+ 2:     return lst[0]
+ 3: 
+ 4: def linear_search(lst, target):
+ 5:     for item in lst:
+ 6:         if item == target:
+ 7:             return True
+ 8:     return False
+ 9: 
+10: def binary_search(sorted_lst, target):  # ← new
+11:     lo, hi = 0, len(sorted_lst) - 1       # ← new
+12:     while lo <= hi:                       # ← new
+13:         mid = (lo + hi) // 2              # ← new
+14:         if sorted_lst[mid] == target:     # ← new
+15:             return mid                    # ← new
+16:         elif sorted_lst[mid] < target:    # ← new
+17:             lo = mid + 1                  # ← new
+18:         else:                             # ← new
+19:             hi = mid - 1                  # ← new
+20:     return -1                             # ← new
 ```
-This function traverses an entire list to locate the maximum value.
-
+This adds the `binary_search` function which operates in O(log n) time.
 ### Mechanical walkthrough
-1. `def find_max(lst):` defines the function.
-2. `best = lst[0]` initializes the tracker to the first element ($O(1)$).
-3. `for x in lst:` begins an iteration. This block will execute $n$ times, where $n$ is the length of `lst`.
-4. `if x > best:` and `best = x` are constant-time operations occurring *inside* the loop.
-Since $O(1)$ work occurs $n$ times, the overall complexity is $O(n)$. Operations like `x in lst` for lists also take $O(n)$ time because they must scan the elements one by one.
+- `def binary_search(sorted_lst, target):` defines the function.
+- `lo, hi = 0, len(sorted_lst) - 1` sets the initial search bounds to the start and end of the list.
+- `while lo <= hi:` loops as long as the search space is valid.
+- `mid = (lo + hi) // 2` calculates the middle index using integer division.
+- `if sorted_lst[mid] == target:` checks if the middle element is the target.
+- `return mid` returns the index if found.
+- `elif sorted_lst[mid] < target:` checks if the target must be in the right half.
+- `lo = mid + 1` updates the lower bound to shrink the search space by half.
+- `else:` implies the target must be in the left half.
+- `hi = mid - 1` updates the upper bound.
+- `return -1` returns -1 if the loop exhausts the search space without finding the target.
+### CS lens
+Divide and Conquer. Binary search is the classic O(log n) algorithm. Each step eliminates half the remaining possibilities. Real-world examples: guessing a number between 1 and 100 by asking "higher or lower?", searching a physical dictionary by splitting it open, or traversing a balanced binary search tree.
+### SE lens
+Preconditions. Binary search *requires* the data to be sorted. The alternative is sorting the data first, which takes O(n log n) time. If you only search once, a linear search (O(n)) is faster than sorting and then binary searching. But if you search thousands of times, sorting once and binary searching thereafter is a massive performance win.
+### Commands needed
+`python3`
+### Run it
+Predicted confidently: Found in 10 steps for 1000 items, and 20 steps for 1,000,000 items.
+### One sentence connecting to previous unit
+While searching can be done in O(log n) or O(n) time, what happens when we need to compare every item against every other item?
 
----
-
-## Concept Unit: O(log n) — logarithmic time
-
+## Concept Unit: O(n^2) — quadratic: nested loops
 ### The Problem
-Searching one item at a time is slow. If a list is already sorted, can we find an item faster than checking every single element?
-
+How do we check if a list has any duplicate values? The intuitive way is to compare the first item to all others, then the second item to all others. How does the total amount of work grow as the list size doubles?
 ### Introduce the concept in isolation
 ```python
-import math
-
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
-
-for size in [1_000, 1_000_000, 1_000_000_000]:
-    iterations = math.ceil(math.log2(size))
-    print(f'n={size:>13}: ~{iterations} iterations')
-```
-*Expected output:*
-```text
-n=         1000: ~10 iterations
-n=      1000000: ~20 iterations
-n= 1000000000: ~30 iterations
-```
-This output proves the extraordinary efficiency of logarithmic scaling: searching a billion items takes a maximum of just 30 operations because we halve the remaining possibilities on every single step. This is called **logarithmic time** or **O(log n)**.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `logarithmic_time.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** Python `math` module.
-
-### The New Code
-```python
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
-```
-
-### The Updated Project
-```python
-# ← new
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
-```
-This function efficiently finds a target in a sorted list by repeatedly halving the search space.
-
-### Mechanical walkthrough
-1. `def binary_search(lst, target):` defines the function.
-2. `low, high = 0, len(lst) - 1` sets pointers to the boundaries.
-3. `while low <= high:` loops as long as the search space is valid.
-4. `mid = (low + high) // 2` finds the middle index.
-5. If `lst[mid] == target:`, the search terminates immediately.
-6. `elif lst[mid] < target:` discards the lower half of the list by moving `low`.
-7. `else:` discards the upper half by moving `high`.
-Because the size of the search window is divided by 2 in each iteration, the maximum number of iterations is $\log_2(n)$. 
-
----
-
-## Concept Unit: O(n²) — quadratic time
-
-### The Problem
-What happens if an algorithm requires nesting one $O(n)$ operation inside another $O(n)$ operation?
-
-### Introduce the concept in isolation
-```python
-import time
-
-def bubble_sort(lst):
-    lst = lst[:]  # copy
-    n = len(lst)
-    for i in range(n):          # n iterations
-        for j in range(n-1-i):  # ~n iterations each
-            if lst[j] > lst[j+1]:
-                lst[j], lst[j+1] = lst[j+1], lst[j]
-    return lst
-
-for size in [1_000, 2_000, 4_000]:
-    data = list(range(size, 0, -1))  # worst case: reversed
-    start = time.time()
-    bubble_sort(data)
-    elapsed = time.time() - start
-    print(f'n={size}: {elapsed:.3f}s')
-```
-*Expected output:*
-```text
-n=1000: 0.102s
-n=2000: 0.412s
-n=4000: 1.651s
-```
-This output proves that when $n$ doubles (e.g., from 1000 to 2000), the execution time increases by a factor of 4. When $n$ doubles again, time increases by a factor of 4 again. The time required scales with the square of the input size. This is called **quadratic time** or **O(n²)**.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
-### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `quadratic_time.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** Python `time` module.
-
-### The New Code
-```python
-def bubble_sort(lst):
-    lst = lst[:]
+def has_duplicates(lst):     # O(n^2): nested loops
     n = len(lst)
     for i in range(n):
-        for j in range(n-1-i):
-            if lst[j] > lst[j+1]:
-                lst[j], lst[j+1] = lst[j+1], lst[j]
-    return lst
-```
+        for j in range(i + 1, n):
+            if lst[i] == lst[j]:
+                return True
+    return False
 
-### The Updated Project
+def has_duplicates_fast(lst):  # O(n): use a set
+    seen = set()
+    for item in lst:
+        if item in seen:       # O(1) set lookup
+            return True
+        seen.add(item)
+    return False
+
+import time
+for n in [1000, 2000, 4000]:
+    data = list(range(n))      # no duplicates
+    t0 = time.perf_counter()
+    has_duplicates(data)
+    t1 = time.perf_counter()
+    has_duplicates_fast(data)
+    t2 = time.perf_counter()
+    print(f'n={n}: O(n^2)={t1-t0:.4f}s, O(n)={t2-t1:.4f}s')
+```
+This proves **Quadratic Time (O(n^2))**. Doubling `n` results in 4x time for O(n^2), while O(n) only takes 2x time. Trace `has_duplicates([0..3])`: i=0: j=1,2,3. i=1: j=2,3. i=2: j=3. i=3: no j. Total comparisons: 3+2+1 = n*(n-1)/2 = O(n^2).
+### Discard the throwaway
+This empirical verification code is discarded and will not appear in the project again.
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+### The New Code
 ```python
-# ← new
-def bubble_sort(lst):
-    lst = lst[:]
+def has_duplicates(lst):
     n = len(lst)
     for i in range(n):
-        for j in range(n-1-i):
-            if lst[j] > lst[j+1]:
-                lst[j], lst[j+1] = lst[j+1], lst[j]
-    return lst
+        for j in range(i + 1, n):
+            if lst[i] == lst[j]:
+                return True
+    return False
+
+def has_duplicates_fast(lst):
+    seen = set()
+    for item in lst:
+        if item in seen:
+            return True
+        seen.add(item)
+    return False
 ```
-This function sorts a list by repeatedly swapping adjacent elements that are out of order.
-
+### The Updated Project
+```python
+22: def has_duplicates(lst):             # ← new
+23:     n = len(lst)                     # ← new
+24:     for i in range(n):               # ← new
+25:         for j in range(i + 1, n):    # ← new
+26:             if lst[i] == lst[j]:     # ← new
+27:                 return True          # ← new
+28:     return False                     # ← new
+29: 
+30: def has_duplicates_fast(lst):        # ← new
+31:     seen = set()                     # ← new
+32:     for item in lst:                 # ← new
+33:         if item in seen:             # ← new
+34:             return True              # ← new
+35:         seen.add(item)               # ← new
+36:     return False                     # ← new
+```
+This adds the naive quadratic duplicate check and the fast linear duplicate check.
 ### Mechanical walkthrough
-1. `def bubble_sort(lst):` defines the function.
-2. `for i in range(n):` iterates $n$ times.
-3. `for j in range(n-1-i):` iterates up to $n$ times for each iteration of the outer loop.
-4. `if lst[j] > lst[j+1]:` compares adjacent items.
-5. `lst[j], lst[j+1] = lst[j+1], lst[j]` swaps them if needed.
-Because an $O(n)$ loop is nested inside another $O(n)$ loop, the total number of operations is proportional to $n \times n = n^2$.
+- `def has_duplicates(lst):` defines the naive approach.
+- `n = len(lst)` gets the list length.
+- `for i in range(n):` iterates over every index.
+- `for j in range(i + 1, n):` iterates over all subsequent indices. This nested loop structure causes O(n^2) complexity.
+- `if lst[i] == lst[j]:` compares two elements.
+- `return True` returns immediately if a duplicate is found.
+- `return False` is reached only if no duplicates exist.
+- `def has_duplicates_fast(lst):` defines the optimized approach.
+- `seen = set()` initializes an empty set for O(1) lookups.
+- `for item in lst:` iterates through the list once (O(n)).
+- `if item in seen:` checks for membership in constant time.
+- `return True` exits if found.
+- `seen.add(item)` adds the item to the set.
+- `return False` returns if no duplicates were found.
+### CS lens
+Space-Time Tradeoff. We reduced the time complexity from O(n^2) to O(n) by using a hash set. This costs O(n) additional memory. Real-world examples of O(n^2): comparing every pixel in an image to every other pixel, bubble sort, or naive collision detection between many moving objects.
+### SE lens
+Algorithmic scaling. O(n^2) algorithms often pass unit tests (where n=10) with flying colors, but completely freeze production systems (where n=1,000,000). The alternative is to recognize nested loops over the same dataset and proactively look for a hashing or sorting-based optimization.
+### Commands needed
+`python3`
+### Run it
+Predicted confidently: The O(n^2) time will roughly quadruple when `n` doubles, whereas the O(n) time will only double.
+### One sentence connecting to previous unit
+While O(n^2) is bad, some recursive algorithms exhibit even worse growth, while some built-in operations like sorting sit neatly between O(n) and O(n^2).
 
----
-
-## Concept Unit: O(2^n) — exponential time
-
+## Concept Unit: O(n log n) and O(2^n)
 ### The Problem
-Some recursive algorithms solve a problem by branching multiple times for every step. How badly does this scale?
-
+How expensive is sorting a list? And what happens when a function calls itself multiple times per step, branching out like a tree?
 ### Introduce the concept in isolation
 ```python
 import time
 
-def fib_naive(n):
+# O(n log n): sorting (Python's sort, merge sort, heap sort)
+def count_operations_sort(n):
+    data = list(range(n, 0, -1))  # reverse sorted: worst case for many sorts
+    t0 = time.perf_counter()
+    data.sort()                    # Timsort: O(n log n)
+    return time.perf_counter() - t0
+
+# O(2^n): exponential - naive recursive Fibonacci
+def fib_exp(n):
     if n <= 1:
         return n
-    return fib_naive(n-1) + fib_naive(n-2)
+    return fib_exp(n-1) + fib_exp(n-2)  # 2 recursive calls: 2^n total calls
 
-for n in [20, 30, 35]:
-    start = time.time()
-    result = fib_naive(n)
-    elapsed = time.time() - start
-    print(f'fib({n}) = {result}, time: {elapsed:.3f}s')
+# Measure fib_exp: grows explosively
+for n in [10, 20, 30]:
+    t0 = time.perf_counter()
+    result = fib_exp(n)
+    elapsed = time.perf_counter() - t0
+    print(f'fib({n})={result}, time={elapsed:.4f}s')
 ```
-*Expected output:*
-```text
-fib(20) = 6765, time: 0.001s
-fib(30) = 832040, time: 0.234s
-fib(35) = 9227465, time: 2.611s
-```
-This output proves that each tiny increment in $n$ causes a massive, disproportionate surge in required time. Evaluating `fib(50)` this way would literally take years on a standard computer. This catastrophic scaling is called **exponential time** or **O(2^n)**.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
+This proves **Exponential Time (O(2^n))** grows explosively. Trace `fib_exp(4)`: calls fib(3)+fib(2). fib(3) calls fib(2)+fib(1). fib(2) called TWICE. Tree has 2^4=16 calls for n=4. `fib(30)`: ~2^30 = 1 billion calls.
+### Discard the throwaway
+This empirical verification code is discarded and will not appear in the project again.
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `exponential_time.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** Python `time` module.
-
+No reference counterpart — this is a standalone theory lesson.
 ### The New Code
 ```python
-def fib_naive(n):
+def fib_exp(n):
     if n <= 1:
         return n
-    return fib_naive(n-1) + fib_naive(n-2)
+    return fib_exp(n-1) + fib_exp(n-2)
 ```
-
 ### The Updated Project
 ```python
-# ← new
-def fib_naive(n):
-    if n <= 1:
-        return n
-    return fib_naive(n-1) + fib_naive(n-2)
+38: def fib_exp(n):                        # ← new
+39:     if n <= 1:                         # ← new
+40:         return n                       # ← new
+41:     return fib_exp(n-1) + fib_exp(n-2) # ← new
 ```
-This function calculates Fibonacci numbers using a naive branching recursion.
-
+This adds the naive recursive Fibonacci generator.
 ### Mechanical walkthrough
-1. `def fib_naive(n):` defines the function.
-2. `if n <= 1: return n` handles the base cases.
-3. `return fib_naive(n-1) + fib_naive(n-2)` is where the disaster happens. Every single function call spawns *two more* function calls, which in turn spawn two more each. This causes the number of operations to double every time $n$ increases by 1, yielding $O(2^n)$ complexity. The solution (memoization) will be covered in Lesson 34.
+- `def fib_exp(n):` defines a function taking an integer.
+- `if n <= 1:` is the base case for the recursion.
+- `return n` returns the value for 0 or 1.
+- `return fib_exp(n-1) + fib_exp(n-2)` is the recursive step, calling the function twice. This branching causes the total number of calls to double for each increase in `n`.
+### CS lens
+Combinatorial Explosion. Exponential time algorithms are practically unusable for n > 50. Real-world examples of O(2^n) or O(n!): the Traveling Salesperson Problem, brute-forcing a password, or naive recursive backtracking. **Linearithmic Time (O(n log n))** is the best possible worst-case time for comparison-based sorting algorithms.
+### SE lens
+Algorithmic bounds. Whenever you see a recursive function that makes two or more calls to itself, carefully analyze the depth and branching factor. The alternative is dynamic programming (memoization), which can often turn an O(2^n) recursive algorithm into an O(n) iterative or cached one.
+### Commands needed
+`python3`
+### Run it
+Predicted confidently: `fib(10)` takes ~0.0s, `fib(20)` takes ~0.01s, `fib(30)` takes ~0.3s, and `fib(40)` takes ~30s.
+### One sentence connecting to previous unit
+Now that we know how loops and recursion affect complexity, let's look at hidden complexities inside Python's built-in operations.
 
----
-
-## Concept Unit: Best, worst, and average case
-
+## Concept Unit: Analyzing Python operations
 ### The Problem
-When we say `in` on a list is $O(n)$, does it *always* take $n$ steps? What if the item we are looking for happens to be the very first one?
-
+When you write `x in lst` or `string_a + string_b`, you aren't writing loops, but work is still happening. How do we avoid accidentally writing an O(n^2) algorithm by putting an O(n) built-in operation inside an O(n) loop?
 ### Introduce the concept in isolation
 ```python
-def linear_search(lst, target):
-    for i, x in enumerate(lst):
-        if x == target:
-            return i
-    return -1
+# WRONG: building string in loop
+def slow_join(words):
+    result = ''
+    for w in words:       # O(n^2): each += creates new string of growing length
+        result += w
+    return result
 
-# Best case: target is lst[0] -- O(1)
-# Worst case: target is last or not present -- O(n)
-# Average case: target is in the middle -- O(n/2) = O(n)
+# RIGHT:
+def fast_join(words):
+    return ''.join(words) # O(n): one allocation
+
+words = ['word'] * 10000
+import time
+t0=time.perf_counter(); slow_join(words); print(f'slow: {time.perf_counter()-t0:.3f}s')
+t0=time.perf_counter(); fast_join(words); print(f'fast: {time.perf_counter()-t0:.4f}s')
 ```
-*Expected behavior:* If the `target` is the first item, the loop exits on iteration 1. If it's not present, it checks every item.
-
-### Discard the throwaway example
-The throwaway script is discarded.
-
+This proves that using `+=` on strings in a loop is O(n^2) while `''.join()` is O(n). Trace `slow_join(['a','b','c'])`: result='' + 'a' = 'a' (new str, length 1). 'a'+'b'='ab' (new str, length 2). 'ab'+'c'='abc' (new str, length 3). Total work: 0+1+2+...+(n-1) = n*(n-1)/2 = O(n^2). fast_join: `''.join`: ONE allocation of the final string. O(n).
+### Discard the throwaway
+This empirical verification code is discarded and will not appear in the project again.
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected:** `cases.py` (created)
-- **Change type:** Add
-- **Location:** Brand-new file
-- **Dependencies:** None
-
+No reference counterpart — this is a standalone theory lesson.
 ### The New Code
 ```python
-def linear_search(lst, target):
-    for i, x in enumerate(lst):
-        if x == target:
-            return i
-    return -1
-```
+def slow_join(words):
+    result = ''
+    for w in words:
+        result += w
+    return result
 
+def fast_join(words):
+    return ''.join(words)
+```
 ### The Updated Project
 ```python
-# ← new
-def linear_search(lst, target):
-    for i, x in enumerate(lst):
-        if x == target:
-            return i
-    return -1
+43: def slow_join(words):         # ← new
+44:     result = ''               # ← new
+45:     for w in words:           # ← new
+46:         result += w           # ← new
+47:     return result             # ← new
+48: 
+49: def fast_join(words):         # ← new
+50:     return ''.join(words)     # ← new
 ```
-This function searches for a target in a list linearly.
-
+This adds string joining examples.
 ### Mechanical walkthrough
-1. `def linear_search(lst, target):` defines the function.
-2. `for i, x in enumerate(lst):` begins iterating through the list.
-3. `if x == target: return i` returns instantly if the match is found. 
-Big-O notation typically refers to the **worst-case scenario** — the maximum bound on the time required. Thus, we say linear search is $O(n)$, even though occasionally it might get lucky and finish in $O(1)$ time. 
-- Python's `.sort()` uses Timsort, which is $O(n \log n)$ worst case.
-- List membership (`in`) is $O(n)$ worst case.
-- Dictionary key membership (`in`) is $O(1)$ average case (hash collisions are rare, though worst case is theoretically $O(n)$).
-- Binary search on a sorted list is $O(\log n)$ worst case.
+- `def slow_join(words):` defines the naive approach.
+- `result = ''` initializes an empty string.
+- `for w in words:` loops over the words.
+- `result += w` concatenates the strings. Because strings are immutable in Python, this requires allocating a new string and copying all characters every single iteration.
+- `return result` returns the final string.
+- `def fast_join(words):` defines the optimized approach.
+- `return ''.join(words)` calls the `join` method on the empty string separator. This calculates the total needed length once, allocates the memory once, and copies each word in exactly once, making it O(n).
+### CS lens
+Amortized Analysis and Immutability. Python lists have O(1) amortized appends because they occasionally reallocate and copy, but mostly just write to pre-allocated space. Strings are immutable, so *every* concatenation allocates and copies. Real-world examples: Java's `StringBuilder` vs `String` concatenation, or resizing dynamic arrays.
+### SE lens
+Idiomatic Python. Understanding the performance characteristics of built-ins is crucial. The alternative (ignoring them) leads to "accidentally quadratic" code. Always use `''.join()` for sequences of strings, `set` for lookups, and `list.append()` instead of `list.insert(0, ...)` (which is O(n) because it shifts all elements).
+### Commands needed
+`python3`
+### Run it
+Predicted confidently: `slow_join` will take significantly longer (orders of magnitude) than `fast_join` for large inputs.
+### One sentence connecting to previous unit
+Understanding how Big-O applies to both loops and built-in operations gives us a complete toolkit to evaluate our code's scalability.
 
----
-
-Big-O provides the standardized vocabulary for algorithmic discussion. 
-In Lesson 30, we will cover search algorithms in more depth, specifically contrasting linear search and binary search implementations. 
-
-*Exercises:* Classify each of these as $O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$, $O(n^2)$:
-(a) finding an element in a set
-(b) finding an element in an unsorted list
-(c) Python's `sorted()`
-(d) selection sort
-(e) dict key lookup
-Empirically verify your answers by measuring timing for different input sizes.
+## Closing
+### Connect the pieces
+We can classify `linear_search` as O(n), `binary_search` as O(log n), `has_duplicates` as O(n^2), and `has_duplicates_fast` as O(n). Understanding these complexity classes allows us to reason about performance independently of hardware speed. At scale, an O(n) algorithm will fundamentally beat an O(n^2) algorithm regardless of the constant factors, because the total work grows much more slowly as the dataset increases.

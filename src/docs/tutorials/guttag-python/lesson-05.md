@@ -1,659 +1,472 @@
-# Lesson 5: Functions — `def`, Parameters, `return`, and Scope
+# Lesson 05: Functions — def, Parameters, return, and Scope
 
-What you will build: The reader will define and call functions, understand the difference between `return` and `print`, trace the call stack, understand local vs global scope, and use default parameter values. The transferable problems: (1) a function is a named, reusable computation — it takes inputs (parameters), does work, and produces an output (return value); (2) `return` terminates the function and gives a value back to the caller; `print` is a side effect that does NOT give a value back; (3) local variables exist only inside the function — they are created when the function is called and destroyed when it returns.
+What you will build: The reader understands Python functions: def syntax, parameters vs. arguments, positional vs. keyword arguments, default values, return values, and scope (local vs. global, LEGB rule). The transferable insight: a function is an abstraction that names a computation. It takes inputs (parameters), performs work, and produces an output (return value). Every function call creates a new local scope; names inside don't leak out.
 
-What you need to know first: Lessons 0–4 (REPL, types, variables, conditionals, iteration).
+What you need to know first: Lessons 00-04.
 
-## Terms used in this lesson
+Terms used in this lesson:
+- **Function** — A reusable block of code that performs a specific task. Functions abstract away the implementation details of a computation, allowing you to name it and use it multiple times without duplicating code.
+- **Parameter** — A named variable in a function's definition that acts as a placeholder for the data the function will receive when it is called.
+- **Argument** — The actual value passed to a function's parameter when the function is called.
+- **Scope** — The region of a program where a specific name (like a variable or function name) is valid and can be accessed. It prevents name collisions and encapsulates data.
+- **LEGB Rule** — The order in which Python resolves names: Local, Enclosing, Global, and Built-in. It defines how Python looks up the value associated with a name.
+- **Positional argument** — An argument matched to a parameter based on its position (left to right) in the function call.
+- **Keyword argument** — An argument matched to a parameter by explicitly stating the parameter's name in the function call (e.g., `x=1`), order-independent.
+- **Default value** — A value provided in the function definition that is used if the caller does not supply an argument for that parameter.
+- **Docstring** — A string literal appearing as the first statement in a function body, used to document what the function does.
+- **First-class object** — An entity that can be dynamically created, destroyed, passed to a function, returned as a value, and assigned to a variable. In Python, functions are first-class objects.
+- **def** — A language keyword used to define a new function. It binds a function object to a name.
+- **return** — A language keyword used to exit a function and specify the value to send back to the caller.
+- **global** — A language keyword used inside a function to declare that a variable name refers to a globally scoped variable, not a local one.
 
-- **Function** — a named, reusable sequence of statements that performs a specific computation. Functions solve the problem of writing the same code multiple times, allowing you to package logic into a single callable unit.
-- **`def`** — the Python keyword used to define a new function. It introduces a function definition block, binding a name to the function object.
-- **Parameter** — a local variable listed in a function definition that receives a value passed by the caller. It acts as the input to the function's computation.
-- **Argument** — the actual value passed into a function call, which gets assigned to the corresponding parameter.
-- **`return`** — the Python keyword used to terminate a function's execution and specify the value to give back to the caller. It solves the problem of getting computed data out of a function so it can be used elsewhere.
-- **Call stack** — the internal mechanism Python uses to keep track of active function calls. It solves the problem of knowing where to return control (and data) after a function finishes execution.
-- **Frame** — a block of memory on the call stack allocated for a single function call, containing its local variables. It is created when the function is called and destroyed when it returns.
-- **Scope** — the region of a program where a specific variable name is valid and accessible. It solves the problem of name collisions by keeping local variables isolated from the rest of the program.
-- **Local variable** — a variable assigned inside a function. It belongs exclusively to that function's scope and cannot be seen from outside.
-- **Global variable** — a variable assigned at the top level of a script or module, accessible from anywhere in the file.
-- **Default parameter** — a parameter given a fallback value in the function definition, making the corresponding argument optional for the caller. It solves the problem of requiring repetitive arguments for common use cases.
-- **Tuple** — an immutable sequence of values in Python. Used implicitly when a function returns multiple comma-separated values.
-- **Tuple unpacking** — the syntax for assigning individual elements of a tuple to multiple distinct variables in a single statement.
-- **Docstring** — a string literal appearing as the first statement within a function, used to document its purpose, parameters, and return value. It solves the problem of making code self-documenting and accessible to tools like `help()`.
+Objects and methods used:
 
-## Objects and methods used
+**`print`**
+- *What it is:* A built-in function that outputs data to the console.
+- *Implementation:* `print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)`
+- *Its use:* To display the results of our function calls and trace execution flow.
+- *Type:* Built-in function.
+- *Responsibility:* Converts its arguments to strings and writes them to a standard output stream.
+- *Depends on:* The values passed as `*objects`.
+- *Connects to:* Called by our script, calls the `__str__` method of the objects passed to it.
+- *Shape:* An API boundary between the Python script and the standard output console.
 
-- **`print`**
-  - *What it is:* A built-in Python function that outputs data to the console.
-  - *Implementation:* `print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)`. Returns `None`.
-  - *Its use:* Used in this lesson to display function outputs and side effects, and to demonstrate the critical difference between printing to the screen and returning a value.
-  - *Type:* Built-in function.
-  - *Responsibility:* Converts given objects to strings and writes them to a standard output stream, appending a newline by default.
-  - *Depends on:* The objects passed to it as arguments.
-  - *Connects to:* Calls `__str__` on objects to format them, writes to `sys.stdout`.
-  - *Shape:* A global built-in utility used at the application boundary for human-readable output.
+**`help`**
+- *What it is:* A built-in utility function to invoke the interactive help system or display documentation for an object.
+- *Implementation:* `help([object])`
+- *Its use:* To retrieve and display the docstring of a function.
+- *Type:* Built-in function.
+- *Responsibility:* Formats and displays the documentation (`__doc__` attribute) of a given object.
+- *Depends on:* An object (like a function) passed to it.
+- *Connects to:* Called by our script, reads the `__doc__` attribute of the target object.
+- *Shape:* An introspective diagnostic tool used at the development layer.
 
-- **`help`**
-  - *What it is:* A built-in Python utility for querying documentation.
-  - *Implementation:* `help([object])`. Returns `None`.
-  - *Its use:* Used to demonstrate how docstrings are accessed by developers to understand a function's contract.
-  - *Type:* Built-in function.
-  - *Responsibility:* Retrieves and formats the interactive help text or docstring for a given object, module, or function.
-  - *Depends on:* The object passed to it (which should have a `__doc__` attribute).
-  - *Connects to:* Reads the `__doc__` attribute of the target, outputs formatted text to the console.
-  - *Shape:* A global built-in utility used for developer tooling and introspection.
+**`id`**
+- *What it is:* A built-in function that returns the unique identifier (memory address in CPython) of an object.
+- *Implementation:* `id(object)`
+- *Its use:* To demonstrate that functions are distinct objects in memory.
+- *Type:* Built-in function.
+- *Responsibility:* Returns an integer representing the identity of an object, guaranteed to be unique and constant for this object during its lifetime.
+- *Depends on:* An object passed to it.
+- *Connects to:* Called by our script, accesses the internal memory representation of the runtime.
+- *Shape:* A runtime introspection utility.
 
----
+**`type`**
+- *What it is:* A built-in function that returns the type of an object.
+- *Implementation:* `type(object)`
+- *Its use:* To prove that a function is an object of type `function`.
+- *Type:* Built-in function.
+- *Responsibility:* Retrieves and returns the type object corresponding to the given instance.
+- *Depends on:* An object passed to it.
+- *Connects to:* Called by our script, accesses the internal type metadata of an object.
+- *Shape:* A runtime introspection utility.
 
-## Concept Unit: Defining and calling a function
-
+## Concept Unit: def and return — defining and calling a function
 ### The Problem
-If we want to square a number, we can write `5 * 5`. But what if we need to square numbers in fifty different places in our program? Repeating the multiplication logic every time is tedious and error-prone. We need a way to package this computation under a reusable name.
+If we have a block of code that computes something useful, and we want to perform that exact same computation multiple times in different parts of our program, we would have to copy and paste the code. How can we group this code together, give it a name, and invoke it on demand? What happens if that computation needs to give us an answer back?
 
 ### Introduce the concept in isolation
-Let's see the basic mechanism of creating a reusable block by defining a simple greeter.
-
 ```python
-def greet():
-    return "Hi"
+def get_greeting():
+    return "Hello, World!"
 
-print(greet())
+result = get_greeting()
+print(result)
 ```
-
 Output:
-```text
-Hi
 ```
-This proves that we can encapsulate a value-returning statement inside a reusable block called a **function**.
+Hello, World!
+```
+This output proves that the function `get_greeting` was executed when called, and the string it evaluated to was handed back to the caller and stored in `result`. This is called a **function definition**.
 
-### Discard the throwaway example
-This throwaway code is discarded. It will not appear in the project again.
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart — this is a from-scratch addition.
-- **Files affected**: `math_utils.py` (created)
-- **Change type**: add
-- **Location**: new file
-- **Dependencies**: none
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are starting our open-calc project's function module.
+- **Files affected:** `calculator.py` (created)
+- **Change type:** add
+- **Location:** At the top of the new file.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def square(x):
-    return x * x
+def add_two_numbers():
+    return 2 + 2
 ```
 
 ### The Updated Project
 ```python
 # ← new
-def square(x):
-    return x * x
-
-result = square(5)
-print(result)
-print(square(3) + square(4))
+1: def add_two_numbers():
+2:     return 2 + 2
 ```
-This gives us a named operation that computes a square, which we can call repeatedly with different inputs.
+This structure creates a new function named `add_two_numbers` that, when called, evaluates the addition and returns the result.
 
-Output of the updated project:
-```text
-25
-25
-```
+### Mechanical walkthrough
+- `def`: A language keyword that begins a function definition, telling Python to create a new function object.
+- `add_two_numbers`: The name assigned to the newly created function object.
+- `()`: Parentheses that enclose the function's parameters. Here, they are empty, meaning the function takes no inputs.
+- `:`: A colon indicating the start of the function's body (a new indented block).
+- `return`: A language keyword that immediately terminates the function call and specifies the value to be sent back to the caller.
+- `2`: An integer literal.
+- `+`: The addition operator.
+- `2`: Another integer literal.
 
-### Mechanical Walkthrough
-- `def`: This keyword introduces a function definition.
-- `square`: This is the name we chose for our function.
-- `(x)`: `x` is the parameter — a local variable that receives the value passed by the caller.
-- `return`: This keyword computes `x * x` and gives that value back to the caller.
-- `square(5)`: The function call binds the argument `5` to the parameter `x`, runs the body, and returns `25`.
-- `result = square(5)`: This binds the returned value to the variable `result`.
+### CS lens
+This is a **subroutine** or **procedure**. In computer science, abstracting instructions into a named subroutine is the fundamental building block of modular programming. Real-world places it appears:
+- Database stored procedures.
+- OS system calls.
+- Command-line aliases.
 
----
+### SE lens
+**Abstraction**. The principle of hiding implementation details behind a clear interface. The alternative not chosen is inline code duplication (copy-pasting). The tradeoff is that a function call introduces a small performance overhead compared to inline code, but it dramatically improves maintainability.
 
-## Concept Unit: The call stack
+### Commands needed
+`python3 calculator.py`
 
+### Run it
+Predicted confidently: Nothing will print because we defined the function but did not call it yet.
+
+### One sentence connecting to previous unit
+Now that we have a named function, we need a way to pass specific values into it so it doesn't just compute `2 + 2` every time.
+
+## Concept Unit: Parameters and arguments
 ### The Problem
-When we run `square(3) + square(4)`, how does Python keep track of which `square` is which, and where the results should go while computing the total?
+Our `add_two_numbers` function always adds 2 and 2. How can we make it flexible so it can add *any* two numbers? If we want to pass multiple values, how does the function know which is which?
 
 ### Introduce the concept in isolation
-Let's trace a simple nested call.
-
 ```python
-def one():
-    return 1
+def greet_person(name, punctuation="!"):
+    return "Hello, " + name + punctuation
 
-def two():
-    return one() + 1
-
-print(two())
+print(greet_person("Alice"))
+print(greet_person(punctuation=".", name="Bob"))
 ```
-
 Output:
-```text
-2
 ```
-This proves that Python can pause the execution of one function to go execute another, keeping track of where it left off. This mechanism is called the **call stack**.
+Hello, Alice!
+Hello, Bob.
+```
+This output proves that arguments can be matched to parameters by position ("Alice" to `name`) or explicitly by keyword (`name="Bob"`), and that a parameter (`punctuation`) can provide a fallback value if omitted. This is called **parameter binding**.
 
-### Discard the throwaway example
-This throwaway code is discarded.
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: trace
-- **Location**: none
-- **Dependencies**: none
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are expanding our calculator.
+- **Files affected:** `calculator.py` (modified)
+- **Change type:** replace
+- **Location:** Replacing the original `add_two_numbers` function.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-square(3) + square(4)
+def add_two_numbers(a, b=0):
+    return a + b
 ```
 
 ### The Updated Project
 ```python
-def square(x):
-    return x * x
-
-result = square(5)
-print(result)
-# ← trace target
-print(square(3) + square(4))
+1: def add_two_numbers(a, b=0): # ← new
+2:     return a + b             # ← new
 ```
-This evaluates two separate function calls and adds their results.
+This structure redefines `add_two_numbers` to accept two inputs, `a` and `b`, where `b` defaults to 0 if not provided, making the computation flexible.
 
-### Mechanical Walkthrough
-Trace `square(3) + square(4)`:
-- Step 1: Python evaluates `square(3)`. It pushes a frame for `square` onto the call stack with `x=3`. It evaluates `x * x` (which is `9`), returns `9`, and pops the frame off the stack.
-- Step 2: Python evaluates `square(4)`. It pushes a new frame for `square` onto the call stack with `x=4`. It evaluates `x * x` (which is `16`), returns `16`, and pops the frame off the stack.
-- Step 3: Python evaluates `9 + 16` to yield `25`.
+### Mechanical walkthrough
+- `def`: A language keyword that begins a function definition.
+- `add_two_numbers`: The name of the function.
+- `(`: Opens the parameter list.
+- `a`: A parameter name. This is a positional argument by default.
+- `,`: Separates parameters in the list.
+- `b`: Another parameter name.
+- `=`: Assignment operator used here to denote a default value.
+- `0`: Integer literal serving as the default value for `b`.
+- `)`: Closes the parameter list.
+- `:`: Begins the function body.
+- `return`: Exits the function and outputs the evaluated expression.
+- `a`: Evaluates to the argument passed for `a`.
+- `+`: Addition operator.
+- `b`: Evaluates to the argument passed for `b`.
 
-When a function calls another function, frames stack up. When a function returns, its frame is popped.
+### CS lens
+This is **parameter passing**. Real-world places it appears:
+- HTTP request query parameters (`?q=search`).
+- Command-line flags (`ls -l`).
+- Configuration files supplying dynamic inputs to an application.
 
----
+### SE lens
+**API Design (Default Arguments)**. The principle of making the most common use case easy while allowing customization. The alternative not chosen is forcing the caller to always supply two arguments, or writing two separate functions `add_one_number(a)` and `add_two_numbers(a, b)`. The tradeoff is that default arguments can sometimes hide errors if the caller forgets an argument they intended to pass.
 
-## Concept Unit: `return` vs `print`
+### Commands needed
+None for this unit.
 
+### Run it
+Predicted confidently: Nothing prints as we only redefined the function.
+
+### One sentence connecting to previous unit
+With inputs handled, we must understand where these parameters live and whether they can accidentally overwrite variables outside the function.
+
+## Concept Unit: Scope and the LEGB rule
 ### The Problem
-If our function just needs to show a result to the user, we might be tempted to use `print` inside the function instead of `return`. What happens if we try to use the result of a function that only prints?
+If we have a variable named `a` outside our function, and a parameter named `a` inside our function, do they conflict? When we type `a` inside the function, which one does Python use?
 
 ### Introduce the concept in isolation
-Let's define a function that prints instead of returning.
-
 ```python
-def say_hello():
-    print("Hello")
+x = 10
 
-val = say_hello()
-print(val)
-```
-
-Output:
-```text
-Hello
-None
-```
-This proves that `print` only displays text to the screen and causes the function to implicitly return **`None`**. 
-
-### Discard the throwaway example
-This throwaway code is discarded.
-
-### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
-
-### The New Code
-```python
-def square_print(x):
-    print(x * x)
-
-def square_return(x):
-    return x * x
-```
-
-### The Updated Project
-```python
-def square_print(x):
-    print(x * x)
-
-def square_return(x):
-    return x * x
-
-# square_return can be composed:
-result = square_return(5) + 1
-print(result)
-
-# square_print can't be composed:
-# result_bad = square_print(5) + 1 # This would crash
-```
-Output:
-```text
-26
-```
-This demonstrates that only returned values can be used in further calculations.
-
-### Mechanical Walkthrough
-- `square_print(x)`: Evaluates `x * x` and passes it to `print`. `print` is for human-readable output — it writes to the screen and returns `None`. Because the function has no explicit `return`, it also returns `None`.
-- `result = square_print(5) + 1`: `square_print(5)` prints `25` to the screen and evaluates to `None`. The expression becomes `None + 1`, which crashes with `TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'`.
-- `square_return(x)`: Evaluates `x * x` and uses `return` to give the value back to the caller.
-- `result = square_return(5) + 1`: `square_return(5)` evaluates to `25`. The expression becomes `25 + 1`, which evaluates to `26`.
-
-ALWAYS use `return` in functions that compute values so the result can be used in further computation. Use `print` only at the top level or in functions specifically meant to display output.
-
----
-
-## Concept Unit: Multiple `return` statements
-
-### The Problem
-Sometimes the value a function should return depends on a condition. Can a function have more than one `return` keyword?
-
-### Introduce the concept in isolation
-Let's use an `if` statement to return different strings based on a boolean.
-
-```python
-def check(val):
-    if val:
-        return "Yes"
-    return "No"
-
-print(check(True))
-```
-
-Output:
-```text
-Yes
-```
-This proves that a function can contain multiple `return` keywords, and execution stops as soon as the first one is hit.
-
-### Discard the throwaway example
-This throwaway code is discarded.
-
-### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
-
-### The New Code
-```python
-def abs_val(x):
-    if x >= 0:
-        return x
-    else:
-        return -x
-```
-
-### The Updated Project
-```python
-# ← new
-def abs_val(x):
-    if x >= 0:
-        return x
-    else:
-        return -x
-
-print(abs_val(5))
-print(abs_val(-3))
-print(abs_val(0))
-```
-
-Output:
-```text
-5
-3
-0
-```
-This provides a function that returns the absolute value of a number using conditional returns.
-
-### Mechanical Walkthrough
-Trace for `abs_val(-3)`:
-- `abs_val(-3)` is called, binding `-3` to `x`.
-- `if x >= 0:` evaluates `if -3 >= 0:`, which is `False`.
-- Execution jumps to the `else:` block.
-- `return -x` evaluates `-(-3)`, which is `3`.
-- The function returns `3` and terminates immediately.
-
-A function can have multiple `return` statements. The first one reached terminates the function. Code after a `return` that is always reached is dead code — it never runs.
-
----
-
-## Concept Unit: Local scope
-
-### The Problem
-If we define a variable inside a function, can we use it outside the function? What happens if a variable inside a function has the same name as a variable outside?
-
-### Introduce the concept in isolation
-Let's assign a variable inside a function and try to print it outside.
-
-```python
-def do_something():
-    y = 5
-    return y
-
-print(do_something())
-# print(y)  # This would cause a NameError
-```
-
-Output:
-```text
-5
-```
-This proves that variables created inside a function are private to that function. This isolation is called **local scope**.
-
-### Discard the throwaway example
-This throwaway code is discarded.
-
-### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
-
-### The New Code
-```python
-def compute():
-    local_var = 42
-    return local_var
-
-x = 10  # global
-
-def show_x():
-    print(x)  # can READ a global
-
-def modify_x_wrong():
-    x = 99    # creates a NEW local x, does NOT modify the global
+def print_x():
+    x = 5
     print(x)
-```
 
-### The Updated Project
-```python
-# ← new
-def compute():
-    local_var = 42
-    return local_var
-
-print(compute())
-# print(local_var)   # NameError: name 'local_var' is not defined
-
-x = 10  # global
-
-def show_x():
-    print(x)  # can READ a global
-
-def modify_x_wrong():
-    x = 99    # creates a NEW local x, does NOT modify the global
-    print(x)  # 99
-
-show_x()
-modify_x_wrong()
+print_x()
 print(x)
 ```
-
 Output:
-```text
-42
-10
-99
+```
+5
 10
 ```
-This demonstrates the difference between local and global variables, and how variable assignment inside a function creates a new local variable rather than updating a global one.
+This output proves that the assignment `x = 5` inside the function created a new local variable that shadowed the global `x`, leaving the global `x` unmodified. This is called **local scope**.
 
-### Mechanical Walkthrough
-- `local_var = 42`: Inside `compute`, this creates a local variable. When `compute()` finishes returning, `local_var` is destroyed. Attempting to print it globally results in `NameError`.
-- `x = 10`: This creates a global variable `x` at the top level of the file.
-- `show_x()`: When it calls `print(x)`, Python looks for a local `x`, doesn't find one, and falls back to reading the global `x` (which is `10`).
-- `modify_x_wrong()`: When evaluating `x = 99`, Python does not update the global `x`. Instead, it creates a new local variable also named `x` that shadows the global one.
-- `print(x)` inside `modify_x_wrong`: This prints the local `x` (`99`).
-- `print(x)` at the very end: This prints the global `x`, which is still `10`.
-
-A function can READ a global variable, but assigning to a name inside a function creates a LOCAL variable. To modify a global, you need the `global` keyword (but this is generally bad practice — prefer passing values as parameters and returning results).
-
----
-
-## Concept Unit: Default parameter values
-
-### The Problem
-Sometimes a function requires an argument that is almost always the same value. Forcing the caller to provide it every time is repetitive. Can we make an argument optional?
-
-### Introduce the concept in isolation
-Let's give a parameter a fallback value.
-
-```python
-def echo(msg="default"):
-    return msg
-
-print(echo())
-print(echo("hello"))
-```
-
-Output:
-```text
-default
-hello
-```
-This proves that parameters can have a default value, making them optional for the caller. These are called **default parameters**.
-
-### Discard the throwaway example
-This throwaway code is discarded.
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
+- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are demonstrating scope.
+- **Files affected:** `calculator.py` (modified)
+- **Change type:** add
+- **Location:** Below the existing `add_two_numbers` function.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def greet(name, greeting='Hello'):
-    return f'{greeting}, {name}!'
+multiplier = 2
+
+def multiply_and_add(a, b):
+    product = a * multiplier
+    return product + b
 ```
 
 ### The Updated Project
 ```python
-# ← new
-def greet(name, greeting='Hello'):
-    return f'{greeting}, {name}!'
-
-print(greet('Alice'))
-print(greet('Bob', 'Hi'))
-print(greet('Carol', greeting='Hey'))
+1: def add_two_numbers(a, b=0):
+2:     return a + b
+3:
+4: multiplier = 2 # ← new
+5:
+6: def multiply_and_add(a, b): # ← new
+7:     product = a * multiplier # ← new
+8:     return product + b # ← new
 ```
+This structure defines a global variable `multiplier` and a new function `multiply_and_add` that accesses both its local parameters (`a`, `b`, `product`) and the globally scoped `multiplier`.
 
-Output:
-```text
-Hello, Alice!
-Hi, Bob!
-Hey, Carol!
-```
-This gives us a flexible function that can be customized when needed but remains simple to call in the common case.
+### Mechanical walkthrough
+- `multiplier`: A global variable name.
+- `=`: Assignment operator.
+- `2`: Integer literal.
+- `def multiply_and_add(a, b):`: Defines a function with two parameters.
+- `product`: A new local variable created inside the function's scope.
+- `=`: Assignment operator.
+- `a`: Resolves to the local parameter `a` (Local in LEGB).
+- `*`: Multiplication operator.
+- `multiplier`: Resolves to the global variable `multiplier` because it was not found in the local scope (Global in LEGB).
+- `return`: Exits and returns a value.
+- `product`: Resolves to the local variable.
+- `+`: Addition operator.
+- `b`: Resolves to the local parameter.
 
-### Mechanical Walkthrough
-- `greeting='Hello'`: In the function definition, this assigns a default value of `'Hello'` to the parameter `greeting`.
-- `greet('Alice')`: The caller omits the second argument. `name` is bound to `'Alice'`, and `greeting` falls back to `'Hello'`.
-- `greet('Bob', 'Hi')`: The caller provides both arguments based on their position. `greeting` is bound to `'Hi'`.
-- `greet('Carol', greeting='Hey')`: The caller explicitly passes the second argument by its name. This is a keyword argument.
+### CS lens
+This is **lexical scoping** and **name resolution**. Real-world places it appears:
+- Directory paths in a file system (local vs. absolute).
+- DNS resolution (local cache vs. root servers).
+- Environment variables overriding system defaults.
 
-Parameters with defaults are optional — callers can omit them. Parameters without defaults are required. Required parameters must come BEFORE optional ones in the function signature. Keyword arguments can be passed in any order.
+### SE lens
+**Encapsulation and Information Hiding**. The principle of keeping a function's internal state private. The alternative not chosen is using global variables for all intermediate calculations. The real tradeoff is that relying on global variables (like `multiplier`) makes the function's behavior dependent on external state, making it harder to test and reason about, even though it saves passing an extra parameter.
 
----
+### Commands needed
+None for this unit.
 
-## Concept Unit: Multiple parameters and multiple return values
+### Run it
+Predicted confidently: No output; this only defines variables and functions.
 
+### One sentence connecting to previous unit
+Now that we know how data enters a function and where it lives, we need to explore how a function can send complex data back out.
+
+## Concept Unit: Return values and multiple returns
 ### The Problem
-Sometimes a computation naturally produces more than one distinct result (like the quotient and remainder of a division). How can a function give back multiple values?
+Our functions currently return a single number. What if a computation naturally produces two distinct pieces of information, like both the sum and the difference of two numbers? Can a function hand back more than one thing?
 
 ### Introduce the concept in isolation
-Let's see what happens when we return comma-separated values.
-
 ```python
-def pair():
-    return 1, 2
+def sum_and_diff(x, y):
+    if x < 0 or y < 0:
+        return None
+    return x + y, x - y
 
-a, b = pair()
-print(a)
-```
-
-Output:
-```text
-1
-```
-This proves that a function can return multiple values combined into a single structure, which can then be assigned to separate variables. This structure is a **tuple**.
-
-### Discard the throwaway example
-This throwaway code is discarded.
-
-### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
-
-### The New Code
-```python
-def divide_with_remainder(a, b):
-    quotient = a // b
-    remainder = a % b
-    return quotient, remainder
-```
-
-### The Updated Project
-```python
-# ← new
-def divide_with_remainder(a, b):
-    quotient = a // b
-    remainder = a % b
-    return quotient, remainder
-
-q, r = divide_with_remainder(17, 5)
-print(q, r)
-
-# Or capture the whole tuple:
-result = divide_with_remainder(17, 5)
+result = sum_and_diff(10, 3)
 print(result)
-print(result[0])
 ```
-
 Output:
-```text
-3 2
-(3, 2)
-3
 ```
-This provides a function that accurately reports both the quotient and the remainder in one call.
+(13, 7)
+```
+This output proves that a function can return a single `None` object as an early exit, or it can return multiple comma-separated values, which Python automatically packs into a single tuple object. This is called **multiple returns**.
 
-### Mechanical Walkthrough
-Trace for `divide_with_remainder(17, 5)`:
-- `a` is bound to `17`, `b` is bound to `5`.
-- `quotient = 17 // 5` evaluates to `3`.
-- `remainder = 17 % 5` evaluates to `2`.
-- `return quotient, remainder` evaluates to `return 3, 2`. This returns a **tuple**.
-- `q, r = divide_with_remainder(...)`: This is **tuple unpacking**. The tuple `(3, 2)` is unpacked so that `3` binds to `q` and `2` binds to `r`.
-- `result = divide_with_remainder(...)`: The whole tuple `(3, 2)` binds to `result`. We can access elements via indexing, e.g., `result[0]`.
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
-This is Python's idiom for returning multiple values — many built-in functions use it.
+### Project Change
+- **Reference Source:** No reference counterpart — this is a from-scratch addition.
+- **Files affected:** `calculator.py` (modified)
+- **Change type:** add
+- **Location:** At the bottom of the file.
+- **Dependencies:** None.
 
----
+### The New Code
+```python
+def calculate_stats(a, b):
+    if type(a) is not int or type(b) is not int:
+        return None, None
+    return a + b, a * b
+```
 
-## Concept Unit: Docstrings
+### The Updated Project
+```python
+7:     product = a * multiplier
+8:     return product + b
+9: 
+10: def calculate_stats(a, b): # ← new
+11:     if type(a) is not int or type(b) is not int: # ← new
+12:         return None, None # ← new
+13:     return a + b, a * b # ← new
+```
+This structure adds a function that acts as a guard clause returning `None` if inputs are invalid, or returns both the sum and the product packed in a tuple.
 
+### Mechanical walkthrough
+- `def calculate_stats(a, b):`: Defines the function.
+- `if`: A language keyword that begins a conditional block.
+- `type`: A built-in function that returns the type of its argument.
+- `(`: Opens function call.
+- `a`: The local parameter.
+- `)`: Closes function call.
+- `is not`: Identity comparison operator checking if the types do not match.
+- `int`: The built-in integer type object.
+- `or`: Logical operator.
+- `type(b) is not int`: Repeats the check for `b`.
+- `:`: Begins the conditional body.
+- `return`: Exits the function early.
+- `None`: The built-in null object in Python.
+- `,`: Separator indicating multiple return values (forming a tuple).
+- `None`: Another instance of the null object.
+- `return a + b, a * b`: The final return statement, outputting two expressions separated by a comma, which Python packs into a tuple.
+
+### CS lens
+This is **guard clauses** and **compound data types**. Real-world places it appears:
+- Network requests returning both a status code and a response body.
+- Security checkpoints halting execution early if credentials fail.
+- Geographic coordinates (latitude, longitude) returned together.
+
+### SE lens
+**Fail Fast**. The principle of aborting an operation immediately when invalid conditions are detected. The alternative not chosen is a deeply nested `if-else` block. The tradeoff is multiple exit points in a function, which can make control flow harder to follow, but it heavily flattens indentation and improves readability for the "happy path".
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: No output; only defining the function.
+
+### One sentence connecting to previous unit
+Functions are useful, but as they grow more complex, we need a way to document them and treat them like any other data in our program.
+
+## Concept Unit: Docstrings and function as object
 ### The Problem
-When we look at a function named `celsius_to_fahrenheit`, we might guess what it does. But how do we explicitly document a function's parameters, return type, and purpose so other developers (and tooling like IDEs) can understand its contract without reading its body?
+How do we tell other developers (or our future selves) what `calculate_stats` expects and returns without them having to read the source code? Furthermore, if a function is just a named computation, can we pass that computation around like a variable?
 
 ### Introduce the concept in isolation
-Let's place a string immediately under a function definition.
-
 ```python
-def dummy():
-    """Does nothing."""
+def my_func():
+    """This function does nothing but has a docstring."""
     pass
 
-print(dummy.__doc__)
+print(my_func.__doc__)
+print(type(my_func))
 ```
-
 Output:
-```text
-Does nothing.
 ```
-This proves that a string at the start of a function is stored as metadata on the function itself. This is called a **docstring**.
+This function does nothing but has a docstring.
+<class 'function'>
+```
+This output proves that a string immediately following the `def` statement is attached to the function object as its `__doc__` attribute, and that the function itself is a first-class object of type `function`. This is called a **docstring** and **first-class functions**.
 
-### Discard the throwaway example
-This throwaway code is discarded.
+### Discard the throwaway
+This throwaway example is discarded and will not appear in the project again.
 
 ### Project Change
-No reference counterpart.
-- **Files affected**: `math_utils.py`
-- **Change type**: add
-- **Location**: bottom of file
-- **Dependencies**: none
+- **Reference Source:** No reference counterpart.
+- **Files affected:** `calculator.py` (modified)
+- **Change type:** add/replace
+- **Location:** Updating `calculate_stats` and adding executable code at the bottom.
+- **Dependencies:** None.
 
 ### The New Code
 ```python
-def celsius_to_fahrenheit(c):
-    '''Convert a temperature from Celsius to Fahrenheit.
+def calculate_stats(a, b):
+    """
+    Computes the sum and product of two integers.
+    Returns (None, None) if inputs are not integers.
+    """
+    if type(a) is not int or type(b) is not int:
+        return None, None
+    return a + b, a * b
 
-    Args:
-        c (float): Temperature in degrees Celsius.
-
-    Returns:
-        float: Temperature in degrees Fahrenheit.
-    '''
-    return c * 9/5 + 32
+operation = calculate_stats
 ```
 
 ### The Updated Project
 ```python
-# ← new
-def celsius_to_fahrenheit(c):
-    '''Convert a temperature from Celsius to Fahrenheit.
-
-    Args:
-        c (float): Temperature in degrees Celsius.
-
-    Returns:
-        float: Temperature in degrees Fahrenheit.
-    '''
-    return c * 9/5 + 32
-
-print(celsius_to_fahrenheit(100))
-print(celsius_to_fahrenheit(0))
-help(celsius_to_fahrenheit)
+10: def calculate_stats(a, b):
+11:     """ # ← new
+12:     Computes the sum and product of two integers. # ← new
+13:     Returns (None, None) if inputs are not integers. # ← new
+14:     """ # ← new
+15:     if type(a) is not int or type(b) is not int:
+16:         return None, None
+17:     return a + b, a * b
+18:
+19: operation = calculate_stats # ← new
 ```
+This structure adds documentation to the function and assigns the function object itself to a new variable named `operation`.
 
-Output:
-```text
-212.0
-32.0
-Help on function celsius_to_fahrenheit in module __main__:
+### Mechanical walkthrough
+- `def calculate_stats(a, b):`: Defines the function.
+- `"""`: Opens a multi-line string literal.
+- `Computes the sum and product of two integers.`: Documentation text.
+- `Returns (None, None) if inputs are not integers.`: Documentation text.
+- `"""`: Closes the multi-line string literal. Because it is the first statement, Python assigns it to the function's `__doc__` attribute.
+- `operation`: A new variable name.
+- `=`: Assignment operator.
+- `calculate_stats`: A reference to the function object itself, *without* parentheses, meaning we are assigning the object, not calling it.
 
-celsius_to_fahrenheit(c)
-    Convert a temperature from Celsius to Fahrenheit.
-    
-    Args:
-        c (float): Temperature in degrees Celsius.
-        
-    Returns:
-        float: Temperature in degrees Fahrenheit.
-```
-This provides a fully documented function whose contract is accessible dynamically via `help`.
+### CS lens
+This is **metadata** and **first-class functions / higher-order functions**. Real-world places it appears:
+- HTML `<meta>` tags describing a webpage.
+- Passing a callback function to a UI button click event.
+- Sorting algorithms that accept a custom comparison function.
 
-### Mechanical Walkthrough
-- `'''Convert a temperature...'''`: A string literal placed as the very first statement inside a function definition becomes its **docstring**.
-- `c * 9/5 + 32`: The body of the function executes normally when called.
-- `help(celsius_to_fahrenheit)`: Python's built-in `help` function reads the docstring and displays it to the developer in a formatted way.
+### SE lens
+**Self-Documenting Code vs. Explicit Documentation**. The principle of embedding usage instructions directly alongside the code. The alternative not chosen is maintaining a separate wiki or text file for documentation. The tradeoff is that inline docstrings clutter the source file slightly, but they guarantee the documentation lives with the code and is accessible via introspection tools like `help()`.
 
-This is how Python's own documentation works — `help(print)`, `help(len)` etc. Every function you write should have a docstring.
+### Commands needed
+None for this unit.
 
----
+### Run it
+Predicted confidently: No output; only defining a docstring and assigning a variable.
 
-Module 0 is complete. The reader can now open the Python REPL, work with all basic types, write conditional and iterative programs, and define reusable functions. Module 1 covers Python's data structures — lists, tuples, dicts, sets — the building blocks of real programs. 
+### One sentence connecting to previous unit
+With all the pieces in place, we can now see how parameters, scope, execution, and return values flow together in a complete program.
 
-Exercises: 
-- Write `is_palindrome(s)` that returns True if string s reads the same forwards and backwards.
-- Write `count_vowels(s)` that counts the number of vowels in a string.
-- Write `collatz(n)` that prints the Collatz sequence starting from n until it reaches 1.
+## Closing
+### Connect the pieces
+When we execute a function call like `greet('Alice', greeting='Hi')`, the entire life cycle of a function comes into play. First, Python looks up the name `greet` (using the **LEGB rule**) to find the function object (a **first-class object** with a **docstring**). Next, it creates a new **local scope** for this specific call. It performs **parameter binding**, matching the **positional argument** `'Alice'` to the first parameter, and the **keyword argument** `'greeting='Hi'` to the second, overriding its **default value**. As the body executes, any variables created live only in that local scope. Finally, the function reaches a `return` statement, ending the local scope's execution and sending the computed output (the **return value**) back to the caller to be used in the rest of the program.

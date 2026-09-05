@@ -1,700 +1,482 @@
 # Lesson 30: Search Algorithms — Linear and Binary
 
-**What you will build**
-The reader will implement linear search (O(n)) and binary search (O(log n)), trace them mechanically, prove why binary search requires a SORTED list, and use the `bisect` module. The transferable problems: (1) linear search is the default — scan every element; it works on any sequence but is slow; (2) binary search requires a SORTED input and is dramatically faster — but incorrect on unsorted data; (3) the `bisect` module gives you production-ready binary search and sorted-insertion.
+What you will build: The reader implements linear search (O(n)), binary search (O(log n)), and understands the PRECONDITION of binary search (sorted input), the bisect module, and searching with custom keys. The transferable insight: binary search is the canonical example of 'divide and conquer applied to search.' Each step eliminates HALF the remaining candidates. This is why O(log n) is so powerful: log2(1,000,000) = 20. You find any element in a million-element sorted list in at most 20 steps.
 
-**What you need to know first**
-Lessons 0–29 (full curriculum through Big-O).
+What you need to know first: Lessons 00-29.
 
 **Terms used in this lesson**
-- **Linear search** — scanning every element of a list one by one to find a target. It solves the problem of finding an item in an unsorted collection.
-- **Binary search** — repeatedly halving a sorted search space to find a target. It solves the problem of searching efficiently (O(log n)) in a sorted collection.
-- **Worst-case complexity** — the maximum amount of time an algorithm can take for an input of size n.
-- **Recursion** — a function calling itself to solve a smaller instance of the same problem.
-- **O(n)** — linear time complexity.
-- **O(log n)** — logarithmic time complexity.
-- **Stack overflow** — a failure caused by exceeding the maximum number of recursive function calls.
-- **Dataclass** — a decorator that automatically generates special methods.
+- **Linear search** — An algorithmic process that checks every element in a list sequentially until the target is found. It exists to provide a simple, foolproof way to search unsorted data.
+- **Binary search** — An algorithmic process that repeatedly divides a sorted list in half to find a target. It exists to provide extremely fast searches, solving the performance bottlenecks of linear search on large datasets.
+- **Divide and conquer** — An algorithmic design paradigm. It exists to solve complex problems by breaking them down into smaller, similar sub-problems, solving them, and combining the results.
+- **Precondition** — A condition that must be true before a function or algorithm runs (e.g., binary search requires a sorted list). It exists to guarantee the correct behavior of the algorithm.
+- **O(n)** — Linear time complexity. It describes performance that scales directly in proportion to the input size.
+- **O(log n)** — Logarithmic time complexity. It describes performance that scales with the logarithm of the input size, indicating massive efficiency gains for large data.
 
 **Objects and methods used**
-
 - **`enumerate`**
-  - *What it is:* A built-in Python generator.
-  - *Implementation:* `def enumerate(iterable, start=0): ...` yields `(index, value)` tuples.
-  - *Its use:* To get both the index and the element during linear search.
-  - *Type:* Built-in function.
-  - *Responsibility:* Yields pairs containing a count and a value.
+  - *What it is:* A Python built-in function that adds a counter to an iterable.
+  - *Implementation:* `enumerate(iterable, start=0)`
+  - *Its use:* To retrieve both the index and the value simultaneously during our linear search loop.
+  - *Type:* Built-in function
+  - *Responsibility:* Yields a tuple containing a count (from start) and the values obtained from iterating over iterable.
   - *Depends on:* An iterable object.
-  - *Connects to:* Consumed by a `for` loop.
-  - *Shape:* A standard library built-in.
-
+  - *Connects to:* Consumed by a `for` loop to unpack index and item.
+  - *Shape:* Standard library utility function, used as a helper in iteration.
 - **`bisect.bisect_left`**
-  - *What it is:* A function to locate the insertion point for a target in a sorted list.
-  - *Implementation:* `def bisect_left(a, x, lo=0, hi=None, *, key=None): ...` 
-  - *Its use:* To find if an element exists, or where to put it.
-  - *Type:* Module-level function.
-  - *Responsibility:* Finds the correct insertion index via binary search.
-  - *Depends on:* A pre-sorted list and a comparable target.
-  - *Connects to:* Returns an integer index to the caller.
-  - *Shape:* Standard library utility function.
-
-- **`bisect.bisect_right`**
-  - *What it is:* Similar to `bisect_left`, but locates the insertion point to the right of any existing identical elements.
-  - *Implementation:* `def bisect_right(a, x, lo=0, hi=None, *, key=None): ...`
-  - *Its use:* To insert items after existing matches.
-  - *Type:* Module-level function.
-  - *Responsibility:* Finds the insertion point after existing equals.
-  - *Depends on:* A pre-sorted list and a comparable target.
-  - *Connects to:* Returns an integer index to the caller.
-  - *Shape:* Standard library utility function.
-
+  - *What it is:* A function in the `bisect` module to locate the insertion point for a target in a sorted list to maintain sorted order.
+  - *Implementation:* `bisect.bisect_left(a, x, lo=0, hi=len(a))`
+  - *Its use:* To perform a highly optimized binary search for an element or its insertion point.
+  - *Type:* Standard library module function
+  - *Responsibility:* Finds the leftmost index where the target can be inserted while maintaining sorted order.
+  - *Depends on:* A sorted list and a target value.
+  - *Connects to:* Called by the user, returns an integer index.
+  - *Shape:* A utility function from Python's standard library.
 - **`bisect.insort`**
-  - *What it is:* A function to insert an element into a sorted list while maintaining the sort order.
-  - *Implementation:* `def insort(a, x, lo=0, hi=None, *, key=None): ...`
-  - *Its use:* Keeping a list sorted dynamically.
-  - *Type:* Module-level function.
-  - *Responsibility:* Finds insertion point and modifies the list in-place.
-  - *Depends on:* A pre-sorted list and a comparable target.
-  - *Connects to:* Modifies the list passed to it.
-  - *Shape:* Standard library utility function causing an O(n) memory shift.
-
-- **`time.time`**
-  - *What it is:* A function that returns the current time in seconds since the Epoch.
-  - *Implementation:* `def time(): -> float`
-  - *Its use:* To measure the elapsed time of our algorithms.
-  - *Type:* Module-level function.
-  - *Responsibility:* Reading the system clock.
-  - *Depends on:* System clock.
-  - *Connects to:* Returns a `float`.
+  - *What it is:* A function in the `bisect` module to insert an element into a sorted sequence.
+  - *Implementation:* `bisect.insort(a, x, lo=0, hi=len(a))`
+  - *Its use:* To insert a new item into our sorted dataset without having to manually find the index.
+  - *Type:* Standard library module function
+  - *Responsibility:* Inserts item `x` in list `a`, and keeps it sorted assuming `a` is already sorted.
+  - *Depends on:* A sorted list and a target value.
+  - *Connects to:* Modifies the list in place; relies on binary search internally.
+  - *Shape:* Standard library utility function that modifies a data structure.
+- **`bisect.bisect_right`**
+  - *What it is:* A function similar to `bisect_left`, but returns an insertion point which comes after any existing entries of the target.
+  - *Implementation:* `bisect.bisect_right(a, x, lo=0, hi=len(a))`
+  - *Its use:* To find the upper bound when doing a range query.
+  - *Type:* Standard library module function
+  - *Responsibility:* Finds the rightmost index where the target can be inserted while maintaining sorted order.
+  - *Depends on:* A sorted list and a target value.
+  - *Connects to:* Called by the user to calculate an ending boundary index.
+  - *Shape:* Utility function for bounded searches.
+- **`lambda`**
+  - *What it is:* A keyword used to create small, anonymous functions in Python.
+  - *Implementation:* `lambda arguments: expression`
+  - *Its use:* To define a quick, inline extraction function for the key parameter in our search algorithm.
+  - *Type:* Keyword/Language feature
+  - *Responsibility:* Creates a callable function object without binding it to a name.
+  - *Depends on:* An expression to evaluate.
+  - *Connects to:* Passed as an argument (like `key`) to other functions.
+  - *Shape:* Anonymous inline function.
+- **`sorted`**
+  - *What it is:* A built-in function that builds a new sorted list from an iterable.
+  - *Implementation:* `sorted(iterable, /, *, key=None, reverse=False)`
+  - *Its use:* To prepare unsorted data so that we can apply binary search to it.
+  - *Type:* Built-in function
+  - *Responsibility:* Returns a new sorted list containing all items from the iterable.
+  - *Depends on:* An iterable to sort.
+  - *Connects to:* Called with an iterable and an optional key function, returns a new list.
   - *Shape:* Standard library utility.
+- **`time.perf_counter`**
+  - *What it is:* A function that returns a float value of time in seconds, useful for performance profiling.
+  - *Implementation:* `time.perf_counter()`
+  - *Its use:* To measure and compare the execution time between linear and binary searches.
+  - *Type:* Standard library module function
+  - *Responsibility:* Provides a high-resolution clock for short-duration timing.
+  - *Depends on:* The system's underlying clock mechanism.
+  - *Connects to:* Called before and after a block of code; differences are calculated.
+  - *Shape:* Timing utility from the standard library.
+- **`list.sort`**
+  - *What it is:* A method that sorts a list in place.
+  - *Implementation:* `list.sort(*, key=None, reverse=False)`
+  - *Its use:* To sort the large dataset once before performing multiple binary searches.
+  - *Type:* List instance method
+  - *Responsibility:* Modifies the list to be in sorted order.
+  - *Depends on:* The elements of the list being comparable.
+  - *Connects to:* Called on the list instance, modifies it directly.
+  - *Shape:* Core data structure method.
 
-- **`@dataclass(order=True)`**
-  - *What it is:* A decorator from the `dataclasses` module.
-  - *Implementation:* `@dataclass(order=True)` synthesizes `__lt__`, `__le__`, `__gt__`, `__ge__`.
-  - *Its use:* Making custom objects comparable.
-  - *Type:* Class decorator.
-  - *Responsibility:* Generating boilerplate magic methods.
-  - *Depends on:* A class definition with type-hinted fields.
-  - *Connects to:* Modifies the class object at definition time.
-  - *Shape:* Python metaprogramming built-in.
-
----
-
-## Concept Unit: Linear Search
-
+## Concept Unit: Linear search — O(n) brute force
 ### The Problem
-If we have a sequence of items, how do we find a specific target and its position? Given an unsorted collection, what is the simplest way to locate an item without missing anything?
-
+How do we find a specific item in a collection of data? If the data is completely scrambled, in what order should we look? What happens if the item we are looking for is at the very end, or not there at all?
 ### Introduce the concept in isolation
-To scan every element, we use a loop. Let's look at `enumerate` in action.
-
 ```python
-demo_list = [10, 20, 30]
-target = 20
-found_index = -1
-for i, val in enumerate(demo_list):
-    if val == target:
-        found_index = i
-        break
-print(found_index)
-```
-Output:
-```
-1
-```
-This proves that by iterating one by one, checking equality at each step, we correctly locate the index of the target. This technique is called **linear search**.
+def linear_search(lst, target):
+    for i, item in enumerate(lst):
+        if item == target:
+            return i    # found at index i
+    return -1           # not found
 
-### Discard the throwaway example
-We will discard this one-off loop and write a reusable search function for our project.
+data = [4, 2, 7, 1, 9, 3, 6, 5, 8]
+print(linear_search(data, 7))   # 2 (index)
+print(linear_search(data, 10))  # -1
 
+# Python's 'in' operator: also O(n) for lists
+print(7 in data)   # True  -- same as linear_search but returns bool
+print(10 in data)  # False
+```
+Trace linear_search([4,2,7,1,9], 7): i=0,item=4: 4!=7. i=1,item=2: 2!=7. i=2,item=7: 7==7. Return 2. This proves that **linear search** must potentially look at every element, operating in O(n) time.
+### Discard the throwaway
+This exact throwaway code is deleted and will not appear in the project again.
 ### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py` (created).
-- **Change type**: Add.
-- **Location**: Top of file.
-- **Dependencies**: None.
-
+No reference counterpart — this is a standalone theory lesson on search foundations.
+- Files affected: `search_tools.py` created.
+- Change type: add.
+- Location: entire file.
+- Dependencies: None.
 ### The New Code
 ```python
 def linear_search(lst, target):
-    for i, x in enumerate(lst):
-        if x == target:
+    for i, item in enumerate(lst):
+        if item == target:
             return i
     return -1
 ```
-
 ### The Updated Project
 ```python
-# search_tools.py
-# ← new
-1: def linear_search(lst, target):
-2:     for i, x in enumerate(lst):
-3:         if x == target:
-4:             return i
-5:     return -1
-
-print(linear_search([3, 1, 4, 1, 5, 9, 2, 6], 5))
-print(linear_search([3, 1, 4, 1, 5, 9, 2, 6], 7))
+1: def linear_search(lst, target):  # <- new
+2:     for i, item in enumerate(lst):  # <- new
+3:         if item == target:  # <- new
+4:             return i  # <- new
+5:     return -1  # <- new
 ```
-Output:
-```
-4
--1
-```
-
+This structure creates a function that iterates through a list, checking every item sequentially until the target is found or the list is exhausted.
 ### Mechanical walkthrough
-- `def linear_search(lst, target):` defines a new function taking a list and a target.
-- `for i, x in enumerate(lst):` iterates through the list, yielding index `i` and element `x`.
-- `if x == target:` checks if the current element matches the target.
-- `return i` returns the match index, immediately stopping the search.
-- `return -1` executes if the loop finishes entirely, meaning the target was missing.
+- `def linear_search(lst, target):` declares a function accepting a list and a target value.
+- `for i, item in enumerate(lst):` iterates over the list, extracting both the index `i` and the `item` value at that index.
+- `if item == target:` compares the current value with the target value.
+- `return i` exits the function early and returns the index where the item was found.
+- `return -1` provides a sentinel value indicating the target was not found in the list.
+### CS lens
+This is a sequential search, operating in O(n) time complexity. It appears in log parsing, checking for simple unindexed database rows, or simple array scans in low-level C code where setting up complex structures is unnecessary.
+### SE lens
+Design principle: Keep It Simple Stupid (KISS). An alternative not chosen is to build a complex hash map or sorted index. The tradeoff is that while linear search is slow on large data, it has zero setup cost and works on completely unordered inputs.
+### Commands needed
+None for this unit.
+### Run it
+Predicted confidently: For a target in the list, it returns its 0-based index. For a missing target, it returns -1.
+### One sentence connecting to previous unit
+Linear search solves the problem for unordered data, but for large datasets, we need a faster approach.
 
-**Trace for `linear_search([3, 1, 4], 4)`:**
-- `i=0 x=3` (no)
-- `i=1 x=1` (no)
-- `i=2 x=4` (yes), `return 2`.
-
-**Complexity:** O(n) worst case (target is last or not present), O(1) best case (target is first), O(n/2) average. Use this for unsorted data, small collections, or when searching exactly once.
-
----
-
-## Concept Unit: Binary Search
-
+## Concept Unit: Binary search — O(log n) on sorted data
 ### The Problem
-Linear search is too slow for large collections. If a list is already sorted, can we find an item faster than checking every single element?
-
+If you have a million records and they are already sorted, does it make sense to check the first item, then the second, and so on? How could you jump ahead and narrow down the possibilities faster?
 ### Introduce the concept in isolation
-When data is sorted, we can check the middle element. If our target is smaller, we know it must be in the left half, eliminating the entire right half instantly. 
-
 ```python
-lst = [2, 4, 6, 8, 10]
-target = 8
-low, high = 0, len(lst) - 1
-mid = (low + high) // 2  # 2
-if lst[mid] < target:
-    low = mid + 1        # 3
-print(f"Next search space: indices {low} to {high}")
-```
-Output:
-```
-Next search space: indices 3 to 4
-```
-This proves that a single comparison cuts the problem space in half. This is called **binary search**.
+def binary_search(sorted_lst, target):
+    lo, hi = 0, len(sorted_lst) - 1
 
-### Discard the throwaway example
-We will discard this static check and write a dynamic loop.
-
-### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py` (modified).
-- **Change type**: Add.
-- **Location**: Below `linear_search`.
-- **Dependencies**: None.
-
-### The New Code
-```python
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
-            return mid
-        elif lst[mid] < target:
-            low = mid + 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
+            return mid          # found
+        elif sorted_lst[mid] < target:
+            lo = mid + 1        # target in right half
         else:
-            high = mid - 1
-    return -1
+            hi = mid - 1        # target in left half
+
+    return -1   # not found
+
+data = [1, 3, 5, 7, 9, 11, 13]  # MUST be sorted
+print(binary_search(data, 7))    # 3
+print(binary_search(data, 6))    # -1
+print(binary_search(data, 1))    # 0
+print(binary_search(data, 13))   # 6
 ```
-
-### The Updated Project
-```python
-# search_tools.py
-def linear_search(lst, target):
-    for i, x in enumerate(lst):
-        if x == target:
-            return i
-    return -1
-
-# ← new
-8: def binary_search(lst, target):
-9:     low, high = 0, len(lst) - 1
-10:    while low <= high:
-11:        mid = (low + high) // 2
-12:        if lst[mid] == target:
-13:            return mid
-14:        elif lst[mid] < target:
-15:            low = mid + 1
-16:        else:
-17:            high = mid - 1
-18:    return -1
-
-sorted_lst = [1, 3, 5, 7, 9, 11, 13, 15]
-print(binary_search(sorted_lst, 7))
-print(binary_search(sorted_lst, 6))
-print(binary_search(sorted_lst, 1))
-print(binary_search(sorted_lst, 15))
-```
-Output:
-```
-3
--1
-0
-7
-```
-
-### Mechanical walkthrough
-- `low, high = 0, len(lst) - 1` sets pointers to the start and end of the list.
-- `while low <= high:` loops as long as the search space is valid (at least 1 item).
-- `mid = (low + high) // 2` calculates the middle index using integer division.
-- `if lst[mid] == target:` returns the index if the middle element is a match.
-- `elif lst[mid] < target:` updates `low = mid + 1` to search the right half because the target is larger than the middle element.
-- `else:` updates `high = mid - 1` to search the left half.
-
-**Trace for `binary_search([1,3,5,7,9,11,13,15], 7)`:**
-- `low=0`, `high=7`, `mid=3`, `lst[3]=7 == 7`, `return 3`
-
-**Trace for `target=6`:**
-- `low=0 high=7 mid=3 lst[3]=7 > 6`, `high=2`
-- `low=0 high=2 mid=1 lst[1]=3 < 6`, `low=2`
-- `low=2 high=2 mid=2 lst[2]=5 < 6`, `low=3`
-- `low=3 > high=2`, exit loop, `return -1`
-
-**Complexity:** O(log n) — it halves the search space at each step.
-
----
-
-## Concept Unit: Why binary search FAILS on unsorted data
-
-### The Problem
-Does binary search work on any list? What happens if the data is not in order?
-
-### Introduce the concept in isolation
-Let's trace binary search on a randomized list.
-
-```python
-unsorted = [9, 1, 5, 3, 7]
-# We want to find 3, which is at index 3
-low, high = 0, len(unsorted) - 1
-mid = (low + high) // 2  # mid = 2, lst[2] = 5
-if unsorted[mid] > 3:
-    high = mid - 1       # high = 1
-print(f"Target 3 is in {unsorted[0:high+1]}")
-```
-Output:
-```
-Target 3 is in [9, 1]
-```
-The logic eliminated the right half where `3` actually lives! This proves that on unsorted data, binary search is dangerously incorrect.
-
-### Discard the throwaway example
-We will discard this failed search example.
-
+Trace binary_search([1,3,5,7,9,11,13], 7): lo=0,hi=6. mid=3: data[3]=7==7. Return 3. One step! If target=6: lo=0,hi=6,mid=3,data[3]=7>6 -> hi=2. lo=0,hi=2,mid=1,data[1]=3<6 -> lo=2. lo=2,hi=2,mid=2,data[2]=5<6 -> lo=3. lo=3>hi=2: return -1. This proves that **binary search** rapidly halves the search space in O(log n) time.
+### Discard the throwaway
+This throwaway code is deleted and will not appear in the project again.
 ### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py`
-- **Change type**: Usage/Demonstration.
-- **Location**: Bottom of file.
-- **Dependencies**: None.
-
+No reference counterpart — this is a standalone theory lesson.
+- Files affected: `search_tools.py` modified.
+- Change type: add.
+- Location: appending to file.
+- Dependencies: previously defined `linear_search`.
 ### The New Code
 ```python
-unsorted = [9, 1, 5, 3, 7]
-print(binary_search(unsorted, 3))
-```
-
-### The Updated Project
-```python
-# search_tools.py
-# ...
-def binary_search(lst, target):
-    low, high = 0, len(lst) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if lst[mid] == target:
+def binary_search(sorted_lst, target):
+    lo, hi = 0, len(sorted_lst) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if sorted_lst[mid] == target:
             return mid
-        elif lst[mid] < target:
-            low = mid + 1
+        elif sorted_lst[mid] < target:
+            lo = mid + 1
         else:
-            high = mid - 1
+            hi = mid - 1
+    return -1
+```
+### The Updated Project
+```python
+1: def binary_search(sorted_lst, target):  # <- new
+2:     lo, hi = 0, len(sorted_lst) - 1  # <- new
+3:     while lo <= hi:  # <- new
+4:         mid = (lo + hi) // 2  # <- new
+5:         if sorted_lst[mid] == target:  # <- new
+6:             return mid  # <- new
+7:         elif sorted_lst[mid] < target:  # <- new
+8:             lo = mid + 1  # <- new
+9:         else:  # <- new
+10:             hi = mid - 1  # <- new
+11:     return -1  # <- new
+```
+This adds the binary search function which leverages sorted data to locate an element quickly by iteratively narrowing bounds.
+### Mechanical walkthrough
+- `def binary_search(sorted_lst, target):` defines the function, making it clear through variable naming that `sorted_lst` must be sorted.
+- `lo, hi = 0, len(sorted_lst) - 1` initializes two pointers to the start and end of the list, respectively.
+- `while lo <= hi:` sets up a loop that continues as long as there is a valid range of elements to examine.
+- `mid = (lo + hi) // 2` calculates the midpoint index, using integer division `//` to ensure an integer index.
+- `if sorted_lst[mid] == target:` tests if the midpoint is exactly what we are searching for.
+- `return mid` returns the index if the target is found.
+- `elif sorted_lst[mid] < target:` checks if the target is greater than the midpoint value, meaning it must be in the right half.
+- `lo = mid + 1` shifts the lower bound up, discarding the left half.
+- `else:` captures the case where the target is less than the midpoint value, meaning it must be in the left half.
+- `hi = mid - 1` shifts the upper bound down, discarding the right half.
+- `return -1` executes if the loop exhausts all options, meaning the target does not exist in the list.
+### CS lens
+This represents the classic "divide and conquer" paradigm applied to search. Real-world appearances include binary search trees (BSTs) in databases, git bisect for finding bugs, and B-trees in file systems.
+### SE lens
+Design principle: Contract prerequisites. The alternative not chosen is sorting the list inside `binary_search`. The tradeoff is that sorting internally would hide the O(n log n) cost; forcing the caller to provide a sorted list enforces the precondition and keeps the search function strictly O(log n).
+### Commands needed
+None for this unit.
+### Run it
+Predicted confidently: For target 7 in sorted data `[1,3,5,7,9,11,13]`, it returns 3. For target 6, it returns -1.
+### One sentence connecting to previous unit
+While writing our own binary search is educational, Python provides an optimized standard library module for this exact purpose.
+
+## Concept Unit: The bisect module — binary search in the standard library
+### The Problem
+Why reinvent the wheel? If binary search is such a fundamental algorithm, shouldn't Python provide a built-in, highly optimized way to do it, and perhaps handle edge cases like inserting items while maintaining order?
+### Introduce the concept in isolation
+```python
+import bisect
+
+data = [1, 3, 5, 7, 9, 11, 13]
+
+# bisect_left: index where target would be inserted to keep sorted order
+print(bisect.bisect_left(data, 7))   # 3 (7 is at index 3)
+print(bisect.bisect_left(data, 6))   # 3 (6 would go before 7)
+print(bisect.bisect_left(data, 0))   # 0 (before all elements)
+print(bisect.bisect_left(data, 14))  # 7 (after all elements)
+
+# insort: insert while maintaining sorted order O(n) due to list shift
+bisect.insort(data, 6)
+print(data)  # [1, 3, 5, 6, 7, 9, 11, 13]
+
+# Finding all values in a range [lo, hi]:
+def values_in_range(sorted_lst, lo, hi):
+    left  = bisect.bisect_left(sorted_lst, lo)
+    right = bisect.bisect_right(sorted_lst, hi)
+    return sorted_lst[left:right]
+
+print(values_in_range([1,3,5,7,9,11,13], 4, 10))  # [5,7,9]
+```
+Trace values_in_range([1,3,5,7,9,11,13], 4, 10): bisect_left([...],4)=2 (5 is first >= 4). bisect_right([...],10)=5 (11 is first > 10). data[2:5]=[5,7,9]. This proves that **the bisect module** offers fast O(log n) primitives for working with sorted lists.
+### Discard the throwaway
+This throwaway code is deleted and will not appear in the project again.
+### Project Change
+No reference counterpart — this is a standalone theory lesson.
+- Files affected: `search_tools.py` modified.
+- Change type: add.
+- Location: appending to file.
+- Dependencies: None.
+### The New Code
+```python
+import bisect
+
+def values_in_range(sorted_lst, lo, hi):
+    left  = bisect.bisect_left(sorted_lst, lo)
+    right = bisect.bisect_right(sorted_lst, hi)
+    return sorted_lst[left:right]
+```
+### The Updated Project
+```python
+1: import bisect  # <- new
+2: 
+3: def values_in_range(sorted_lst, lo, hi):  # <- new
+4:     left  = bisect.bisect_left(sorted_lst, lo)  # <- new
+5:     right = bisect.bisect_right(sorted_lst, hi)  # <- new
+6:     return sorted_lst[left:right]  # <- new
+```
+This leverages Python's `bisect` library to quickly query sub-ranges of a sorted array.
+### Mechanical walkthrough
+- `import bisect` brings the standard library module into scope.
+- `def values_in_range(sorted_lst, lo, hi):` defines a function to return a slice of a sorted list containing values between `lo` and `hi`.
+- `left = bisect.bisect_left(sorted_lst, lo)` finds the index of the first element greater than or equal to `lo`.
+- `right = bisect.bisect_right(sorted_lst, hi)` finds the index of the first element strictly greater than `hi`.
+- `return sorted_lst[left:right]` returns the slice of the list using the found indices, extracting only the valid range in O(k) time where k is the number of elements found.
+### CS lens
+This is an application of bounded search queries. It appears in time-series databases for fetching events between two timestamps, graphics for frustum culling, and spatial indexing.
+### SE lens
+Design principle: Reuse standard libraries. The alternative not chosen is writing custom bound-finding loops. The tradeoff is trusting the opaque module implementation vs having complete control; in almost all Python code, standard library C implementations are drastically faster and less bug-prone.
+### Commands needed
+None for this unit.
+### Run it
+Predicted confidently: For a range `4` to `10` on `[1,3,5,7,9,11,13]`, it returns `[5, 7, 9]`.
+### One sentence connecting to previous unit
+Sometimes, the values we want to search aren't plain numbers, but complex objects, requiring us to define exactly what value we are sorting and searching on.
+
+## Concept Unit: Searching with a key function
+### The Problem
+What if we have a list of tuples representing people's names and ages? If we want to find someone by their age, how do we tell the binary search to look only at the age field instead of the whole tuple?
+### Introduce the concept in isolation
+```python
+def binary_search_key(sorted_lst, target, key=lambda x: x):
+    lo, hi = 0, len(sorted_lst) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        mid_val = key(sorted_lst[mid])
+        if mid_val == target:
+            return mid
+        elif mid_val < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
     return -1
 
-# ← new
-25: unsorted = [9, 1, 5, 3, 7]
-26: print(binary_search(unsorted, 3))
+people = [('Alice', 25), ('Bob', 30), ('Charlie', 35), ('Diana', 40)]
+idx = binary_search_key(people, 35, key=lambda p: p[1])
+print(idx)              # 2
+print(people[idx])      # ('Charlie', 35)
 ```
-Output:
-```
--1
-```
-
-### Mechanical walkthrough
-- Binary search assumes that if `lst[mid] < target`, the target MUST be to the right, and if `lst[mid] > target`, it MUST be to the left.
-- On unsorted data, this assumption is completely violated. The algorithm will happily eliminate the half containing the target.
-- `low=0 high=4 mid=2 lst[2]=5 > 3, high=1`
-- `low=0 high=1 mid=0 lst[0]=9 > 3, high=-1`
-- `low=0 > high=-1, return -1` — MISSED IT!
-- **Rule:** ALWAYS sort before binary searching.
-
----
-
-## Concept Unit: Recursive Binary Search
-
-### The Problem
-The iterative loop is effective, but searching half of a list is just a smaller version of the same problem. Can a function invoke itself to solve this?
-
-### Introduce the concept in isolation
-A function calling itself is recursion. 
-
-```python
-def countdown(n):
-    if n <= 0:
-        return
-    countdown(n - 1)
-
-countdown(3)
-```
-Output (predictable):
-`(No output, function terminates safely)`
-This proves a function can invoke itself with a smaller boundary.
-
-### Discard the throwaway example
-Discard the countdown; we will write a recursive search.
-
+Trace binary_search_key(people, 35, key=lambda p: p[1]): lo=0,hi=3. mid=1: key(people[1])=key(('Bob',30))=30 < 35 -> lo=2. mid=2: key(people[2])=35==35. Return 2. This proves that **searching with a key function** decouples the search logic from the data's specific structure.
+### Discard the throwaway
+This throwaway code is deleted and will not appear in the project again.
 ### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py` (modified).
-- **Change type**: Add.
-- **Location**: Below `binary_search`.
-- **Dependencies**: None.
-
+No reference counterpart — this is a standalone theory lesson.
+- Files affected: `search_tools.py` modified.
+- Change type: add.
+- Location: appending to file.
+- Dependencies: None.
 ### The New Code
 ```python
-def binary_search_recursive(lst, target, low=0, high=None):
-    if high is None:
-        high = len(lst) - 1
-    if low > high:
-        return -1
-    mid = (low + high) // 2
-    if lst[mid] == target:
-        return mid
-    elif lst[mid] < target:
-        return binary_search_recursive(lst, target, mid+1, high)
-    else:
-        return binary_search_recursive(lst, target, low, mid-1)
+def binary_search_key(sorted_lst, target, key=lambda x: x):
+    lo, hi = 0, len(sorted_lst) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        mid_val = key(sorted_lst[mid])
+        if mid_val == target:
+            return mid
+        elif mid_val < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
 ```
-
 ### The Updated Project
 ```python
-# search_tools.py
-# ...
-# ← new
-30: def binary_search_recursive(lst, target, low=0, high=None):
-31:     if high is None:
-32:         high = len(lst) - 1
-33:     if low > high:
-34:         return -1
-35:     mid = (low + high) // 2
-36:     if lst[mid] == target:
-37:         return mid
-38:     elif lst[mid] < target:
-39:         return binary_search_recursive(lst, target, mid+1, high)
-40:     else:
-41:         return binary_search_recursive(lst, target, low, mid-1)
-
-print(binary_search_recursive([1,3,5,7,9], 7))
-print(binary_search_recursive([1,3,5,7,9], 4))
+1: def binary_search_key(sorted_lst, target, key=lambda x: x):  # <- new
+2:     lo, hi = 0, len(sorted_lst) - 1  # <- new
+3:     while lo <= hi:  # <- new
+4:         mid = (lo + hi) // 2  # <- new
+5:         mid_val = key(sorted_lst[mid])  # <- new
+6:         if mid_val == target:  # <- new
+7:             return mid  # <- new
+8:         elif mid_val < target:  # <- new
+9:             lo = mid + 1  # <- new
+10:         else:  # <- new
+11:             hi = mid - 1  # <- new
+12:     return -1  # <- new
 ```
-Output:
-```
-3
--1
-```
-
+This generalizes binary search to handle arbitrary objects by introducing a functional key extractor.
 ### Mechanical walkthrough
-- `def binary_search_recursive(lst, target, low=0, high=None):` provides default arguments to mimic the iterative startup.
-- `if high is None: high = len(lst) - 1` initializes `high` safely on the first call.
-- `if low > high: return -1` is the base case: the search space is exhausted.
-- `mid = (low + high) // 2` finds the midpoint.
-- `if lst[mid] == target: return mid` is the success base case.
-- `return binary_search_recursive(lst, target, mid+1, high)` triggers recursion if the target is larger, returning the result of the recursive call back up the chain.
-- `return binary_search_recursive(lst, target, low, mid-1)` triggers recursion if the target is smaller.
+- `def binary_search_key(sorted_lst, target, key=lambda x: x):` defines the function and sets a default `key` argument using an inline anonymous `lambda` function that just returns the item itself.
+- `lo, hi = 0, len(sorted_lst) - 1` initializes the boundary pointers.
+- `while lo <= hi:` loop as long as the search space is valid.
+- `mid = (lo + hi) // 2` calculates the midpoint index.
+- `mid_val = key(sorted_lst[mid])` dynamically extracts the comparison value from the midpoint object by calling the `key` function.
+- `if mid_val == target:` compares the extracted value against our target.
+- `return mid` returns the index if there is a match.
+- `elif mid_val < target:` handles the case where the extracted value is less than the target.
+- `lo = mid + 1` moves the lower bound up.
+- `else:` handles the case where the extracted value is greater than the target.
+- `hi = mid - 1` moves the upper bound down.
+- `return -1` returns if the search fails.
+### CS lens
+This highlights the concept of functional programming abstractions, treating behavior (how to extract a comparison key) as data (an argument). It is widely used in relational databases for secondary indexes.
+### SE lens
+Design principle: Dependency Inversion. The alternative not chosen is hardcoding `sorted_lst[mid][1]` for the tuple. The tradeoff is performance (function call overhead inside a tight loop) versus massive reusability across any data type.
+### Commands needed
+None for this unit.
+### Run it
+Predicted confidently: For a tuple list sorted by age, searching for 35 with a `lambda p: p[1]` key returns the index containing `('Charlie', 35)`.
+### One sentence connecting to previous unit
+Now that we have all these tools, we need to know when to apply which algorithm depending on our performance needs.
 
-The recursive version is elegant but uses O(log n) stack frames. The iterative version is typically preferred in Python to avoid overhead or `RecursionError` on deep recursion.
-
----
-
-## Concept Unit: The `bisect` Module
-
+## Concept Unit: When to use what — search selection guide
 ### The Problem
-Writing binary search by hand is prone to off-by-one errors. Does Python provide a standard, highly optimized way to do this in production code?
-
+If sorting an array takes time, when is it actually worth doing it just so we can use binary search? If we only need to look for one item, is it faster to just scan the unsorted list?
 ### Introduce the concept in isolation
-Python includes the `bisect` module for binary search operations.
-
-```python
-import bisect
-arr = [10, 20, 30]
-idx = bisect.bisect_left(arr, 20)
-print(idx)
-```
-Output:
-```
-1
-```
-This proves that `bisect_left` natively performs binary search to find an index.
-
-### Discard the throwaway example
-We will discard this and implement a full demonstration in our project.
-
-### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py`
-- **Change type**: Add.
-- **Location**: Bottom of file.
-- **Dependencies**: `import bisect`.
-
-### The New Code
-```python
-import bisect
-
-sorted_lst = [1, 3, 5, 7, 9, 11]
-print(bisect.bisect_left(sorted_lst, 7))
-print(bisect.bisect_left(sorted_lst, 6))
-print(bisect.bisect_left(sorted_lst, 0))
-print(bisect.bisect_left(sorted_lst, 12))
-
-print(bisect.bisect_right(sorted_lst, 7))
-
-bisect.insort(sorted_lst, 6)
-print(sorted_lst)
-```
-
-### The Updated Project
-```python
-# search_tools.py
-# ...
-# ← new
-45: import bisect
-46: 
-47: sorted_lst = [1, 3, 5, 7, 9, 11]
-48: 
-49: # bisect_left: index where target would be inserted
-50: print(bisect.bisect_left(sorted_lst, 7))
-51: print(bisect.bisect_left(sorted_lst, 6))
-52: print(bisect.bisect_left(sorted_lst, 0))
-53: print(bisect.bisect_left(sorted_lst, 12))
-54: 
-55: # bisect_right: insert AFTER existing matches
-56: print(bisect.bisect_right(sorted_lst, 7))
-57: 
-58: # insort: insert while maintaining sorted order
-59: bisect.insort(sorted_lst, 6)
-60: print(sorted_lst)
-```
-Output:
-```
-3
-3
-0
-6
-4
-[1, 3, 5, 6, 7, 9, 11]
-```
-
-### Mechanical walkthrough
-- `import bisect` loads the standard module.
-- `bisect_left(sorted_lst, 7)` returns `3`, the leftmost index where `7` could be inserted without breaking the sorted order.
-- `bisect_left(sorted_lst, 6)` returns `3`, showing where `6` would go (pushing `7` to index 4).
-- To checking if an element exists, you must inspect the returned index: `i = bisect.bisect_left(a, x); if i < len(a) and a[i] == x:`
-- `bisect_right(sorted_lst, 7)` returns `4`, telling us to insert a *new* `7` after the existing one.
-- `bisect.insort(sorted_lst, 6)` finds the insertion point and automatically mutates the list. This relies on binary search to find the spot, but still requires O(n) time overall because a Python list must shift all subsequent elements in memory.
-
----
-
-## Concept Unit: Searching in sorted lists of objects
-
-### The Problem
-Often we search arrays of objects, not integers. How do we binary search custom objects?
-
-### Introduce the concept in isolation
-We can use the `dataclass` decorator with `order=True` to make instances comparable, allowing `bisect` to function.
-
-```python
-from dataclasses import dataclass
-
-@dataclass(order=True)
-class Box:
-    weight: int
-
-print(Box(10) < Box(20))
-```
-Output:
-```
-True
-```
-This proves that `@dataclass(order=True)` synthesizes `__lt__` correctly based on the fields.
-
-### Discard the throwaway example
-We will discard the `Box` and apply this to a `Student` record.
-
-### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py`
-- **Change type**: Add.
-- **Location**: Bottom of file.
-- **Dependencies**: `from dataclasses import dataclass`.
-
-### The New Code
-```python
-from dataclasses import dataclass
-
-@dataclass(order=True)
-class Student:
-    gpa: float
-    name: str
-
-students = sorted([
-    Student(3.9, 'Alice'),
-    Student(3.5, 'Bob'),
-    Student(3.7, 'Carol'),
-    Student(3.2, 'Dave'),
-])
-print(students)
-
-idx = bisect.bisect_left(students, Student(3.6, ''))
-print(idx)
-```
-
-### The Updated Project
-```python
-# search_tools.py
-# ...
-import bisect
-# ← new
-62: from dataclasses import dataclass
-63: 
-64: @dataclass(order=True)
-65: class Student:
-66:     gpa: float
-67:     name: str
-68: 
-69: students = sorted([
-70:     Student(3.9, 'Alice'),
-71:     Student(3.5, 'Bob'),
-72:     Student(3.7, 'Carol'),
-73:     Student(3.2, 'Dave'),
-74: ])
-75: print(students)
-76: 
-77: idx = bisect.bisect_left(students, Student(3.6, ''))
-78: print(idx)
-```
-Output:
-```
-[Student(gpa=3.2, name='Dave'), Student(gpa=3.5, name='Bob'), Student(gpa=3.7, name='Carol'), Student(gpa=3.9, name='Alice')]
-2
-```
-
-### Mechanical walkthrough
-- `from dataclasses import dataclass` imports the decorator.
-- `@dataclass(order=True)` configures the class to be comparable. It compares fields top-to-bottom: `gpa` first, then `name` as a tiebreaker.
-- `sorted([...])` natively uses these generated comparison methods to order the students by GPA.
-- `bisect_left(students, Student(3.6, ''))` queries the list with a dummy object possessing the target GPA.
-- `idx` becomes `2`, accurately reporting that a `3.6` GPA student fits exactly between Bob (3.5) and Carol (3.7).
-
----
-
-## Concept Unit: Empirical Comparison (Linear vs. Binary)
-
-### The Problem
-We know O(log n) is mathematically faster than O(n), but what does that speedup actually look like in code?
-
-### Introduce the concept in isolation
-We can use `time.time()` to take timestamps and measure elapsed seconds.
-
 ```python
 import time
-start = time.time()
-# ... minimal work
-end = time.time()
-print(end - start > 0)
-```
-Output:
-```
-True
-```
-This proves we can capture high-resolution execution time by subtracting timestamps.
+import bisect
 
-### Discard the throwaway example
-We will discard this and write a formal timing loop to race our algorithms.
+n = 100000
+data = list(range(n, 0, -1))  # reverse sorted
+targets = list(range(0, n, 100))
 
+# Linear: O(n) per search = O(n*k) total
+t0 = time.perf_counter()
+for t in targets:
+    t in data
+linear_time = time.perf_counter() - t0
+
+# Sort once + binary: O(n log n) + O(k log n)
+t0 = time.perf_counter()
+data.sort()   # O(n log n) once
+for t in targets:
+    bisect.bisect_left(data, t)  # O(log n) per query
+binary_time = time.perf_counter() - t0
+
+print(f'Linear: {linear_time:.3f}s')
+print(f'Sort+Binary: {binary_time:.3f}s')
+print(f'Speedup: {linear_time/binary_time:.1f}x')
+```
+Trace: 1000 searches on 100000-element list. Linear: 1000 * 100000 comparisons = 100M. Binary: sort (1.7M ops) + 1000 * 17 = 18700 ops. Total: ~1.7M vs 100M -> ~58x speedup in operation count. This proves the pattern of **sort-once-search-many**.
+### Discard the throwaway
+This throwaway code is deleted and will not appear in the project again.
 ### Project Change
-- **Reference Source**: None.
-- **Files affected**: `search_tools.py`
-- **Change type**: Add.
-- **Location**: Bottom of file.
-- **Dependencies**: `import time`.
-
+No reference counterpart.
+- Files affected: `search_tools.py` modified.
+- Change type: add.
+- Location: appending to file.
+- Dependencies: None.
 ### The New Code
 ```python
-import time
-
-for size in [10_000, 100_000, 1_000_000]:
-    data = list(range(size))
-    target = size - 1  # worst case for linear search
-
-    start = time.time()
-    for _ in range(1000):
-        linear_search(data, target)
-    linear_time = (time.time() - start) / 1000
-
-    start = time.time()
-    for _ in range(1000):
-        binary_search(data, target)
-    binary_time = (time.time() - start) / 1000
-
-    print(f'n={size:>8}: linear={linear_time:.6f}s, binary={binary_time:.6f}s, speedup={linear_time/binary_time:.0f}x')
+# Decision guide for searching:
+# Data is unsorted, small n (< 1000): linear search or 'in'
+# Data is unsorted, large n, many searches: sort once + binary search
+# Data changes frequently: sorted container (SortedList from sortedcontainers)
+# Need O(1) lookup: dict or set (hash map)
+# Range queries: bisect on sorted list
 ```
-
 ### The Updated Project
 ```python
-# search_tools.py
-# ...
-# ← new
-81: import time
-82: 
-83: for size in [10_000, 100_000, 1_000_000]:
-84:     data = list(range(size))
-85:     target = size - 1  # worst case for linear search
-86: 
-87:     start = time.time()
-88:     for _ in range(1000):
-89:         linear_search(data, target)
-90:     linear_time = (time.time() - start) / 1000
-91: 
-92:     start = time.time()
-93:     for _ in range(1000):
-94:         binary_search(data, target)
-95:     binary_time = (time.time() - start) / 1000
-96: 
-97:     print(f'n={size:>8}: linear={linear_time:.6f}s, binary={binary_time:.6f}s, speedup={linear_time/binary_time:.0f}x')
+1: # Decision guide for searching:  # <- new
+2: # Data is unsorted, small n (< 1000): linear search or 'in'  # <- new
+3: # Data is unsorted, large n, many searches: sort once + binary search  # <- new
+4: # Data changes frequently: sorted container (SortedList from sortedcontainers)  # <- new
+5: # Need O(1) lookup: dict or set (hash map)  # <- new
+6: # Range queries: bisect on sorted list  # <- new
 ```
-Expected output (times will vary slightly per run):
-```
-n=   10000: linear=0.000412s, binary=0.000004s, speedup=103x
-n=  100000: linear=0.003890s, binary=0.000005s, speedup=778x
-n= 1000000: linear=0.038760s, binary=0.000006s, speedup=6460x
-```
-
+This block of comments acts as a mental model reference inside the module.
 ### Mechanical walkthrough
-- `data = list(range(size))` builds a massive sorted array.
-- `target = size - 1` forces linear search to hit its worst case by querying the final element.
-- `start = time.time()` records the clock.
-- `for _ in range(1000):` runs the search 1000 times to get a stable, measurable duration.
-- `(time.time() - start) / 1000` calculates the average execution time per search.
-- The output clearly demonstrates that as `n` grows by a factor of 10, linear search takes exactly 10x longer. 
-- Binary search takes barely any extra time (only 1 or 2 extra operations per 10x growth) because O(log n) is extremely flat. The speedup skyrockets as `n` increases.
+- `# Decision guide for searching:` marks the start of the documentation.
+- `# Data is unsorted, small n (< 1000): linear search or 'in'` documents that the overhead of sorting isn't worth it for small data or single lookups.
+- `# Data is unsorted, large n, many searches: sort once + binary search` states the amortization principle: paying O(n log n) once is cheap if you do many O(log n) searches.
+- `# Data changes frequently: sorted container (SortedList from sortedcontainers)` specifies that list insertions are O(n), so highly volatile data needs specialized structures.
+- `# Need O(1) lookup: dict or set (hash map)` mentions that absolute fastest exact-match lookups belong to hashing, not binary search.
+- `# Range queries: bisect on sorted list` reiterates that binary search excels at bounding problems.
+### CS lens
+This represents algorithmic profiling and amortization. Real-world systems like Postgres query planners constantly make this exact decision: "Should I do a sequential scan, or use an index scan?" based on the number of rows.
+### SE lens
+Design principle: Optimize for the dominant use case. The alternative not chosen is using a dictionary for everything. The tradeoff is that while dictionaries offer O(1) lookups, they use more memory and cannot answer range queries efficiently; sorted lists and binary search provide an optimal balance.
+### Commands needed
+None for this unit.
+### Run it
+Predicted confidently: This is a documentation block, so running the script does nothing.
+### One sentence connecting to previous unit
+Understanding the tradeoffs ensures we choose the right algorithmic tool for our dataset.
 
----
+## Closing
+### Connect the pieces
+Let's trace `binary_search([1,3,5,7,9,11,13], 7)` step by step using our custom `binary_search` algorithm:
+1. `lo=0, hi=6`. `mid = (0 + 6) // 2 = 3`. The element at `data[3]` is `7`. Since `7 == 7`, we return index `3` immediately.
 
-Closing: search algorithms are the foundation of all retrieval. Lesson 31 covers sorting algorithms. Exercises: implement `find_all(lst, target)` that returns ALL indices where target appears; implement `search_rotated(lst, target)` for a sorted list that has been rotated (e.g., [5,6,7,1,2,3,4]); implement `count_less_than(sorted_lst, x)` in O(log n) using bisect.
+If we searched for `6`:
+1. `lo=0, hi=6`. `mid=3`. `data[3]` is `7`. `7 > 6`, so we set `hi = mid - 1 = 2`.
+2. `lo=0, hi=2`. `mid = (0 + 2) // 2 = 1`. `data[1]` is `3`. `3 < 6`, so we set `lo = mid + 1 = 2`.
+3. `lo=2, hi=2`. `mid = (2 + 2) // 2 = 2`. `data[2]` is `5`. `5 < 6`, so we set `lo = mid + 1 = 3`.
+4. Now `lo=3` and `hi=2`. The condition `lo <= hi` fails. The loop terminates, and we return `-1`.
+
+This demonstrates the divide and conquer mechanism that eliminates half the candidates at each step, culminating in an extremely efficient O(log n) operation count.

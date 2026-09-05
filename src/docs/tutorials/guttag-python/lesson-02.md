@@ -1,404 +1,425 @@
-# Lesson 2: Variables, Assignment, and Names
+# Lesson 02: Variables, Assignment, and Names
 
-What you will build: The reader will understand what a variable is (a name bound to an object), how assignment works in Python's object model, augmented assignment, multiple assignment, `id()` and object identity, and the dangers of shadowing built-ins. The transferable problems: (1) in Python, variables are not boxes that hold values — they are names that POINT TO objects; this distinction matters when you assign `b = a` and then modify the object; (2) augmented assignment (`+=`, `-=`, etc.) is shorthand but has subtleties with immutable vs mutable objects; (3) shadowing built-in names (`list`, `dict`, `print`) is a silent bug that breaks your code in confusing ways.
+What you will build: The reader understands that a Python variable is a NAME bound to an OBJECT, not a container. Assignment binds a name to an object. Rebinding changes what object the name refers to. Multiple names can bind to the same object. The transferable insight: Python variables are references, not boxes. This is why a = b; a = 99 does NOT change b. It is also why mutable aliasing surprises (a = []; b = a; b.append(1) DOES change a). Understanding this model eliminates an entire class of bugs.
 
-What you need to know first: Lesson 0 (REPL, arithmetic, print, type), Lesson 1 (int, float, bool, str, None, type conversion).
+What you need to know first: Lessons 00-01.
 
-Terms used in this lesson:
-- **Variable** — A name that is bound to an object in memory. In Python, variables are not containers or boxes; they are labels or references that point to an object.
-- **Assignment** — The process of binding a name to an object. The `=` operator evaluates the expression on the right, creates or finds the resulting object, and binds the name on the left to it.
-- **Object** — A piece of data in memory with a type, a value, and a unique identity. 
-- **Immutable** — An object whose value cannot be changed after it is created. Integers, floats, strings, and booleans are immutable.
-- **Mutable** — An object whose state or value can be changed in place after creation (e.g., lists, dicts).
-- **Identifier** — A valid name for a variable, function, class, etc. Must start with a letter or underscore, and contain only letters, digits, or underscores.
-- **Keyword** — A reserved word in Python that has special meaning and cannot be used as a variable name (e.g., `True`, `def`, `if`).
-- **Tuple Unpacking** — The ability to assign multiple names to multiple values in a single statement by unpacking an iterable (like a tuple) on the right side into a sequence of names on the left.
-- **Augmented Assignment** — Shorthand operators (like `+=`, `-=`) that combine an arithmetic operation with assignment. 
-- **Shadowing** — Reusing a built-in name (like `list` or `print`) for a local variable, which hides the built-in function and makes it inaccessible in that scope.
+**Terms used in this lesson**
+- **Variable** — A name that refers to an object in memory, not a container that holds a value. Exists to give a human-readable label to data so it can be referenced and manipulated.
+- **Assignment** — The operation (`=`) that binds a name to an object. Exists to establish the reference between a label and the data.
+- **Rebinding** — The act of pointing an existing name to a different object. Exists to update what a name refers to without modifying the original object.
+- **Object Identity** — The unique memory address of an object, checked via `is`. Exists to distinguish between two objects that have the same value but live in different places in memory.
+- **Aliasing** — When multiple names refer to the exact same object. Exists as a natural consequence of assignment by reference, allowing shared access to data without copying it.
+- **Mutability** — The ability of an object to be changed in place (e.g., lists). Exists to allow efficient in-place updates of large data structures.
+- **Garbage Collection** — The automatic process of freeing memory when an object has no more names bound to it. Exists to manage memory automatically without explicit deallocation by the programmer.
+- **Name Mangling** — Python's convention of rewriting names starting with `__` to make them harder to access from outside a class. Exists to prevent accidental name collisions in subclasses.
+- **snake_case** — The naming convention of using lowercase letters separated by underscores. Exists to make variable names readable and consistent across Python code.
 
-Objects and methods used:
-- **`id`**
-  - *What it is:* A built-in function that returns the unique identity of an object.
-  - *Implementation:* `id(object) -> integer`
-  - *Its use:* Used to demonstrate whether two variable names point to the exact same object in memory.
-  - *Type:* Built-in function.
-  - *Responsibility:* Returns a unique integer identifying the object during its lifetime. In CPython, this is typically the memory address.
-  - *Depends on:* An object passed as an argument.
-  - *Connects to:* Called by user code to inspect object identity.
-  - *Shape:* A fundamental built-in utility available globally.
-- **`keyword.kwlist`**
-  - *What it is:* A list of all reserved keywords in the current Python version.
-  - *Implementation:* `kwlist` is a list of strings within the `keyword` module.
-  - *Its use:* Used to show which names are forbidden as identifiers.
-  - *Type:* Module attribute (list of strings).
-  - *Responsibility:* Maintains the definitive list of reserved keywords for the Python parser.
-  - *Depends on:* The `keyword` module being imported.
-  - *Connects to:* Accessed by developers or tools to check for keyword validity.
-  - *Shape:* A static data structure provided by the standard library.
-- **`del`**
-  - *What it is:* A statement used to delete a name binding or elements from a container.
-  - *Implementation:* `del target`
-  - *Its use:* Used to remove a variable name from the current namespace, unbinding it from its object.
-  - *Type:* Language statement / keyword.
-  - *Responsibility:* Removes the binding between a name and an object. If it is the last reference, the object may be garbage collected.
-  - *Depends on:* An existing bound name.
-  - *Connects to:* Interacts with the local or global namespace dictionary.
-  - *Shape:* Core language syntax for namespace management.
+**Objects and methods used**
 
-## Concept Unit: What a variable is — names and objects
+**`id`**
+- *What it is:* A built-in function that returns the unique integer identity of an object.
+- *Implementation:* `def id(obj, /): ...` returning an integer (the memory address in CPython).
+- *Its use:* Used here to prove whether two names refer to the exact same underlying object in memory.
+- *Type:* Built-in function.
+- *Responsibility:* Returns a unique and constant identifier for an object during its lifetime.
+- *Depends on:* Any Python object passed as an argument.
+- *Connects to:* Called by user code to inspect object identity; interacts with the Python runtime's memory management.
+- *Shape:* A fundamental runtime introspection tool.
+
+**`type`**
+- *What it is:* A built-in function that returns the class type of an object.
+- *Implementation:* `class type(object)` returning the type object.
+- *Its use:* Used here to demonstrate that types belong to objects, not to the names bound to them.
+- *Type:* Built-in class/function.
+- *Responsibility:* Determines and returns the type of the given object.
+- *Depends on:* Any Python object.
+- *Connects to:* Called by user code for type checking and introspection.
+- *Shape:* A fundamental runtime introspection tool.
+
+**`list`**
+- *What it is:* A built-in mutable sequence type, and its constructor.
+- *Implementation:* `class list(iterable=(), /)` returning a new list object.
+- *Its use:* Used here to demonstrate mutable objects and how aliasing affects them, and to create shallow copies.
+- *Type:* Built-in class.
+- *Responsibility:* Manages a mutable, ordered sequence of items.
+- *Depends on:* An optional iterable to initialize the list.
+- *Connects to:* Called by user code to group items; used widely across all Python programs as a primary data structure.
+- *Shape:* Core data structure.
+
+**`copy.copy`**
+- *What it is:* A function from the `copy` module that creates a shallow copy of an object.
+- *Implementation:* `def copy(x): ...` returning a new object of the same type.
+- *Its use:* Used here to show how to deliberately break an alias by duplicating the object rather than sharing the reference.
+- *Type:* Module-level function.
+- *Responsibility:* Produces a shallow copy of the input object.
+- *Depends on:* The object to be copied; requires `import copy`.
+- *Connects to:* Called by user code to avoid unintended mutation of shared state.
+- *Shape:* Utility function in the standard library.
+
+**`__iadd__`**
+- *What it is:* The magic method that implements in-place addition (e.g., `+=`).
+- *Implementation:* `def __iadd__(self, other): ...` modifying `self` and returning it.
+- *Its use:* Discussed here to explain why `+=` mutates lists in place but rebinds integers.
+- *Type:* Instance method (dunder method).
+- *Responsibility:* Implements augmented assignment, updating the object in place if possible.
+- *Depends on:* The object itself and the value being added.
+- *Connects to:* Invoked implicitly by the Python runtime when `+=` is used on an object.
+- *Shape:* Protocol method defining core operator behavior.
+
+
+## Concept Unit: Names and objects — binding vs. storing
 
 ### The Problem
-When programming, you need a way to store data and refer to it later. If you calculate `42 * 10`, how do you keep that result so you can use it in the next step?
-
-> **Socratic prompt:** If you write `x = 42` in Python, what do you think actually happens behind the scenes? Is Python creating a box named "x" and putting the number 42 inside it, or is it doing something else? 
+When you assign a value to a variable in Python, what exactly is happening under the hood? Is the variable a box that now contains a value? If we create two variables with the same value, do we have two boxes or one? What would happen if we checked their underlying memory addresses?
 
 ### Introduce the concept in isolation
-```python
->>> x = 42
->>> x
-42
->>> y = x
->>> y
-42
->>> x = 100
->>> x
-100
->>> y
-42
-```
-This demonstrates that variables in Python are **names bound to objects**. The statement `x = 42` does NOT create a box named `x` and put 42 in it. It creates the integer object `42` in memory, and binds the name `x` to that object. `y = x` binds the name `y` to the SAME object as `x`. Then `x = 100` rebinds `x` to a new object (`100`) — `y` still points to `42`. This is the crucial distinction from some other languages. For **immutable** objects (int, float, str, bool), this distinction is safe — you can't modify the integer 42 in place. For **mutable** objects (lists, dicts), it matters enormously (covered in Lessons 7 and 9).
-
-### Discard the throwaway example
-This throwaway REPL session is discarded and will not appear in our project.
-
-### Project Change
-- **Reference Source:** No reference counterpart — this is a from-scratch addition because we are demonstrating core language mechanics in the REPL.
-- **Files affected:** None (REPL session).
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
-
-### The New Code
 ```python
 x = 42
+y = 42
+print(id(x) == id(y))
+print(type(x))
+print(x is y)
 ```
-
-### The Updated Project
-```python
-# In the REPL
->>> x = 42
+Output:
 ```
-This creates an integer object 42 and binds the name `x` to it.
-
-### Mechanical walkthrough
-- `x` is the variable name (identifier) being bound.
-- `=` is the assignment operator. It evaluates the right side first, then binds the name on the left.
-- `42` is an integer literal. It evaluates to an integer object in memory.
-
-## Concept Unit: `id()` — the identity of an object
-
-### The Problem
-How can we prove that `x` and `y` are pointing to the exact same object in memory, rather than just two different objects that both happen to have the value 42?
-
-> **Socratic prompt:** How might a programming language tell the difference between "two things that look the same" and "literally the exact same thing"?
-
-### Introduce the concept in isolation
-```python
->>> x = 42
->>> id(x)
-140234567890
->>> y = 42
->>> id(y)
-140234567890
->>> z = 1000
->>> w = 1000
->>> id(z) == id(w)
-False
->>> x is y
 True
->>> z is w
+<class 'int'>
+True
+```
+This proves that Python variables are names bound to objects, not containers. Because of small int caching (CPython caches -5 to 256), both `x` and `y` are bound to the exact same object `42` in memory, which is an integer type. This is **Binding**.
+
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
+
+### Project Change
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating variable binding mechanics in our calculator.
+- **Files affected**: `src/calc.py`
+- **Change type**: add
+- **Location**: Top of the file.
+- **Dependencies**: None.
+
+### The New Code
+```python
+default_value = 0
+```
+
+### The Updated Project
+```python
+# src/calc.py
+1: default_value = 0 # <- new
+```
+This adds a module-level name bound to the integer object `0`.
+
+### Mechanical walkthrough
+- `default_value`: The name being declared and bound to an object.
+- `=`: The assignment operator that performs the binding.
+- `0`: The integer literal object created in memory (or retrieved from cache) to which the name is bound.
+
+### CS lens
+**Name Binding**: The association of a human-readable identifier with a lower-level construct like a memory address or an object. It appears in DNS (domain names to IP addresses), compilers (symbol tables mapping variable names to memory offsets), and environment variables in operating systems.
+
+### SE lens
+**Meaningful Naming**: We chose `default_value` instead of `x`. The design principle is self-documenting code. The tradeoff is typing a few extra characters versus making the code immediately understandable to the next reader without needing a comment.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: This simply assigns a variable in the script and produces no console output.
+
+### One sentence connecting to previous unit
+Now that we know how to bind names to objects, let's explore what happens when we want to change what a name points to.
+
+
+## Concept Unit: Rebinding — names are not containers
+
+### The Problem
+If a variable is just a name bound to an object, what happens when we use the assignment operator again on the same variable? Does it overwrite the object in memory, or does it do something else? If we try to increment a number, are we modifying the number itself?
+
+### Introduce the concept in isolation
+```python
+x = 1
+old_id = id(x)
+x = 2
+print(id(x) == old_id)
+x += 1
+print(x)
+```
+Output:
+```
 False
+3
 ```
-This demonstrates `id()` and the `is` operator. `id()` returns the memory address (identity) of an object. The `is` operator checks if two names point to the SAME object (same id). The `==` operator checks if two objects have the SAME VALUE. For small integers (-5 to 256), Python reuses objects as an optimization, so `42 is 42` is True. For large integers, `1000 is 1000` is False in general. 
+This proves that assigning a new value to an existing name does not overwrite the original object; it binds the name to a completely new object. Even `x += 1` for an integer is just syntactic sugar for `x = x + 1`, causing a **Rebinding**. The original object `1` is unchanged (and may be garbage collected if no other names reference it).
 
-### Discard the throwaway example
-This throwaway code is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating rebinding.
+- **Files affected**: `src/calc.py`
+- **Change type**: add
+- **Location**: After `default_value`.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-id(x)
+default_value = 1
 ```
 
 ### The Updated Project
 ```python
->>> x = 42
->>> id(x)
-140234567890
+# src/calc.py
+1: default_value = 0
+2: default_value = 1 # <- new
 ```
-This shows the unique identity of the object `x` points to.
+This rebinds the existing name `default_value` to the new integer object `1`.
 
 ### Mechanical walkthrough
-- `id` is a built-in function that returns an object's unique integer identity.
-- `(` and `)` enclose the arguments for the function call.
-- `x` is the variable passed as an argument.
+- `default_value`: The existing name being rebound.
+- `=`: The assignment operator performing the new binding.
+- `1`: The new integer object that `default_value` now points to.
 
-## Concept Unit: Valid variable names — identifiers and keywords
+### CS lens
+**Immutability**: Integers in Python are immutable; they cannot be changed once created. Appears in functional programming languages (where all data is immutable), Git commits (which cannot be altered once written), and string pools in Java or C#.
+
+### SE lens
+**Reassignment vs Single Assignment**: Reusing a variable name for a new value is a design choice. The alternative is single-assignment (creating a new variable `default_value_2`). The tradeoff is saving variable names and memory overhead versus making the code's state harder to track over time.
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: No output, it simply rebinds a variable.
+
+### One sentence connecting to previous unit
+Since rebinding changes the name's target but not the object, we must consider what happens if multiple names target the same object.
+
+
+## Concept Unit: Multiple names, one object — aliasing
 
 ### The Problem
-What rules govern what you can name a variable? Can you name it `2bad` or `True`?
-
-> **Socratic prompt:** Try to guess what happens if you name a variable `1st_place = "John"`.
+If we have a mutable object like a list, and we assign it to a new variable, do we get a copy of the list? What happens if we append an item to the new variable? Will the original variable see the change?
 
 ### Introduce the concept in isolation
 ```python
->>> my_variable = 5
->>> _private = 10
->>> CamelCase = 15
->>> 2bad = 3
-SyntaxError: invalid decimal literal
->>> import keyword
->>> keyword.kwlist
-['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
- 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
- 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
- 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try',
- 'while', 'with', 'yield']
+import copy
+a = [1, 2, 3]
+b = a
+b.append(4)
+print(a)
+b = b + [5]
+print(a)
+c = copy.copy(a)
+c.append(6)
+print(a)
 ```
-This demonstrates that a valid **identifier** starts with a letter or underscore, followed by letters, digits, or underscores. **Keywords** are reserved and cannot be used as variable names. By convention, use `snake_case` for variables, `CamelCase` for classes, and `ALL_CAPS` for constants.
+Output:
+```
+[1, 2, 3, 4]
+[1, 2, 3, 4]
+[1, 2, 3, 4]
+```
+This proves **Aliasing**. `b = a` means both names refer to the exact same list object. Mutating it via `b.append(4)` makes the change visible to `a`. However, `b = b + [5]` evaluates to a *new* list object and rebinds `b`, leaving `a` unchanged. Using `copy.copy(a)` creates a distinct shallow copy, so mutating `c` does not affect `a`.
 
-### Discard the throwaway example
-This code is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating aliasing.
+- **Files affected**: `src/calc.py`
+- **Change type**: add
+- **Location**: After the previous code.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-my_variable = 5
+history = []
+backup = history
 ```
 
 ### The Updated Project
 ```python
->>> my_variable = 5
+# src/calc.py
+1: default_value = 0
+2: default_value = 1
+3: history = [] # <- new
+4: backup = history # <- new
 ```
-A valid assignment using a proper identifier.
+This creates a list and aliases it with two different names.
 
 ### Mechanical walkthrough
-- `my_variable` is an identifier starting with a letter and containing an underscore.
-- `=` is the assignment operator.
-- `5` is an integer literal.
+- `history`: A new name bound to a new empty list.
+- `=`: Assignment operator.
+- `[]`: Empty list literal, creating a new mutable list object.
+- `backup`: Another new name.
+- `=`: Assignment operator.
+- `history`: Evaluates to the list object bound to `history`, which is then bound to `backup`.
 
-## Concept Unit: Multiple assignment and swap
+### CS lens
+**Shared Reference**: When multiple pointers or references point to the same memory location. Appears in database connection pools, shared memory in multithreading, and file hard links in UNIX file systems.
+
+### SE lens
+**Defensive Copying**: We created an alias. The alternative is defensive copying (e.g., `backup = history[:]`). The tradeoff is performance (avoiding copying data) versus safety (preventing unintended side effects when one part of the system modifies shared state).
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: No output, it just creates a list and an alias.
+
+### One sentence connecting to previous unit
+Understanding aliasing is crucial when dealing with operations that might either mutate an object in place or return a completely new one.
+
+
+## Concept Unit: Augmented assignment and mutability
 
 ### The Problem
-How do you swap the values of two variables? In many languages, you need a temporary variable to hold one value so it isn't overwritten.
-
-> **Socratic prompt:** If `a = 10` and `b = 20`, what happens if you just write `a = b` and then `b = a`?
+We've seen `x += 1` rebind `x` when dealing with integers. But what happens if we use `+=` on a mutable object like a list? Does it rebind the name to a new list, or does it mutate the existing list in place? How does this affect aliased variables?
 
 ### Introduce the concept in isolation
 ```python
->>> a, b = 10, 20
->>> a
-10
->>> b
-20
->>> a, b = b, a
->>> a
-20
->>> b
-10
->>> x = y = z = 0
->>> x, y, z
-(0, 0, 0)
-```
-This demonstrates **multiple assignment** and swap. `a, b = 10, 20` is **tuple unpacking** — the right side creates a tuple `(10, 20)`, then Python assigns the first element to `a` and the second to `b`. The swap `a, b = b, a` works because the right side is fully evaluated BEFORE any assignment happens. Python evaluates `(b, a)` = `(20, 10)` and then assigns. This is atomic: no temporary variable needed. `x = y = z = 0` is chain assignment.
+def f_int(n):
+    n += 1
 
-### Discard the throwaway example
-This throwaway is discarded.
+def f_list(lst):
+    lst += [1]
+
+x = 0
+f_int(x)
+print(x)
+
+my_list = []
+f_list(my_list)
+print(my_list)
+```
+Output:
+```
+0
+[1]
+```
+This proves that `+=` behaves differently based on mutability. For integers (immutable), `n += 1` rebinds the local name `n`, leaving the caller's `x` unchanged. For lists (mutable), `lst += [1]` calls `__iadd__`, mutating the list in place, which modifies the caller's list. This difference is a major source of **Mutability** bugs.
+
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating augmented assignment on mutable types.
+- **Files affected**: `src/calc.py`
+- **Change type**: add
+- **Location**: After the alias creation.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-a, b = b, a
+history += [default_value]
 ```
 
 ### The Updated Project
 ```python
->>> a, b = 10, 20
->>> a, b = b, a
+# src/calc.py
+1: default_value = 0
+2: default_value = 1
+3: history = []
+4: backup = history
+5: history += [default_value] # <- new
 ```
-The variables' bindings are swapped atomically.
+This mutates the list bound to `history` (and consequently `backup`) in place by appending `1`.
 
 ### Mechanical walkthrough
-- `a, b` on the left is a sequence of variable names to unpack into.
-- `=` is the assignment operator.
-- `b, a` on the right is evaluated first as a tuple, capturing the current bindings.
+- `history`: The name bound to the list object.
+- `+=`: Augmented assignment operator; for lists, it maps to `__iadd__` and mutates in place.
+- `[` and `]`: List literal syntax for the right-hand side.
+- `default_value`: The name evaluating to the integer `1`.
 
-## Concept Unit: Augmented assignment
+### CS lens
+**In-place Modification**: Modifying a data structure directly in memory rather than allocating a new one. Appears in sorting algorithms (like Quicksort), graphics buffers, and memory-mapped files.
+
+### SE lens
+**Pure Functions vs Side Effects**: Modifying an object passed as an argument is a side effect. The alternative is returning a new object (a pure function). Tradeoff is performance (in-place is faster and uses less memory) versus predictability (pure functions are easier to test and reason about).
+
+### Commands needed
+None for this unit.
+
+### Run it
+Predicted confidently: No output, it just mutates the list.
+
+### One sentence connecting to previous unit
+As our codebase grows with these variables, we must follow rules and conventions to name them appropriately so we don't confuse ourselves or others.
+
+
+## Concept Unit: Variable naming rules and conventions
 
 ### The Problem
-Updating a variable based on its current value (e.g., adding 5 to a score) is extremely common. Writing `score = score + 5` feels repetitive. Is there a shorter way?
-
-> **Socratic prompt:** If `x = 10`, what do you think `x += 5` does?
+We need to name our variables, but can we name them whatever we want? What if we start a name with a number, or use a keyword like `if`? And even if a name is technically legal, how do we write it so it matches what other Python developers expect?
 
 ### Introduce the concept in isolation
 ```python
->>> x = 10
->>> x += 5
->>> x
-15
->>> x -= 3
->>> x
-12
->>> x *= 2
->>> x
-24
->>> x //= 5
->>> x
-4
->>> x **= 3
->>> x
-64
+_private_var = 10
+MAX_RETRIES = 3
+user_age = 25
+print(user_age)
 ```
-This demonstrates **augmented assignment**. `x += 5` is shorthand for `x = x + 5`. For immutable objects (int, str), this rebinds the name to a new object. For mutable objects (list), `+=` modifies the object in place (using the list's `__iadd__` method).
+Output:
+```
+25
+```
+This proves the conventions in Python. Variable names must start with a letter or underscore, contain only letters, digits, or underscores, and are case-sensitive. We use **snake_case** for regular variables (`user_age`), UPPER_SNAKE for constants (`MAX_RETRIES`), and a leading underscore to indicate a variable is meant for internal use (`_private_var`). Double leading underscores (`__name`) invoke name mangling in classes.
 
-### Discard the throwaway example
-This is discarded.
+### Discard the throwaway
+This throwaway code is explicitly discarded and will not appear in the project.
 
 ### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
+- **Reference Source**: No reference counterpart — this is a from-scratch addition because we are demonstrating variable naming.
+- **Files affected**: `src/calc.py`
+- **Change type**: add
+- **Location**: Bottom of the file.
+- **Dependencies**: None.
 
 ### The New Code
 ```python
-x += 5
+_execution_count = 0
 ```
 
 ### The Updated Project
 ```python
->>> x = 10
->>> x += 5
+# src/calc.py
+1: default_value = 0
+2: default_value = 1
+3: history = []
+4: backup = history
+5: history += [default_value]
+6: _execution_count = 0 # <- new
 ```
-Updates `x` by binding it to the result of `x + 5`.
+This adds a "private" variable to track internal state using snake_case and a leading underscore.
 
 ### Mechanical walkthrough
-- `x` is the variable being modified.
-- `+=` is the augmented assignment operator for addition. It evaluates `x + 5` and then rebinds `x` to the result.
-- `5` is the value to add.
+- `_execution_count`: A new variable name. The leading `_` signals by convention that it's private. The `snake_case` format makes multiple words readable.
+- `=`: Assignment operator binding the name.
+- `0`: The integer object.
 
-## Concept Unit: Shadowing built-in names — a silent danger
+### CS lens
+**Lexical Rules**: The rules defined by a language's grammar that dictate valid tokens. Appears in regex parsers, configuration file formats (like JSON or YAML keys), and database table naming schemas.
 
-### The Problem
-Python has many built-in functions like `print`, `list`, and `type`. What happens if you accidentally use one of those names for your own variable?
+### SE lens
+**Convention over Configuration**: Adopting a standard like snake_case means developers don't have to debate or document naming rules per project. The alternative is mixed conventions or strict tooling constraints. The tradeoff is relying on developer discipline versus enforcing rules with a linter.
 
-> **Socratic prompt:** What would occur if you wrote `print = 5` and then tried to call `print("Hello")`?
+### Commands needed
+None for this unit.
 
-### Introduce the concept in isolation
-```python
->>> list([1, 2, 3])
-[1, 2, 3]
->>> list = [1, 2, 3]
->>> list([4, 5, 6])
-TypeError: 'list' object is not callable
->>> del list
->>> list([4, 5, 6])
-[4, 5, 6]
-```
-This demonstrates **shadowing**. Python has no protection against this — it silently rebinds the name `list` to your new object (the list `[1, 2, 3]`). The built-in `list` function is now shadowed and inaccessible in this scope. The bug is confusing because the error (`'list' object is not callable`) appears later, when you try to use it as a function. Never shadow built-ins like `list`, `dict`, `set`, `str`, `print`, etc.
+### Run it
+Predicted confidently: No output. It successfully binds the conventionally named variable.
 
-### Discard the throwaway example
-This code is discarded.
+### One sentence connecting to previous unit
+With a firm grasp on how names bind to objects and how to write them correctly, we can now see the entire picture of Python variables in action.
 
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
 
-### The New Code
-```python
-list = [1, 2, 3]
-```
-
-### The Updated Project
-```python
->>> list = [1, 2, 3]
-```
-This shadows the built-in `list` identifier.
-
-### Mechanical walkthrough
-- `list` is the identifier being bound. Here, it overwrites the reference to the built-in type.
-- `=` is the assignment operator.
-- `[1, 2, 3]` is a list literal.
-
-## Concept Unit: `del` — removing a name binding
-
-### The Problem
-If you accidentally shadow a built-in like `list`, or if you simply want to remove a variable name so it can no longer be used, how do you get rid of it?
-
-> **Socratic prompt:** If you delete a variable name, does the object it pointed to get destroyed immediately?
-
-### Introduce the concept in isolation
-```python
->>> x = 42
->>> x
-42
->>> del x
->>> x
-NameError: name 'x' is not defined
-```
-This demonstrates the `del` statement. `del x` removes the name binding from the namespace. It does NOT necessarily destroy the object — if another name points to the same object, the object lives on. Python's garbage collector reclaims memory when no names point to an object.
-
-### Discard the throwaway example
-Discarded.
-
-### Project Change
-- **Reference Source:** No reference counterpart.
-- **Files affected:** None.
-- **Change type:** N/A.
-- **Location:** N/A.
-- **Dependencies:** Python 3.12 REPL.
-
-### The New Code
-```python
-del x
-```
-
-### The Updated Project
-```python
->>> x = 42
->>> del x
-```
-Removes the name `x`.
-
-### Mechanical walkthrough
-- `del` is a keyword statement that unbinds a name.
-- `x` is the identifier being unbound.
-
----
-Closing: variables in Python are name bindings — not boxes. This distinction becomes critical when you start using mutable objects (lists, dicts) in Lessons 7 and 9. Lesson 3 covers conditionals: how to make your program choose between different paths. 
-
-Exercises: 
-- without running it first, predict the output of `a, b = 1, 2; a, b = a + b, a - b; print(a, b)`
-- explain what happens to the integer object 42 when you run `x = 42; x = 100`.
+## Closing
+### Connect the pieces
+Let's trace a simple sequence to lock in exactly what we've learned: `x = 3; y = x; x = 99; print(y)`.
+1. `x = 3`: We create an integer object `3` and bind the name `x` to it. (Names and objects — binding vs. storing)
+2. `y = x`: We take the object `x` is bound to (`3`) and also bind the name `y` to it. Now `x` and `y` are aliases for the exact same integer object. (Multiple names, one object — aliasing)
+3. `x = 99`: We create a new integer object `99` and rebind `x` to it. This is a rebinding operation on the name `x`, not a mutation of the object `3`. (Rebinding — names are not containers)
+4. `print(y)`: The name `y` was never rebound. It still points to the integer object `3`. (Augmented assignment and mutability proves integers are immutable, so `3` could not have changed in place).
+This is why `y` is still `3`. Variables are references to objects, not boxes containing values. Assignment changes what the reference points to, and multiple references can point to the same object simultaneously.
