@@ -1,16 +1,16 @@
 # Lesson M4.0: A Window Does Nothing Until the Event Loop Runs
 
-*File paths under mastercam-app/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder. All new code in this lesson goes into verification/mastercam-app-copy/mastercam-app/tests/ - not the real mastercam-app/tests/, per this phase's rule.*
+*File paths under mastercam-app/... refer to the real manufacturing-platform repository. Paths under verification/... refer to that same repository's verification folder. This lesson adds two real, standalone scripts to verification/mastercam-app-copy/mastercam-app/manual_checks/ - not the real mastercam-app/, per this phase's rule. Unlike most lessons in this curriculum, the "done" state here is not a passing pytest run - it's you, running each script directly and watching what actually happens on screen.*
 
-**What you will build:** A real, minimal QMainWindow - built the same shape as the real DataViewer (central widget, a layout, a menu) - and a real test proving what show() actually does and doesn't do, before this phase gets into fields, tables, and dialogs.
+**What you will build:** Two real, runnable scripts - one that deliberately freezes its own window for 5 real seconds so you can watch what an unresponsive GUI actually looks like, and one with a real closeEvent override that pops up a genuine confirmation dialog and can refuse to let the window close, depending on which button you click.
 
-**What you need to know first:** Nothing from earlier phases - this is the first lesson of a new, independent phase. Phase M2's ErrorTerminalDialog already used QDialog and Signal in passing; this phase names the underlying model directly.
+**What you need to know first:** Nothing from earlier phases - this is the first lesson of a new, independent phase.
 
 ## Terms used in this lesson
 
-- **QApplication** — The one object every PySide6 program needs exactly one of - it owns the event loop and must exist before any widget is created. Creating a second one in the same process is an error.
-- **Event loop** — A real, running loop, started by app.exec(), that waits for things to happen (a click, a key press, a timer firing) and dispatches each one to the right widget's code. Nothing after app.exec() in main() runs until the loop actually stops (the window closes).
-- **Central widget** — The one widget a QMainWindow displays in its main area, set once via setCentralWidget() - menus, toolbars, and status bars are separate, but everything else lives inside this one widget's own layout.
+- **QApplication** — The one object every PySide6 program needs exactly one of - it owns the event loop and must exist before any widget is created.
+- **Event loop** — A real, running loop, started by app.exec(), that waits for things to happen (a click, a key press, a repaint request) and dispatches each one. Anything that blocks the same thread - a long computation, a sleep, a network call - stops the loop from processing anything at all until that blocking code finishes.
+- **QCloseEvent / event.ignore()** — The real object Qt constructs and passes to closeEvent when something asks a window to close. Calling event.ignore() on it is a real, working way to refuse the close - the window simply stays open, with no further code needed.
 
 ## Objects and methods used
 
@@ -24,197 +24,181 @@
   - *Connects to:* main() constructs it; every dialog in this app is parented to it or a descendant
   - *Shape:* QMainWindow subclass, built in __init__ via small _setup_* methods
 
-## Concept Unit: Constructing a Window Is Not the Same as Showing It
+## Concept Unit: Freezing Your Own Window on Purpose
 
 ### The Problem
 
-DataViewer() in main() builds the whole window - menu, central widget, layout - before window.show() ever runs. What's actually true about the window in between those two lines?
+"The event loop processes events" is easy to read and easy to forget, because a working app never makes you feel what happens when it doesn't run. The real way to understand it is to block it yourself and watch.
 
 Before reading on:
 
-- Right after DataViewer() returns but before .show() is called, is the window drawn on screen? What real attribute would prove your answer instead of guessing?
-- main() ends with sys.exit(app.exec()) - what happens to every line of Python after that call, for as long as the window stays open?
+- Before running the script below, predict: between win.show() and time.sleep(5), has the window already appeared on screen, or does it only appear once app.exec() starts?
+- While the window is frozen, try dragging another window on top of it and then away again. What do you expect to see left behind, and why would that specifically happen during the freeze but not after it?
 
 ### Project Change
 
-- **Reference Source:** mastercam_app/app.py:103-116 (DataViewer.__init__) and :1129-1134 (main), quoted verbatim:
-class DataViewer(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle(f"<<< {get_current_username().upper()}'s  • Master Control Center >>>")
-        self.resize(1680, 1020)
-        self.setStyleSheet(STYLE)
-        ...
-        self._setup_menu()
-        self._setup_ui()
-        self._auto_load()
-
-def main():
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    window = DataViewer()
-    window.show()
-    sys.exit(app.exec())
-- **Files affected:** `verification/mastercam-app-copy/mastercam-app/tests/test_qmainwindow_basics.py` (new)
+- **Reference Source:** No reference counterpart - a from-scratch, standalone script, not a modification of any real app file.
+- **Files affected:** `verification/mastercam-app-copy/mastercam-app/manual_checks/freeze_demo.py` (new)
 - **Change type:** add
-- **Location:** new test file
-- **Dependencies:** PySide6.QtWidgets
+- **Location:** new file
+- **Dependencies:** PySide6.QtWidgets, time
 
 ### The New Code
 
-A minimal window built the same shape as DataViewer - a QMainWindow subclass with a central widget set in __init__ - and a real test of construction vs. showing.
+The whole script - run it directly, don't import it.
 
-**File:** `verification/mastercam-app-copy/mastercam-app/tests/test_qmainwindow_basics.py` (new)
+**File:** `verification/mastercam-app-copy/mastercam-app/manual_checks/freeze_demo.py` (new)
 
 ```python
-from PySide6.QtWidgets import QMainWindow, QWidget, QLabel, QVBoxLayout
+import sys
+import time
 
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
 
-class MiniWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Mini Window")
-        central = QWidget()
-        layout = QVBoxLayout(central)
-        layout.addWidget(QLabel("hello"))
-        self.setCentralWidget(central)
+app = QApplication(sys.argv)
+win = QMainWindow()
+win.setWindowTitle("Freeze Demo - try dragging me during the freeze")
+win.setCentralWidget(QLabel("  Try moving this window right now.  "))
+win.resize(400, 100)
+win.show()
 
+print("Window shown. Freezing for 5 real seconds starting now...")
+time.sleep(5)
+print("Unfrozen. Starting the real event loop - try moving it now.")
 
-def test_constructing_a_window_does_not_make_it_visible(qapp):
-    win = MiniWindow()
-
-    assert win.windowTitle() == "Mini Window"
-    assert win.centralWidget() is not None
-    assert win.isVisible() is False
-
-
-def test_show_makes_the_already_built_window_visible(qapp):
-    win = MiniWindow()
-    win.show()
-
-    assert win.isVisible() is True
+sys.exit(app.exec())
 ```
 
 ### Mechanical Walkthrough
 
-- `central = QWidget(); layout = QVBoxLayout(central); self.setCentralWidget(central)` — Passing central directly to QVBoxLayout(...) sets that layout as central's layout in one step - equivalent to central.setLayout(layout) separately. setCentralWidget then hands ownership of central to the QMainWindow - it's the one widget the window's main area will ever show.
-- `assert win.isVisible() is False` — This is the real, measured proof that building a widget tree (window, layout, label, all fully constructed in memory) is a separate step from anything appearing on screen - nothing here is guessed from how Qt "should" work.
+- `win.show() then time.sleep(5) then app.exec()` — show() genuinely does make the window appear - the freeze isn't "the window hasn't shown yet," it's "the window has shown, but nothing is running that could repaint it, respond to a drag, or process a click." That distinction is the entire point: visible and responsive are two different, separately-controlled things.
+- `print(...) calls before and after the sleep` — These run in your real terminal, not the GUI - useful here specifically because the GUI itself can't show you anything new during the freeze; the terminal is what proves the script is still alive and progressing on schedule.
 
 ### CS Lens
 
-This is the same **construct, then activate** shape as opening a file handle before reading it, or compiling a regex before running it - building a real, valid object graph is necessary but not sufficient; a separate, explicit step is what actually does the real work (here: painting pixels).
+This is a directly felt case of **cooperative single-threaded scheduling** - the event loop only gets to run when your own code isn't. A real, measured version of the same fact: a QTimer scheduled to fire immediately still doesn't fire until a blocking sleep finishes, proven below without needing a visible window at all.
 
 ### SE Lens
 
-The real alternative - some frameworks show a widget as a side effect of construction - would make testing harder: every window built anywhere (including in a test, as above) would try to paint immediately. Qt's split lets tests build and inspect a window's state, like this lesson just did, without ever needing a real screen.
+The real fix for genuinely slow work - a database query, a network call, a big computation - is never "sleep and hope," it's moving the work off this thread entirely (a real topic for a later lesson: QThread/worker objects). This demo uses sleep() only because it's the simplest way to occupy the thread on purpose, not because it's how a real blocking operation should ever be written.
 
 ### Commands needed
 
-- `python -m pytest tests/test_qmainwindow_basics.py -v` — Run from verification/mastercam-app-copy/mastercam-app/
+- `python manual_checks/freeze_demo.py` — Run from verification/mastercam-app-copy/mastercam-app/ - watch the real window for the full 5 seconds, then try moving it
 
 ### Verification
 
 ```text
-collected 2 items
+The interactive result (a visibly frozen, then responsive,
+window) has to be watched, not pasted as text - that's the
+point of this lesson. The underlying mechanism was measured
+directly instead: a QTimer.singleShot(0, ...) scheduled just
+before a real 2-second sleep did not fire until 2.0 seconds
+later, at the same moment the sleep ended - proving nothing
+queued during a blocking call can run until the block ends,
+the identical mechanism the visible freeze demonstrates:
 
-tests/test_qmainwindow_basics.py::test_constructing_a_window_does_not_make_it_visible PASSED [ 50%]
-tests/test_qmainwindow_basics.py::test_show_makes_the_already_built_window_visible PASSED [100%]
+timer fired 2.0 seconds after sleep started
+sleep itself took 2.0 seconds
+timer only fired once processEvents ran, proving it could not fire during the sleep
 ```
 
-Full saved run: `verification/mastercam-phase-04/lab_test_qmainwindow_basics_output.txt`.
+Full saved run: `verification/mastercam-phase-04/lab_event_loop_blocking_output.txt`.
 
 ### Connection to the previous unit
 
 This is a new phase's first lesson - nothing precedes it.
 
-## Concept Unit: closeEvent Is Qt Calling You, Not You Calling Qt
+## Concept Unit: A Real Dialog That Can Refuse to Let the Window Close
 
 ### The Problem
 
-DataViewer overrides closeEvent to stop background servers before the window actually closes. Nothing in this codebase calls closeEvent directly - so what actually triggers it?
+DataViewer's real closeEvent (mastercam_app/app.py:118) runs cleanup and then always accepts the close. Making it possible to refuse - a real "are you sure?" - means calling event.ignore() instead, and feeling what that actually does by clicking it yourself.
 
 Before reading on:
 
-- If closeEvent is never called explicitly anywhere in this codebase, and it still runs when you click the window's X button, what's actually invoking it?
-- event.accept() is the last line - what would a real event.ignore() do instead, and when might that matter for a window with unsaved changes?
+- Before running the script below, predict: after clicking the real X button and then clicking 'No' in the dialog that appears, is the window still open? Then actually try it.
+- QMessageBox.question(...) blocks until you click a button - given Lesson M4.0's first unit, what is the event loop doing (or not doing) while that dialog is waiting for your click?
 
 ### Project Change
 
-- **Reference Source:** mastercam_app/app.py:118-128 (DataViewer.closeEvent), quoted verbatim:
-def closeEvent(self, event):
-    for server in getattr(self, "_live_servers", []):
-        try:
-            server.stop()
-        except Exception:
-            pass
-    event.accept()
-- **Files affected:** `verification/mastercam-app-copy/mastercam-app/tests/test_qmainwindow_basics.py` (modified)
+- **Reference Source:** mastercam_app/app.py:118-128 (DataViewer's real closeEvent, which always calls event.accept() unconditionally) - this script adds the one real branch DataViewer doesn't have: a way to refuse.
+- **Files affected:** `verification/mastercam-app-copy/mastercam-app/manual_checks/close_confirm_demo.py` (new)
 - **Change type:** add
-- **Location:** end of test_qmainwindow_basics.py
-- **Dependencies:** MiniWindow from the unit above
+- **Location:** new file
+- **Dependencies:** PySide6.QtWidgets.QMessageBox
 
 ### The New Code
 
-A real closeEvent override on MiniWindow, and a test calling close() - not closeEvent - to prove Qt is the one routing the call.
+The whole script - run it directly and actually click the X button.
 
-**File:** `verification/mastercam-app-copy/mastercam-app/tests/test_qmainwindow_basics.py` (new)
+**File:** `verification/mastercam-app-copy/mastercam-app/manual_checks/close_confirm_demo.py` (new)
 
 ```python
-class TrackedCloseWindow(MiniWindow):
+import sys
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QMessageBox
+
+
+class ConfirmCloseWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.close_event_ran = False
+        self.setWindowTitle("Close Confirm Demo - click the real X button")
+        self.setCentralWidget(QLabel("  Close this window with the X button.  "))
+        self.resize(400, 100)
 
     def closeEvent(self, event):
-        self.close_event_ran = True
-        event.accept()
+        answer = QMessageBox.question(
+            self, "Confirm", "Are you sure you want to quit?"
+        )
+        if answer == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
 
-def test_close_calls_closeevent_without_anyone_calling_it_directly(qapp):
-    win = TrackedCloseWindow()
-    win.show()
-
-    win.close()
-
-    assert win.close_event_ran is True
-    assert win.isVisible() is False
+app = QApplication(sys.argv)
+win = ConfirmCloseWindow()
+win.show()
+sys.exit(app.exec())
 ```
 
 ### Mechanical Walkthrough
 
-- `win.close()  # not win.closeEvent(...)` — close() is the real, public method application code calls (or clicking the window's own X button triggers internally) - it asks Qt to close the window, and Qt's own machinery is what constructs a real QCloseEvent and calls closeEvent(self, event) on the window automatically. This is the same event- dispatch mechanism the whole event loop runs on, just visible here through one specific, overridable method instead of a generic handler.
-- `assert win.close_event_ran is True` — This is the real, mechanical proof that overriding closeEvent genuinely hooks into Qt's own close machinery - not just a method that happens to share a name Qt never actually calls.
+- `answer = QMessageBox.question(self, "Confirm", "Are you sure you want to quit?")` — Nothing in this script calls closeEvent, and nothing calls QMessageBox.question except Qt itself, from inside its own close machinery, the moment you click the real X button - the same "Qt is calling you" relationship the original version of this lesson named, now with a visible, clickable consequence instead of a silent boolean.
+- `if answer == QMessageBox.Yes: event.accept() else: event.ignore()` — event.ignore() is the real, whole mechanism - no flag to reset, no state to track. Qt simply doesn't proceed with closing the window when this runs, which is why clicking 'No' leaves the window exactly as it was.
 
 ### CS Lens
 
-This is the **template method** shape - Qt defines the overall close sequence and calls out to your override at a fixed point, the same relationship a framework's lifecycle hooks (setUp/tearDown, componentDidMount) have with the code that fills them in.
+This is the same **template method** relationship as before - Qt owns the close sequence and calls out to your override at a fixed point - but now with a real, visible branch: your override doesn't just run, it can change the outcome Qt was about to produce.
 
 ### SE Lens
 
-The real alternative - DataViewer could name its own method shutdown() and require every caller to remember to call it before closing - depends on every call site cooperating. Overriding closeEvent means the cleanup runs no matter how the window closes (X button, Alt+F4, programmatic .close()), because Qt itself is the one guaranteed caller.
+The real alternative - a window that closes unconditionally, with a separate "did you save?" check run some other way - is exactly what DataViewer already does today (it always accepts). Adding a real refusal here isn't proposing DataViewer is wrong; it's making the specific, real mechanism that a future "unsaved changes" guard would need, tangible before you'd ever need to add one for real.
 
 ### Commands needed
 
-- `python -m pytest tests/test_qmainwindow_basics.py -v` — Run from verification/mastercam-app-copy/mastercam-app/, all three tests
+- `python manual_checks/close_confirm_demo.py` — Run from verification/mastercam-app-copy/mastercam-app/ - click the real X button, then click No, then try again and click Yes
 
 ### Verification
 
 ```text
-collected 3 items
+The real experience (clicking a genuine dialog) has to be done
+by hand. The underlying mechanism was verified directly by
+simulating both answers instead of a real click:
 
-tests/test_qmainwindow_basics.py::test_constructing_a_window_does_not_make_it_visible PASSED [ 33%]
-tests/test_qmainwindow_basics.py::test_show_makes_the_already_built_window_visible PASSED [ 66%]
-tests/test_qmainwindow_basics.py::test_close_calls_closeevent_without_anyone_calling_it_directly PASSED [100%]
+after clicking No, isVisible: True
+after clicking Yes, isVisible: False
 ```
 
-Full saved run: `verification/mastercam-phase-04/lab_test_qmainwindow_basics_output.txt`.
+Full saved run: `verification/mastercam-phase-04/lab_close_confirm_output.txt`.
 
 ### Connection to the previous unit
 
-The unit above proved show()/isVisible() reflect real, separate steps; this unit proves closing is the same kind of thing - a real Qt-driven call, not a plain Python method you'd call yourself.
+The unit above froze the window with no way to interact at all; this unit is the opposite case - a window whose close depends entirely on a real interaction you provide.
 
 ## Connect the pieces
 
-Trace one MiniWindow through both units: constructed but invisible, then shown (unit one) - and, in unit two, TrackedCloseWindow's close_event_ran flag flips to True only because Qt's own close() machinery calls closeEvent for you, the exact mechanism the real DataViewer relies on to stop its live color servers before exiting.
+Run both scripts back to back: freeze_demo.py proves a window can be visible and completely unresponsive at the same time; close_confirm_demo.py proves the reverse is also controllable - Qt will wait, genuinely blocked, for your real click before deciding whether to close at all. Both are the same event loop, doing what it was always going to do: run your code exactly when it's supposed to, and nothing else in between.
 
 **Next lesson:** Next: collecting real data in fields - QLineEdit and QFormLayout, grounded in the real TAEditorDialog.

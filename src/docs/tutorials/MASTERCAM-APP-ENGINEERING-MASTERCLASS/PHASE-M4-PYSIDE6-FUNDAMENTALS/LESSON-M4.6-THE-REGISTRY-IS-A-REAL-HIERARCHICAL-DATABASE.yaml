@@ -1,0 +1,224 @@
+number: "M4.6"
+title: "The Registry Is a Real, Hierarchical Database"
+path_note: >
+  This lesson is about Windows itself, not mastercam-app code - a direct
+  continuation of Lesson M4.5's real path-length investigation. Every
+  command below was actually run on this real machine.
+
+what_you_will_build: >
+  Nothing added to the app - real, verified understanding of what the
+  Windows registry actually is: a real, hierarchical key-value database,
+  organized into hives, with real per-key access control that doesn't
+  follow a single blanket rule - demonstrated by two real HKLM subkeys
+  that behave completely differently from each other.
+
+what_you_need_to_know_first: >
+  Lesson M4.5's LongPathsEnabled - this lesson is about the storage
+  system that value actually lives in.
+
+terms:
+  - name: "Registry hive"
+    definition: >
+      One of a small number of real, top-level roots the entire registry
+      is organized under - HKEY_LOCAL_MACHINE (HKLM, machine-wide
+      settings), HKEY_CURRENT_USER (HKCU, this user's own settings),
+      plus HKEY_USERS, HKEY_CLASSES_ROOT, and HKEY_CURRENT_CONFIG. Every
+      registry key lives under exactly one hive.
+  - name: "Registry key"
+    definition: >
+      A real node in the registry's tree, addressed by a path like
+      SYSTEM\CurrentControlSet\Control\FileSystem - conceptually a
+      folder, except a key can hold both child keys (subfolders) and
+      named values (the actual data, like LongPathsEnabled).
+  - name: "ACL (access control list)"
+    definition: >
+      A real, per-object list of who can do what - read, write, or
+      neither - attached to a specific registry key, not just to a whole
+      hive. Two keys under the same hive can have completely different
+      real permissions, as this lesson demonstrates directly.
+
+objects_and_methods: []
+
+concept_units:
+  - title: "Five Hives, One Tree - and LongPathsEnabled's Real Address in It"
+    problem: >
+      LongPathsEnabled was addressed as
+      HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled
+      in Lesson M4.5 without explaining what any of those pieces mean -
+      HKLM, SYSTEM, CurrentControlSet - as real, separate parts of one
+      addressing scheme.
+    socratic_prompt:
+      - "PowerShell's Get-ChildItem HKLM:\\ below lists real, top-level keys directly under HKEY_LOCAL_MACHINE - SOFTWARE, SYSTEM, HARDWARE, and others. Which one would you expect installed-program settings to live under, versus live hardware state?"
+      - "The same LongPathsEnabled path could theoretically exist under HKCU instead of HKLM - what real, different meaning would that have: 'long paths are on for this one Windows user' versus 'long paths are on for this machine, every user'?"
+    project_change:
+      reference_source: >
+        No reference counterpart - real, live Windows registry state on
+        this machine.
+      files_affected:
+        - path: "none"
+          status: none
+      change_type: none
+      location: "n/a"
+      dependencies: "none"
+    new_code:
+      applicable: false
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "Get-ChildItem \"HKLM:\\\" - real output includes DRIVERS, HARDWARE, SAM, SOFTWARE, SYSTEM"
+          explanation: >
+            These are real, top-level keys directly under
+            HKEY_LOCAL_MACHINE on this machine, right now. SOFTWARE holds
+            most installed-application and OS-feature configuration
+            (where LongPathsEnabled's parent chain lives); HARDWARE holds
+            live, volatile hardware state rebuilt every boot, not
+            persistent settings at all.
+        - element: "SYSTEM\\CurrentControlSet\\Control\\FileSystem"
+          explanation: >
+            CurrentControlSet is itself a real, live pointer to whichever
+            of several saved hardware/driver configurations Windows
+            actually booted with - Control\\FileSystem is a real,
+            specific key under that, holding filesystem-behavior
+            switches; LongPathsEnabled is one named value stored directly
+            inside it, alongside others.
+    mental_model:
+      applicable: true
+      diagram: |
+        HKEY_LOCAL_MACHINE (a hive)
+          -> SYSTEM (a top-level key)
+            -> CurrentControlSet (a key)
+              -> Control (a key)
+                -> FileSystem (a key)
+                  -> LongPathsEnabled (a named value, holding a DWORD)
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is a real, literal **tree structure** - hives as roots, keys
+      as internal nodes, values as the actual leaf data - the same shape
+      as a filesystem's own directory tree, which is exactly why
+      PowerShell's registry provider lets Get-ChildItem, Get-ItemProperty,
+      and New-ItemProperty work on it using the same verbs it uses for
+      real files and folders.
+    se_lens: >
+      The real alternative - one flat namespace for every setting on the
+      machine - would make "which program owns this setting" and "does
+      this affect one user or everyone" both ambiguous. Hives split that
+      exact question (machine-wide vs. per-user) at the root, before any
+      individual key even has to address it.
+    commands:
+      - command: "Get-ChildItem \"HKLM:\\\" | Select-Object Name"
+        explanation: "Run in PowerShell - lists real top-level HKLM keys"
+    verification:
+      applicable: true
+      real_output: |
+        Name
+        ----
+        HKEY_LOCAL_MACHINE\DRIVERS
+        HKEY_LOCAL_MACHINE\HARDWARE
+        HKEY_LOCAL_MACHINE\SAM
+        HKEY_LOCAL_MACHINE\SOFTWARE
+        HKEY_LOCAL_MACHINE\SYSTEM
+      output_file: "verification/mastercam-phase-04/lab_registry_hives_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      Lesson M4.5 used this exact path without explaining its structure;
+      this unit is that structure, verified directly against the real
+      keys on this machine.
+
+  - title: "Two Real HKLM Keys, Two Completely Different Access Rules"
+    problem: >
+      If "HKLM needs admin" were a single blanket rule, every key under
+      it would behave identically. The real output above already
+      contradicts that - SAM produced a permission error just being
+      listed, while SOFTWARE and SYSTEM listed fine.
+    socratic_prompt:
+      - "SAM (Security Accounts Manager) stores real Windows account password hash data. Given what it stores, why would even reading its structure - not writing, just listing - be denied to a normal, non-elevated session?"
+      - "SYSTEM\\CurrentControlSet\\Control\\FileSystem read successfully with no elevation in Lesson M4.5, but writing to it (attempted below) failed. What real, different permission is being checked for a read versus a write on the identical key?"
+    project_change:
+      reference_source: >
+        No reference counterpart - real, live Windows registry
+        permissions on this machine.
+      files_affected:
+        - path: "none"
+          status: none
+      change_type: none
+      location: "n/a"
+      dependencies: "none"
+    new_code:
+      applicable: false
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "Get-ChildItem \"HKLM:\\\" real error on SAM/SECURITY: 'Requested registry access is not allowed'"
+          explanation: >
+            This is a real ACL denial at the individual-key level - SAM
+            and SECURITY carry real, restrictive permissions (by default,
+            not even Administrators can read SAM's contents directly;
+            it's reserved for the SYSTEM account and specific privileged
+            APIs) - while SOFTWARE and SYSTEM, sibling keys under the
+            identical hive, allow ordinary read access to any logged-in
+            user.
+        - element: "New-ItemProperty ... -Path HKLM:\\SYSTEM\\...\\FileSystem ... real error: 'Requested registry access is not allowed'"
+          explanation: >
+            The exact same error text as the SAM read failure, but for a
+            different real reason: this key allows read for everyone,
+            write for Administrators only. Two different keys, two
+            different real ACLs, producing the identical error message -
+            proof the message itself doesn't distinguish "you can never
+            touch this" from "you specifically need to elevate first."
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      Each registry key has its own **discretionary access control
+      list** - the same general access-control model Windows applies to
+      real files and folders on NTFS, applied identically to registry
+      keys. "HKLM" is a location, not a single permission level; the
+      permission lives on the individual key.
+    se_lens: >
+      The real alternative - one permission for all of HKLM - would
+      force every setting to be either "readable by anyone" (exposing
+      SAM's sensitive structure) or "admin-only" (requiring elevation
+      just to check whether Fusion drawing mode is enabled, or any other
+      harmless setting). Per-key ACLs let Windows make that call
+      correctly, key by key, instead of picking one answer for
+      everything under HKLM.
+    commands:
+      - command: "$id = [Security.Principal.WindowsIdentity]::GetCurrent(); (New-Object Security.Principal.WindowsPrincipal($id)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)"
+        explanation: "Run in PowerShell - confirms whether the current session is elevated"
+      - command: "New-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem\" -Name \"LongPathsEnabled\" -Value 1 -PropertyType DWORD -Force"
+        explanation: "Run in PowerShell without elevation - real, expected failure"
+    verification:
+      applicable: true
+      real_output: |
+        Is elevated Administrator: False
+
+        New-ItemProperty : Requested registry access is not allowed.
+
+        HKCU write to a comparable value SUCCEEDED with no elevation.
+      output_file: "verification/mastercam-phase-04/lab_registry_privilege_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above mapped LongPathsEnabled's real address; this unit
+      is why that specific address refuses a write from this session -
+      not because it's under HKLM in general, but because of that one
+      key's own real, specific ACL.
+
+closing:
+  connect_the_pieces: >
+    Trace one real key through both units: SYSTEM\CurrentControlSet\
+    Control\FileSystem sits under HKLM, a real, ordinary, world-readable
+    key (unit one) - and separately, that same key's own ACL allows read
+    for anyone but write only for Administrators (unit two), which is the
+    real, specific reason enabling LongPathsEnabled requires an elevated
+    session, not a general "HKLM is locked" rule.
+  next_lesson_pointer: >
+    Next: why the setting doesn't take effect in a session that's
+    already running, even after it's written correctly - what "read once
+    at process start" really means, and the real difference between a
+    setting that applies live and one that doesn't.
