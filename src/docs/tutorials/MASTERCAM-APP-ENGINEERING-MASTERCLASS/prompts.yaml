@@ -106,10 +106,12 @@ lesson:
         substitute for explaining a concept inline, even with a full
         explanation following it - naming the lesson number is itself
         the violation.
-      - "Already covered elsewhere" or "already explained earlier in
+      - >-
+        "Already covered elsewhere" or "already explained earlier in
         this curriculum" language anywhere except a Header's own
         forward-looking pointer fields.
-      - "(full treatment above)" or any equivalent self-citation phrase
+      - >-
+        "(full treatment above)" or any equivalent self-citation phrase
         pointing back at this SAME lesson's own Header - just use the
         name; the Header already did its job once.
     basic_knowledge_phrasing: >
@@ -478,7 +480,43 @@ project_overrides:
   # likely rediscover some of the same rules independently - that's
   # fine, and worth confirming by re-deriving them from a real mistake
   # on THIS project, not by assuming they transfer automatically.
-  #
-  # Leave this empty until a real authoring session actually surfaces
-  # a project-specific decision worth recording here.
-  []
+
+  basic_pyside6_vocabulary:
+    problem: >
+      Starting at Lesson M2.1, this project's lessons show real PySide6
+      code (QApplication, QMainWindow, QDialog, QPushButton, QLabel,
+      QLineEdit, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
+      QMessageBox, QTextEdit, QTimer, the PySide6/QtCore/QtWidgets module
+      names themselves) with no Terms/Objects entry for the class itself -
+      only for the specific behavior a lesson actually depends on (e.g.
+      Lesson M4.4 gives Qt.ItemFlag its own real entry because that
+      lesson's own Lens depends on its bit-flag mechanism). Left
+      unrecorded, this reads as an accidental gap rather than a
+      deliberate call, per prompts.yaml's own basic_knowledge_phrasing
+      rule ("define what counts as basic for this specific project
+      explicitly, once, rather than leaving it to feel").
+    rule: >
+      A PySide6 widget/layout/module class used only for its ordinary,
+      well-documented constructor/layout/display role - and never the
+      subject of a Mechanical Walkthrough, CS Lens, or SE Lens claim
+      about its own specific mechanism - counts as basic PySide6
+      vocabulary for this project, the same way an `if` statement counts
+      as basic Python. Every lesson that uses one or more such classes
+      still gets exactly one Terms entry, named "PySide6 basics (this
+      lesson)", listing every basic class this specific lesson's own code
+      actually names, each wrapped in backticks so the compiler's
+      vocabulary check resolves it - short by design, not a substitute
+      for real treatment where real treatment is actually owed.
+    escalation: >
+      The moment a lesson's own Mechanical Walkthrough, CS Lens, or SE
+      Lens makes a claim about HOW a specific PySide6 class behaves (a
+      signal, a flag, a layout's real resizing behavior, a specific
+      constructor argument's real effect) - not just that it exists and
+      is used - that class is promoted out of the basic-vocabulary list
+      for that lesson and gets its own real Objects/methods or Terms
+      entry instead, per the ordinary citation-vs-walkthrough rule.
+      `Qt.ItemFlag` (Lesson M4.4), `QLineEdit.text()` (Lesson M4.1), and
+      `Signal`/`Slot` (Lesson M4.1) are the real, already-existing
+      examples of this - they were never basic-vocabulary candidates to
+      begin with, since each lesson's own Lens depends on its mechanism.
+    applies_from: "Lesson M2.1 onward (first real PySide6 code in this curriculum)"

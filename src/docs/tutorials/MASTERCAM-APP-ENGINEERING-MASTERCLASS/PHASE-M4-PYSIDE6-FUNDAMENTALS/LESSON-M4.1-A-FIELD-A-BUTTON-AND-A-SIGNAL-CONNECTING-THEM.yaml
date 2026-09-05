@@ -36,6 +36,14 @@ terms:
       Reads whatever the user has currently typed into a single-line
       text field, as a real, live Python string - not a snapshot taken
       at field-creation time.
+  - name: "PySide6 basics (this lesson)"
+    definition: >
+      Per this project's own project_overrides (prompts.yaml), these
+      PySide6 names are used here only for their ordinary, documented
+      role, with no Lens or walkthrough in this lesson depending on how
+      any of them actually works internally: `PySide6`, `QDialog`,
+      `QHBoxLayout`, `QLabel`, `QPushButton`, `QTableWidget`,
+      `QTableWidgetItem`, `QVBoxLayout`, `QtWidgets`.
 
 objects_and_methods:
   - name: "TASearchPanel"

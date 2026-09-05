@@ -10,6 +10,7 @@
 
 - **QMessageBox.information / .warning** — Real, built-in modal dialog helpers - calling either blocks execution until the user dismisses it, then returns which button was clicked (unused here, since there's only one).
 - **QFileDialog.getSaveFileName** — Opens the real OS file-save picker and returns a (path, filter) tuple - path is an empty string if the user cancels, which is the real signal to abort rather than proceeding with no path.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), this PySide6 name is used here only for its ordinary, documented role, with no Lens or walkthrough in this lesson depending on how it actually works internally: `QPushButton`.
 
 ## Objects and methods used
 

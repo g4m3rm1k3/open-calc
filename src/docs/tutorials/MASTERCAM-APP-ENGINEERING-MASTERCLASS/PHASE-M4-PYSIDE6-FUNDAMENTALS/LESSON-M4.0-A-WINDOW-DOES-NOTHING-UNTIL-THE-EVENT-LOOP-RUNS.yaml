@@ -39,6 +39,13 @@ terms:
       something asks a window to close. Calling event.ignore() on it is
       a real, working way to refuse the close - the window simply stays
       open, with no further code needed.
+  - name: "PySide6 basics (this lesson)"
+    definition: >
+      Per this project's own project_overrides (prompts.yaml), these
+      PySide6 names are used here only for their ordinary, documented
+      role, with no Lens or walkthrough in this lesson depending on how
+      any of them actually works internally: `PySide6`, `QLabel`,
+      `QMainWindow`, `QtWidgets`.
 
 objects_and_methods:
   - name: "DataViewer"

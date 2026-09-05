@@ -10,6 +10,7 @@
 
 - **cellDoubleClicked** — A real QTableWidget signal, emitted with (row, column) whenever a cell is double-clicked - unlike clicked, which fires on a single click, this is Qt's own, separate signal for the double-click gesture specifically.
 - **QFormLayout** — A layout built specifically for label/field pairs - addRow(label, widget) places both side by side and handles their alignment automatically, which is why TAEditorDialog already uses it for exactly this shape.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `QLineEdit`, `QPushButton`.
 
 ## Objects and methods used
 

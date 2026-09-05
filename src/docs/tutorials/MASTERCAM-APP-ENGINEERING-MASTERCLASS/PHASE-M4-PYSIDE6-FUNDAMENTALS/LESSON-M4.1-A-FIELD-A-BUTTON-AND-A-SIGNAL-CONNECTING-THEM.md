@@ -11,6 +11,7 @@
 - **Signal** — A real, declared event source a Qt object can emit - QPushButton already has a built-in `clicked` signal, emitted automatically whenever the button is actually clicked (or activated via keyboard).
 - **Slot** — Any callable connected to a signal - here, a plain method, `self._run_search`, connected via `.connect(...)`. Nothing marks it as special; anything callable can be a slot.
 - **QLineEdit.text()** — Reads whatever the user has currently typed into a single-line text field, as a real, live Python string - not a snapshot taken at field-creation time.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `PySide6`, `QDialog`, `QHBoxLayout`, `QLabel`, `QPushButton`, `QTableWidget`, `QTableWidgetItem`, `QVBoxLayout`, `QtWidgets`.
 
 ## Objects and methods used
 

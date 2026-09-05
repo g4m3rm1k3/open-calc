@@ -9,6 +9,7 @@
 ## Terms used in this lesson
 
 - **context manager** — A real object usable directly after Python's own real `with` keyword, defining what real setup happens the moment the `with` block begins, and what real teardown or checking happens the moment it ends - regardless of whether the code inside the block finished normally or raised. `pytest.raises(SomeError)` (Objects and methods, below) is a real, concrete example: its own real teardown is what actually decides whether the test passes.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `PySide6`, `QTextEdit`, `QVBoxLayout`, `QtCore`, `QtWidgets`.
 
 ## Objects and methods used
 

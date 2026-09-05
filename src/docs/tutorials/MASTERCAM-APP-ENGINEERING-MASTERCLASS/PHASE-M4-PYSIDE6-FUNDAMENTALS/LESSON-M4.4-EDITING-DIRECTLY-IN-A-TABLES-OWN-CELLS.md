@@ -11,6 +11,7 @@
 - **Qt.ItemFlag** — A real, combinable set of bit flags on a QTableWidgetItem controlling what a user can do with that specific cell - Qt.ItemIsEditable is one flag among several (selectable, enabled, checkable); removing just that one flag leaves the cell visible and selectable, only not directly typeable-into.
 - **Dirty state** — Data that has been changed in the UI but not yet persisted - real, visible, and real to the user looking at it, but invisible to anything reading the database directly, including this same panel's own next search.
 - **Atomic operation vs. transaction** — Atomic means one operation either fully happens or fully doesn't - update_ta (Lesson M3.3) is atomic per call. A transaction wrapping several operations together means either ALL of them happen or NONE do - three atomic calls in a loop is not the same guarantee as one transaction around all three, and this lesson's Save Table Edits is the first case, not the second.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `QMessageBox`, `QPushButton`, `QTableWidgetItem`.
 
 ## Objects and methods used
 

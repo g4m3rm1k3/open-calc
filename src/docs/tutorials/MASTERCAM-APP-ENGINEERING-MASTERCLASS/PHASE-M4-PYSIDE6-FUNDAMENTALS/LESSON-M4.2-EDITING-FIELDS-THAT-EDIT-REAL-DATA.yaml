@@ -30,6 +30,12 @@ terms:
       widget) places both side by side and handles their alignment
       automatically, which is why TAEditorDialog already uses it for
       exactly this shape.
+  - name: "PySide6 basics (this lesson)"
+    definition: >
+      Per this project's own project_overrides (prompts.yaml), these
+      PySide6 names are used here only for their ordinary, documented
+      role, with no Lens or walkthrough in this lesson depending on how
+      any of them actually works internally: `QLineEdit`, `QPushButton`.
 
 objects_and_methods:
   - name: "TASearchPanel._open_edit_fields"

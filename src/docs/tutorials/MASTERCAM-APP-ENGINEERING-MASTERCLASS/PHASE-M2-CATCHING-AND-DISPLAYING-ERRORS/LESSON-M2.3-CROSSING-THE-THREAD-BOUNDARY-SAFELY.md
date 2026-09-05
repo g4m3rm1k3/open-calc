@@ -10,6 +10,7 @@
 
 - **main thread** — The one, real, original thread a program starts running on - for a real PySide6 app, the one, real, specific thread that must own every real widget and must be the one running `app.exec()` (Lesson M0.1). It exists as a named, real concept because Qt itself enforces, internally, that real widget operations only happen on this one real thread - not as a suggestion, as a real, hard requirement this lesson's own first unit proves the cost of ignoring.
 - **cross-thread communication** — Real data or a real notification passed safely from one real, running thread to another, without either one directly touching an object the other real thread owns. It exists because two real threads running at once (this app's own real main thread, and `LiveColorServer`'s own two real background threads) can each be part-way through their own real work at any given real moment - a real widget being read by one thread while a different real thread is mid-way through changing it is exactly the real, undefined territory Qt's own thread-affinity rule exists to prevent.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `PySide6`, `QApplication`, `QTimer`, `QtCore`, `QtWidgets`.
 
 ## Objects and methods used
 

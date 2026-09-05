@@ -44,6 +44,13 @@ terms:
       NONE do - three atomic calls in a loop is not the same guarantee
       as one transaction around all three, and this lesson's Save Table
       Edits is the first case, not the second.
+  - name: "PySide6 basics (this lesson)"
+    definition: >
+      Per this project's own project_overrides (prompts.yaml), these
+      PySide6 names are used here only for their ordinary, documented
+      role, with no Lens or walkthrough in this lesson depending on how
+      any of them actually works internally: `QMessageBox`,
+      `QPushButton`, `QTableWidgetItem`.
 
 objects_and_methods:
   - name: "TASearchPanel._save_table_edits"

@@ -11,6 +11,7 @@
 - **QApplication** — The one object every PySide6 program needs exactly one of - it owns the event loop and must exist before any widget is created.
 - **Event loop** — A real, running loop, started by app.exec(), that waits for things to happen (a click, a key press, a repaint request) and dispatches each one. Anything that blocks the same thread - a long computation, a sleep, a network call - stops the loop from processing anything at all until that blocking code finishes.
 - **QCloseEvent / event.ignore()** — The real object Qt constructs and passes to closeEvent when something asks a window to close. Calling event.ignore() on it is a real, working way to refuse the close - the window simply stays open, with no further code needed.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `PySide6`, `QLabel`, `QMainWindow`, `QtWidgets`.
 
 ## Objects and methods used
 

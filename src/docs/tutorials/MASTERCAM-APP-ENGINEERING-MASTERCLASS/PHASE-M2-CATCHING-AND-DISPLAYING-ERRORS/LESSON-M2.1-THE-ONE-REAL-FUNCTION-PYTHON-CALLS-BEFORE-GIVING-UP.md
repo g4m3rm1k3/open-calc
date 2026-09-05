@@ -10,6 +10,7 @@
 
 - **uncaught exception** — A real exception that was `raise`d somewhere, and never matched by any real, enclosing `try`/`except` block anywhere between where it was raised and the very top of the program. It exists as a real, distinct category from a *caught* exception (Lesson M1.2's own real `except ValueError:` blocks inside `Tool.from_xml`) - a caught exception is handled and the program continues normally; an uncaught one keeps unwinding, real function call by real function call, until nothing is left to catch it.
 - **stderr** — A real, second output stream every running program has, separate from `stdout` (what `print()` writes to by default) - conventionally where error messages and tracebacks go, so a real, automated tool reading a program's normal output can tell the two apart. It exists here specifically because a real, packaged, windowed application (this app, once built with PyInstaller) has no real, visible console at all - anything written to `stderr` reaches nowhere a real user can see, even though the real message was genuinely produced.
+- **PySide6 basics (this lesson)** — Per this project's own project_overrides (prompts.yaml), these PySide6 names are used here only for their ordinary, documented role, with no Lens or walkthrough in this lesson depending on how any of them actually works internally: `PySide6`, `QtCore`, `QtWidgets`.
 
 ## Objects and methods used
 
