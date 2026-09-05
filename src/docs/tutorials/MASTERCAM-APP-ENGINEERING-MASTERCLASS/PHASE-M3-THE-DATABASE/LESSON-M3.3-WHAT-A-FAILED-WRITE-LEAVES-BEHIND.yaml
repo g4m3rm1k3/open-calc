@@ -1,0 +1,323 @@
+number: "M3.3"
+title: "What a Failed Write Leaves Behind"
+path_note: >
+  File paths under mastercam-app/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same repository's
+  verification folder. All new code in this lesson goes into
+  verification/mastercam-app-copy/mastercam-app/tests/ - not the real
+  mastercam-app/tests/, per this phase's rule.
+
+what_you_will_build: >
+  Real proof of two different real behaviors this file mixes: save_part
+  wraps its writes in `with self._conn:`, so a mid-write exception rolls
+  back everything, cleanly. update_ta doesn't - it issues separate
+  execute() calls with a single commit() at the end, and a real,
+  reproducible failure shows exactly what that leaves dangling: two
+  already-executed, uncommitted ta_changes rows, visible to that same
+  connection, with nothing in update_ta itself ever cleaning them up.
+
+what_you_need_to_know_first: >
+  _validate_and_upsert_ta's real, no-exception-on-conflict behavior from
+  the previous lesson - this lesson is the other place a failure's
+  consequences matter in this file.
+
+terms:
+  - name: "Transaction"
+    definition: >
+      A group of writes that either all happen or none do. sqlite3
+      starts one implicitly on the first write after a commit, and it
+      stays open - uncommitted - until something calls commit() or
+      rollback() on that connection.
+  - name: "with conn: (as a context manager)"
+    definition: >
+      sqlite3.Connection supports the `with` statement directly - on
+      success it commits everything done inside the block; if any
+      exception escapes the block, it rolls back everything done inside
+      it, automatically, before letting the exception continue upward.
+
+objects_and_methods:
+  - name: "Database.save_part"
+    what_it_is: "Wraps its writes in with self._conn: - already covered in Lesson M3.1"
+    implementation: "mastercam_app/db/database.py:438"
+    its_use: "Every real XML upload"
+    type: "method"
+    responsibility: "All-or-nothing: a part's rows and every valid sequence's rows, or none of them"
+    depends_on: "self._conn"
+    connects_to: "the context-manager pattern this lesson names directly"
+    shape: "with self._conn: wraps the whole method body"
+  - name: "Database.update_ta"
+    what_it_is: "Updates a TA's fields and logs each change - using separate execute() calls and one final commit()"
+    implementation: "mastercam_app/db/database.py:823"
+    its_use: "Called when a user edits a TA's details directly in the UI"
+    type: "method"
+    responsibility: "Log what changed to ta_changes, then apply the update"
+    depends_on: "self._conn, self.get_ta"
+    connects_to: "the manual-commit pattern this lesson contrasts against save_part"
+    shape: "loop of execute() calls, then one UPDATE, then one commit() - no with block"
+
+concept_units:
+  - title: "with self._conn: Rolls Back Everything, Automatically"
+    problem: >
+      save_part inserts a parts row, then loops inserting a ta_parts row
+      per sequence. If sequence 5 of 8 has bad data and raises partway
+      through that loop, what happens to the parts row and the four
+      ta_parts rows already inserted before the failure?
+    socratic_prompt:
+      - "Lesson M3.1 already showed save_part uses `with self._conn:` - before running the code below, predict: does the parts row from a failed save_part call exist afterward?"
+      - "The exception in the test below is re-raised after the with block exits - what real evidence would you look at to tell whether the rollback happened before or after that re-raise?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/database.py:438-439 (Database.save_part, the
+        opening of the write), quoted verbatim:
+
+        with self._conn:
+
+            # ── 1. Upsert part ────────────────────────────────────────────────
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_database_transactions.py"
+          status: new
+      change_type: add
+      location: "new test file"
+      dependencies: "mastercam_app.db.database.Database, pytest"
+    new_code:
+      applicable: true
+      intro: >
+        A minimal, real demonstration using the same sqlite3.Connection
+        this codebase uses - not save_part itself yet, just the
+        with-conn mechanism in isolation.
+      file: "verification/mastercam-app-copy/mastercam-app/tests/test_database_transactions.py"
+      status: new
+      language: python
+      code: |
+        import sqlite3
+
+        import pytest
+
+        from mastercam_app.db.database import Database
+
+
+        def test_with_conn_rolls_back_everything_on_a_raised_exception():
+            db = Database(":memory:")
+            conn = db._conn
+
+            with pytest.raises(RuntimeError):
+                with conn:
+                    conn.execute("INSERT INTO tas (ta_number, holder_name) VALUES ('TA_A', 'X')")
+                    raise RuntimeError("boom inside with-block")
+
+            rows = conn.execute("SELECT * FROM tas WHERE ta_number='TA_A'").fetchall()
+            assert len(rows) == 0
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "with pytest.raises(RuntimeError): with conn: ..."
+          explanation: >
+            Two nested with-blocks doing two different jobs: the inner
+            `with conn:` is the real thing being tested - sqlite3's own
+            transaction handling. The outer `with pytest.raises(...)` is
+            just how the test tells pytest "yes, an exception escaping
+            here is the expected, correct outcome" - without it, the
+            raised RuntimeError would fail the test instead of being the
+            point of it.
+        - element: "assert len(rows) == 0"
+          explanation: >
+            This is the real proof, not an assumption: the INSERT
+            genuinely ran (it's a real, syntactically valid statement)
+            but `with conn:` caught the exception on the way out and
+            issued a real rollback before re-raising - so by the time
+            this line runs, the row is gone.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is **atomicity** - the "all or nothing" property of a
+      transaction. `with conn:` is Python's context-manager protocol
+      (the same `__enter__`/`__exit__` shape as `with open(...)`) applied
+      to a real database transaction: `__exit__` is where the
+      commit-or-rollback decision actually happens, based on whether an
+      exception is propagating through it.
+    se_lens: >
+      The real alternative is what the next unit shows - separate
+      execute() calls with commit() at the end, and no automatic cleanup
+      if something fails before reaching it. `with conn:` costs nothing
+      here (it's the same execute() calls, just wrapped) and removes an
+      entire class of "partially-applied write" bugs for free - which
+      makes the next unit's contrast a real design inconsistency, not a
+      necessary tradeoff.
+    commands:
+      - command: "python -m pytest tests/test_database_transactions.py::test_with_conn_rolls_back_everything_on_a_raised_exception -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/"
+    verification:
+      applicable: true
+      real_output: |
+        collected 1 item
+
+        tests/test_database_transactions.py::test_with_conn_rolls_back_everything_on_a_raised_exception PASSED [100%]
+      output_file: "verification/mastercam-phase-03/lab_test_database_transactions_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      Lesson M3.1 already used save_part's `with self._conn:` without
+      naming it - this unit is that same mechanism, isolated and proven
+      directly.
+
+  - title: "update_ta Doesn't Roll Back - a Real, Reproducible Dangling Write"
+    problem: >
+      update_ta issues several execute() calls (one INSERT per changed
+      field into ta_changes, then one UPDATE) and calls commit() only
+      once, at the very end - no with block. What real state is left
+      behind if it fails after some of those execute() calls have
+      already run, but before reaching that final commit()?
+    socratic_prompt:
+      - "update_ta's ta_changes loop calls str(new_value) before inserting - a Python list converts to a string just fine ('[...]'). So which specific line is where the real ProgrammingError below actually fires?"
+      - "After the exception, db._conn.rollback() is called explicitly in the test, not by update_ta itself - what does that tell you about whether update_ta cleans up after its own failures?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/database.py:855-868 (end of Database.update_ta,
+        the raw UPDATE and final commit), quoted verbatim:
+
+        updates = []
+        values = []
+        for field, value in fields.items():
+            if field in allowed_fields:
+                updates.append(f"{field} = ?")
+                values.append(value)
+
+        if not updates:
+            return
+
+        values.append(ta_number)
+        query = f"UPDATE tas SET {', '.join(updates)} WHERE ta_number = ?"
+        self._conn.execute(query, values)
+        self._conn.commit()
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_database_transactions.py"
+          status: modified
+      change_type: add
+      location: "end of test_database_transactions.py"
+      dependencies: "Database, sqlite3, pytest"
+    new_code:
+      applicable: true
+      intro: >
+        The real, reproducible failure - a bad field type update_ta
+        never validates.
+      file: "verification/mastercam-app-copy/mastercam-app/tests/test_database_transactions.py"
+      status: new
+      language: python
+      code: |
+        def test_update_ta_leaves_a_dangling_uncommitted_ta_changes_row_on_a_mid_call_failure():
+            db = Database(":memory:")
+            db._conn.execute(
+                "INSERT INTO tas (ta_number, holder_name, tool_code) VALUES ('TA0099', 'OLD_HOLDER', 'OLD_CODE')"
+            )
+            db._conn.commit()
+
+            with pytest.raises(sqlite3.ProgrammingError):
+                db.update_ta("TA0099", {"holder_name": "NEW_HOLDER", "tool_code": ["not", "a", "string"]})
+
+            row = db._conn.execute("SELECT * FROM tas WHERE ta_number='TA0099'").fetchone()
+            assert row["holder_name"] == "OLD_HOLDER"
+
+            dangling = db._conn.execute(
+                "SELECT * FROM ta_changes WHERE ta_number='TA0099'"
+            ).fetchall()
+            assert len(dangling) == 2
+
+            db._conn.rollback()
+            after_rollback = db._conn.execute(
+                "SELECT * FROM ta_changes WHERE ta_number='TA0099'"
+            ).fetchall()
+            assert len(after_rollback) == 0
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "{'holder_name': 'NEW_HOLDER', 'tool_code': ['not', 'a', 'string']}"
+          explanation: >
+            Both fields differ from what's stored, so update_ta's loop
+            logs BOTH as ta_changes rows - str(['not','a','string'])
+            is a real, valid string ("['not', 'a', 'string']"), so that
+            INSERT succeeds too. The real failure only happens later, at
+            `self._conn.execute(query, values)` - the raw UPDATE - because
+            `values` there holds the unconverted list, not its str(), and
+            sqlite3 can only bind None/int/float/str/bytes.
+        - element: "assert len(dangling) == 2"
+          explanation: >
+            This is the real, measured count - not assumed. Two
+            ta_changes rows already exist in the database, from that same
+            connection's point of view, even though update_ta raised and
+            never reached its own commit(). They're real rows sitting in
+            an open transaction nobody closed.
+        - element: "db._conn.rollback()"
+          explanation: >
+            This line is doing update_ta's own job for it, from outside
+            the method - proving the dangling rows are still just an open
+            transaction (a real rollback makes them disappear), not
+            already-committed data. update_ta has no equivalent cleanup
+            of its own.
+    mental_model:
+      applicable: true
+      diagram: |
+        update_ta("TA0099", {holder_name: ..., tool_code: [...]}):
+          INSERT ta_changes (holder_name row)   -- executes, uncommitted
+          INSERT ta_changes (tool_code row)     -- executes, uncommitted
+          UPDATE tas SET ... WHERE ta_number=?  -- raises ProgrammingError
+          self._conn.commit()                   -- never reached
+
+        Connection state right after the raise:
+          2 real ta_changes rows sitting in an open transaction
+          tas.holder_name still OLD_HOLDER (the UPDATE never completed)
+          no rollback() called by update_ta itself
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the real risk atomicity (the unit above) is supposed to
+      prevent - a **partial write**, where some effects of an operation
+      happened and others didn't, with no guarantee about which. Here
+      it's an audit log (ta_changes) getting entries for a change that
+      never actually applied.
+    se_lens: >
+      Because Database is a singleton with exactly one shared connection
+      (Lesson M3.0), this isn't contained to update_ta's own caller - the
+      dangling transaction sits on the connection every other part of the
+      app shares. The real alternative, wrapping update_ta's body in
+      `with self._conn:` the same way save_part already does, costs
+      nothing here either; the inconsistency between the two methods
+      looks like an oversight, not a deliberate choice, since nothing in
+      update_ta needs manual commit control.
+    commands:
+      - command: "python -m pytest tests/test_database_transactions.py -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/, both tests"
+    verification:
+      applicable: true
+      real_output: |
+        collected 2 items
+
+        tests/test_database_transactions.py::test_with_conn_rolls_back_everything_on_a_raised_exception PASSED [ 50%]
+        tests/test_database_transactions.py::test_update_ta_leaves_a_dangling_uncommitted_ta_changes_row_on_a_mid_call_failure PASSED [100%]
+
+        ============================== 2 passed in 0.10s ==============================
+      output_file: "verification/mastercam-phase-03/lab_test_database_transactions_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above proved `with conn:` cleans up after itself
+      automatically; this unit proves update_ta has no equivalent - the
+      dangling rows only disappeared because the test called rollback()
+      manually, standing in for cleanup update_ta doesn't do.
+
+closing:
+  connect_the_pieces: >
+    Trace ta_number "TA0099" through both units: it never appears in the
+    first (that one's about the general mechanism), but in the second, a
+    single update_ta call with a bad tool_code leaves two real,
+    already-executed ta_changes rows sitting uncommitted - visible to the
+    connection, invisible to a fresh read, and cleaned up only because
+    the test called rollback() itself, standing in for cleanup update_ta
+    doesn't do.
+  next_lesson_pointer: >
+    Next: connection.py's resilience layer - what happens when the
+    database file itself is corrupted, tested by actually corrupting one
+    and watching the real repair path run.

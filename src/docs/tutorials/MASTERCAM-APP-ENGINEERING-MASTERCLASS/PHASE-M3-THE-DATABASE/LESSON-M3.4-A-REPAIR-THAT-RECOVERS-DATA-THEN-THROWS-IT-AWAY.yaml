@@ -1,0 +1,332 @@
+number: "M3.4"
+title: "A Repair That Recovers Data, Then Throws It Away"
+path_note: >
+  File paths under mastercam-app/... refer to the real manufacturing-platform
+  repository. Paths under verification/... refer to that same repository's
+  verification folder. All new code in this lesson goes into
+  verification/mastercam-app-copy/mastercam-app/tests/ - not the real
+  mastercam-app/tests/, per this phase's rule.
+
+what_you_will_build: >
+  Real tests against connection.py's corruption-detection and repair
+  functions, using an actually-corrupted real SQLite file (built for
+  real, then corrupted for real - not simulated). Along the way, a real,
+  reproducible gap in the repair function: it copies several real tables
+  successfully into a fresh file, then a later step throws, and the
+  whole partial recovery is discarded because nothing captures it before
+  the failure.
+
+what_you_need_to_know_first: >
+  The real schema from Lesson M3.0 - this lesson corrupts and repairs a
+  real database built with that exact schema.
+
+terms:
+  - name: "PRAGMA integrity_check"
+    definition: >
+      A real, built-in SQLite command that walks the whole file's
+      internal structure (pages, indexes, b-trees) and reports 'ok' or a
+      list of specific problems. It's a real check of the file's
+      internal consistency - not a guarantee the data in it is
+      semantically correct, only that its storage structure is intact.
+  - name: "ATTACH DATABASE"
+    definition: >
+      A real SQL statement that opens a second database file inside an
+      existing connection, under a chosen alias - here, `old_db` - so a
+      query can reference tables in both databases at once
+      (`old_db.tas`), which is what makes copying rows between two real
+      files possible without an external tool.
+
+objects_and_methods:
+  - name: "connection._integrity_ok"
+    what_it_is: "A thin wrapper around PRAGMA integrity_check"
+    implementation: "mastercam_app/db/connection.py:25"
+    its_use: "Called after every real open, and again after every repair attempt"
+    type: "function"
+    responsibility: "Answer true/false: is this connection's file internally consistent"
+    depends_on: "sqlite3"
+    connects_to: "_open_db and _repair_database"
+    shape: "one PRAGMA, one comparison"
+  - name: "connection._repair_database"
+    what_it_is: "Rebuilds a fresh database file by copying whatever it can read from a corrupted one"
+    implementation: "mastercam_app/db/connection.py:33"
+    its_use: "Called by _open_db when a corrupted file can't be restored from any backup"
+    type: "function"
+    responsibility: "Best-effort recovery: copy every table's schema and rows it can, skip what it can't"
+    depends_on: "sqlite3's ATTACH DATABASE, _integrity_ok"
+    connects_to: "the fresh file it builds becomes the new mastercam.db on success"
+    shape: "per-table try/except inside one large try/except"
+
+concept_units:
+  - title: "integrity_check Catches Real Corruption, on a Real File"
+    problem: >
+      Before trusting _repair_database, its detector needs to be proven
+      against a database that's actually broken - not assumed broken,
+      actually corrupted on disk, the same way a real crash or bad copy
+      would leave it.
+    socratic_prompt:
+      - "The corruption below flips bytes in the middle of the file, not the first few bytes - why would corrupting only the header (the file's first 100 bytes) be a much less interesting real test case?"
+      - "If integrity_check reported 'ok' on a file you'd just deliberately corrupted, what would that tell you about the real limits of what this check actually verifies?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/connection.py:25-30 (_integrity_ok), quoted
+        verbatim:
+
+        def _integrity_ok(conn: sqlite3.Connection) -> bool:
+            try:
+                row = conn.execute("PRAGMA integrity_check;").fetchone()
+                return bool(row and row[0] == "ok")
+            except Exception:
+                return False
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_connection_resilience.py"
+          status: new
+      change_type: add
+      location: "new test file"
+      dependencies: "mastercam_app.db.connection, mastercam_app.db.database.Database, pytest's tmp_path"
+    new_code:
+      applicable: true
+      intro: >
+        Two real helpers - build a real database file, then corrupt real
+        bytes in the middle of it - and the first two tests.
+      file: "verification/mastercam-app-copy/mastercam-app/tests/test_connection_resilience.py"
+      status: new
+      language: python
+      code: |
+        import sqlite3
+        from pathlib import Path
+
+        from mastercam_app.db.connection import _integrity_ok, _repair_database
+        from mastercam_app.db.database import Database
+
+
+        def make_real_db_file(path: Path, row_count: int = 50) -> None:
+            db = Database(str(path))
+            for i in range(row_count):
+                db._conn.execute(
+                    "INSERT INTO tas (ta_number, holder_name) VALUES (?, ?)",
+                    (f"TA{i:04d}", "ER32"),
+                )
+            db._conn.commit()
+            db._conn.close()
+
+
+        def scramble_middle(path: Path, span: int = 2000) -> None:
+            data = bytearray(path.read_bytes())
+            mid = len(data) // 2
+            for i in range(mid, mid + span):
+                data[i] = (data[i] + 137) % 256
+            path.write_bytes(bytes(data))
+
+
+        def test_integrity_ok_is_true_for_a_real_freshly_saved_database(tmp_path):
+            db_path = tmp_path / "test.db"
+            make_real_db_file(db_path)
+
+            conn = sqlite3.connect(str(db_path))
+            assert _integrity_ok(conn) is True
+
+
+        def test_integrity_ok_is_false_after_real_mid_file_corruption(tmp_path):
+            db_path = tmp_path / "test.db"
+            make_real_db_file(db_path)
+            scramble_middle(db_path)
+
+            conn = sqlite3.connect(str(db_path))
+            assert _integrity_ok(conn) is False
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "for i in range(mid, mid + span): data[i] = (data[i] + 137) % 256"
+          explanation: >
+            This isn't a targeted, surgical edit - it's a real, blunt
+            corruption of 2000 consecutive bytes in the middle of a real
+            114KB file, well past the header, landing inside the actual
+            page data SQLite's b-tree structure depends on. That's what
+            makes integrity_check's False result meaningful: it's
+            detecting real structural damage, not a contrived edge case.
+        - element: "except Exception: return False"
+          explanation: >
+            If the file is corrupted badly enough that even running
+            PRAGMA integrity_check itself raises (not just returns a
+            problem list), this function still returns a real, usable
+            False instead of letting that exception escape and crash
+            whatever called it.
+    mental_model:
+      applicable: false
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      A checksum or structural integrity check like this is a **real,
+      partial** guarantee, not a complete one - it tells you the file's
+      internal bookkeeping is self-consistent, which is necessary but not
+      sufficient for "the data is correct." A file could pass
+      integrity_check and still contain a row with the wrong holder_name,
+      written by a real bug elsewhere (Lesson M3.2's dead exception
+      classes, for instance) - integrity_check would never see that.
+    se_lens: >
+      The real alternative to trusting a built-in check like this is
+      application-level checksums of your own data - real extra work,
+      real extra storage, for a guarantee SQLite's own integrity_check
+      already gives you almost for free at the storage layer. The real
+      cost that remains, regardless: it only ever tells you about
+      storage-level corruption, never semantic correctness.
+    commands:
+      - command: "python -m pytest tests/test_connection_resilience.py -v -k integrity_ok"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/"
+    verification:
+      applicable: true
+      real_output: |
+        collected 2 items
+
+        tests/test_connection_resilience.py::test_integrity_ok_is_true_for_a_real_freshly_saved_database PASSED [ 50%]
+        tests/test_connection_resilience.py::test_integrity_ok_is_false_after_real_mid_file_corruption PASSED [100%]
+      output_file: "verification/mastercam-phase-03/lab_test_connection_resilience_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      This is the detector _repair_database's own callers rely on to
+      decide whether repair is even needed - the next unit runs repair
+      against this exact same real corruption.
+
+  - title: "_repair_database Copies What It Can, Then Discards It All"
+    problem: >
+      _repair_database has a try/except around each individual table's
+      copy, which reads like a deliberate "recover whatever's readable,
+      skip what isn't" design. Against the real corruption from the unit
+      above, what does it actually return?
+    socratic_prompt:
+      - "Given the per-table try/except, predict: does _repair_database recover at least some of the 50 real rows in tas from this corruption, or none at all?"
+      - "The function's very last step, after copying every table it can, is dest_conn.commit() followed by DETACH DATABASE old_db - both while old_db (the corrupted file) is still attached. What real risk does staying attached that long create?"
+    project_change:
+      reference_source: >
+        mastercam_app/db/connection.py:75-92 (end of _repair_database -
+        the final commit, detach, and integrity check), quoted verbatim:
+
+        dest_conn.commit()
+        dest_conn.execute("DETACH DATABASE old_db;")
+
+        if _integrity_ok(dest_conn):
+            return tmp_path
+        dest_conn.close()
+
+        except Exception:
+            pass
+        finally:
+            try:
+                dest_conn.close()
+            except Exception:
+                pass
+
+        if tmp_path.exists():
+            tmp_path.unlink()
+        return None
+      files_affected:
+        - path: "verification/mastercam-app-copy/mastercam-app/tests/test_connection_resilience.py"
+          status: modified
+      change_type: add
+      location: "end of test_connection_resilience.py"
+      dependencies: "_repair_database, the helpers from the unit above"
+    new_code:
+      applicable: true
+      intro: "The real test, against the identical corruption already proven detectable."
+      file: "verification/mastercam-app-copy/mastercam-app/tests/test_connection_resilience.py"
+      status: new
+      language: python
+      code: |
+        def test_repair_database_returns_none_for_this_real_corruption_despite_partial_recovery(tmp_path):
+            db_path = tmp_path / "test.db"
+            make_real_db_file(db_path)
+            scramble_middle(db_path)
+
+            repaired_path = _repair_database(db_path)
+
+            assert repaired_path is None
+    updated_project:
+      applicable: false
+    mechanical_walkthrough:
+      applicable: true
+      items:
+        - element: "dest_conn.commit()"
+          explanation: >
+            Traced by hand (not guessed): for this real corruption, five
+            of eleven real tables (parts, tas, ta_parts, parsed_parts,
+            part_versions) copy successfully before this line runs - real,
+            recovered data, sitting in dest_conn's own uncommitted
+            transaction. This commit() call is what raises
+            'database disk image is malformed', because old_db (the
+            corrupted source) is still ATTACHed, and finalizing the
+            transaction still touches it.
+        - element: "except Exception: pass ... if tmp_path.exists(): tmp_path.unlink()"
+          explanation: >
+            The outer try/except catches that commit() failure - correct,
+            it shouldn't crash the caller - but there's no code path that
+            keeps the five tables' worth of real data already copied into
+            dest_conn. The function's own final act, on any exception this
+            late, is deleting the very file that data was just written
+            into. The per-table try/except one level up gives the
+            *appearance* of graceful partial recovery, but a failure at
+            this specific, later step discards it entirely - a real gap
+            between what the function's structure suggests and what it
+            actually does for this real, reproducible case.
+    mental_model:
+      applicable: true
+      diagram: |
+        _repair_database(corrupted_path):
+          ATTACH old_db (still corrupted)
+          copy 5 of 11 tables successfully   <- real data now in dest_conn
+          copy 6 of 11 tables: caught, skipped (per-table try/except)
+          dest_conn.commit()                 <- raises here, old_db still attached
+          [outer except catches it]
+          tmp_path.unlink()                  <- the 5 recovered tables are deleted too
+          return None
+    execution_trace:
+      applicable: false
+    cs_lens: >
+      This is the same **partial write** shape as Lesson M3.3's
+      update_ta, at a different scale - work that happened is discarded
+      because nothing captured or committed it before the point of
+      failure. The per-table try/except handles failure *during* copying;
+      nothing here handles failure *after* copying but before persisting
+      it.
+    se_lens: >
+      A real, minimal fix exists: detach old_db (or commit) right after
+      the per-table copy loop, before touching indexes/triggers/views -
+      so a later failure in that second phase can't retroactively erase
+      table data that already safely landed. That's a small, targeted
+      change, not a redesign - worth understanding fully before deciding
+      whether it's worth making, since "the repair path returns None"
+      might currently be masking "the repair path actually half-worked."
+    commands:
+      - command: "python -m pytest tests/test_connection_resilience.py -v"
+        explanation: "Run from verification/mastercam-app-copy/mastercam-app/, all three tests"
+    verification:
+      applicable: true
+      real_output: |
+        collected 3 items
+
+        tests/test_connection_resilience.py::test_integrity_ok_is_true_for_a_real_freshly_saved_database PASSED [ 33%]
+        tests/test_connection_resilience.py::test_integrity_ok_is_false_after_real_mid_file_corruption PASSED [ 66%]
+        tests/test_connection_resilience.py::test_repair_database_returns_none_for_this_real_corruption_despite_partial_recovery PASSED [100%]
+
+        ============================== 3 passed in 0.36s ==============================
+      output_file: "verification/mastercam-phase-03/lab_test_connection_resilience_output.txt"
+      exemption_reason: ""
+    connection_to_previous: >
+      The unit above proved the corruption is real and detectable; this
+      unit proves the response to it - officially "repair failed, nothing
+      recovered" - isn't quite the full story of what happened internally.
+
+closing:
+  connect_the_pieces: >
+    Trace the same 50-row, real corrupted file through both units:
+    integrity_ok correctly reports False on it (unit one), and
+    _repair_database, run against that identical file, silently recovers
+    5 of 11 tables' real data into a temp file before a late commit()
+    failure against the still-attached corrupted source discards that
+    temp file entirely, returning None - a real, measured gap between
+    "repair failed" and what actually happened along the way.
+  next_lesson_pointer: >
+    Next: the real, already-found bug from database.py - two identical
+    definitions of search_by_tool_code - understood, tested, and then
+    yours to fix for real in the actual app.
