@@ -73,9 +73,14 @@ export default function Taskbar({ windows, onFocus }) {
     openWindow({ id: app.id, label: app.label, emoji: app.emoji, Component, backTo: '/' })
   }
 
-  // Animation variants for Mac dock hover effect
   const macHoverProps = taskbarStyle === 'mac' ? {
-    whileHover: { scale: 1.4, y: -10, originY: 1 },
+    whileHover: { 
+      scale: 1.4, 
+      y: -10, 
+      originY: 1, 
+      rotateY: 360,
+      filter: 'drop-shadow(0 20px 10px rgba(0,0,0,0.4))'
+    },
     transition: { type: 'spring', stiffness: 400, damping: 20 }
   } : {}
 
