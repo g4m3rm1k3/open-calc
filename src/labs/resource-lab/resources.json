@@ -1,28 +1,28 @@
 [
   {
     "title": "FreeCodeCamp",
-    "description": "Learn to code — for free. Build projects. Earn certifications.",
     "url": "https://www.freecodecamp.org/",
+    "description": "Learn to code — for free. Build projects. Earn certifications.",
     "tags": [
       "Web Dev",
       "Learning"
     ]
   },
-    {
+  {
     "title": "Numerical methods with Python",
-    "description": "Numerical methods with Python book",
     "url": "https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/Index.html",
+    "description": "Numerical methods with Python book",
     "tags": [
-      "Mathametics",
+      "Mathematics",
       "Python"
     ]
   },
-      {
-    "title": "Bayesian Econometics",
-    "description": "application of Bayesian statistical methods for econometric inference",
+  {
+    "title": "Bayesian Econometrics",
     "url": "https://econ.pages.code.wm.edu/414/notes/docs/index.html",
+    "description": "application of Bayesian statistical methods for econometric inference",
     "tags": [
-      "Mathametics",
+      "Mathematics",
       "Python",
       "Economics",
       "Matplotlib"
@@ -30,35 +30,35 @@
   },
   {
     "title": "Data Oriented Design",
+    "url": "https://www.dataorienteddesign.com/dodbook/node1.html",
     "description": "This is the free, online, reduced version",
-    "url": " https://www.dataorienteddesign.com/dodbook/node1.html",
     "tags": [
       "Software Engineering"
     ]
   },
   {
     "title": "Game Math Book",
-    "description": "3D Math Primer for Graphics and Game Development – Dunn & Parberry",
     "url": "https://gamemath.com/book/intro.html",
+    "description": "3D Math Primer for Graphics and Game Development – Dunn & Parberry",
     "tags": [
       "quaternions",
       "Euler Angles",
-      "Transfromations"
+      "Transformations"
     ]
   },
   {
     "title": "Objectos Blog",
-    "description": "Tech blog with web development articles",
     "url": "https://www.objectos.com.br/blog/index.html",
+    "description": "Tech blog with web development articles",
     "tags": [
       "Web Dev",
       "Blog"
     ]
   },
-    {
+  {
     "title": "Python for Linear Algebra",
-    "description": "a showcase of how to use Python to do computations from linear algebra",
     "url": "https://www.sfu.ca/~jtmulhol/py4math/linalg/",
+    "description": "a showcase of how to use Python to do computations from linear algebra",
     "tags": [
       "Python",
       "Linear Algebra",
@@ -68,34 +68,34 @@
   },
   {
     "title": "MDN Web Docs",
-    "description": "Resources for developers, by developers",
     "url": "https://developer.mozilla.org/",
+    "description": "Resources for developers, by developers",
     "tags": [
       "Web Dev",
       "Reference"
     ]
   },
-    {
+  {
     "title": "Ask Python",
-    "description": "Everything Python, A Single Platform",
     "url": "https://www.askpython.com/",
+    "description": "Everything Python, A Single Platform",
     "tags": [
       "Python"
     ]
   },
-      {
+  {
     "title": "Discrete Math",
-    "description": "result of work by mathematics and information technology professors at Georgia Gwinnett College",
     "url": "https://ggc-discrete-math.github.io/index.html#_about_this_text",
+    "description": "result of work by mathematics and information technology professors at Georgia Gwinnett College",
     "tags": [
       "Python",
       "Discrete Mathematics"
     ]
   },
-        {
+  {
     "title": "RuneStone Academy",
-    "description": "Free Online Textbooks for Math and Computer Science",
     "url": "https://landing.runestone.academy/",
+    "description": "Free Online Textbooks for Math and Computer Science",
     "tags": [
       "Mathematics",
       "Computer Science"
@@ -103,8 +103,8 @@
   },
   {
     "title": "W3Schools",
-    "description": "Online Web Tutorials",
     "url": "https://www.w3schools.com/",
+    "description": "Online Web Tutorials",
     "tags": [
       "Web Dev",
       "Tutorials"
@@ -112,8 +112,8 @@
   },
   {
     "title": "GeeksForGeeks",
-    "description": "A computer science portal for geeks",
     "url": "https://www.geeksforgeeks.org/",
+    "description": "A computer science portal for geeks",
     "tags": [
       "CS",
       "Tutorials"
@@ -121,8 +121,8 @@
   },
   {
     "title": "TutorialsPoint",
-    "description": "Simply Easy Learning",
     "url": "https://www.tutorialspoint.com/",
+    "description": "Simply Easy Learning",
     "tags": [
       "CS",
       "Tutorials"
@@ -130,8 +130,8 @@
   },
   {
     "title": "CodePath",
-    "description": "Code Path Guides",
     "url": "https://guides.codepath.org/",
+    "description": "Code Path Guides",
     "tags": [
       "Android Development",
       "CS",
@@ -141,488 +141,426 @@
     ]
   },
   {
-    "title": "W3Schools",
-    "description": "Learn to Code",
-    "url": "https://www.w3schools.com/",
+    "title": "CS50",
+    "url": "https://cs50.harvard.edu/x/",
+    "description": "Harvard's free introduction to computer science and programming",
     "tags": [
       "CS",
+      "Fundamentals",
+      "Course"
+    ]
+  },
+  {
+    "title": "The Odin Project",
+    "url": "https://www.theodinproject.com/",
+    "description": "Free full-stack curriculum with project-based learning",
+    "tags": [
       "Web Dev",
+      "Curriculum"
+    ]
+  },
+  {
+    "title": "Teach Yourself CS",
+    "url": "https://teachyourselfcs.com/",
+    "description": "Curated reading list covering the core CS topics missed outside a degree",
+    "tags": [
+      "CS",
+      "Curriculum",
+      "Self-Study"
+    ]
+  },
+  {
+    "title": "MIT OpenCourseWare",
+    "url": "https://ocw.mit.edu/",
+    "description": "Free lecture notes, exams, and videos from actual MIT courses",
+    "tags": [
+      "CS",
+      "STEM",
+      "Courses"
+    ]
+  },
+  {
+    "title": "Visualgo",
+    "url": "https://visualgo.net/",
+    "description": "Visualizing data structures and algorithms through animation",
+    "tags": [
+      "Algorithms",
+      "Data Structures",
+      "Visualization"
+    ]
+  },
+  {
+    "title": "NeetCode",
+    "url": "https://neetcode.io/",
+    "description": "Curated algorithm/data structure problems with free video explanations",
+    "tags": [
+      "Algorithms",
+      "Interview Prep"
+    ]
+  },
+  {
+    "title": "Exercism",
+    "url": "https://exercism.org/",
+    "description": "Free code practice and mentorship in 70+ languages",
+    "tags": [
+      "Practice",
+      "Mentorship",
+      "CS"
+    ]
+  },
+  {
+    "title": "The Rust Book",
+    "url": "https://doc.rust-lang.org/book/",
+    "description": "Official free book for learning the Rust programming language",
+    "tags": [
+      "Rust",
+      "Systems Programming"
+    ]
+  },
+  {
+    "title": "Nand2Tetris",
+    "url": "https://www.nand2tetris.org/",
+    "description": "Build a modern computer system from first principles (free course)",
+    "tags": [
+      "Computer Architecture",
+      "Systems"
+    ]
+  },
+  {
+    "title": "OSSU Computer Science",
+    "url": "https://github.com/ossu/computer-science",
+    "description": "A complete self-taught CS degree built entirely from free online courses",
+    "tags": [
+      "CS",
+      "Curriculum",
+      "Self-Study"
+    ]
+  },
+  {
+    "title": "Real Python",
+    "url": "https://realpython.com/",
+    "description": "Python tutorials ranging from beginner to advanced (free tier)",
+    "tags": [
+      "Python",
       "Tutorials"
     ]
   },
-    {
-      "title": "CS50",
-      "description": "Harvard's free introduction to computer science and programming",
-      "url": "https://cs50.harvard.edu/x/",
-      "tags": [
-        "CS",
-        "Fundamentals",
-        "Course"
-      ]
-    },
-    {
-      "title": "The Odin Project",
-      "description": "Free full-stack curriculum with project-based learning",
-      "url": "https://www.theodinproject.com/",
-      "tags": [
-        "Web Dev",
-        "Curriculum"
-      ]
-    },
-    {
-      "title": "Teach Yourself CS",
-      "description": "Curated reading list covering the core CS topics missed outside a degree",
-      "url": "https://teachyourselfcs.com/",
-      "tags": [
-        "CS",
-        "Curriculum",
-        "Self-Study"
-      ]
-    },
-    {
-      "title": "MIT OpenCourseWare",
-      "description": "Free lecture notes, exams, and videos from actual MIT courses",
-      "url": "https://ocw.mit.edu/",
-      "tags": [
-        "CS",
-        "STEM",
-        "Courses"
-      ]
-    },
-    {
-      "title": "Visualgo",
-      "description": "Visualizing data structures and algorithms through animation",
-      "url": "https://visualgo.net/",
-      "tags": [
-        "Algorithms",
-        "Data Structures",
-        "Visualization"
-      ]
-    },
-    {
-      "title": "NeetCode",
-      "description": "Curated algorithm/data structure problems with free video explanations",
-      "url": "https://neetcode.io/",
-      "tags": [
-        "Algorithms",
-        "Interview Prep"
-      ]
-    },
-    {
-      "title": "Exercism",
-      "description": "Free code practice and mentorship in 70+ languages",
-      "url": "https://exercism.org/",
-      "tags": [
-        "Practice",
-        "Mentorship",
-        "CS"
-      ]
-    },
-    {
-      "title": "The Rust Book",
-      "description": "Official free book for learning the Rust programming language",
-      "url": "https://doc.rust-lang.org/book/",
-      "tags": [
-        "Rust",
-        "Systems Programming"
-      ]
-    },
-    {
-      "title": "Nand2Tetris",
-      "description": "Build a modern computer system from first principles (free course)",
-      "url": "https://www.nand2tetris.org/",
-      "tags": [
-        "Computer Architecture",
-        "Systems"
-      ]
-    },
-    {
-      "title": "OSSU Computer Science",
-      "description": "A complete self-taught CS degree built entirely from free online courses",
-      "url": "https://github.com/ossu/computer-science",
-      "tags": [
-        "CS",
-        "Curriculum",
-        "Self-Study"
-      ]
-    },
-    {
-      "title": "Real Python",
-      "description": "Python tutorials ranging from beginner to advanced (free tier)",
-      "url": "https://realpython.com/",
-      "tags": [
-        "Python",
-        "Tutorials"
-      ]
-    },
-    {
-      "title": "Automate the Boring Stuff with Python",
-      "description": "Free book teaching practical Python scripting for automation",
-      "url": "https://automatetheboringstuff.com/",
-      "tags": [
-        "Python",
-        "Automation",
-        "Manufacturing"
-      ]
-    },
-    {
-      "title": "Control Systems Engineering (LibreTexts)",
-      "description": "Open-access textbook covering feedback and control systems theory",
-      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
-      "tags": [
-        "Controls",
-        "Manufacturing",
-        "Engineering"
-      ]
-    },
-    {
-      "title": "Paul's Online Math Notes",
-      "description": "Free calculus, linear algebra, and differential equations notes",
-      "url": "https://tutorial.math.lamar.edu/",
-      "tags": [
-        "Math",
-        "STEM"
-      ]
-    },
-    {
-      "title": "3Blue1Brown",
-      "description": "Visual, intuition-first math explanations (linear algebra, calculus, etc.)",
-      "url": "https://www.3blue1brown.com/",
-      "tags": [
-        "Math",
-        "Visualization"
-      ]
-    },
-    {
-      "title": "Khan Academy",
-      "description": "Free courses across math, CS, and STEM subjects",
-      "url": "https://www.khanacademy.org/",
-      "tags": [
-        "Math",
-        "STEM",
-        "Courses"
-      ]
-    },
-    {
-      "title": "CS50",
-      "description": "Harvard's free introduction to computer science and programming",
-      "url": "https://cs50.harvard.edu/x/",
-      "tags": [
-        "CS",
-        "Fundamentals",
-        "Course"
-      ]
-    },
-    {
-      "title": "The Odin Project",
-      "description": "Free full-stack curriculum with project-based learning",
-      "url": "https://www.theodinproject.com/",
-      "tags": [
-        "Web Dev",
-        "Curriculum"
-      ]
-    },
-    {
-      "title": "Teach Yourself CS",
-      "description": "Curated reading list covering the core CS topics missed outside a degree",
-      "url": "https://teachyourselfcs.com/",
-      "tags": [
-        "CS",
-        "Curriculum",
-        "Self-Study"
-      ]
-    },
-    {
-      "title": "MIT OpenCourseWare",
-      "description": "Free lecture notes, exams, and videos from actual MIT courses",
-      "url": "https://ocw.mit.edu/",
-      "tags": [
-        "CS",
-        "STEM",
-        "Courses"
-      ]
-    },
-    {
-      "title": "Visualgo",
-      "description": "Visualizing data structures and algorithms through animation",
-      "url": "https://visualgo.net/",
-      "tags": [
-        "Algorithms",
-        "Data Structures",
-        "Visualization"
-      ]
-    },
-    {
-      "title": "NeetCode",
-      "description": "Curated algorithm/data structure problems with free video explanations",
-      "url": "https://neetcode.io/",
-      "tags": [
-        "Algorithms",
-        "Interview Prep"
-      ]
-    },
-    {
-      "title": "Exercism",
-      "description": "Free code practice and mentorship in 70+ languages",
-      "url": "https://exercism.org/",
-      "tags": [
-        "Practice",
-        "Mentorship",
-        "CS"
-      ]
-    },
-    {
-      "title": "The Rust Book",
-      "description": "Official free book for learning the Rust programming language",
-      "url": "https://doc.rust-lang.org/book/",
-      "tags": [
-        "Rust",
-        "Systems Programming"
-      ]
-    },
-    {
-      "title": "Nand2Tetris",
-      "description": "Build a modern computer system from first principles (free course)",
-      "url": "https://www.nand2tetris.org/",
-      "tags": [
-        "Computer Architecture",
-        "Systems"
-      ]
-    },
-    {
-      "title": "OSSU Computer Science",
-      "description": "A complete self-taught CS degree built entirely from free online courses",
-      "url": "https://github.com/ossu/computer-science",
-      "tags": [
-        "CS",
-        "Curriculum",
-        "Self-Study"
-      ]
-    },
-    {
-      "title": "Real Python",
-      "description": "Python tutorials ranging from beginner to advanced (free tier)",
-      "url": "https://realpython.com/",
-      "tags": [
-        "Python",
-        "Tutorials"
-      ]
-    },
-    {
-      "title": "Automate the Boring Stuff with Python",
-      "description": "Free book teaching practical Python scripting for automation",
-      "url": "https://automatetheboringstuff.com/",
-      "tags": [
-        "Python",
-        "Automation",
-        "Manufacturing"
-      ]
-    },
-    {
-      "title": "Control Systems Engineering (LibreTexts)",
-      "description": "Open-access textbook covering feedback and control systems theory",
-      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
-      "tags": [
-        "Controls",
-        "Manufacturing",
-        "Engineering"
-      ]
-    },
-    {
-      "title": "Paul's Online Math Notes",
-      "description": "Free calculus, linear algebra, and differential equations notes",
-      "url": "https://tutorial.math.lamar.edu/",
-      "tags": [
-        "Math",
-        "STEM"
-      ]
-    },
-    {
-      "title": "3Blue1Brown",
-      "description": "Visual, intuition-first math explanations (linear algebra, calculus, etc.)",
-      "url": "https://www.3blue1brown.com/",
-      "tags": [
-        "Math",
-        "Visualization"
-      ]
-    },
-    {
-      "title": "Khan Academy",
-      "description": "Free courses across math, CS, and STEM subjects",
-      "url": "https://www.khanacademy.org/",
-      "tags": [
-        "Math",
-        "STEM",
-        "Courses"
-      ]
-    },
-      {
+  {
+    "title": "Automate the Boring Stuff with Python",
+    "url": "https://automatetheboringstuff.com/",
+    "description": "Free book teaching practical Python scripting for automation",
+    "tags": [
+      "Python",
+      "Automation",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "Control Systems Engineering (LibreTexts)",
+    "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
+    "description": "Open-access textbook covering feedback and control systems theory",
+    "tags": [
+      "Controls",
+      "Manufacturing",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "Paul's Online Math Notes",
+    "url": "https://tutorial.math.lamar.edu/",
+    "description": "Free calculus, linear algebra, and differential equations notes",
+    "tags": [
+      "Math",
+      "STEM"
+    ]
+  },
+  {
+    "title": "3Blue1Brown",
+    "url": "https://www.3blue1brown.com/",
+    "description": "Visual, intuition-first math explanations (linear algebra, calculus, etc.)",
+    "tags": [
+      "Math",
+      "Visualization"
+    ]
+  },
+  {
+    "title": "Khan Academy",
+    "url": "https://www.khanacademy.org/",
+    "description": "Free courses across math, CS, and STEM subjects",
+    "tags": [
+      "Math",
+      "STEM",
+      "Courses"
+    ]
+  },
+  {
     "title": "Eloquent JavaScript",
-    "description": "Free online book teaching JavaScript, programming, and the browser, with in-browser coding exercises",
     "url": "https://eloquentjavascript.net/",
-    "tags": ["JavaScript", "Book", "Interactive"]
+    "description": "Free online book teaching JavaScript, programming, and the browser, with in-browser coding exercises",
+    "tags": [
+      "JavaScript",
+      "Book",
+      "Interactive"
+    ]
   },
   {
     "title": "SICP (Structure and Interpretation of Computer Programs)",
-    "description": "The classic free MIT book on programming fundamentals using Scheme",
     "url": "https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html",
-    "tags": ["CS", "Book", "Scheme"]
+    "description": "The classic free MIT book on programming fundamentals using Scheme",
+    "tags": [
+      "CS",
+      "Book",
+      "Scheme"
+    ]
   },
   {
     "title": "How to Design Programs",
-    "description": "Free book teaching a systematic approach to programming, used in intro CS courses",
     "url": "https://htdp.org/",
-    "tags": ["CS", "Book", "Fundamentals"]
+    "description": "Free book teaching a systematic approach to programming, used in intro CS courses",
+    "tags": [
+      "CS",
+      "Book",
+      "Fundamentals"
+    ]
   },
   {
     "title": "Think Python",
-    "description": "Free introductory Python book by Allen Downey",
     "url": "https://greenteapress.com/wp/think-python-2e/",
-    "tags": ["Python", "Book"]
+    "description": "Free introductory Python book by Allen Downey",
+    "tags": [
+      "Python",
+      "Book"
+    ]
   },
   {
     "title": "A Byte of Python",
-    "description": "Free beginner-friendly Python book",
     "url": "https://python.swaroopch.com/",
-    "tags": ["Python", "Book"]
+    "description": "Free beginner-friendly Python book",
+    "tags": [
+      "Python",
+      "Book"
+    ]
   },
   {
     "title": "Learn You a Haskell for Great Good!",
-    "description": "Free, illustrated, humorous introduction to Haskell",
     "url": "https://learnyouahaskell.github.io/",
-    "tags": ["Haskell", "Book", "Functional Programming"]
+    "description": "Free, illustrated, humorous introduction to Haskell",
+    "tags": [
+      "Haskell",
+      "Book",
+      "Functional Programming"
+    ]
   },
   {
     "title": "The Rust Programming Language (interactive edition)",
-    "description": "Rust's official book with runnable code examples inline",
     "url": "https://rust-book.cs.brown.edu/",
-    "tags": ["Rust", "Book", "Interactive"]
+    "description": "Rust's official book with runnable code examples inline",
+    "tags": [
+      "Rust",
+      "Book",
+      "Interactive"
+    ]
   },
   {
     "title": "Learning Go the hard way / Go by Example",
-    "description": "Hands-on annotated example programs for learning Go",
     "url": "https://gobyexample.com/",
-    "tags": ["Go", "Interactive", "Examples"]
+    "description": "Hands-on annotated example programs for learning Go",
+    "tags": [
+      "Go",
+      "Interactive",
+      "Examples"
+    ]
   },
   {
     "title": "Zero to Production in Rust (free chapters)",
-    "description": "Practical book on building backend systems in Rust",
     "url": "https://www.zero2prod.com/index.html",
-    "tags": ["Rust", "Book", "Backend"]
+    "description": "Practical book on building backend systems in Rust",
+    "tags": [
+      "Rust",
+      "Book",
+      "Backend"
+    ]
   },
   {
     "title": "The Book of Shaders",
-    "description": "Free interactive book teaching fragment shaders, with live editable code",
     "url": "https://thebookofshaders.com/",
-    "tags": ["Graphics", "Book", "Interactive"]
+    "description": "Free interactive book teaching fragment shaders, with live editable code",
+    "tags": [
+      "Graphics",
+      "Book",
+      "Interactive"
+    ]
   },
   {
     "title": "Ray Tracing in One Weekend",
-    "description": "Free short book series on building a ray tracer from scratch",
     "url": "https://raytracing.github.io/",
-    "tags": ["Graphics", "Book"]
+    "description": "Free short book series on building a ray tracer from scratch",
+    "tags": [
+      "Graphics",
+      "Book"
+    ]
   },
   {
     "title": "Physically Based Rendering (PBR Book)",
-    "description": "Free online edition of the definitive rendering textbook",
     "url": "https://pbr-book.org/",
-    "tags": ["Graphics", "Book"]
+    "description": "Free online edition of the definitive rendering textbook",
+    "tags": [
+      "Graphics",
+      "Book"
+    ]
   },
   {
     "title": "The Little Schemer / free CS books archive (r/algorithms wiki style)",
-    "description": "Free community-maintained list of free CS books across all topics",
     "url": "https://github.com/EbookFoundation/free-programming-books",
-    "tags": ["CS", "Book List", "Reference"]
+    "description": "Free community-maintained list of free CS books across all topics",
+    "tags": [
+      "CS",
+      "Book List",
+      "Reference"
+    ]
   },
   {
     "title": "Codecademy (free tier)",
-    "description": "Interactive in-browser coding lessons across many languages",
     "url": "https://www.codecademy.com/catalog",
-    "tags": ["Interactive", "CS", "Tutorials"]
+    "description": "Interactive in-browser coding lessons across many languages",
+    "tags": [
+      "Interactive",
+      "CS",
+      "Tutorials"
+    ]
   },
   {
     "title": "Scrimba",
-    "description": "Interactive screencasts where you can edit code directly inside the video",
     "url": "https://scrimba.com/",
-    "tags": ["Interactive", "Web Dev", "Video"]
+    "description": "Interactive screencasts where you can edit code directly inside the video",
+    "tags": [
+      "Interactive",
+      "Web Dev",
+      "Video"
+    ]
   },
   {
     "title": "Codewars",
-    "description": "Practice coding through community-created challenges (katas) with instant feedback",
     "url": "https://www.codewars.com/",
-    "tags": ["Interactive", "Practice", "Algorithms"]
+    "description": "Practice coding through community-created challenges (katas) with instant feedback",
+    "tags": [
+      "Interactive",
+      "Practice",
+      "Algorithms"
+    ]
   },
   {
     "title": "LeetCode (free tier)",
-    "description": "Interactive coding problems with an online judge for practice",
     "url": "https://leetcode.com/",
-    "tags": ["Interactive", "Algorithms", "Practice"]
+    "description": "Interactive coding problems with an online judge for practice",
+    "tags": [
+      "Interactive",
+      "Algorithms",
+      "Practice"
+    ]
   },
   {
     "title": "HackerRank",
-    "description": "Free interactive coding challenges across domains (algorithms, SQL, etc.)",
     "url": "https://www.hackerrank.com/",
-    "tags": ["Interactive", "Practice", "CS"]
+    "description": "Free interactive coding challenges across domains (algorithms, SQL, etc.)",
+    "tags": [
+      "Interactive",
+      "Practice",
+      "CS"
+    ]
   },
   {
     "title": "Codingame",
-    "description": "Learn programming by solving puzzles and building bots/games interactively",
     "url": "https://www.codingame.com/",
-    "tags": ["Interactive", "Games", "Practice"]
+    "description": "Learn programming by solving puzzles and building bots/games interactively",
+    "tags": [
+      "Interactive",
+      "Games",
+      "Practice"
+    ]
   },
   {
     "title": "SQL Zoo",
-    "description": "Interactive SQL tutorial with live query execution",
     "url": "https://sqlzoo.net/",
-    "tags": ["SQL", "Interactive"]
+    "description": "Interactive SQL tutorial with live query execution",
+    "tags": [
+      "SQL",
+      "Interactive"
+    ]
   },
   {
     "title": "Regex101 / RegexOne",
-    "description": "Interactive regular expressions tutorial with live pattern testing",
     "url": "https://regexone.com/",
-    "tags": ["Regex", "Interactive"]
+    "description": "Interactive regular expressions tutorial with live pattern testing",
+    "tags": [
+      "Regex",
+      "Interactive"
+    ]
   },
   {
     "title": "Vim Adventures / OpenVim",
-    "description": "Interactive in-browser tutorial for learning Vim commands",
     "url": "https://www.openvim.com/",
-    "tags": ["Vim", "Interactive", "Tools"]
+    "description": "Interactive in-browser tutorial for learning Vim commands",
+    "tags": [
+      "Vim",
+      "Interactive",
+      "Tools"
+    ]
   },
   {
     "title": "Explorable Explanations",
-    "description": "Collection of interactive, playable explanations of math and science concepts",
     "url": "https://explorabl.es/",
-    "tags": ["Math", "STEM", "Interactive"]
+    "description": "Collection of interactive, playable explanations of math and science concepts",
+    "tags": [
+      "Math",
+      "STEM",
+      "Interactive"
+    ]
   },
   {
     "title": "Seeing Theory",
-    "description": "Interactive visual introduction to probability and statistics",
     "url": "https://seeing-theory.brown.edu/",
-    "tags": ["Statistics", "Math", "Interactive"]
+    "description": "Interactive visual introduction to probability and statistics",
+    "tags": [
+      "Statistics",
+      "Math",
+      "Interactive"
+    ]
   },
   {
     "title": "Distill.pub (archive)",
-    "description": "Interactive, visual explanations of machine learning research",
     "url": "https://distill.pub/",
-    "tags": ["Machine Learning", "Interactive", "Research"]
+    "description": "Interactive, visual explanations of machine learning research",
+    "tags": [
+      "Machine Learning",
+      "Interactive",
+      "Research"
+    ]
   },
   {
     "title": "Feynman Lectures on Physics",
-    "description": "Free complete online edition of Feynman's famous physics lectures",
     "url": "https://www.feynmanlectures.caltech.edu/",
-    "tags": ["Physics", "Book", "STEM"]
+    "description": "Free complete online edition of Feynman's famous physics lectures",
+    "tags": [
+      "Physics",
+      "Book",
+      "STEM"
+    ]
   },
   {
     "title": "OpenStax",
-    "description": "Free peer-reviewed textbooks covering math, physics, chemistry, and more",
     "url": "https://openstax.org/subjects",
-    "tags": ["STEM", "Book", "Textbooks"]
+    "description": "Free peer-reviewed textbooks covering math, physics, chemistry, and more",
+    "tags": [
+      "STEM",
+      "Book",
+      "Textbooks"
+    ]
   },
-
   {
     "title": "Introduction to Mechanical Design and Manufacturing",
-    "description": "Open textbook covering mechanical product design, design requirements, assemblies, prototyping, design for manufacturing, casting, molding, forming, machining, joining, and plastics processing.",
     "url": "https://open.umn.edu/opentextbooks/textbooks/introduction-to-mechanical-design-and-manufacturing",
+    "description": "Open textbook covering mechanical product design, design requirements, assemblies, prototyping, design for manufacturing, casting, molding, forming, machining, joining, and plastics processing.",
     "tags": [
       "Mechanical Engineering",
       "Manufacturing",
@@ -632,9 +570,279 @@
     ]
   },
   {
+    "title": "Machining Calculators",
+    "url": "https://www.machiningdoctor.com/calculators/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Feeds and Speeds"
+    ]
+  },
+  {
+    "title": "Machining Doctor - Milling Speeds and Feeds",
+    "url": "https://www.machiningdoctor.com/calculators/milling-speeds-and-feeds/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Feeds and Speeds"
+    ]
+  },
+  {
+    "title": "Machining Doctor - Turning Speeds and Feeds",
+    "url": "https://www.machiningdoctor.com/calculators/turning-speeds-and-feeds/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Feeds and Speeds"
+    ]
+  },
+  {
+    "title": "Harvey Tool - Speeds and Feeds",
+    "url": "https://www.harveytool.com/resources/tool-parameter",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "Helical Solutions - Speeds and Feeds",
+    "url": "https://www.helicaltool.com/resources/technical-resources",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "FSWizard",
+    "url": "https://fswizard.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Feeds and Speeds Calculator"
+    ]
+  },
+  {
+    "title": "CNC Cookbook - Feeds and Speeds",
+    "url": "https://www.cnccookbook.com/cnc-feeds-speeds-expert-guide/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Feeds and Speeds"
+    ]
+  },
+  {
+    "title": "CNC Cookbook - Milling Cutter Geometry",
+    "url": "https://www.cnccookbook.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Tool Geometry"
+    ]
+  },
+  {
+    "title": "CNC Cookbook - G-Code Reference",
+    "url": "https://www.cnccookbook.com/g-code-m-code-reference/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "G-Code"
+    ]
+  },
+  {
+    "title": "Sandvik Coromant - Cutting Data",
+    "url": "https://www.sandvik.coromant.com/en-us/tools/tooling-systems",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Data"
+    ]
+  },
+  {
+    "title": "Sandvik Coromant - Milling",
+    "url": "https://www.sandvik.coromant.com/en-us/knowledge/milling",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Milling"
+    ]
+  },
+  {
+    "title": "Sandvik Coromant - Turning",
+    "url": "https://www.sandvik.coromant.com/en-us/knowledge/turning",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Turning"
+    ]
+  },
+  {
+    "title": "Seco Tools - Technical Information",
+    "url": "https://www.secotools.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "Kennametal - Technical Resources",
+    "url": "https://www.kennametal.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "OSG - Technical Resources",
+    "url": "https://www.osgtool.com/technical-resources/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Tools"
+    ]
+  },
+  {
+    "title": "Mitsubishi Materials - Technical Information",
+    "url": "https://www.mitsubishicarbide.com/en/technical-information",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "Tungaloy - Technical Resources",
+    "url": "https://tungaloy.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "Walter Tools - Cutting Data",
+    "url": "https://www.walter-tools.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Parameters"
+    ]
+  },
+  {
+    "title": "Iscar - Technical Information",
+    "url": "https://www.iscar.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Cutting Tools"
+    ]
+  },
+  {
+    "title": "Haas Tooling - Technical Resources",
+    "url": "https://www.haascnc.com/haas-tooling.html",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Tooling"
+    ]
+  },
+  {
+    "title": "Haas CNC Machining Techniques",
+    "url": "https://www.haascnc.com/video.html",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Toolpaths"
+    ]
+  },
+  {
+    "title": "Autodesk Fusion Manufacturing",
+    "url": "https://www.autodesk.com/solutions/cam",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CAM",
+      "Toolpaths"
+    ]
+  },
+  {
+    "title": "Autodesk Fusion Manufacturing Learning",
+    "url": "https://www.autodesk.com/learn/ondemand/collection/manufacturing",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CAM",
+      "Toolpaths"
+    ]
+  },
+  {
+    "title": "FreeCAD Path Workbench",
+    "url": "https://wiki.freecad.org/Path_Workbench",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CAM",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "LinuxCNC Documentation",
+    "url": "https://www.linuxcnc.org/docs/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Motion Control"
+    ]
+  },
+  {
+    "title": "bCNC",
+    "url": "https://github.com/vlachoudis/bCNC",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC",
+      "Toolpath Generation"
+    ]
+  },
+  {
+    "title": "OpenBuilds CAM",
+    "url": "https://cam.openbuilds.com/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CAM",
+      "Toolpaths"
+    ]
+  },
+  {
     "title": "MIT Design and Manufacturing II",
-    "description": "University-level manufacturing course covering manufacturing processes, metal cutting, machining, joining, quality, manufacturing systems, forming, casting, additive manufacturing, and process economics.",
     "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+    "description": "University-level manufacturing course covering manufacturing processes, metal cutting, machining, joining, quality, manufacturing systems, forming, casting, additive manufacturing, and process economics.",
     "tags": [
       "Manufacturing",
       "Mechanical Engineering",
@@ -646,8 +854,8 @@
   },
   {
     "title": "MIT Manufacturing Processes",
-    "description": "MIT OpenCourseWare manufacturing materials covering process physics, manufacturing equipment, process selection, and production engineering.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=manufacturing",
+    "description": "MIT OpenCourseWare manufacturing materials covering process physics, manufacturing equipment, process selection, and production engineering.",
     "tags": [
       "Manufacturing",
       "Mechanical Engineering",
@@ -657,8 +865,8 @@
   },
   {
     "title": "Engineering LibreTexts",
-    "description": "Large open engineering library covering mechanical engineering, manufacturing, materials, thermodynamics, mechanics, electrical engineering, chemical engineering, and related disciplines.",
     "url": "https://eng.libretexts.org/",
+    "description": "Large open engineering library covering mechanical engineering, manufacturing, materials, thermodynamics, mechanics, electrical engineering, chemical engineering, and related disciplines.",
     "tags": [
       "Engineering",
       "Manufacturing",
@@ -668,8 +876,8 @@
   },
   {
     "title": "Mechanical Engineering LibreTexts",
-    "description": "Open mechanical engineering textbooks and references covering mechanics, thermodynamics, fluid mechanics, materials, machine design, and manufacturing.",
     "url": "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering",
+    "description": "Open mechanical engineering textbooks and references covering mechanics, thermodynamics, fluid mechanics, materials, machine design, and manufacturing.",
     "tags": [
       "Mechanical Engineering",
       "Engineering",
@@ -678,8 +886,8 @@
   },
   {
     "title": "Manufacturing Engineering LibreTexts",
-    "description": "Open educational material covering manufacturing processes, materials, production systems, machining, forming, casting, and manufacturing engineering.",
     "url": "https://eng.libretexts.org/Bookshelves/Manufacturing",
+    "description": "Open educational material covering manufacturing processes, materials, production systems, machining, forming, casting, and manufacturing engineering.",
     "tags": [
       "Manufacturing",
       "Engineering",
@@ -689,8 +897,8 @@
   },
   {
     "title": "America's Cutting Edge",
-    "description": "No-cost self-paced CNC machining training covering machining fundamentals, machining dynamics, machine cost, CAM, Fusion, Mastercam, and advanced manufacturing.",
     "url": "https://tees.tamu.edu/workforce-development/manufacturing-training-and-development/ace/",
+    "description": "No-cost self-paced CNC machining training covering machining fundamentals, machining dynamics, machine cost, CAM, Fusion, Mastercam, and advanced manufacturing.",
     "tags": [
       "CNC",
       "Machining",
@@ -701,8 +909,8 @@
   },
   {
     "title": "TITANS of CNC Academy",
-    "description": "Free CAD, CAM, and CNC training with machining projects covering milling, turning, 5-axis machining, aerospace machining, CAD modeling, CAM programming, and setup.",
     "url": "https://academy.titansofcnc.com/",
+    "description": "Free CAD, CAM, and CNC training with machining projects covering milling, turning, 5-axis machining, aerospace machining, CAD modeling, CAM programming, and setup.",
     "tags": [
       "CNC",
       "Machining",
@@ -714,8 +922,8 @@
   },
   {
     "title": "TITANS of CNC Building Blocks",
-    "description": "Large collection of free machining and CAD/CAM lessons covering modeling, toolpaths, fixtures, turning, milling, Fusion 360, Mastercam, and CNC programming.",
     "url": "https://academy.titansofcnc.com/",
+    "description": "Large collection of free machining and CAD/CAM lessons covering modeling, toolpaths, fixtures, turning, milling, Fusion 360, Mastercam, and CNC programming.",
     "tags": [
       "CNC",
       "CAD",
@@ -727,8 +935,8 @@
   },
   {
     "title": "CNC Cookbook",
-    "description": "Large free technical reference covering CNC programming, G-code, machining concepts, feeds and speeds, tooling, workholding, CNC machine operation, and manufacturing calculations.",
     "url": "https://www.cnccookbook.com/",
+    "description": "Large free technical reference covering CNC programming, G-code, machining concepts, feeds and speeds, tooling, workholding, CNC machine operation, and manufacturing calculations.",
     "tags": [
       "CNC",
       "G-Code",
@@ -739,8 +947,8 @@
   },
   {
     "title": "CNC Cookbook G-Code Reference",
-    "description": "Free reference material for CNC G-code and M-code programming, including commands, programming concepts, and machine control.",
     "url": "https://www.cnccookbook.com/g-code-m-code-reference/",
+    "description": "Free reference material for CNC G-code and M-code programming, including commands, programming concepts, and machine control.",
     "tags": [
       "CNC",
       "G-Code",
@@ -751,8 +959,8 @@
   },
   {
     "title": "GCodeTutor",
-    "description": "Free CNC training material covering G-code, shop mathematics, manual machining, CNC programming, and practical machining skills.",
     "url": "https://gcodetutor.com/free-course.html",
+    "description": "Free CNC training material covering G-code, shop mathematics, manual machining, CNC programming, and practical machining skills.",
     "tags": [
       "CNC",
       "G-Code",
@@ -763,8 +971,8 @@
   },
   {
     "title": "Machinist Guides",
-    "description": "Free machining education and reference material covering CNC programming, machining processes, tooling, shop mathematics, and manufacturing fundamentals.",
     "url": "https://www.machinistguides.com/",
+    "description": "Free machining education and reference material covering CNC programming, machining processes, tooling, shop mathematics, and manufacturing fundamentals.",
     "tags": [
       "Machining",
       "CNC",
@@ -774,8 +982,8 @@
   },
   {
     "title": "Machinist's Handbook Resources",
-    "description": "Collection of machining reference information covering feeds, speeds, tooling, materials, tolerances, measurements, and shop calculations.",
     "url": "https://www.machinistblog.com/",
+    "description": "Collection of machining reference information covering feeds, speeds, tooling, materials, tolerances, measurements, and shop calculations.",
     "tags": [
       "Machining",
       "Reference",
@@ -785,8 +993,8 @@
   },
   {
     "title": "Practical Machinist",
-    "description": "Large machining and manufacturing community containing technical discussions, machining knowledge, tooling information, CNC programming, and shop practices.",
     "url": "https://www.practicalmachinist.com/",
+    "description": "Large machining and manufacturing community containing technical discussions, machining knowledge, tooling information, CNC programming, and shop practices.",
     "tags": [
       "Machining",
       "CNC",
@@ -796,8 +1004,8 @@
   },
   {
     "title": "Machinist's Learning Resources",
-    "description": "Collection of educational resources for machinists covering CNC programming, machining fundamentals, CAD/CAM, manufacturing processes, and tooling.",
     "url": "https://machinist.com/resources/educational",
+    "description": "Collection of educational resources for machinists covering CNC programming, machining fundamentals, CAD/CAM, manufacturing processes, and tooling.",
     "tags": [
       "Machining",
       "CNC",
@@ -808,8 +1016,8 @@
   },
   {
     "title": "NYC CNC",
-    "description": "Practical CNC machining education covering Fusion 360, CAD/CAM, CNC milling, turning, workholding, tooling, machine setup, and manufacturing projects.",
     "url": "https://www.nyccnc.com/",
+    "description": "Practical CNC machining education covering Fusion 360, CAD/CAM, CNC milling, turning, workholding, tooling, machine setup, and manufacturing projects.",
     "tags": [
       "CNC",
       "Machining",
@@ -820,8 +1028,8 @@
   },
   {
     "title": "Autodesk Fusion Manufacturing",
-    "description": "Free educational material covering CAD/CAM workflows, CNC machining, toolpath generation, simulation, post-processing, and manufacturing.",
     "url": "https://www.autodesk.com/solutions/manufacturing",
+    "description": "Free educational material covering CAD/CAM workflows, CNC machining, toolpath generation, simulation, post-processing, and manufacturing.",
     "tags": [
       "CAD",
       "CAM",
@@ -832,8 +1040,8 @@
   },
   {
     "title": "Autodesk Fusion CNC Training",
-    "description": "Free training resources covering CAD modeling, CAM programming, CNC milling, toolpaths, simulation, and practical manufacturing workflows.",
     "url": "https://www.autodesk.com/solutions/free-cam-software",
+    "description": "Free training resources covering CAD modeling, CAM programming, CNC milling, toolpaths, simulation, and practical manufacturing workflows.",
     "tags": [
       "Fusion 360",
       "CAM",
@@ -844,8 +1052,8 @@
   },
   {
     "title": "Haas CNC Education",
-    "description": "Educational CNC resources covering Haas machines, CNC operation, programming, machining, setup, and manufacturing technology.",
     "url": "https://www.haascnc.com/service/training.html",
+    "description": "Educational CNC resources covering Haas machines, CNC operation, programming, machining, setup, and manufacturing technology.",
     "tags": [
       "CNC",
       "Machining",
@@ -856,8 +1064,8 @@
   },
   {
     "title": "Haas Automation CNC Programming",
-    "description": "CNC programming and machine-operation resources covering milling, turning, G-code, setup, tooling, and machine controls.",
     "url": "https://www.haascnc.com/",
+    "description": "CNC programming and machine-operation resources covering milling, turning, G-code, setup, tooling, and machine controls.",
     "tags": [
       "CNC",
       "G-Code",
@@ -867,8 +1075,8 @@
   },
   {
     "title": "Mastercam University",
-    "description": "Online educational resources for Mastercam CAD/CAM programming covering milling, turning, multiaxis machining, toolpaths, and CNC manufacturing.",
     "url": "https://www.mastercam.com/learn/mastercam-university/",
+    "description": "Online educational resources for Mastercam CAD/CAM programming covering milling, turning, multiaxis machining, toolpaths, and CNC manufacturing.",
     "tags": [
       "Mastercam",
       "CAM",
@@ -879,8 +1087,8 @@
   },
   {
     "title": "Mastercam Learning Center",
-    "description": "Mastercam training resources covering CAD/CAM workflows, milling, turning, multiaxis machining, programming, and manufacturing.",
     "url": "https://www.mastercam.com/learn/",
+    "description": "Mastercam training resources covering CAD/CAM workflows, milling, turning, multiaxis machining, programming, and manufacturing.",
     "tags": [
       "Mastercam",
       "CAM",
@@ -890,8 +1098,8 @@
   },
   {
     "title": "FreeCAD",
-    "description": "Free open-source parametric 3D CAD system suitable for mechanical design, engineering, assemblies, technical drawings, and manufacturing workflows.",
     "url": "https://www.freecad.org/",
+    "description": "Free open-source parametric 3D CAD system suitable for mechanical design, engineering, assemblies, technical drawings, and manufacturing workflows.",
     "tags": [
       "CAD",
       "Mechanical Engineering",
@@ -902,8 +1110,8 @@
   },
   {
     "title": "FreeCAD Path Workbench",
-    "description": "Open-source CAM environment within FreeCAD for creating CNC toolpaths, machining operations, post-processing, and manufacturing workflows.",
     "url": "https://www.freecad.org/wiki/Path_Workbench",
+    "description": "Open-source CAM environment within FreeCAD for creating CNC toolpaths, machining operations, post-processing, and manufacturing workflows.",
     "tags": [
       "CAM",
       "CNC",
@@ -914,8 +1122,8 @@
   },
   {
     "title": "OpenBuilds",
-    "description": "Open-source CNC machine ecosystem containing machine designs, electronics, software, documentation, and CNC learning resources.",
     "url": "https://openbuilds.com/",
+    "description": "Open-source CNC machine ecosystem containing machine designs, electronics, software, documentation, and CNC learning resources.",
     "tags": [
       "CNC",
       "Open Source",
@@ -924,31 +1132,9 @@
     ]
   },
   {
-    "title": "OpenBuilds CAM",
-    "description": "Free browser-based CAM software for generating CNC toolpaths and G-code from vector and CAD geometry.",
-    "url": "https://cam.openbuilds.com/",
-    "tags": [
-      "CAM",
-      "CNC",
-      "G-Code",
-      "Open Source"
-    ]
-  },
-  {
-    "title": "bCNC",
-    "description": "Free open-source CNC controller and G-code sender with visualization, probing, jogging, and machine-control capabilities.",
-    "url": "https://github.com/vlachoudis/bCNC",
-    "tags": [
-      "CNC",
-      "G-Code",
-      "Open Source",
-      "Machine Control"
-    ]
-  },
-  {
     "title": "LinuxCNC",
-    "description": "Free open-source CNC control software for controlling machine tools and implementing custom CNC machine architectures.",
     "url": "https://linuxcnc.org/",
+    "description": "Free open-source CNC control software for controlling machine tools and implementing custom CNC machine architectures.",
     "tags": [
       "CNC",
       "Open Source",
@@ -958,8 +1144,8 @@
   },
   {
     "title": "GRBL",
-    "description": "Open-source CNC controller firmware for converting embedded hardware into a CNC machine controller.",
     "url": "https://github.com/grbl/grbl",
+    "description": "Open-source CNC controller firmware for converting embedded hardware into a CNC machine controller.",
     "tags": [
       "CNC",
       "G-Code",
@@ -969,8 +1155,8 @@
   },
   {
     "title": "FluidNC",
-    "description": "Open-source CNC firmware based on ESP32 providing configurable motion control, networking, and machine control.",
     "url": "https://github.com/bdring/FluidNC",
+    "description": "Open-source CNC firmware based on ESP32 providing configurable motion control, networking, and machine control.",
     "tags": [
       "CNC",
       "Embedded Systems",
@@ -980,8 +1166,8 @@
   },
   {
     "title": "RepRap",
-    "description": "Open-source 3D printing project covering machine design, firmware, electronics, mechanics, materials, and additive manufacturing.",
     "url": "https://reprap.org/",
+    "description": "Open-source 3D printing project covering machine design, firmware, electronics, mechanics, materials, and additive manufacturing.",
     "tags": [
       "3D Printing",
       "Additive Manufacturing",
@@ -991,8 +1177,8 @@
   },
   {
     "title": "Prusa Knowledge Base",
-    "description": "Free technical documentation and educational resources covering 3D printing, slicing, materials, printer mechanics, calibration, and troubleshooting.",
     "url": "https://help.prusa3d.com/",
+    "description": "Free technical documentation and educational resources covering 3D printing, slicing, materials, printer mechanics, calibration, and troubleshooting.",
     "tags": [
       "3D Printing",
       "Additive Manufacturing",
@@ -1002,8 +1188,8 @@
   },
   {
     "title": "PrusaSlicer",
-    "description": "Open-source slicing software for converting 3D models into toolpaths for additive manufacturing and 3D printing.",
     "url": "https://github.com/prusa3d/PrusaSlicer",
+    "description": "Open-source slicing software for converting 3D models into toolpaths for additive manufacturing and 3D printing.",
     "tags": [
       "3D Printing",
       "Additive Manufacturing",
@@ -1013,8 +1199,8 @@
   },
   {
     "title": "OpenSCAD",
-    "description": "Open-source script-based solid modeling system for creating parametric mechanical parts and engineering models.",
     "url": "https://openscad.org/",
+    "description": "Open-source script-based solid modeling system for creating parametric mechanical parts and engineering models.",
     "tags": [
       "CAD",
       "Parametric Modeling",
@@ -1024,8 +1210,8 @@
   },
   {
     "title": "OpenSCAD Documentation",
-    "description": "Free documentation teaching script-based parametric CAD modeling and computational solid geometry.",
     "url": "https://en.wikibooks.org/wiki/OpenSCAD_User_Manual",
+    "description": "Free documentation teaching script-based parametric CAD modeling and computational solid geometry.",
     "tags": [
       "CAD",
       "OpenSCAD",
@@ -1035,8 +1221,8 @@
   },
   {
     "title": "SolveSpace",
-    "description": "Free open-source parametric 2D and 3D CAD program designed for mechanical design and constraint-based modeling.",
     "url": "https://solvespace.com/",
+    "description": "Free open-source parametric 2D and 3D CAD program designed for mechanical design and constraint-based modeling.",
     "tags": [
       "CAD",
       "Mechanical Engineering",
@@ -1046,8 +1232,8 @@
   },
   {
     "title": "BRL-CAD",
-    "description": "Open-source constructive solid geometry CAD system with modeling, analysis, ray tracing, and engineering capabilities.",
     "url": "https://brlcad.org/",
+    "description": "Open-source constructive solid geometry CAD system with modeling, analysis, ray tracing, and engineering capabilities.",
     "tags": [
       "CAD",
       "Engineering",
@@ -1057,8 +1243,8 @@
   },
   {
     "title": "KiCad",
-    "description": "Open-source electronics design suite for schematic capture, PCB layout, electrical design, and circuit simulation.",
     "url": "https://www.kicad.org/",
+    "description": "Open-source electronics design suite for schematic capture, PCB layout, electrical design, and circuit simulation.",
     "tags": [
       "Electrical Engineering",
       "PCB",
@@ -1068,8 +1254,8 @@
   },
   {
     "title": "OpenModelica",
-    "description": "Open-source modeling and simulation environment for physical systems including mechanical, electrical, thermal, hydraulic, and control systems.",
     "url": "https://openmodelica.org/",
+    "description": "Open-source modeling and simulation environment for physical systems including mechanical, electrical, thermal, hydraulic, and control systems.",
     "tags": [
       "Engineering",
       "Simulation",
@@ -1080,8 +1266,8 @@
   },
   {
     "title": "Modelica",
-    "description": "Open standard and ecosystem for equation-based modeling and simulation of complex physical engineering systems.",
     "url": "https://modelica.org/",
+    "description": "Open standard and ecosystem for equation-based modeling and simulation of complex physical engineering systems.",
     "tags": [
       "Engineering",
       "Simulation",
@@ -1091,8 +1277,8 @@
   },
   {
     "title": "CalculiX",
-    "description": "Free finite-element analysis software for structural mechanics, thermal analysis, and engineering simulation.",
     "url": "https://www.calculix.de/",
+    "description": "Free finite-element analysis software for structural mechanics, thermal analysis, and engineering simulation.",
     "tags": [
       "FEA",
       "Mechanical Engineering",
@@ -1102,8 +1288,8 @@
   },
   {
     "title": "Code_Aster",
-    "description": "Open-source finite-element analysis software developed for advanced structural, thermal, seismic, and multiphysics engineering analysis.",
     "url": "https://www.code-aster.org/",
+    "description": "Open-source finite-element analysis software developed for advanced structural, thermal, seismic, and multiphysics engineering analysis.",
     "tags": [
       "FEA",
       "Simulation",
@@ -1113,8 +1299,8 @@
   },
   {
     "title": "Elmer FEM",
-    "description": "Open-source multiphysics simulation software for finite-element analysis of thermal, structural, fluid, electromagnetic, and other physical systems.",
     "url": "https://www.csc.fi/web/elmer",
+    "description": "Open-source multiphysics simulation software for finite-element analysis of thermal, structural, fluid, electromagnetic, and other physical systems.",
     "tags": [
       "FEA",
       "Multiphysics",
@@ -1124,8 +1310,8 @@
   },
   {
     "title": "OpenFOAM",
-    "description": "Open-source computational fluid dynamics platform for simulating fluid flow, heat transfer, turbulence, multiphase systems, and engineering processes.",
     "url": "https://www.openfoam.com/",
+    "description": "Open-source computational fluid dynamics platform for simulating fluid flow, heat transfer, turbulence, multiphase systems, and engineering processes.",
     "tags": [
       "CFD",
       "Fluid Mechanics",
@@ -1136,8 +1322,8 @@
   },
   {
     "title": "SU2",
-    "description": "Open-source multiphysics simulation and design software focused on computational fluid dynamics, aerodynamics, and optimization.",
     "url": "https://su2code.github.io/",
+    "description": "Open-source multiphysics simulation and design software focused on computational fluid dynamics, aerodynamics, and optimization.",
     "tags": [
       "CFD",
       "Aerodynamics",
@@ -1147,8 +1333,8 @@
   },
   {
     "title": "Calculix CrunchiX",
-    "description": "Free finite-element solver for nonlinear structural mechanics and engineering simulation.",
     "url": "https://www.calculix.de/",
+    "description": "Free finite-element solver for nonlinear structural mechanics and engineering simulation.",
     "tags": [
       "FEA",
       "Structural Engineering",
@@ -1157,8 +1343,8 @@
   },
   {
     "title": "GNU Octave",
-    "description": "Free numerical computing environment useful for engineering mathematics, matrix computation, modeling, simulation, and numerical analysis.",
     "url": "https://octave.org/",
+    "description": "Free numerical computing environment useful for engineering mathematics, matrix computation, modeling, simulation, and numerical analysis.",
     "tags": [
       "Engineering",
       "Mathematics",
@@ -1168,8 +1354,8 @@
   },
   {
     "title": "SciPy",
-    "description": "Scientific Python library providing optimization, integration, interpolation, signal processing, statistics, linear algebra, and numerical algorithms.",
     "url": "https://scipy.org/",
+    "description": "Scientific Python library providing optimization, integration, interpolation, signal processing, statistics, linear algebra, and numerical algorithms.",
     "tags": [
       "Engineering",
       "Python",
@@ -1179,8 +1365,8 @@
   },
   {
     "title": "Engineering Statistics Handbook",
-    "description": "Free statistical reference covering engineering statistics, probability, measurement, process control, reliability, and experimental design.",
     "url": "https://www.itl.nist.gov/div898/handbook/",
+    "description": "Free statistical reference covering engineering statistics, probability, measurement, process control, reliability, and experimental design.",
     "tags": [
       "Engineering",
       "Statistics",
@@ -1190,8 +1376,8 @@
   },
   {
     "title": "NIST Engineering Statistics Handbook",
-    "description": "Comprehensive engineering statistics reference covering statistical methods, process characterization, design of experiments, reliability, and quality engineering.",
     "url": "https://www.itl.nist.gov/div898/handbook/",
+    "description": "Comprehensive engineering statistics reference covering statistical methods, process characterization, design of experiments, reliability, and quality engineering.",
     "tags": [
       "Statistics",
       "Quality Engineering",
@@ -1201,8 +1387,8 @@
   },
   {
     "title": "NIST Manufacturing",
-    "description": "Research and technical resources covering advanced manufacturing, measurement science, manufacturing processes, materials, automation, and production systems.",
     "url": "https://www.nist.gov/topics/manufacturing",
+    "description": "Research and technical resources covering advanced manufacturing, measurement science, manufacturing processes, materials, automation, and production systems.",
     "tags": [
       "Manufacturing",
       "Metrology",
@@ -1213,8 +1399,8 @@
   },
   {
     "title": "NIST Materials Science",
-    "description": "Technical information and research resources covering materials properties, characterization, measurement, manufacturing, and materials engineering.",
     "url": "https://www.nist.gov/materials-science-and-engineering",
+    "description": "Technical information and research resources covering materials properties, characterization, measurement, manufacturing, and materials engineering.",
     "tags": [
       "Materials Science",
       "Manufacturing",
@@ -1224,8 +1410,8 @@
   },
   {
     "title": "NIST Digital Manufacturing",
-    "description": "Research and educational resources related to digital manufacturing, smart manufacturing, industrial automation, manufacturing data, and interoperability.",
     "url": "https://www.nist.gov/topics/advanced-manufacturing",
+    "description": "Research and educational resources related to digital manufacturing, smart manufacturing, industrial automation, manufacturing data, and interoperability.",
     "tags": [
       "Digital Manufacturing",
       "Smart Manufacturing",
@@ -1235,8 +1421,8 @@
   },
   {
     "title": "DoE Manufacturing Resources",
-    "description": "United States Department of Energy resources covering advanced manufacturing, industrial efficiency, materials, process technologies, and manufacturing research.",
     "url": "https://www.energy.gov/eere/amo/advanced-materials",
+    "description": "United States Department of Energy resources covering advanced manufacturing, industrial efficiency, materials, process technologies, and manufacturing research.",
     "tags": [
       "Manufacturing",
       "Materials",
@@ -1246,8 +1432,8 @@
   },
   {
     "title": "Oak Ridge National Laboratory Manufacturing",
-    "description": "Research and educational resources covering advanced manufacturing, additive manufacturing, composites, materials, robotics, machining, and digital manufacturing.",
     "url": "https://www.ornl.gov/topic/manufacturing",
+    "description": "Research and educational resources covering advanced manufacturing, additive manufacturing, composites, materials, robotics, machining, and digital manufacturing.",
     "tags": [
       "Advanced Manufacturing",
       "Materials",
@@ -1257,8 +1443,8 @@
   },
   {
     "title": "America Makes",
-    "description": "Additive manufacturing education, research, technology development, and workforce resources focused on industrial 3D printing.",
     "url": "https://www.americamakes.us/",
+    "description": "Additive manufacturing education, research, technology development, and workforce resources focused on industrial 3D printing.",
     "tags": [
       "Additive Manufacturing",
       "3D Printing",
@@ -1268,8 +1454,8 @@
   },
   {
     "title": "DoITPoMS",
-    "description": "University of Cambridge teaching resources covering materials science, crystallography, polymers, composites, phase diagrams, mechanical properties, and materials processing.",
     "url": "https://www.doitpoms.ac.uk/",
+    "description": "University of Cambridge teaching resources covering materials science, crystallography, polymers, composites, phase diagrams, mechanical properties, and materials processing.",
     "tags": [
       "Materials Science",
       "Engineering",
@@ -1280,8 +1466,8 @@
   },
   {
     "title": "Materials Project",
-    "description": "Open materials database providing computed materials properties, crystal structures, phase information, and materials science data.",
     "url": "https://materialsproject.org/",
+    "description": "Open materials database providing computed materials properties, crystal structures, phase information, and materials science data.",
     "tags": [
       "Materials Science",
       "Materials Engineering",
@@ -1291,8 +1477,8 @@
   },
   {
     "title": "MatWeb",
-    "description": "Free materials property database containing engineering properties for metals, plastics, ceramics, composites, and other materials.",
     "url": "https://www.matweb.com/",
+    "description": "Free materials property database containing engineering properties for metals, plastics, ceramics, composites, and other materials.",
     "tags": [
       "Materials",
       "Engineering",
@@ -1303,8 +1489,8 @@
   },
   {
     "title": "MakeItFrom",
-    "description": "Materials engineering database providing mechanical, thermal, physical, and manufacturing properties for engineering materials.",
     "url": "https://www.makeitfrom.com/",
+    "description": "Materials engineering database providing mechanical, thermal, physical, and manufacturing properties for engineering materials.",
     "tags": [
       "Materials",
       "Engineering",
@@ -1314,8 +1500,8 @@
   },
   {
     "title": "Engineering Toolbox",
-    "description": "Large engineering reference containing equations, material properties, fluid data, thermodynamics, heat transfer, mechanical engineering data, and process calculations.",
     "url": "https://www.engineeringtoolbox.com/",
+    "description": "Large engineering reference containing equations, material properties, fluid data, thermodynamics, heat transfer, mechanical engineering data, and process calculations.",
     "tags": [
       "Engineering",
       "Reference",
@@ -1325,8 +1511,8 @@
   },
   {
     "title": "RoyMech",
-    "description": "Engineering reference covering mechanical engineering calculations, materials, fasteners, bearings, gears, shafts, springs, tolerances, and machine design.",
     "url": "https://roymech.co.uk/",
+    "description": "Engineering reference covering mechanical engineering calculations, materials, fasteners, bearings, gears, shafts, springs, tolerances, and machine design.",
     "tags": [
       "Mechanical Engineering",
       "Machine Design",
@@ -1336,8 +1522,8 @@
   },
   {
     "title": "eFunda",
-    "description": "Engineering reference covering mathematics, mechanics, materials, thermodynamics, electrical engineering, chemical engineering, and engineering calculators.",
     "url": "https://www.efunda.com/",
+    "description": "Engineering reference covering mathematics, mechanics, materials, thermodynamics, electrical engineering, chemical engineering, and engineering calculators.",
     "tags": [
       "Engineering",
       "Mechanical Engineering",
@@ -1347,8 +1533,8 @@
   },
   {
     "title": "MIT Machine Design",
-    "description": "Open mechanical engineering course resources covering machine elements, mechanical design, stress, fatigue, bearings, gears, shafts, and design methodology.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=machine%20design",
+    "description": "Open mechanical engineering course resources covering machine elements, mechanical design, stress, fatigue, bearings, gears, shafts, and design methodology.",
     "tags": [
       "Mechanical Engineering",
       "Machine Design",
@@ -1358,8 +1544,8 @@
   },
   {
     "title": "MIT Mechanics of Materials",
-    "description": "Open course resources covering stress, strain, deformation, beams, torsion, failure, and structural mechanics.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=mechanics%20of%20materials",
+    "description": "Open course resources covering stress, strain, deformation, beams, torsion, failure, and structural mechanics.",
     "tags": [
       "Mechanical Engineering",
       "Materials",
@@ -1369,8 +1555,8 @@
   },
   {
     "title": "MIT Thermodynamics",
-    "description": "Open thermodynamics courses covering energy, entropy, heat engines, refrigeration, phase behavior, and engineering thermodynamic systems.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=thermodynamics",
+    "description": "Open thermodynamics courses covering energy, entropy, heat engines, refrigeration, phase behavior, and engineering thermodynamic systems.",
     "tags": [
       "Mechanical Engineering",
       "Thermodynamics",
@@ -1380,8 +1566,8 @@
   },
   {
     "title": "MIT Fluid Mechanics",
-    "description": "Open engineering courses covering fluid statics, fluid dynamics, conservation laws, boundary layers, turbulence, and engineering flows.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=fluid%20mechanics",
+    "description": "Open engineering courses covering fluid statics, fluid dynamics, conservation laws, boundary layers, turbulence, and engineering flows.",
     "tags": [
       "Mechanical Engineering",
       "Fluid Mechanics",
@@ -1391,8 +1577,8 @@
   },
   {
     "title": "MIT Heat Transfer",
-    "description": "Open engineering resources covering conduction, convection, radiation, heat exchangers, and thermal systems.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=heat%20transfer",
+    "description": "Open engineering resources covering conduction, convection, radiation, heat exchangers, and thermal systems.",
     "tags": [
       "Mechanical Engineering",
       "Thermal Engineering",
@@ -1401,8 +1587,8 @@
   },
   {
     "title": "MIT Dynamics",
-    "description": "Open engineering course material covering kinematics, kinetics, rigid-body dynamics, vibration, and mechanical systems.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=dynamics",
+    "description": "Open engineering course material covering kinematics, kinetics, rigid-body dynamics, vibration, and mechanical systems.",
     "tags": [
       "Mechanical Engineering",
       "Dynamics",
@@ -1411,8 +1597,8 @@
   },
   {
     "title": "MIT Robotics",
-    "description": "Open robotics courses covering robot kinematics, dynamics, control, motion planning, sensing, manipulation, and autonomous systems.",
     "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=robotics",
+    "description": "Open robotics courses covering robot kinematics, dynamics, control, motion planning, sensing, manipulation, and autonomous systems.",
     "tags": [
       "Robotics",
       "Mechanical Engineering",
@@ -1422,8 +1608,8 @@
   },
   {
     "title": "Modern Robotics",
-    "description": "Free online robotics textbook and course material covering robot kinematics, dynamics, trajectory generation, motion planning, control, and manipulation.",
     "url": "https://modernrobotics.northwestern.edu/",
+    "description": "Free online robotics textbook and course material covering robot kinematics, dynamics, trajectory generation, motion planning, control, and manipulation.",
     "tags": [
       "Robotics",
       "Mechanical Engineering",
@@ -1433,8 +1619,8 @@
   },
   {
     "title": "Robotics Toolbox for MATLAB",
-    "description": "Robotics software and educational resources for modeling robot kinematics, dynamics, trajectories, and manipulators.",
     "url": "https://petercorke.com/toolboxes/robotics-toolbox/",
+    "description": "Robotics software and educational resources for modeling robot kinematics, dynamics, trajectories, and manipulators.",
     "tags": [
       "Robotics",
       "Simulation",
@@ -1444,8 +1630,8 @@
   },
   {
     "title": "ROS",
-    "description": "Open-source robotics middleware ecosystem providing tools, libraries, simulation interfaces, visualization, communication, and robot software development infrastructure.",
     "url": "https://www.ros.org/",
+    "description": "Open-source robotics middleware ecosystem providing tools, libraries, simulation interfaces, visualization, communication, and robot software development infrastructure.",
     "tags": [
       "Robotics",
       "Automation",
@@ -1455,8 +1641,8 @@
   },
   {
     "title": "ROS Documentation",
-    "description": "Free technical documentation and tutorials for building robotic applications using ROS 2.",
     "url": "https://docs.ros.org/",
+    "description": "Free technical documentation and tutorials for building robotic applications using ROS 2.",
     "tags": [
       "Robotics",
       "ROS",
@@ -1466,8 +1652,8 @@
   },
   {
     "title": "Gazebo",
-    "description": "Open-source robotics simulation platform for modeling robots, sensors, environments, physics, and autonomous systems.",
     "url": "https://gazebosim.org/",
+    "description": "Open-source robotics simulation platform for modeling robots, sensors, environments, physics, and autonomous systems.",
     "tags": [
       "Robotics",
       "Simulation",
@@ -1477,8 +1663,8 @@
   },
   {
     "title": "PLC Open",
-    "description": "Open industrial automation resources covering programmable logic controllers, automation standards, motion control, and industrial programming.",
     "url": "https://www.plcopen.org/",
+    "description": "Open industrial automation resources covering programmable logic controllers, automation standards, motion control, and industrial programming.",
     "tags": [
       "Automation",
       "PLC",
@@ -1488,8 +1674,8 @@
   },
   {
     "title": "AutomationDirect Learning",
-    "description": "Free industrial automation learning resources covering PLCs, controls, sensors, motors, motion control, industrial networking, and automation hardware.",
     "url": "https://library.automationdirect.com/",
+    "description": "Free industrial automation learning resources covering PLCs, controls, sensors, motors, motion control, industrial networking, and automation hardware.",
     "tags": [
       "Automation",
       "PLC",
@@ -1499,8 +1685,8 @@
   },
   {
     "title": "RealPars",
-    "description": "Industrial automation educational resources covering PLCs, sensors, industrial networks, robotics, SCADA, drives, and manufacturing automation.",
     "url": "https://realpars.com/",
+    "description": "Industrial automation educational resources covering PLCs, sensors, industrial networks, robotics, SCADA, drives, and manufacturing automation.",
     "tags": [
       "Automation",
       "PLC",
@@ -1510,8 +1696,8 @@
   },
   {
     "title": "InstrumentationTools",
-    "description": "Free engineering reference covering instrumentation, process control, industrial automation, sensors, PLCs, control systems, and engineering calculations.",
     "url": "https://instrumentationtools.com/",
+    "description": "Free engineering reference covering instrumentation, process control, industrial automation, sensors, PLCs, control systems, and engineering calculations.",
     "tags": [
       "Instrumentation",
       "Controls",
@@ -1521,8 +1707,8 @@
   },
   {
     "title": "Control Systems Engineering LibreTexts",
-    "description": "Open textbook covering feedback systems, transfer functions, block diagrams, stability, controllers, and control engineering.",
     "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
+    "description": "Open textbook covering feedback systems, transfer functions, block diagrams, stability, controllers, and control engineering.",
     "tags": [
       "Controls",
       "Automation",
@@ -1532,8 +1718,8 @@
   },
   {
     "title": "LearnChemE",
-    "description": "Free chemical engineering simulations, screencasts, concept questions, and interactive educational resources covering thermodynamics, transport, reactors, and process engineering.",
     "url": "https://learncheme.com/",
+    "description": "Free chemical engineering simulations, screencasts, concept questions, and interactive educational resources covering thermodynamics, transport, reactors, and process engineering.",
     "tags": [
       "Chemical Engineering",
       "Simulation",
@@ -1543,8 +1729,8 @@
   },
   {
     "title": "MIT Chemical Engineering",
-    "description": "Open chemical engineering courses covering transport phenomena, thermodynamics, reaction engineering, process design, and chemical process systems.",
     "url": "https://ocw.mit.edu/search/?d=Chemical%20Engineering",
+    "description": "Open chemical engineering courses covering transport phenomena, thermodynamics, reaction engineering, process design, and chemical process systems.",
     "tags": [
       "Chemical Engineering",
       "Process Engineering",
@@ -1554,8 +1740,8 @@
   },
   {
     "title": "Engineering ToolBox - Manufacturing",
-    "description": "Engineering reference information for manufacturing processes, material properties, machining calculations, heat treatment, and industrial engineering.",
     "url": "https://www.engineeringtoolbox.com/",
+    "description": "Engineering reference information for manufacturing processes, material properties, machining calculations, heat treatment, and industrial engineering.",
     "tags": [
       "Manufacturing",
       "Engineering",
@@ -1565,8 +1751,8 @@
   },
   {
     "title": "WeldingWeb",
-    "description": "Community and educational resource covering welding processes, fabrication, metallurgy, equipment, techniques, and shop practices.",
     "url": "https://weldingweb.com/",
+    "description": "Community and educational resource covering welding processes, fabrication, metallurgy, equipment, techniques, and shop practices.",
     "tags": [
       "Welding",
       "Fabrication",
@@ -1576,8 +1762,8 @@
   },
   {
     "title": "Lincoln Electric Education",
-    "description": "Educational resources covering welding processes, metallurgy, welding technology, safety, fabrication, and welding engineering.",
     "url": "https://www.lincolnelectric.com/en/welding-education",
+    "description": "Educational resources covering welding processes, metallurgy, welding technology, safety, fabrication, and welding engineering.",
     "tags": [
       "Welding",
       "Manufacturing",
@@ -1587,8 +1773,8 @@
   },
   {
     "title": "Miller Welds Education",
-    "description": "Welding educational resources covering welding processes, equipment, techniques, fabrication, and welding fundamentals.",
     "url": "https://www.millerwelds.com/resources/welding-resources",
+    "description": "Welding educational resources covering welding processes, equipment, techniques, fabrication, and welding fundamentals.",
     "tags": [
       "Welding",
       "Fabrication",
@@ -1597,8 +1783,8 @@
   },
   {
     "title": "Open Textbooks Welding and Machining",
-    "description": "Openly licensed professional-technical textbooks covering welding and machining with downloadable and adaptable educational material.",
     "url": "https://www.constructioncenterofexcellence.com/training/open-textbooks-welding-machining",
+    "description": "Openly licensed professional-technical textbooks covering welding and machining with downloadable and adaptable educational material.",
     "tags": [
       "Welding",
       "Machining",
@@ -1608,8 +1794,8 @@
   },
   {
     "title": "SME Manufacturing Resources",
-    "description": "Manufacturing engineering resources covering machining, additive manufacturing, automation, production systems, quality, and manufacturing technology.",
     "url": "https://www.sme.org/",
+    "description": "Manufacturing engineering resources covering machining, additive manufacturing, automation, production systems, quality, and manufacturing technology.",
     "tags": [
       "Manufacturing",
       "Machining",
@@ -1619,8 +1805,8 @@
   },
   {
     "title": "ASME Learning and Resources",
-    "description": "Engineering educational resources covering mechanical engineering, manufacturing, design, energy, robotics, and engineering standards.",
     "url": "https://www.asme.org/topics-resources",
+    "description": "Engineering educational resources covering mechanical engineering, manufacturing, design, energy, robotics, and engineering standards.",
     "tags": [
       "Mechanical Engineering",
       "Manufacturing",
@@ -1630,8 +1816,8 @@
   },
   {
     "title": "SAE Learning Resources",
-    "description": "Engineering resources covering automotive, aerospace, mobility, manufacturing, materials, propulsion, and transportation engineering.",
     "url": "https://www.sae.org/learn",
+    "description": "Engineering resources covering automotive, aerospace, mobility, manufacturing, materials, propulsion, and transportation engineering.",
     "tags": [
       "Automotive",
       "Aerospace",
@@ -1641,8 +1827,8 @@
   },
   {
     "title": "NASA Manufacturing",
-    "description": "NASA engineering resources and research covering aerospace manufacturing, materials, additive manufacturing, composites, machining, robotics, and advanced production.",
     "url": "https://www.nasa.gov/",
+    "description": "NASA engineering resources and research covering aerospace manufacturing, materials, additive manufacturing, composites, machining, robotics, and advanced production.",
     "tags": [
       "Aerospace",
       "Manufacturing",
@@ -1652,8 +1838,8 @@
   },
   {
     "title": "NASA Systems Engineering Handbook",
-    "description": "Free systems engineering reference covering requirements, architecture, design, verification, validation, integration, and lifecycle engineering.",
     "url": "https://www.nasa.gov/reference/systems-engineering-handbook/",
+    "description": "Free systems engineering reference covering requirements, architecture, design, verification, validation, integration, and lifecycle engineering.",
     "tags": [
       "Systems Engineering",
       "Engineering",
@@ -1663,8 +1849,8 @@
   },
   {
     "title": "NASA Technical Reports Server",
-    "description": "Free repository of NASA technical reports and engineering research covering aerospace engineering, materials, propulsion, structures, manufacturing, and systems.",
     "url": "https://ntrs.nasa.gov/",
+    "description": "Free repository of NASA technical reports and engineering research covering aerospace engineering, materials, propulsion, structures, manufacturing, and systems.",
     "tags": [
       "Engineering",
       "Aerospace",
@@ -1673,9 +1859,515 @@
     ]
   },
   {
+    "title": "PhET Interactive Simulations",
+    "url": "https://phet.colorado.edu/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Earth Science",
+      "Mathematics",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "Open Physics Education Network",
+    "url": "https://openphysicsed.org/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Classical Mechanics",
+      "Electromagnetism",
+      "Mathematical Methods",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "Falstad Physics Applets",
+    "url": "https://www.falstad.com/mathphysics.html",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Engineering",
+      "Circuits",
+      "Waves",
+      "Electromagnetism",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "oPhysics",
+    "url": "https://ophysics.com/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Mechanics",
+      "Waves",
+      "Optics",
+      "Electricity",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "myPhysicsLab",
+    "url": "https://www.myphysicslab.com/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Mechanics",
+      "Dynamics",
+      "Numerical Simulation"
+    ]
+  },
+  {
+    "title": "GeoGebra",
+    "url": "https://www.geogebra.org/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Geometry",
+      "Algebra",
+      "Calculus",
+      "Statistics",
+      "3D",
+      "Interactive Mathematics"
+    ]
+  },
+  {
+    "title": "Desmos",
+    "url": "https://www.desmos.com/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Graphing",
+      "Algebra",
+      "Geometry",
+      "Calculus",
+      "Statistics"
+    ]
+  },
+  {
+    "title": "OpenStax",
+    "url": "https://openstax.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Engineering",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "LibreTexts",
+    "url": "https://libretexts.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Engineering",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "OpenStax Engineering",
+    "url": "https://openstax.org/subjects/science",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Engineering Textbooks"
+    ]
+  },
+  {
+    "title": "Concord Consortium",
+    "url": "https://concord.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Earth Science",
+      "Mathematics",
+      "Computational Science",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "LabXchange",
+    "url": "https://www.labxchange.org/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Biology",
+      "Chemistry",
+      "Physics",
+      "Virtual Labs",
+      "Interactive Learning"
+    ]
+  },
+  {
+    "title": "Open Source Physics",
+    "url": "https://www.compadre.org/osp/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Physics",
+      "Computational Physics",
+      "Modeling",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "Open Source Engineering",
+    "url": "https://opensourceengineering.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Civil Engineering",
+      "Open Resources"
+    ]
+  },
+  {
+    "title": "LibreCAD",
+    "url": "https://librecad.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "CAD",
+      "2D CAD",
+      "Technical Drawing"
+    ]
+  },
+  {
+    "title": "SageMath",
+    "url": "https://www.sagemath.org/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Algebra",
+      "Calculus",
+      "Number Theory",
+      "Statistics",
+      "Scientific Computing"
+    ]
+  },
+  {
+    "title": "SymPy",
+    "url": "https://www.sympy.org/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Symbolic Mathematics",
+      "Algebra",
+      "Calculus",
+      "Physics"
+    ]
+  },
+  {
+    "title": "NumPy",
+    "url": "https://numpy.org/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Numerical Computing",
+      "Linear Algebra",
+      "Scientific Computing"
+    ]
+  },
+  {
+    "title": "Jupyter",
+    "url": "https://jupyter.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Scientific Computing",
+      "Mathematics",
+      "Data Science",
+      "Interactive Computing"
+    ]
+  },
+  {
+    "title": "NASA Open Data",
+    "url": "https://data.nasa.gov/",
+    "description": "",
+    "tags": [
+      "Science",
+      "Aerospace",
+      "Astronomy",
+      "Earth Science",
+      "Engineering",
+      "Open Data"
+    ]
+  },
+  {
+    "title": "NOAA Open Data",
+    "url": "https://www.noaa.gov/data",
+    "description": "",
+    "tags": [
+      "Science",
+      "Earth Science",
+      "Atmospheric Science",
+      "Oceanography",
+      "Climate",
+      "Open Data"
+    ]
+  },
+  {
+    "title": "USGS Science Data",
+    "url": "https://www.usgs.gov/products/data",
+    "description": "",
+    "tags": [
+      "Science",
+      "Geology",
+      "Earth Science",
+      "Hydrology",
+      "Geography",
+      "Open Data"
+    ]
+  },
+  {
+    "title": "NIST Chemistry WebBook",
+    "url": "https://webbook.nist.gov/chemistry/",
+    "description": "",
+    "tags": [
+      "Chemistry",
+      "Thermodynamics",
+      "Spectroscopy",
+      "Chemical Properties",
+      "Reference Data"
+    ]
+  },
+  {
+    "title": "Wikiversity",
+    "url": "https://www.wikiversity.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Science",
+      "Engineering",
+      "Open Courses",
+      "Learning Resources"
+    ]
+  },
+  {
+    "title": "Wikibooks",
+    "url": "https://en.wikibooks.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Science",
+      "Engineering",
+      "Open Textbooks",
+      "Reference"
+    ]
+  },
+  {
+    "title": "OpenStax Physics",
+    "url": "https://openstax.org/details/books/physics",
+    "description": "",
+    "tags": [
+      "Physics",
+      "Mechanics",
+      "Thermodynamics",
+      "Electromagnetism",
+      "Optics",
+      "Modern Physics"
+    ]
+  },
+  {
+    "title": "OpenStax Chemistry",
+    "url": "https://openstax.org/details/books/chemistry-2e",
+    "description": "",
+    "tags": [
+      "Chemistry",
+      "General Chemistry",
+      "Thermodynamics",
+      "Chemical Reactions",
+      "Atomic Structure"
+    ]
+  },
+  {
+    "title": "OpenStax Biology",
+    "url": "https://openstax.org/details/books/biology-2e",
+    "description": "",
+    "tags": [
+      "Biology",
+      "Cell Biology",
+      "Genetics",
+      "Evolution",
+      "Ecology",
+      "Physiology"
+    ]
+  },
+  {
+    "title": "Purdue Machine Tool Cutting Dataset",
+    "url": "https://github.com/purduelamm/mt_cutting_dataset",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC Machining",
+      "Milling",
+      "Cutting Data",
+      "Machine Learning",
+      "Research Dataset"
+    ]
+  },
+  {
+    "title": "HMoTP High-Speed Milling Dataset",
+    "url": "https://github.com/dataforresearch/HMoTP",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CNC Machining",
+      "Milling",
+      "Tool Wear",
+      "Chatter",
+      "Titanium",
+      "Research Dataset"
+    ]
+  },
+  {
+    "title": "FreeCAD Path Workbench",
+    "url": "https://www.freecad.org/",
+    "description": "",
+    "tags": [
+      "Manufacturing",
+      "CAM",
+      "CNC",
+      "Toolpaths",
+      "CAD-CAM"
+    ]
+  },
+  {
+    "title": "CalculiX",
+    "url": "http://www.calculix.de/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Finite Element Analysis",
+      "FEA",
+      "Structural Mechanics",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "Elmer FEM",
+    "url": "https://www.elmerfem.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Finite Element Analysis",
+      "Multiphysics",
+      "Heat Transfer",
+      "Fluid Mechanics"
+    ]
+  },
+  {
+    "title": "SALOME",
+    "url": "https://www.salome-platform.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "CAD",
+      "Meshing",
+      "FEA",
+      "CFD",
+      "Numerical Simulation"
+    ]
+  },
+  {
+    "title": "MOOSE",
+    "url": "https://mooseframework.inl.gov/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Multiphysics",
+      "Finite Element Analysis",
+      "Numerical Simulation",
+      "Materials Science"
+    ]
+  },
+  {
+    "title": "OpenFOAM Documentation",
+    "url": "https://doc.openfoam.com/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Fluid Mechanics",
+      "CFD",
+      "Numerical Methods",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "PyBaMM",
+    "url": "https://www.pybamm.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Battery Engineering",
+      "Electrochemistry",
+      "Mathematical Modeling",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "KiCad Documentation",
+    "url": "https://docs.kicad.org/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Electronics",
+      "PCB Design",
+      "Electrical Engineering"
+    ]
+  },
+  {
+    "title": "Falstad Circuit Simulator",
+    "url": "https://www.falstad.com/circuit/",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Electrical Engineering",
+      "Electronics",
+      "Circuit Analysis",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "LTspice",
+    "url": "https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html",
+    "description": "",
+    "tags": [
+      "Engineering",
+      "Electrical Engineering",
+      "Electronics",
+      "Circuit Simulation",
+      "SPICE"
+    ]
+  },
+  {
     "title": "MIT Lean Manufacturing",
-    "description": "Open manufacturing systems material covering lean production, process improvement, production planning, manufacturing systems, and operational efficiency.",
     "url": "https://ocw.mit.edu/search/?q=lean%20manufacturing",
+    "description": "Open manufacturing systems material covering lean production, process improvement, production planning, manufacturing systems, and operational efficiency.",
     "tags": [
       "Manufacturing",
       "Lean",
@@ -1685,8 +2377,8 @@
   },
   {
     "title": "MIT Operations Management",
-    "description": "Open university resources covering production systems, inventory, scheduling, manufacturing operations, process analysis, and operations management.",
     "url": "https://ocw.mit.edu/search/?d=Sloan%20School%20of%20Management&q=operations",
+    "description": "Open university resources covering production systems, inventory, scheduling, manufacturing operations, process analysis, and operations management.",
     "tags": [
       "Manufacturing",
       "Operations",
@@ -1696,8 +2388,8 @@
   },
   {
     "title": "MIT Statistical Quality Control",
-    "description": "Open course resources covering variation, statistical process control, quality engineering, measurement, and manufacturing process capability.",
     "url": "https://ocw.mit.edu/search/?q=statistical%20process%20control",
+    "description": "Open course resources covering variation, statistical process control, quality engineering, measurement, and manufacturing process capability.",
     "tags": [
       "Quality",
       "Manufacturing",
@@ -1706,21 +2398,9 @@
     ]
   },
   {
-    "title": "NIST Engineering Statistics Handbook",
-    "description": "Detailed reference for statistical process control, process characterization, measurement systems, experimental design, reliability, and engineering statistics.",
-    "url": "https://www.itl.nist.gov/div898/handbook/",
-    "tags": [
-      "Quality",
-      "SPC",
-      "Statistics",
-      "Manufacturing",
-      "Metrology"
-    ]
-  },
-  {
     "title": "MIT Manufacturing Systems",
-    "description": "Open resources covering production systems, manufacturing planning, cost, process modeling, transfer lines, operations, and factory systems.",
     "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+    "description": "Open resources covering production systems, manufacturing planning, cost, process modeling, transfer lines, operations, and factory systems.",
     "tags": [
       "Manufacturing",
       "Production Systems",
@@ -1730,8 +2410,8 @@
   },
   {
     "title": "Simulation Modeling and Arena",
-    "description": "Open textbook covering discrete-event simulation, manufacturing systems, process modeling, probability, statistics, and engineering experimentation.",
     "url": "https://rossetti.github.io/RossettiArenaBook/",
+    "description": "Open textbook covering discrete-event simulation, manufacturing systems, process modeling, probability, statistics, and engineering experimentation.",
     "tags": [
       "Manufacturing",
       "Simulation",
@@ -1741,8 +2421,8 @@
   },
   {
     "title": "Factory Physics",
-    "description": "Educational resources for understanding manufacturing systems, production flow, variability, capacity, inventory, queues, and factory performance.",
     "url": "https://factoryphysics.com/",
+    "description": "Educational resources for understanding manufacturing systems, production flow, variability, capacity, inventory, queues, and factory performance.",
     "tags": [
       "Manufacturing",
       "Industrial Engineering",
@@ -1752,8 +2432,8 @@
   },
   {
     "title": "The Engineering Mindset",
-    "description": "Free visual engineering explanations covering mechanical systems, HVAC, electrical systems, thermodynamics, fluid systems, motors, pumps, and industrial technology.",
     "url": "https://theengineeringmindset.com/",
+    "description": "Free visual engineering explanations covering mechanical systems, HVAC, electrical systems, thermodynamics, fluid systems, motors, pumps, and industrial technology.",
     "tags": [
       "Engineering",
       "Mechanical Engineering",
@@ -1763,8 +2443,8 @@
   },
   {
     "title": "Learn Engineering",
-    "description": "Visual engineering education covering mechanics, machines, manufacturing, thermodynamics, automotive systems, electrical systems, and engineering principles.",
     "url": "https://learnengineering.org/",
+    "description": "Visual engineering education covering mechanics, machines, manufacturing, thermodynamics, automotive systems, electrical systems, and engineering principles.",
     "tags": [
       "Engineering",
       "Mechanical Engineering",
@@ -1774,8 +2454,8 @@
   },
   {
     "title": "Engineering LibreTexts - Materials",
-    "description": "Open engineering materials covering metallurgy, polymers, ceramics, composites, material properties, processing, and failure.",
     "url": "https://eng.libretexts.org/Bookshelves/Materials_Science",
+    "description": "Open engineering materials covering metallurgy, polymers, ceramics, composites, material properties, processing, and failure.",
     "tags": [
       "Materials Science",
       "Metallurgy",
@@ -1785,8 +2465,8 @@
   },
   {
     "title": "MIT Materials Science and Engineering",
-    "description": "Open MIT resources covering crystal structures, phase diagrams, mechanical behavior, materials processing, polymers, metals, ceramics, and composites.",
     "url": "https://ocw.mit.edu/search/?d=Materials%20Science%20and%20Engineering",
+    "description": "Open MIT resources covering crystal structures, phase diagrams, mechanical behavior, materials processing, polymers, metals, ceramics, and composites.",
     "tags": [
       "Materials Science",
       "Metallurgy",
@@ -1796,8 +2476,8 @@
   },
   {
     "title": "Aerospace Structures and Materials",
-    "description": "Open textbook covering aerospace structures, material behavior, loads, stress, fatigue, composites, and structural design.",
     "url": "https://www.tudelft.nl/en/ae/education/aerospace-structures-and-materials",
+    "description": "Open textbook covering aerospace structures, material behavior, loads, stress, fatigue, composites, and structural design.",
     "tags": [
       "Aerospace",
       "Materials",
@@ -1807,8 +2487,8 @@
   },
   {
     "title": "TU Delft OpenCourseWare",
-    "description": "Free university engineering courses covering mechanical engineering, aerospace engineering, manufacturing, materials, robotics, civil engineering, and design.",
     "url": "https://ocw.tudelft.nl/",
+    "description": "Free university engineering courses covering mechanical engineering, aerospace engineering, manufacturing, materials, robotics, civil engineering, and design.",
     "tags": [
       "Engineering",
       "Mechanical Engineering",
@@ -1818,8 +2498,8 @@
   },
   {
     "title": "NPTEL Mechanical Engineering",
-    "description": "Free university engineering lectures covering manufacturing, machining, mechanical design, materials, thermodynamics, fluid mechanics, robotics, and production engineering.",
     "url": "https://nptel.ac.in/courses",
+    "description": "Free university engineering lectures covering manufacturing, machining, mechanical design, materials, thermodynamics, fluid mechanics, robotics, and production engineering.",
     "tags": [
       "Mechanical Engineering",
       "Manufacturing",
@@ -1829,8 +2509,8 @@
   },
   {
     "title": "NPTEL Manufacturing Processes",
-    "description": "University-level lecture courses covering machining, casting, forming, welding, manufacturing processes, production engineering, and machine tools.",
     "url": "https://nptel.ac.in/courses",
+    "description": "University-level lecture courses covering machining, casting, forming, welding, manufacturing processes, production engineering, and machine tools.",
     "tags": [
       "Manufacturing",
       "Machining",
@@ -1841,8 +2521,8 @@
   },
   {
     "title": "NPTEL CAD/CAM",
-    "description": "Free engineering lectures covering computer-aided design, computer-aided manufacturing, CNC, geometric modeling, process planning, and manufacturing automation.",
     "url": "https://nptel.ac.in/courses",
+    "description": "Free engineering lectures covering computer-aided design, computer-aided manufacturing, CNC, geometric modeling, process planning, and manufacturing automation.",
     "tags": [
       "CAD",
       "CAM",
@@ -1853,8 +2533,8 @@
   },
   {
     "title": "NPTEL Robotics",
-    "description": "Free engineering lectures covering robot kinematics, dynamics, control, industrial robots, automation, sensing, and robotic manufacturing.",
     "url": "https://nptel.ac.in/courses",
+    "description": "Free engineering lectures covering robot kinematics, dynamics, control, industrial robots, automation, sensing, and robotic manufacturing.",
     "tags": [
       "Robotics",
       "Automation",
@@ -1864,8 +2544,8 @@
   },
   {
     "title": "NPTEL Industrial Engineering",
-    "description": "Free courses covering production planning, operations research, quality control, manufacturing systems, optimization, and industrial engineering.",
     "url": "https://nptel.ac.in/courses",
+    "description": "Free courses covering production planning, operations research, quality control, manufacturing systems, optimization, and industrial engineering.",
     "tags": [
       "Industrial Engineering",
       "Manufacturing",
@@ -1875,8 +2555,8 @@
   },
   {
     "title": "MIT Additive Manufacturing",
-    "description": "Open MIT resources covering additive manufacturing processes, materials, design, process physics, and advanced manufacturing technologies.",
     "url": "https://ocw.mit.edu/search/?q=additive%20manufacturing",
+    "description": "Open MIT resources covering additive manufacturing processes, materials, design, process physics, and advanced manufacturing technologies.",
     "tags": [
       "Additive Manufacturing",
       "3D Printing",
@@ -1886,8 +2566,8 @@
   },
   {
     "title": "America Makes Education",
-    "description": "Additive manufacturing education and workforce resources covering 3D printing technologies, materials, design, process development, and industrial applications.",
     "url": "https://www.americamakes.us/",
+    "description": "Additive manufacturing education and workforce resources covering 3D printing technologies, materials, design, process development, and industrial applications.",
     "tags": [
       "Additive Manufacturing",
       "3D Printing",
@@ -1897,8 +2577,8 @@
   },
   {
     "title": "DoE Advanced Manufacturing Office",
-    "description": "Government research and educational resources covering advanced manufacturing technologies, materials, industrial efficiency, process technologies, and smart manufacturing.",
     "url": "https://www.energy.gov/",
+    "description": "Government research and educational resources covering advanced manufacturing technologies, materials, industrial efficiency, process technologies, and smart manufacturing.",
     "tags": [
       "Advanced Manufacturing",
       "Industrial Engineering",
@@ -1908,8 +2588,8 @@
   },
   {
     "title": "CESMII",
-    "description": "Smart manufacturing education and resources covering manufacturing data, industrial automation, energy efficiency, interoperability, and digital manufacturing systems.",
     "url": "https://www.cesmii.org/",
+    "description": "Smart manufacturing education and resources covering manufacturing data, industrial automation, energy efficiency, interoperability, and digital manufacturing systems.",
     "tags": [
       "Smart Manufacturing",
       "Industry 4.0",
@@ -1919,8 +2599,8 @@
   },
   {
     "title": "ISA Automation Resources",
-    "description": "Industrial automation resources covering instrumentation, process control, PLCs, industrial networking, cybersecurity, and automation engineering.",
     "url": "https://www.isa.org/resources",
+    "description": "Industrial automation resources covering instrumentation, process control, PLCs, industrial networking, cybersecurity, and automation engineering.",
     "tags": [
       "Automation",
       "Controls",
@@ -1931,8 +2611,8 @@
   },
   {
     "title": "OpenPLC",
-    "description": "Open-source programmable logic controller software for learning and experimenting with industrial automation and IEC 61131-3 programming.",
     "url": "https://autonomylogic.com/",
+    "description": "Open-source programmable logic controller software for learning and experimenting with industrial automation and IEC 61131-3 programming.",
     "tags": [
       "PLC",
       "Automation",
@@ -1942,8 +2622,8 @@
   },
   {
     "title": "CODESYS",
-    "description": "Industrial automation development environment and educational resources for PLC programming, motion control, visualization, and industrial systems.",
     "url": "https://www.codesys.com/",
+    "description": "Industrial automation development environment and educational resources for PLC programming, motion control, visualization, and industrial systems.",
     "tags": [
       "PLC",
       "Automation",
@@ -1953,8 +2633,8 @@
   },
   {
     "title": "Factory I/O",
-    "description": "Interactive factory simulation environment for learning PLC programming, industrial automation, sensors, actuators, conveyors, and manufacturing systems.",
     "url": "https://factoryio.com/",
+    "description": "Interactive factory simulation environment for learning PLC programming, industrial automation, sensors, actuators, conveyors, and manufacturing systems.",
     "tags": [
       "Automation",
       "PLC",
@@ -1964,8 +2644,8 @@
   },
   {
     "title": "FlexSim",
-    "description": "3D discrete-event simulation software and educational resources for modeling manufacturing, logistics, warehouses, production lines, and operations.",
     "url": "https://www.flexsim.com/",
+    "description": "3D discrete-event simulation software and educational resources for modeling manufacturing, logistics, warehouses, production lines, and operations.",
     "tags": [
       "Manufacturing",
       "Simulation",
@@ -1975,8 +2655,8 @@
   },
   {
     "title": "AnyLogic",
-    "description": "Simulation platform and educational resources for modeling manufacturing, supply chains, logistics, production systems, and complex operations.",
     "url": "https://www.anylogic.com/",
+    "description": "Simulation platform and educational resources for modeling manufacturing, supply chains, logistics, production systems, and complex operations.",
     "tags": [
       "Simulation",
       "Manufacturing",
@@ -1986,8 +2666,8 @@
   },
   {
     "title": "OpenModelica Manufacturing Simulation",
-    "description": "Open physical-system modeling environment applicable to manufacturing equipment, mechanical systems, controls, and industrial processes.",
     "url": "https://openmodelica.org/",
+    "description": "Open physical-system modeling environment applicable to manufacturing equipment, mechanical systems, controls, and industrial processes.",
     "tags": [
       "Manufacturing",
       "Simulation",
@@ -1997,8 +2677,8 @@
   },
   {
     "title": "PyBullet",
-    "description": "Open-source physics simulation environment useful for robotics, mechanism simulation, dynamics, control, and engineering experimentation.",
     "url": "https://pybullet.org/",
+    "description": "Open-source physics simulation environment useful for robotics, mechanism simulation, dynamics, control, and engineering experimentation.",
     "tags": [
       "Robotics",
       "Simulation",
@@ -2008,8 +2688,8 @@
   },
   {
     "title": "Project Chrono",
-    "description": "Open-source multiphysics simulation framework for mechanical systems, vehicle dynamics, robotics, granular materials, and engineering simulation.",
     "url": "https://projectchrono.org/",
+    "description": "Open-source multiphysics simulation framework for mechanical systems, vehicle dynamics, robotics, granular materials, and engineering simulation.",
     "tags": [
       "Mechanical Engineering",
       "Simulation",
@@ -2019,8 +2699,8 @@
   },
   {
     "title": "MBDyn",
-    "description": "Open-source multibody dynamics simulation software for mechanical systems, vehicles, robotics, aerospace, and engineering research.",
     "url": "https://www.mbdyn.org/",
+    "description": "Open-source multibody dynamics simulation software for mechanical systems, vehicles, robotics, aerospace, and engineering research.",
     "tags": [
       "Mechanical Engineering",
       "Dynamics",
@@ -2030,8 +2710,8 @@
   },
   {
     "title": "OpenFAST",
-    "description": "Open-source multiphysics engineering software for wind turbine simulation, structural dynamics, aerodynamics, controls, and renewable energy systems.",
     "url": "https://www.nrel.gov/wind/nwtc/openfast.html",
+    "description": "Open-source multiphysics engineering software for wind turbine simulation, structural dynamics, aerodynamics, controls, and renewable energy systems.",
     "tags": [
       "Mechanical Engineering",
       "Simulation",
@@ -2041,8 +2721,8 @@
   },
   {
     "title": "NREL Engineering Resources",
-    "description": "Free research and engineering resources covering renewable energy systems, manufacturing, materials, controls, simulation, and computational engineering.",
     "url": "https://www.nrel.gov/",
+    "description": "Free research and engineering resources covering renewable energy systems, manufacturing, materials, controls, simulation, and computational engineering.",
     "tags": [
       "Engineering",
       "Energy",
@@ -2052,8 +2732,8 @@
   },
   {
     "title": "OpenFAST",
-    "description": "Open-source wind turbine simulation framework combining aerodynamics, structural dynamics, hydrodynamics, control systems, and electrical systems.",
     "url": "https://github.com/OpenFAST/openfast",
+    "description": "Open-source wind turbine simulation framework combining aerodynamics, structural dynamics, hydrodynamics, control systems, and electrical systems.",
     "tags": [
       "Simulation",
       "Mechanical Engineering",
@@ -2061,719 +2741,1310 @@
       "Energy"
     ]
   },
-
-  {
-    "title": "LibreTexts",
-    "description": "Large collection of free open textbooks and learning materials covering mathematics, physics, chemistry, biology, engineering, and many other STEM disciplines.",
-    "url": "https://libretexts.org/",
-    "tags": ["STEM", "Open Textbooks", "Reference"]
-  },
   {
     "title": "Open Textbook Library",
-    "description": "Collection of openly licensed college textbooks covering mathematics, science, engineering, computer science, and other academic subjects.",
     "url": "https://open.umn.edu/opentextbooks/",
-    "tags": ["STEM", "Open Textbooks", "College"]
+    "description": "Collection of openly licensed college textbooks covering mathematics, science, engineering, computer science, and other academic subjects.",
+    "tags": [
+      "STEM",
+      "Open Textbooks",
+      "College"
+    ]
   },
   {
     "title": "BCcampus Open Collection",
-    "description": "Free and openly licensed post-secondary textbooks covering mathematics, science, engineering, computing, and technical subjects.",
     "url": "https://open.bccampus.ca/",
-    "tags": ["STEM", "Open Textbooks", "College"]
+    "description": "Free and openly licensed post-secondary textbooks covering mathematics, science, engineering, computing, and technical subjects.",
+    "tags": [
+      "STEM",
+      "Open Textbooks",
+      "College"
+    ]
   },
   {
     "title": "Siyavula",
-    "description": "Free open educational resources for mathematics and science, particularly useful for secondary education.",
     "url": "https://www.siyavula.com/",
-    "tags": ["Mathematics", "Physics", "Chemistry", "Biology", "Open Education"]
+    "description": "Free open educational resources for mathematics and science, particularly useful for secondary education.",
+    "tags": [
+      "Mathematics",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Open Education"
+    ]
   },
   {
     "title": "CK-12",
-    "description": "Free digital textbooks, simulations, exercises, and adaptive learning resources for K-12 mathematics and science.",
     "url": "https://www.ck12.org/",
-    "tags": ["STEM", "K-12", "Interactive", "Textbooks"]
+    "description": "Free digital textbooks, simulations, exercises, and adaptive learning resources for K-12 mathematics and science.",
+    "tags": [
+      "STEM",
+      "K-12",
+      "Interactive",
+      "Textbooks"
+    ]
   },
   {
     "title": "MERLOT",
-    "description": "Large collection of free and open learning materials, simulations, textbooks, courses, and educational resources.",
     "url": "https://www.merlot.org/",
-    "tags": ["STEM", "Open Education", "Resources"]
+    "description": "Large collection of free and open learning materials, simulations, textbooks, courses, and educational resources.",
+    "tags": [
+      "STEM",
+      "Open Education",
+      "Resources"
+    ]
   },
   {
     "title": "OER Commons",
-    "description": "Open educational resource library containing free textbooks, lessons, simulations, activities, and courses across STEM disciplines.",
     "url": "https://www.oercommons.org/",
-    "tags": ["STEM", "Open Education", "Resources"]
+    "description": "Open educational resource library containing free textbooks, lessons, simulations, activities, and courses across STEM disciplines.",
+    "tags": [
+      "STEM",
+      "Open Education",
+      "Resources"
+    ]
   },
   {
     "title": "Math LibreTexts",
-    "description": "Open mathematics textbook collection covering algebra, calculus, linear algebra, differential equations, statistics, and advanced mathematics.",
     "url": "https://math.libretexts.org/",
-    "tags": ["Mathematics", "Open Textbooks", "Reference"]
+    "description": "Open mathematics textbook collection covering algebra, calculus, linear algebra, differential equations, statistics, and advanced mathematics.",
+    "tags": [
+      "Mathematics",
+      "Open Textbooks",
+      "Reference"
+    ]
   },
   {
     "title": "Mathematics LibreTexts",
-    "description": "Extensive open mathematics library containing textbooks, worked examples, exercises, and advanced mathematical topics.",
     "url": "https://math.libretexts.org/",
-    "tags": ["Mathematics", "Textbooks", "Exercises"]
+    "description": "Extensive open mathematics library containing textbooks, worked examples, exercises, and advanced mathematical topics.",
+    "tags": [
+      "Mathematics",
+      "Textbooks",
+      "Exercises"
+    ]
   },
   {
     "title": "Mathigon",
-    "description": "Interactive mathematics platform using visualizations, interactive lessons, puzzles, and explorations to teach mathematical concepts.",
     "url": "https://mathigon.org/",
-    "tags": ["Mathematics", "Interactive", "Visualization"]
-  },
-  {
-    "title": "GeoGebra",
-    "description": "Interactive mathematics platform for geometry, algebra, graphing, calculus, statistics, and 3D mathematics.",
-    "url": "https://www.geogebra.org/",
-    "tags": ["Mathematics", "Geometry", "Calculus", "Visualization", "Interactive"]
-  },
-  {
-    "title": "Desmos",
-    "description": "Interactive graphing and mathematical visualization tools for algebra, functions, geometry, statistics, and calculus.",
-    "url": "https://www.desmos.com/",
-    "tags": ["Mathematics", "Graphing", "Visualization", "Interactive"]
+    "description": "Interactive mathematics platform using visualizations, interactive lessons, puzzles, and explorations to teach mathematical concepts.",
+    "tags": [
+      "Mathematics",
+      "Interactive",
+      "Visualization"
+    ]
   },
   {
     "title": "Wolfram Demonstrations Project",
-    "description": "Large collection of interactive mathematical, scientific, engineering, and technical demonstrations.",
     "url": "https://demonstrations.wolfram.com/",
-    "tags": ["Mathematics", "Science", "Visualization", "Interactive"]
+    "description": "Large collection of interactive mathematical, scientific, engineering, and technical demonstrations.",
+    "tags": [
+      "Mathematics",
+      "Science",
+      "Visualization",
+      "Interactive"
+    ]
   },
   {
     "title": "NRICH",
-    "description": "Free mathematics problems and activities designed around mathematical reasoning, problem solving, and exploration.",
     "url": "https://nrich.maths.org/",
-    "tags": ["Mathematics", "Problem Solving", "K-12"]
+    "description": "Free mathematics problems and activities designed around mathematical reasoning, problem solving, and exploration.",
+    "tags": [
+      "Mathematics",
+      "Problem Solving",
+      "K-12"
+    ]
   },
   {
     "title": "Math Open Reference",
-    "description": "Interactive reference for geometry and mathematical constructions.",
     "url": "https://www.mathopenref.com/",
-    "tags": ["Mathematics", "Geometry", "Interactive"]
-  },
-  {
-    "title": "Open Source Physics",
-    "description": "Open-source physics simulations and computational modeling tools for exploring mechanics, electricity, waves, thermodynamics, and other physics topics.",
-    "url": "https://www.compadre.org/osp/",
-    "tags": ["Physics", "Simulation", "Computational Science"]
-  },
-  {
-    "title": "MyPhysicsLab",
-    "description": "Interactive physics simulations covering mechanics, oscillations, collisions, electricity, and dynamical systems.",
-    "url": "https://www.myphysicslab.com/",
-    "tags": ["Physics", "Simulation", "Interactive"]
-  },
-  {
-    "title": "Falstad Physics Applets",
-    "description": "Interactive browser-based physics simulations covering circuits, waves, mechanics, optics, electromagnetism, and other physical systems.",
-    "url": "https://www.falstad.com/mathphysics.html",
-    "tags": ["Physics", "Simulation", "Electronics", "Interactive"]
+    "description": "Interactive reference for geometry and mathematical constructions.",
+    "tags": [
+      "Mathematics",
+      "Geometry",
+      "Interactive"
+    ]
   },
   {
     "title": "The Physics Classroom",
-    "description": "Free tutorials, simulations, problem sets, and conceptual resources for introductory physics.",
     "url": "https://www.physicsclassroom.com/",
-    "tags": ["Physics", "Tutorials", "Simulation", "Problem Solving"]
+    "description": "Free tutorials, simulations, problem sets, and conceptual resources for introductory physics.",
+    "tags": [
+      "Physics",
+      "Tutorials",
+      "Simulation",
+      "Problem Solving"
+    ]
   },
   {
     "title": "HyperPhysics",
-    "description": "Compact concept map and reference covering mechanics, electricity, magnetism, thermodynamics, relativity, quantum physics, and other physics topics.",
     "url": "http://hyperphysics.phy-astr.gsu.edu/",
-    "tags": ["Physics", "Reference"]
+    "description": "Compact concept map and reference covering mechanics, electricity, magnetism, thermodynamics, relativity, quantum physics, and other physics topics.",
+    "tags": [
+      "Physics",
+      "Reference"
+    ]
   },
   {
     "title": "Physics LibreTexts",
-    "description": "Open physics textbooks and reference materials covering introductory through advanced physics.",
     "url": "https://phys.libretexts.org/",
-    "tags": ["Physics", "Open Textbooks", "Reference"]
+    "description": "Open physics textbooks and reference materials covering introductory through advanced physics.",
+    "tags": [
+      "Physics",
+      "Open Textbooks",
+      "Reference"
+    ]
   },
   {
     "title": "Astronomy LibreTexts",
-    "description": "Free open astronomy textbooks and educational materials covering observational astronomy, astrophysics, cosmology, and planetary science.",
     "url": "https://astro.libretexts.org/",
-    "tags": ["Astronomy", "Physics", "Open Textbooks"]
+    "description": "Free open astronomy textbooks and educational materials covering observational astronomy, astrophysics, cosmology, and planetary science.",
+    "tags": [
+      "Astronomy",
+      "Physics",
+      "Open Textbooks"
+    ]
   },
   {
     "title": "NASA STEM",
-    "description": "Free educational resources, activities, lessons, datasets, and projects covering space science, Earth science, engineering, physics, and mathematics.",
     "url": "https://www.nasa.gov/stem/",
-    "tags": ["STEM", "Space", "Physics", "Engineering", "Earth Science"]
+    "description": "Free educational resources, activities, lessons, datasets, and projects covering space science, Earth science, engineering, physics, and mathematics.",
+    "tags": [
+      "STEM",
+      "Space",
+      "Physics",
+      "Engineering",
+      "Earth Science"
+    ]
   },
   {
     "title": "NASA Eyes",
-    "description": "Interactive NASA visualization applications for exploring the solar system, Earth, exoplanets, spacecraft, and space missions.",
     "url": "https://eyes.nasa.gov/",
-    "tags": ["Astronomy", "Space", "Simulation", "Visualization"]
+    "description": "Interactive NASA visualization applications for exploring the solar system, Earth, exoplanets, spacecraft, and space missions.",
+    "tags": [
+      "Astronomy",
+      "Space",
+      "Simulation",
+      "Visualization"
+    ]
   },
   {
     "title": "Stellarium",
-    "description": "Free open-source planetarium software that provides a realistic 3D sky simulation.",
     "url": "https://stellarium.org/",
-    "tags": ["Astronomy", "Simulation", "Open Source", "Visualization"]
+    "description": "Free open-source planetarium software that provides a realistic 3D sky simulation.",
+    "tags": [
+      "Astronomy",
+      "Simulation",
+      "Open Source",
+      "Visualization"
+    ]
   },
   {
     "title": "Chemistry LibreTexts",
-    "description": "Extensive collection of free chemistry textbooks and reference materials covering general, organic, inorganic, physical, analytical, and biochemistry.",
     "url": "https://chem.libretexts.org/",
-    "tags": ["Chemistry", "Open Textbooks", "Reference"]
+    "description": "Extensive collection of free chemistry textbooks and reference materials covering general, organic, inorganic, physical, analytical, and biochemistry.",
+    "tags": [
+      "Chemistry",
+      "Open Textbooks",
+      "Reference"
+    ]
   },
   {
     "title": "ChemCollective",
-    "description": "Free virtual chemistry laboratory containing simulations, laboratory exercises, tutorials, and problem-based activities.",
     "url": "https://chemcollective.org/",
-    "tags": ["Chemistry", "Virtual Lab", "Simulation", "Interactive"]
+    "description": "Free virtual chemistry laboratory containing simulations, laboratory exercises, tutorials, and problem-based activities.",
+    "tags": [
+      "Chemistry",
+      "Virtual Lab",
+      "Simulation",
+      "Interactive"
+    ]
   },
   {
     "title": "MolView",
-    "description": "Browser-based molecular visualization and chemistry modeling tool for exploring molecular structures and compounds.",
     "url": "https://molview.org/",
-    "tags": ["Chemistry", "Molecular Modeling", "Visualization", "Interactive"]
+    "description": "Browser-based molecular visualization and chemistry modeling tool for exploring molecular structures and compounds.",
+    "tags": [
+      "Chemistry",
+      "Molecular Modeling",
+      "Visualization",
+      "Interactive"
+    ]
   },
   {
     "title": "PubChem",
-    "description": "Free database of chemical molecules, properties, structures, biological activities, and chemical information maintained by the National Library of Medicine.",
     "url": "https://pubchem.ncbi.nlm.nih.gov/",
-    "tags": ["Chemistry", "Database", "Reference", "Molecular Science"]
+    "description": "Free database of chemical molecules, properties, structures, biological activities, and chemical information maintained by the National Library of Medicine.",
+    "tags": [
+      "Chemistry",
+      "Database",
+      "Reference",
+      "Molecular Science"
+    ]
   },
   {
     "title": "Periodic Table - Royal Society of Chemistry",
-    "description": "Interactive periodic table containing element properties, history, uses, and chemical information.",
     "url": "https://www.rsc.org/periodic-table",
-    "tags": ["Chemistry", "Periodic Table", "Reference", "Interactive"]
+    "description": "Interactive periodic table containing element properties, history, uses, and chemical information.",
+    "tags": [
+      "Chemistry",
+      "Periodic Table",
+      "Reference",
+      "Interactive"
+    ]
   },
   {
     "title": "Biology LibreTexts",
-    "description": "Free open biology textbooks and educational materials covering cell biology, genetics, evolution, ecology, physiology, and molecular biology.",
     "url": "https://bio.libretexts.org/",
-    "tags": ["Biology", "Open Textbooks", "Reference"]
+    "description": "Free open biology textbooks and educational materials covering cell biology, genetics, evolution, ecology, physiology, and molecular biology.",
+    "tags": [
+      "Biology",
+      "Open Textbooks",
+      "Reference"
+    ]
   },
   {
     "title": "HHMI BioInteractive",
-    "description": "Free biology educational resources including interactive activities, virtual labs, videos, datasets, and classroom investigations.",
     "url": "https://www.biointeractive.org/",
-    "tags": ["Biology", "Virtual Lab", "Interactive", "Genetics"]
+    "description": "Free biology educational resources including interactive activities, virtual labs, videos, datasets, and classroom investigations.",
+    "tags": [
+      "Biology",
+      "Virtual Lab",
+      "Interactive",
+      "Genetics"
+    ]
   },
   {
     "title": "Learn.Genetics",
-    "description": "Interactive genetics and biology educational resources including simulations, animations, virtual laboratories, and tutorials.",
     "url": "https://learn.genetics.utah.edu/",
-    "tags": ["Biology", "Genetics", "Interactive", "Virtual Lab"]
+    "description": "Interactive genetics and biology educational resources including simulations, animations, virtual laboratories, and tutorials.",
+    "tags": [
+      "Biology",
+      "Genetics",
+      "Interactive",
+      "Virtual Lab"
+    ]
   },
   {
     "title": "BioNumbers",
-    "description": "Quantitative biology database containing measured biological quantities and numerical data used for scientific modeling.",
     "url": "https://bionumbers.hms.harvard.edu/",
-    "tags": ["Biology", "Quantitative Biology", "Database", "Data"]
+    "description": "Quantitative biology database containing measured biological quantities and numerical data used for scientific modeling.",
+    "tags": [
+      "Biology",
+      "Quantitative Biology",
+      "Database",
+      "Data"
+    ]
   },
   {
     "title": "NCBI Bookshelf",
-    "description": "Free collection of biomedical and life science books and documents from the National Library of Medicine.",
     "url": "https://www.ncbi.nlm.nih.gov/books/",
-    "tags": ["Biology", "Medicine", "Reference", "Books"]
+    "description": "Free collection of biomedical and life science books and documents from the National Library of Medicine.",
+    "tags": [
+      "Biology",
+      "Medicine",
+      "Reference",
+      "Books"
+    ]
   },
   {
     "title": "iBiology",
-    "description": "Free lectures, seminars, and educational videos from scientists covering modern biology and biomedical research.",
     "url": "https://www.ibiology.org/",
-    "tags": ["Biology", "Research", "Lectures"]
+    "description": "Free lectures, seminars, and educational videos from scientists covering modern biology and biomedical research.",
+    "tags": [
+      "Biology",
+      "Research",
+      "Lectures"
+    ]
   },
   {
     "title": "EMBL-EBI Training",
-    "description": "Free training resources for bioinformatics, computational biology, genomics, structural biology, and biological databases.",
     "url": "https://www.ebi.ac.uk/training/",
-    "tags": ["Bioinformatics", "Biology", "Computational Biology", "Genomics"]
+    "description": "Free training resources for bioinformatics, computational biology, genomics, structural biology, and biological databases.",
+    "tags": [
+      "Bioinformatics",
+      "Biology",
+      "Computational Biology",
+      "Genomics"
+    ]
   },
   {
     "title": "Earth Science LibreTexts",
-    "description": "Free open textbooks and educational resources covering geology, meteorology, oceanography, and Earth science.",
     "url": "https://geo.libretexts.org/",
-    "tags": ["Earth Science", "Geology", "Open Textbooks"]
+    "description": "Free open textbooks and educational resources covering geology, meteorology, oceanography, and Earth science.",
+    "tags": [
+      "Earth Science",
+      "Geology",
+      "Open Textbooks"
+    ]
   },
   {
     "title": "USGS Education",
-    "description": "Free Earth science educational resources covering geology, earthquakes, volcanoes, water, ecosystems, natural hazards, and mapping.",
     "url": "https://www.usgs.gov/educational-resources",
-    "tags": ["Earth Science", "Geology", "Environmental Science"]
+    "description": "Free Earth science educational resources covering geology, earthquakes, volcanoes, water, ecosystems, natural hazards, and mapping.",
+    "tags": [
+      "Earth Science",
+      "Geology",
+      "Environmental Science"
+    ]
   },
   {
     "title": "NOAA Education",
-    "description": "Free educational resources covering oceans, atmosphere, climate, weather, marine science, and Earth systems.",
     "url": "https://www.noaa.gov/education",
-    "tags": ["Earth Science", "Climate", "Oceanography", "Meteorology"]
+    "description": "Free educational resources covering oceans, atmosphere, climate, weather, marine science, and Earth systems.",
+    "tags": [
+      "Earth Science",
+      "Climate",
+      "Oceanography",
+      "Meteorology"
+    ]
   },
   {
     "title": "Climate Interactive",
-    "description": "Interactive climate simulations and systems-thinking tools for exploring climate policy, emissions, energy, and global warming.",
     "url": "https://www.climateinteractive.org/",
-    "tags": ["Climate Science", "Simulation", "Systems Thinking"]
+    "description": "Interactive climate simulations and systems-thinking tools for exploring climate policy, emissions, energy, and global warming.",
+    "tags": [
+      "Climate Science",
+      "Simulation",
+      "Systems Thinking"
+    ]
   },
   {
     "title": "En-ROADS",
-    "description": "Interactive climate simulator for exploring how energy, economic, technological, and policy decisions affect climate outcomes.",
     "url": "https://en-roads.climateinteractive.org/",
-    "tags": ["Climate Science", "Simulation", "Energy", "Systems Modeling"]
-  },
-  {
-    "title": "Engineering LibreTexts",
-    "description": "Open engineering textbooks and reference materials covering mechanical, electrical, chemical, civil, materials, and other engineering disciplines.",
-    "url": "https://eng.libretexts.org/",
-    "tags": ["Engineering", "Open Textbooks", "Reference"]
-  },
-  {
-    "title": "LearnChemE",
-    "description": "Free chemical engineering educational resources including interactive simulations, screencasts, concept questions, and process models.",
-    "url": "https://learncheme.com/",
-    "tags": ["Chemical Engineering", "Simulation", "Process Engineering"]
+    "description": "Interactive climate simulator for exploring how energy, economic, technological, and policy decisions affect climate outcomes.",
+    "tags": [
+      "Climate Science",
+      "Simulation",
+      "Energy",
+      "Systems Modeling"
+    ]
   },
   {
     "title": "NPTEL",
-    "description": "Free university-level courses and lectures from Indian Institutes of Technology and other institutions covering engineering, science, mathematics, and computer science.",
     "url": "https://nptel.ac.in/",
-    "tags": ["Engineering", "STEM", "Courses", "Lectures"]
+    "description": "Free university-level courses and lectures from Indian Institutes of Technology and other institutions covering engineering, science, mathematics, and computer science.",
+    "tags": [
+      "Engineering",
+      "STEM",
+      "Courses",
+      "Lectures"
+    ]
   },
   {
     "title": "OpenCourseWare Consortium",
-    "description": "Global network and directory of institutions publishing free and open course materials.",
     "url": "https://www.ocwconsortium.org/",
-    "tags": ["STEM", "Courses", "Open Education"]
+    "description": "Global network and directory of institutions publishing free and open course materials.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "Open Education"
+    ]
   },
   {
     "title": "Open Yale Courses",
-    "description": "Free university courses from Yale with recorded lectures, transcripts, and supporting course materials.",
     "url": "https://oyc.yale.edu/",
-    "tags": ["STEM", "University Courses", "Lectures"]
+    "description": "Free university courses from Yale with recorded lectures, transcripts, and supporting course materials.",
+    "tags": [
+      "STEM",
+      "University Courses",
+      "Lectures"
+    ]
   },
   {
     "title": "MIT Open Learning Library",
-    "description": "Free interactive MIT learning experiences combining course material with exercises and automatically graded assessments.",
     "url": "https://openlearninglibrary.mit.edu/",
-    "tags": ["STEM", "Courses", "Interactive", "Assessment"]
+    "description": "Free interactive MIT learning experiences combining course material with exercises and automatically graded assessments.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "Interactive",
+      "Assessment"
+    ]
   },
   {
     "title": "Stanford Engineering Everywhere",
-    "description": "Free Stanford engineering courses including lectures, assignments, exams, and course materials.",
     "url": "https://see.stanford.edu/",
-    "tags": ["Engineering", "Computer Science", "Courses", "University"]
+    "description": "Free Stanford engineering courses including lectures, assignments, exams, and course materials.",
+    "tags": [
+      "Engineering",
+      "Computer Science",
+      "Courses",
+      "University"
+    ]
   },
   {
     "title": "Stanford Online",
-    "description": "Free online educational materials and courses from Stanford covering engineering, computer science, mathematics, and science.",
     "url": "https://online.stanford.edu/free-courses",
-    "tags": ["STEM", "Courses", "University"]
+    "description": "Free online educational materials and courses from Stanford covering engineering, computer science, mathematics, and science.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "University"
+    ]
   },
   {
     "title": "OpenLearn",
-    "description": "Free courses and educational resources from The Open University covering science, mathematics, technology, engineering, and computing.",
     "url": "https://www.open.edu/openlearn/",
-    "tags": ["STEM", "Courses", "Open Education"]
+    "description": "Free courses and educational resources from The Open University covering science, mathematics, technology, engineering, and computing.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "Open Education"
+    ]
   },
   {
     "title": "Saylor Academy",
-    "description": "Free self-paced courses covering mathematics, computer science, engineering-related subjects, and other academic disciplines.",
     "url": "https://learn.saylor.org/",
-    "tags": ["STEM", "Courses", "Self-Study"]
+    "description": "Free self-paced courses covering mathematics, computer science, engineering-related subjects, and other academic disciplines.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "Self-Study"
+    ]
   },
   {
     "title": "Free Computer Science",
-    "description": "Large directory of free computer science courses, books, tutorials, lectures, and programming resources.",
     "url": "https://github.com/ossu/computer-science",
-    "tags": ["Computer Science", "Curriculum", "Self-Study"]
+    "description": "Large directory of free computer science courses, books, tutorials, lectures, and programming resources.",
+    "tags": [
+      "Computer Science",
+      "Curriculum",
+      "Self-Study"
+    ]
   },
   {
     "title": "Teach Yourself Computer Science",
-    "description": "Structured guide to studying the major foundations of computer science using free books, courses, and lectures.",
     "url": "https://teachyourselfcs.com/",
-    "tags": ["Computer Science", "Curriculum", "Self-Study"]
+    "description": "Structured guide to studying the major foundations of computer science using free books, courses, and lectures.",
+    "tags": [
+      "Computer Science",
+      "Curriculum",
+      "Self-Study"
+    ]
   },
   {
     "title": "Full Stack Open",
-    "description": "Free university-level web development course covering modern JavaScript, React, Node.js, APIs, databases, testing, and TypeScript.",
     "url": "https://fullstackopen.com/",
-    "tags": ["Computer Science", "Web Development", "JavaScript", "React"]
+    "description": "Free university-level web development course covering modern JavaScript, React, Node.js, APIs, databases, testing, and TypeScript.",
+    "tags": [
+      "Computer Science",
+      "Web Development",
+      "JavaScript",
+      "React"
+    ]
   },
   {
     "title": "CS50 Python",
-    "description": "Free Harvard course introducing programming with Python, testing, debugging, libraries, regular expressions, classes, and file handling.",
     "url": "https://cs50.harvard.edu/python/",
-    "tags": ["Python", "Computer Science", "Course", "Programming"]
+    "description": "Free Harvard course introducing programming with Python, testing, debugging, libraries, regular expressions, classes, and file handling.",
+    "tags": [
+      "Python",
+      "Computer Science",
+      "Course",
+      "Programming"
+    ]
   },
   {
     "title": "CS50 SQL",
-    "description": "Free Harvard course teaching relational database concepts and SQL through practical programming exercises.",
     "url": "https://cs50.harvard.edu/sql/",
-    "tags": ["SQL", "Databases", "Computer Science", "Course"]
+    "description": "Free Harvard course teaching relational database concepts and SQL through practical programming exercises.",
+    "tags": [
+      "SQL",
+      "Databases",
+      "Computer Science",
+      "Course"
+    ]
   },
   {
     "title": "CS50 Web",
-    "description": "Free Harvard course covering web programming with Python, JavaScript, SQL, Django, APIs, testing, and application architecture.",
     "url": "https://cs50.harvard.edu/web/",
-    "tags": ["Web Development", "Python", "JavaScript", "Course"]
+    "description": "Free Harvard course covering web programming with Python, JavaScript, SQL, Django, APIs, testing, and application architecture.",
+    "tags": [
+      "Web Development",
+      "Python",
+      "JavaScript",
+      "Course"
+    ]
   },
   {
     "title": "Berkeley CS61A",
-    "description": "Free introductory computer science course emphasizing programming, abstraction, higher-order functions, recursion, and data structures.",
     "url": "https://cs61a.org/",
-    "tags": ["Computer Science", "Programming", "Python", "Course"]
+    "description": "Free introductory computer science course emphasizing programming, abstraction, higher-order functions, recursion, and data structures.",
+    "tags": [
+      "Computer Science",
+      "Programming",
+      "Python",
+      "Course"
+    ]
   },
   {
     "title": "Berkeley CS61B",
-    "description": "Free course covering data structures, algorithms, software engineering, and implementation techniques.",
     "url": "https://sp24.datastructur.es/",
-    "tags": ["Computer Science", "Algorithms", "Data Structures"]
+    "description": "Free course covering data structures, algorithms, software engineering, and implementation techniques.",
+    "tags": [
+      "Computer Science",
+      "Algorithms",
+      "Data Structures"
+    ]
   },
   {
     "title": "Stanford Algorithms",
-    "description": "University-level materials covering algorithm design, graph algorithms, divide-and-conquer, greedy algorithms, and dynamic programming.",
     "url": "https://web.stanford.edu/class/cs161/",
-    "tags": ["Algorithms", "Computer Science", "Course"]
-  },
-  {
-    "title": "Nand2Tetris",
-    "description": "Hands-on project sequence that builds a complete computer system from logic gates through CPU, assembler, virtual machine, compiler, and operating system.",
-    "url": "https://www.nand2tetris.org/",
-    "tags": ["Computer Architecture", "Systems", "Programming", "Projects"]
+    "description": "University-level materials covering algorithm design, graph algorithms, divide-and-conquer, greedy algorithms, and dynamic programming.",
+    "tags": [
+      "Algorithms",
+      "Computer Science",
+      "Course"
+    ]
   },
   {
     "title": "OSTEP - Operating Systems: Three Easy Pieces",
-    "description": "Free open textbook covering virtualization, concurrency, persistence, and core operating-system concepts.",
     "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/",
-    "tags": ["Operating Systems", "Computer Science", "Open Textbook"]
+    "description": "Free open textbook covering virtualization, concurrency, persistence, and core operating-system concepts.",
+    "tags": [
+      "Operating Systems",
+      "Computer Science",
+      "Open Textbook"
+    ]
   },
   {
     "title": "Computer Networking: A Top-Down Approach Resources",
-    "description": "Supplementary free networking resources and teaching materials covering protocols, applications, transport, routing, and network architecture.",
     "url": "https://gaia.cs.umass.edu/kurose_ross/index.php",
-    "tags": ["Networking", "Computer Science", "Reference"]
+    "description": "Supplementary free networking resources and teaching materials covering protocols, applications, transport, routing, and network architecture.",
+    "tags": [
+      "Networking",
+      "Computer Science",
+      "Reference"
+    ]
   },
   {
     "title": "Computer Systems: A Programmer's Perspective",
-    "description": "Online educational resources supporting the study of computer systems, machine-level programming, memory, linking, exceptional control flow, and architecture.",
     "url": "https://csapp.cs.cmu.edu/",
-    "tags": ["Computer Systems", "C", "Computer Architecture"]
+    "description": "Online educational resources supporting the study of computer systems, machine-level programming, memory, linking, exceptional control flow, and architecture.",
+    "tags": [
+      "Computer Systems",
+      "C",
+      "Computer Architecture"
+    ]
   },
   {
     "title": "MIT Missing Semester",
-    "description": "Free MIT course teaching practical computing tools including shell usage, editors, version control, debugging, and command-line workflows.",
     "url": "https://missing.csail.mit.edu/",
-    "tags": ["Computer Science", "Linux", "Developer Tools", "Systems"]
+    "description": "Free MIT course teaching practical computing tools including shell usage, editors, version control, debugging, and command-line workflows.",
+    "tags": [
+      "Computer Science",
+      "Linux",
+      "Developer Tools",
+      "Systems"
+    ]
   },
   {
     "title": "Pro Git",
-    "description": "Free online book covering Git from basic usage through branching, remotes, internals, and advanced workflows.",
     "url": "https://git-scm.com/book/en/v2",
-    "tags": ["Software Engineering", "Git", "Book"]
+    "description": "Free online book covering Git from basic usage through branching, remotes, internals, and advanced workflows.",
+    "tags": [
+      "Software Engineering",
+      "Git",
+      "Book"
+    ]
   },
   {
     "title": "Full Stack Open GraphQL",
-    "description": "Free educational material covering GraphQL, queries, schemas, APIs, and modern application development.",
     "url": "https://fullstackopen.com/en/part8/",
-    "tags": ["GraphQL", "Web Development", "APIs"]
+    "description": "Free educational material covering GraphQL, queries, schemas, APIs, and modern application development.",
+    "tags": [
+      "GraphQL",
+      "Web Development",
+      "APIs"
+    ]
   },
   {
     "title": "Open Source Computer Science",
-    "description": "Community-maintained collection of free computer science educational resources and curricula.",
     "url": "https://github.com/ForrestKnight/open-source-cs",
-    "tags": ["Computer Science", "Curriculum", "Open Source"]
+    "description": "Community-maintained collection of free computer science educational resources and curricula.",
+    "tags": [
+      "Computer Science",
+      "Curriculum",
+      "Open Source"
+    ]
   },
   {
     "title": "Open Source Society University - Mathematics",
-    "description": "Free mathematics courses and resources integrated into a broader self-taught computer science curriculum.",
     "url": "https://github.com/ossu/computer-science",
-    "tags": ["Mathematics", "Computer Science", "Curriculum"]
+    "description": "Free mathematics courses and resources integrated into a broader self-taught computer science curriculum.",
+    "tags": [
+      "Mathematics",
+      "Computer Science",
+      "Curriculum"
+    ]
   },
   {
     "title": "The Missing Semester",
-    "description": "Practical computing curriculum covering shell tools, version control, editors, debugging, security, and developer workflows.",
     "url": "https://missing.csail.mit.edu/",
-    "tags": ["Computer Science", "Software Engineering", "Tools"]
+    "description": "Practical computing curriculum covering shell tools, version control, editors, debugging, security, and developer workflows.",
+    "tags": [
+      "Computer Science",
+      "Software Engineering",
+      "Tools"
+    ]
   },
   {
     "title": "CS Primer",
-    "description": "Interactive computer science learning resources focused on programming, algorithms, data structures, and technical foundations.",
     "url": "https://csprimer.com/",
-    "tags": ["Computer Science", "Algorithms", "Interactive"]
+    "description": "Interactive computer science learning resources focused on programming, algorithms, data structures, and technical foundations.",
+    "tags": [
+      "Computer Science",
+      "Algorithms",
+      "Interactive"
+    ]
   },
   {
     "title": "Roadmap.sh",
-    "description": "Community-maintained learning roadmaps for programming, software engineering, DevOps, computer science, and related technologies.",
     "url": "https://roadmap.sh/",
-    "tags": ["Computer Science", "Software Engineering", "Curriculum"]
+    "description": "Community-maintained learning roadmaps for programming, software engineering, DevOps, computer science, and related technologies.",
+    "tags": [
+      "Computer Science",
+      "Software Engineering",
+      "Curriculum"
+    ]
   },
   {
     "title": "MDN Curriculum",
-    "description": "Structured curriculum for learning modern web development from foundational HTML, CSS, and JavaScript through advanced development concepts.",
     "url": "https://developer.mozilla.org/en-US/curriculum/",
-    "tags": ["Web Development", "JavaScript", "HTML", "CSS", "Curriculum"]
+    "description": "Structured curriculum for learning modern web development from foundational HTML, CSS, and JavaScript through advanced development concepts.",
+    "tags": [
+      "Web Development",
+      "JavaScript",
+      "HTML",
+      "CSS",
+      "Curriculum"
+    ]
   },
   {
     "title": "Open Source Physics Tracker",
-    "description": "Free video analysis and modeling software for studying motion and extracting quantitative physics measurements from video.",
     "url": "https://physlets.org/tracker/",
-    "tags": ["Physics", "Video Analysis", "Measurement", "Open Source"]
+    "description": "Free video analysis and modeling software for studying motion and extracting quantitative physics measurements from video.",
+    "tags": [
+      "Physics",
+      "Video Analysis",
+      "Measurement",
+      "Open Source"
+    ]
   },
   {
     "title": "Tracker Video Analysis",
-    "description": "Open-source physics tool for analyzing motion in video and constructing quantitative models from experimental observations.",
     "url": "https://opensourcephysics.github.io/tracker-website/",
-    "tags": ["Physics", "Simulation", "Experiment", "Open Source"]
+    "description": "Open-source physics tool for analyzing motion in video and constructing quantitative models from experimental observations.",
+    "tags": [
+      "Physics",
+      "Simulation",
+      "Experiment",
+      "Open Source"
+    ]
   },
   {
     "title": "GeoGebra Physics",
-    "description": "Interactive mathematics and physics constructions for modeling functions, vectors, mechanics, geometry, and physical systems.",
     "url": "https://www.geogebra.org/materials",
-    "tags": ["Physics", "Mathematics", "Simulation", "Visualization"]
+    "description": "Interactive mathematics and physics constructions for modeling functions, vectors, mechanics, geometry, and physical systems.",
+    "tags": [
+      "Physics",
+      "Mathematics",
+      "Simulation",
+      "Visualization"
+    ]
   },
   {
     "title": "CircuitLab Educational Resources",
-    "description": "Online circuit analysis and schematic resources useful for exploring electrical circuits and electronics.",
     "url": "https://www.circuitlab.com/",
-    "tags": ["Electronics", "Electrical Engineering", "Circuits"]
-  },
-  {
-    "title": "Falstad Circuit Simulator",
-    "description": "Interactive circuit simulator that allows students to construct and observe electrical circuits in real time.",
-    "url": "https://www.falstad.com/circuit/",
-    "tags": ["Electronics", "Circuits", "Simulation", "Interactive"]
-  },
-  {
-    "title": "LTspice",
-    "description": "Free SPICE-based circuit simulation software for analyzing analog and switching circuits.",
-    "url": "https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html",
-    "tags": ["Electronics", "Circuit Simulation", "Electrical Engineering"]
-  },
-  {
-    "title": "KiCad",
-    "description": "Free open-source electronics design automation suite for schematics, PCB layout, simulation, and board design.",
-    "url": "https://www.kicad.org/",
-    "tags": ["Electronics", "PCB", "Electrical Engineering", "Open Source"]
+    "description": "Online circuit analysis and schematic resources useful for exploring electrical circuits and electronics.",
+    "tags": [
+      "Electronics",
+      "Electrical Engineering",
+      "Circuits"
+    ]
   },
   {
     "title": "GNU Radio",
-    "description": "Free open-source software toolkit for software-defined radio and signal-processing experiments.",
     "url": "https://www.gnuradio.org/",
-    "tags": ["Electrical Engineering", "Signal Processing", "Radio", "Open Source"]
+    "description": "Free open-source software toolkit for software-defined radio and signal-processing experiments.",
+    "tags": [
+      "Electrical Engineering",
+      "Signal Processing",
+      "Radio",
+      "Open Source"
+    ]
   },
   {
     "title": "Octave",
-    "description": "Free open-source numerical computing environment compatible with many MATLAB workflows.",
     "url": "https://octave.org/",
-    "tags": ["Mathematics", "Numerical Computing", "Engineering", "Programming"]
-  },
-  {
-    "title": "SciPy",
-    "description": "Open-source Python library for scientific computing including optimization, integration, interpolation, signal processing, statistics, and linear algebra.",
-    "url": "https://scipy.org/",
-    "tags": ["Python", "Scientific Computing", "Mathematics", "Engineering"]
-  },
-  {
-    "title": "NumPy",
-    "description": "Core open-source Python library for numerical computing, multidimensional arrays, vectorized operations, and scientific programming.",
-    "url": "https://numpy.org/",
-    "tags": ["Python", "Numerical Computing", "Linear Algebra"]
-  },
-  {
-    "title": "SymPy",
-    "description": "Open-source Python computer algebra system for symbolic mathematics, calculus, algebra, matrices, and equation manipulation.",
-    "url": "https://www.sympy.org/",
-    "tags": ["Python", "Mathematics", "Symbolic Mathematics"]
+    "description": "Free open-source numerical computing environment compatible with many MATLAB workflows.",
+    "tags": [
+      "Mathematics",
+      "Numerical Computing",
+      "Engineering",
+      "Programming"
+    ]
   },
   {
     "title": "Matplotlib",
-    "description": "Open-source Python visualization library for plotting mathematical functions, scientific data, simulations, and experiments.",
     "url": "https://matplotlib.org/",
-    "tags": ["Python", "Visualization", "Scientific Computing"]
-  },
-  {
-    "title": "Jupyter",
-    "description": "Open-source interactive computing environment for combining executable code, mathematics, visualizations, and explanatory text.",
-    "url": "https://jupyter.org/",
-    "tags": ["Python", "Scientific Computing", "Interactive", "Data Science"]
+    "description": "Open-source Python visualization library for plotting mathematical functions, scientific data, simulations, and experiments.",
+    "tags": [
+      "Python",
+      "Visualization",
+      "Scientific Computing"
+    ]
   },
   {
     "title": "Project Jupyter - Try Jupyter",
-    "description": "Browser-based environment for experimenting with Jupyter notebooks without installing software.",
     "url": "https://jupyter.org/try",
-    "tags": ["Python", "Interactive", "Scientific Computing"]
+    "description": "Browser-based environment for experimenting with Jupyter notebooks without installing software.",
+    "tags": [
+      "Python",
+      "Interactive",
+      "Scientific Computing"
+    ]
   },
   {
     "title": "Scikit-learn",
-    "description": "Open-source Python machine learning library providing algorithms for classification, regression, clustering, dimensionality reduction, and model evaluation.",
     "url": "https://scikit-learn.org/",
-    "tags": ["Machine Learning", "Python", "Data Science"]
+    "description": "Open-source Python machine learning library providing algorithms for classification, regression, clustering, dimensionality reduction, and model evaluation.",
+    "tags": [
+      "Machine Learning",
+      "Python",
+      "Data Science"
+    ]
   },
   {
     "title": "PyTorch",
-    "description": "Open-source machine learning framework for tensor computation, neural networks, scientific computing, and deep learning.",
     "url": "https://pytorch.org/",
-    "tags": ["Machine Learning", "Python", "AI", "Scientific Computing"]
+    "description": "Open-source machine learning framework for tensor computation, neural networks, scientific computing, and deep learning.",
+    "tags": [
+      "Machine Learning",
+      "Python",
+      "AI",
+      "Scientific Computing"
+    ]
   },
   {
     "title": "TensorFlow",
-    "description": "Open-source machine learning platform for numerical computation, neural networks, and large-scale machine learning.",
     "url": "https://www.tensorflow.org/",
-    "tags": ["Machine Learning", "Python", "AI"]
+    "description": "Open-source machine learning platform for numerical computation, neural networks, and large-scale machine learning.",
+    "tags": [
+      "Machine Learning",
+      "Python",
+      "AI"
+    ]
   },
   {
     "title": "DeepLearning.AI Short Courses",
-    "description": "Free educational courses and tutorials covering machine learning, generative AI, neural networks, and modern AI development.",
     "url": "https://www.deeplearning.ai/courses/",
-    "tags": ["Machine Learning", "AI", "Courses"]
+    "description": "Free educational courses and tutorials covering machine learning, generative AI, neural networks, and modern AI development.",
+    "tags": [
+      "Machine Learning",
+      "AI",
+      "Courses"
+    ]
   },
   {
     "title": "Dive into Deep Learning",
-    "description": "Interactive open-source textbook combining mathematical explanations, code, experiments, and executable notebooks for deep learning.",
     "url": "https://d2l.ai/",
-    "tags": ["Machine Learning", "Deep Learning", "Python", "Interactive"]
+    "description": "Interactive open-source textbook combining mathematical explanations, code, experiments, and executable notebooks for deep learning.",
+    "tags": [
+      "Machine Learning",
+      "Deep Learning",
+      "Python",
+      "Interactive"
+    ]
   },
   {
     "title": "Mathematics for Machine Learning",
-    "description": "Free educational materials connecting linear algebra, calculus, probability, and optimization to machine learning.",
     "url": "https://mml-book.github.io/",
-    "tags": ["Mathematics", "Machine Learning", "Linear Algebra", "Calculus"]
-  },
-  {
-    "title": "Seeing Theory",
-    "description": "Interactive visual introduction to probability and statistics covering probability distributions, Bayesian inference, regression, and statistical concepts.",
-    "url": "https://seeing-theory.brown.edu/",
-    "tags": ["Statistics", "Probability", "Mathematics", "Interactive"]
+    "description": "Free educational materials connecting linear algebra, calculus, probability, and optimization to machine learning.",
+    "tags": [
+      "Mathematics",
+      "Machine Learning",
+      "Linear Algebra",
+      "Calculus"
+    ]
   },
   {
     "title": "StatQuest",
-    "description": "Free visual explanations of statistics, probability, machine learning, and data science concepts.",
     "url": "https://statquest.org/",
-    "tags": ["Statistics", "Machine Learning", "Data Science", "Visualization"]
+    "description": "Free visual explanations of statistics, probability, machine learning, and data science concepts.",
+    "tags": [
+      "Statistics",
+      "Machine Learning",
+      "Data Science",
+      "Visualization"
+    ]
   },
   {
     "title": "OpenIntro",
-    "description": "Free open statistics textbooks and educational resources for introductory statistics and data analysis.",
     "url": "https://www.openintro.org/",
-    "tags": ["Statistics", "Data Science", "Open Textbooks"]
+    "description": "Free open statistics textbooks and educational resources for introductory statistics and data analysis.",
+    "tags": [
+      "Statistics",
+      "Data Science",
+      "Open Textbooks"
+    ]
   },
   {
     "title": "An Introduction to Statistical Learning",
-    "description": "Free textbook and supporting materials introducing statistical learning, regression, classification, resampling, tree methods, and unsupervised learning.",
     "url": "https://www.statlearning.com/",
-    "tags": ["Statistics", "Machine Learning", "Data Science", "Book"]
+    "description": "Free textbook and supporting materials introducing statistical learning, regression, classification, resampling, tree methods, and unsupervised learning.",
+    "tags": [
+      "Statistics",
+      "Machine Learning",
+      "Data Science",
+      "Book"
+    ]
   },
   {
     "title": "Think Stats",
-    "description": "Free book teaching statistics through computational thinking and Python programming.",
     "url": "https://greenteapress.com/thinkstats2/html/",
-    "tags": ["Statistics", "Python", "Data Science", "Book"]
+    "description": "Free book teaching statistics through computational thinking and Python programming.",
+    "tags": [
+      "Statistics",
+      "Python",
+      "Data Science",
+      "Book"
+    ]
   },
   {
     "title": "Think Bayes",
-    "description": "Free book teaching Bayesian statistics through computational examples and Python.",
     "url": "https://allendowney.github.io/ThinkBayes2/",
-    "tags": ["Statistics", "Bayesian Statistics", "Python", "Book"]
+    "description": "Free book teaching Bayesian statistics through computational examples and Python.",
+    "tags": [
+      "Statistics",
+      "Bayesian Statistics",
+      "Python",
+      "Book"
+    ]
   },
   {
     "title": "Think Complexity",
-    "description": "Free computational exploration of algorithms, graphs, cellular automata, networks, and complex systems.",
     "url": "https://greenteapress.com/complexity2/html/",
-    "tags": ["Computer Science", "Mathematics", "Complex Systems", "Python"]
+    "description": "Free computational exploration of algorithms, graphs, cellular automata, networks, and complex systems.",
+    "tags": [
+      "Computer Science",
+      "Mathematics",
+      "Complex Systems",
+      "Python"
+    ]
   },
   {
     "title": "Think DSP",
-    "description": "Free introduction to digital signal processing using Python, covering signals, Fourier transforms, filtering, and audio analysis.",
     "url": "https://greenteapress.com/thinkdsp/html/",
-    "tags": ["Signal Processing", "Python", "Mathematics", "Engineering"]
-  },
-  {
-    "title": "Think Stats",
-    "description": "Computational introduction to statistics using Python and real-world data analysis.",
-    "url": "https://greenteapress.com/thinkstats2/html/",
-    "tags": ["Statistics", "Python", "Data Science"]
+    "description": "Free introduction to digital signal processing using Python, covering signals, Fourier transforms, filtering, and audio analysis.",
+    "tags": [
+      "Signal Processing",
+      "Python",
+      "Mathematics",
+      "Engineering"
+    ]
   },
   {
     "title": "Open Source Machine Learning",
-    "description": "Community-maintained collection of free machine learning courses, books, tutorials, datasets, and educational resources.",
     "url": "https://github.com/josephmisiti/awesome-machine-learning",
-    "tags": ["Machine Learning", "AI", "Resources"]
+    "description": "Community-maintained collection of free machine learning courses, books, tutorials, datasets, and educational resources.",
+    "tags": [
+      "Machine Learning",
+      "AI",
+      "Resources"
+    ]
   },
   {
     "title": "Awesome Scientific Computing",
-    "description": "Curated collection of open-source scientific computing libraries, tools, software, datasets, and educational resources.",
     "url": "https://github.com/nschloe/awesome-scientific-computing",
-    "tags": ["Scientific Computing", "Programming", "Engineering", "Resources"]
+    "description": "Curated collection of open-source scientific computing libraries, tools, software, datasets, and educational resources.",
+    "tags": [
+      "Scientific Computing",
+      "Programming",
+      "Engineering",
+      "Resources"
+    ]
   },
   {
     "title": "Awesome Open Source STEM",
-    "description": "Curated collection of open-source tools, educational resources, simulations, software, and projects for science, technology, engineering, and mathematics.",
     "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
-    "tags": ["STEM", "Open Source", "Resources"]
+    "description": "Curated collection of open-source tools, educational resources, simulations, software, and projects for science, technology, engineering, and mathematics.",
+    "tags": [
+      "STEM",
+      "Open Source",
+      "Resources"
+    ]
   },
   {
     "title": "Project Gutenberg",
-    "description": "Free digital library containing thousands of public-domain books, including historical mathematics, science, engineering, and technical texts.",
     "url": "https://www.gutenberg.org/",
-    "tags": ["STEM", "Books", "Public Domain"]
+    "description": "Free digital library containing thousands of public-domain books, including historical mathematics, science, engineering, and technical texts.",
+    "tags": [
+      "STEM",
+      "Books",
+      "Public Domain"
+    ]
   },
   {
     "title": "Internet Archive",
-    "description": "Nonprofit digital library providing access to books, technical documents, software, datasets, educational media, and historical scientific material.",
     "url": "https://archive.org/",
-    "tags": ["STEM", "Digital Library", "Books", "Research"]
+    "description": "Nonprofit digital library providing access to books, technical documents, software, datasets, educational media, and historical scientific material.",
+    "tags": [
+      "STEM",
+      "Digital Library",
+      "Books",
+      "Research"
+    ]
   },
   {
     "title": "Wikibooks",
-    "description": "Free community-written textbooks and manuals covering mathematics, science, programming, engineering, and technical subjects.",
     "url": "https://www.wikibooks.org/",
-    "tags": ["STEM", "Open Textbooks", "Reference"]
-  },
-  {
-    "title": "Wikiversity",
-    "description": "Free collaborative learning environment containing courses, lessons, learning projects, and educational resources across STEM disciplines.",
-    "url": "https://www.wikiversity.org/",
-    "tags": ["STEM", "Courses", "Open Education"]
+    "description": "Free community-written textbooks and manuals covering mathematics, science, programming, engineering, and technical subjects.",
+    "tags": [
+      "STEM",
+      "Open Textbooks",
+      "Reference"
+    ]
   },
   {
     "title": "Wikipedia Science Portals",
-    "description": "Extensive free reference material covering mathematics, physics, chemistry, biology, engineering, computer science, and other scientific disciplines.",
     "url": "https://en.wikipedia.org/wiki/Portal:Science",
-    "tags": ["STEM", "Reference", "Encyclopedia"]
+    "description": "Extensive free reference material covering mathematics, physics, chemistry, biology, engineering, computer science, and other scientific disciplines.",
+    "tags": [
+      "STEM",
+      "Reference",
+      "Encyclopedia"
+    ]
   },
   {
     "title": "ScienceDirect Open Access",
-    "description": "Collection of openly accessible scientific and engineering research articles and educational material.",
     "url": "https://www.sciencedirect.com/browse/open-access",
-    "tags": ["Science", "Engineering", "Research", "Open Access"]
+    "description": "Collection of openly accessible scientific and engineering research articles and educational material.",
+    "tags": [
+      "Science",
+      "Engineering",
+      "Research",
+      "Open Access"
+    ]
   },
   {
     "title": "arXiv",
-    "description": "Free open-access repository of research papers in physics, mathematics, computer science, statistics, quantitative biology, and related fields.",
     "url": "https://arxiv.org/",
-    "tags": ["Research", "Mathematics", "Physics", "Computer Science", "Open Access"]
-  },
-  {
-    "title": "MIT OpenCourseWare",
-    "description": "Free MIT course materials spanning mathematics, physics, chemistry, biology, engineering, computer science, economics, and many other disciplines.",
-    "url": "https://ocw.mit.edu/",
-    "tags": ["STEM", "University Courses", "Open Education"]
+    "description": "Free open-access repository of research papers in physics, mathematics, computer science, statistics, quantitative biology, and related fields.",
+    "tags": [
+      "Research",
+      "Mathematics",
+      "Physics",
+      "Computer Science",
+      "Open Access"
+    ]
   },
   {
     "title": "MIT OCW Scholar",
-    "description": "Structured MIT courses combining lectures, problem sets, exams, and supporting material for self-directed study.",
     "url": "https://ocw.mit.edu/courses/ocw-scholar/",
-    "tags": ["STEM", "Courses", "University", "Self-Study"]
+    "description": "Structured MIT courses combining lectures, problem sets, exams, and supporting material for self-directed study.",
+    "tags": [
+      "STEM",
+      "Courses",
+      "University",
+      "Self-Study"
+    ]
   },
   {
-    "title": "OpenStax",
-    "description": "Free peer-reviewed and openly licensed textbooks covering mathematics, physics, chemistry, biology, astronomy, statistics, and other STEM fields.",
-    "url": "https://openstax.org/subjects",
-    "tags": ["STEM", "Open Textbooks", "College"]
+    "title": "Open Source Society University (OSSU)",
+    "url": "https://github.com/ossu/computer-science",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Complete Curriculum",
+      "Self-Study"
+    ]
   },
   {
-    "title": "PhET Interactive Simulations",
-    "description": "Free research-based interactive simulations for physics, chemistry, mathematics, earth science, and biology.",
-    "url": "https://phet.colorado.edu/",
-    "tags": ["STEM", "Simulation", "Physics", "Chemistry", "Mathematics", "Biology"]
+    "title": "CS50x",
+    "url": "https://cs50.harvard.edu/x/",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Programming",
+      "Algorithms",
+      "Systems",
+      "Web Development"
+    ]
   },
   {
-    "title": "Explorable Explanations",
-    "description": "Collection of interactive explanations that let learners explore mathematical, scientific, and computational concepts through direct manipulation.",
-    "url": "https://explorabl.es/",
-    "tags": ["STEM", "Interactive", "Visualization"]
+    "title": "Runestone Interactive",
+    "url": "https://runestone.academy/",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Programming",
+      "Data Structures",
+      "Algorithms",
+      "Interactive Textbooks"
+    ]
+  },
+  {
+    "title": "Open Source Computer Science",
+    "url": "https://github.com/Charmve/OpenCS-Courses",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Programming",
+      "Systems",
+      "Theory",
+      "Security",
+      "Applications"
+    ]
+  },
+  {
+    "title": "The Missing Semester of Your CS Education",
+    "url": "https://missing.csail.mit.edu/",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Developer Tools",
+      "Shell",
+      "Git",
+      "Debugging",
+      "Productivity"
+    ]
+  },
+  {
+    "title": "Computer Science Field Guide",
+    "url": "https://www.csfieldguide.org.nz/",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Algorithms",
+      "Data",
+      "Networks",
+      "Programming",
+      "Theory"
+    ]
+  },
+  {
+    "title": "Advent of Code",
+    "url": "https://adventofcode.com/",
+    "description": "",
+    "tags": [
+      "Computer Science",
+      "Programming",
+      "Algorithms",
+      "Problem Solving"
+    ]
+  },
+  {
+    "title": "Khan Academy Mathematics",
+    "url": "https://www.khanacademy.org/math",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Arithmetic",
+      "Algebra",
+      "Geometry",
+      "Trigonometry",
+      "Calculus",
+      "Statistics"
+    ]
+  },
+  {
+    "title": "MIT OpenCourseWare Mathematics",
+    "url": "https://ocw.mit.edu/search/?d=Mathematics",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Calculus",
+      "Linear Algebra",
+      "Differential Equations",
+      "Discrete Mathematics",
+      "Probability"
+    ]
+  },
+  {
+    "title": "OpenStax Mathematics",
+    "url": "https://openstax.org/",
+    "description": "",
+    "tags": [
+      "Mathematics",
+      "Algebra",
+      "Calculus",
+      "Statistics",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "MIT OpenCourseWare Physics",
+    "url": "https://ocw.mit.edu/search/?d=Physics",
+    "description": "",
+    "tags": [
+      "Physics",
+      "Classical Mechanics",
+      "Electromagnetism",
+      "Quantum Mechanics",
+      "Thermodynamics"
+    ]
+  },
+  {
+    "title": "PhET Chemistry Simulations",
+    "url": "https://phet.colorado.edu/en/simulations/filter?subjects=chemistry",
+    "description": "",
+    "tags": [
+      "Chemistry",
+      "Atoms",
+      "Molecules",
+      "Reactions",
+      "Solutions",
+      "Quantum Chemistry",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "MIT OpenCourseWare Chemistry",
+    "url": "https://ocw.mit.edu/search/?d=Chemistry",
+    "description": "",
+    "tags": [
+      "Chemistry",
+      "General Chemistry",
+      "Organic Chemistry",
+      "Physical Chemistry",
+      "Materials"
+    ]
+  },
+  {
+    "title": "MIT OpenCourseWare Biology",
+    "url": "https://ocw.mit.edu/search/?d=Biology",
+    "description": "",
+    "tags": [
+      "Biology",
+      "Cell Biology",
+      "Genetics",
+      "Molecular Biology",
+      "Ecology",
+      "Evolution"
+    ]
+  },
+  {
+    "title": "PhET Biology Simulations",
+    "url": "https://phet.colorado.edu/en/simulations/filter?subjects=biology",
+    "description": "",
+    "tags": [
+      "Biology",
+      "Cell Biology",
+      "Gene Expression",
+      "Membranes",
+      "Simulations"
+    ]
+  },
+  {
+    "title": "NCBI",
+    "url": "https://www.ncbi.nlm.nih.gov/",
+    "description": "",
+    "tags": [
+      "Biology",
+      "Genetics",
+      "Genomics",
+      "Bioinformatics",
+      "Biomedical Databases"
+    ]
+  },
+  {
+    "title": "Ensembl",
+    "url": "https://www.ensembl.org/",
+    "description": "",
+    "tags": [
+      "Biology",
+      "Genomics",
+      "Genetics",
+      "Bioinformatics",
+      "Genome Data"
+    ]
+  },
+  {
+    "title": "R Project",
+    "url": "https://www.r-project.org/",
+    "description": "",
+    "tags": [
+      "Statistics",
+      "Data Science",
+      "Statistical Computing",
+      "Visualization"
+    ]
+  },
+  {
+    "title": "RStudio Education",
+    "url": "https://education.rstudio.com/",
+    "description": "",
+    "tags": [
+      "Statistics",
+      "Data Science",
+      "R Programming",
+      "Statistical Methods"
+    ]
+  },
+  {
+    "title": "OpenLearn",
+    "url": "https://www.open.edu/openlearn/science-maths-technology/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Computer Science",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "OpenScholarSearch",
+    "url": "https://www.openscholarsearch.org/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Open Educational Resources",
+      "Textbooks",
+      "Papers",
+      "Datasets",
+      "Research"
+    ]
+  },
+  {
+    "title": "Siemens Stiftung Media Portal",
+    "url": "https://www.siemens-stiftung.org/en/projects/mediaportal/",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Mathematics",
+      "Biology",
+      "Chemistry",
+      "Physics",
+      "Computer Science",
+      "Open Educational Resources"
+    ]
+  },
+  {
+    "title": "Awesome DIY Science",
+    "url": "https://github.com/daligao/awesome-diy-science",
+    "description": "",
+    "tags": [
+      "STEM",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Astronomy",
+      "Simulations",
+      "DIY Experiments"
+    ]
+  },
+  {
+    "title": "Prachub",
+    "url": "https://prachub.com/",
+    "description": "Community hub for professional learning and resources.",
+    "tags": [
+      "STEM",
+      "Resources"
+    ]
   }
-  ]
+]
