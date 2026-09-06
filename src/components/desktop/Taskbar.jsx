@@ -67,68 +67,97 @@ const MacCube = ({ children, sideContent, isMac, frontClass, badgeContent, badge
   const baseClass = frontClass || 'bg-slate-800';
   const sides = sideContent || children;
 
-  if (animationType === 'flat') {
-    return (
-      <div className={`absolute inset-0 flex items-center justify-center rounded-[12px] ${baseClass}`}>
-        {children}
-        {badgeContent && (
-          <div className={`absolute -bottom-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black text-white shadow-md ${badgeColor || 'bg-red-500'}`}>
-            {badgeContent}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   const hoverVariant = animationType === 'dice' 
     ? { rotateY: 705, rotateX: 705, rotateZ: 0, transition: { type: 'spring', stiffness: 40, damping: 12 } }
     : { rotateY: 345, rotateX: -15, rotateZ: 0, transition: { type: 'spring', stiffness: 300, damping: 20 } };
 
+  const mainElement = animationType === 'flat' ? (
+    <div className={`absolute inset-0 flex items-center justify-center rounded-[12px] ${baseClass}`}>
+      {children}
+      {badgeContent && (
+        <div className={`absolute -bottom-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black text-white shadow-md ${badgeColor || 'bg-red-500'}`}>
+          {badgeContent}
+        </div>
+      )}
+    </div>
+  ) : (
+    <motion.div
+      className="w-full h-full relative origin-center"
+      style={{ transformStyle: 'preserve-3d' }}
+      variants={{
+        idle: { rotateY: -15, rotateX: -15, rotateZ: 0 },
+        hover: hoverVariant
+      }}
+    >
+      {/* Front */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'translateZ(22px)' }}>
+        {children}
+        <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_15px_rgba(0,0,0,0.2)] pointer-events-none" />
+      </div>
+      {/* Back */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(180deg) translateZ(22px)' }}>
+        {sides}
+        <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] pointer-events-none" />
+      </div>
+      {/* Right */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(90deg) translateZ(22px)' }}>
+        {sides}
+        <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] pointer-events-none" />
+      </div>
+      {/* Left */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(-90deg) translateZ(22px)' }}>
+        {sides}
+        <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.7)] pointer-events-none" />
+      </div>
+      {/* Top */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateX(90deg) translateZ(22px)' }}>
+         {sides}
+         <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(255,255,255,0.3)] pointer-events-none" />
+      </div>
+      {/* Bottom (with drop shadow) */}
+      <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateX(-90deg) translateZ(22px)' }}>
+         {sides}
+         <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] pointer-events-none" />
+         <div className="absolute inset-0 rounded-[8px] shadow-[0_20px_25px_rgba(0,0,0,0.8)] pointer-events-none" />
+      </div>
+      
+      {badgeContent && (
+        <BadgeCube content={badgeContent} colorClass={badgeColor || 'bg-red-500'} />
+      )}
+    </motion.div>
+  );
+
   return (
     <div className="absolute inset-0 pointer-events-none" style={{ perspective: '800px' }}>
-      <motion.div
-        className="w-full h-full relative origin-center"
-        style={{ transformStyle: 'preserve-3d' }}
+      {/* Real object */}
+      <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
+        {mainElement}
+      </div>
+      
+      {/* Parallax Floor Glow */}
+      <motion.div 
+        className="absolute top-full left-0 right-0 h-full pointer-events-none z-[-1]"
+        variants={{ idle: { y: 0, scale: 1 }, hover: { y: 2, scale: 0.95 } }}
+      >
+        <div className="absolute -top-1 left-[15%] right-[15%] h-3 bg-black/40 blur-md rounded-full transition-all duration-300 group-hover:bg-black/50 group-hover:blur-lg" />
+        <div className="absolute -top-2 left-[5%] right-[5%] h-4 bg-cyan-400/0 blur-md rounded-full transition-all duration-300 group-hover:bg-cyan-400/40 group-hover:blur-xl" />
+      </motion.div>
+
+      {/* True 3D Reflection */}
+      <motion.div 
+        className="absolute top-full left-0 right-0 h-full pointer-events-none opacity-40 transition-opacity duration-300 group-hover:opacity-70"
+        style={{ 
+          maskImage: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
+          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)'
+        }}
         variants={{
-          idle: { rotateY: -15, rotateX: -15, rotateZ: 0 },
-          hover: hoverVariant
+          idle: { y: 0, scaleY: -1 },
+          hover: { y: 12, scaleY: -1 } // Counteracts parent y:-10 to pin reflection to the floor
         }}
       >
-        {/* Front */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'translateZ(22px)' }}>
-          {children}
-          <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_15px_rgba(0,0,0,0.2)] pointer-events-none" />
+        <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
+          {mainElement}
         </div>
-        {/* Back */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(180deg) translateZ(22px)' }}>
-          {sides}
-          <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] pointer-events-none" />
-        </div>
-        {/* Right */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(90deg) translateZ(22px)' }}>
-          {sides}
-          <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] pointer-events-none" />
-        </div>
-        {/* Left */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateY(-90deg) translateZ(22px)' }}>
-          {sides}
-          <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(0,0,0,0.7)] pointer-events-none" />
-        </div>
-        {/* Top */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateX(90deg) translateZ(22px)' }}>
-           {sides}
-           <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_20px_rgba(255,255,255,0.3)] pointer-events-none" />
-        </div>
-        {/* Bottom (with drop shadow) */}
-        <div className={`absolute inset-0 flex items-center justify-center rounded-[8px] overflow-hidden ${baseClass}`} style={{ transform: 'rotateX(-90deg) translateZ(22px)' }}>
-           {sides}
-           <div className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] pointer-events-none" />
-           <div className="absolute inset-0 rounded-[8px] shadow-[0_20px_25px_rgba(0,0,0,0.8)] pointer-events-none" />
-        </div>
-        
-        {badgeContent && (
-          <BadgeCube content={badgeContent} colorClass={badgeColor || 'bg-red-500'} />
-        )}
       </motion.div>
     </div>
   );
