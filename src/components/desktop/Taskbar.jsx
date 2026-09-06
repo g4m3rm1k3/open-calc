@@ -27,6 +27,7 @@ const PINNED_APPS = [
   { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
   { id: 'canvas-notes', label: 'Canvas Notes', emoji: '🗒️', loader: () => getLabEntry('canvas-notes').then((e) => e.component) },
+  { id: 'resource-lab', label: 'Resource Lab', emoji: '📚', loader: () => getLabEntry('resource-lab').then((e) => e.component) },
 ]
 import { LayoutGrid, Command, BookOpen, MessageSquare, StickyNote, GraduationCap, Zap, Lightbulb, Dumbbell } from 'lucide-react'
 
