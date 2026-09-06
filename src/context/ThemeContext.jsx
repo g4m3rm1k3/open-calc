@@ -8,7 +8,9 @@ const ThemeContext = createContext({
   isDarkGlobal: true, // We'll assume true since it's mainly for dark mode
   themeStyles: {},
   taskbarStyle: 'mac',
-  setTaskbarStyle: () => {}
+  setTaskbarStyle: () => {},
+  macAnimation: 'flat',
+  setMacAnimation: () => {}
 });
 
 export const FONT_OPTIONS = [
@@ -225,9 +227,18 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('oc-taskbar-style', newStyle);
   }, []);
 
+  const [macAnimation, setMacAnimationState] = useState(() => {
+    return localStorage.getItem('oc-mac-animation') || 'flat';
+  });
+
+  const setMacAnimation = useCallback((newAnim) => {
+    setMacAnimationState(newAnim);
+    localStorage.setItem('oc-mac-animation', newAnim);
+  }, []);
+
   const value = useMemo(
-    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle }),
-    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle]
+    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation]
   );
 
   return (

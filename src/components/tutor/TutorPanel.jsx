@@ -1134,7 +1134,7 @@ export default function TutorPanel({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           style={panelStyle}
-          className="flex flex-col rounded-[2.5rem] shadow-[0_0_80px_rgba(0,0,0,0.15)] dark:shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border border-white/20 dark:border-white/5 overflow-hidden select-none min-h-0 ring-1 ring-black/5"
+          className="flex flex-col rounded-[2.5rem] shadow-[0_0_80px_rgba(0,0,0,0.15)] dark:shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl border border-white/20 dark:border-white/5 overflow-hidden select-none min-h-0 ring-1 ring-black/5"
         >
           {/* Header - Scientific Handle */}
           <div

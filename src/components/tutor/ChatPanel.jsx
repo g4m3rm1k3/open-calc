@@ -783,7 +783,7 @@ export default function ChatPanel({ isOpen, onClose }) {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
             style={{ width, right: 24, bottom: 90 }}
-            className={`fixed z-[1500] flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-black/[0.08] dark:border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden max-h-[calc(100vh-140px)]`}
+            className={`fixed z-[1500] flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-black/[0.08] dark:border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden max-h-[calc(100vh-140px)]`}
           >
             {/* Header / Drag Handle */}
             <div 

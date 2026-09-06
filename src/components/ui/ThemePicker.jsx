@@ -188,7 +188,7 @@ function ThemeCard({ theme, isActive, onClick }) {
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 function ThemeModal({ onClose }) {
-  const { studioTheme, setStudioTheme, typography, setTypography, taskbarStyle, setTaskbarStyle } = useGlobalTheme();
+  const { studioTheme, setStudioTheme, typography, setTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation } = useGlobalTheme();
   const [activeTab, setActiveTab] = useState('themes'); // 'themes' | 'typography' | 'interface'
   const [activeGroup, setActiveGroup] = useState(() => {
     for (const g of GROUPS) {
@@ -574,6 +574,50 @@ function ThemeModal({ onClose }) {
                     )
                   })}
                 </div>
+                
+                {taskbarStyle === 'mac' && (
+                  <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Sparkles className="w-5 h-5 text-indigo-500" />
+                      <h3 className="text-base font-bold">Mac Dock Animation</h3>
+                    </div>
+                    <div className="flex bg-slate-200/50 dark:bg-slate-800 rounded-xl p-1 max-w-md">
+                      <button
+                        onClick={() => setMacAnimation('flat')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                          macAnimation === 'flat'
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        2D Cards
+                      </button>
+                      <button
+                        onClick={() => setMacAnimation('spin')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                          macAnimation === 'spin'
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        3D Spin
+                      </button>
+                      <button
+                        onClick={() => setMacAnimation('dice')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                          macAnimation === 'dice'
+                            ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        3D Dice
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-3 max-w-md">
+                      Choose '2D Cards' for flat scaling, '3D Spin' for a gentle 3D cube spin, or '3D Dice' for a full tumbling cube.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
