@@ -629,9 +629,7 @@ export default function AppShell({ children }) {
           <main
             className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isFullWidthRoute ? "min-h-screen pb-4 lg:pb-11" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-4 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-[52px]`}
             style={{
-              paddingRight: chatOpen
-                ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
-                : scratchSnap === "right" ? `${scratchSnapW}px` : undefined,
+              paddingRight: scratchSnap === "right" ? `${scratchSnapW}px` : undefined,
               ...(scratchSnap === "left"
                 ? { paddingLeft: `${12 + scratchSnapW}px` }
                 : {}),

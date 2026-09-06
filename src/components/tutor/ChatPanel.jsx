@@ -20,7 +20,7 @@ import {
   isLovelaceMention,
   extractQuestion,
 } from "../../hooks/useLovelaceAI.js";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
 
 const PEER_COLORS = [
   "text-blue-500",
@@ -757,6 +757,8 @@ export default function ChatPanel({ isOpen, onClose }) {
     setUsername(nameInput);
     setEditingName(false);
   };
+  const [isMini, setIsMini] = useState(false);
+  const dragControls = useDragControls();
 
   return (
     <>
@@ -772,32 +774,30 @@ export default function ChatPanel({ isOpen, onClose }) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: "100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "100%", opacity: 0 }}
+            drag
+            dragControls={dragControls}
+            dragListener={false}
+            dragMomentum={false}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0, height: isMini ? 'auto' : 600 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
-            style={{ width }}
-            className="fixed right-0 top-12 bottom-11 z-[1500] flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border-l border-black/[0.08] dark:border-white/[0.1] shadow-[-10px_0_40px_rgba(0,0,0,0.08)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
+            style={{ width, right: 24, bottom: 90 }}
+            className={`fixed z-[1500] flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-black/[0.08] dark:border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden max-h-[calc(100vh-140px)]`}
           >
-            {/* Resize handle */}
-            <div
-              className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-10 group hover:bg-indigo-500/20 transition-colors"
-              onMouseDown={onResizeMouseDown}
+            {/* Header / Drag Handle */}
+            <div 
+              onPointerDown={(e) => dragControls.start(e)}
+              className="relative flex items-center justify-between px-4 py-3 border-b border-indigo-500/10 dark:border-indigo-500/20 shrink-0 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-900/20 dark:to-purple-900/20 cursor-move"
             >
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-10 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-indigo-400 dark:group-hover:bg-indigo-500 transition-colors" />
-            </div>
-            {/* Header */}
-            <div className="relative flex items-center justify-between px-6 py-5 border-b border-indigo-500/10 dark:border-indigo-500/20 shrink-0 overflow-hidden bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-900/20 dark:to-purple-900/20">
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/20 dark:via-indigo-400/20 to-transparent" />
-              <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/20 dark:bg-indigo-500/10 blur-[50px] rounded-full pointer-events-none" />
-              <div className="absolute right-0 bottom-0 w-32 h-32 bg-purple-500/20 dark:bg-purple-500/10 blur-[50px] rounded-full pointer-events-none" />
-              <div className="relative z-10 flex items-center gap-4">
+              <div className="relative z-10 flex items-center gap-3">
                 <div className="relative flex items-center justify-center">
-                  <div className="w-3.5 h-3.5 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.9)] animate-pulse" />
-                  <div className="absolute inset-0 bg-indigo-400/20 blur-md rounded-full animate-ping" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.9)] animate-pulse" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-black text-slate-900 dark:text-white text-[12px] uppercase tracking-[0.3em] leading-none mb-1">
+                <div className="flex flex-col select-none">
+                  <span className="font-black text-slate-900 dark:text-white text-[11px] uppercase tracking-[0.2em] leading-none mb-0.5">
+
                     Study Chat
                   </span>
                   <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 tracking-[0.1em] uppercase opacity-80">
@@ -815,15 +815,24 @@ export default function ChatPanel({ isOpen, onClose }) {
                     <RefreshCw className="w-4 h-4" />
                   </button>
                 )}
+                {!isMini && (
+                  <button
+                    onClick={() => setShowSettings((v) => !v)}
+                    title="Blocked users"
+                    className={`relative p-1.5 rounded-lg transition-colors ${showSettings ? "text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+                  >
+                    <Settings className="w-4 h-4" />
+                    {blockedUsers.length > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
+                  </button>
+                )}
                 <button
-                  onClick={() => setShowSettings((v) => !v)}
-                  title="Blocked users"
-                  className={`relative p-1.5 rounded-lg transition-colors ${showSettings ? "text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+                  onClick={() => setIsMini(m => !m)}
+                  title={isMini ? "Expand" : "Quick Reply Mode"}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
-                  <Settings className="w-4 h-4" />
-                  {blockedUsers.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
-                  )}
+                  {isMini ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
                 <button
                   onClick={onClose}
@@ -834,7 +843,14 @@ export default function ChatPanel({ isOpen, onClose }) {
               </div>
             </div>
 
-            {showSettings ? (
+            {isMini ? (
+              <ChatInput
+                onSend={handleSend}
+                disabled={!connected}
+                lovelaceActive={lovelaceActive}
+                peers={peers}
+              />
+            ) : showSettings ? (
               <BlockedUsersPanel onClose={() => setShowSettings(false)} />
             ) : (
               <>

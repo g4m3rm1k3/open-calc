@@ -107,35 +107,38 @@ export default function Taskbar({ windows, onFocus }) {
         whileHover={taskbarStyle === 'mac' ? macHoverProps.whileHover : { scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         transition={macHoverProps.transition}
+        onMouseEnter={() => import('../../concepts/ConceptExplorerModal.tsx')}
         onClick={() => setConceptExplorerOpen(o => !o)}
         title="Concept Explorer"
-        className={`relative flex items-center justify-center rounded-xl transition-all focus:outline-none overflow-hidden group ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all focus:outline-none overflow-hidden group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-11 h-11' : 'w-9 h-9'
         } ${
           conceptExplorerOpen 
-            ? 'bg-gradient-to-tr from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/40 ring-1 ring-amber-400/50' 
-            : 'bg-amber-500/10 text-amber-500 dark:text-amber-400/80 hover:bg-amber-500/20 hover:text-amber-500 dark:hover:text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.1)] hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+            ? 'bg-gradient-to-br from-amber-300 via-orange-400 to-orange-500 text-white shadow-[0_0_25px_rgba(245,158,11,0.6)]' 
+            : 'bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-white shadow-[0_6px_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_20px_rgba(245,158,11,0.5)]'
         }`}
       >
-        {conceptExplorerOpen && <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />}
-        <Lightbulb className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10 transition-all ${conceptExplorerOpen ? 'drop-shadow-sm' : 'drop-shadow-[0_0_2px_rgba(245,158,11,0.6)]'}`} />
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <Lightbulb className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10 drop-shadow-md`} />
       </motion.button>
 
       <motion.button
         whileHover={taskbarStyle === 'mac' ? macHoverProps.whileHover : { scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         transition={macHoverProps.transition}
+        onMouseEnter={() => import('../../practice/PracticeExplorerModal.tsx')}
         onClick={() => setPracticeOpen(o => !o)}
         title="Practice"
-        className={`relative flex items-center justify-center rounded-xl transition-all focus:outline-none overflow-hidden group ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all focus:outline-none overflow-hidden group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-11 h-11' : 'w-9 h-9'
         } ${
           practiceOpen
-            ? 'bg-gradient-to-tr from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-400/50'
-            : 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400/80 hover:bg-emerald-500/20 hover:text-emerald-500 dark:hover:text-emerald-400'
+            ? 'bg-gradient-to-br from-emerald-300 via-teal-400 to-teal-500 text-white shadow-[0_0_25px_rgba(16,185,129,0.6)]'
+            : 'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600 text-white shadow-[0_6px_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]'
         }`}
       >
-        <Dumbbell className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10`} />
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <Dumbbell className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10 drop-shadow-md`} />
       </motion.button>
 
       <motion.button
@@ -144,16 +147,16 @@ export default function Taskbar({ windows, onFocus }) {
         transition={macHoverProps.transition}
         onClick={() => { setNotesOpen(o => !o); setChapNavOpen(false) }}
         title="Notes"
-        className={`relative flex items-center justify-center rounded-xl transition-all focus:outline-none overflow-hidden group ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all focus:outline-none overflow-hidden group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-11 h-11' : 'w-9 h-9'
         } ${
           notesOpen
-            ? 'bg-gradient-to-tr from-yellow-400 to-amber-500 text-white shadow-lg shadow-yellow-500/40 ring-1 ring-yellow-400/50'
-            : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20 shadow-[0_0_8px_rgba(234,179,8,0.1)] hover:shadow-[0_0_12px_rgba(234,179,8,0.2)]'
+            ? 'bg-gradient-to-br from-yellow-300 via-amber-400 to-amber-500 text-white shadow-[0_0_25px_rgba(245,158,11,0.6)]'
+            : 'bg-gradient-to-br from-yellow-400 via-amber-500 to-amber-600 text-white shadow-[0_6px_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_20px_rgba(245,158,11,0.5)]'
         }`}
       >
-        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        <StickyNote className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10`} />
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <StickyNote className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10 drop-shadow-md`} />
       </motion.button>
 
       <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
@@ -165,18 +168,19 @@ export default function Taskbar({ windows, onFocus }) {
         transition={macHoverProps.transition}
         onClick={monty.openMonty}
         title={`Monty — Lv ${level}, ${xpInLevel}/100 XP`}
-        className={`relative flex items-center justify-center rounded-2xl transition-all duration-300 focus:outline-none group ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all duration-300 focus:outline-none group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-12 h-12' : 'w-10 h-10'
         } ${
           monty.montyOpen
-            ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/40 ring-2 ring-cyan-400 ring-offset-2 dark:ring-offset-slate-950'
-            : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 shadow hover:shadow-cyan-500/20'
+            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 text-white shadow-[0_0_25px_rgba(6,182,212,0.6)]'
+            : 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 dark:from-slate-800 dark:via-slate-900 dark:to-black text-cyan-400 shadow-[0_6px_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
         }`}
         style={{
-          filter: `drop-shadow(0 0 ${4 + (xpInLevel / 100) * 12}px rgba(6,182,212,${0.3 + (xpInLevel / 100) * 0.6}))`,
+          filter: monty.montyOpen ? 'none' : `drop-shadow(0 0 ${4 + (xpInLevel / 100) * 12}px rgba(6,182,212,${0.3 + (xpInLevel / 100) * 0.6}))`,
         }}
       >
-        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 rounded-[12px] overflow-hidden pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 40 40">
             <defs>
@@ -208,12 +212,12 @@ export default function Taskbar({ windows, onFocus }) {
         transition={macHoverProps.transition}
         onClick={toggleTutor}
         title="Delta — your STEM tutor"
-        className={`relative flex items-center justify-center rounded-xl transition-all focus:outline-none overflow-hidden group bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 dark:text-sky-400 shadow-[0_0_8px_rgba(14,165,233,0.1)] hover:shadow-[0_0_12px_rgba(14,165,233,0.2)] ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all focus:outline-none overflow-hidden group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-11 h-11' : 'w-9 h-9'
-        }`}
+        } bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 text-white shadow-[0_6px_15px_rgba(14,165,233,0.4)] hover:shadow-[0_0_20px_rgba(14,165,233,0.5)]`}
       >
-        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        <GraduationCap className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10`} />
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <GraduationCap className={`${taskbarStyle === 'mac' ? 'w-6 h-6' : 'w-5 h-5'} relative z-10 drop-shadow-md`} />
       </motion.button>
 
       <motion.button
@@ -222,16 +226,16 @@ export default function Taskbar({ windows, onFocus }) {
         transition={macHoverProps.transition}
         onClick={toggleChat}
         title="Study Chat"
-        className={`relative flex items-center justify-center rounded-xl transition-all focus:outline-none group ${
+        className={`relative flex items-center justify-center rounded-[12px] transition-all focus:outline-none group border border-white/20 dark:border-white/10 ${
           taskbarStyle === 'mac' ? 'w-11 h-11' : 'w-9 h-9'
         } ${
           chatOpen
-            ? 'bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40 ring-1 ring-indigo-400/50'
-            : 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 shadow-[0_0_8px_rgba(99,102,241,0.1)] hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]'
+            ? 'bg-gradient-to-br from-indigo-400 via-purple-500 to-fuchsia-600 text-white shadow-[0_0_25px_rgba(99,102,241,0.6)]'
+            : 'bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-700 text-white shadow-[0_6px_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]'
         }`}
       >
-        <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        <MessageSquare className={`${taskbarStyle === 'mac' ? 'w-5 h-5' : 'w-4 h-4'} relative z-10`} />
+        <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <MessageSquare className={`${taskbarStyle === 'mac' ? 'w-5 h-5' : 'w-4 h-4'} relative z-10 drop-shadow-md`} />
         {unreadCount > 0 && !chatOpen && (
           <span className="absolute -top-1 -right-1 z-20 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
             {unreadCount > 99 ? '99+' : unreadCount}
