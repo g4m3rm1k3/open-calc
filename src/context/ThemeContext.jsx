@@ -10,7 +10,11 @@ const ThemeContext = createContext({
   taskbarStyle: 'mac',
   setTaskbarStyle: () => {},
   macAnimation: 'flat',
-  setMacAnimation: () => {}
+  setMacAnimation: () => {},
+  laserEnabled: false,
+  setLaserEnabled: () => {},
+  laserColor: '#06b6d4',
+  setLaserColor: () => {}
 });
 
 export const FONT_OPTIONS = [
@@ -231,14 +235,37 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('oc-mac-animation') || 'flat';
   });
 
+  const [laserEnabled, setLaserEnabledState] = useState(() => {
+    return localStorage.getItem('oc-laser-enabled') === 'true';
+  });
+
+  const [laserColor, setLaserColorState] = useState(() => {
+    return localStorage.getItem('oc-laser-color') || '#06b6d4'; // Cyan-500
+  });
+
   const setMacAnimation = useCallback((newAnim) => {
     setMacAnimationState(newAnim);
     localStorage.setItem('oc-mac-animation', newAnim);
   }, []);
 
+  const setLaserEnabled = useCallback((enabled) => {
+    setLaserEnabledState(enabled);
+    localStorage.setItem('oc-laser-enabled', enabled);
+  }, []);
+
+  const setLaserColor = useCallback((color) => {
+    setLaserColorState(color);
+    localStorage.setItem('oc-laser-color', color);
+  }, []);
+
   const value = useMemo(
-    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation }),
-    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation]
+    () => ({ 
+      studioTheme, setStudioTheme, isDarkGlobal, themeStyles, 
+      typography, setTypography, codeTypography, setCodeTypography, 
+      taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation,
+      laserEnabled, setLaserEnabled, laserColor, setLaserColor
+    }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles, typography, setTypography, codeTypography, setCodeTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation, laserEnabled, setLaserEnabled, laserColor, setLaserColor]
   );
 
   return (

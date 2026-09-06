@@ -75,6 +75,7 @@ export const meta = {
     "React.lazy() + Suspense defers each page's bundle until the user navigates there. Only the code actually needed gets downloaded.",
 };
 
+import LaserCursor from './components/ui/LaserCursor'
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 
 export default function App() {
@@ -357,6 +358,7 @@ export default function App() {
                         </Suspense>
                       </AppShell>
                     </RootErrorBoundary>
+                    <LaserCursor />
                   </ConceptWindowProvider>
                   </DesktopProvider>
                   </ChatProvider>

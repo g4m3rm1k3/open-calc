@@ -188,7 +188,7 @@ function ThemeCard({ theme, isActive, onClick }) {
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 function ThemeModal({ onClose }) {
-  const { studioTheme, setStudioTheme, typography, setTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation } = useGlobalTheme();
+  const { studioTheme, setStudioTheme, typography, setTypography, taskbarStyle, setTaskbarStyle, macAnimation, setMacAnimation, laserEnabled, setLaserEnabled, laserColor, setLaserColor } = useGlobalTheme();
   const [activeTab, setActiveTab] = useState('themes'); // 'themes' | 'typography' | 'interface'
   const [activeGroup, setActiveGroup] = useState(() => {
     for (const g of GROUPS) {
@@ -618,6 +618,53 @@ function ThemeModal({ onClose }) {
                     </p>
                   </div>
                 )}
+
+                {/* Laser Cursor */}
+                <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-500">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Laser Pointer</h3>
+                      <p className="text-xs text-slate-500">Display a trailing laser beam behind the mouse</p>
+                    </div>
+                    <button
+                      onClick={() => setLaserEnabled(!laserEnabled)}
+                      className={`w-12 h-6 rounded-full p-1 transition-colors ${laserEnabled ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+                    >
+                      <div className={`w-4 h-4 bg-white rounded-full transition-transform ${laserEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+
+                  {laserEnabled && (
+                    <div className="ml-11">
+                      <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Laser Color</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { hex: '#ef4444', name: 'Red' },
+                          { hex: '#f97316', name: 'Orange' },
+                          { hex: '#f59e0b', name: 'Yellow' },
+                          { hex: '#10b981', name: 'Green' },
+                          { hex: '#06b6d4', name: 'Cyan' },
+                          { hex: '#3b82f6', name: 'Blue' },
+                          { hex: '#8b5cf6', name: 'Purple' },
+                          { hex: '#d946ef', name: 'Magenta' }
+                        ].map((color) => (
+                          <button
+                            key={color.hex}
+                            onClick={() => setLaserColor(color.hex)}
+                            className={`w-8 h-8 rounded-full shadow-sm ring-2 ring-offset-2 dark:ring-offset-slate-900 transition-all ${
+                              laserColor === color.hex ? 'ring-indigo-500 scale-110' : 'ring-transparent hover:scale-105'
+                            }`}
+                            style={{ backgroundColor: color.hex }}
+                            title={color.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
