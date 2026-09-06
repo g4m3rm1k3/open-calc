@@ -429,6 +429,31 @@ function ThemeModal({ onClose }) {
                 </div>
               </div>
 
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <Monitor className="w-5 h-5 text-indigo-500" />
+                  <h3 className="text-base font-bold">Markdown Look & Feel</h3>
+                </div>
+                <button
+                  onClick={() => setTypography({ basicWebpage: !typography.basicWebpage })}
+                  className={`w-full px-5 py-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                    typography.basicWebpage
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <div>
+                    <div className="font-bold mb-1">Basic Webpage Style</div>
+                    <div className={`text-sm ${typography.basicWebpage ? 'text-indigo-600/80 dark:text-indigo-300/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                      Disable fancy styles, custom Markdown components, and code editor embeds. Renders docs as a standard webpage.
+                    </div>
+                  </div>
+                  <div className={`w-12 h-6 rounded-full p-1 transition-colors ${typography.basicWebpage ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white transition-transform ${typography.basicWebpage ? 'translate-x-6' : 'translate-x-0'}`} />
+                  </div>
+                </button>
+              </div>
+
               <div className="max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-2 mb-4">

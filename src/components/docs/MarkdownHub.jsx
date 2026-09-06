@@ -17,6 +17,21 @@ import rehypeRaw from "rehype-raw";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import Editor from "@monaco-editor/react";
+import Prism from "prismjs";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-c";
+import "prismjs/components/prism-cpp";
+import "prismjs/components/prism-csharp";
+import "prismjs/components/prism-go";
+import "prismjs/components/prism-rust";
+import "prismjs/components/prism-bash";
+import "prismjs/components/prism-sql";
+import "prismjs/components/prism-json";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-markup";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import MarkdownToolbar from "../markdown-toolbar/MarkdownToolbar.jsx";
 import { LANG_LABEL } from "../markdown/codeDisplay.jsx";
@@ -421,7 +436,39 @@ function seriesFromPath(path) {
   return parts.length ? displayName(parts[parts.length - 1]) : "General";
 }
 
-function getMdCss(md) {
+function getMdCss(md, basicWebpage = false) {
+  if (basicWebpage) {
+    return `
+.md-body { line-height: 1.75; font-size: 15px; color: ${md.text}; }
+.md-body h1 { font-size: 2em; font-weight: 700; margin: 0.67em 0; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.3em; }
+.md-body h2 { font-size: 1.5em; font-weight: 700; margin: 1em 0 0.5em; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.2em; }
+.md-body h3 { font-size: 1.25em; font-weight: 600; margin: 1em 0 0.4em; }
+.md-body h4 { font-size: 1em; font-weight: 600; margin: 1em 0 0.3em; }
+.md-body h5 { font-size: 0.875em; font-weight: 600; margin: 1em 0 0.3em; }
+.md-body h6 { font-size: 0.85em; font-weight: 600; margin: 1em 0 0.3em; color: ${md.quoteText}; }
+.md-body p { margin: 0 0 1em; }
+.md-body strong, .md-body b { font-weight: 700; }
+.md-body em, .md-body i { font-style: italic; }
+.md-body a { color: ${md.a}; text-decoration: underline; }
+.md-body a:hover { text-decoration: none; }
+.md-body code { background: ${md.codeBg}; border-radius: 3px; padding: 2px 5px; font-size: 0.875em; font-family: 'Consolas', 'Courier New', monospace; }
+.md-body pre { background: ${md.preBg}; border: 1px solid ${md.preBorder}; border-radius: 4px; padding: 14px 18px; overflow-x: auto; margin: 0 0 1.2em; }
+.md-body pre code { background: none; border: none; padding: 0; font-size: 0.875em; font-family: 'Consolas', 'Courier New', monospace; }
+.md-body blockquote { border-left: 4px solid ${md.quoteBorder}; margin: 0 0 1em 0; padding: 6px 16px; color: ${md.quoteText}; }
+.md-body ul { margin: 0 0 1em 1.5em; list-style: disc; }
+.md-body ol { margin: 0 0 1em 1.5em; list-style: decimal; }
+.md-body li { margin-bottom: 0.25em; }
+.md-body ul ul { list-style: circle; margin-bottom: 0; }
+.md-body ul ul ul { list-style: square; }
+.md-body table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: 0.9em; }
+.md-body th { background: ${md.thBg}; border: 1px solid ${md.tdBorder}; padding: 8px 12px; text-align: left; font-weight: 600; }
+.md-body td { border: 1px solid ${md.tdBorder}; padding: 7px 12px; }
+.md-body tr:nth-child(even) td { background: ${md.trEven}; }
+.md-body hr { border: none; border-top: 1px solid ${md.hr}; margin: 1.5em 0; }
+.md-body img { max-width: 100%; }
+.md-code-monaco { overflow: hidden; }
+`;
+  }
   return `
 .md-body { line-height: 1.75; font-size: 15px; color: ${md.text}; --card-glow: 0 4px 20px -5px color-mix(in srgb, ${md.strong} 30%, transparent), inset 0 0 0 1px color-mix(in srgb, ${md.strong} 15%, transparent); }
 .md-body h1 { font-size: 2em; font-weight: 700; margin: 0 0 0.5em; color: ${md.h1}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.3em; }
@@ -438,7 +485,7 @@ function getMdCss(md) {
 .md-body pre { background: ${md.preBg}; border: 1px solid ${md.preBorder}; border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 1.2em; }
 .md-body pre code { background: none; border: none; padding: 0; color: ${md.text}; }
 .md-body blockquote { border-left: 3px solid ${md.quoteBorder}; margin: 0 0 1em; padding: 8px 16px; background: ${md.quoteBg}; border-radius: 0 4px 4px 0; color: ${md.quoteText}; }
-.md-body ul, .md-body ol { margin: 0 0 1em 1.4em; }
+.md-body ul, .md-body ol { margin: 0 0 1em 1.4em; list-style-type: disc; }
 .md-body li { margin-bottom: 0.3em; }
 .md-body ul:has(> li > strong + br) { margin-left: 0; }
 .md-body li:has(> strong + br) { list-style: none; border: 1px solid ${md.tdBorder}; border-radius: 10px; padding: 14px 18px; margin: 0 0 1em; box-shadow: var(--card-glow); }
@@ -938,6 +985,78 @@ function MdCodeBlock({ language, code }) {
           </pre>
         </div>
       )}
+    </div>
+  );
+}
+
+// Simple read-only syntax-highlighted code block for Basic Webpage mode.
+// Uses Monaco in read-only mode with no header, resize handle, or run buttons.
+function BasicMdCodeBlock({ language, code }) {
+  const { isDarkGlobal, themeStyles, codeTypography } = useGlobalTheme();
+  const isDark = isDarkGlobal;
+  const { monacoTheme } = useContext(DocsCtx);
+  const [copied, setCopied] = useState(false);
+
+  const monacoLang = MONACO_LANG[language] || language;
+  const displayLang = LANG_LABEL[language] || monacoLang;
+  const lineCount = code.split('\n').length;
+  const editorHeight = Math.min(Math.max(lineCount * 19 + 24, 48), 600);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [code]);
+
+  return (
+    <div className={`rounded-lg overflow-hidden border mb-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+      {/* minimal header: language label + copy */}
+      <div className={`flex items-center justify-between px-3 py-1.5 text-xs ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+        <span className="font-mono font-semibold uppercase tracking-wide text-[11px]">{displayLang || 'code'}</span>
+        <button
+          onClick={handleCopy}
+          className={`px-2 py-0.5 rounded text-[11px] transition-colors ${copied ? 'text-green-600' : isDark ? 'hover:text-slate-200' : 'hover:text-slate-800'}`}
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
+      </div>
+      <div className="md-code-monaco">
+        <Editor
+          height={editorHeight}
+          language={monacoLang}
+          defaultValue={code}
+          theme={monacoTheme || (isDark ? 'open-calc-dark' : 'open-calc-light')}
+          beforeMount={setupOpenCalcMonaco}
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            lineNumbers: 'on',
+            lineDecorationsWidth: 4,
+            lineNumbersMinChars: 3,
+            folding: false,
+            wordWrap: 'off',
+            fontSize: parseInt(getCodeFontSize(codeTypography.fontSize)),
+            fontFamily: getCodeFontFamily(codeTypography.font),
+            fontLigatures: codeTypography.ligatures,
+            renderLineHighlight: 'none',
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            scrollbar: {
+              vertical: 'hidden',
+              horizontal: 'auto',
+              alwaysConsumeMouseWheel: false,
+              horizontalScrollbarSize: 4,
+            },
+            padding: { top: 8, bottom: 8 },
+            contextmenu: false,
+            automaticLayout: true,
+            glyphMargin: false,
+            cursorStyle: 'line',
+            domReadOnly: true,
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -1567,6 +1686,84 @@ const MD_COMPONENTS = {
   },
 };
 
+// A tiny map from common aliases to Prism's grammar names
+const PRISM_LANG_ALIAS = {
+  js: 'javascript', ts: 'typescript', py: 'python',
+  sh: 'bash', zsh: 'bash', shell: 'bash',
+  cs: 'csharp', 'c++': 'cpp', htm: 'markup', html: 'markup', xml: 'markup',
+  rb: 'ruby', lua: 'lua', go: 'go', rs: 'rust',
+};
+
+function PrismCodeBlock({ lang, code }) {
+  const isDark = useIsDark();
+  const grammar = Prism.languages[PRISM_LANG_ALIAS[lang] || lang];
+  const highlighted = grammar
+    ? Prism.highlight(code, grammar, PRISM_LANG_ALIAS[lang] || lang)
+    : null;
+
+  return (
+    <>
+      {/* Inject the appropriate Prism theme — light or dark */}
+      <style>{isDark
+        ? `/* prism-okaidia */
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#8b949e}
+.token.punctuation{color:#c9d1d9}
+.token.namespace{opacity:.7}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#f97583}
+.token.boolean,.token.number{color:#79b8ff}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#9ecbff}
+.token.operator,.token.entity,.token.url,.language-css .token.string,.style .token.string{color:#79b8ff}
+.token.atrule,.token.attr-value,.token.keyword{color:#b392f0}
+.token.function,.token.class-name{color:#b392f0}
+.token.regex,.token.important,.token.variable{color:#ffab70}
+.token.important,.token.bold{font-weight:700}
+.token.italic{font-style:italic}
+pre[class*="language-"]{background:#161b22;color:#c9d1d9;border:1px solid #30363d}`
+        : `/* prism-default (github-like) */
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#6a737d}
+.token.punctuation{color:#24292e}
+.token.namespace{opacity:.7}
+.token.property,.token.tag,.token.constant,.token.symbol,.token.deleted{color:#d73a49}
+.token.boolean,.token.number{color:#005cc5}
+.token.selector,.token.attr-name,.token.string,.token.char,.token.builtin,.token.inserted{color:#032f62}
+.token.operator,.token.entity,.token.url,.language-css .token.string,.style .token.string{color:#005cc5}
+.token.atrule,.token.attr-value,.token.keyword{color:#d73a49}
+.token.function,.token.class-name{color:#6f42c1}
+.token.regex,.token.important,.token.variable{color:#e36209}
+.token.important,.token.bold{font-weight:700}
+.token.italic{font-style:italic}
+pre[class*="language-"]{background:#f6f8fa;color:#24292e;border:1px solid #e1e4e8}`
+      }</style>
+      {highlighted ? (
+        <pre className={lang ? `language-${lang}` : undefined}>
+          <code
+            className={lang ? `language-${lang}` : undefined}
+            dangerouslySetInnerHTML={{ __html: highlighted }}
+          />
+        </pre>
+      ) : (
+        <pre>
+          <code>{code}</code>
+        </pre>
+      )}
+    </>
+  );
+}
+
+const BASIC_MD_COMPONENTS = {
+  h1: ({ node, children }) => <h1 id={useHeadingId(node, children)}>{children}</h1>,
+  h2: ({ node, children }) => <h2 id={useHeadingId(node, children)}>{children}</h2>,
+  h3: ({ node, children }) => <h3 id={useHeadingId(node, children)}>{children}</h3>,
+  h4: ({ node, children }) => <h4 id={useHeadingId(node, children)}>{children}</h4>,
+  pre({ node }) {
+    const codeNode = node?.children?.[0];
+    const className = codeNode?.properties?.className?.[0] || '';
+    const lang = className.replace('language-', '') || '';
+    const code = codeNode?.children?.[0]?.value ?? '';
+    return <PrismCodeBlock lang={lang} code={code.replace(/\n$/, '')} />;
+  },
+};
+
 function nodeContainsFile(node, filePath) {
   if (!filePath) return false;
   if (node.type === "file") return node.path === filePath;
@@ -2121,6 +2318,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   lineHeight,
   fontSize,
   textAlign,
+  basicWebpage = false,
   // True when this render is nested inside another chrome-providing box
   // (currently: ConceptEmbed's own bordered/padded card). The card already
   // supplies border/shadow/background/padding, so re-adding this component's
@@ -2145,6 +2343,13 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
   }, []);
 
   const pages = useMemo(() => {
+    if (basicWebpage) {
+      return [{
+        title: "",
+        titleLine: 1,
+        sections: splitMarkdownSections(content, 1),
+      }];
+    }
     return splitIntoPages(content).map(({ content: pageContent, startLine }) => {
       let title = "";
       let body = pageContent;
@@ -2166,7 +2371,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         sections: splitMarkdownSections(body, bodyStartLine),
       };
     });
-  }, [content]);
+  }, [content, basicWebpage]);
 
   useEffect(
     () => () => {
@@ -2204,6 +2409,12 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
     <div className="space-y-6 sm:space-y-8 pb-24">
       {/* Dynamic style for the H1 in the intro page so we can use the accentColor */}
       <style>{`
+        ::highlight(markdown-reader-word) {
+          background: rgba(34, 211, 238, .38);
+          color: inherit;
+          border-radius: 3px;
+        }
+        ${!basicWebpage ? `
         .curled-shadow-wrapper {
           position: relative;
           z-index: 1;
@@ -2228,11 +2439,6 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         }
         .dark .curled-shadow-wrapper::before, .dark .curled-shadow-wrapper::after {
           box-shadow: 0 15px 15px rgba(0,0,0,0.4);
-        }
-        ::highlight(markdown-reader-word) {
-          background: rgba(34, 211, 238, .38);
-          color: inherit;
-          border-radius: 3px;
         }
         .md-body h1 {
           position: relative;
@@ -2307,6 +2513,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         .md-body h1 code, .md-body h2 code, .md-body h3 code, .md-body h4 code {
           -webkit-text-fill-color: initial;
         }
+        ` : ''}
         
         .intro-page-content h1 {
           font-size: 2.5rem;
@@ -2346,14 +2553,16 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
         // provides all of that, so this is bare content, not a second card.
         const wrapperClasses = embedded
           ? "w-full"
-          : `relative w-full ${widthClass} curled-shadow-wrapper mt-4`;
+          : basicWebpage
+            ? `w-full ${widthClass} mt-6`
+            : `relative w-full ${widthClass} curled-shadow-wrapper mt-4`;
 
-        const pageClasses = embedded
+        const pageClasses = embedded || basicWebpage
           ? "w-full"
           : `relative bg-white dark:bg-[#0c1520] rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-10 border ${ui?.border || "border-slate-200 dark:border-slate-800"} w-full h-full`;
 
         // We use a pseudo-random fold size and corner based on pageIdx
-        const hasFold = !embedded && (pageIdx * 17) % 5 === 0; // ~20% chance
+        const hasFold = !embedded && !basicWebpage && (pageIdx * 17) % 5 === 0; // ~20% chance
         const foldSize = hasFold ? 30 + ((pageIdx * 7) % 3) * 10 : 0; // 30, 40, or 50
         const isFoldRight = pageIdx % 2 === 0;
         
@@ -2437,7 +2646,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath]}
                         rehypePlugins={[rehypeRaw, rehypeKatex]}
-                        components={MD_COMPONENTS}
+                        components={basicWebpage ? BASIC_MD_COMPONENTS : MD_COMPONENTS}
                       >
                         {title}
                       </ReactMarkdown>
@@ -2471,7 +2680,7 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                       key={globalIdx}
                       remarkPlugins={[remarkGfm, remarkMath]}
                       rehypePlugins={[rehypeRaw, rehypeKatex]}
-                      components={MD_COMPONENTS}
+                      components={basicWebpage ? BASIC_MD_COMPONENTS : MD_COMPONENTS}
                     >
                       {section.content}
                     </ReactMarkdown>
@@ -2480,32 +2689,34 @@ export const SectionedMarkdown = memo(function SectionedMarkdown({
                 const isPlaying = playingIdx === globalIdx;
                 return (
                   <div ref={node => { if (node) sectionRefs.current.set(globalIdx, node); else sectionRefs.current.delete(globalIdx); }} key={globalIdx} className={`relative group ${secIdx === 0 ? "" : "mt-4"}`}>
-                    <button
-                      onClick={() => handlePlay(globalIdx, section.content)}
-                      title={isPlaying ? (isPaused ? "Resume reading" : "Pause reading") : "Read aloud"}
-                      className={`absolute -top-3 -right-3 z-10 flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md border transition-all shadow-sm ${
-                        isPlaying
-                          ? "opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20"
-                          : `opacity-0 group-hover:opacity-100 text-slate-500 bg-white border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700`
-                      }`}
-                    >
-                      {isPlaying ? (
-                        <>
-                          {isPaused ? <Play className="w-3 h-3 fill-current" /> : <Pause className="w-3 h-3 fill-current" />}
-                          &nbsp;{isPaused ? "Resume" : "Pause"}
-                        </>
-                      ) : (
-                        <>
-                          <Volume2 className="w-2.5 h-2.5" />
-                          &nbsp;Read
-                        </>
-                      )}
-                    </button>
+                    {!basicWebpage && (
+                      <button
+                        onClick={() => handlePlay(globalIdx, section.content)}
+                        title={isPlaying ? (isPaused ? "Resume reading" : "Pause reading") : "Read aloud"}
+                        className={`absolute -top-3 -right-3 z-10 flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md border transition-all shadow-sm ${
+                          isPlaying
+                            ? "opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20"
+                            : `opacity-0 group-hover:opacity-100 text-slate-500 bg-white border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700`
+                        }`}
+                      >
+                        {isPlaying ? (
+                          <>
+                            {isPaused ? <Play className="w-3 h-3 fill-current" /> : <Pause className="w-3 h-3 fill-current" />}
+                            &nbsp;{isPaused ? "Resume" : "Pause"}
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-2.5 h-2.5" />
+                            &nbsp;Read
+                          </>
+                        )}
+                      </button>
+                    )}
                     <ChunkLineOffsetCtx.Provider value={section.startLine}>
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath]}
                         rehypePlugins={[rehypeRaw, rehypeKatex]}
-                        components={MD_COMPONENTS}
+                        components={basicWebpage ? BASIC_MD_COMPONENTS : MD_COMPONENTS}
                       >
                         {normalizeDisplayMath(
                           convertTexDelimiters(section.content),
@@ -3565,7 +3776,7 @@ export default function MarkdownHub() {
 
   return (
     <>
-      <style>{getMdCss(themeStyles.md)}</style>
+      <style>{getMdCss(themeStyles.md, typography.basicWebpage)}</style>
       <input
         ref={fileInputRef}
         type="file"
@@ -3789,6 +4000,26 @@ export default function MarkdownHub() {
                           </button>
                         ))}
                       </div>
+                    </div>
+                    <div>
+                      <label
+                        className={`block text-[10px] uppercase font-bold tracking-widest ${ui.txt2} mb-2 mt-4`}
+                      >
+                        Look & Feel
+                      </label>
+                      <button
+                        onClick={() => setTypography({ basicWebpage: !typography.basicWebpage })}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                          typography.basicWebpage
+                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
+                            : `bg-slate-100 dark:bg-slate-800 ${ui.txt1} hover:opacity-80`
+                        }`}
+                      >
+                        <span>Basic Webpage Style</span>
+                        <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${typography.basicWebpage ? 'bg-indigo-500' : 'bg-slate-400 dark:bg-slate-600'}`}>
+                          <div className={`w-3 h-3 rounded-full bg-white transition-transform ${typography.basicWebpage ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -4275,7 +4506,7 @@ export default function MarkdownHub() {
                                   <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath]}
                                     rehypePlugins={[rehypeRaw, rehypeKatex]}
-                                    components={MD_COMPONENTS}
+                                    components={typography.basicWebpage ? BASIC_MD_COMPONENTS : MD_COMPONENTS}
                                   >
                                     {filteredTermsMd}
                                   </ReactMarkdown>
@@ -4297,7 +4528,7 @@ export default function MarkdownHub() {
                                   <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath]}
                                     rehypePlugins={[rehypeRaw, rehypeKatex]}
-                                    components={MD_COMPONENTS}
+                                    components={typography.basicWebpage ? BASIC_MD_COMPONENTS : MD_COMPONENTS}
                                   >
                                     {filteredObjectsMd}
                                   </ReactMarkdown>
@@ -4444,6 +4675,7 @@ export default function MarkdownHub() {
                         lineHeight={typography.lineHeight}
                         fontSize={typography.fontSize}
                         textAlign={typography.textAlign}
+                        basicWebpage={typography.basicWebpage}
                       />
                       {nextTutorial && (
                         <div className="mt-10 px-4 flex justify-end">
@@ -4500,6 +4732,7 @@ export default function MarkdownHub() {
                     lineHeight={typography.lineHeight}
                     fontSize={typography.fontSize}
                     textAlign={typography.textAlign}
+                    basicWebpage={typography.basicWebpage}
                   />
                 </div>
               )}

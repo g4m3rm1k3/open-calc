@@ -75,7 +75,8 @@ const DEFAULT_TYPOGRAPHY = {
   fontSize: 'base',
   textAlign: 'left',
   width: 'wide',
-  lineHeight: 'relaxed'
+  lineHeight: 'relaxed',
+  basicWebpage: false
 };
 
 export function ThemeProvider({ children }) {
@@ -190,7 +191,8 @@ export function ThemeProvider({ children }) {
       fontSize: 'base',
       textAlign: 'left',
       width: 'wide',
-      lineHeight: 'relaxed'
+      lineHeight: 'relaxed',
+      basicWebpage: false
     };
   });
 
