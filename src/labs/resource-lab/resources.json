@@ -618,6 +618,1450 @@
     "url": "https://openstax.org/subjects",
     "tags": ["STEM", "Book", "Textbooks"]
   },
+
+  {
+    "title": "Introduction to Mechanical Design and Manufacturing",
+    "description": "Open textbook covering mechanical product design, design requirements, assemblies, prototyping, design for manufacturing, casting, molding, forming, machining, joining, and plastics processing.",
+    "url": "https://open.umn.edu/opentextbooks/textbooks/introduction-to-mechanical-design-and-manufacturing",
+    "tags": [
+      "Mechanical Engineering",
+      "Manufacturing",
+      "Machining",
+      "Design for Manufacturing",
+      "Open Textbook"
+    ]
+  },
+  {
+    "title": "MIT Design and Manufacturing II",
+    "description": "University-level manufacturing course covering manufacturing processes, metal cutting, machining, joining, quality, manufacturing systems, forming, casting, additive manufacturing, and process economics.",
+    "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+    "tags": [
+      "Manufacturing",
+      "Mechanical Engineering",
+      "Machining",
+      "Materials",
+      "Quality",
+      "Course"
+    ]
+  },
+  {
+    "title": "MIT Manufacturing Processes",
+    "description": "MIT OpenCourseWare manufacturing materials covering process physics, manufacturing equipment, process selection, and production engineering.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=manufacturing",
+    "tags": [
+      "Manufacturing",
+      "Mechanical Engineering",
+      "Engineering",
+      "Courses"
+    ]
+  },
+  {
+    "title": "Engineering LibreTexts",
+    "description": "Large open engineering library covering mechanical engineering, manufacturing, materials, thermodynamics, mechanics, electrical engineering, chemical engineering, and related disciplines.",
+    "url": "https://eng.libretexts.org/",
+    "tags": [
+      "Engineering",
+      "Manufacturing",
+      "Mechanical Engineering",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "Mechanical Engineering LibreTexts",
+    "description": "Open mechanical engineering textbooks and references covering mechanics, thermodynamics, fluid mechanics, materials, machine design, and manufacturing.",
+    "url": "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering",
+    "tags": [
+      "Mechanical Engineering",
+      "Engineering",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "Manufacturing Engineering LibreTexts",
+    "description": "Open educational material covering manufacturing processes, materials, production systems, machining, forming, casting, and manufacturing engineering.",
+    "url": "https://eng.libretexts.org/Bookshelves/Manufacturing",
+    "tags": [
+      "Manufacturing",
+      "Engineering",
+      "Machining",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "America's Cutting Edge",
+    "description": "No-cost self-paced CNC machining training covering machining fundamentals, machining dynamics, machine cost, CAM, Fusion, Mastercam, and advanced manufacturing.",
+    "url": "https://tees.tamu.edu/workforce-development/manufacturing-training-and-development/ace/",
+    "tags": [
+      "CNC",
+      "Machining",
+      "CAM",
+      "Manufacturing",
+      "Training"
+    ]
+  },
+  {
+    "title": "TITANS of CNC Academy",
+    "description": "Free CAD, CAM, and CNC training with machining projects covering milling, turning, 5-axis machining, aerospace machining, CAD modeling, CAM programming, and setup.",
+    "url": "https://academy.titansofcnc.com/",
+    "tags": [
+      "CNC",
+      "Machining",
+      "CAD",
+      "CAM",
+      "5-Axis",
+      "Training"
+    ]
+  },
+  {
+    "title": "TITANS of CNC Building Blocks",
+    "description": "Large collection of free machining and CAD/CAM lessons covering modeling, toolpaths, fixtures, turning, milling, Fusion 360, Mastercam, and CNC programming.",
+    "url": "https://academy.titansofcnc.com/",
+    "tags": [
+      "CNC",
+      "CAD",
+      "CAM",
+      "Machining",
+      "Fusion 360",
+      "Mastercam"
+    ]
+  },
+  {
+    "title": "CNC Cookbook",
+    "description": "Large free technical reference covering CNC programming, G-code, machining concepts, feeds and speeds, tooling, workholding, CNC machine operation, and manufacturing calculations.",
+    "url": "https://www.cnccookbook.com/",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "Machining",
+      "Feeds and Speeds",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "CNC Cookbook G-Code Reference",
+    "description": "Free reference material for CNC G-code and M-code programming, including commands, programming concepts, and machine control.",
+    "url": "https://www.cnccookbook.com/g-code-m-code-reference/",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "M-Code",
+      "Programming",
+      "Machining"
+    ]
+  },
+  {
+    "title": "GCodeTutor",
+    "description": "Free CNC training material covering G-code, shop mathematics, manual machining, CNC programming, and practical machining skills.",
+    "url": "https://gcodetutor.com/free-course.html",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "Machining",
+      "Shop Math",
+      "Training"
+    ]
+  },
+  {
+    "title": "Machinist Guides",
+    "description": "Free machining education and reference material covering CNC programming, machining processes, tooling, shop mathematics, and manufacturing fundamentals.",
+    "url": "https://www.machinistguides.com/",
+    "tags": [
+      "Machining",
+      "CNC",
+      "Manufacturing",
+      "Shop Math"
+    ]
+  },
+  {
+    "title": "Machinist's Handbook Resources",
+    "description": "Collection of machining reference information covering feeds, speeds, tooling, materials, tolerances, measurements, and shop calculations.",
+    "url": "https://www.machinistblog.com/",
+    "tags": [
+      "Machining",
+      "Reference",
+      "Manufacturing",
+      "Metrology"
+    ]
+  },
+  {
+    "title": "Practical Machinist",
+    "description": "Large machining and manufacturing community containing technical discussions, machining knowledge, tooling information, CNC programming, and shop practices.",
+    "url": "https://www.practicalmachinist.com/",
+    "tags": [
+      "Machining",
+      "CNC",
+      "Manufacturing",
+      "Community"
+    ]
+  },
+  {
+    "title": "Machinist's Learning Resources",
+    "description": "Collection of educational resources for machinists covering CNC programming, machining fundamentals, CAD/CAM, manufacturing processes, and tooling.",
+    "url": "https://machinist.com/resources/educational",
+    "tags": [
+      "Machining",
+      "CNC",
+      "CAD",
+      "CAM",
+      "Training"
+    ]
+  },
+  {
+    "title": "NYC CNC",
+    "description": "Practical CNC machining education covering Fusion 360, CAD/CAM, CNC milling, turning, workholding, tooling, machine setup, and manufacturing projects.",
+    "url": "https://www.nyccnc.com/",
+    "tags": [
+      "CNC",
+      "Machining",
+      "Fusion 360",
+      "CAD",
+      "CAM"
+    ]
+  },
+  {
+    "title": "Autodesk Fusion Manufacturing",
+    "description": "Free educational material covering CAD/CAM workflows, CNC machining, toolpath generation, simulation, post-processing, and manufacturing.",
+    "url": "https://www.autodesk.com/solutions/manufacturing",
+    "tags": [
+      "CAD",
+      "CAM",
+      "CNC",
+      "Fusion 360",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "Autodesk Fusion CNC Training",
+    "description": "Free training resources covering CAD modeling, CAM programming, CNC milling, toolpaths, simulation, and practical manufacturing workflows.",
+    "url": "https://www.autodesk.com/solutions/free-cam-software",
+    "tags": [
+      "Fusion 360",
+      "CAM",
+      "CNC",
+      "Machining",
+      "Training"
+    ]
+  },
+  {
+    "title": "Haas CNC Education",
+    "description": "Educational CNC resources covering Haas machines, CNC operation, programming, machining, setup, and manufacturing technology.",
+    "url": "https://www.haascnc.com/service/training.html",
+    "tags": [
+      "CNC",
+      "Machining",
+      "Haas",
+      "G-Code",
+      "Training"
+    ]
+  },
+  {
+    "title": "Haas Automation CNC Programming",
+    "description": "CNC programming and machine-operation resources covering milling, turning, G-code, setup, tooling, and machine controls.",
+    "url": "https://www.haascnc.com/",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "Machining",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "Mastercam University",
+    "description": "Online educational resources for Mastercam CAD/CAM programming covering milling, turning, multiaxis machining, toolpaths, and CNC manufacturing.",
+    "url": "https://www.mastercam.com/learn/mastercam-university/",
+    "tags": [
+      "Mastercam",
+      "CAM",
+      "CNC",
+      "Machining",
+      "Training"
+    ]
+  },
+  {
+    "title": "Mastercam Learning Center",
+    "description": "Mastercam training resources covering CAD/CAM workflows, milling, turning, multiaxis machining, programming, and manufacturing.",
+    "url": "https://www.mastercam.com/learn/",
+    "tags": [
+      "Mastercam",
+      "CAM",
+      "CNC",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "FreeCAD",
+    "description": "Free open-source parametric 3D CAD system suitable for mechanical design, engineering, assemblies, technical drawings, and manufacturing workflows.",
+    "url": "https://www.freecad.org/",
+    "tags": [
+      "CAD",
+      "Mechanical Engineering",
+      "Open Source",
+      "3D Modeling",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "FreeCAD Path Workbench",
+    "description": "Open-source CAM environment within FreeCAD for creating CNC toolpaths, machining operations, post-processing, and manufacturing workflows.",
+    "url": "https://www.freecad.org/wiki/Path_Workbench",
+    "tags": [
+      "CAM",
+      "CNC",
+      "FreeCAD",
+      "Open Source",
+      "Machining"
+    ]
+  },
+  {
+    "title": "OpenBuilds",
+    "description": "Open-source CNC machine ecosystem containing machine designs, electronics, software, documentation, and CNC learning resources.",
+    "url": "https://openbuilds.com/",
+    "tags": [
+      "CNC",
+      "Open Source",
+      "Machine Design",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "OpenBuilds CAM",
+    "description": "Free browser-based CAM software for generating CNC toolpaths and G-code from vector and CAD geometry.",
+    "url": "https://cam.openbuilds.com/",
+    "tags": [
+      "CAM",
+      "CNC",
+      "G-Code",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "bCNC",
+    "description": "Free open-source CNC controller and G-code sender with visualization, probing, jogging, and machine-control capabilities.",
+    "url": "https://github.com/vlachoudis/bCNC",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "Open Source",
+      "Machine Control"
+    ]
+  },
+  {
+    "title": "LinuxCNC",
+    "description": "Free open-source CNC control software for controlling machine tools and implementing custom CNC machine architectures.",
+    "url": "https://linuxcnc.org/",
+    "tags": [
+      "CNC",
+      "Open Source",
+      "Machine Control",
+      "Automation"
+    ]
+  },
+  {
+    "title": "GRBL",
+    "description": "Open-source CNC controller firmware for converting embedded hardware into a CNC machine controller.",
+    "url": "https://github.com/grbl/grbl",
+    "tags": [
+      "CNC",
+      "G-Code",
+      "Embedded Systems",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "FluidNC",
+    "description": "Open-source CNC firmware based on ESP32 providing configurable motion control, networking, and machine control.",
+    "url": "https://github.com/bdring/FluidNC",
+    "tags": [
+      "CNC",
+      "Embedded Systems",
+      "ESP32",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "RepRap",
+    "description": "Open-source 3D printing project covering machine design, firmware, electronics, mechanics, materials, and additive manufacturing.",
+    "url": "https://reprap.org/",
+    "tags": [
+      "3D Printing",
+      "Additive Manufacturing",
+      "Open Source",
+      "Mechanical Engineering"
+    ]
+  },
+  {
+    "title": "Prusa Knowledge Base",
+    "description": "Free technical documentation and educational resources covering 3D printing, slicing, materials, printer mechanics, calibration, and troubleshooting.",
+    "url": "https://help.prusa3d.com/",
+    "tags": [
+      "3D Printing",
+      "Additive Manufacturing",
+      "Materials",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "PrusaSlicer",
+    "description": "Open-source slicing software for converting 3D models into toolpaths for additive manufacturing and 3D printing.",
+    "url": "https://github.com/prusa3d/PrusaSlicer",
+    "tags": [
+      "3D Printing",
+      "Additive Manufacturing",
+      "Open Source",
+      "Toolpaths"
+    ]
+  },
+  {
+    "title": "OpenSCAD",
+    "description": "Open-source script-based solid modeling system for creating parametric mechanical parts and engineering models.",
+    "url": "https://openscad.org/",
+    "tags": [
+      "CAD",
+      "Parametric Modeling",
+      "Open Source",
+      "Mechanical Engineering"
+    ]
+  },
+  {
+    "title": "OpenSCAD Documentation",
+    "description": "Free documentation teaching script-based parametric CAD modeling and computational solid geometry.",
+    "url": "https://en.wikibooks.org/wiki/OpenSCAD_User_Manual",
+    "tags": [
+      "CAD",
+      "OpenSCAD",
+      "Parametric Modeling",
+      "Programming"
+    ]
+  },
+  {
+    "title": "SolveSpace",
+    "description": "Free open-source parametric 2D and 3D CAD program designed for mechanical design and constraint-based modeling.",
+    "url": "https://solvespace.com/",
+    "tags": [
+      "CAD",
+      "Mechanical Engineering",
+      "Open Source",
+      "Parametric Modeling"
+    ]
+  },
+  {
+    "title": "BRL-CAD",
+    "description": "Open-source constructive solid geometry CAD system with modeling, analysis, ray tracing, and engineering capabilities.",
+    "url": "https://brlcad.org/",
+    "tags": [
+      "CAD",
+      "Engineering",
+      "Open Source",
+      "Solid Modeling"
+    ]
+  },
+  {
+    "title": "KiCad",
+    "description": "Open-source electronics design suite for schematic capture, PCB layout, electrical design, and circuit simulation.",
+    "url": "https://www.kicad.org/",
+    "tags": [
+      "Electrical Engineering",
+      "PCB",
+      "Electronics",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "OpenModelica",
+    "description": "Open-source modeling and simulation environment for physical systems including mechanical, electrical, thermal, hydraulic, and control systems.",
+    "url": "https://openmodelica.org/",
+    "tags": [
+      "Engineering",
+      "Simulation",
+      "Systems Engineering",
+      "Controls",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "Modelica",
+    "description": "Open standard and ecosystem for equation-based modeling and simulation of complex physical engineering systems.",
+    "url": "https://modelica.org/",
+    "tags": [
+      "Engineering",
+      "Simulation",
+      "Systems Engineering",
+      "Modeling"
+    ]
+  },
+  {
+    "title": "CalculiX",
+    "description": "Free finite-element analysis software for structural mechanics, thermal analysis, and engineering simulation.",
+    "url": "https://www.calculix.de/",
+    "tags": [
+      "FEA",
+      "Mechanical Engineering",
+      "Simulation",
+      "Structural Analysis"
+    ]
+  },
+  {
+    "title": "Code_Aster",
+    "description": "Open-source finite-element analysis software developed for advanced structural, thermal, seismic, and multiphysics engineering analysis.",
+    "url": "https://www.code-aster.org/",
+    "tags": [
+      "FEA",
+      "Simulation",
+      "Mechanical Engineering",
+      "Structural Engineering"
+    ]
+  },
+  {
+    "title": "Elmer FEM",
+    "description": "Open-source multiphysics simulation software for finite-element analysis of thermal, structural, fluid, electromagnetic, and other physical systems.",
+    "url": "https://www.csc.fi/web/elmer",
+    "tags": [
+      "FEA",
+      "Multiphysics",
+      "Simulation",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "OpenFOAM",
+    "description": "Open-source computational fluid dynamics platform for simulating fluid flow, heat transfer, turbulence, multiphase systems, and engineering processes.",
+    "url": "https://www.openfoam.com/",
+    "tags": [
+      "CFD",
+      "Fluid Mechanics",
+      "Simulation",
+      "Engineering",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "SU2",
+    "description": "Open-source multiphysics simulation and design software focused on computational fluid dynamics, aerodynamics, and optimization.",
+    "url": "https://su2code.github.io/",
+    "tags": [
+      "CFD",
+      "Aerodynamics",
+      "Simulation",
+      "Optimization"
+    ]
+  },
+  {
+    "title": "Calculix CrunchiX",
+    "description": "Free finite-element solver for nonlinear structural mechanics and engineering simulation.",
+    "url": "https://www.calculix.de/",
+    "tags": [
+      "FEA",
+      "Structural Engineering",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "GNU Octave",
+    "description": "Free numerical computing environment useful for engineering mathematics, matrix computation, modeling, simulation, and numerical analysis.",
+    "url": "https://octave.org/",
+    "tags": [
+      "Engineering",
+      "Mathematics",
+      "Numerical Computing",
+      "Simulation"
+    ]
+  },
+  {
+    "title": "SciPy",
+    "description": "Scientific Python library providing optimization, integration, interpolation, signal processing, statistics, linear algebra, and numerical algorithms.",
+    "url": "https://scipy.org/",
+    "tags": [
+      "Engineering",
+      "Python",
+      "Numerical Computing",
+      "Scientific Computing"
+    ]
+  },
+  {
+    "title": "Engineering Statistics Handbook",
+    "description": "Free statistical reference covering engineering statistics, probability, measurement, process control, reliability, and experimental design.",
+    "url": "https://www.itl.nist.gov/div898/handbook/",
+    "tags": [
+      "Engineering",
+      "Statistics",
+      "Quality",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "NIST Engineering Statistics Handbook",
+    "description": "Comprehensive engineering statistics reference covering statistical methods, process characterization, design of experiments, reliability, and quality engineering.",
+    "url": "https://www.itl.nist.gov/div898/handbook/",
+    "tags": [
+      "Statistics",
+      "Quality Engineering",
+      "Manufacturing",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "NIST Manufacturing",
+    "description": "Research and technical resources covering advanced manufacturing, measurement science, manufacturing processes, materials, automation, and production systems.",
+    "url": "https://www.nist.gov/topics/manufacturing",
+    "tags": [
+      "Manufacturing",
+      "Metrology",
+      "Automation",
+      "Materials",
+      "Research"
+    ]
+  },
+  {
+    "title": "NIST Materials Science",
+    "description": "Technical information and research resources covering materials properties, characterization, measurement, manufacturing, and materials engineering.",
+    "url": "https://www.nist.gov/materials-science-and-engineering",
+    "tags": [
+      "Materials Science",
+      "Manufacturing",
+      "Engineering",
+      "Metrology"
+    ]
+  },
+  {
+    "title": "NIST Digital Manufacturing",
+    "description": "Research and educational resources related to digital manufacturing, smart manufacturing, industrial automation, manufacturing data, and interoperability.",
+    "url": "https://www.nist.gov/topics/advanced-manufacturing",
+    "tags": [
+      "Digital Manufacturing",
+      "Smart Manufacturing",
+      "Automation",
+      "Industry 4.0"
+    ]
+  },
+  {
+    "title": "DoE Manufacturing Resources",
+    "description": "United States Department of Energy resources covering advanced manufacturing, industrial efficiency, materials, process technologies, and manufacturing research.",
+    "url": "https://www.energy.gov/eere/amo/advanced-materials",
+    "tags": [
+      "Manufacturing",
+      "Materials",
+      "Energy",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "Oak Ridge National Laboratory Manufacturing",
+    "description": "Research and educational resources covering advanced manufacturing, additive manufacturing, composites, materials, robotics, machining, and digital manufacturing.",
+    "url": "https://www.ornl.gov/topic/manufacturing",
+    "tags": [
+      "Advanced Manufacturing",
+      "Materials",
+      "Robotics",
+      "Additive Manufacturing"
+    ]
+  },
+  {
+    "title": "America Makes",
+    "description": "Additive manufacturing education, research, technology development, and workforce resources focused on industrial 3D printing.",
+    "url": "https://www.americamakes.us/",
+    "tags": [
+      "Additive Manufacturing",
+      "3D Printing",
+      "Manufacturing",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "DoITPoMS",
+    "description": "University of Cambridge teaching resources covering materials science, crystallography, polymers, composites, phase diagrams, mechanical properties, and materials processing.",
+    "url": "https://www.doitpoms.ac.uk/",
+    "tags": [
+      "Materials Science",
+      "Engineering",
+      "Composites",
+      "Metallurgy",
+      "Interactive"
+    ]
+  },
+  {
+    "title": "Materials Project",
+    "description": "Open materials database providing computed materials properties, crystal structures, phase information, and materials science data.",
+    "url": "https://materialsproject.org/",
+    "tags": [
+      "Materials Science",
+      "Materials Engineering",
+      "Database",
+      "Research"
+    ]
+  },
+  {
+    "title": "MatWeb",
+    "description": "Free materials property database containing engineering properties for metals, plastics, ceramics, composites, and other materials.",
+    "url": "https://www.matweb.com/",
+    "tags": [
+      "Materials",
+      "Engineering",
+      "Metals",
+      "Plastics",
+      "Reference"
+    ]
+  },
+  {
+    "title": "MakeItFrom",
+    "description": "Materials engineering database providing mechanical, thermal, physical, and manufacturing properties for engineering materials.",
+    "url": "https://www.makeitfrom.com/",
+    "tags": [
+      "Materials",
+      "Engineering",
+      "Manufacturing",
+      "Reference"
+    ]
+  },
+  {
+    "title": "Engineering Toolbox",
+    "description": "Large engineering reference containing equations, material properties, fluid data, thermodynamics, heat transfer, mechanical engineering data, and process calculations.",
+    "url": "https://www.engineeringtoolbox.com/",
+    "tags": [
+      "Engineering",
+      "Reference",
+      "Mechanical Engineering",
+      "Thermodynamics"
+    ]
+  },
+  {
+    "title": "RoyMech",
+    "description": "Engineering reference covering mechanical engineering calculations, materials, fasteners, bearings, gears, shafts, springs, tolerances, and machine design.",
+    "url": "https://roymech.co.uk/",
+    "tags": [
+      "Mechanical Engineering",
+      "Machine Design",
+      "Engineering",
+      "Reference"
+    ]
+  },
+  {
+    "title": "eFunda",
+    "description": "Engineering reference covering mathematics, mechanics, materials, thermodynamics, electrical engineering, chemical engineering, and engineering calculators.",
+    "url": "https://www.efunda.com/",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Reference",
+      "Calculators"
+    ]
+  },
+  {
+    "title": "MIT Machine Design",
+    "description": "Open mechanical engineering course resources covering machine elements, mechanical design, stress, fatigue, bearings, gears, shafts, and design methodology.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=machine%20design",
+    "tags": [
+      "Mechanical Engineering",
+      "Machine Design",
+      "Engineering",
+      "Course"
+    ]
+  },
+  {
+    "title": "MIT Mechanics of Materials",
+    "description": "Open course resources covering stress, strain, deformation, beams, torsion, failure, and structural mechanics.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=mechanics%20of%20materials",
+    "tags": [
+      "Mechanical Engineering",
+      "Materials",
+      "Mechanics",
+      "Structural Engineering"
+    ]
+  },
+  {
+    "title": "MIT Thermodynamics",
+    "description": "Open thermodynamics courses covering energy, entropy, heat engines, refrigeration, phase behavior, and engineering thermodynamic systems.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=thermodynamics",
+    "tags": [
+      "Mechanical Engineering",
+      "Thermodynamics",
+      "Energy",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "MIT Fluid Mechanics",
+    "description": "Open engineering courses covering fluid statics, fluid dynamics, conservation laws, boundary layers, turbulence, and engineering flows.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=fluid%20mechanics",
+    "tags": [
+      "Mechanical Engineering",
+      "Fluid Mechanics",
+      "CFD",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "MIT Heat Transfer",
+    "description": "Open engineering resources covering conduction, convection, radiation, heat exchangers, and thermal systems.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=heat%20transfer",
+    "tags": [
+      "Mechanical Engineering",
+      "Thermal Engineering",
+      "Heat Transfer"
+    ]
+  },
+  {
+    "title": "MIT Dynamics",
+    "description": "Open engineering course material covering kinematics, kinetics, rigid-body dynamics, vibration, and mechanical systems.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=dynamics",
+    "tags": [
+      "Mechanical Engineering",
+      "Dynamics",
+      "Mechanics"
+    ]
+  },
+  {
+    "title": "MIT Robotics",
+    "description": "Open robotics courses covering robot kinematics, dynamics, control, motion planning, sensing, manipulation, and autonomous systems.",
+    "url": "https://ocw.mit.edu/search/?d=Mechanical%20Engineering&q=robotics",
+    "tags": [
+      "Robotics",
+      "Mechanical Engineering",
+      "Controls",
+      "Automation"
+    ]
+  },
+  {
+    "title": "Modern Robotics",
+    "description": "Free online robotics textbook and course material covering robot kinematics, dynamics, trajectory generation, motion planning, control, and manipulation.",
+    "url": "https://modernrobotics.northwestern.edu/",
+    "tags": [
+      "Robotics",
+      "Mechanical Engineering",
+      "Controls",
+      "Book"
+    ]
+  },
+  {
+    "title": "Robotics Toolbox for MATLAB",
+    "description": "Robotics software and educational resources for modeling robot kinematics, dynamics, trajectories, and manipulators.",
+    "url": "https://petercorke.com/toolboxes/robotics-toolbox/",
+    "tags": [
+      "Robotics",
+      "Simulation",
+      "Kinematics",
+      "Dynamics"
+    ]
+  },
+  {
+    "title": "ROS",
+    "description": "Open-source robotics middleware ecosystem providing tools, libraries, simulation interfaces, visualization, communication, and robot software development infrastructure.",
+    "url": "https://www.ros.org/",
+    "tags": [
+      "Robotics",
+      "Automation",
+      "Programming",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "ROS Documentation",
+    "description": "Free technical documentation and tutorials for building robotic applications using ROS 2.",
+    "url": "https://docs.ros.org/",
+    "tags": [
+      "Robotics",
+      "ROS",
+      "Programming",
+      "Automation"
+    ]
+  },
+  {
+    "title": "Gazebo",
+    "description": "Open-source robotics simulation platform for modeling robots, sensors, environments, physics, and autonomous systems.",
+    "url": "https://gazebosim.org/",
+    "tags": [
+      "Robotics",
+      "Simulation",
+      "Automation",
+      "Open Source"
+    ]
+  },
+  {
+    "title": "PLC Open",
+    "description": "Open industrial automation resources covering programmable logic controllers, automation standards, motion control, and industrial programming.",
+    "url": "https://www.plcopen.org/",
+    "tags": [
+      "Automation",
+      "PLC",
+      "Industrial Engineering",
+      "Controls"
+    ]
+  },
+  {
+    "title": "AutomationDirect Learning",
+    "description": "Free industrial automation learning resources covering PLCs, controls, sensors, motors, motion control, industrial networking, and automation hardware.",
+    "url": "https://library.automationdirect.com/",
+    "tags": [
+      "Automation",
+      "PLC",
+      "Controls",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "RealPars",
+    "description": "Industrial automation educational resources covering PLCs, sensors, industrial networks, robotics, SCADA, drives, and manufacturing automation.",
+    "url": "https://realpars.com/",
+    "tags": [
+      "Automation",
+      "PLC",
+      "Industrial Engineering",
+      "Robotics"
+    ]
+  },
+  {
+    "title": "InstrumentationTools",
+    "description": "Free engineering reference covering instrumentation, process control, industrial automation, sensors, PLCs, control systems, and engineering calculations.",
+    "url": "https://instrumentationtools.com/",
+    "tags": [
+      "Instrumentation",
+      "Controls",
+      "Automation",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "Control Systems Engineering LibreTexts",
+    "description": "Open textbook covering feedback systems, transfer functions, block diagrams, stability, controllers, and control engineering.",
+    "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introduction_to_Control_Systems",
+    "tags": [
+      "Controls",
+      "Automation",
+      "Electrical Engineering",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "LearnChemE",
+    "description": "Free chemical engineering simulations, screencasts, concept questions, and interactive educational resources covering thermodynamics, transport, reactors, and process engineering.",
+    "url": "https://learncheme.com/",
+    "tags": [
+      "Chemical Engineering",
+      "Simulation",
+      "Process Engineering",
+      "Interactive"
+    ]
+  },
+  {
+    "title": "MIT Chemical Engineering",
+    "description": "Open chemical engineering courses covering transport phenomena, thermodynamics, reaction engineering, process design, and chemical process systems.",
+    "url": "https://ocw.mit.edu/search/?d=Chemical%20Engineering",
+    "tags": [
+      "Chemical Engineering",
+      "Process Engineering",
+      "Thermodynamics",
+      "Courses"
+    ]
+  },
+  {
+    "title": "Engineering ToolBox - Manufacturing",
+    "description": "Engineering reference information for manufacturing processes, material properties, machining calculations, heat treatment, and industrial engineering.",
+    "url": "https://www.engineeringtoolbox.com/",
+    "tags": [
+      "Manufacturing",
+      "Engineering",
+      "Materials",
+      "Reference"
+    ]
+  },
+  {
+    "title": "WeldingWeb",
+    "description": "Community and educational resource covering welding processes, fabrication, metallurgy, equipment, techniques, and shop practices.",
+    "url": "https://weldingweb.com/",
+    "tags": [
+      "Welding",
+      "Fabrication",
+      "Manufacturing",
+      "Metallurgy"
+    ]
+  },
+  {
+    "title": "Lincoln Electric Education",
+    "description": "Educational resources covering welding processes, metallurgy, welding technology, safety, fabrication, and welding engineering.",
+    "url": "https://www.lincolnelectric.com/en/welding-education",
+    "tags": [
+      "Welding",
+      "Manufacturing",
+      "Metallurgy",
+      "Fabrication"
+    ]
+  },
+  {
+    "title": "Miller Welds Education",
+    "description": "Welding educational resources covering welding processes, equipment, techniques, fabrication, and welding fundamentals.",
+    "url": "https://www.millerwelds.com/resources/welding-resources",
+    "tags": [
+      "Welding",
+      "Fabrication",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "Open Textbooks Welding and Machining",
+    "description": "Openly licensed professional-technical textbooks covering welding and machining with downloadable and adaptable educational material.",
+    "url": "https://www.constructioncenterofexcellence.com/training/open-textbooks-welding-machining",
+    "tags": [
+      "Welding",
+      "Machining",
+      "Manufacturing",
+      "Open Textbooks"
+    ]
+  },
+  {
+    "title": "SME Manufacturing Resources",
+    "description": "Manufacturing engineering resources covering machining, additive manufacturing, automation, production systems, quality, and manufacturing technology.",
+    "url": "https://www.sme.org/",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Engineering",
+      "Automation"
+    ]
+  },
+  {
+    "title": "ASME Learning and Resources",
+    "description": "Engineering educational resources covering mechanical engineering, manufacturing, design, energy, robotics, and engineering standards.",
+    "url": "https://www.asme.org/topics-resources",
+    "tags": [
+      "Mechanical Engineering",
+      "Manufacturing",
+      "Engineering",
+      "Design"
+    ]
+  },
+  {
+    "title": "SAE Learning Resources",
+    "description": "Engineering resources covering automotive, aerospace, mobility, manufacturing, materials, propulsion, and transportation engineering.",
+    "url": "https://www.sae.org/learn",
+    "tags": [
+      "Automotive",
+      "Aerospace",
+      "Manufacturing",
+      "Mechanical Engineering"
+    ]
+  },
+  {
+    "title": "NASA Manufacturing",
+    "description": "NASA engineering resources and research covering aerospace manufacturing, materials, additive manufacturing, composites, machining, robotics, and advanced production.",
+    "url": "https://www.nasa.gov/",
+    "tags": [
+      "Aerospace",
+      "Manufacturing",
+      "Materials",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "NASA Systems Engineering Handbook",
+    "description": "Free systems engineering reference covering requirements, architecture, design, verification, validation, integration, and lifecycle engineering.",
+    "url": "https://www.nasa.gov/reference/systems-engineering-handbook/",
+    "tags": [
+      "Systems Engineering",
+      "Engineering",
+      "Design",
+      "Project Management"
+    ]
+  },
+  {
+    "title": "NASA Technical Reports Server",
+    "description": "Free repository of NASA technical reports and engineering research covering aerospace engineering, materials, propulsion, structures, manufacturing, and systems.",
+    "url": "https://ntrs.nasa.gov/",
+    "tags": [
+      "Engineering",
+      "Aerospace",
+      "Research",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "MIT Lean Manufacturing",
+    "description": "Open manufacturing systems material covering lean production, process improvement, production planning, manufacturing systems, and operational efficiency.",
+    "url": "https://ocw.mit.edu/search/?q=lean%20manufacturing",
+    "tags": [
+      "Manufacturing",
+      "Lean",
+      "Industrial Engineering",
+      "Operations"
+    ]
+  },
+  {
+    "title": "MIT Operations Management",
+    "description": "Open university resources covering production systems, inventory, scheduling, manufacturing operations, process analysis, and operations management.",
+    "url": "https://ocw.mit.edu/search/?d=Sloan%20School%20of%20Management&q=operations",
+    "tags": [
+      "Manufacturing",
+      "Operations",
+      "Industrial Engineering",
+      "Production"
+    ]
+  },
+  {
+    "title": "MIT Statistical Quality Control",
+    "description": "Open course resources covering variation, statistical process control, quality engineering, measurement, and manufacturing process capability.",
+    "url": "https://ocw.mit.edu/search/?q=statistical%20process%20control",
+    "tags": [
+      "Quality",
+      "Manufacturing",
+      "Statistics",
+      "SPC"
+    ]
+  },
+  {
+    "title": "NIST Engineering Statistics Handbook",
+    "description": "Detailed reference for statistical process control, process characterization, measurement systems, experimental design, reliability, and engineering statistics.",
+    "url": "https://www.itl.nist.gov/div898/handbook/",
+    "tags": [
+      "Quality",
+      "SPC",
+      "Statistics",
+      "Manufacturing",
+      "Metrology"
+    ]
+  },
+  {
+    "title": "MIT Manufacturing Systems",
+    "description": "Open resources covering production systems, manufacturing planning, cost, process modeling, transfer lines, operations, and factory systems.",
+    "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+    "tags": [
+      "Manufacturing",
+      "Production Systems",
+      "Industrial Engineering",
+      "Operations"
+    ]
+  },
+  {
+    "title": "Simulation Modeling and Arena",
+    "description": "Open textbook covering discrete-event simulation, manufacturing systems, process modeling, probability, statistics, and engineering experimentation.",
+    "url": "https://rossetti.github.io/RossettiArenaBook/",
+    "tags": [
+      "Manufacturing",
+      "Simulation",
+      "Industrial Engineering",
+      "Operations"
+    ]
+  },
+  {
+    "title": "Factory Physics",
+    "description": "Educational resources for understanding manufacturing systems, production flow, variability, capacity, inventory, queues, and factory performance.",
+    "url": "https://factoryphysics.com/",
+    "tags": [
+      "Manufacturing",
+      "Industrial Engineering",
+      "Operations",
+      "Production"
+    ]
+  },
+  {
+    "title": "The Engineering Mindset",
+    "description": "Free visual engineering explanations covering mechanical systems, HVAC, electrical systems, thermodynamics, fluid systems, motors, pumps, and industrial technology.",
+    "url": "https://theengineeringmindset.com/",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Visualization"
+    ]
+  },
+  {
+    "title": "Learn Engineering",
+    "description": "Visual engineering education covering mechanics, machines, manufacturing, thermodynamics, automotive systems, electrical systems, and engineering principles.",
+    "url": "https://learnengineering.org/",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Manufacturing",
+      "Visualization"
+    ]
+  },
+  {
+    "title": "Engineering LibreTexts - Materials",
+    "description": "Open engineering materials covering metallurgy, polymers, ceramics, composites, material properties, processing, and failure.",
+    "url": "https://eng.libretexts.org/Bookshelves/Materials_Science",
+    "tags": [
+      "Materials Science",
+      "Metallurgy",
+      "Manufacturing",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "MIT Materials Science and Engineering",
+    "description": "Open MIT resources covering crystal structures, phase diagrams, mechanical behavior, materials processing, polymers, metals, ceramics, and composites.",
+    "url": "https://ocw.mit.edu/search/?d=Materials%20Science%20and%20Engineering",
+    "tags": [
+      "Materials Science",
+      "Metallurgy",
+      "Mechanical Engineering",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "Aerospace Structures and Materials",
+    "description": "Open textbook covering aerospace structures, material behavior, loads, stress, fatigue, composites, and structural design.",
+    "url": "https://www.tudelft.nl/en/ae/education/aerospace-structures-and-materials",
+    "tags": [
+      "Aerospace",
+      "Materials",
+      "Structural Engineering",
+      "Mechanical Engineering"
+    ]
+  },
+  {
+    "title": "TU Delft OpenCourseWare",
+    "description": "Free university engineering courses covering mechanical engineering, aerospace engineering, manufacturing, materials, robotics, civil engineering, and design.",
+    "url": "https://ocw.tudelft.nl/",
+    "tags": [
+      "Engineering",
+      "Mechanical Engineering",
+      "Manufacturing",
+      "Courses"
+    ]
+  },
+  {
+    "title": "NPTEL Mechanical Engineering",
+    "description": "Free university engineering lectures covering manufacturing, machining, mechanical design, materials, thermodynamics, fluid mechanics, robotics, and production engineering.",
+    "url": "https://nptel.ac.in/courses",
+    "tags": [
+      "Mechanical Engineering",
+      "Manufacturing",
+      "Machining",
+      "Courses"
+    ]
+  },
+  {
+    "title": "NPTEL Manufacturing Processes",
+    "description": "University-level lecture courses covering machining, casting, forming, welding, manufacturing processes, production engineering, and machine tools.",
+    "url": "https://nptel.ac.in/courses",
+    "tags": [
+      "Manufacturing",
+      "Machining",
+      "Welding",
+      "Casting",
+      "Courses"
+    ]
+  },
+  {
+    "title": "NPTEL CAD/CAM",
+    "description": "Free engineering lectures covering computer-aided design, computer-aided manufacturing, CNC, geometric modeling, process planning, and manufacturing automation.",
+    "url": "https://nptel.ac.in/courses",
+    "tags": [
+      "CAD",
+      "CAM",
+      "CNC",
+      "Manufacturing",
+      "Courses"
+    ]
+  },
+  {
+    "title": "NPTEL Robotics",
+    "description": "Free engineering lectures covering robot kinematics, dynamics, control, industrial robots, automation, sensing, and robotic manufacturing.",
+    "url": "https://nptel.ac.in/courses",
+    "tags": [
+      "Robotics",
+      "Automation",
+      "Manufacturing",
+      "Controls"
+    ]
+  },
+  {
+    "title": "NPTEL Industrial Engineering",
+    "description": "Free courses covering production planning, operations research, quality control, manufacturing systems, optimization, and industrial engineering.",
+    "url": "https://nptel.ac.in/courses",
+    "tags": [
+      "Industrial Engineering",
+      "Manufacturing",
+      "Quality",
+      "Operations"
+    ]
+  },
+  {
+    "title": "MIT Additive Manufacturing",
+    "description": "Open MIT resources covering additive manufacturing processes, materials, design, process physics, and advanced manufacturing technologies.",
+    "url": "https://ocw.mit.edu/search/?q=additive%20manufacturing",
+    "tags": [
+      "Additive Manufacturing",
+      "3D Printing",
+      "Materials",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "America Makes Education",
+    "description": "Additive manufacturing education and workforce resources covering 3D printing technologies, materials, design, process development, and industrial applications.",
+    "url": "https://www.americamakes.us/",
+    "tags": [
+      "Additive Manufacturing",
+      "3D Printing",
+      "Engineering",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "DoE Advanced Manufacturing Office",
+    "description": "Government research and educational resources covering advanced manufacturing technologies, materials, industrial efficiency, process technologies, and smart manufacturing.",
+    "url": "https://www.energy.gov/",
+    "tags": [
+      "Advanced Manufacturing",
+      "Industrial Engineering",
+      "Materials",
+      "Energy"
+    ]
+  },
+  {
+    "title": "CESMII",
+    "description": "Smart manufacturing education and resources covering manufacturing data, industrial automation, energy efficiency, interoperability, and digital manufacturing systems.",
+    "url": "https://www.cesmii.org/",
+    "tags": [
+      "Smart Manufacturing",
+      "Industry 4.0",
+      "Automation",
+      "Digital Manufacturing"
+    ]
+  },
+  {
+    "title": "ISA Automation Resources",
+    "description": "Industrial automation resources covering instrumentation, process control, PLCs, industrial networking, cybersecurity, and automation engineering.",
+    "url": "https://www.isa.org/resources",
+    "tags": [
+      "Automation",
+      "Controls",
+      "PLC",
+      "Instrumentation",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "OpenPLC",
+    "description": "Open-source programmable logic controller software for learning and experimenting with industrial automation and IEC 61131-3 programming.",
+    "url": "https://autonomylogic.com/",
+    "tags": [
+      "PLC",
+      "Automation",
+      "Open Source",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "CODESYS",
+    "description": "Industrial automation development environment and educational resources for PLC programming, motion control, visualization, and industrial systems.",
+    "url": "https://www.codesys.com/",
+    "tags": [
+      "PLC",
+      "Automation",
+      "Controls",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "Factory I/O",
+    "description": "Interactive factory simulation environment for learning PLC programming, industrial automation, sensors, actuators, conveyors, and manufacturing systems.",
+    "url": "https://factoryio.com/",
+    "tags": [
+      "Automation",
+      "PLC",
+      "Simulation",
+      "Manufacturing"
+    ]
+  },
+  {
+    "title": "FlexSim",
+    "description": "3D discrete-event simulation software and educational resources for modeling manufacturing, logistics, warehouses, production lines, and operations.",
+    "url": "https://www.flexsim.com/",
+    "tags": [
+      "Manufacturing",
+      "Simulation",
+      "Industrial Engineering",
+      "Operations"
+    ]
+  },
+  {
+    "title": "AnyLogic",
+    "description": "Simulation platform and educational resources for modeling manufacturing, supply chains, logistics, production systems, and complex operations.",
+    "url": "https://www.anylogic.com/",
+    "tags": [
+      "Simulation",
+      "Manufacturing",
+      "Operations",
+      "Industrial Engineering"
+    ]
+  },
+  {
+    "title": "OpenModelica Manufacturing Simulation",
+    "description": "Open physical-system modeling environment applicable to manufacturing equipment, mechanical systems, controls, and industrial processes.",
+    "url": "https://openmodelica.org/",
+    "tags": [
+      "Manufacturing",
+      "Simulation",
+      "Controls",
+      "Engineering"
+    ]
+  },
+  {
+    "title": "PyBullet",
+    "description": "Open-source physics simulation environment useful for robotics, mechanism simulation, dynamics, control, and engineering experimentation.",
+    "url": "https://pybullet.org/",
+    "tags": [
+      "Robotics",
+      "Simulation",
+      "Dynamics",
+      "Mechanical Engineering"
+    ]
+  },
+  {
+    "title": "Project Chrono",
+    "description": "Open-source multiphysics simulation framework for mechanical systems, vehicle dynamics, robotics, granular materials, and engineering simulation.",
+    "url": "https://projectchrono.org/",
+    "tags": [
+      "Mechanical Engineering",
+      "Simulation",
+      "Dynamics",
+      "Robotics"
+    ]
+  },
+  {
+    "title": "MBDyn",
+    "description": "Open-source multibody dynamics simulation software for mechanical systems, vehicles, robotics, aerospace, and engineering research.",
+    "url": "https://www.mbdyn.org/",
+    "tags": [
+      "Mechanical Engineering",
+      "Dynamics",
+      "Simulation",
+      "Multibody"
+    ]
+  },
+  {
+    "title": "OpenFAST",
+    "description": "Open-source multiphysics engineering software for wind turbine simulation, structural dynamics, aerodynamics, controls, and renewable energy systems.",
+    "url": "https://www.nrel.gov/wind/nwtc/openfast.html",
+    "tags": [
+      "Mechanical Engineering",
+      "Simulation",
+      "Energy",
+      "Controls"
+    ]
+  },
+  {
+    "title": "NREL Engineering Resources",
+    "description": "Free research and engineering resources covering renewable energy systems, manufacturing, materials, controls, simulation, and computational engineering.",
+    "url": "https://www.nrel.gov/",
+    "tags": [
+      "Engineering",
+      "Energy",
+      "Simulation",
+      "Materials"
+    ]
+  },
+  {
+    "title": "OpenFAST",
+    "description": "Open-source wind turbine simulation framework combining aerodynamics, structural dynamics, hydrodynamics, control systems, and electrical systems.",
+    "url": "https://github.com/OpenFAST/openfast",
+    "tags": [
+      "Simulation",
+      "Mechanical Engineering",
+      "Controls",
+      "Energy"
+    ]
+  },
+
   {
     "title": "LibreTexts",
     "description": "Large collection of free open textbooks and learning materials covering mathematics, physics, chemistry, biology, engineering, and many other STEM disciplines.",

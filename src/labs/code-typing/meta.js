@@ -1,3 +1,5 @@
+import { lazy } from 'react';
+
 export default {
   label: 'Code Typing Studio',
   emoji: '⌨️',
@@ -14,4 +16,5 @@ export default {
   },
   order: 19,
   routes: ['/code-typing'],
+  component: lazy(() => import('./index.jsx')),
 }

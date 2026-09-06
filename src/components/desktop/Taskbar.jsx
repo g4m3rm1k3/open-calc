@@ -262,11 +262,21 @@ export default function Taskbar({ windows, onFocus }) {
 
         {taskbarStyle === 'win11' && <div className="flex-1 pointer-events-none" />}
 
-        <div className={`flex items-center pointer-events-auto ${
+        <div className={`flex items-center pointer-events-auto relative ${
           taskbarStyle === 'mac'
-            ? 'gap-3 px-4 py-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-2xl shadow-2xl'
+            ? 'gap-3 px-4 py-2'
             : 'gap-2'
         }`}>
+          {taskbarStyle === 'mac' && (
+            <div 
+              className="absolute bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-2xl shadow-2xl pointer-events-none"
+              style={{ 
+                top: '-4px', bottom: '-8px', left: '-20px', right: '-20px',
+                transform: 'perspective(400px) rotateX(45deg)', 
+                transformOrigin: 'bottom' 
+              }}
+            />
+          )}
           <motion.button
             data-tour="start-menu"
             whileHover={taskbarStyle === 'mac' ? macHoverProps.whileHover : { scale: 1.05 }}

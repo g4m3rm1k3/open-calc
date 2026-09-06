@@ -27,6 +27,15 @@ export default function ResourceLab({ onClose, onBack }) {
     }
   });
 
+  const [savedUrls, setSavedUrls] = useState(() => {
+    try {
+      const stored = localStorage.getItem('resourceLab_savedUrls');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
   const sidebarRef = useRef(null);
   
   const [sidebarScrollPos] = useState(() => {
@@ -100,6 +109,34 @@ export default function ResourceLab({ onClose, onBack }) {
       prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
     );
   };
+
+  const handleIframeLoad = (e) => {
+    try {
+      const currentUrl = e.target.contentWindow.location.href;
+      if (currentUrl && currentUrl !== 'about:blank' && activeResourceId !== null) {
+        setSavedUrls(prev => {
+          if (prev[activeResourceId] === currentUrl) return prev;
+          const next = { ...prev, [activeResourceId]: currentUrl };
+          localStorage.setItem('resourceLab_savedUrls', JSON.stringify(next));
+          return next;
+        });
+      }
+    } catch (err) {
+      // Browser blocked access due to cross-origin policies.
+    }
+  };
+
+  const resetUrl = () => {
+    if (!activeResource) return;
+    setSavedUrls(prev => {
+      const next = { ...prev };
+      delete next[activeResource.id];
+      localStorage.setItem('resourceLab_savedUrls', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const displayUrl = activeResource ? (savedUrls[activeResource.id] || activeResource.url) : '';
 
   return (
     <div className="flex h-full w-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans overflow-hidden">
@@ -202,14 +239,25 @@ export default function ResourceLab({ onClose, onBack }) {
                 </button>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm">{activeResource.title}</span>
-                  <span className="text-xs text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 max-w-[300px] truncate">
-                    {activeResource.url}
-                  </span>
+                  <div className="flex items-center group/url">
+                    <span className="text-xs text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 max-w-[300px] truncate" title={displayUrl}>
+                      {displayUrl}
+                    </span>
+                    {savedUrls[activeResource.id] && savedUrls[activeResource.id] !== activeResource.url && (
+                      <button 
+                        onClick={resetUrl}
+                        className="ml-2 text-xs text-slate-400 hover:text-indigo-500 opacity-0 group-hover/url:opacity-100 transition-opacity"
+                        title="Reset to original URL"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <a
-                  href={activeResource.url}
+                  href={displayUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-md text-slate-500 transition-colors flex items-center gap-1.5 text-xs font-medium"
@@ -231,7 +279,7 @@ export default function ResourceLab({ onClose, onBack }) {
                     This page cannot be viewed directly inside the lab because the page author does not believe in free and open-source education. They have explicitly blocked this site from being embedded.
                   </p>
                   <a
-                    href={activeResource.url}
+                    href={displayUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-sm transition-colors flex items-center gap-2"
@@ -242,7 +290,8 @@ export default function ResourceLab({ onClose, onBack }) {
                 </div>
               ) : (
                 <iframe
-                  src={activeResource.url}
+                  src={displayUrl}
+                  onLoad={handleIframeLoad}
                   className="w-full h-full border-none absolute inset-0 bg-white"
                   title={activeResource.title}
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
