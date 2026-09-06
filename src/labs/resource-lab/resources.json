@@ -8,6 +8,26 @@
       "Learning"
     ]
   },
+    {
+    "title": "Numerical methods with Python",
+    "description": "Numerical methods with Python book",
+    "url": "https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/Index.html",
+    "tags": [
+      "Mathametics",
+      "Python"
+    ]
+  },
+      {
+    "title": "Bayesian Econometics",
+    "description": "application of Bayesian statistical methods for econometric inference",
+    "url": "https://econ.pages.code.wm.edu/414/notes/docs/index.html",
+    "tags": [
+      "Mathametics",
+      "Python",
+      "Economics",
+      "Matplotlib"
+    ]
+  },
   {
     "title": "Data Oriented Design",
     "description": "This is the free, online, reduced version",
@@ -35,6 +55,17 @@
       "Blog"
     ]
   },
+    {
+    "title": "Python for Linear Algebra",
+    "description": "a showcase of how to use Python to do computations from linear algebra",
+    "url": "https://www.sfu.ca/~jtmulhol/py4math/linalg/",
+    "tags": [
+      "Python",
+      "Linear Algebra",
+      "Numpy",
+      "Sympy"
+    ]
+  },
   {
     "title": "MDN Web Docs",
     "description": "Resources for developers, by developers",
@@ -42,6 +73,32 @@
     "tags": [
       "Web Dev",
       "Reference"
+    ]
+  },
+    {
+    "title": "Ask Python",
+    "description": "Everything Python, A Single Platform",
+    "url": "https://www.askpython.com/",
+    "tags": [
+      "Python"
+    ]
+  },
+      {
+    "title": "Discrete Math",
+    "description": "result of work by mathematics and information technology professors at Georgia Gwinnett College",
+    "url": "https://ggc-discrete-math.github.io/index.html#_about_this_text",
+    "tags": [
+      "Python",
+      "Discrete Mathematics"
+    ]
+  },
+        {
+    "title": "RuneStone Academy",
+    "description": "Free Online Textbooks for Math and Computer Science",
+    "url": "https://landing.runestone.academy/",
+    "tags": [
+      "Mathematics",
+      "Computer Science"
     ]
   },
   {
@@ -560,5 +617,719 @@
     "description": "Free peer-reviewed textbooks covering math, physics, chemistry, and more",
     "url": "https://openstax.org/subjects",
     "tags": ["STEM", "Book", "Textbooks"]
+  },
+  {
+    "title": "LibreTexts",
+    "description": "Large collection of free open textbooks and learning materials covering mathematics, physics, chemistry, biology, engineering, and many other STEM disciplines.",
+    "url": "https://libretexts.org/",
+    "tags": ["STEM", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "Open Textbook Library",
+    "description": "Collection of openly licensed college textbooks covering mathematics, science, engineering, computer science, and other academic subjects.",
+    "url": "https://open.umn.edu/opentextbooks/",
+    "tags": ["STEM", "Open Textbooks", "College"]
+  },
+  {
+    "title": "BCcampus Open Collection",
+    "description": "Free and openly licensed post-secondary textbooks covering mathematics, science, engineering, computing, and technical subjects.",
+    "url": "https://open.bccampus.ca/",
+    "tags": ["STEM", "Open Textbooks", "College"]
+  },
+  {
+    "title": "Siyavula",
+    "description": "Free open educational resources for mathematics and science, particularly useful for secondary education.",
+    "url": "https://www.siyavula.com/",
+    "tags": ["Mathematics", "Physics", "Chemistry", "Biology", "Open Education"]
+  },
+  {
+    "title": "CK-12",
+    "description": "Free digital textbooks, simulations, exercises, and adaptive learning resources for K-12 mathematics and science.",
+    "url": "https://www.ck12.org/",
+    "tags": ["STEM", "K-12", "Interactive", "Textbooks"]
+  },
+  {
+    "title": "MERLOT",
+    "description": "Large collection of free and open learning materials, simulations, textbooks, courses, and educational resources.",
+    "url": "https://www.merlot.org/",
+    "tags": ["STEM", "Open Education", "Resources"]
+  },
+  {
+    "title": "OER Commons",
+    "description": "Open educational resource library containing free textbooks, lessons, simulations, activities, and courses across STEM disciplines.",
+    "url": "https://www.oercommons.org/",
+    "tags": ["STEM", "Open Education", "Resources"]
+  },
+  {
+    "title": "Math LibreTexts",
+    "description": "Open mathematics textbook collection covering algebra, calculus, linear algebra, differential equations, statistics, and advanced mathematics.",
+    "url": "https://math.libretexts.org/",
+    "tags": ["Mathematics", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "Mathematics LibreTexts",
+    "description": "Extensive open mathematics library containing textbooks, worked examples, exercises, and advanced mathematical topics.",
+    "url": "https://math.libretexts.org/",
+    "tags": ["Mathematics", "Textbooks", "Exercises"]
+  },
+  {
+    "title": "Mathigon",
+    "description": "Interactive mathematics platform using visualizations, interactive lessons, puzzles, and explorations to teach mathematical concepts.",
+    "url": "https://mathigon.org/",
+    "tags": ["Mathematics", "Interactive", "Visualization"]
+  },
+  {
+    "title": "GeoGebra",
+    "description": "Interactive mathematics platform for geometry, algebra, graphing, calculus, statistics, and 3D mathematics.",
+    "url": "https://www.geogebra.org/",
+    "tags": ["Mathematics", "Geometry", "Calculus", "Visualization", "Interactive"]
+  },
+  {
+    "title": "Desmos",
+    "description": "Interactive graphing and mathematical visualization tools for algebra, functions, geometry, statistics, and calculus.",
+    "url": "https://www.desmos.com/",
+    "tags": ["Mathematics", "Graphing", "Visualization", "Interactive"]
+  },
+  {
+    "title": "Wolfram Demonstrations Project",
+    "description": "Large collection of interactive mathematical, scientific, engineering, and technical demonstrations.",
+    "url": "https://demonstrations.wolfram.com/",
+    "tags": ["Mathematics", "Science", "Visualization", "Interactive"]
+  },
+  {
+    "title": "NRICH",
+    "description": "Free mathematics problems and activities designed around mathematical reasoning, problem solving, and exploration.",
+    "url": "https://nrich.maths.org/",
+    "tags": ["Mathematics", "Problem Solving", "K-12"]
+  },
+  {
+    "title": "Math Open Reference",
+    "description": "Interactive reference for geometry and mathematical constructions.",
+    "url": "https://www.mathopenref.com/",
+    "tags": ["Mathematics", "Geometry", "Interactive"]
+  },
+  {
+    "title": "Open Source Physics",
+    "description": "Open-source physics simulations and computational modeling tools for exploring mechanics, electricity, waves, thermodynamics, and other physics topics.",
+    "url": "https://www.compadre.org/osp/",
+    "tags": ["Physics", "Simulation", "Computational Science"]
+  },
+  {
+    "title": "MyPhysicsLab",
+    "description": "Interactive physics simulations covering mechanics, oscillations, collisions, electricity, and dynamical systems.",
+    "url": "https://www.myphysicslab.com/",
+    "tags": ["Physics", "Simulation", "Interactive"]
+  },
+  {
+    "title": "Falstad Physics Applets",
+    "description": "Interactive browser-based physics simulations covering circuits, waves, mechanics, optics, electromagnetism, and other physical systems.",
+    "url": "https://www.falstad.com/mathphysics.html",
+    "tags": ["Physics", "Simulation", "Electronics", "Interactive"]
+  },
+  {
+    "title": "The Physics Classroom",
+    "description": "Free tutorials, simulations, problem sets, and conceptual resources for introductory physics.",
+    "url": "https://www.physicsclassroom.com/",
+    "tags": ["Physics", "Tutorials", "Simulation", "Problem Solving"]
+  },
+  {
+    "title": "HyperPhysics",
+    "description": "Compact concept map and reference covering mechanics, electricity, magnetism, thermodynamics, relativity, quantum physics, and other physics topics.",
+    "url": "http://hyperphysics.phy-astr.gsu.edu/",
+    "tags": ["Physics", "Reference"]
+  },
+  {
+    "title": "Physics LibreTexts",
+    "description": "Open physics textbooks and reference materials covering introductory through advanced physics.",
+    "url": "https://phys.libretexts.org/",
+    "tags": ["Physics", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "Astronomy LibreTexts",
+    "description": "Free open astronomy textbooks and educational materials covering observational astronomy, astrophysics, cosmology, and planetary science.",
+    "url": "https://astro.libretexts.org/",
+    "tags": ["Astronomy", "Physics", "Open Textbooks"]
+  },
+  {
+    "title": "NASA STEM",
+    "description": "Free educational resources, activities, lessons, datasets, and projects covering space science, Earth science, engineering, physics, and mathematics.",
+    "url": "https://www.nasa.gov/stem/",
+    "tags": ["STEM", "Space", "Physics", "Engineering", "Earth Science"]
+  },
+  {
+    "title": "NASA Eyes",
+    "description": "Interactive NASA visualization applications for exploring the solar system, Earth, exoplanets, spacecraft, and space missions.",
+    "url": "https://eyes.nasa.gov/",
+    "tags": ["Astronomy", "Space", "Simulation", "Visualization"]
+  },
+  {
+    "title": "Stellarium",
+    "description": "Free open-source planetarium software that provides a realistic 3D sky simulation.",
+    "url": "https://stellarium.org/",
+    "tags": ["Astronomy", "Simulation", "Open Source", "Visualization"]
+  },
+  {
+    "title": "Chemistry LibreTexts",
+    "description": "Extensive collection of free chemistry textbooks and reference materials covering general, organic, inorganic, physical, analytical, and biochemistry.",
+    "url": "https://chem.libretexts.org/",
+    "tags": ["Chemistry", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "ChemCollective",
+    "description": "Free virtual chemistry laboratory containing simulations, laboratory exercises, tutorials, and problem-based activities.",
+    "url": "https://chemcollective.org/",
+    "tags": ["Chemistry", "Virtual Lab", "Simulation", "Interactive"]
+  },
+  {
+    "title": "MolView",
+    "description": "Browser-based molecular visualization and chemistry modeling tool for exploring molecular structures and compounds.",
+    "url": "https://molview.org/",
+    "tags": ["Chemistry", "Molecular Modeling", "Visualization", "Interactive"]
+  },
+  {
+    "title": "PubChem",
+    "description": "Free database of chemical molecules, properties, structures, biological activities, and chemical information maintained by the National Library of Medicine.",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/",
+    "tags": ["Chemistry", "Database", "Reference", "Molecular Science"]
+  },
+  {
+    "title": "Periodic Table - Royal Society of Chemistry",
+    "description": "Interactive periodic table containing element properties, history, uses, and chemical information.",
+    "url": "https://www.rsc.org/periodic-table",
+    "tags": ["Chemistry", "Periodic Table", "Reference", "Interactive"]
+  },
+  {
+    "title": "Biology LibreTexts",
+    "description": "Free open biology textbooks and educational materials covering cell biology, genetics, evolution, ecology, physiology, and molecular biology.",
+    "url": "https://bio.libretexts.org/",
+    "tags": ["Biology", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "HHMI BioInteractive",
+    "description": "Free biology educational resources including interactive activities, virtual labs, videos, datasets, and classroom investigations.",
+    "url": "https://www.biointeractive.org/",
+    "tags": ["Biology", "Virtual Lab", "Interactive", "Genetics"]
+  },
+  {
+    "title": "Learn.Genetics",
+    "description": "Interactive genetics and biology educational resources including simulations, animations, virtual laboratories, and tutorials.",
+    "url": "https://learn.genetics.utah.edu/",
+    "tags": ["Biology", "Genetics", "Interactive", "Virtual Lab"]
+  },
+  {
+    "title": "BioNumbers",
+    "description": "Quantitative biology database containing measured biological quantities and numerical data used for scientific modeling.",
+    "url": "https://bionumbers.hms.harvard.edu/",
+    "tags": ["Biology", "Quantitative Biology", "Database", "Data"]
+  },
+  {
+    "title": "NCBI Bookshelf",
+    "description": "Free collection of biomedical and life science books and documents from the National Library of Medicine.",
+    "url": "https://www.ncbi.nlm.nih.gov/books/",
+    "tags": ["Biology", "Medicine", "Reference", "Books"]
+  },
+  {
+    "title": "iBiology",
+    "description": "Free lectures, seminars, and educational videos from scientists covering modern biology and biomedical research.",
+    "url": "https://www.ibiology.org/",
+    "tags": ["Biology", "Research", "Lectures"]
+  },
+  {
+    "title": "EMBL-EBI Training",
+    "description": "Free training resources for bioinformatics, computational biology, genomics, structural biology, and biological databases.",
+    "url": "https://www.ebi.ac.uk/training/",
+    "tags": ["Bioinformatics", "Biology", "Computational Biology", "Genomics"]
+  },
+  {
+    "title": "Earth Science LibreTexts",
+    "description": "Free open textbooks and educational resources covering geology, meteorology, oceanography, and Earth science.",
+    "url": "https://geo.libretexts.org/",
+    "tags": ["Earth Science", "Geology", "Open Textbooks"]
+  },
+  {
+    "title": "USGS Education",
+    "description": "Free Earth science educational resources covering geology, earthquakes, volcanoes, water, ecosystems, natural hazards, and mapping.",
+    "url": "https://www.usgs.gov/educational-resources",
+    "tags": ["Earth Science", "Geology", "Environmental Science"]
+  },
+  {
+    "title": "NOAA Education",
+    "description": "Free educational resources covering oceans, atmosphere, climate, weather, marine science, and Earth systems.",
+    "url": "https://www.noaa.gov/education",
+    "tags": ["Earth Science", "Climate", "Oceanography", "Meteorology"]
+  },
+  {
+    "title": "Climate Interactive",
+    "description": "Interactive climate simulations and systems-thinking tools for exploring climate policy, emissions, energy, and global warming.",
+    "url": "https://www.climateinteractive.org/",
+    "tags": ["Climate Science", "Simulation", "Systems Thinking"]
+  },
+  {
+    "title": "En-ROADS",
+    "description": "Interactive climate simulator for exploring how energy, economic, technological, and policy decisions affect climate outcomes.",
+    "url": "https://en-roads.climateinteractive.org/",
+    "tags": ["Climate Science", "Simulation", "Energy", "Systems Modeling"]
+  },
+  {
+    "title": "Engineering LibreTexts",
+    "description": "Open engineering textbooks and reference materials covering mechanical, electrical, chemical, civil, materials, and other engineering disciplines.",
+    "url": "https://eng.libretexts.org/",
+    "tags": ["Engineering", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "LearnChemE",
+    "description": "Free chemical engineering educational resources including interactive simulations, screencasts, concept questions, and process models.",
+    "url": "https://learncheme.com/",
+    "tags": ["Chemical Engineering", "Simulation", "Process Engineering"]
+  },
+  {
+    "title": "NPTEL",
+    "description": "Free university-level courses and lectures from Indian Institutes of Technology and other institutions covering engineering, science, mathematics, and computer science.",
+    "url": "https://nptel.ac.in/",
+    "tags": ["Engineering", "STEM", "Courses", "Lectures"]
+  },
+  {
+    "title": "OpenCourseWare Consortium",
+    "description": "Global network and directory of institutions publishing free and open course materials.",
+    "url": "https://www.ocwconsortium.org/",
+    "tags": ["STEM", "Courses", "Open Education"]
+  },
+  {
+    "title": "Open Yale Courses",
+    "description": "Free university courses from Yale with recorded lectures, transcripts, and supporting course materials.",
+    "url": "https://oyc.yale.edu/",
+    "tags": ["STEM", "University Courses", "Lectures"]
+  },
+  {
+    "title": "MIT Open Learning Library",
+    "description": "Free interactive MIT learning experiences combining course material with exercises and automatically graded assessments.",
+    "url": "https://openlearninglibrary.mit.edu/",
+    "tags": ["STEM", "Courses", "Interactive", "Assessment"]
+  },
+  {
+    "title": "Stanford Engineering Everywhere",
+    "description": "Free Stanford engineering courses including lectures, assignments, exams, and course materials.",
+    "url": "https://see.stanford.edu/",
+    "tags": ["Engineering", "Computer Science", "Courses", "University"]
+  },
+  {
+    "title": "Stanford Online",
+    "description": "Free online educational materials and courses from Stanford covering engineering, computer science, mathematics, and science.",
+    "url": "https://online.stanford.edu/free-courses",
+    "tags": ["STEM", "Courses", "University"]
+  },
+  {
+    "title": "OpenLearn",
+    "description": "Free courses and educational resources from The Open University covering science, mathematics, technology, engineering, and computing.",
+    "url": "https://www.open.edu/openlearn/",
+    "tags": ["STEM", "Courses", "Open Education"]
+  },
+  {
+    "title": "Saylor Academy",
+    "description": "Free self-paced courses covering mathematics, computer science, engineering-related subjects, and other academic disciplines.",
+    "url": "https://learn.saylor.org/",
+    "tags": ["STEM", "Courses", "Self-Study"]
+  },
+  {
+    "title": "Free Computer Science",
+    "description": "Large directory of free computer science courses, books, tutorials, lectures, and programming resources.",
+    "url": "https://github.com/ossu/computer-science",
+    "tags": ["Computer Science", "Curriculum", "Self-Study"]
+  },
+  {
+    "title": "Teach Yourself Computer Science",
+    "description": "Structured guide to studying the major foundations of computer science using free books, courses, and lectures.",
+    "url": "https://teachyourselfcs.com/",
+    "tags": ["Computer Science", "Curriculum", "Self-Study"]
+  },
+  {
+    "title": "Full Stack Open",
+    "description": "Free university-level web development course covering modern JavaScript, React, Node.js, APIs, databases, testing, and TypeScript.",
+    "url": "https://fullstackopen.com/",
+    "tags": ["Computer Science", "Web Development", "JavaScript", "React"]
+  },
+  {
+    "title": "CS50 Python",
+    "description": "Free Harvard course introducing programming with Python, testing, debugging, libraries, regular expressions, classes, and file handling.",
+    "url": "https://cs50.harvard.edu/python/",
+    "tags": ["Python", "Computer Science", "Course", "Programming"]
+  },
+  {
+    "title": "CS50 SQL",
+    "description": "Free Harvard course teaching relational database concepts and SQL through practical programming exercises.",
+    "url": "https://cs50.harvard.edu/sql/",
+    "tags": ["SQL", "Databases", "Computer Science", "Course"]
+  },
+  {
+    "title": "CS50 Web",
+    "description": "Free Harvard course covering web programming with Python, JavaScript, SQL, Django, APIs, testing, and application architecture.",
+    "url": "https://cs50.harvard.edu/web/",
+    "tags": ["Web Development", "Python", "JavaScript", "Course"]
+  },
+  {
+    "title": "Berkeley CS61A",
+    "description": "Free introductory computer science course emphasizing programming, abstraction, higher-order functions, recursion, and data structures.",
+    "url": "https://cs61a.org/",
+    "tags": ["Computer Science", "Programming", "Python", "Course"]
+  },
+  {
+    "title": "Berkeley CS61B",
+    "description": "Free course covering data structures, algorithms, software engineering, and implementation techniques.",
+    "url": "https://sp24.datastructur.es/",
+    "tags": ["Computer Science", "Algorithms", "Data Structures"]
+  },
+  {
+    "title": "Stanford Algorithms",
+    "description": "University-level materials covering algorithm design, graph algorithms, divide-and-conquer, greedy algorithms, and dynamic programming.",
+    "url": "https://web.stanford.edu/class/cs161/",
+    "tags": ["Algorithms", "Computer Science", "Course"]
+  },
+  {
+    "title": "Nand2Tetris",
+    "description": "Hands-on project sequence that builds a complete computer system from logic gates through CPU, assembler, virtual machine, compiler, and operating system.",
+    "url": "https://www.nand2tetris.org/",
+    "tags": ["Computer Architecture", "Systems", "Programming", "Projects"]
+  },
+  {
+    "title": "OSTEP - Operating Systems: Three Easy Pieces",
+    "description": "Free open textbook covering virtualization, concurrency, persistence, and core operating-system concepts.",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/",
+    "tags": ["Operating Systems", "Computer Science", "Open Textbook"]
+  },
+  {
+    "title": "Computer Networking: A Top-Down Approach Resources",
+    "description": "Supplementary free networking resources and teaching materials covering protocols, applications, transport, routing, and network architecture.",
+    "url": "https://gaia.cs.umass.edu/kurose_ross/index.php",
+    "tags": ["Networking", "Computer Science", "Reference"]
+  },
+  {
+    "title": "Computer Systems: A Programmer's Perspective",
+    "description": "Online educational resources supporting the study of computer systems, machine-level programming, memory, linking, exceptional control flow, and architecture.",
+    "url": "https://csapp.cs.cmu.edu/",
+    "tags": ["Computer Systems", "C", "Computer Architecture"]
+  },
+  {
+    "title": "MIT Missing Semester",
+    "description": "Free MIT course teaching practical computing tools including shell usage, editors, version control, debugging, and command-line workflows.",
+    "url": "https://missing.csail.mit.edu/",
+    "tags": ["Computer Science", "Linux", "Developer Tools", "Systems"]
+  },
+  {
+    "title": "Pro Git",
+    "description": "Free online book covering Git from basic usage through branching, remotes, internals, and advanced workflows.",
+    "url": "https://git-scm.com/book/en/v2",
+    "tags": ["Software Engineering", "Git", "Book"]
+  },
+  {
+    "title": "Full Stack Open GraphQL",
+    "description": "Free educational material covering GraphQL, queries, schemas, APIs, and modern application development.",
+    "url": "https://fullstackopen.com/en/part8/",
+    "tags": ["GraphQL", "Web Development", "APIs"]
+  },
+  {
+    "title": "Open Source Computer Science",
+    "description": "Community-maintained collection of free computer science educational resources and curricula.",
+    "url": "https://github.com/ForrestKnight/open-source-cs",
+    "tags": ["Computer Science", "Curriculum", "Open Source"]
+  },
+  {
+    "title": "Open Source Society University - Mathematics",
+    "description": "Free mathematics courses and resources integrated into a broader self-taught computer science curriculum.",
+    "url": "https://github.com/ossu/computer-science",
+    "tags": ["Mathematics", "Computer Science", "Curriculum"]
+  },
+  {
+    "title": "The Missing Semester",
+    "description": "Practical computing curriculum covering shell tools, version control, editors, debugging, security, and developer workflows.",
+    "url": "https://missing.csail.mit.edu/",
+    "tags": ["Computer Science", "Software Engineering", "Tools"]
+  },
+  {
+    "title": "CS Primer",
+    "description": "Interactive computer science learning resources focused on programming, algorithms, data structures, and technical foundations.",
+    "url": "https://csprimer.com/",
+    "tags": ["Computer Science", "Algorithms", "Interactive"]
+  },
+  {
+    "title": "Roadmap.sh",
+    "description": "Community-maintained learning roadmaps for programming, software engineering, DevOps, computer science, and related technologies.",
+    "url": "https://roadmap.sh/",
+    "tags": ["Computer Science", "Software Engineering", "Curriculum"]
+  },
+  {
+    "title": "MDN Curriculum",
+    "description": "Structured curriculum for learning modern web development from foundational HTML, CSS, and JavaScript through advanced development concepts.",
+    "url": "https://developer.mozilla.org/en-US/curriculum/",
+    "tags": ["Web Development", "JavaScript", "HTML", "CSS", "Curriculum"]
+  },
+  {
+    "title": "Open Source Physics Tracker",
+    "description": "Free video analysis and modeling software for studying motion and extracting quantitative physics measurements from video.",
+    "url": "https://physlets.org/tracker/",
+    "tags": ["Physics", "Video Analysis", "Measurement", "Open Source"]
+  },
+  {
+    "title": "Tracker Video Analysis",
+    "description": "Open-source physics tool for analyzing motion in video and constructing quantitative models from experimental observations.",
+    "url": "https://opensourcephysics.github.io/tracker-website/",
+    "tags": ["Physics", "Simulation", "Experiment", "Open Source"]
+  },
+  {
+    "title": "GeoGebra Physics",
+    "description": "Interactive mathematics and physics constructions for modeling functions, vectors, mechanics, geometry, and physical systems.",
+    "url": "https://www.geogebra.org/materials",
+    "tags": ["Physics", "Mathematics", "Simulation", "Visualization"]
+  },
+  {
+    "title": "CircuitLab Educational Resources",
+    "description": "Online circuit analysis and schematic resources useful for exploring electrical circuits and electronics.",
+    "url": "https://www.circuitlab.com/",
+    "tags": ["Electronics", "Electrical Engineering", "Circuits"]
+  },
+  {
+    "title": "Falstad Circuit Simulator",
+    "description": "Interactive circuit simulator that allows students to construct and observe electrical circuits in real time.",
+    "url": "https://www.falstad.com/circuit/",
+    "tags": ["Electronics", "Circuits", "Simulation", "Interactive"]
+  },
+  {
+    "title": "LTspice",
+    "description": "Free SPICE-based circuit simulation software for analyzing analog and switching circuits.",
+    "url": "https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html",
+    "tags": ["Electronics", "Circuit Simulation", "Electrical Engineering"]
+  },
+  {
+    "title": "KiCad",
+    "description": "Free open-source electronics design automation suite for schematics, PCB layout, simulation, and board design.",
+    "url": "https://www.kicad.org/",
+    "tags": ["Electronics", "PCB", "Electrical Engineering", "Open Source"]
+  },
+  {
+    "title": "GNU Radio",
+    "description": "Free open-source software toolkit for software-defined radio and signal-processing experiments.",
+    "url": "https://www.gnuradio.org/",
+    "tags": ["Electrical Engineering", "Signal Processing", "Radio", "Open Source"]
+  },
+  {
+    "title": "Octave",
+    "description": "Free open-source numerical computing environment compatible with many MATLAB workflows.",
+    "url": "https://octave.org/",
+    "tags": ["Mathematics", "Numerical Computing", "Engineering", "Programming"]
+  },
+  {
+    "title": "SciPy",
+    "description": "Open-source Python library for scientific computing including optimization, integration, interpolation, signal processing, statistics, and linear algebra.",
+    "url": "https://scipy.org/",
+    "tags": ["Python", "Scientific Computing", "Mathematics", "Engineering"]
+  },
+  {
+    "title": "NumPy",
+    "description": "Core open-source Python library for numerical computing, multidimensional arrays, vectorized operations, and scientific programming.",
+    "url": "https://numpy.org/",
+    "tags": ["Python", "Numerical Computing", "Linear Algebra"]
+  },
+  {
+    "title": "SymPy",
+    "description": "Open-source Python computer algebra system for symbolic mathematics, calculus, algebra, matrices, and equation manipulation.",
+    "url": "https://www.sympy.org/",
+    "tags": ["Python", "Mathematics", "Symbolic Mathematics"]
+  },
+  {
+    "title": "Matplotlib",
+    "description": "Open-source Python visualization library for plotting mathematical functions, scientific data, simulations, and experiments.",
+    "url": "https://matplotlib.org/",
+    "tags": ["Python", "Visualization", "Scientific Computing"]
+  },
+  {
+    "title": "Jupyter",
+    "description": "Open-source interactive computing environment for combining executable code, mathematics, visualizations, and explanatory text.",
+    "url": "https://jupyter.org/",
+    "tags": ["Python", "Scientific Computing", "Interactive", "Data Science"]
+  },
+  {
+    "title": "Project Jupyter - Try Jupyter",
+    "description": "Browser-based environment for experimenting with Jupyter notebooks without installing software.",
+    "url": "https://jupyter.org/try",
+    "tags": ["Python", "Interactive", "Scientific Computing"]
+  },
+  {
+    "title": "Scikit-learn",
+    "description": "Open-source Python machine learning library providing algorithms for classification, regression, clustering, dimensionality reduction, and model evaluation.",
+    "url": "https://scikit-learn.org/",
+    "tags": ["Machine Learning", "Python", "Data Science"]
+  },
+  {
+    "title": "PyTorch",
+    "description": "Open-source machine learning framework for tensor computation, neural networks, scientific computing, and deep learning.",
+    "url": "https://pytorch.org/",
+    "tags": ["Machine Learning", "Python", "AI", "Scientific Computing"]
+  },
+  {
+    "title": "TensorFlow",
+    "description": "Open-source machine learning platform for numerical computation, neural networks, and large-scale machine learning.",
+    "url": "https://www.tensorflow.org/",
+    "tags": ["Machine Learning", "Python", "AI"]
+  },
+  {
+    "title": "DeepLearning.AI Short Courses",
+    "description": "Free educational courses and tutorials covering machine learning, generative AI, neural networks, and modern AI development.",
+    "url": "https://www.deeplearning.ai/courses/",
+    "tags": ["Machine Learning", "AI", "Courses"]
+  },
+  {
+    "title": "Dive into Deep Learning",
+    "description": "Interactive open-source textbook combining mathematical explanations, code, experiments, and executable notebooks for deep learning.",
+    "url": "https://d2l.ai/",
+    "tags": ["Machine Learning", "Deep Learning", "Python", "Interactive"]
+  },
+  {
+    "title": "Mathematics for Machine Learning",
+    "description": "Free educational materials connecting linear algebra, calculus, probability, and optimization to machine learning.",
+    "url": "https://mml-book.github.io/",
+    "tags": ["Mathematics", "Machine Learning", "Linear Algebra", "Calculus"]
+  },
+  {
+    "title": "Seeing Theory",
+    "description": "Interactive visual introduction to probability and statistics covering probability distributions, Bayesian inference, regression, and statistical concepts.",
+    "url": "https://seeing-theory.brown.edu/",
+    "tags": ["Statistics", "Probability", "Mathematics", "Interactive"]
+  },
+  {
+    "title": "StatQuest",
+    "description": "Free visual explanations of statistics, probability, machine learning, and data science concepts.",
+    "url": "https://statquest.org/",
+    "tags": ["Statistics", "Machine Learning", "Data Science", "Visualization"]
+  },
+  {
+    "title": "OpenIntro",
+    "description": "Free open statistics textbooks and educational resources for introductory statistics and data analysis.",
+    "url": "https://www.openintro.org/",
+    "tags": ["Statistics", "Data Science", "Open Textbooks"]
+  },
+  {
+    "title": "An Introduction to Statistical Learning",
+    "description": "Free textbook and supporting materials introducing statistical learning, regression, classification, resampling, tree methods, and unsupervised learning.",
+    "url": "https://www.statlearning.com/",
+    "tags": ["Statistics", "Machine Learning", "Data Science", "Book"]
+  },
+  {
+    "title": "Think Stats",
+    "description": "Free book teaching statistics through computational thinking and Python programming.",
+    "url": "https://greenteapress.com/thinkstats2/html/",
+    "tags": ["Statistics", "Python", "Data Science", "Book"]
+  },
+  {
+    "title": "Think Bayes",
+    "description": "Free book teaching Bayesian statistics through computational examples and Python.",
+    "url": "https://allendowney.github.io/ThinkBayes2/",
+    "tags": ["Statistics", "Bayesian Statistics", "Python", "Book"]
+  },
+  {
+    "title": "Think Complexity",
+    "description": "Free computational exploration of algorithms, graphs, cellular automata, networks, and complex systems.",
+    "url": "https://greenteapress.com/complexity2/html/",
+    "tags": ["Computer Science", "Mathematics", "Complex Systems", "Python"]
+  },
+  {
+    "title": "Think DSP",
+    "description": "Free introduction to digital signal processing using Python, covering signals, Fourier transforms, filtering, and audio analysis.",
+    "url": "https://greenteapress.com/thinkdsp/html/",
+    "tags": ["Signal Processing", "Python", "Mathematics", "Engineering"]
+  },
+  {
+    "title": "Think Stats",
+    "description": "Computational introduction to statistics using Python and real-world data analysis.",
+    "url": "https://greenteapress.com/thinkstats2/html/",
+    "tags": ["Statistics", "Python", "Data Science"]
+  },
+  {
+    "title": "Open Source Machine Learning",
+    "description": "Community-maintained collection of free machine learning courses, books, tutorials, datasets, and educational resources.",
+    "url": "https://github.com/josephmisiti/awesome-machine-learning",
+    "tags": ["Machine Learning", "AI", "Resources"]
+  },
+  {
+    "title": "Awesome Scientific Computing",
+    "description": "Curated collection of open-source scientific computing libraries, tools, software, datasets, and educational resources.",
+    "url": "https://github.com/nschloe/awesome-scientific-computing",
+    "tags": ["Scientific Computing", "Programming", "Engineering", "Resources"]
+  },
+  {
+    "title": "Awesome Open Source STEM",
+    "description": "Curated collection of open-source tools, educational resources, simulations, software, and projects for science, technology, engineering, and mathematics.",
+    "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
+    "tags": ["STEM", "Open Source", "Resources"]
+  },
+  {
+    "title": "Project Gutenberg",
+    "description": "Free digital library containing thousands of public-domain books, including historical mathematics, science, engineering, and technical texts.",
+    "url": "https://www.gutenberg.org/",
+    "tags": ["STEM", "Books", "Public Domain"]
+  },
+  {
+    "title": "Internet Archive",
+    "description": "Nonprofit digital library providing access to books, technical documents, software, datasets, educational media, and historical scientific material.",
+    "url": "https://archive.org/",
+    "tags": ["STEM", "Digital Library", "Books", "Research"]
+  },
+  {
+    "title": "Wikibooks",
+    "description": "Free community-written textbooks and manuals covering mathematics, science, programming, engineering, and technical subjects.",
+    "url": "https://www.wikibooks.org/",
+    "tags": ["STEM", "Open Textbooks", "Reference"]
+  },
+  {
+    "title": "Wikiversity",
+    "description": "Free collaborative learning environment containing courses, lessons, learning projects, and educational resources across STEM disciplines.",
+    "url": "https://www.wikiversity.org/",
+    "tags": ["STEM", "Courses", "Open Education"]
+  },
+  {
+    "title": "Wikipedia Science Portals",
+    "description": "Extensive free reference material covering mathematics, physics, chemistry, biology, engineering, computer science, and other scientific disciplines.",
+    "url": "https://en.wikipedia.org/wiki/Portal:Science",
+    "tags": ["STEM", "Reference", "Encyclopedia"]
+  },
+  {
+    "title": "ScienceDirect Open Access",
+    "description": "Collection of openly accessible scientific and engineering research articles and educational material.",
+    "url": "https://www.sciencedirect.com/browse/open-access",
+    "tags": ["Science", "Engineering", "Research", "Open Access"]
+  },
+  {
+    "title": "arXiv",
+    "description": "Free open-access repository of research papers in physics, mathematics, computer science, statistics, quantitative biology, and related fields.",
+    "url": "https://arxiv.org/",
+    "tags": ["Research", "Mathematics", "Physics", "Computer Science", "Open Access"]
+  },
+  {
+    "title": "MIT OpenCourseWare",
+    "description": "Free MIT course materials spanning mathematics, physics, chemistry, biology, engineering, computer science, economics, and many other disciplines.",
+    "url": "https://ocw.mit.edu/",
+    "tags": ["STEM", "University Courses", "Open Education"]
+  },
+  {
+    "title": "MIT OCW Scholar",
+    "description": "Structured MIT courses combining lectures, problem sets, exams, and supporting material for self-directed study.",
+    "url": "https://ocw.mit.edu/courses/ocw-scholar/",
+    "tags": ["STEM", "Courses", "University", "Self-Study"]
+  },
+  {
+    "title": "OpenStax",
+    "description": "Free peer-reviewed and openly licensed textbooks covering mathematics, physics, chemistry, biology, astronomy, statistics, and other STEM fields.",
+    "url": "https://openstax.org/subjects",
+    "tags": ["STEM", "Open Textbooks", "College"]
+  },
+  {
+    "title": "PhET Interactive Simulations",
+    "description": "Free research-based interactive simulations for physics, chemistry, mathematics, earth science, and biology.",
+    "url": "https://phet.colorado.edu/",
+    "tags": ["STEM", "Simulation", "Physics", "Chemistry", "Mathematics", "Biology"]
+  },
+  {
+    "title": "Explorable Explanations",
+    "description": "Collection of interactive explanations that let learners explore mathematical, scientific, and computational concepts through direct manipulation.",
+    "url": "https://explorabl.es/",
+    "tags": ["STEM", "Interactive", "Visualization"]
   }
   ]
